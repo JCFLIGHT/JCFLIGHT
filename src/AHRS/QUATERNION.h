@@ -1,6 +1,6 @@
-#pragma once
+#ifndef QUATERNION_H_
+#define QUATERNION_H_
 
-#include <stdint.h>
 #include "VECTOR.h"
 
 typedef struct
@@ -22,7 +22,7 @@ static inline Struct_Quaternion *QuaternionInitUnit(Struct_Quaternion *Result)
 
 static inline float QuaternionNormalizedSquared(const Struct_Quaternion *Quaternion)
 {
-    return sq(Quaternion->q0) + sq(Quaternion->q1) + sq(Quaternion->q2) + sq(Quaternion->q3);
+    return SquareFloat(Quaternion->q0) + SquareFloat(Quaternion->q1) + SquareFloat(Quaternion->q2) + SquareFloat(Quaternion->q3);
 }
 
 static inline Struct_Quaternion *QuaternionNormalize(Struct_Quaternion *Result,
@@ -47,15 +47,15 @@ static inline Struct_Quaternion *QuaternionNormalize(Struct_Quaternion *Result,
 }
 
 static inline Struct_Quaternion *QuaternionMultiply(Struct_Quaternion *Result,
-                                                    const Struct_Quaternion *a,
-                                                    const Struct_Quaternion *b)
+                                                    const Struct_Quaternion *VectorA,
+                                                    const Struct_Quaternion *VectorB)
 {
-    Struct_Quaternion p;
-    p.q0 = a->q0 * b->q0 - a->q1 * b->q1 - a->q2 * b->q2 - a->q3 * b->q3;
-    p.q1 = a->q0 * b->q1 + a->q1 * b->q0 + a->q2 * b->q3 - a->q3 * b->q2;
-    p.q2 = a->q0 * b->q2 - a->q1 * b->q3 + a->q2 * b->q0 + a->q3 * b->q1;
-    p.q3 = a->q0 * b->q3 + a->q1 * b->q2 - a->q2 * b->q1 + a->q3 * b->q0;
-    *Result = p;
+    Struct_Quaternion CalcedResult;
+    CalcedResult.q0 = VectorA->q0 * VectorB->q0 - VectorA->q1 * VectorB->q1 - VectorA->q2 * VectorB->q2 - VectorA->q3 * VectorB->q3;
+    CalcedResult.q1 = VectorA->q0 * VectorB->q1 + VectorA->q1 * VectorB->q0 + VectorA->q2 * VectorB->q3 - VectorA->q3 * VectorB->q2;
+    CalcedResult.q2 = VectorA->q0 * VectorB->q2 - VectorA->q1 * VectorB->q3 + VectorA->q2 * VectorB->q0 + VectorA->q3 * VectorB->q1;
+    CalcedResult.q3 = VectorA->q0 * VectorB->q3 + VectorA->q1 * VectorB->q2 - VectorA->q2 * VectorB->q1 + VectorA->q3 * VectorB->q0;
+    *Result = CalcedResult;
     return Result;
 }
 
@@ -108,24 +108,25 @@ static inline Struct_Vector3x3 *QuaternionRotateVectorInv(Struct_Vector3x3 *Resu
 }
 
 static inline Struct_Quaternion *QuaternionInitFromVector(Struct_Quaternion *Result,
-                                                          const Struct_Vector3x3 *v)
+                                                          const Struct_Vector3x3 *Vector)
 {
     Result->q0 = 0.0f;
-    Result->q1 = v->Roll;
-    Result->q2 = v->Pitch;
-    Result->q3 = v->Yaw;
+    Result->q1 = Vector->Roll;
+    Result->q2 = Vector->Pitch;
+    Result->q3 = Vector->Yaw;
     return Result;
 }
 
 static inline Struct_Quaternion *QuaternionScale(Struct_Quaternion *Result,
-                                                 const Struct_Quaternion *a,
-                                                 const float b)
+                                                 const Struct_Quaternion *VectorA,
+                                                 const float VectorB)
 {
-    Struct_Quaternion p;
-    p.q0 = a->q0 * b;
-    p.q1 = a->q1 * b;
-    p.q2 = a->q2 * b;
-    p.q3 = a->q3 * b;
-    *Result = p;
+    Struct_Quaternion CalcedResult;
+    CalcedResult.q0 = VectorA->q0 * VectorB;
+    CalcedResult.q1 = VectorA->q1 * VectorB;
+    CalcedResult.q2 = VectorA->q2 * VectorB;
+    CalcedResult.q3 = VectorA->q3 * VectorB;
+    *Result = CalcedResult;
     return Result;
 }
+#endif

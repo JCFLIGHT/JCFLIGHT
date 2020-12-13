@@ -166,12 +166,11 @@ static void MahonyAHRSUpdate(float DeltaTime,
   //CORREÇÃO DO ROLL E PITCH USANDO O VETOR DO ACELEROMETRO
   if (AccelerationBodyFrame)
   {
-    static const Struct_Vector3x3 Gravity = {.Vector = {0.0f,
-                                                        0.0f,
-                                                        1.0f}};
-    Struct_Vector3x3 EstimatedGravity,
-        AccelerationVector,
-        VectorError;
+    static const Struct_Vector3x3 Gravity = {.Vector = {0.0f, 0.0f, 1.0f}};
+
+    Struct_Vector3x3 EstimatedGravity;
+    Struct_Vector3x3 AccelerationVector;
+    Struct_Vector3x3 VectorError;
 
     //ESTIMA A GRAVIDADE NO BODY FRAME
     QuaternionRotateVector(&EstimatedGravity, &Gravity, &Orientation);
@@ -184,7 +183,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
     if (IMURuntimeConfiguration.kI_Accelerometer > 0.0f)
     {
       //DESATIVA A INTEGRAÇÃO SE O SPIN RATE ULTRAPASSAR UM CERTO VALOR
-      if (Spin_Rate_Square < sq(ConvertToRadians(SPIN_RATE_LIMIT)))
+      if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Struct_Vector3x3 OldVector;
         //CALCULA O ERRO ESCALADO POR Ki
@@ -200,13 +199,9 @@ static void MahonyAHRSUpdate(float DeltaTime,
   //CORREÇÃO DO YAW
   if (MagnetometerBodyFrame || GPS_HeadingState)
   {
-    static const Struct_Vector3x3 Forward = {.Vector = {1.0f,
-                                                        0.0f,
-                                                        0.0f}};
+    static const Struct_Vector3x3 Forward = {.Vector = {1.0f, 0.0f, 0.0f}};
 
-    Struct_Vector3x3 VectorError = {.Vector = {0.0f,
-                                               0.0f,
-                                               0.0f}};
+    Struct_Vector3x3 VectorError = {.Vector = {0.0f, 0.0f, 0.0f}};
 
     if (MagnetometerBodyFrame && VectorNormSquared(MagnetometerBodyFrame) > 0.01f)
     {
@@ -243,8 +238,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
         CourseOverGround += (2.0f * 3.14159265358979323846f);
 
       //CALCULA O VALOR DE HEADING COM BASE NO COG
-      Struct_Vector3x3 vCoG = {.Vector = {-cos_approx(CourseOverGround),
-                                          sin_approx(CourseOverGround), 0.0f}};
+      Struct_Vector3x3 vCoG = {.Vector = {-cos_approx(CourseOverGround), sin_approx(CourseOverGround), 0.0f}};
 
       //ROTACIONA O VETOR DO BODY FRAME PARA EARTH FRAME
       QuaternionRotateVectorInv(&HeadingEarthFrame, &Forward, &Orientation);
@@ -268,7 +262,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
     if (IMURuntimeConfiguration.ki_Magnetometer > 0.0f)
     {
       //PARE A INTEGRAÇÃO SE O SPIN RATE FOR MAIOR QUE O LIMITE
-      if (Spin_Rate_Square < sq(ConvertToRadians(SPIN_RATE_LIMIT)))
+      if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Struct_Vector3x3 OldVector;
 

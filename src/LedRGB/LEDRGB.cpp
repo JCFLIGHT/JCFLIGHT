@@ -46,9 +46,9 @@ void LEDRGB::Update()
     RGB.Function(CONFIGFLIGHT);
 }
 
-void LEDRGB::Function(uint8_t MODE)
+void LEDRGB::Function(uint8_t Mode)
 {
-  switch (MODE)
+  switch (Mode)
   {
 
   //GPS LED É PRIORIDADE
@@ -132,8 +132,8 @@ void LEDRGB::MAG_Led(void)
 void LEDRGB::ConfigFlight_Led(void)
 {
   static bool ToogleBlinkConfig = true;
-  static uint32_t StoreBlinkConfig = 0;
-  if (AVRTIME.SchedulerMillis() - StoreBlinkConfig > 500)
+  static uint32_t StoreBlinkConfig = AVRTIME.SchedulerMillis();
+  if (AVRTIME.SchedulerMillis() - StoreBlinkConfig >= 500)
   {
     ToogleBlinkConfig = !ToogleBlinkConfig;
     StoreBlinkConfig = AVRTIME.SchedulerMillis();
@@ -152,10 +152,13 @@ void LEDRGB::ConfigFlight_Led(void)
 void LEDRGB::CalibEsc_Led(void)
 {
   static uint8_t FlashLedCount = 0;
-  static uint32_t FlashTimer = 0;
+  static uint32_t FlashTimer = AVRTIME.SchedulerMillis();
   //TEMPO DE ATUALIZAÇÃO DO LED FLASHER
-  if (AVRTIME.SchedulerMillis() - FlashTimer > 170)
-    FlashLedCount += 1, FlashTimer = AVRTIME.SchedulerMillis();
+  if (AVRTIME.SchedulerMillis() - FlashTimer >= 170)
+  {
+    FlashLedCount += 1;
+    FlashTimer = AVRTIME.SchedulerMillis();
+  }
   //LED FLASHER POR PARTES
   switch (FlashLedCount)
   {
@@ -203,7 +206,7 @@ void LEDRGB::GPS_Led(void)
 {
   //SE O NÚMERO DE SATELITES FOR MENOR OU IGUAL A 4,O LED VERMELHO IRÁ FICAR PISCANDO SEM PARAR
   static bool GPS_Fail_Toggle = false;
-  static uint32_t GPS_Fail;
+  static uint32_t GPS_Fail = AVRTIME.SchedulerMillis();
   if (GPS_NumberOfSatellites <= 4)
   {
     if (AVRTIME.SchedulerMillis() - GPS_Fail >= 350)
@@ -228,7 +231,7 @@ void LEDRGB::GPS_Led(void)
   //7 SATELITES         = 3 PISCADAS
   //8 SATELITES OU MAIS = 4 PISCADAS
   static uint8_t BlinkCount;
-  static uint32_t BlinkTime;
+  static uint32_t BlinkTime = AVRTIME.SchedulerMillis();
   if (GPS_Flight_Mode != GPS_MODE_RTH)
   {
     if (AVRTIME.SchedulerMillis() - BlinkTime >= 150)

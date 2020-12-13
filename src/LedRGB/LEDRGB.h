@@ -25,7 +25,7 @@ public:
   LEDRGB(){};
   void Initialization();
   void Update();
-  void Function(uint8_t MODE);
+  void Function(uint8_t Mode);
   void Off_All_Leds(void);
 
 private:

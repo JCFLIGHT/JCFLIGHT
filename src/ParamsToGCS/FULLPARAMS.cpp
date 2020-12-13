@@ -19,7 +19,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "StorageManager/EEPROMCHECK.h"
-#include "StringLib/STRINGSUPPORT.h"
+#include "StringSupport/STRINGSUPPORT.h"
 
 //#define OPERATOR_CHECK_EEPROM
 

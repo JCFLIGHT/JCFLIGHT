@@ -149,7 +149,7 @@ bool SAFETYBUTTONCLASS::GetSafeStateToOutput()
 
 bool SAFETYBUTTONCLASS::SafeButtonEnabled()
 {
-    if (STORAGEMANAGER.Read_8Bits(SAFEBUTTON_ADDR) == 0)
+    if (STORAGEMANAGER.Read_8Bits(SAFEBUTTON_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(SAFEBUTTON_ADDR) == 2)
         return false;
     return true;
 }

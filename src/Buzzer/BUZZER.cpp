@@ -21,6 +21,8 @@
 #include "EscCalibration/CALIBESC.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 
 BEEPERCLASS BEEPER;
 
@@ -167,6 +169,8 @@ void BEEPERCLASS::BeeperProcessCommand()
 
 void BEEPERCLASS::Run()
 {
+  if (STORAGEMANAGER.Read_8Bits(SAFEBUTTON_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(SAFEBUTTON_ADDR) == 3)
+    return;
   if (!BuzzerInit)
     DDRH |= (1 << DDD6); //DEFINE A PORTA DIGITAL 9 COMO SAIDA
 

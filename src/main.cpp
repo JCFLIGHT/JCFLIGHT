@@ -24,7 +24,7 @@
     {                                   \
       AVRTIME.SchedulerInit();          \
       MachineInit();                    \
-      while (1)                         \
+      while (true)                      \
       {                                 \
         MachineRun();                   \
       }                                 \

@@ -19,9 +19,6 @@
 #include "Math/AVRMATH.h"
 #include "Common/STRUCTS.h"
 
-#define sin_approx(x) sinf(x)
-#define cos_approx(x) cosf(x)
-
 typedef struct
 {
     float Roll;
@@ -84,27 +81,27 @@ void RotationMatrixFromAngles(Matrix3x3_Struct *RotationMath, const Union_Angles
     float CosZSinX;
     float SinZSinX;
 
-    CosX = cos_approx(Angles->Angles.Roll);
-    SinX = sin_approx(Angles->Angles.Roll);
-    CosY = cos_approx(Angles->Angles.Pitch);
-    SinY = sin_approx(Angles->Angles.Pitch);
-    CosZ = cos_approx(Angles->Angles.Yaw);
-    SinZ = sin_approx(Angles->Angles.Yaw);
+    CosX = Fast_Cosine(Angles->Angles.Roll);
+    SinX = Fast_Sine(Angles->Angles.Roll);
+    CosY = Fast_Cosine(Angles->Angles.Pitch);
+    SinY = Fast_Sine(Angles->Angles.Pitch);
+    CosZ = Fast_Cosine(Angles->Angles.Yaw);
+    SinZ = Fast_Sine(Angles->Angles.Yaw);
 
     CosZCosX = CosZ * CosX;
     SinZCosX = SinZ * CosX;
     CosZSinX = SinX * CosZ;
     SinZSinX = SinX * SinZ;
 
-    RotationMath->Matrix3x3[0][ROLL] = CosZ * CosY;
-    RotationMath->Matrix3x3[0][PITCH] = -CosY * SinZ;
-    RotationMath->Matrix3x3[0][YAW] = SinY;
-    RotationMath->Matrix3x3[1][ROLL] = SinZCosX + (CosZSinX * SinY);
-    RotationMath->Matrix3x3[1][PITCH] = CosZCosX - (SinZSinX * SinY);
-    RotationMath->Matrix3x3[1][YAW] = -SinX * CosY;
-    RotationMath->Matrix3x3[2][ROLL] = (SinZSinX) - (CosZCosX * SinY);
-    RotationMath->Matrix3x3[2][PITCH] = (CosZSinX) + (SinZCosX * SinY);
-    RotationMath->Matrix3x3[2][YAW] = CosY * CosX;
+    RotationMath->Matrix3x3[0][0] = CosZ * CosY;
+    RotationMath->Matrix3x3[0][1] = -CosY * SinZ;
+    RotationMath->Matrix3x3[0][2] = SinY;
+    RotationMath->Matrix3x3[1][0] = SinZCosX + (CosZSinX * SinY);
+    RotationMath->Matrix3x3[1][1] = CosZCosX - (SinZSinX * SinY);
+    RotationMath->Matrix3x3[1][2] = -SinX * CosY;
+    RotationMath->Matrix3x3[2][0] = (SinZSinX) - (CosZCosX * SinY);
+    RotationMath->Matrix3x3[2][1] = (CosZSinX) + (SinZCosX * SinY);
+    RotationMath->Matrix3x3[2][2] = CosY * CosX;
 }
 
 static bool CheckValidSensorAlignment()

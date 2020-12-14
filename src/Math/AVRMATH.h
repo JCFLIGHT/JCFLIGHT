@@ -48,4 +48,8 @@ float Calculate_Cosine_Approx(int16_t InputAngle);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);
 float InvertSquareRootFloat(float InputValue);
+float Fast_Sine(float X);
+float Fast_Cosine(float X);
+float Fast_Atan2(float Y, float X);
+float Fast_AtanCosine(float X);
 #endif

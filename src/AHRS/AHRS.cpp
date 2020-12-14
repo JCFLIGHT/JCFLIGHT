@@ -34,15 +34,6 @@
 #define GYRO_SCALE (1.0f / 16.4f) //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GRAVITY_CMSS 980.665f     //VALOR DA GRAVIDADE EM CM/S^2
 
-//FUNÇÕES MATEMATICAS PARA CALCULO DO AHRS
-//PODEMOS TROCAR PARA UMA MATEMATICA EXPRESSA EM LINHAS DE CODIGO
-//SEM TER A NECESSIDADE DE DEPENDER DA OTIMIZAÇÃO DO GCC
-//EM BREVE EU ADICIONO ISSO
-#define sin_approx(x) sinf(x)
-#define cos_approx(x) cosf(x)
-#define atan2_approx(y, x) atan2f(y, x)
-#define acos_approx(x) acosf(x)
-
 typedef struct
 {
   float kP_Accelerometer = 0.25f;
@@ -90,8 +81,8 @@ void AHRS_Initialization(void)
   const int16_t Degrees = ((int16_t)(STORAGEMANAGER.Read_Float(DECLINATION_ADDR) * 100)) / 100;
   const int16_t Remainder = ((int16_t)(STORAGEMANAGER.Read_Float(DECLINATION_ADDR) * 100)) % 100;
   const float CalcedvalueInRadians = -ConvertToRadians(Degrees + Remainder / 60.0f);
-  CorrectedMagneticFieldNorth.Roll = cos_approx(CalcedvalueInRadians);
-  CorrectedMagneticFieldNorth.Pitch = sin_approx(CalcedvalueInRadians);
+  CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedvalueInRadians);
+  CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedvalueInRadians);
   CorrectedMagneticFieldNorth.Yaw = 0;
   //RESETA O QUATERNION,A MATRIX E O FILTRO
   QuaternionInitUnit(&Orientation);
@@ -232,7 +223,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
         CourseOverGround += (2.0f * 3.14159265358979323846f);
 
       //CALCULA O VALOR DE HEADING COM BASE NO COG
-      Struct_Vector3x3 vCoG = {.Vector = {-cos_approx(CourseOverGround), sin_approx(CourseOverGround), 0.0f}};
+      Struct_Vector3x3 vCoG = {.Vector = {-Fast_Cosine(CourseOverGround), Fast_Sine(CourseOverGround), 0.0f}};
 
       //ROTACIONA O VETOR DO BODY FRAME PARA EARTH FRAME
       QuaternionRotateVectorInv(&HeadingEarthFrame, &Forward, &Orientation);
@@ -297,8 +288,8 @@ static void MahonyAHRSUpdate(float DeltaTime,
     else
     {
       const float thetaMagnitude = sqrtf(ThetaSquared);
-      QuaternionScale(&QuaternionDelta, &QuaternionDelta, sin_approx(thetaMagnitude) / thetaMagnitude);
-      QuaternionDelta.q0 = cos_approx(thetaMagnitude);
+      QuaternionScale(&QuaternionDelta, &QuaternionDelta, Fast_Sine(thetaMagnitude) / thetaMagnitude);
+      QuaternionDelta.q0 = Fast_Cosine(thetaMagnitude);
     }
 
     //CALCULA O VALOR FINA DA ORIENTAÇÃO E RENORMALIZA O QUATERNION
@@ -340,14 +331,14 @@ static void ComputeQuaternionFromRPY(int16_t initialRoll, int16_t initialPitch, 
   if (initialYaw > 1800)
     initialYaw -= 3600;
 
-  const float cosRoll = cos_approx(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
-  const float sinRoll = sin_approx(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
+  const float cosRoll = Fast_Cosine(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
+  const float sinRoll = Fast_Sine(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
 
-  const float cosPitch = cos_approx(ConvertDeciDegreesToRadians(initialPitch) * 0.5f);
-  const float sinPitch = sin_approx(ConvertDeciDegreesToRadians(initialPitch) * 0.5f);
+  const float cosPitch = Fast_Cosine(ConvertDeciDegreesToRadians(initialPitch) * 0.5f);
+  const float sinPitch = Fast_Sine(ConvertDeciDegreesToRadians(initialPitch) * 0.5f);
 
-  const float cosYaw = cos_approx(ConvertDeciDegreesToRadians(-initialYaw) * 0.5f);
-  const float sinYaw = sin_approx(ConvertDeciDegreesToRadians(-initialYaw) * 0.5f);
+  const float cosYaw = Fast_Cosine(ConvertDeciDegreesToRadians(-initialYaw) * 0.5f);
+  const float sinYaw = Fast_Sine(ConvertDeciDegreesToRadians(-initialYaw) * 0.5f);
 
   Orientation.q0 = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
   Orientation.q1 = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
@@ -436,11 +427,11 @@ void AHRS_Update()
 
   //SAÍDA DOS EIXOS DO APÓS O AHRS
   //ROLL
-  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees(atan2_approx(RotationMath[2][1], RotationMath[2][2]));
+  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees(Fast_Atan2(RotationMath[2][1], RotationMath[2][2]));
   //PITCH
-  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - acos_approx(-RotationMath[2][0]));
+  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-RotationMath[2][0]));
   //YAW
-  ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-atan2_approx(RotationMath[1][0], RotationMath[0][0]));
+  ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMath[1][0], RotationMath[0][0]));
   //CONVERTE O VALOR DE COMPASS HEADING PARA O VALOR ACEITAVEL
   if (ATTITUDE.CompassHeading < 0)
     ATTITUDE.CompassHeading += 3600;

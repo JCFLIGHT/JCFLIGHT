@@ -51,8 +51,6 @@ typedef struct
   float kI_Accelerometer = 0.0050f;
   float kP_Magnetometer = 1;
   float ki_Magnetometer = 0;
-  float Acc_Ignore_Rate = 0;
-  float Acc_Ignore_Slope = 0;
 } Struct_IMURuntimeConfiguration;
 
 Struct_Vector3x3 BodyFrameAcceleration;
@@ -330,33 +328,7 @@ static float CalculateAccelerometerWeight(const float DeltaTime)
   const float Nearness = ABS_FLOAT(100 - (AccelerometerMagnitudeSquare * 100));
   const float AccWeight_Nearness = (Nearness > MAX_ACC_SQ_NEARNESS) ? 0.0f : NEARNESS;
 
-  float AccWeight_RateIgnore = 1.0f;
-
-  //A VELOCIDADE EM AEROS É BEM SUPERIOR A DOS DRONES,QUANTO MAIOR A VELOCIDADE,MAIOR A FORÇA CENTRÍFUGA,
-  //SENDO ASSIM MAIOR SERÁ O ERRO DE ÂNGULO NO ACELEROMETRO,POR EXEMPLO,
-  //EM UMA CURVA DE 5 GRAUS COM UMA VELOCIDADE DE 20M/S FACILMENTE TERIAMOS O DOBRO DE ERRO DE INCLINAÇÃO,
-  //PARA CONTORNAR ISSO,A TAXA DE MAGNITUDE DO ACELEROMETRO É FILTRADA POR UM LPF COM FREQUENCIA DE 1HZ,
-  //E SE O VALOR FOR MAIOR QUE O LIMITE O ACELEROMETRO DEIXA DE SER USADO PELO AHRS.
-  if (COMMAND_ARM_DISARM && (FrameType == 3 || FrameType == 4 || FrameType == 5) && IMURuntimeConfiguration.Acc_Ignore_Rate != 0)
-  {
-    const float RotationRateMagnitude = sqrtf(VectorNormSquared(&BodyFrameRotation));
-    const float RotationRateMagnitudeFiltered = PT1FilterApply(&RotationRateFilter, RotationRateMagnitude, 1.0f, DeltaTime);
-    if (IMURuntimeConfiguration.Acc_Ignore_Slope != 0)
-    {
-      const float RateSlopeMin = ConvertToRadians((IMURuntimeConfiguration.Acc_Ignore_Rate - IMURuntimeConfiguration.Acc_Ignore_Slope));
-      const float RateSlopeMax = ConvertToRadians((IMURuntimeConfiguration.Acc_Ignore_Rate + IMURuntimeConfiguration.Acc_Ignore_Slope));
-      AccWeight_RateIgnore = Map_Float(Constrain_Float(RotationRateMagnitudeFiltered, RateSlopeMin, RateSlopeMax), RateSlopeMin, RateSlopeMax, 1.0f, 0.0f);
-    }
-    else
-    {
-      if (RotationRateMagnitudeFiltered > ConvertToRadians(IMURuntimeConfiguration.Acc_Ignore_Rate))
-      {
-        AccWeight_RateIgnore = 0.0f;
-      }
-    }
-  }
-
-  return AccWeight_Nearness * AccWeight_RateIgnore;
+  return AccWeight_Nearness;
 }
 
 static void ComputeQuaternionFromRPY(int16_t initialRoll, int16_t initialPitch, int16_t initialYaw)

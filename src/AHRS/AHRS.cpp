@@ -18,7 +18,6 @@
 #include "AHRS.h"
 #include "Math/AVRLOWER.h"
 #include "Common/STRUCTS.h"
-#include "Filters/PT1.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
@@ -28,10 +27,9 @@
 #include "Yaw/YAWMANIPULATION.h"
 #include "QUATERNION.h"
 
-#define SPIN_RATE_LIMIT 20     //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
-#define MAX_ACC_SQ_NEARNESS 25 //25% (0.87G - 1.12G)
-#define NEARNESS 100.0f        //FATOR DE CORREÇÃO DO ACELEROMETRO NO AHRS
-
+#define SPIN_RATE_LIMIT 20        //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
+#define MAX_ACC_SQ_NEARNESS 25    //25% (0.87G - 1.12G)
+#define NEARNESS 100.0f           //FATOR DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #define ACC_1G 512                //1G DA IMU - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GYRO_SCALE (1.0f / 16.4f) //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GRAVITY_CMSS 980.665f     //VALOR DA GRAVIDADE EM CM/S^2
@@ -59,7 +57,6 @@ Struct_Quaternion Orientation;
 
 static Struct_Vector3x3 CorrectedMagneticFieldNorth;
 static Struct_IMURuntimeConfiguration IMURuntimeConfiguration;
-static PT1_Filter_Struct RotationRateFilter;
 
 static bool GPSHeadingInitialized = false;
 
@@ -99,7 +96,6 @@ void AHRS_Initialization(void)
   //RESETA O QUATERNION,A MATRIX E O FILTRO
   QuaternionInitUnit(&Orientation);
   ComputeRotationMatrix();
-  RotationRateFilter.State = 0;
 }
 
 static bool ValidateQuaternion(const Struct_Quaternion *Quaternion)
@@ -320,10 +316,12 @@ static void MahonyAHRSUpdate(float DeltaTime,
 static float CalculateAccelerometerWeight(const float DeltaTime)
 {
   float AccelerometerMagnitudeSquare = 0;
+
   //CALCULA A RAIZ QUADRADA DE TODOS OS EIXOS DO ACELEROMETRO PARA EXTRAIR A MAGNITUDE
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[ROLL] / ACC_1G);
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[PITCH] / ACC_1G);
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[YAW] / ACC_1G);
+
   //CALCULA A MAGNITUDE DO ACELEROMETRO EM %
   const float Nearness = ABS_FLOAT(100 - (AccelerometerMagnitudeSquare * 100));
   const float AccWeight_Nearness = (Nearness > MAX_ACC_SQ_NEARNESS) ? 0.0f : NEARNESS;

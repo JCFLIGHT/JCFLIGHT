@@ -37,7 +37,6 @@ typedef struct
   uint16_t Param_Servo_Pulse_Min;
   uint16_t Param_Servo_Pulse_Middle;
   uint16_t Param_Servo_Pulse_Max;
-  uint16_t Param_Servo_LPF_CutOff;
   uint8_t Param_AutoLaunch_AHRS_BankAngle;
   uint16_t Param_AutoLaunch_IMU_BankAngle;
   uint8_t Param_AutoLaunch_IMU_Swing;
@@ -116,7 +115,6 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"Servo_Pulse_Min", SERVO_PULSE_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Min, 300, 2500},
     {"Pulse_Middle", SERVO_PULSE_MIDDLE_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Middle, 400, 2500},
     {"Servo_Pulse_Max", SERVO_PULSE_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Max, 1000, 2600},
-    {"Servo_LPF_CutOff", SERVO_LPF_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_LPF_CutOff, 0, 32000},
     {"AutoLaunch_AHRS_BankAngle", AL_AHRS_BA_ADDR, VAR_8BITS, &FullParamsList.Param_AutoLaunch_AHRS_BankAngle, 0, 255},
     {"AutoLaunch_IMU_BankAngle", AL_IMU_BA_ADDR, VAR_16BITS, &FullParamsList.Param_AutoLaunch_IMU_BankAngle, 0, 1000},
     {"AutoLaunch_IMU_Swing", AL_IMU_SWING_ADDR, VAR_8BITS, &FullParamsList.Param_AutoLaunch_IMU_Swing, 0, 255},

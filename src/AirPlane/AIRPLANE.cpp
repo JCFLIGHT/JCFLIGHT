@@ -20,14 +20,14 @@
 #include "Filters/LPFSERVO.h"
 #include "Math/AVRMATH.h"
 #include "SERVOTRIM.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 #include "FastSerial/PRINTF.h"
 
 #define PULSE_MIN 500     //PULSO MINIMO PARA OS SERVOS
 #define PULSE_MIDDLE 1500 //PULSO MEDIO PARA OS SERVOS
 #define PULSE_MAX 2200    //PULSO MAXIMO PARA OS SERVOS
-#define LPF_CUTOFF 50     //FREQUENCIA DE CORTE PARA O FILTRO DO SINAL DOS SERVOS
 #define LPF_SETPOINT 1500 //PONTO MEDIO DOS SERVOS PARA O FILTRO
-#define APPLY_LPF         //ESSE LPF CONSOME 1524KB DE FLASH E 536KB DE RAM
 
 //DEBUG
 //#define PRINTLN_SERVO_SIGNAL
@@ -133,28 +133,29 @@ void Servo_Rate_Adjust()
   //SERVO 4
   MotorControl[MOTOR6] = (((int32_t)ServoRate[SERVO4] * MotorControl[MOTOR6]) / 100) + PULSE_MIDDLE; //AJUSTA O RATE DO SERVO 4
 
-#ifndef APPLY_LPF
+  int16_t Servo_LPF_CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
 
-  //PULSO MINIMO E MAXIMO PARA OS SERVOS
-  MotorControl[MOTOR3] = Constrain_16Bits(MotorControl[MOTOR3], PULSE_MIN, PULSE_MAX); //SERVO 1
-  MotorControl[MOTOR2] = Constrain_16Bits(MotorControl[MOTOR2], PULSE_MIN, PULSE_MAX); //SERVO 2
-  MotorControl[MOTOR1] = Constrain_16Bits(MotorControl[MOTOR1], PULSE_MIN, PULSE_MAX); //SERVO 3
-  MotorControl[MOTOR6] = Constrain_16Bits(MotorControl[MOTOR6], PULSE_MIN, PULSE_MAX); //SERVO 4
-
-#else
-
-  //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
-  DeviceFiltered[SERVO1] = (int16_t)LowPassFilter(&LPFDevice[SERVO1], MotorControl[MOTOR3], LPF_CUTOFF, LPF_SETPOINT);
-  DeviceFiltered[SERVO2] = (int16_t)LowPassFilter(&LPFDevice[SERVO2], MotorControl[MOTOR2], LPF_CUTOFF, LPF_SETPOINT);
-  DeviceFiltered[SERVO3] = (int16_t)LowPassFilter(&LPFDevice[SERVO3], MotorControl[MOTOR1], LPF_CUTOFF, LPF_SETPOINT);
-  DeviceFiltered[SERVO4] = (int16_t)LowPassFilter(&LPFDevice[SERVO4], MotorControl[MOTOR6], LPF_CUTOFF, LPF_SETPOINT);
-  //PULSO MINIMO E MAXIMO PARA OS SERVOS
-  MotorControl[MOTOR3] = Constrain_16Bits(DeviceFiltered[SERVO1], PULSE_MIN, PULSE_MAX); //SERVO 1
-  MotorControl[MOTOR2] = Constrain_16Bits(DeviceFiltered[SERVO2], PULSE_MIN, PULSE_MAX); //SERVO 2
-  MotorControl[MOTOR1] = Constrain_16Bits(DeviceFiltered[SERVO3], PULSE_MIN, PULSE_MAX); //SERVO 3
-  MotorControl[MOTOR6] = Constrain_16Bits(DeviceFiltered[SERVO4], PULSE_MIN, PULSE_MAX); //SERVO 4
-
-#endif
+  if (Servo_LPF_CutOff == 0)
+  {
+    //PULSO MINIMO E MAXIMO PARA OS SERVOS
+    MotorControl[MOTOR3] = Constrain_16Bits(MotorControl[MOTOR3], PULSE_MIN, PULSE_MAX); //SERVO 1
+    MotorControl[MOTOR2] = Constrain_16Bits(MotorControl[MOTOR2], PULSE_MIN, PULSE_MAX); //SERVO 2
+    MotorControl[MOTOR1] = Constrain_16Bits(MotorControl[MOTOR1], PULSE_MIN, PULSE_MAX); //SERVO 3
+    MotorControl[MOTOR6] = Constrain_16Bits(MotorControl[MOTOR6], PULSE_MIN, PULSE_MAX); //SERVO 4
+  }
+  else
+  {
+    //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
+    DeviceFiltered[SERVO1] = (int16_t)LowPassFilter(&LPFDevice[SERVO1], MotorControl[MOTOR3], Servo_LPF_CutOff, LPF_SETPOINT);
+    DeviceFiltered[SERVO2] = (int16_t)LowPassFilter(&LPFDevice[SERVO2], MotorControl[MOTOR2], Servo_LPF_CutOff, LPF_SETPOINT);
+    DeviceFiltered[SERVO3] = (int16_t)LowPassFilter(&LPFDevice[SERVO3], MotorControl[MOTOR1], Servo_LPF_CutOff, LPF_SETPOINT);
+    DeviceFiltered[SERVO4] = (int16_t)LowPassFilter(&LPFDevice[SERVO4], MotorControl[MOTOR6], Servo_LPF_CutOff, LPF_SETPOINT);
+    //PULSO MINIMO E MAXIMO PARA OS SERVOS
+    MotorControl[MOTOR3] = Constrain_16Bits(DeviceFiltered[SERVO1], PULSE_MIN, PULSE_MAX); //SERVO 1
+    MotorControl[MOTOR2] = Constrain_16Bits(DeviceFiltered[SERVO2], PULSE_MIN, PULSE_MAX); //SERVO 2
+    MotorControl[MOTOR1] = Constrain_16Bits(DeviceFiltered[SERVO3], PULSE_MIN, PULSE_MAX); //SERVO 3
+    MotorControl[MOTOR6] = Constrain_16Bits(DeviceFiltered[SERVO4], PULSE_MIN, PULSE_MAX); //SERVO 4
+  }
 
 #if defined(PRINTLN_SERVO_SIGNAL)
   FastSerialPrintln(PSTR("Servo1:%d COMMAND_ARM_DISARM:%d AirPlaneMotor:%d RCController[YAW]:%d\n"),

@@ -202,10 +202,10 @@ struct _SendUserMediumGCSParameters
     int16_t SendDerivativeLPF;
     int16_t SendRCLPF;
     uint8_t SendKalmanState;
-    int16_t SendPT1AccLPF;
-    int16_t SendPT1GyroLPF;
-    int16_t SendAccNotch;
-    int16_t SendGyroNotch;
+    int16_t SendBiQuadAccLPF;
+    int16_t SendBiQuadGyroLPF;
+    int16_t SendBiQuadAccNotch;
+    int16_t SendBiQuadGyroNotch;
     uint8_t SendMotorCompensationState;
     uint8_t SendProportionalPitch;
     uint8_t SendIntegralPitch;
@@ -219,6 +219,7 @@ struct _SendUserMediumGCSParameters
     uint8_t SendProportionalAltitudeHold;
     uint8_t SendProportionalGPSHold;
     uint8_t SendIntegralGPSHold;
+    int16_t SendServosLPF;
 } SendUserMediumGCSParameters;
 
 struct _GetUserMediumGCSParameters
@@ -246,6 +247,7 @@ struct _GetUserMediumGCSParameters
     uint8_t GetProportionalAltitudeHold;
     uint8_t GetProportionalGPSHold;
     uint8_t GetIntegralGPSHold;
+    int16_t GetServosLPF;
 } GetUserMediumGCSParameters;
 
 struct _SendWayPointGCSCoordinates
@@ -738,8 +740,6 @@ uint8_t GCSClass::GetDevicesActived()
 
 void GCSClass::Save_Basic_Configuration()
 {
-    //ENDEREÇOS DO 516 AO 599 ESTÃO VAZIOS
-
     if (GetUserBasicGCSParameters.GetFrameType != STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR))
         STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, GetUserBasicGCSParameters.GetFrameType);
 
@@ -922,6 +922,9 @@ void GCSClass::Save_Medium_Configuration()
     if (STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR) != PID[PIDGPSPOSITION].IntegratorVector)
         STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, PID[PIDGPSPOSITION].IntegratorVector);
 
+    if (GetUserMediumGCSParameters.GetServosLPF != STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR))
+        STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, GetUserMediumGCSParameters.GetServosLPF);
+
     //ATUALIZA OS PARAMETROS
     GCS.UpdatePID = false;
 }
@@ -940,6 +943,7 @@ void GCSClass::Dafult_Medium_Configuration()
     STORAGEMANAGER.Write_16Bits(BI_ACC_NOTCH_ADDR, 0);    //VOLTA O ACCNOTCH AO PADRÃO DE FABRICA
     STORAGEMANAGER.Write_16Bits(BI_GYRO_NOTCH_ADDR, 0);   //VOLTA O GYRONOTCH AO PADRÃO DE FABRICA
     STORAGEMANAGER.Write_8Bits(MOTCOMP_STATE_ADDR, 0);    //VOLTA O COMPENSATION SPEED AO PADRÃO DE FABRICA
+    STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, 50);     //VOLTA O FILTRO LPF DOS SERVOS AO PADRÃO DE FABRICA
     //VOLTA TODO O PID PARA O PADRÃO DE FABRICA
     //PITCH
     STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 35);
@@ -995,10 +999,10 @@ void GCSClass::UpdateParametersToGCS()
     SendUserMediumGCSParameters.SendDerivativeLPF = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
     SendUserMediumGCSParameters.SendRCLPF = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
     SendUserMediumGCSParameters.SendKalmanState = STORAGEMANAGER.Read_8Bits(KALMAN_ADDR);
-    SendUserMediumGCSParameters.SendPT1AccLPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
-    SendUserMediumGCSParameters.SendPT1GyroLPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
-    SendUserMediumGCSParameters.SendAccNotch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
-    SendUserMediumGCSParameters.SendGyroNotch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
+    SendUserMediumGCSParameters.SendBiQuadAccLPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
+    SendUserMediumGCSParameters.SendBiQuadGyroLPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
+    SendUserMediumGCSParameters.SendBiQuadAccNotch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
+    SendUserMediumGCSParameters.SendBiQuadGyroNotch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
     SendUserMediumGCSParameters.SendMotorCompensationState = STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR);
     SendUserMediumGCSParameters.SendProportionalPitch = STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR);
     SendUserMediumGCSParameters.SendIntegralPitch = STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR);
@@ -1012,4 +1016,5 @@ void GCSClass::UpdateParametersToGCS()
     SendUserMediumGCSParameters.SendProportionalAltitudeHold = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
     SendUserMediumGCSParameters.SendProportionalGPSHold = STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR);
     SendUserMediumGCSParameters.SendIntegralGPSHold = STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR);
+    SendUserMediumGCSParameters.SendServosLPF = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
 }

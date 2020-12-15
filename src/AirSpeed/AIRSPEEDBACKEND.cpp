@@ -17,20 +17,20 @@
 
 #include "AIRSPEEDBACKEND.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-
-#define SENSOR_TYPE_ADDRES 4000 //ENDEREÇO NÃO DEFINIDO,MOVER PARA O "BAR" QUANDO DEFINIDO
+#include "BAR/BAR.h"
 
 void Set_AirSpeed_Type(uint8_t AirSpeedType)
 {
-  STORAGEMANAGER.Write_8Bits(SENSOR_TYPE_ADDRES, AirSpeedType);
+  if (Get_AirSpeed_Type() != AirSpeedType)
+    STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, AirSpeedType);
 }
 
 uint8_t Get_AirSpeed_Type(void)
 {
-  return STORAGEMANAGER.Read_8Bits(SENSOR_TYPE_ADDRES);
+  return STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR);
 }
 
 bool Get_AirSpeed_State(void)
 {
-  return STORAGEMANAGER.Read_8Bits(SENSOR_TYPE_ADDRES) > 0;
+  return STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR) > 0;
 }

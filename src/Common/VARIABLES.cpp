@@ -84,6 +84,7 @@ int16_t IOC_Initial_Compass;
 int16_t GPS_Navigation_Array[2];
 int16_t GPS_Angle[3] = {0, 0, 0};
 int16_t DirectionToHome;
+int16_t ErrorI2C = 0;
 int16_t SlipAngleForAirPlane;
 volatile int16_t Fail_Safe_System = 0;
 

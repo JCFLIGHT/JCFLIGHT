@@ -73,6 +73,6 @@ void AirSpeed_Update()
   }
   else
   {
-    AirSpeedCalculedPressure = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 3.6;
+    AirSpeedCalculedPressure = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 3.6f;
   }
 }

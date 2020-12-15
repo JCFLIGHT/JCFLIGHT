@@ -38,6 +38,7 @@
 #include "TimeMonitor/TIMEMONITOR.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "AVRCheck/FREERAM.h"
+#include "AirSpeed/AIRSPEED.h"
 
 #include "PID/PIDXYZ.h" //APENAS PARA VISUALIZAR O CICLO DE MAQUINA
 
@@ -124,6 +125,21 @@ struct _GCSParameters_Two
     int16_t SendAttitudeRollValue;
     uint16_t SendMemoryRamUsed;
     uint8_t SendMemoryRamUsedPercent;
+    int16_t SendAccXNotFiltered;
+    int16_t SendAccYNotFiltered;
+    int16_t SendAccZNotFiltered;
+    int16_t SendAccXFiltered;
+    int16_t SendAccYFiltered;
+    int16_t SendAccZFiltered;
+    int16_t SendGyroXNotFiltered;
+    int16_t SendGyroYNotFiltered;
+    int16_t SendGyroZNotFiltered;
+    int16_t SendGyroXFiltered;
+    int16_t SendGyroYFiltered;
+    int16_t SendGyroZFiltered;
+    uint16_t SendGPSGroundSpeed;
+    int16_t SendI2CError;
+    uint16_t SendAirSpeedValue;
 } GCSParameters_Two;
 
 struct _SendUserBasicGCSParameters
@@ -149,6 +165,7 @@ struct _SendUserBasicGCSParameters
     uint8_t SendArmDisarmType;
     uint8_t SendAutoLandType;
     uint8_t SendSafeBtnState;
+    uint8_t SendAirSpeedState;
 } SendUserBasicGCSParameters;
 
 struct _GetUserBasicGCSParameters
@@ -174,6 +191,7 @@ struct _GetUserBasicGCSParameters
     uint8_t GetArmDisarmType;
     uint8_t GetAutoLandType;
     uint8_t GetSafeBtnState;
+    uint8_t GetAirSpeedState;
 } GetUserBasicGCSParameters;
 
 struct _SendUserMediumGCSParameters
@@ -620,6 +638,21 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendAttitudeRollValue = RCController[ROLL];
     GCSParameters_Two.SendMemoryRamUsed = MEMORY.Check();
     GCSParameters_Two.SendMemoryRamUsedPercent = MEMORY.GetPercentageRAMUsed();
+    GCSParameters_Two.SendAccXNotFiltered = IMU.AccelerometerReadNF[ROLL];
+    GCSParameters_Two.SendAccYNotFiltered = IMU.AccelerometerReadNF[PITCH];
+    GCSParameters_Two.SendAccZNotFiltered = IMU.AccelerometerReadNF[YAW];
+    GCSParameters_Two.SendAccXFiltered = IMU.AccelerometerRead[ROLL];
+    GCSParameters_Two.SendAccYFiltered = IMU.AccelerometerRead[PITCH];
+    GCSParameters_Two.SendAccZFiltered = IMU.AccelerometerRead[YAW];
+    GCSParameters_Two.SendGyroXNotFiltered = IMU.GyroscopeReadNF[ROLL];
+    GCSParameters_Two.SendGyroYNotFiltered = IMU.GyroscopeReadNF[PITCH];
+    GCSParameters_Two.SendGyroZNotFiltered = IMU.GyroscopeReadNF[PITCH];
+    GCSParameters_Two.SendGyroXFiltered = IMU.GyroscopeRead[ROLL];
+    GCSParameters_Two.SendGyroYFiltered = IMU.GyroscopeRead[PITCH];
+    GCSParameters_Two.SendGyroZFiltered = IMU.GyroscopeRead[PITCH];
+    GCSParameters_Two.SendGPSGroundSpeed = GPS_Ground_Speed;
+    GCSParameters_Two.SendI2CError = ErrorI2C;
+    GCSParameters_Two.SendAirSpeedValue = AirSpeedCalculedPressure;
 }
 
 void GCSClass::WayPoint_Request_Coordinates_Parameters()
@@ -767,8 +800,11 @@ void GCSClass::Save_Basic_Configuration()
     if (GetUserBasicGCSParameters.GetAutoLandType != STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR))
         STORAGEMANAGER.Write_8Bits(AUTOLAND_ADDR, GetUserBasicGCSParameters.GetAutoLandType);
 
-    if (GetUserBasicGCSParameters.GetSafeBtnState != STORAGEMANAGER.Read_8Bits(SAFEBUTTON_ADDR))
-        STORAGEMANAGER.Write_8Bits(SAFEBUTTON_ADDR, GetUserBasicGCSParameters.GetSafeBtnState);
+    if (GetUserBasicGCSParameters.GetSafeBtnState != STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR))
+        STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, GetUserBasicGCSParameters.GetSafeBtnState);
+
+    if (GetUserBasicGCSParameters.GetAirSpeedState != STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR))
+        STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, GetUserBasicGCSParameters.GetAirSpeedState);
 }
 
 void GCSClass::Dafult_Basic_Configuration()
@@ -794,7 +830,8 @@ void GCSClass::Dafult_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(AUTOMISSION_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DO MODO AUTO
     STORAGEMANAGER.Write_8Bits(ARMDISARM_ADDR, 0);        //LIMPA A CONFIGURAÇÃO DO ARMDISARM VIA CHAVE AUX
     STORAGEMANAGER.Write_8Bits(AUTOLAND_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO AUTO LAND
-    STORAGEMANAGER.Write_8Bits(SAFEBUTTON_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DO SAFE BUTTON
+    STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, 0);    //LIMPA A CONFIGURAÇÃO DO SAFE BUTTON
+    STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, 0);    //LIMPA A CONFIGURAÇÃO DO AIR-SPEED
 }
 
 void GCSClass::Save_Medium_Configuration()
@@ -948,7 +985,8 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendAutomaticMissonType = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR);
     SendUserBasicGCSParameters.SendArmDisarmType = STORAGEMANAGER.Read_8Bits(ARMDISARM_ADDR);
     SendUserBasicGCSParameters.SendAutoLandType = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);
-    SendUserBasicGCSParameters.SendSafeBtnState = STORAGEMANAGER.Read_8Bits(SAFEBUTTON_ADDR);
+    SendUserBasicGCSParameters.SendSafeBtnState = STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR);
+    SendUserBasicGCSParameters.SendAirSpeedState = STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR);
 
     //ENVIA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     SendUserMediumGCSParameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);

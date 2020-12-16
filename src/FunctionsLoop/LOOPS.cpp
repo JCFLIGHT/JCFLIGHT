@@ -133,7 +133,7 @@ void Fast_Loop()
         }
 }
 
-void Total_Loop()
+void Integral_Loop()
 {
 #ifdef ENABLE_TIMEMONITOR
         AVRTIMEMONITOR.MeasuringStartTime(TOTAL_LOOP);

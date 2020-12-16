@@ -23,7 +23,7 @@ const char Function_0[] __attribute__((__progmem__)) = "Slow_Loop()";
 const char Function_1[] __attribute__((__progmem__)) = "Medium_Loop()";
 const char Function_2[] __attribute__((__progmem__)) = "Fast_Medium_Loop()";
 const char Function_3[] __attribute__((__progmem__)) = "Fast_Loop()";
-const char Function_4[] __attribute__((__progmem__)) = "Total_Loop()";
+const char Function_4[] __attribute__((__progmem__)) = "Integral_Loop()";
 
 const char *const Function_Table[] __attribute__((__progmem__)) =
     {

@@ -97,5 +97,5 @@ void MachineRun()
     Medium_Loop();
     Fast_Medium_Loop();
     Fast_Loop();
-    Total_Loop();
+    Integral_Loop();
 }

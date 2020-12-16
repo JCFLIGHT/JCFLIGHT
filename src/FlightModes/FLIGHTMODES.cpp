@@ -167,7 +167,7 @@ void FlightModesUpdate()
         {
           if (SetFlightModes[RTH_MODE])
           {
-            SetFlightModes[GPSHOLD_MODE] = 0;
+            SetFlightModes[GPSHOLD_MODE] = false;
           }
           else
           {
@@ -179,7 +179,7 @@ void FlightModesUpdate()
             if (SetFlightModes[RTH_MODE])
             {
               GPSHold_CallBaro = true;
-              SetFlightModes[SETCOMPASSACTUAL] = 1;
+              SetFlightModes[SETCOMPASSACTUAL] = true;
               Do_Mode_RTH_Now();
             }
             else if (SetFlightModes[GPSHOLD_MODE])
@@ -187,7 +187,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_HOLD;
               Do_GPS_Altitude = false;
               GPSHold_CallBaro = true;
-              SetFlightModes[SETCOMPASSACTUAL] = 1;
+              SetFlightModes[SETCOMPASSACTUAL] = true;
               SetThisPointToPositionHold();
               NavigationMode = Do_PositionHold;
             }
@@ -196,7 +196,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_HOLD;
               Do_GPS_Altitude = true;
               SetThisPointToPositionHold();
-              SetFlightModes[SETCOMPASSACTUAL] = 1;
+              SetFlightModes[SETCOMPASSACTUAL] = true;
               NavigationMode = Do_Land_Init;
             }
             else
@@ -204,7 +204,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_NONE;
               GPSHold_CallBaro = false;
               Do_GPS_Altitude = false;
-              SetFlightModes[SETCOMPASSACTUAL] = 0;
+              SetFlightModes[SETCOMPASSACTUAL] = false;
               GPS_Reset_Navigation();
             }
           }

@@ -54,9 +54,9 @@ void RCSticks_Update()
       if (ArmDisarmConfig > 0)
       {
         if (ArmDisarmControlAux)
-          SetFlightModes[ARMDISARM_MODE] = 1;
+          SetFlightModes[ARMDISARM_MODE] = true;
         else
-          SetFlightModes[ARMDISARM_MODE] = 0;
+          SetFlightModes[ARMDISARM_MODE] = false;
         if (SetFlightModes[ARMDISARM_MODE])
         {
           if (Fail_Safe_System < 5 && !SetFlightModes[RTH_MODE] && !SetFlightModes[GPSHOLD_MODE])

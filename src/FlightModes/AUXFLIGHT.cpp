@@ -28,6 +28,7 @@
 
 AUXFLIGHTCLASS AUXFLIGHT;
 
+//VARIAVEIS DE CARREGAMENTO DA EEPROM
 uint8_t GPSHoldConfig,
     RTHConfig,
     IOCConfig,
@@ -41,6 +42,8 @@ uint8_t GPSHoldConfig,
     ArmDisarmConfig,
     AutoLandConfig,
     ParachuteDetectTrigger;
+
+//VARIAVEIS PARA OBTÉR O VALOR EM uS QUE ESTÁ CONFIGURADO OS MODOS
 int16_t AltitudeHoldControlAux,
     GPSHoldControlAux,
     RTHControlAux,
@@ -1097,39 +1100,39 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
     return;
   //ACRO
   if (AcroControlAux)
-    SetFlightModes[STABILIZE_MODE] = 0;
+    SetFlightModes[STABILIZE_MODE] = false;
   else
-    SetFlightModes[STABILIZE_MODE] = 1;
+    SetFlightModes[STABILIZE_MODE] = true;
   //IOC
   if (IOCControlAux)
-    SetFlightModes[IOC_MODE] = 1;
+    SetFlightModes[IOC_MODE] = true;
   else
-    SetFlightModes[IOC_MODE] = 0;
+    SetFlightModes[IOC_MODE] = false;
   //ALTITUDE-HOLD
   if (AltitudeHoldControlAux)
-    SetFlightModes[ALTITUDEHOLD_MODE] = 1;
+    SetFlightModes[ALTITUDEHOLD_MODE] = true;
   else
-    SetFlightModes[ALTITUDEHOLD_MODE] = 0;
+    SetFlightModes[ALTITUDEHOLD_MODE] = false;
   //GPS-HOLD
   if (GPSHoldControlAux)
-    SetFlightModes[GPSHOLD_MODE] = 1;
+    SetFlightModes[GPSHOLD_MODE] = true;
   else
-    SetFlightModes[GPSHOLD_MODE] = 0;
+    SetFlightModes[GPSHOLD_MODE] = false;
   //AUTO LAND
   if (AutoLandControlAux)
-    SetFlightModes[LAND_MODE] = 1;
+    SetFlightModes[LAND_MODE] = true;
   else
-    SetFlightModes[LAND_MODE] = 0;
+    SetFlightModes[LAND_MODE] = false;
   //RTH
   if (RTHControlAux)
-    SetFlightModes[RTH_MODE] = 1;
+    SetFlightModes[RTH_MODE] = true;
   else
-    SetFlightModes[RTH_MODE] = 0;
+    SetFlightModes[RTH_MODE] = false;
   //SPORT
   if (SportControlAux)
-    SetFlightModes[ATACK_MODE] = 1;
+    SetFlightModes[ATACK_MODE] = true;
   else
-    SetFlightModes[ATACK_MODE] = 0;
+    SetFlightModes[ATACK_MODE] = false;
   //AUTO-FLIP
   if (AutoFlipControlAux)
     Flip_Mode = true;

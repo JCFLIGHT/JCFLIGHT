@@ -22,6 +22,7 @@
 //BOOL OU BOOLEAN (0 - 1) OU (TRUE - FALSE)
 //*******************************************************
 bool COMMAND_ARM_DISARM = false;
+bool SetFlightModes[SIZEOFTHIS];
 bool CalibratingCompass = false;
 bool Do_GPS_Altitude = false;
 bool GPSHold_CallBaro = false;
@@ -46,7 +47,6 @@ uint8_t LedRGB[3] = {0, 0, 0};
 uint8_t Compass_Type = 0;
 uint8_t MagAddress = 0;
 uint8_t MagRegister = 0;
-uint8_t SetFlightModes[SIZEOFTHIS];
 uint8_t GPS_NumberOfSatellites;
 uint8_t NavigationMode = 0;
 uint8_t GPS_Flight_Mode;

@@ -19,6 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
+#include "FlightModes/AUXFLIGHT.h"
 
 #define THIS_LOOP_RATE 50     //HZ
 #define FAILSAFE_DELAY 1      //SEGUNDO
@@ -50,19 +51,24 @@ void FailSafeCheck()
   else
     Fail_Safe_Event = false;
   if (COMMAND_ARM_DISARM)
+  {
     Fail_Safe_System++;
+  }
   else
-    SetFlightModes[RTH_MODE] = 0;
+  {
+    if (!RTHControlAux)
+      SetFlightModes[RTH_MODE] = false;
+  }
 }
 
 void NormalizeFailSafe()
 {
-  SetFlightModes[STABILIZE_MODE] = 1;
-  SetFlightModes[IOC_MODE] = 0;
-  SetFlightModes[ALTITUDEHOLD_MODE] = 0;
-  SetFlightModes[GPSHOLD_MODE] = 0;
-  SetFlightModes[RTH_MODE] = 1;
-  SetFlightModes[ATACK_MODE] = 0;
+  SetFlightModes[STABILIZE_MODE] = true;
+  SetFlightModes[IOC_MODE] = false;
+  SetFlightModes[ALTITUDEHOLD_MODE] = false;
+  SetFlightModes[GPSHOLD_MODE] = false;
+  SetFlightModes[RTH_MODE] = true;
+  SetFlightModes[ATACK_MODE] = false;
   Flip_Mode = false;
   Do_WayPoint = false;
 }

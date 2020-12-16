@@ -24,6 +24,7 @@
 //BOOL OU BOOLEAN (0 - 1) OU (TRUE - FALSE)
 //*******************************************************
 extern bool COMMAND_ARM_DISARM;
+extern bool SetFlightModes[SIZEOFTHIS];
 extern bool CalibratingCompass;
 extern bool Do_GPS_Altitude;
 extern bool GPSHold_CallBaro;
@@ -57,7 +58,6 @@ extern uint8_t ThrottleExpo;
 extern uint8_t NavigationMode;
 extern uint8_t GPS_NumberOfSatellites;
 extern uint8_t FrameType;
-extern uint8_t SetFlightModes[SIZEOFTHIS];
 extern uint8_t GPS_Flight_Mode;
 
 //*******************************************************

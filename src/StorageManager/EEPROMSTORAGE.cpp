@@ -17,10 +17,6 @@
 
 #include "EEPROMSTORAGE.h"
 #include <avr/eeprom.h>
-#include "Common/VARIABLES.h"
-#include "RadioControl/CURVESRC.h"
-#include "PID/PIDPARAMS.h"
-#include "GPS/GPS.h"
 
 EEPROMSTORAGE STORAGEMANAGER;
 

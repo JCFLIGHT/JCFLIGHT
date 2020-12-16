@@ -15,13 +15,13 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "GPS.h"
+#include "MULTIROTORNAVIGATION.h"
 #include "Common/VARIABLES.h"
 #include "PID/PIDPARAMS.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Declination/AUTODECLINATION.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "AirPlane/AIRPLANENAVIGATION.h"
+#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/AVRMATH.h"
 #include "PID/GPSPID.h"

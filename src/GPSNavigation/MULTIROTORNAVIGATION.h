@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GPS_H_
-#define GPS_H_
+#ifndef MULTIROTORNAVIGATION_H_
+#define MULTIROTORNAVIGATION_H_
 #include "Arduino.h"
 extern float ScaleDownOfLongitude;
 extern int32_t GPSDistanceToHome[2];

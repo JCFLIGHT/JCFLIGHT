@@ -19,9 +19,9 @@
 #include "Scheduler/SCHEDULER.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Common/VARIABLES.h"
-#include "GPS.h"
+#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "IMU/ACCELERATION.h"
-#include "AirPlane/AIRPLANENAVIGATION.h"
 
 void GPS_Orientation_Update()
 {

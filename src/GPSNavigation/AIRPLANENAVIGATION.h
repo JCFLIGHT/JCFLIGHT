@@ -15,12 +15,12 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAVFIXEDWING_H_
-#define NAVFIXEDWING_H_
+#ifndef AIRPLANENAVIGATION_H_
+#define AIRPLANENAVIGATION_H_
 #include "Arduino.h"
 extern int32_t GPS_Altitude_For_Plane;
 extern int32_t GPS_AltitudeHold_For_Plane;
-void PlaneResetNavigation(void);
 void Cruise_Mode_Update();
 void PlaneUpdateNavigation(void);
+void PlaneResetNavigation(void);
 #endif

@@ -18,7 +18,7 @@
 #include "WAYPOINT.h"
 #include "Common/VARIABLES.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
-#include "GPS/GPS.h"
+#include "GPSNavigation/MULTIROTORNAVIGATION.h"
 #include "RadioControl/RCCONFIG.h"
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"

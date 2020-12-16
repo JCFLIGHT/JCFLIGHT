@@ -17,11 +17,11 @@
 
 #include "FLIGHTMODES.h"
 #include "Common/VARIABLES.h"
-#include "GPS/GPS.h"
+#include "GPSNavigation/MULTIROTORNAVIGATION.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "PID/PIDXYZ.h"
 #include "WayPointNavigation/WAYPOINT.h"
-#include "AirPlane/AIRPLANENAVIGATION.h"
+#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Math/AVRMATH.h"
 #include "RadioControl/STATES.h"
 
@@ -187,6 +187,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_HOLD;
               Do_GPS_Altitude = false;
               GPSHold_CallBaro = true;
+              SetFlightModes[SETCOMPASSACTUAL] = 1;
               SetThisPointToPositionHold();
               NavigationMode = Do_PositionHold;
             }
@@ -195,6 +196,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_HOLD;
               Do_GPS_Altitude = true;
               SetThisPointToPositionHold();
+              SetFlightModes[SETCOMPASSACTUAL] = 1;
               NavigationMode = Do_Land_Init;
             }
             else

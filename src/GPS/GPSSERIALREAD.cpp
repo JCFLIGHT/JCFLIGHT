@@ -17,7 +17,7 @@
 
 #include "GPSSERIALREAD.h"
 #include "FastSerial/FASTSERIAL.h"
-#include "GPS/GPS.h"
+#include "GPSNavigation/MULTIROTORNAVIGATION.h"
 #include "GPS/GPSREAD.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Common/VARIABLES.h"

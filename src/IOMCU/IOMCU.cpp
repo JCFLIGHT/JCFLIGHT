@@ -27,12 +27,12 @@
 #include "BatteryMonitor/BATTERY.h"
 #include "LedRGB/LEDRGB.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "AirPlane/AIRPLANENAVIGATION.h"
 #include "Math/AVRMATH.h"
 #include "BAR/BAR.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "Buzzer/BUZZER.h"
-#include "GPS/GPS.h"
+#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "IMU/GFORCE.h"
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "TimeMonitor/TIMEMONITOR.h"
@@ -606,12 +606,12 @@ void GCSClass::GCS_Request_Parameters()
     GCSParameters.SendHomePointState = Home_Point;
     GCSParameters.SendTemperature = BaroTemperatureRaw / 100;
     GCSParameters.SendHomePointDistance = DistanceToHome;
-#ifndef MACHINE_CYCLE
     GCSParameters.SendCurrentInMah = BATTERY.Get_Current_In_Mah();
-#else
-    GCSParameters.SendCurrentInMah = PID_Integral_Time;
-#endif
+#ifndef MACHINE_CYCLE
     GCSParameters.SendCourseOverGround = GPS_Ground_Course;
+#else
+    GCSParameters.SendCourseOverGround = PID_Integral_Time;
+#endif
     GCSParameters.SendCrosstrack = Target_Bearing;
     GCSParameters.SendAccGForce = GetGForce() * 100;
     GCSParameters.SendAccImageBitMap = GetImageToGCS();

@@ -18,8 +18,8 @@
 #include "GPSREAD.h"
 #include "FastSerial/FASTSERIAL.h"
 #include "Common/VARIABLES.h"
-#include "GPS.h"
-#include "AirPlane/AIRPLANENAVIGATION.h"
+#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Scheduler/SCHEDULERTIME.h"
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES

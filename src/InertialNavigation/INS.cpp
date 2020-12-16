@@ -18,7 +18,7 @@
 #include "INS.h"
 #include "I2C/I2C.h"
 #include "Common/VARIABLES.h"
-#include "GPS/GPS.h"
+#include "GPSNavigation/MULTIROTORNAVIGATION.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Barometer/BAROREAD.h"

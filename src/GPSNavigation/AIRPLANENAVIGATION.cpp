@@ -16,14 +16,14 @@
 */
 
 #include "AIRPLANENAVIGATION.h"
-#include "GPS/GPS.h"
+#include "MULTIROTORNAVIGATION.h"
 #include "Common/VARIABLES.h"
 #include "FlightModes/FLIGHTMODES.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/AVRMATH.h"
 
 //PARAMETROS DE NAVEGAÇÃO
-#define CRUISE_DISTANCE 500   //DISTANCIA DO RAIO PARA REALIZAR A CIRCUNFERENCIA (EM CM)
+#define CRUISE_DISTANCE 500   //DISTANCIA (EM CM)
 #define SAFE_NAV_ALT 25       //ALTITUDE SEGURA PARA O MODO DE NAVEGAÇÃO COM GPS HEADING
 #define SAFE_DECSCEND_ZONE 50 //VOLOR SEGURO PARA MANTER A ALTITUDE DO PLANE (EM METROS)
 #define PITCH_COMP 0.5f       //COMPENSAÇÃO DE ANGULO DINAMICO
@@ -62,36 +62,17 @@ void Cruise_Mode_Update()
 {
   if (FrameType < 3 || FrameType == 6 || FrameType == 7)
     return;
-  float Latitude_To_Circumference;
-  float Longitude_To_Circumference;
-  float Scale_Of_Circumference;
-  int32_t HeadingToCircumference = GPS_Ground_Course / 10;
-  if (HeadingToCircumference > 180)
-    HeadingToCircumference -= 360;
-  Scale_Of_Circumference = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
-  Latitude_To_Circumference = cos(HeadingToCircumference * 0.0174532925f);
-  Longitude_To_Circumference = sin(HeadingToCircumference * 0.0174532925f) * ScaleDownOfLongitude;
-  Coordinates_To_Navigation[0] += Latitude_To_Circumference * Scale_Of_Circumference;
-  Coordinates_To_Navigation[1] += Longitude_To_Circumference * Scale_Of_Circumference;
-}
-
-void PlaneResetNavigation(void)
-{
-  IntegralErrorOfNavigation = 0;
-  IntegralErrorOfAltitude = 0;
-  PreviousAltitudeDifference = 0;
-  PreviousHeadingDifference = 0;
-  ThrottleBoost = 0;
-  AltitudeVector[0] = 0;
-  NavigationDifferenceVector[0] = 0;
-  AltitudeVector[1] = 0;
-  NavigationDifferenceVector[1] = 0;
-  AltitudeVector[2] = 0;
-  NavigationDifferenceVector[2] = 0;
-  AltitudeVector[3] = 0;
-  NavigationDifferenceVector[3] = 0;
-  AltitudeVector[4] = 0;
-  NavigationDifferenceVector[4] = 0;
+  float Latitude_To_Cruise;
+  float Longitude_To_Cruise;
+  float Scale_Of_Cruise;
+  int32_t HeadingToCruise = GPS_Ground_Course / 10;
+  if (HeadingToCruise > 180)
+    HeadingToCruise -= 360;
+  Scale_Of_Cruise = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
+  Latitude_To_Cruise = cos(HeadingToCruise * 0.0174532925f);
+  Longitude_To_Cruise = sin(HeadingToCruise * 0.0174532925f) * ScaleDownOfLongitude;
+  Coordinates_To_Navigation[0] += Latitude_To_Cruise * Scale_Of_Cruise;
+  Coordinates_To_Navigation[1] += Longitude_To_Cruise * Scale_Of_Cruise;
 }
 
 void PlaneUpdateNavigation(void)
@@ -229,4 +210,23 @@ void PlaneUpdateNavigation(void)
   }
   RCController[THROTTLE] = GetThrottleToNavigation;
   RCController[YAW] += GPS_Angle[YAW];
+}
+
+void PlaneResetNavigation(void)
+{
+  IntegralErrorOfNavigation = 0;
+  IntegralErrorOfAltitude = 0;
+  PreviousAltitudeDifference = 0;
+  PreviousHeadingDifference = 0;
+  ThrottleBoost = 0;
+  AltitudeVector[0] = 0;
+  NavigationDifferenceVector[0] = 0;
+  AltitudeVector[1] = 0;
+  NavigationDifferenceVector[1] = 0;
+  AltitudeVector[2] = 0;
+  NavigationDifferenceVector[2] = 0;
+  AltitudeVector[3] = 0;
+  NavigationDifferenceVector[3] = 0;
+  AltitudeVector[4] = 0;
+  NavigationDifferenceVector[4] = 0;
 }

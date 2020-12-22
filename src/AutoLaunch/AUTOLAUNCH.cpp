@@ -83,7 +83,7 @@ void Auto_Launch_Update()
 {
   if (GetFrameStateOfMultirotor())
     return;
-  if (SportControlAux)
+  if (SetFlightModes[ATACK_MODE])
   {
     if (GetValidStateToRunLaunch() && !LaunchedDetect)
     {

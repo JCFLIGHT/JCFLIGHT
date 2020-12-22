@@ -17,10 +17,7 @@
 
 #include "LOOPS.h"
 #include "Common/COMMON.h"
-
-//FUNÇÕES QUE CONTÉM "WHILE" FORAM MOVIDAS PARA O LOOP DE 500HZ
-//ANTES ELAS ESTAVAM NO LOOP INTEGRAL E,ESTAVAM CAUSANDO INSTABILIDADE NAS FUNÇÕES MICROS E MILLIS
-#define I2C_AND_SERIAL_500HZ
+#include "Build/BOARDDEFS.h"
 
 void Slow_Loop()
 {
@@ -37,6 +34,7 @@ void Slow_Loop()
                 AUXFLIGHT.LoadEEPROM();
                 RTH_Altitude_EEPROM();
                 IMU_Filters_Update();
+                PID_DerivativeLPF_Update();
                 UpdateValuesOfPID();
                 UpdateServosDirection();
                 ServosPWR();
@@ -136,42 +134,51 @@ void Fast_Loop()
 
 void Integral_Loop()
 {
-#ifdef ENABLE_TIMEMONITOR
-        AVRTIMEMONITOR.MeasuringStartTime(TOTAL_LOOP);
+#ifdef LOOP_PERIOD
+        static Scheduler_Struct IntegralLoop;
+        if (SchedulerTimer(&IntegralLoop, LOOP_PERIOD)) //1KHZ
+        {
 #endif
 
-        RGB.Update();
-        SAFETYBUTTON.UpdateRoutine();
+#ifdef ENABLE_TIMEMONITOR
+                AVRTIMEMONITOR.MeasuringStartTime(TOTAL_LOOP);
+#endif
+
+                RGB.Update();
+                SAFETYBUTTON.UpdateRoutine();
 #ifndef I2C_AND_SERIAL_500HZ
-        SBUS_Update();
-        IBUS_Update();
-        Acc_ReadBufferData();
-        Gyro_ReadBufferData();
-        COMPASS.Constant_Read();
-        Barometer_Update();
-        GPS_Serial_Read();
-        AHRS_Update();
+                SBUS_Update();
+                IBUS_Update();
+                Acc_ReadBufferData();
+                Gyro_ReadBufferData();
+                COMPASS.Constant_Read();
+                Barometer_Update();
+                GPS_Serial_Read();
+                AHRS_Update();
 #endif
-        DynamicPID();
-        Auto_Launch_Update();
-        GPS_Process_FlightModes();
-        CalculateAccelerationXYZ();
-        INS_Calculate_AccelerationZ();
-        CalculateXY_INS();
-        AirSpeed_Update();
-        YawManipulationUpdate();
-        Apply_Controll_For_Throttle();
-        GPS_Orientation_Update();
-        PID_Time();
-        PID_Update();
-        PID_Reset_Integral_Accumulators();
-        PID_MixMotors();
-        Servo_Rate_Adjust();
-        ApplyPWMInAllComponents();
-        Switch_Flag();
-        BATTERY.Calculate_Total_Mah();
+                DynamicPID();
+                Auto_Launch_Update();
+                GPS_Process_FlightModes();
+                CalculateAccelerationXYZ();
+                INS_Calculate_AccelerationZ();
+                CalculateXY_INS();
+                AirSpeed_Update();
+                Apply_Controll_For_Throttle();
+                GPS_Orientation_Update();
+                PID_Time();
+                PID_Update();
+                PID_Reset_Integral_Accumulators();
+                PID_MixMotors();
+                Servo_Rate_Adjust();
+                ApplyPWMInAllComponents();
+                Switch_Flag();
+                BATTERY.Calculate_Total_Mah();
 
 #ifdef ENABLE_TIMEMONITOR
-        AVRTIMEMONITOR.MeasuringFinishTime();
+                AVRTIMEMONITOR.MeasuringFinishTime();
+#endif
+
+#ifdef LOOP_PERIOD
+        }
 #endif
 }

@@ -30,6 +30,8 @@
 
 void ConfigureRegisters()
 {
+#ifdef __AVR_ATmega2560__
+
   //CONFIGURAÇÃO DAS PORTAS DE SAÍDA
   DDRE |= (1 << DDD4); //DEFINE A PORTA DIGITAL 2 COMO SAIDA
   DDRE |= (1 << DDD5); //DEFINE A PORTA DIGITAL 3 COMO SAIDA
@@ -91,6 +93,10 @@ void ConfigureRegisters()
   TCCR5A |= _BV(COM4B1); //CONECTA O PINO 45 AO TIMER4 CANAL B
   //TCCR5A |= _BV(COM4C1); //CONECTA O PINO 44 AO TIMER4 CANAL C
 
+#elif __arm__
+
+#endif
+
   if (!ESC.Run_Calibrate && !SAFETYBUTTON.SafeButtonEnabled())
   {
     PulseInAllMotors(1000);
@@ -136,6 +142,8 @@ void PulseInAllMotors(int16_t Pulse)
 void ApplyPWMInAllComponents()
 {
 
+#ifdef __AVR_ATmega2560__
+
 #ifndef PWM_PINS_IN_ORDER
 
   OCR3C = MotorControl[MOTOR1] << 3; //PINO DIGITAL 3 (MOTOR 4 NO FRAME)
@@ -158,4 +166,8 @@ void ApplyPWMInAllComponents()
 
   OCR5A = MotorControl[GIMBAL] << 3;         //PINO DIGITAL 46
   OCR5B = MotorControl[PARACHUTESERVO] << 3; //PINO DIGITAL 45
+
+#elif __arm__
+
+#endif
 }

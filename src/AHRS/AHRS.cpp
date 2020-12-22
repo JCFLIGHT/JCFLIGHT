@@ -399,7 +399,6 @@ void AHRS_Update()
       {
         ComputeQuaternionFromRPY(ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[PITCH], GPS_Ground_Course);
         GPSHeadingInitialized = true;
-        ForceYawReset = true;
       }
     }
   }

@@ -22,19 +22,6 @@
 //T = DURAÇÃO
 //1 = PRIMEIRA ORDEM
 
-float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime)
-{
-    //CALCULA O VALOR RC DO FILTRO
-    //ESTAMOS CALCULANDO UM RESISTOR E UM CAPACITOR DIGITALMENTE
-    if (!Filter->RC)
-    {
-        Filter->RC = 1.0f / (2.0f * 3.14159265358979323846f * CutOffFrequency);
-    }
-    Filter->DeltaTime = DeltaTime;                                                                  //GUARDA O ÚLTIMO VALOR DO DELTA TIME
-    Filter->State = Filter->State + DeltaTime / (Filter->RC + DeltaTime) * (Input - Filter->State); //CALCULA O VALOR DO FILTRO
-    return Filter->State;                                                                           //RETORNA O VALOR FILTRADO
-}
-
 void PT1FilterInit(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime)
 {
     PT1FilterInitRC(Filter, 1.0f / (2.0f * 3.14159265358979323846f * CutOff), DeltaTime);
@@ -47,8 +34,15 @@ void PT1FilterInitRC(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime)
     Filter->DeltaTime = DeltaTime;
 }
 
-float PT1FilterApply2(PT1_Filter_Struct *Filter, float Input)
+float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime)
 {
-    Filter->State = Filter->State + Filter->DeltaTime / (Filter->RC + Filter->DeltaTime) * (Input - Filter->State);
-    return Filter->State;
+    //CALCULA O VALOR RC DO FILTRO
+    //ESTAMOS CALCULANDO UM RESISTOR E UM CAPACITOR DIGITALMENTE
+    if (!Filter->RC)
+    {
+        Filter->RC = 1.0f / (2.0f * 3.14159265358979323846f * CutOffFrequency);
+    }
+    Filter->DeltaTime = DeltaTime;                                                                  //GUARDA O ÚLTIMO VALOR DO DELTA TIME
+    Filter->State = Filter->State + DeltaTime / (Filter->RC + DeltaTime) * (Input - Filter->State); //CALCULA O VALOR DO FILTRO
+    return Filter->State;                                                                           //RETORNA O VALOR FILTRADO
 }

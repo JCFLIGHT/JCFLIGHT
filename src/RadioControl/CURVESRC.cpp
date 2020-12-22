@@ -19,8 +19,11 @@
 #include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "Math/AVRMATH.h"
 
 #define THROTTLE_LOOKUP_LENGTH 11
+//lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO (1.5 = 2 / 2.5 = 2)
+#define LRint lrint
 
 void CurvesRC_CalculeValue()
 {
@@ -37,6 +40,33 @@ void CurvesRC_CalculeValue()
                                                                                               100 - ThrottleExpo);
     CalculeLookUpThrottle[IndexOfLookUpThrottle] = MotorSpeed + (uint32_t)((uint16_t)(1900 - MotorSpeed)) * CalculeLookUpThrottle[IndexOfLookUpThrottle] / 10000;
   }
+}
+
+int16_t RCControllerToRate(int16_t StickData, uint8_t Rate)
+{
+  const int16_t MaximumRateDPS = Rate * 10;
+  return Map_32Bits((int16_t)StickData, -500, 500, -MaximumRateDPS, MaximumRateDPS);
+}
+
+int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo)
+{
+  int16_t RCValueDeflection;
+  RCValueDeflection = Constrain_16Bits(RadioControllOutput[Data] - 1500, -500, 500);
+  float ConvertValueToFloat = RCValueDeflection / 100.0f;
+  return LRint((2500.0f + (float)RcExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
+}
+
+uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
+{
+  if (CalcedDeflection > 999)
+    return 1900;
+
+  const uint8_t CalcedLookUpStep = CalcedDeflection / 100;
+  return CalculeLookUpThrottle[CalcedLookUpStep] +
+         (CalcedDeflection - CalcedLookUpStep * 100) *
+             (CalculeLookUpThrottle[CalcedLookUpStep + 1] -
+              CalculeLookUpThrottle[CalcedLookUpStep]) /
+             100;
 }
 
 void CurvesRC_SetValues()

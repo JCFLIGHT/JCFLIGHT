@@ -34,9 +34,7 @@ uint16_t AirSpeedCalculedPressure = 0;
 
 void AirSpeed_Initialization()
 {
-  if ((STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) < 3) ||
-      (STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) == 6) ||
-      (STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) == 7))
+  if (GetFrameStateOfMultirotor())
     return;
   if (Get_AirSpeed_Type() == NONE_AIRSPEED)
   {

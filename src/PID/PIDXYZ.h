@@ -20,12 +20,16 @@
 #include "Arduino.h"
 extern int16_t IntegralAccError[2];
 extern int16_t IntegralGyroError[2];
+extern int16_t CalcedRateTargetRoll;
+extern int16_t CalcedRateTargetPitch;
+extern int16_t CalcedRateTargetYaw;
 extern uint16_t PID_Integral_Time;
+void PID_DerivativeLPF_Update();
 void PID_Time();
 void PID_Update();
-void PID_Controll_Pitch();
-void PID_Controll_Roll();
-void PID_Controll_Yaw();
+void PID_Controll_Pitch(int16_t RateTargetInput);
+void PID_Controll_Roll(int16_t RateTargetInput);
+void PID_Controll_Yaw(int16_t RateTargetInput);
 int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn);
 void PID_Reset_Integral_Accumulators();
 #endif

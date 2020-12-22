@@ -149,8 +149,11 @@ bool SAFETYBUTTONCLASS::GetSafeStateToOutput()
 
 bool SAFETYBUTTONCLASS::SafeButtonEnabled()
 {
-    if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == 2)
+    if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
+        STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_BUZZER)
+    {
         return false;
+    }
     return true;
 }
 

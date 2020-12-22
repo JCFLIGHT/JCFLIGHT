@@ -22,37 +22,37 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Filters/PT1.h"
 
-bool ForceYawReset = false;
-
 #define HEADING_HOLD_ERROR_LPF_FREQ 2
 
 static PT1_Filter_Struct HeadingHoldRateFilter;
 
-void YawManipulationUpdate()
+void UpdateStateOfHeadingHold(void)
+{
+  if (!COMMAND_ARM_DISARM)
+  {
+    HeadingHoldRateFilter.State = 0.0f; //RESETA O FILTRO
+  }
+  HeadingHoldTarget = ATTITUDE.CalculedHeading; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
+}
+
+bool GetSafeStateOfHeadingHold()
+{
+  if (CheckAnglesInclination(25)) //NÃO APLICA A CORREÇÃO DO YAW SE OS ANGULOS FOREM MAIOR QUE 25 GRAUS
+    return false;
+
+  if (GPS_Flight_Mode == Do_None) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
+    return false;
+
+  if (ABS_16BITS(RCController[YAW]) > 10) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
+    return false;
+
+  return true; //TUDO ESTÁ OK
+}
+
+float GetHeadingHoldValue()
 {
   uint8_t Heading_Hold_Rate_Limit = 90;
   float HeadingHoldRate;
-
-  if (!COMMAND_ARM_DISARM || ForceYawReset) //NÃO APLICA A CORREÇÃO DO YAW COM A CONTROLADORA DESARMADA
-  {
-    HeadingHoldTarget = ATTITUDE.CalculedHeading; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
-    HeadingHoldRateFilter.State = 0.0f;           //RESETA O FILTRO
-    if (ForceYawReset)
-      ForceYawReset = false;
-    return;
-  }
-
-  if (CheckAnglesInclination(25)) //NÃO APLICA A CORREÇÃO DO YAW SE OS ANGULOS FOREM MAIOR QUE 25 GRAUS
-    return;
-
-  if (GPS_Flight_Mode == Do_None) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
-    return;
-
-  if (!Do_HeadingHold_Mode) //NÃO APLICA A CORREÇÃO DO YAW SE A ATUALIZAÇÃO DO VALOR DE HEADING NÃO ACONTECER
-    return;
-
-  if (ABS_16BITS(RCController[YAW]) > 10) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
-    return;
 
   int16_t YawError = ATTITUDE.CalculedHeading - HeadingHoldTarget; //CALCULA O ERRO / DIFERENÇA
 
@@ -74,5 +74,5 @@ void YawManipulationUpdate()
   //REALIZA FILTRAGEM DO RATE COM O PT1
   HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, AVRTIME.SchedulerMicros() * 1e-6);
   //APLICA O CONTROLE DO YAW
-  RCController[YAW] -= HeadingHoldRate; //APLICA O CONTROLE DO YAW
+  return HeadingHoldRate;
 }

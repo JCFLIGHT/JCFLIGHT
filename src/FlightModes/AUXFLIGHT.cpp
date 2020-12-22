@@ -1089,7 +1089,7 @@ void AUXFLIGHTCLASS::SelectMode(void)
 
 void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
 {
-  SetFlightModeToGCS();
+  SetFlightModesToGCS();
   if (Fail_Safe_Event)
     return;
   //ACRO

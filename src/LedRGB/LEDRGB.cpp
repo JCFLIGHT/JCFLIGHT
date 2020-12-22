@@ -19,6 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "IOMCU/IOMCU.h"
+#include "Build/BOARDDEFS.h"
 
 LEDRGB RGB;
 
@@ -26,17 +27,17 @@ bool NotPriorit = false;
 
 void LEDRGB::Initialization()
 {
-  DDRB |= (1 << DDD4); //DEFINE A PORTA DIGITAL 10 COMO SAIDA
-  DDRB |= (1 << DDD5); //DEFINE A PORTA DIGITAL 11 COMO SAIDA
-  DDRB |= (1 << DDD6); //DEFINE A PORTA DIGITAL 12 COMO SAIDA
+  RED_LED_PINOUT;
+  GREEN_LED_PINOUT;
+  BLUE_LED_PINOUT;
 }
 
 void LEDRGB::Update()
 {
   //REGISTRADORES DE MANIPULAÇÃO DO LED RGB
-  OCR2A = LedRGB[RED];   //PINO DIGITAL 10
-  OCR1A = LedRGB[GREEN]; //PINO DIGITAL 11
-  OCR1B = LedRGB[BLUE];  //PINO DIGITAL 12
+  RED_LED_PWM_REGISTER = LedRGB[RED];     //PINO DIGITAL 10
+  GREEN_LED_PWM_REGISTER = LedRGB[GREEN]; //PINO DIGITAL 11
+  BLUE_LED_PWM_REGISTER = LedRGB[BLUE];   //PINO DIGITAL 12
   if ((CalibratingAccelerometer == 0) &&
       (!GCS.ConfigFlight) &&
       (!CalibratingCompass) &&

@@ -27,6 +27,7 @@
 #include "Compass/COMPASSREAD.h"
 #include "BAR/BAR.h"
 #include "SensorAlignment/ALIGNMENT.h"
+#include "Build/BOARDDEFS.h"
 
 //INSTANCIAS PARA O LPF
 BiQuadFilter BiquadAccLPF[3];
@@ -35,8 +36,6 @@ BiQuadFilter BiquadGyroLPF[3];
 //INSTANCIAS PARA O NOTCH
 BiQuadFilter BiquadAccNotch[3];
 BiQuadFilter BiquadGyroNotch[3];
-
-#define THIS_LOOP_FREQUENCY 500 //HZ
 
 bool ActiveKalman = false;
 uint8_t GyroLPF = 0;
@@ -179,7 +178,7 @@ void Acc_ReadBufferData()
 {
   I2C.SensorsRead(0x68, 0x3B);
   IMU.AccelerometerRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]) >> 3;
-  IMU.AccelerometerRead[PITCH] = -((BufferData[2] << 8) | BufferData[3]) >> 3;
+  IMU.AccelerometerRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
   IMU.AccelerometerRead[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
 
   //CALIBRAÇÃO DO ACELEROMETRO
@@ -220,8 +219,8 @@ void Acc_ReadBufferData()
 void Gyro_ReadBufferData()
 {
   I2C.SensorsRead(0x68, 0x43);
-  IMU.GyroscopeRead[ROLL] = -((BufferData[0] << 8) | BufferData[1]) >> 2;
-  IMU.GyroscopeRead[PITCH] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
+  IMU.GyroscopeRead[PITCH] = -(((BufferData[0] << 8) | BufferData[1]) >> 2);
+  IMU.GyroscopeRead[ROLL] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
   IMU.GyroscopeRead[YAW] = -((BufferData[4] << 8) | BufferData[5]) >> 2;
 
   //CALIBRAÇÃO DO GYROSCOPIO

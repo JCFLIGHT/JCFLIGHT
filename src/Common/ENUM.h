@@ -424,6 +424,14 @@ enum Buzzer_Modes_Enum
 {
     NORMAL_OPERATION_MODE = -10,
     ESC_CALIBRATION_MODE = 1,
-    ESC_FINISH_CALIBRATION_MODE
+    ESC_FINISH_CALIBRATION_MODE = 2
+};
+
+enum Dispositives_Passives_Enum
+{
+    OFF_ALL_DISP = 0,
+    BUZZER_AND_SWITCH, //NÃO USADO
+    ONLY_BUZZER,
+    ONLY_SWITCH
 };
 #endif

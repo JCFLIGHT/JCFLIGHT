@@ -16,16 +16,13 @@
 */
 
 #include "SERVOSPWR.h"
-#include "StorageManager/EEPROMSTORAGE.h"
-#include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 void ServosPWR(void)
 {
     DDRA |= (1 << DDD1); //DEFINE A PORTA DIGITAL 23 COMO SAIDA
     DDRA |= (1 << DDD2); //DEFINE A PORTA DIGITAL 24 COMO SAIDA
-    if (STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) == 3 ||
-        STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) == 4 ||
-        STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) == 5)
+    if (GetFrameStateOfAirPlane())
     {
         PORTA |= 1 << 1;    //ATIVA A ALIMENTAÇÃO DOS SERVOS
         PORTA &= ~(1 << 2); //ATIVA A ALIMENTAÇÃO DOS SERVOS

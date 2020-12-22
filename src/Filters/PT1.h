@@ -24,13 +24,8 @@ typedef struct PT1Filter
     float RC;
     float DeltaTime;
 } PT1_Filter_Struct;
-typedef union
-{
-    PT1_Filter_Struct PT1;
-} PT1Filter_Struct;
-typedef float (*FilterApplyFnPTR)(void *Filter, float Input);
-float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime);
 void PT1FilterInit(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime);
 void PT1FilterInitRC(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime);
+float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime);
 float PT1FilterApply2(PT1_Filter_Struct *Filter, float Input);
 #endif

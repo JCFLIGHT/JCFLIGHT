@@ -672,9 +672,9 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendActualAuxSevenValue = DirectRadioControllRead[AUX7];
     GCSParameters_Two.SendActualAuxEightValue = DirectRadioControllRead[AUX8];
     GCSParameters_Two.SendAttitudeThrottleValue = RCController[THROTTLE];
-    GCSParameters_Two.SendAttitudeYawValue = RCController[YAW];
-    GCSParameters_Two.SendAttitudePitchValue = RCController[PITCH];
-    GCSParameters_Two.SendAttitudeRollValue = RCController[ROLL];
+    GCSParameters_Two.SendAttitudeYawValue = CalcedRateTargetYaw;
+    GCSParameters_Two.SendAttitudePitchValue = CalcedRateTargetPitch;
+    GCSParameters_Two.SendAttitudeRollValue = CalcedRateTargetRoll;
     GCSParameters_Two.SendMemoryRamUsed = MEMORY.Check();
     GCSParameters_Two.SendMemoryRamUsedPercent = MEMORY.GetPercentageRAMUsed();
     GCSParameters_Two.SendAccXNotFiltered = IMU.AccelerometerReadNF[ROLL];

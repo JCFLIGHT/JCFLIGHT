@@ -19,7 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "AUXFLIGHT.h"
 
-void SetFlightModeToGCS()
+void SetFlightModesToGCS()
 {
   if ((NavigationMode == Do_Land_Settle) ||
       (NavigationMode == Do_LandInProgress) ||

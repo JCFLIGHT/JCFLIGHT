@@ -18,6 +18,9 @@
 #include "ACCELERATION.h"
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
+#include "FastSerial/PRINTF.h"
+
+//#define DEBUG_ACCELERATION
 
 float Cosine_Yaw;
 float Sine_Yaw;
@@ -34,13 +37,32 @@ void CalculateAccelerationXYZ()
   float SinePitch_CosineYaw_Fusion;
   float SinePitch_SineYaw_Fusion;
 
-  //CALCULA O SENO E COSSENO DE CADA EIXO DA ESTIMAÇÃO DE ATTITUDE DADO PELO DCM
-  Cosine_Roll = Calculate_Cosine_Approx(ATTITUDE.AngleOut[ROLL]);
-  Sine_Roll = Calculate_Sine_Approx(ATTITUDE.AngleOut[ROLL]);
-  Cosine_Pitch = Calculate_Cosine_Approx(-ATTITUDE.AngleOut[PITCH]);
-  Sine_Pitch = Calculate_Sine_Approx(-ATTITUDE.AngleOut[PITCH]);
-  Cosine_Yaw = Calculate_Cosine_Approx(ATTITUDE.CompassHeading);
-  Sine_Yaw = Calculate_Sine_Approx(ATTITUDE.CompassHeading);
+  //CALCULA O SENO E COSSENO DE CADA EIXO DA ESTIMAÇÃO DE ATTITUDE DADO PELO AHRS
+  Cosine_Roll = Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
+  Sine_Roll = Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
+  Cosine_Pitch = Fast_Cosine(ConvertDeciDegreesToRadians(-ATTITUDE.AngleOut[PITCH]));
+  Sine_Pitch = Fast_Sine(ConvertDeciDegreesToRadians(-ATTITUDE.AngleOut[PITCH]));
+  Cosine_Yaw = Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
+  Sine_Yaw = Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
+
+#ifdef DEBUG_ACCELERATION
+
+  FastSerialPrintln(PSTR("Cosine_Roll:%.4f Sine_Roll:%.4f\n"),
+                    Cosine_Roll,
+                    Sine_Roll);
+
+/*
+  FastSerialPrintln(PSTR("Cosine_Pitch:%.4f Sine_Pitch:%.4f\n"),
+                    Cosine_Pitch,
+                    Sine_Pitch);
+*/
+
+/*
+  FastSerialPrintln(PSTR("Cosine_Yaw:%.4f Sine_Yaw:%.4f\n"),
+                    Cosine_Yaw,
+                    Sine_Yaw);
+*/
+#endif
 
   //REALIZA A FUSÃO DE ALGUMAS VARIAVEIS PARA OBTER DIFERENTES VALORES DE ACELERAÇÃO EM TORNO DO EIXO Z
   SinePitch_CosineYaw_Fusion = Sine_Pitch * Cosine_Yaw;

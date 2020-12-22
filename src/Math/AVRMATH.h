@@ -43,8 +43,6 @@ float ConvertRadiansToDeciDegrees(float Inputvalue);
 float ConvertDeciDegreesToRadians(float Inputvalue);
 float ConvertDeciDegreesToDegrees(float Inputvalue);
 int16_t ApproximationOfAtan2(int16_t AccRoll, int16_t AccYaw);
-float Calculate_Sine_Approx(int16_t InputAngle);
-float Calculate_Cosine_Approx(int16_t InputAngle);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);
 float InvertSquareRootFloat(float InputValue);

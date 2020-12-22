@@ -19,6 +19,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 
+#ifdef __AVR_ATmega2560__
 void UART2Mode_Initialization()
 {
     DDRA |= (1 << DDD0); //DEFINE A PORTA DIGITAL 22 COMO SAIDA
@@ -31,3 +32,9 @@ void UART2Mode_Initialization()
         PORTA &= ~(1 << 0); //PREPARA OS TRANSISTORES PARA O MODO SBUS
     }
 }
+
+#elif __arm__
+void UART2Mode_Initialization()
+{
+}
+#endif

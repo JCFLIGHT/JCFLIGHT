@@ -19,19 +19,28 @@
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "FastSerial/PRINTF.h"
+
+//#define DEBUG_IOC
 
 void IOC_Mode_Update()
 {
-  if (GetFrameStateOfMultirotor())
+  if (Do_IOC_Mode && GetFrameStateOfMultirotor())
   {
-    if (Do_IOC_Mode)
-    {
-      int16_t HeadingDifference = ATTITUDE.CompassHeading - (IOC_Initial_Compass * 10);
-      float CosineDifference = Calculate_Cosine_Approx(HeadingDifference);
-      float SineDifference = Calculate_Sine_Approx(HeadingDifference);
-      int16_t RCController_PITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;
-      RCController[ROLL] = RCController[ROLL] * CosineDifference - RCController[PITCH] * SineDifference;
-      RCController[PITCH] = RCController_PITCH;
-    }
+    const float HeadingDifference = ConvertToRadians(ConvertDeciDegreesToDegrees(ATTITUDE.CompassHeading) - ConvertDeciDegreesToDegrees(IOC_Initial_Compass));
+    const float CosineDifference = Fast_Cosine(HeadingDifference);
+    const float SineDifference = Fast_Sine(HeadingDifference);
+    const int16_t RCController_PITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;
+    RCController[ROLL] = RCController[ROLL] * CosineDifference - RCController[PITCH] * SineDifference;
+    RCController[PITCH] = RCController_PITCH;
   }
+#ifdef DEBUG_IOC
+  FastSerialPrintln(PSTR("RCController[ROLL]:%d RCController[PITCH]:%d RCController_PITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
+                    RCController[ROLL],
+                    RCController[PITCH],
+                    RCController_PITCH,
+                    HeadingDifference,
+                    CosineDifference,
+                    SineDifference);
+#endif
 }

@@ -18,6 +18,7 @@
 #ifndef YAWMANIPULATION_H_
 #define YAWMANIPULATION_H_
 #include "Arduino.h"
-extern bool ForceYawReset;
-void YawManipulationUpdate();
+void UpdateStateOfHeadingHold(void);
+bool GetSafeStateOfHeadingHold();
+float GetHeadingHoldValue();
 #endif

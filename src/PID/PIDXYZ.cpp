@@ -28,7 +28,8 @@
 #include "AHRS/AHRS.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "FastSerial/PRINTF.h"
+#include "Yaw/YAWMANIPULATION.h"
+#include "RadioControl/CURVESRC.h"
 
 //STABILIZE
 #define STAB_PITCH_ANGLE_MAX 45 //GRAUS
@@ -38,19 +39,21 @@
 #define SPORT_PITCH_ANGLE_MAX 55 //GRAUS
 #define SPORT_ROLL_ANGLE_MAX 55  //GRAUS
 
+#define GYRO_SATURATION_LIMIT 1800 //DPS
+
 int16_t IntegralAccError[2] = {0, 0};
 int16_t IntegralGyroError[2] = {0, 0};
-int16_t Value_LPF_Derivative = 0;
+int16_t Get_LPF_Derivative_Value = 0;
+int16_t CalcedRateTargetRoll = 0;
+int16_t CalcedRateTargetPitch = 0;
+int16_t CalcedRateTargetYaw = 0;
 uint16_t PID_Integral_Time = 0;
 int32_t IntegralGyroError_Yaw = 0;
 uint32_t PID_Guard_Time = 0;
 
-void DerivativeLPF_Update()
+void PID_DerivativeLPF_Update()
 {
-  if (STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR) != Value_LPF_Derivative)
-  {
-    Value_LPF_Derivative = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
-  }
+  Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
 }
 
 void PID_Time()
@@ -62,12 +65,26 @@ void PID_Time()
 
 void PID_Update()
 {
-  PID_Controll_Roll();
-  PID_Controll_Pitch();
-  PID_Controll_Yaw();
+  CalcedRateTargetRoll = RCControllerToRate(RCController[ROLL], RCRate);
+  CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
+  if (Do_HeadingHold_Mode && GetSafeStateOfHeadingHold())
+  {
+    CalcedRateTargetYaw = GetHeadingHoldValue();
+  }
+  else
+  {
+    CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], RCRate);
+    UpdateStateOfHeadingHold();
+  }
+  CalcedRateTargetRoll = Constrain_16Bits(CalcedRateTargetRoll, -GYRO_SATURATION_LIMIT, +GYRO_SATURATION_LIMIT);
+  CalcedRateTargetPitch = Constrain_16Bits(CalcedRateTargetPitch, -GYRO_SATURATION_LIMIT, +GYRO_SATURATION_LIMIT);
+  CalcedRateTargetYaw = Constrain_16Bits(CalcedRateTargetYaw, -GYRO_SATURATION_LIMIT, +GYRO_SATURATION_LIMIT);
+  PID_Controll_Roll(CalcedRateTargetRoll);
+  PID_Controll_Pitch(CalcedRateTargetPitch);
+  PID_Controll_Yaw(CalcedRateTargetYaw);
 }
 
-void PID_Controll_Roll()
+void PID_Controll_Roll(int16_t RateTargetInput)
 {
   int16_t ProportionalTerminate = 0;
   int16_t DerivativeTerminate;
@@ -82,7 +99,7 @@ void PID_Controll_Roll()
   static int16_t SimpleFilterPIDTwo;
   static int16_t SimpleFilterPIDThree;
   int16_t RadioControlToPID;
-  RadioControlToPID = RCController[ROLL] << 1;
+  RadioControlToPID = RateTargetInput << 1;
   PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * PID_Integral_Time) >> 12);
   IntegralGyroError[ROLL] = Constrain_16Bits(IntegralGyroError[ROLL] + PIDError, -16000, +16000);
   if (ABS_16BITS(IMU.GyroscopeRead[ROLL]) > 640)
@@ -91,15 +108,20 @@ void PID_Controll_Roll()
   ProportionalTerminate = Multiplication32Bits(RadioControlToPID, PID[ROLL].ProportionalVector) >> 6;
   if (Do_Stabilize_Mode)
   {
-    if (!SetFlightModes[ATACK_MODE])
+    if (GetFrameStateOfMultirotor())
     {
-      if (!ApplyFlipRoll)
-        MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_ROLL_ANGLE_MAX * 10, +STAB_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
-      else
-        MaxMinAngle = FlipAngleValue;
+      if (!SetFlightModes[ATACK_MODE])
+      {
+        if (!ApplyFlipRoll)
+          MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_ROLL_ANGLE_MAX * 10, +STAB_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
+        else
+          MaxMinAngle = FlipAngleValue;
+      }
     }
     else
+    {
       MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -SPORT_ROLL_ANGLE_MAX * 10, +SPORT_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
+    }
     IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * PID_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_X = PID[PIDAUTOLEVEL].DerivativeVector * 5;
@@ -116,9 +138,9 @@ void PID_Controll_Roll()
   SimpleFilterPIDThree = SimpleFilterPIDTwo;
   SimpleFilterPIDTwo = SimpleFilterPIDOne;
   SimpleFilterPIDOne = SimpleFilterPID;
-  if (Value_LPF_Derivative > 0)
+  if (Get_LPF_Derivative_Value > 0)
   {
-    DiscreteLPF_To_Derivative_PID(Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Value_LPF_Derivative);
+    DiscreteLPF_To_Derivative_PID(Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value);
   }
   else
   {
@@ -127,7 +149,7 @@ void PID_Controll_Roll()
   PIDControllerApply[ROLL] = ProportionalTerminate + IntegratorTerminate - DerivativeTerminate;
 }
 
-void PID_Controll_Pitch()
+void PID_Controll_Pitch(int16_t RateTargetInput)
 {
   int16_t ProportionalTerminate = 0;
   int16_t DerivativeTerminate;
@@ -142,7 +164,7 @@ void PID_Controll_Pitch()
   static int16_t SimpleFilterPIDOne;
   static int16_t SimpleFilterPIDTwo;
   static int16_t SimpleFilterPIDThree;
-  RadioControlToPID = RCController[PITCH] << 1;
+  RadioControlToPID = RateTargetInput << 1;
   PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * PID_Integral_Time) >> 12);
   IntegralGyroError[PITCH] = Constrain_16Bits(IntegralGyroError[PITCH] + PIDError, -16000, +16000);
   if (ABS_16BITS(IMU.GyroscopeRead[PITCH]) > 640)
@@ -151,15 +173,20 @@ void PID_Controll_Pitch()
   ProportionalTerminate = Multiplication32Bits(RadioControlToPID, PID[PITCH].ProportionalVector) >> 6;
   if (Do_Stabilize_Mode)
   {
-    if (!SetFlightModes[ATACK_MODE])
+    if (GetFrameStateOfMultirotor())
     {
-      if (!ApplyFlipPitch)
-        MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PITCH_ANGLE_MAX * 10, +STAB_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
-      else
-        MaxMinAngle = FlipAngleValue;
+      if (!SetFlightModes[ATACK_MODE])
+      {
+        if (!ApplyFlipPitch)
+          MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PITCH_ANGLE_MAX * 10, +STAB_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
+        else
+          MaxMinAngle = FlipAngleValue;
+      }
     }
     else
+    {
       MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -SPORT_PITCH_ANGLE_MAX * 10, +SPORT_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
+    }
     IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * PID_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_Y = PID[PIDAUTOLEVEL].DerivativeVector * 5;
@@ -176,9 +203,9 @@ void PID_Controll_Pitch()
   SimpleFilterPIDThree = SimpleFilterPIDTwo;
   SimpleFilterPIDTwo = SimpleFilterPIDOne;
   SimpleFilterPIDOne = SimpleFilterPID;
-  if (Value_LPF_Derivative > 0)
+  if (Get_LPF_Derivative_Value > 0)
   {
-    DiscreteLPF_To_Derivative_PID(Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Value_LPF_Derivative);
+    DiscreteLPF_To_Derivative_PID(Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value);
   }
   else
   {
@@ -187,7 +214,7 @@ void PID_Controll_Pitch()
   PIDControllerApply[PITCH] = ProportionalTerminate + IntegratorTerminate - DerivativeTerminate;
 }
 
-void PID_Controll_Yaw()
+void PID_Controll_Yaw(int16_t RateTargetInput)
 {
   static uint8_t IntegralGyroMax = 250;
   int16_t RadioControlToPID;
@@ -202,10 +229,11 @@ void PID_Controll_Yaw()
     IntegralGyroMax = 200;
   else
     IntegralGyroMax = 250;
-  RadioControlToPID = Multiplication32Bits(RCController[YAW], (2 * YawRate + 30)) >> 5;
-  PIDError = RadioControlToPID - IMU.GyroscopeRead[YAW];
+  RadioControlToPID = Multiplication32Bits(RateTargetInput, (2 * YawRate + 30)) >> 5;
   if (GetFrameStateOfAirPlane())
     PIDError = TurnControllerForAirPlane(RadioControlToPID);
+  else
+    PIDError = RadioControlToPID - IMU.GyroscopeRead[YAW];
   if (!Do_IOC_Mode) //STABILIZE OU ACRO
   {
     DeltaYawSmallFilter = IMU.GyroscopeRead[YAW] - LastGyroYawValue;

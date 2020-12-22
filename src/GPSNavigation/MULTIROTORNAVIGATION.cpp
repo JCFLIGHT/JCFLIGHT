@@ -40,7 +40,7 @@ void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput);
 
 bool DeclinationPushed = false;
 
-uint8_t MachineCicleCount = 0;
+uint8_t DeclinationPushedCount = 0;
 
 static float DeltaTimeGPSNavigation;
 float ScaleDownOfLongitude = 1.0f;
@@ -82,20 +82,17 @@ void GPS_Process_FlightModes(void)
   if (!COMMAND_ARM_DISARM && !DeclinationPushed)
   {
     Set_Initial_Location(GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1]);
-    MachineCicleCount++;
-  }
-  //VERIFICA SE A DECLINAÇÃO MAGNETICA FOI CALCULADA
-  if (Declination() != 0)
-  {
-    if (MachineCicleCount == 5) //UTILIZA 5 CICLOS DE MAQUINA PARA CALCULAR A DECLINAÇÃO
-      DeclinationPushed = true;
-    MachineCicleCount = 6;
+    DeclinationPushedCount++;
   }
   //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
-  if (Declination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) &&
-      !COMMAND_ARM_DISARM && Declination() != 0 && DeclinationPushed)
+  if (Declination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) && //VERIFICA SE O VALOR É DIFERENTE
+      !COMMAND_ARM_DISARM &&                                          //CHECA SE ESTÁ DESARMADO
+      Declination() != 0 &&                                           //CHECA SE O VALOR É DIFERENTE DE ZERO
+      !DeclinationPushed &&                                           //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
+      DeclinationPushedCount > 250)                                   //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
   {
     STORAGEMANAGER.Write_Float(DECLINATION_ADDR, Declination());
+    DeclinationPushed = true;
   }
   uint32_t ActualCurrentTime = AVRTIME.SchedulerMillis();
   static uint32_t StoredCurrentTime;

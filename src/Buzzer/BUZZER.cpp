@@ -23,12 +23,11 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "Build/BOARDDEFS.h"
 
 BEEPERCLASS BEEPER;
 
 #define BEEPER_COMMAND_STOP 0xFF
-#define BEEP_ON OCR2B = 1000 >> 3
-#define BEEP_OFF OCR2B = 0
 
 bool BuzzerInit = false;
 bool SafeToOthersBeeps = false;
@@ -169,11 +168,15 @@ void BEEPERCLASS::BeeperProcessCommand()
 
 void BEEPERCLASS::Run()
 {
-  if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == 3)
+  if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
+      STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_SWITCH)
+  {
     return;
+  }
   if (!BuzzerInit)
-    DDRH |= (1 << DDD6); //DEFINE A PORTA DIGITAL 9 COMO SAIDA
-
+  {
+    BEEP_PINOUT;
+  }
   if (ESC.BeeperMode == ESC_CALIBRATION_MODE)
   {
     BeeperPlay(BEEPER_CALIBRATION_DONE);
@@ -187,5 +190,6 @@ void BEEPERCLASS::Run()
   if (SafeToOthersBeeps && SafeToOthersBeepsCounter < 254)
     SafeToOthersBeepsCounter++;
   BeeperUpdate();
-  BuzzerInit = true;
+  if (!BuzzerInit)
+    BuzzerInit = true;
 }

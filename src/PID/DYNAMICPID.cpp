@@ -22,37 +22,14 @@
 #include "Math/AVRMATH.h"
 #include "RadioControl/RCSMOOTH.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "RadioControl/CURVESRC.h"
 #include "FastSerial/PRINTF.h"
-
-//lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO
-#define LRintFloat lrint
 
 //DEBUG
 //#define PRINTLN_TPA
 
 uint8_t DynamicProportionalVector[2];
 uint8_t DynamicDerivativeVector[2];
-
-int16_t CalcedAttitudeRC(int16_t Data, int16_t RCExpo)
-{
-  int16_t RCValueDeflection;
-  RCValueDeflection = Constrain_16Bits(RadioControllOutput[Data] - 1500, -500, 500);
-  float ConvertValueToFloat = RCValueDeflection / 100.0f;
-  return LRintFloat((2500.0f + (float)RCExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
-}
-
-uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
-{
-  if (CalcedDeflection > 999)
-    return 1900;
-
-  const uint8_t CalcedLookUpStep = CalcedDeflection / 100;
-  return CalculeLookUpThrottle[CalcedLookUpStep] +
-         (CalcedDeflection - CalcedLookUpStep * 100) *
-             (CalculeLookUpThrottle[CalcedLookUpStep + 1] -
-              CalculeLookUpThrottle[CalcedLookUpStep]) /
-             100;
-}
 
 void DynamicPID()
 {
@@ -75,7 +52,6 @@ void DynamicPID()
     FastSerialPrintln(PSTR("TPAPlane:%d\n"), DynamicProportionalTwo);
 #endif
   }
-
   for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)
   {
     uint16_t DynamicStored = MIN_U16BITS(ABS_16BITS(RadioControllOutput[RCIndexCount] - 1500), 500);
@@ -84,14 +60,13 @@ void DynamicPID()
     DynamicProportionalVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].ProportionalVector * DynamicProportional / 100;
     DynamicDerivativeVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].DerivativeVector * DynamicProportional / 100;
   }
-
   int32_t CalcedThrottle;
   CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], 1000, 2000);
   CalcedThrottle = (uint32_t)(CalcedThrottle - 1000) * 1000 / 900;
   RCController[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
-  RCController[YAW] = CalcedAttitudeRC(YAW, RCRate);
-  RCController[PITCH] = CalcedAttitudeRC(PITCH, RCRate);
-  RCController[ROLL] = CalcedAttitudeRC(ROLL, RCRate);
+  RCController[YAW] = CalcedAttitudeRC(YAW, RCExpo);
+  RCController[PITCH] = CalcedAttitudeRC(PITCH, RCExpo);
+  RCController[ROLL] = CalcedAttitudeRC(ROLL, RCExpo);
   RCInterpolationApply();
   //REMOVE O -1 CAUSADO PELO FILTRO
   if (ABS_16BITS(RCController[YAW]) < 5)

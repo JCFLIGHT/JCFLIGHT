@@ -17,6 +17,9 @@
 
 #ifndef PROGMEM_H_
 #define PROGMEM_H_
+
+#ifdef __AVR_ATmega2560__
+
 #define ProgMemReadByte(Address) (__extension__({   \
     uint16_t __Address16Bits = (uint16_t)(Address); \
     uint8_t __Result;                               \
@@ -54,4 +57,9 @@
                          : "1"(__Address16Bits));                \
     __Result;                                                    \
 }))
+
+#elif __arm__
+
+#endif
+
 #endif

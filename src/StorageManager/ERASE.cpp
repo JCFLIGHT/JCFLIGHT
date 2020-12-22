@@ -19,31 +19,8 @@
 #ifdef __AVR_ATmega2560__
 #include <avr/eeprom.h>
 
-bool PreventRepeatProcess = false;
-
-void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size, bool InLoop)
+void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size)
 {
-    if (PreventRepeatProcess)
-    {
-        PORTB |= 1 << 4;    //PINO DIGITAL 10
-        PORTB &= ~(1 << 5); //PINO DIGITAL 11
-        PORTB &= ~(1 << 6); //PINO DIGITAL 12
-        if (InLoop)
-        {
-            return;
-        }
-        else
-        {
-            while (true)
-                ;
-        }
-    }
-    else
-    {
-        PORTB &= ~(1 << 4); //PINO DIGITAL 10
-        PORTB |= 1 << 5;    //PINO DIGITAL 11
-        PORTB &= ~(1 << 6); //PINO DIGITAL 12
-    }
     uint16_t InitialAddress = GetInitialAddress;
     Size += 1;
     while (Size--)
@@ -54,10 +31,6 @@ void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t 
             eeprom_write_byte((uint8_t *)InitialAddress, 0);
         }
         InitialAddress++;
-        if (InitialAddress == GetFinalAddress)
-        {
-            PreventRepeatProcess = true;
-        }
     }
 }
 

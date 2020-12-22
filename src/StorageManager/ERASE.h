@@ -19,5 +19,5 @@
 #define ERASE_H_
 #include "Arduino.h"
 extern bool PreventRepeatProcess;
-void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size, bool InLoop);
+void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size);
 #endif

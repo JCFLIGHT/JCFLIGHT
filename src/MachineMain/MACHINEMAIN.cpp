@@ -30,9 +30,9 @@ void MachineInit()
     CurvesRC_CalculeValue();
     TPA_Initialization();
     //ATIVA O LED VERMELHO
-    PORTB |= 1 << 4;    //PINO DIGITAL 10
-    PORTB &= ~(1 << 5); //PINO DIGITAL 11
-    PORTB &= ~(1 << 6); //PINO DIGITAL 12
+    RED_LED_ON;
+    GREEN_LED_OFF;
+    BLUE_LED_OFF;
     //CONFIGURA OS REGISTRADORES PARA A ROTINA DE INTERRUPÇÃO DA CAPTURA DO SINAL PPM
     ConfigurePPMRegisters();
     //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA E DO COMPASS
@@ -65,30 +65,29 @@ void MachineInit()
     //INICIALIZA O BOTÃO DE SEGURANÇA
     SAFETYBUTTON.Initialization();
     //DESATIVA TODOS OS LEDS
-    PORTB &= ~(1 << 4); //PINO DIGITAL 10
-    PORTB &= ~(1 << 5); //PINO DIGITAL 11
-    PORTB &= ~(1 << 6); //PINO DIGITAL 12
+    RED_LED_OFF;
+    GREEN_LED_OFF;
+    BLUE_LED_OFF;
     for (uint8_t LedCount = 0; LedCount < 6; LedCount++)
     {
-        //LED TESTE
-        PORTB |= 1 << 4;    //PINO DIGITAL 10
-        PORTB &= ~(1 << 5); //PINO DIGITAL 11
-        PORTB &= ~(1 << 6); //PINO DIGITAL 12
+        RED_LED_ON;
+        GREEN_LED_OFF;
+        BLUE_LED_OFF;
         AVRTIME.SchedulerSleep(133);
-        PORTB &= ~(1 << 4); //PINO DIGITAL 10
-        PORTB |= 1 << 5;    //PINO DIGITAL 11
-        PORTB &= ~(1 << 6); //PINO DIGITAL 12
+        RED_LED_OFF;
+        GREEN_LED_ON;
+        BLUE_LED_OFF;
         AVRTIME.SchedulerSleep(133);
-        PORTB &= ~(1 << 4); //PINO DIGITAL 10
-        PORTB &= ~(1 << 5); //PINO DIGITAL 11
-        PORTB |= 1 << 6;    //PINO DIGITAL 12
+        RED_LED_OFF;
+        GREEN_LED_OFF;
+        BLUE_LED_ON;
         AVRTIME.SchedulerSleep(133);
         //133 * 3 * 5 = 1.995 SEGUNDO
     }
     //DESATIVA TODOS OS LEDS
-    PORTB &= ~(1 << 4); //PINO DIGITAL 10
-    PORTB &= ~(1 << 5); //PINO DIGITAL 11
-    PORTB &= ~(1 << 6); //PINO DIGITAL 12
+    RED_LED_OFF;
+    GREEN_LED_OFF;
+    BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
 }

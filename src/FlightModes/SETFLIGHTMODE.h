@@ -18,5 +18,5 @@
 #ifndef SETFLIGHTMODE_H
 #define SETFLIGHTMODE_H
 #include "Arduino.h"
-void SetFlightModeToGCS();
+void SetFlightModesToGCS();
 #endif

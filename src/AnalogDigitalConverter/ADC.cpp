@@ -19,6 +19,7 @@
 
 AnalogPinClass ADCPIN;
 
+#ifdef __AVR_ATmega2560__
 int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
 {
   uint8_t LowByte;
@@ -35,3 +36,10 @@ int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
   HighByte = (*(volatile uint8_t *)(0x79)); //REALIZA O LEITURA DO ADCH
   return (HighByte << 8) | LowByte;
 }
+
+#elif __arm__
+int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
+{
+  return 0;
+}
+#endif

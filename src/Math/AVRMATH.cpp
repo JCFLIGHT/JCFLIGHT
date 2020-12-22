@@ -16,7 +16,6 @@
 */
 
 #include "AVRMATH.h"
-#include "ProgMem/PROGMEM.h"
 
 float ABS_FLOAT(float X)
 {
@@ -167,61 +166,6 @@ int16_t ApproximationOfAtan2(int16_t AccRoll, int16_t AccYaw)
             Ata2Result -= 1800;
     }
     return Ata2Result;
-}
-
-static const uint16_t TableOfSineApprox[91] __attribute__((__progmem__)) = {0, 17, 35, 52, 70, 87, 105, 122, 139, 156, 174, 191, 208, 225, 242, 259, 276, 292, 309, 326, 342, 358, 375,
-                                                                            391, 407, 423, 438, 454, 469, 485, 500, 515, 530, 545, 559, 574, 588, 602, 616, 629, 643, 656, 669, 682,
-                                                                            695, 707, 719, 731, 743, 755, 766, 777, 788, 799, 809, 819, 829, 839, 848, 857, 866, 875, 883, 891, 899,
-                                                                            906, 914, 921, 927, 934, 940, 946, 951, 956, 961, 966, 970, 974, 978, 982, 985, 988, 990, 993, 995, 996,
-                                                                            998, 999, 999, 1000, 1000};
-
-float Calculate_Sine_Approx(int16_t InputAngle)
-{
-    int8_t InvertValue, InvertValueTwo;
-    int16_t Calculate_Sine_Value;
-    if (InputAngle < 0)
-    {
-        InvertValue = -1;
-        InputAngle = -InputAngle;
-    }
-    else
-    {
-        InvertValue = 1;
-    }
-    if (ABS_16BITS(InputAngle) >= 3600)
-    {
-        InputAngle %= 3600;
-    }
-    if (InputAngle <= 900)
-    {
-        InvertValueTwo = 1;
-    }
-    else if ((InputAngle > 900) && (InputAngle <= 1800))
-    {
-        InputAngle = 1800 - InputAngle;
-        InvertValueTwo = 1;
-    }
-    else if ((InputAngle > 1800) && (InputAngle <= 2700))
-    {
-        InputAngle = InputAngle - 1800;
-        InvertValueTwo = -1;
-    }
-    else
-    {
-        InputAngle = 3600 - InputAngle;
-        InvertValueTwo = -1;
-    }
-    if (InputAngle < 105)
-    {
-        return ((float)(InputAngle * InvertValue * InvertValueTwo)) * 0.001745329252f;
-    }
-    Calculate_Sine_Value = ProgMemReadWord(&TableOfSineApprox[InputAngle / 10]);
-    return (float)(Calculate_Sine_Value * InvertValue * InvertValueTwo) / 1000;
-}
-
-float Calculate_Cosine_Approx(int16_t InputAngle)
-{
-    return (Calculate_Sine_Approx(900 - InputAngle));
 }
 
 uint16_t SquareRootU16Bits(uint16_t ValueInput)

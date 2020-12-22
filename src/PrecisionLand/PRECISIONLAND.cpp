@@ -21,9 +21,9 @@
 #include "Math/AVRMATH.h"
 #include "FastSerial/PRINTF.h"
 
-#define LOOP_RATE_IN_HZ 500
+#define LOOP_RATE_IN_HZ 500          //HZ
 #define LAND_CHECK_ACCEL_MOVING 3.0f //M/S^2
-#define LPF_CUTOFF_IN_HZ 1.0f
+#define LPF_CUTOFF_IN_HZ 1.0f        //HZ
 
 //DEBUG
 //#define PRINTLN_PRECISIONLAND

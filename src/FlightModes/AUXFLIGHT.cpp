@@ -67,17 +67,11 @@ void AUXFLIGHTCLASS::LoadEEPROM(void)
   ParachuteDetectTrigger = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR); //CONFIGURAÇÃO DO PARACHUTE
   AutoFlipConfig = STORAGEMANAGER.Read_8Bits(AUTOFLIP_ADDR);          //CHAVE AUX ATRIBUIDA PARA O MODO AUTO-FLIP
   GimbalControlAux = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);          //CANAL AUX ATRIBUIDO PARA O CONTROLE DO GIMBAL
-  if (FrameType != STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR))
-  {
-    FrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR); //TIPO DE FRAME SELECIONADO
-  }
-  if (ReceiverModel != STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR))
-  {
-    ReceiverModel = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR); //MODELO DO RADIO
-  }
-  ArmDisarmConfig = STORAGEMANAGER.Read_8Bits(ARMDISARM_ADDR);   //CHAVE ATRIBUIDA AO ARMDISARM VIA CHAVE AUX
-  AutoPilotConfig = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR); //CHAVE ATRIBUIDA AO MODO WAYPOINT
-  AutoLandConfig = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);     //CHAVE ATRIBUIDA AO AUTO LAND
+  FrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR);              //TIPO DE FRAME SELECIONADO
+  ReceiverModel = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);           //MODELO DO RADIO
+  ArmDisarmConfig = STORAGEMANAGER.Read_8Bits(ARMDISARM_ADDR);        //CHAVE ATRIBUIDA AO ARMDISARM VIA CHAVE AUX
+  AutoPilotConfig = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR);      //CHAVE ATRIBUIDA AO MODO WAYPOINT
+  AutoLandConfig = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);          //CHAVE ATRIBUIDA AO AUTO LAND
 }
 
 void AUXFLIGHTCLASS::SelectMode(void)
@@ -1135,14 +1129,14 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
     SetFlightModes[ATACK_MODE] = false;
   //AUTO-FLIP
   if (AutoFlipControlAux)
-    Flip_Mode = true;
+    SetFlightModes[FLIP_MODE] = true;
   else
-    Flip_Mode = false;
+    SetFlightModes[FLIP_MODE] = false;
   //AUTO
   if (AutoPilotControlAux)
-    Do_WayPoint = true;
+    SetFlightModes[WAYPOINT_MODE] = true;
   else
-    Do_WayPoint = false;
+    SetFlightModes[WAYPOINT_MODE] = false;
 
   //Throttle_LockUp(true); //TRAVA DO ACELERADOR PARA TER FACILIDADE DE MOVER NO YAW
 }

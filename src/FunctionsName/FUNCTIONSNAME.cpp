@@ -16,8 +16,11 @@
 */
 
 #include "FUNCTIONSNAME.h"
+#include "ProgMem/PROGMEM.h"
 
-#define __ProgramMemoryDWord__(addr) (__extension__({ uint16_t __addr16 = (uint16_t)(addr); uint16_t __result; __asm__ __volatile__ ( "lpm %A0, Z+" "\n\t" "lpm %B0, Z" "\n\t" : "=r" (__result), "=z" (__addr16) : "1" (__addr16) ); __result; }))
+#ifdef __AVR_ATmega2560__
+
+char GetFunctionName[20];
 
 const char Function_0[] __attribute__((__progmem__)) = "Slow_Loop()";
 const char Function_1[] __attribute__((__progmem__)) = "Medium_Loop()";
@@ -33,9 +36,36 @@ const char *const Function_Table[] __attribute__((__progmem__)) =
         Function_3,
         Function_4};
 
-char GetFunctionName[20];
+void UpdateFunctionName(uint8_t FunctionNumber)
+{
+    strcpy_P(GetFunctionName, (char *)ProgMemReadDWord((uint16_t)(&(Function_Table[FunctionNumber]))));
+}
+
+#elif __arm__
+
+char *GetFunctionName;
 
 void UpdateFunctionName(uint8_t FunctionNumber)
 {
-    strcpy_P(GetFunctionName, (char *)__ProgramMemoryDWord__((uint16_t)(&(Function_Table[FunctionNumber]))));
+    if (FunctionNumber == 0)
+    {
+        GetFunctionName = (char *)"Slow_Loop()";
+    }
+    else if (FunctionNumber == 1)
+    {
+        GetFunctionName = (char *)"Medium_Loop()";
+    }
+    else if (FunctionNumber == 2)
+    {
+        GetFunctionName = (char *)"Fast_Medium_Loop()";
+    }
+    else if (FunctionNumber == 3)
+    {
+        GetFunctionName = (char *)"Fast_Loop()";
+    }
+    else if (FunctionNumber == 4)
+    {
+        GetFunctionName = (char *)"Integral_Loop()";
+    }
 }
+#endif

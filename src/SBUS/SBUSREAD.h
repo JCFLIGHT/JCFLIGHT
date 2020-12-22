@@ -27,12 +27,12 @@ public:
   bool FailSafe;
 
 private:
+#define SBUS_TIMEOUT_US 7000
   bool SerialParse();
   uint8_t ParserState;
   uint8_t PrevByte = 0x00;
   uint8_t ActualByte;
   uint8_t PayLoadArray[24];
-  const uint32_t SBUS_TIMEOUT_US = 7000;
 };
 extern SBUS SBUSRC;
 #endif

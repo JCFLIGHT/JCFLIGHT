@@ -33,11 +33,12 @@ void Slow_Loop()
 #endif
 
                 Pre_Arm();
-                CurvesRC_Update();
+                CurvesRC_SetValues();
                 AUXFLIGHT.LoadEEPROM();
                 RTH_Altitude_EEPROM();
                 IMU_Filters_Update();
                 UpdateValuesOfPID();
+                UpdateServosDirection();
                 ServosPWR();
                 GCS.UpdateParametersToGCS();
                 PushWayPointParameters();
@@ -68,7 +69,7 @@ void Medium_Loop()
                 AUXFLIGHT.FlightModesAuxSelect();
                 FlightModesUpdate();
                 PrintlnParameters();
-                Trim_Servo_Update();
+                Manual_Trim_Servo_Update();
                 Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDEHOLD_MODE]);
 
 #ifdef ENABLE_TIMEMONITOR
@@ -153,7 +154,7 @@ void Integral_Loop()
 #endif
         DynamicPID();
         Auto_Launch_Update();
-        GPS_Compute();
+        GPS_Process_FlightModes();
         CalculateAccelerationXYZ();
         INS_Calculate_AccelerationZ();
         CalculateXY_INS();
@@ -163,8 +164,8 @@ void Integral_Loop()
         GPS_Orientation_Update();
         PID_Time();
         PID_Update();
-        PID_Reset_Accumulators();
-        PIDMixMotors();
+        PID_Reset_Integral_Accumulators();
+        PID_MixMotors();
         Servo_Rate_Adjust();
         ApplyPWMInAllComponents();
         Switch_Flag();

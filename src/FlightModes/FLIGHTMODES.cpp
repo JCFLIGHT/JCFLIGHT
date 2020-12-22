@@ -24,6 +24,7 @@
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Math/AVRMATH.h"
 #include "RadioControl/STATES.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 //APENAS PARA AERO E ASA-FIXA
 bool GPS_HOLD_MODE = false;
@@ -35,70 +36,70 @@ void FlightModesUpdate()
 {
   if (SetFlightModes[STABILIZE_MODE] || (Fail_Safe_Event))
   {
-    if (!Stabilize_Mode)
+    if (!Do_Stabilize_Mode)
     {
       IntegralAccError[ROLL] = 0;
       IntegralAccError[PITCH] = 0;
-      Stabilize_Mode = true;
+      Do_Stabilize_Mode = true;
     }
   }
   else
   {
-    if (Stabilize_Mode)
+    if (Do_Stabilize_Mode)
     {
       IntegralGyroError[ROLL] = 0;
       IntegralGyroError[PITCH] = 0;
     }
-    Stabilize_Mode = false;
+    Do_Stabilize_Mode = false;
   }
 
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
   {
     SetFlightModes[ALTITUDEHOLD_MODE] = (SetFlightModes[ALTITUDEHOLD_MODE] || Do_GPS_Altitude);
     if (SetFlightModes[ALTITUDEHOLD_MODE] || GPSHold_CallBaro || Mission_BaroMode)
     {
-      if (!AltitudeHold_Mode)
+      if (!Do_AltitudeHold_Mode)
       {
-        AltitudeHold_Mode = true;
+        Do_AltitudeHold_Mode = true;
       }
     }
     else
     {
-      AltitudeHold_Mode = false;
+      Do_AltitudeHold_Mode = false;
     }
   }
 
-  if (SetFlightModes[SETCOMPASSACTUAL])
+  if (SetFlightModes[HEADINGHOLD_MODE])
   {
-    if (!GuardActualHeading)
+    if (!Do_HeadingHold_Mode)
     {
-      GuardActualHeading = true;
+      Do_HeadingHold_Mode = true;
       HeadingHoldTarget = ATTITUDE.CalculedHeading;
     }
   }
   else
   {
-    GuardActualHeading = false;
+    Do_HeadingHold_Mode = false;
   }
 
   if (SetFlightModes[IOC_MODE])
   {
-    if (!IOCMODE)
+    if (!Do_IOC_Mode)
     {
-      IOCMODE = true;
+      Do_IOC_Mode = true;
     }
   }
   else
   {
-    IOCMODE = false;
+    Do_IOC_Mode = false;
   }
 
-  if (FrameType == 3 || FrameType == 4 || FrameType == 5)
+  if (GetFrameStateOfAirPlane())
   {
     if (GPS_NumberOfSatellites >= 5 && COMMAND_ARM_DISARM)
     {
-      if (GPS_Flight_Mode != GPS_MODE_NONE && !Stabilize_Mode)
-        AltitudeHold_Mode = true;
+      if (GPS_Flight_Mode != GPS_MODE_NONE && !Do_Stabilize_Mode)
+        Do_AltitudeHold_Mode = true;
       if (SetFlightModes[RTH_MODE] || Fail_Safe_Event)
       {
         if (!GPS_HOME_MODE)
@@ -152,7 +153,7 @@ void FlightModesUpdate()
     }
   }
 
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
   {
     if (!SetFlightModes[RTH_MODE] && !SetFlightModes[LAND_MODE])
     {
@@ -179,7 +180,7 @@ void FlightModesUpdate()
             if (SetFlightModes[RTH_MODE])
             {
               GPSHold_CallBaro = true;
-              SetFlightModes[SETCOMPASSACTUAL] = true;
+              SetFlightModes[HEADINGHOLD_MODE] = true;
               Do_Mode_RTH_Now();
             }
             else if (SetFlightModes[GPSHOLD_MODE])
@@ -187,7 +188,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_HOLD;
               Do_GPS_Altitude = false;
               GPSHold_CallBaro = true;
-              SetFlightModes[SETCOMPASSACTUAL] = true;
+              SetFlightModes[HEADINGHOLD_MODE] = true;
               SetThisPointToPositionHold();
               NavigationMode = Do_PositionHold;
             }
@@ -196,7 +197,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_HOLD;
               Do_GPS_Altitude = true;
               SetThisPointToPositionHold();
-              SetFlightModes[SETCOMPASSACTUAL] = true;
+              SetFlightModes[HEADINGHOLD_MODE] = true;
               NavigationMode = Do_Land_Init;
             }
             else
@@ -204,7 +205,7 @@ void FlightModesUpdate()
               GPS_Flight_Mode = GPS_MODE_NONE;
               GPSHold_CallBaro = false;
               Do_GPS_Altitude = false;
-              SetFlightModes[SETCOMPASSACTUAL] = false;
+              SetFlightModes[HEADINGHOLD_MODE] = false;
               GPS_Reset_Navigation();
             }
           }

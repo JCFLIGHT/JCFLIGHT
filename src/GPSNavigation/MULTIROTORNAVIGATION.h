@@ -26,7 +26,7 @@ extern int32_t WRap_180(int32_t AngleInput);
 extern int32_t Coordinates_To_Navigation[2];
 extern int32_t Original_Target_Bearing;
 void LoadGPSParameters(void);
-void GPS_Compute(void);
+void GPS_Process_FlightModes(void);
 void Reset_Home_Point(void);
 void Set_Points_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Destiny, int32_t *Latitude_Actual, int32_t *Longitude_Actual);
 void GPS_Reset_Navigation(void);

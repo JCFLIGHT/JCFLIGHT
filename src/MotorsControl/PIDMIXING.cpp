@@ -18,68 +18,78 @@
 #include "PIDMIXING.h"
 #include "Common/VARIABLES.h"
 #include "AirPlane/AIRPLANE.h"
+#include "MOTORSCOMPENSATION.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 
 uint8_t NumberOfMotors = 4; //APENAS PARA INICIALIZAR
+int16_t MixerThrottleCommand = 1000;
+float ThrottleScale = 1.0f;
 
-void MixingSelectPID()
+void MixingApplyPIDControl()
 {
+
+    MixerThrottleCommand = RCController[THROTTLE];
+    MixerThrottleCommand = ((MixerThrottleCommand - MotorSpeed) * ThrottleScale) + MotorSpeed;
+    Motors_Compensation(STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR), NumberOfMotors);
+
     switch (FrameType)
     {
 
-    case 0:
+    case QUAD_X:
     {
         //QUAD-X
-        MotorControl[MOTOR1] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -1 +
+        MotorControl[MOTOR1] = MixerThrottleCommand + PIDControllerApply[ROLL] * -1 +
                                PIDControllerApply[PITCH] * +1 + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR2] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -1 +
+        MotorControl[MOTOR2] = MixerThrottleCommand + PIDControllerApply[ROLL] * -1 +
                                PIDControllerApply[PITCH] * -1 + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR3] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +1 +
+        MotorControl[MOTOR3] = MixerThrottleCommand + PIDControllerApply[ROLL] * +1 +
                                PIDControllerApply[PITCH] * +1 + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR4] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +1 +
+        MotorControl[MOTOR4] = MixerThrottleCommand + PIDControllerApply[ROLL] * +1 +
                                PIDControllerApply[PITCH] * -1 + 1 * PIDControllerApply[YAW] * -1;
         NumberOfMotors = 4;
         return;
     }
 
-    case 1:
+    case HEXA_X:
     {
         //HEXA-X
-        MotorControl[MOTOR1] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -0.8f +
+        MotorControl[MOTOR1] = MixerThrottleCommand + PIDControllerApply[ROLL] * -0.8f +
                                PIDControllerApply[PITCH] * +0.9f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR2] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -0.8f +
+        MotorControl[MOTOR2] = MixerThrottleCommand + PIDControllerApply[ROLL] * -0.8f +
                                PIDControllerApply[PITCH] * -0.9f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR3] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0.8f +
+        MotorControl[MOTOR3] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0.8f +
                                PIDControllerApply[PITCH] * +0.9f + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR4] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0.8f +
+        MotorControl[MOTOR4] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0.8f +
                                PIDControllerApply[PITCH] * -0.9f + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR5] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -0.8f +
+        MotorControl[MOTOR5] = MixerThrottleCommand + PIDControllerApply[ROLL] * -0.8f +
                                PIDControllerApply[PITCH] * +0 + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR6] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0.8f +
+        MotorControl[MOTOR6] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0.8f +
                                PIDControllerApply[PITCH] * +0 + 1 * PIDControllerApply[YAW] * +1;
         NumberOfMotors = 6;
         return;
     }
 
-    case 2:
+    case HEXA_I:
     {
         //HEXA+
-        MotorControl[MOTOR1] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -0.9f +
+        MotorControl[MOTOR1] = MixerThrottleCommand + PIDControllerApply[ROLL] * -0.9f +
                                PIDControllerApply[PITCH] * +0.8f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR2] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -0.9f +
+        MotorControl[MOTOR2] = MixerThrottleCommand + PIDControllerApply[ROLL] * -0.9f +
                                PIDControllerApply[PITCH] * -0.8f + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR3] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0.9f +
+        MotorControl[MOTOR3] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0.9f +
                                PIDControllerApply[PITCH] * +0.8f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR4] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0.9f +
+        MotorControl[MOTOR4] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0.9f +
                                PIDControllerApply[PITCH] * -0.8f + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR5] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0 +
+        MotorControl[MOTOR5] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0 +
                                PIDControllerApply[PITCH] * -0.8f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR6] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0 +
+        MotorControl[MOTOR6] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0 +
                                PIDControllerApply[PITCH] * +0.8f + 1 * PIDControllerApply[YAW] * -1;
         NumberOfMotors = 6;
         return;
     }
 
-    case 3:
+    case AIRPLANE:
     {
         //AEROMODELO
         AirPlane_Mode_ConventionalPlane_Run();
@@ -88,7 +98,7 @@ void MixingSelectPID()
         return;
     }
 
-    case 4:
+    case FIXED_WING:
     {
         //ASA-FIXA
         AirPlane_Mode_FixedWing_Run();
@@ -99,7 +109,7 @@ void MixingSelectPID()
         return;
     }
 
-    case 5:
+    case PLANE_VTAIL:
     {
         //AERO TIPO V-TAIL
         AirPlane_Mode_PlaneVTail_Run();
@@ -108,31 +118,31 @@ void MixingSelectPID()
         return;
     }
 
-    case 6:
+    case ZMR250:
     {
         //ZMR250
-        MotorControl[MOTOR1] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -1 +
+        MotorControl[MOTOR1] = MixerThrottleCommand + PIDControllerApply[ROLL] * -1 +
                                PIDControllerApply[PITCH] * +0.772f + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR2] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -1 +
+        MotorControl[MOTOR2] = MixerThrottleCommand + PIDControllerApply[ROLL] * -1 +
                                PIDControllerApply[PITCH] * -0.772f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR3] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +1 +
+        MotorControl[MOTOR3] = MixerThrottleCommand + PIDControllerApply[ROLL] * +1 +
                                PIDControllerApply[PITCH] * +0.772f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR4] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +1 +
+        MotorControl[MOTOR4] = MixerThrottleCommand + PIDControllerApply[ROLL] * +1 +
                                PIDControllerApply[PITCH] * -0.772f + 1 * PIDControllerApply[YAW] * -1;
         NumberOfMotors = 4;
         return;
     }
 
-    case 7:
+    case TBS:
     {
         //DIATONE WHITE SHEEP
-        MotorControl[MOTOR1] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -0.848f +
+        MotorControl[MOTOR1] = MixerThrottleCommand + PIDControllerApply[ROLL] * -0.848f +
                                PIDControllerApply[PITCH] * +0.647f + 1 * PIDControllerApply[YAW] * -1;
-        MotorControl[MOTOR2] = RCController[THROTTLE] + PIDControllerApply[ROLL] * -1 +
+        MotorControl[MOTOR2] = MixerThrottleCommand + PIDControllerApply[ROLL] * -1 +
                                PIDControllerApply[PITCH] * -0.647f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR3] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +0.848f +
+        MotorControl[MOTOR3] = MixerThrottleCommand + PIDControllerApply[ROLL] * +0.848f +
                                PIDControllerApply[PITCH] * +0.647f + 1 * PIDControllerApply[YAW] * +1;
-        MotorControl[MOTOR4] = RCController[THROTTLE] + PIDControllerApply[ROLL] * +1 +
+        MotorControl[MOTOR4] = MixerThrottleCommand + PIDControllerApply[ROLL] * +1 +
                                PIDControllerApply[PITCH] * -0.647f + 1 * PIDControllerApply[YAW] * -1;
         NumberOfMotors = 4;
         return;

@@ -18,6 +18,7 @@
 #ifndef SAFETYBUTTON_H_
 #define SAFETYBUTTON_h_
 #include "Arduino.h"
+#include "Common/ENUM.h"
 class SAFETYBUTTONCLASS
 {
 public:
@@ -27,12 +28,6 @@ public:
   void UpdateRoutine();
 
 private:
-  enum class Led_Pattern : uint16_t
-  {
-    FMU_INIT_ARM = 0x0003,
-    FMU_REFUSE_TO_ARM = 0x5555,
-    FMU_SAFE_TO_ARM = 0xffff,
-  };
   bool GetButtonInterval();
   bool GetButtonState();
   bool WaitToNextProcess = false;

@@ -87,7 +87,7 @@ void InterruptRoutine(void)
   PPMTimerDifference = PPMTimer - PPMStoredTimer;
   PPMStoredTimer = PPMTimer;
   if (PPMTimerDifference > 2700)
-    Channels = RESET;
+    Channels = RESET_PPM;
   else
   {
     if (PPMTimerDifference > 750 && PPMTimerDifference < 2250)

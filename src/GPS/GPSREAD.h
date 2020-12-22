@@ -18,7 +18,7 @@
 #ifndef GPSREAD_H_
 #define GPSREAD_H_
 #include "Arduino.h"
-void GPS_SerialInit(uint32_t GPS_BAUDRATE);
+void GPS_SerialInit(uint32_t Get_BaudRate);
 void GPS_SerialRead(uint8_t ReadData);
 void GetAllGPSData(void);
 #endif

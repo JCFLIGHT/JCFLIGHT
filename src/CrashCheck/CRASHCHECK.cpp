@@ -61,7 +61,7 @@ void CrashCheck()
 
   //VERIFICA SE ESTÁ EM QUALQUER MODO DE VOO,MENOS NO MODO ACRO E FLIP
   //SE ESTIVER NO MODO ACRO OU FLIP O DETECTOR DE CRASH NÃO IRÁ FUNCIOANAR
-  if (!SetFlightModes[STABILIZE_MODE] || Flip_Mode)
+  if (!SetFlightModes[STABILIZE_MODE] || SetFlightModes[FLIP_MODE])
   {
     Crash_Counter = 0;
     return;

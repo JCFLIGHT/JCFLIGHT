@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef COMPENSATIONSPEED_H_
-#define COMPENSATIONSPEED_H_
-#include "Arduino.h"
-void Compesation_RPM_DropBatt(uint8_t State, uint8_t _NumbOfMotors);
+#ifndef FRAMESTATUS_H_
+#define FRAMESTATUS_H_
+bool GetFrameStateOfMultirotor();
+bool GetFrameStateOfAirPlane();
 #endif

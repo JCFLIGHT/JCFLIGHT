@@ -193,7 +193,7 @@ void CompassReadClass::Constant_Read()
     MagnetometerRead[ROLL] = MagnetometerRead[ROLL] * 0.9f + IMU.CompassRead[ROLL] * 0.1f;
   //AJUSTA O VALOR DO COMPASS COM A CALIBRAÇÃO GUARDADA NA EEPROM
   if (!CalibratingCompass)
-    IMU.CompassRead[ROLL] -= CALIBRATION.MagnetometerCalibration[0];
+    IMU.CompassRead[ROLL] -= CALIBRATION.MagnetometerCalibration[ROLL];
 
   //APLICA O GANHO CALCULADO
   IMU.CompassRead[PITCH] = IMU.CompassRead[PITCH] * MagnetometerGain[PITCH];
@@ -202,7 +202,7 @@ void CompassReadClass::Constant_Read()
     MagnetometerRead[PITCH] = MagnetometerRead[PITCH] * 0.9f + IMU.CompassRead[PITCH] * 0.1f;
   //AJUSTA O VALOR DO COMPASS COM A CALIBRAÇÃO GUARDADA NA EEPROM
   if (!CalibratingCompass)
-    IMU.CompassRead[PITCH] -= CALIBRATION.MagnetometerCalibration[1];
+    IMU.CompassRead[PITCH] -= CALIBRATION.MagnetometerCalibration[PITCH];
 
   //APLICA O GANHO CALCULADO
   IMU.CompassRead[YAW] = IMU.CompassRead[YAW] * MagnetometerGain[YAW];

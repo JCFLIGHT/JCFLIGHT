@@ -36,7 +36,6 @@ struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 #define THROTTLE_INCREMENT 100          //NÚMERO DE INCREMENTAÇÕES A CADA ESTOURO DE TEMPO DEFINIDO PELO PARAMETRO THROTTLE_INCREMENT_TIME
 #define THROTTLE_INCREMENT_TIME 10      //INCREMENTA A CADA 0.10 SEGUNDOS
 
-bool Do_WayPoint = false;
 bool Auto_TakeOff = false;
 bool Normalize_Throttle_TakeOff = false;
 bool Mission_BaroMode = false;
@@ -185,27 +184,9 @@ void WayPointRun()
 {
   int16_t Navigation_Speed_Result = 0;
 
-  enum
-  {
-    WP_MISSION_INIT = 0,
-    GET_ALTITUDE,
-    GET_ALTITUDE_TAKEOFF,
-    WP_START_MISSION,
-    WP_EN_ROUTE
-  };
-
-  enum
-  {
-    WP_ADVANCE = 1,
-    WP_TIMED,
-    WP_LAND,
-    WP_RTH,
-    WP_TAKEOFF
-  };
-
   Store_And_Clear_WayPoints();
 
-  if (!Do_WayPoint)
+  if (!SetFlightModes[WAYPOINT_MODE])
   {
     WayPointMode = WP_MISSION_INIT;
     WPSucess = false;

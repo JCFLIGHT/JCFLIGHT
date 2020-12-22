@@ -21,9 +21,9 @@
 
 float Cosine_Yaw;
 float Sine_Yaw;
-float AccelerationAdjustBias[3] = {0.0, 0.0, 0.0};
-float AccelerationEarthFrame_LPF[3] = {0.0, 0.0, 0.0};
-float AccelerationDifference[3] = {0.0, 0.0, 0.0};
+float AccelerationAdjustBias[3] = {0.0f, 0.0f, 0.0f};
+float AccelerationEarthFrame_LPF[3] = {0.0f, 0.0f, 0.0f};
+float AccelerationDifference[3] = {0.0f, 0.0f, 0.0f};
 
 void CalculateAccelerationXYZ()
 {
@@ -47,59 +47,59 @@ void CalculateAccelerationXYZ()
   SinePitch_SineYaw_Fusion = Sine_Pitch * Sine_Yaw;
 
   //ROLL
-  INS.AccelerationEarthFrame[0] = -((Cosine_Pitch * Cosine_Yaw) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * SinePitch_CosineYaw_Fusion - Cosine_Roll * Sine_Yaw) * IMU.AccelerometerRead[ROLL] + (Sine_Roll * Sine_Yaw + Cosine_Roll * SinePitch_CosineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
+  INS.AccelerationEarthFrame[ROLL] = -((Cosine_Pitch * Cosine_Yaw) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * SinePitch_CosineYaw_Fusion - Cosine_Roll * Sine_Yaw) * IMU.AccelerometerRead[ROLL] + (Sine_Roll * Sine_Yaw + Cosine_Roll * SinePitch_CosineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
 
   //PITCH
-  INS.AccelerationEarthFrame[1] = -((Cosine_Pitch * Sine_Yaw) * IMU.AccelerometerRead[PITCH] + (Cosine_Roll * Cosine_Yaw + Sine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[ROLL] + (-Sine_Roll * Cosine_Yaw + Cosine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
+  INS.AccelerationEarthFrame[PITCH] = -((Cosine_Pitch * Sine_Yaw) * IMU.AccelerometerRead[PITCH] + (Cosine_Roll * Cosine_Yaw + Sine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[ROLL] + (-Sine_Roll * Cosine_Yaw + Cosine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
 
   //YAW
-  INS.AccelerationEarthFrame[2] = ((-Sine_Pitch) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[ROLL] + (Cosine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[YAW]) - 512;
+  INS.AccelerationEarthFrame[YAW] = ((-Sine_Pitch) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[ROLL] + (Cosine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[YAW]) - 512;
 
   //ROLL
-  INS.AccelerationEarthFrame[0] = INS.AccelerationEarthFrame[0] * 1.915361328125f;
-  AccelerationDifference[0] = INS.AccelerationEarthFrame[0] - AccelerationAdjustBias[0];
+  INS.AccelerationEarthFrame[ROLL] = INS.AccelerationEarthFrame[ROLL] * 1.915361328125f;
+  AccelerationDifference[ROLL] = INS.AccelerationEarthFrame[ROLL] - AccelerationAdjustBias[ROLL];
   if (!COMMAND_ARM_DISARM)
   {
-    AccelerationAdjustBias[0] = AccelerationAdjustBias[0] * 0.985f + INS.AccelerationEarthFrame[0] * 0.015f;
+    AccelerationAdjustBias[ROLL] = AccelerationAdjustBias[ROLL] * 0.985f + INS.AccelerationEarthFrame[ROLL] * 0.015f;
   }
-  else if (ABS_FLOAT(AccelerationDifference[0]) <= 80.0f)
+  else if (ABS_FLOAT(AccelerationDifference[ROLL]) <= 80.0f)
   {
-    AccelerationAdjustBias[0] = AccelerationAdjustBias[0] * 0.9987f + INS.AccelerationEarthFrame[0] * 0.0013f;
+    AccelerationAdjustBias[ROLL] = AccelerationAdjustBias[ROLL] * 0.9987f + INS.AccelerationEarthFrame[ROLL] * 0.0013f;
   }
-  INS.AccelerationEarthFrame[0] = AccelerationDifference[0];
-  AccelerationEarthFrame_LPF[0] = AccelerationEarthFrame_LPF[0] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[0] * 0.14285714285714285714285714285714f;
-  INS.AccelerationEarthFrame_Sum[0] += AccelerationEarthFrame_LPF[0];
-  INS.AccelerationEarthFrame_Sum_Count[0]++;
+  INS.AccelerationEarthFrame[ROLL] = AccelerationDifference[ROLL];
+  AccelerationEarthFrame_LPF[ROLL] = AccelerationEarthFrame_LPF[ROLL] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[ROLL] * 0.14285714285714285714285714285714f;
+  INS.AccelerationEarthFrame_Sum[ROLL] += AccelerationEarthFrame_LPF[ROLL];
+  INS.AccelerationEarthFrame_Sum_Count[ROLL]++;
 
   //PITCH
-  INS.AccelerationEarthFrame[1] = INS.AccelerationEarthFrame[1] * 1.915361328125f;
-  AccelerationDifference[1] = INS.AccelerationEarthFrame[1] - AccelerationAdjustBias[1];
+  INS.AccelerationEarthFrame[PITCH] = INS.AccelerationEarthFrame[PITCH] * 1.915361328125f;
+  AccelerationDifference[PITCH] = INS.AccelerationEarthFrame[PITCH] - AccelerationAdjustBias[PITCH];
   if (!COMMAND_ARM_DISARM)
   {
-    AccelerationAdjustBias[1] = AccelerationAdjustBias[1] * 0.985f + INS.AccelerationEarthFrame[1] * 0.015f;
+    AccelerationAdjustBias[PITCH] = AccelerationAdjustBias[PITCH] * 0.985f + INS.AccelerationEarthFrame[PITCH] * 0.015f;
   }
-  else if (ABS_FLOAT(AccelerationDifference[1]) <= 80.0f)
+  else if (ABS_FLOAT(AccelerationDifference[PITCH]) <= 80.0f)
   {
-    AccelerationAdjustBias[1] = AccelerationAdjustBias[1] * 0.9987f + INS.AccelerationEarthFrame[1] * 0.0013f;
+    AccelerationAdjustBias[PITCH] = AccelerationAdjustBias[PITCH] * 0.9987f + INS.AccelerationEarthFrame[PITCH] * 0.0013f;
   }
-  INS.AccelerationEarthFrame[1] = AccelerationDifference[1];
-  AccelerationEarthFrame_LPF[1] = AccelerationEarthFrame_LPF[1] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[1] * 0.14285714285714285714285714285714f;
-  INS.AccelerationEarthFrame_Sum[1] += AccelerationEarthFrame_LPF[1];
-  INS.AccelerationEarthFrame_Sum_Count[1]++;
+  INS.AccelerationEarthFrame[PITCH] = AccelerationDifference[PITCH];
+  AccelerationEarthFrame_LPF[PITCH] = AccelerationEarthFrame_LPF[PITCH] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[PITCH] * 0.14285714285714285714285714285714f;
+  INS.AccelerationEarthFrame_Sum[PITCH] += AccelerationEarthFrame_LPF[PITCH];
+  INS.AccelerationEarthFrame_Sum_Count[PITCH]++;
 
   //YAW
-  INS.AccelerationEarthFrame[2] = INS.AccelerationEarthFrame[2] * 1.915361328125f;
-  AccelerationDifference[2] = INS.AccelerationEarthFrame[2] - AccelerationAdjustBias[2];
+  INS.AccelerationEarthFrame[YAW] = INS.AccelerationEarthFrame[YAW] * 1.915361328125f;
+  AccelerationDifference[YAW] = INS.AccelerationEarthFrame[YAW] - AccelerationAdjustBias[YAW];
   if (!COMMAND_ARM_DISARM)
   {
-    AccelerationAdjustBias[2] = AccelerationAdjustBias[2] * 0.985f + INS.AccelerationEarthFrame[2] * 0.015f;
+    AccelerationAdjustBias[YAW] = AccelerationAdjustBias[YAW] * 0.985f + INS.AccelerationEarthFrame[YAW] * 0.015f;
   }
-  else if (ABS_FLOAT(AccelerationDifference[2]) <= 80.0f)
+  else if (ABS_FLOAT(AccelerationDifference[YAW]) <= 80.0f)
   {
-    AccelerationAdjustBias[2] = AccelerationAdjustBias[2] * 0.9987f + INS.AccelerationEarthFrame[2] * 0.0013f;
+    AccelerationAdjustBias[YAW] = AccelerationAdjustBias[YAW] * 0.9987f + INS.AccelerationEarthFrame[YAW] * 0.0013f;
   }
-  INS.AccelerationEarthFrame[2] = AccelerationDifference[2];
-  AccelerationEarthFrame_LPF[2] = AccelerationEarthFrame_LPF[2] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[2] * 0.14285714285714285714285714285714f;
-  INS.AccelerationEarthFrame_Sum[2] += AccelerationEarthFrame_LPF[2];
-  INS.AccelerationEarthFrame_Sum_Count[2]++;
+  INS.AccelerationEarthFrame[YAW] = AccelerationDifference[YAW];
+  AccelerationEarthFrame_LPF[YAW] = AccelerationEarthFrame_LPF[YAW] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[YAW] * 0.14285714285714285714285714285714f;
+  INS.AccelerationEarthFrame_Sum[YAW] += AccelerationEarthFrame_LPF[YAW];
+  INS.AccelerationEarthFrame_Sum_Count[YAW]++;
 }

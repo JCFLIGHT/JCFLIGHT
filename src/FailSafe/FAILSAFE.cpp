@@ -69,6 +69,6 @@ void NormalizeFailSafe()
   SetFlightModes[GPSHOLD_MODE] = false;
   SetFlightModes[RTH_MODE] = true;
   SetFlightModes[ATACK_MODE] = false;
-  Flip_Mode = false;
-  Do_WayPoint = false;
+  SetFlightModes[FLIP_MODE] = false;
+  SetFlightModes[WAYPOINT_MODE] = false;
 }

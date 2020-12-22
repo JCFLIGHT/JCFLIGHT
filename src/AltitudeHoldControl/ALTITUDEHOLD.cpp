@@ -33,7 +33,7 @@ bool ApplyAltitudeHoldControl()
   {
     static bool BaroModeActivated = false;
     static bool HoveringState = false;
-    if ((AltitudeHold_Mode || Do_GPS_Altitude) && COMMAND_ARM_DISARM)
+    if ((Do_AltitudeHold_Mode || Do_GPS_Altitude) && COMMAND_ARM_DISARM)
     {
       if (!BaroModeActivated)
       {

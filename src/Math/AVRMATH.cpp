@@ -16,6 +16,7 @@
 */
 
 #include "AVRMATH.h"
+#include "ProgMem/PROGMEM.h"
 
 float ABS_FLOAT(float X)
 {
@@ -214,7 +215,7 @@ float Calculate_Sine_Approx(int16_t InputAngle)
     {
         return ((float)(InputAngle * InvertValue * InvertValueTwo)) * 0.001745329252f;
     }
-    Calculate_Sine_Value = pgm_read_word(&TableOfSineApprox[InputAngle / 10]);
+    Calculate_Sine_Value = ProgMemReadWord(&TableOfSineApprox[InputAngle / 10]);
     return (float)(Calculate_Sine_Value * InvertValue * InvertValueTwo) / 1000;
 }
 

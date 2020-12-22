@@ -18,8 +18,9 @@
 #include "SWITCHFLAG.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Common/VARIABLES.h"
-#include "AirPlane/SERVOTRIM.h"
+#include "AirPlane/SERVOMANUALTRIM.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 //********************************************************************************************
 //ATIVAÇÃO PARA O SAVE-TRIM & CALIBRÇÃO DO MAG VIA CHAVE AUX DO MODO IOC
@@ -88,10 +89,10 @@ void Switch_Flag(void)
     if (GuardValue == 8 && CloseReset == 2)
       GuardValue = 0;
     //ATIVA O SERVOTRIM
-    if (GuardValue == 4 && CloseReset < 2.51f && (FrameType == 3 || FrameType == 4 || FrameType == 5))
+    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
       OkToTrimServo = true;
     //DESATIVA O SERVOTRIM
-    if (GuardValue == 6 && CloseReset < 2.51f && (FrameType == 3 || FrameType == 4 || FrameType == 5))
+    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
       GuardValue = OkToTrimServo = 0;
   }
   //O VALOR GUARDADO É IGUAL A 12?E A DECREMENTAÇÃO ACABOU?SIM...SE O SAVE-TRIM ESTIVER ATIVADO NÃO LIMPA A FLAG,CASO CONTRARIO LIMPA

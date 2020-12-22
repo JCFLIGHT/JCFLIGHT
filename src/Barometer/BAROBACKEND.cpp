@@ -26,17 +26,29 @@ uint8_t BaroType = 0; //DETECTA O BARÔMETRO AUTOMATICAMENTE
 void SetBaroType(uint8_t _BaroType)
 {
     if (_BaroType == 0x77)
+    {
         BaroType = BAROMETER_MS5611;
+        return;
+    }
     if (_BaroType == 0x76)
+    {
         BaroType = BAROMETER_BMP280;
+        return;
+    }
 }
 
 void Baro_Initialization()
 {
     if (BaroType == BAROMETER_MS5611)
+    {
         MS5611_Initialization();
+        return;
+    }
     if (BaroType == BAROMETER_BMP280)
+    {
         BMP280_Initialization();
+        return;
+    }
 }
 
 void Barometer_Update()

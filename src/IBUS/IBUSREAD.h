@@ -19,5 +19,5 @@
 #define IBUSREAD_H_
 #include "Arduino.h"
 extern uint16_t IBUSReadChannels[12];
-void            IBUS_Update(void);
+void IBUS_Update(void);
 #endif

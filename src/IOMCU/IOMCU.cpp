@@ -37,14 +37,16 @@
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "TimeMonitor/TIMEMONITOR.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
-#include "AVRCheck/FREERAM.h"
+#include "MemoryCheck/FREERAM.h"
 #include "AirSpeed/AIRSPEED.h"
+#include "Build/VERSION.h"
+#include "ProgMem/PROGMEM.h"
 
 #include "PID/PIDXYZ.h" //APENAS PARA VISUALIZAR O CICLO DE MAQUINA
 
 GCSClass GCS;
 
-//#define LOCK_GCS //É NECESSARIO ATIVAR ESSE PARAMETRO PARA FAZER O DEBUG SERIAL DE OUTRAS VARIAVEIS
+//#define LOCK_GCS //É NECESSARIO ATIVAR ESSE PARAMETRO PARA FAZER O DEBUG SERIAL NA EXTENSÃO PRINTF.cpp
 //#define MACHINE_CYCLE
 
 uint8_t SerialCheckSum;
@@ -88,7 +90,7 @@ struct _GCSParameters
     uint8_t SendArmDisarmState;
     uint16_t SendHDOPValue;
     uint16_t SendCurrentValue;
-    uint16_t SendWattsValue;
+    uint32_t SendWattsValue;
     int16_t SendDeclinationValue;
     uint8_t SendActualFlightMode;
     uint8_t SendFrameType;
@@ -308,13 +310,13 @@ struct _SendWayPointGCSOthersParameters
     uint8_t SendGPSHoldTimedTen;
 } SendWayPointGCSOthersParameters;
 
-static void GCS_Send_Timing_Data(uint8_t Buffer)
+static void GCS_Send_Data(uint8_t Buffer)
 {
     FASTSERIAL.TX_Send(UART0, Buffer);
     SerialCheckSum ^= Buffer;
 }
 
-static void Communication_Passed(uint8_t Error, uint8_t Buffer)
+static void Communication_Passed(bool Error, uint8_t Buffer)
 {
     FASTSERIAL.TX_Send(UART0, 0x4a);
     SerialCheckSum ^= 0x4a;
@@ -331,10 +333,10 @@ static void Communication_Passed(uint8_t Error, uint8_t Buffer)
 
 static void GCS_Send_Struct_Params(uint8_t *CheckBuffer, uint8_t SizeOfBuffer)
 {
-    Communication_Passed(0, SizeOfBuffer);
+    Communication_Passed(false, SizeOfBuffer);
     while (SizeOfBuffer--)
-        GCS_Send_Timing_Data(*CheckBuffer++);
-    GCS_Send_Timing_Data(SerialCheckSum);
+        GCS_Send_Data(*CheckBuffer++);
+    GCS_Send_Data(SerialCheckSum);
     FASTSERIAL.UartSendData(UART0);
 }
 
@@ -342,6 +344,17 @@ static void __attribute__((noinline)) GCS_Get_Struct_Params(uint8_t *CheckBuffer
 {
     while (SizeOfBuffer--)
         *CheckBuffer++ = SerialInputBuffer[VectorCount++] & 0xff;
+}
+
+static void SendStringToGCS(const char *String)
+{
+    Communication_Passed(false, strlen_P(String));
+    for (const char *StringCount = String; ProgMemReadByte(StringCount); StringCount++)
+    {
+        GCS_Send_Data(ProgMemReadByte(StringCount));
+    }
+    GCS_Send_Data(SerialCheckSum);
+    FASTSERIAL.UartSendData(UART0);
 }
 
 void GCSClass::Serial_Parse_Protocol()
@@ -430,29 +443,29 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 3:
         EEPROM_Function = 1;
         BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 4:
         EEPROM_Function = 2;
         BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 5:
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParameters, sizeof(_GetWayPointGCSParameters));
         break;
 
     case 6:
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParametersTwo, sizeof(_GetWayPointGCSParametersTwo));
         break;
@@ -478,36 +491,36 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 11:
         if (!COMMAND_ARM_DISARM)
             CalibratingAccelerometer = 512;
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 12:
         if (!COMMAND_ARM_DISARM)
             CalibratingCompass = true;
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 13:
         GCS.ConfigFlight = true;
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 14:
         GCS.ConfigFlight = false;
         Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 15:
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         GCS_Get_Struct_Params((uint8_t *)&GetUserBasicGCSParameters, sizeof(_GetUserBasicGCSParameters));
         break;
@@ -516,21 +529,21 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS.Save_Basic_Configuration();
         BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
         Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 17:
         GCS.Dafult_Basic_Configuration();
         BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 18:
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         GCS_Get_Struct_Params((uint8_t *)&GetUserMediumGCSParameters, sizeof(_GetUserMediumGCSParameters));
         break;
@@ -538,22 +551,46 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 19:
         GCS.Save_Medium_Configuration();
         BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
     case 20:
         GCS.Dafult_Medium_Configuration();
         BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(0, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
 
+    case 21:
+        SendStringToGCS(PlatformName);
+        break;
+
+    case 22:
+        SendStringToGCS(FirwareName);
+        break;
+
+    case 23:
+        SendStringToGCS(FirmwareVersion);
+        break;
+
+    case 24:
+        SendStringToGCS(CompilerVersion);
+        break;
+
+    case 25:
+        SendStringToGCS(BuildDate);
+        break;
+
+    case 26:
+        SendStringToGCS(BuildTime);
+        break;
+
     default:
-        Communication_Passed(1, 0);
-        GCS_Send_Timing_Data(SerialCheckSum);
+        Communication_Passed(true, 0);
+        GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
         break;
     }
@@ -951,8 +988,8 @@ void GCSClass::Dafult_Medium_Configuration()
     STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 26);
     //ROLL
     STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 35);
-    STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 25);
-    STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 26);
+    STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 25);
+    STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 26);
     //YAW
     STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 69);
     STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 50);

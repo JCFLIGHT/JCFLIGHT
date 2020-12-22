@@ -20,12 +20,13 @@
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
 #include "AHRS/AHRS.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 bool CheckInclinationForCopter(void)
 {
-    if ((FrameType == 3) || (FrameType == 4) || (FrameType == 5))
+    if (GetFrameStateOfAirPlane())
         return false; //PULA A CHECAGEM DE INCLINAÇÃO NO MODO PLANE
-    if (((FrameType < 3) || (FrameType == 6) || (FrameType == 7)) && CheckAnglesInclination(25))
+    if (GetFrameStateOfMultirotor() && CheckAnglesInclination(25))
         return true; //INVALIDA O ARMAMENTO DO SISTEMA SE HOUVER INCLINAÇÃO NOS EIXOS
     return false;    //INCLINAÇÃO NÃO DETECTADA
 }

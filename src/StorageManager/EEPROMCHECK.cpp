@@ -20,24 +20,33 @@
 #include "EEPROMSTORAGE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 
-#define AVR2560_EEPROM_SIZE 4096
-
 uint16_t EPPROM_Address = 0;
 
-void Operator_Check_Values_In_Address(void)
+#ifdef __AVR_ATmega2560__
+void Operator_Check_Values_In_Address(uint16_t Size)
 {
-    while (1)
+    while (true)
     {
         FastSerialPrintln(PSTR("Address:%d ValorGuardado:%d\n"),
                           EPPROM_Address,
                           STORAGEMANAGER.Read_8Bits(EPPROM_Address));
         EPPROM_Address++;
-        if (EPPROM_Address == AVR2560_EEPROM_SIZE)
+        if (EPPROM_Address == Size)
         {
             FastSerialPrintln(PSTR("Completo!\n"));
-            while (1)
+            while (true)
                 ;
         }
         AVRTIME.SchedulerSleep(4);
     }
 }
+
+#elif __arm__
+
+void Operator_Check_Values_In_Address(uint16_t Size)
+{
+    while (true)
+    {
+    }
+}
+#endif

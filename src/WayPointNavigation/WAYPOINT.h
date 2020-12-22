@@ -133,7 +133,6 @@ struct _GetWayPointGCSParametersTwo
 };
 extern struct _GetWayPointGCSParameters GetWayPointGCSParameters;
 extern struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
-extern bool Do_WayPoint;
 extern bool Auto_TakeOff;
 extern bool Mission_BaroMode;
 extern uint8_t EEPROM_Function;

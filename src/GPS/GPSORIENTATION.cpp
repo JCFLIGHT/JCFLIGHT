@@ -22,10 +22,11 @@
 #include "GPSNavigation/MULTIROTORNAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "IMU/ACCELERATION.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 void GPS_Orientation_Update()
 {
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
   {
     bool AltHoldControlApplied = ApplyAltitudeHoldControl();
     static Scheduler_Struct GPSControlTimer;

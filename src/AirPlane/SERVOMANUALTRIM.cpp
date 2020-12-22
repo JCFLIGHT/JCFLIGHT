@@ -15,14 +15,15 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "SERVOTRIM.h"
+#include "SERVOMANUALTRIM.h"
 #include "AIRPLANE.h"
 #include "RadioControl/RCCONFIG.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
-#include "FastSerial/PRINTF.h"
+#include "FrameStatus/FRAMESTATUS.h"
 #include "BAR/BAR.h"
+#include "FastSerial/PRINTF.h"
 
 //#define PRINTLN_SERVORATE
 
@@ -30,7 +31,7 @@ bool OkToTrimServo = false;
 bool OkToSaveTrim = false;
 int16_t Trim_Servo[4];
 
-void Trim_Servo_Initializate()
+void Manual_Trim_Servo_Initializate()
 {
   //CARREGA A TRIMAGEM SALVA NA EEPROM
   Trim_Servo[SERVO1] = STORAGEMANAGER.Read_8Bits(SERVO1_TRIM_ADDR);
@@ -44,9 +45,9 @@ void Trim_Servo_Initializate()
   ServoRate[SERVO4] = Map_16Bits(Trim_Servo[3], 0, 255, -127, 127);
 }
 
-void Trim_Servo_Update()
+void Manual_Trim_Servo_Update()
 {
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
     return;
 #if defined(PRINTLN_SERVORATE)
   FastSerialPrintln(PSTR("Trim1:%d Trim2:%d Trim3:%d Trim4:%d Rate1:%d Rate2:%d Rate3:%d Rate4:%d OkToTrimServo:%d\n"),

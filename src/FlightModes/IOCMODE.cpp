@@ -18,12 +18,13 @@
 #include "IOCMODE.h"
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 void IOC_Mode_Update()
 {
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
   {
-    if (IOCMODE)
+    if (Do_IOC_Mode)
     {
       int16_t HeadingDifference = ATTITUDE.CompassHeading - (IOC_Initial_Compass * 10);
       float CosineDifference = Calculate_Cosine_Approx(HeadingDifference);

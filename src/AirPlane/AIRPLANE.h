@@ -19,6 +19,7 @@
 #define AIRPLANE_H_
 #include "Arduino.h"
 extern int8_t ServoRate[4];
+void UpdateServosDirection(void);
 void AirPlane_Mode_ConventionalPlane_Run();
 void AirPlane_Mode_FixedWing_Run();
 void AirPlane_Mode_PlaneVTail_Run();

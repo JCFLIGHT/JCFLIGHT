@@ -18,6 +18,6 @@
 #ifndef CURVESRC_H_
 #define CURVESRC_H_
 #include "Arduino.h"
-void CurvesRC_Initialization();
-void CurvesRC_Update();
+void CurvesRC_CalculeValue();
+void CurvesRC_SetValues();
 #endif

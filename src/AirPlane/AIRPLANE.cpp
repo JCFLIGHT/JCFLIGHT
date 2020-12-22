@@ -19,28 +19,38 @@
 #include "Common/VARIABLES.h"
 #include "Filters/LPFSERVO.h"
 #include "Math/AVRMATH.h"
-#include "SERVOTRIM.h"
+#include "SERVOMANUALTRIM.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
 #include "FastSerial/PRINTF.h"
 
-#define PULSE_MIN 500     //PULSO MINIMO PARA OS SERVOS
-#define PULSE_MIDDLE 1500 //PULSO MEDIO PARA OS SERVOS
-#define PULSE_MAX 2200    //PULSO MAXIMO PARA OS SERVOS
-#define LPF_SETPOINT 1500 //PONTO MEDIO DOS SERVOS PARA O FILTRO
+#define PULSE_MIN 500                                                                     //PULSO MINIMO PARA OS SERVOS
+#define PULSE_MIDDLE 1500                                                                 //PULSO MEDIO PARA OS SERVOS
+#define PULSE_MAX 2200                                                                    //PULSO MAXIMO PARA OS SERVOS
+#define LPF_SETPOINT 1500                                                                 //PONTO MEDIO DOS SERVOS PARA O FILTRO
+#define GET_SERVO_DIRECTION(Address) ((STORAGEMANAGER.Read_8Bits(Address) == 1) ? -1 : 1) //OBTÉM A DIREÇÃO DOS SERVOS
 
 //DEBUG
 //#define PRINTLN_SERVO_SIGNAL
 
 Struct_LowPassFilter LPFDevice[4]; //INSTANCIA PARA APLICAR O FILTRO LPF NOS SERVOS
 
-int8_t FlapperonsDirection[2] = {-1, 1}; //CONTROLE DOS 2 SERVOS DA ASA,O SEGUNDO SERVO TEM O MOVIMENTO AO CONTRARIO DO PRIMEIRO
+int8_t ServoDirection[4] = {1, 1, 1, 1}; //CONTROLE DE DIREÇÃO DOS SERVOS
 int8_t ServoRate[4];                     //AJUSTE DE RATE DOS SERVOS DE -127 - +127
 int16_t DeviceFiltered[4];               //SAIDA FILTRADADA DOS PULSOS PWM DOS SERVOS
 
+void UpdateServosDirection(void)
+{
+  ServoDirection[SERVO1] = GET_SERVO_DIRECTION(SERVO1_DIRECTION_ADDR);
+  ServoDirection[SERVO2] = GET_SERVO_DIRECTION(SERVO2_DIRECTION_ADDR);
+  ServoDirection[SERVO3] = GET_SERVO_DIRECTION(SERVO3_DIRECTION_ADDR);
+  ServoDirection[SERVO4] = GET_SERVO_DIRECTION(SERVO4_DIRECTION_ADDR);
+}
+
 void AirPlane_Mode_ConventionalPlane_Run()
 {
-  if (FrameType != 3)
+  if (FrameType != AIRPLANE)
     return;
   if (!COMMAND_ARM_DISARM)
     MotorControl[MOTOR4] = 1000;
@@ -48,27 +58,27 @@ void AirPlane_Mode_ConventionalPlane_Run()
     MotorControl[MOTOR4] = RCController[THROTTLE];
   if (!OkToTrimServo)
   {
-    if (IOCMODE) //MANUAL
+    if (Do_IOC_Mode) //MANUAL
     {
-      MotorControl[MOTOR3] = RCController[PITCH] * FlapperonsDirection[0]; //WING     (SERVO 1 DA ASA)
-      MotorControl[MOTOR2] = RCController[PITCH] * FlapperonsDirection[1]; //WING     (SERVO 2 DA ASA)
-      MotorControl[MOTOR1] = RCController[YAW];                            //RUDDER   (LEME)
-      MotorControl[MOTOR6] = RCController[ROLL];                           //ELEVATOR (PROFUNDOR)
+      MotorControl[MOTOR3] = RCController[PITCH] * ServoDirection[0]; //WING     (SERVO 1 DA ASA)
+      MotorControl[MOTOR2] = RCController[PITCH] * ServoDirection[1]; //WING     (SERVO 2 DA ASA)
+      MotorControl[MOTOR1] = RCController[YAW] * ServoDirection[2];   //RUDDER   (LEME)
+      MotorControl[MOTOR6] = RCController[ROLL] * ServoDirection[3];  //ELEVATOR (PROFUNDOR)
     }
     else //STABILIZE OU ACRO
     {
       //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-      MotorControl[MOTOR3] = PIDControllerApply[PITCH] * FlapperonsDirection[0]; //WING     (SERVO 1 DA ASA)
-      MotorControl[MOTOR2] = PIDControllerApply[PITCH] * FlapperonsDirection[1]; //WING     (SERVO 2 DA ASA)
-      MotorControl[MOTOR1] = PIDControllerApply[YAW];                            //RUDDER   (LEME)
-      MotorControl[MOTOR6] = PIDControllerApply[ROLL];                           //ELEVATOR (PROFUNDOR)
+      MotorControl[MOTOR3] = PIDControllerApply[PITCH] * ServoDirection[0]; //WING     (SERVO 1 DA ASA)
+      MotorControl[MOTOR2] = PIDControllerApply[PITCH] * ServoDirection[1]; //WING     (SERVO 2 DA ASA)
+      MotorControl[MOTOR1] = PIDControllerApply[YAW] * ServoDirection[2];   //RUDDER   (LEME)
+      MotorControl[MOTOR6] = PIDControllerApply[ROLL] * ServoDirection[3];  //ELEVATOR (PROFUNDOR)
     }
   }
 }
 
 void AirPlane_Mode_FixedWing_Run()
 {
-  if (FrameType != 4)
+  if (FrameType != FIXED_WING)
     return;
   if (!COMMAND_ARM_DISARM)
     MotorControl[MOTOR4] = 1000;
@@ -76,23 +86,23 @@ void AirPlane_Mode_FixedWing_Run()
     MotorControl[MOTOR4] = RCController[THROTTLE];
   if (!OkToTrimServo)
   {
-    if (IOCMODE) //MANUAL
+    if (Do_IOC_Mode) //MANUAL
     {
-      MotorControl[MOTOR3] = (RCController[PITCH] * FlapperonsDirection[0]) + (RCController[ROLL] * FlapperonsDirection[1]); //WING (SERVO 1 DA ASA)
-      MotorControl[MOTOR2] = (RCController[PITCH] * FlapperonsDirection[0]) - (RCController[ROLL] * FlapperonsDirection[1]); //WING (SERVO 2 DA ASA)
+      MotorControl[MOTOR3] = (RCController[PITCH] * ServoDirection[0]) + (RCController[ROLL] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
+      MotorControl[MOTOR2] = (RCController[PITCH] * ServoDirection[0]) - (RCController[ROLL] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
     }
     else //STABILIZE OU ACRO
     {
       //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-      MotorControl[MOTOR3] = (PIDControllerApply[PITCH] * FlapperonsDirection[0]) + (PIDControllerApply[ROLL] * FlapperonsDirection[1]); //WING (SERVO 1 DA ASA)
-      MotorControl[MOTOR2] = (PIDControllerApply[PITCH] * FlapperonsDirection[0]) - (PIDControllerApply[ROLL] * FlapperonsDirection[1]); //WING (SERVO 2 DA ASA)
+      MotorControl[MOTOR3] = (PIDControllerApply[PITCH] * ServoDirection[0]) + (PIDControllerApply[ROLL] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
+      MotorControl[MOTOR2] = (PIDControllerApply[PITCH] * ServoDirection[0]) - (PIDControllerApply[ROLL] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
     }
   }
 }
 
 void AirPlane_Mode_PlaneVTail_Run()
 {
-  if (FrameType != 5)
+  if (FrameType != PLANE_VTAIL)
     return;
   if (!COMMAND_ARM_DISARM)
     MotorControl[MOTOR4] = 1000;
@@ -100,27 +110,27 @@ void AirPlane_Mode_PlaneVTail_Run()
     MotorControl[MOTOR4] = RCController[THROTTLE];
   if (!OkToTrimServo)
   {
-    if (IOCMODE) //MANUAL
+    if (Do_IOC_Mode) //MANUAL
     {
-      MotorControl[MOTOR3] = RCController[ROLL] * FlapperonsDirection[0]; //WING     (SERVO 1 DA ASA)
-      MotorControl[MOTOR2] = RCController[ROLL] * FlapperonsDirection[1]; //WING     (SERVO 2 DA ASA)
-      MotorControl[MOTOR1] = RCController[PITCH] + RCController[YAW];     //V-TAIL   (CAUDA)
-      MotorControl[MOTOR6] = RCController[PITCH] - RCController[YAW];     //V-TAIL   (CAUDA)
+      MotorControl[MOTOR3] = RCController[ROLL] * ServoDirection[0];                        //WING     (SERVO 1 DA ASA)
+      MotorControl[MOTOR2] = RCController[ROLL] * ServoDirection[1];                        //WING     (SERVO 2 DA ASA)
+      MotorControl[MOTOR1] = (RCController[PITCH] + RCController[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
+      MotorControl[MOTOR6] = (RCController[PITCH] - RCController[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
     }
     else //STABILIZE OU ACRO
     {
       //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-      MotorControl[MOTOR3] = PIDControllerApply[ROLL] * FlapperonsDirection[0];   //WING     (SERVO 1 DA ASA)
-      MotorControl[MOTOR2] = PIDControllerApply[ROLL] * FlapperonsDirection[1];   //WING     (SERVO 2 DA ASA)
-      MotorControl[MOTOR1] = PIDControllerApply[PITCH] + PIDControllerApply[YAW]; //V-TAIL   (CAUDA)
-      MotorControl[MOTOR6] = PIDControllerApply[PITCH] - PIDControllerApply[YAW]; //V-TAIL   (CAUDA)
+      MotorControl[MOTOR3] = PIDControllerApply[ROLL] * ServoDirection[0];                              //WING     (SERVO 1 DA ASA)
+      MotorControl[MOTOR2] = PIDControllerApply[ROLL] * ServoDirection[1];                              //WING     (SERVO 2 DA ASA)
+      MotorControl[MOTOR1] = (PIDControllerApply[PITCH] + PIDControllerApply[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
+      MotorControl[MOTOR6] = (PIDControllerApply[PITCH] - PIDControllerApply[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
     }
   }
 }
 
 void Servo_Rate_Adjust()
 {
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
     return;
   //CASO OS SERVOS INICIEM COM O PULSO MINIMO É POR QUE O SERVO TRIM NÃO FOI FEITO,OS VALORES GUARDADOS NA EEPROM SERÃO 0 (ZERO),ZERO É IGUAL A -127 NO TRIM
   //RATE PARA OS SERVOS

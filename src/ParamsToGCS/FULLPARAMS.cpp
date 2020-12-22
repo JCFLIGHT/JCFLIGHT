@@ -20,12 +20,27 @@
 #include "BAR/BAR.h"
 #include "StorageManager/EEPROMCHECK.h"
 #include "StringSupport/STRINGSUPPORT.h"
+#include "Common/ENUM.h"
+#include "StorageManager/ERASE.h"
 
 //A LISTA COMPLETA DE PARAMETROS IRÁ FUNCIONAR APENAS NA PLATAFORMA STM32
 //PARA O ATMEGA2560 FICARA APENAS OS PARAMETROS MAIS IMPORTANTES
+#ifdef __AVR_ATmega2560__
 #define MEGA2560
+#define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0
+#define FINAL_ADDRESS_EEPROM_TO_CLEAR 4096
+#define SIZE_OF_EEPROM 4096
+#define OPERATION_IN_LOOP false
+
+#elif __arm__
+#define INITIAL_ADDRESS_EEPROM_TO_CLEAR ? ? ? ?
+#define FINAL_ADDRESS_EEPROM_TO_CLEAR ? ? ? ?
+#define SIZE_OF_EEPROM ? ? ? ?
+#define OPERATION_IN_LOOP false
+#endif
 
 //#define OPERATOR_CHECK_EEPROM
+//#define ERASE_ALL_EEPROM
 
 typedef struct
 {
@@ -37,6 +52,12 @@ typedef struct
   uint16_t Param_Servo_Pulse_Min;
   uint16_t Param_Servo_Pulse_Middle;
   uint16_t Param_Servo_Pulse_Max;
+#endif
+  uint8_t Param_Servo1_Derection;
+  uint8_t Param_Servo2_Derection;
+  uint8_t Param_Servo3_Derection;
+  uint8_t Param_Servo4_Derection;
+#ifndef MEGA2560
   uint8_t Param_AutoLaunch_AHRS_BankAngle;
   uint16_t Param_AutoLaunch_IMU_BankAngle;
   uint8_t Param_AutoLaunch_IMU_Swing;
@@ -68,6 +89,9 @@ typedef struct
   uint8_t Param_Throttle_Middle;
   uint8_t Param_Throttle_Expo;
 #ifndef MEGA2560
+  uint8_t Param_Throttle_Idle_Factor;
+  int16_t Param_Throttle_Max;
+  uint8_t Param_Throttle_Factor;
   uint8_t Param_AutoDisarm_Time;
   uint16_t Param_AutoDisarm_Throttle_Min;
   uint16_t Param_AutoDisarm_YPR_Min;
@@ -89,13 +113,6 @@ typedef struct
 
 Struct_FullParamsList FullParamsList;
 
-typedef enum
-{
-  VAR_8BITS,
-  VAR_16BITS,
-  VAR_32BITS
-} VarType;
-
 typedef struct
 {
   const char *Param_Name;
@@ -115,6 +132,12 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"Servo_Pulse_Min", SERVO_PULSE_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Min, 300, 2500},
     {"Pulse_Middle", SERVO_PULSE_MIDDLE_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Middle, 400, 2500},
     {"Servo_Pulse_Max", SERVO_PULSE_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Max, 1000, 2600},
+#endif
+    {"Servo1_Direction", SERVO1_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo1_Derection, 0, 1},
+    {"Servo2_Direction", SERVO2_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo2_Derection, 0, 1},
+    {"Servo3_Direction", SERVO3_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo3_Derection, 0, 1},
+    {"Servo4_Direction", SERVO4_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo4_Derection, 0, 1},
+#ifndef MEGA2560
     {"AutoLaunch_AHRS_BankAngle", AL_AHRS_BA_ADDR, VAR_8BITS, &FullParamsList.Param_AutoLaunch_AHRS_BankAngle, 0, 255},
     {"AutoLaunch_IMU_BankAngle", AL_IMU_BA_ADDR, VAR_16BITS, &FullParamsList.Param_AutoLaunch_IMU_BankAngle, 0, 1000},
     {"AutoLaunch_IMU_Swing", AL_IMU_SWING_ADDR, VAR_8BITS, &FullParamsList.Param_AutoLaunch_IMU_Swing, 0, 255},
@@ -131,7 +154,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"CrashCheck_BankAngle", CC_BANKANGLE_ADDR, VAR_8BITS, &FullParamsList.Param_CrashCheck_BankAngle, 0, 255},
     {"CrashCheck_Time", CC_TIME_ADDR, VAR_8BITS, &FullParamsList.Param_CrashCheck_Time, 0, 255},
 #endif
-    {"FailSafeValue", FAILSAFE_ADDR, VAR_16BITS, &FullParamsList.Param_FailSafeValue, 0, 2000},
+    {"FailSafeValue", FAILSAFE_ADDR, VAR_16BITS, &FullParamsList.Param_FailSafeValue, 0, 2200},
 #ifndef MEGA2560
     {"GimbalMinValue", GIMBAL_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_GimbalMinValue, 800, 2200},
     {"GimbalMiddleValue", GIMBAL_MID_ADDR, VAR_16BITS, &FullParamsList.Param_GimbalMiddleValue, 800, 2200},
@@ -146,17 +169,20 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"ThrottleMiddle", THROTTLE_MIDDLE_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Middle, 0, 255},
     {"ThrottleExpo", THROTTLE_EXPO_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Expo, 0, 255},
 #ifndef MEGA2560
+    {"ThrottleIddleFactor", THROTTLE_IDDLE_FACTOR_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Idle_Factor, 0, 255},
+    {"ThrottleMaxValue", THROTTLE_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_Throttle_Max, 1500, 2200},
+    {"ThrottleFactor", THROTTLE_FACTOR_ADDR, VAR_16BITS, &FullParamsList.Param_Throttle_Factor, 0, 255},
     {"AutoDisarm", AUTODISARM_ADDR, VAR_8BITS, &FullParamsList.Param_AutoDisarm_Time, 0, 255},
-    {"Throttle_Min", THR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_Throttle_Min, 800, 1500},
-    {"YPR_Min", YPR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_YPR_Min, 800, 1500},
-    {"YPR_Max", YPR_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_YPR_Max, 800, 2200},
+    {"AutoDisarm_Throttle_Min", AUTODISARM_THR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_Throttle_Min, 800, 1500},
+    {"AutoDisarm_YPR_Min", AUTODISARM_YPR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_YPR_Min, 800, 1500},
+    {"AutoDisarm_YPR_Max", AUTODISARM_YPR_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_YPR_Max, 800, 2200},
     {"AHRS_Nearness", NEARNESS_ADDR, VAR_8BITS, &FullParamsList.Param_AHRS_Nearness, 0, 255},
     {"AirPlane_Wheels", WHEELS_ADDR, VAR_8BITS, &FullParamsList.Param_AirPlane_Wheels, 0, 255},
-    {"GPS_Baud_Rate", GPS_BAUDRATE_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_Baud_Rate, 0, 4},
+    {"GPS_Baud_Rate", Get_BaudRate_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_Baud_Rate, 0, 4},
     {"Navigation_Vel", NAV_VEL_ADDR, VAR_16BITS, &FullParamsList.Param_Navigation_Vel, 0, 400},
     {"GPS_WP_Radius", WP_RADIUS_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_WP_Radius, 0, 255},
     {"GPS_RTH_Land", RTH_LAND_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_RTH_Land, 0, 255},
-    {"GPS_TiltCompensation", TILT_COMP_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_TiltCompensation, 0, 100},
+    {"GPS_TiltCompensation", GPS_TILT_COMP_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_TiltCompensation, 0, 100},
     {"AirSpeed_Samples", AIRSPEED_SAMPLES_ADDR, VAR_8BITS, &FullParamsList.Param_AirSpeed_Samples, 0, 255},
     {"AirSpeed_Factor", AIRSPEED_FACTOR_ADDR, VAR_16BITS, &FullParamsList.Param_AirSpeed_Factor, 0, 5000},
     {"Adjust_Roll", ROLL_ADJ_ADDR, VAR_16BITS, &FullParamsList.Param_Acc_Adjust_Roll, -800, 800},
@@ -169,26 +195,36 @@ const Requesited_Values_Of_Param Params_Table[] = {
 
 void FullParamsListInitialization()
 {
-  //SetNewValue("kP_Acc_AHRS", 242);
+  //SetNewValue("kP_Acc_AHRS", 242); //APENAS PARA TESTE INICIAL
 #ifdef OPERATOR_CHECK_EEPROM
-  Operator_Check_Values_In_Address();
+  Operator_Check_Values_In_Address(SIZE_OF_EEPROM);
+#endif
+
+#ifdef ERASE_ALL_EEPROM
+  EraseEEPROM(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR, SIZE_OF_EEPROM, OPERATION_IN_LOOP);
 #endif
 }
 
 void SetNewValue(const char *ParamName, int32_t NewValue)
 {
-  for (uint32_t i = 0; i < TABLE_COUNT; i++)
+  for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
-    if (StringCompare(ParamName, Params_Table[i].Param_Name, StringLength(Params_Table[i].Param_Name)) == 0)
+    if (StringCompare(ParamName, Params_Table[Table_Counter].Param_Name, StringLength(Params_Table[Table_Counter].Param_Name)) == 0)
     {
-      if (NewValue >= Params_Table[i].Value_Min && NewValue <= Params_Table[i].Value_Max)
+      if (NewValue >= Params_Table[Table_Counter].Value_Min && NewValue <= Params_Table[Table_Counter].Value_Max)
       {
-        if (Params_Table[i].VariableType == VAR_8BITS && NewValue != STORAGEMANAGER.Read_8Bits(Params_Table[i].Address))
-          STORAGEMANAGER.Write_8Bits(Params_Table[i].Address, NewValue);
-        else if (Params_Table[i].VariableType == VAR_16BITS && NewValue != STORAGEMANAGER.Read_16Bits(Params_Table[i].Address))
-          STORAGEMANAGER.Write_16Bits(Params_Table[i].Address, NewValue);
-        else if (Params_Table[i].VariableType == VAR_32BITS && NewValue != STORAGEMANAGER.Read_32Bits(Params_Table[i].Address))
-          STORAGEMANAGER.Write_32Bits(Params_Table[i].Address, NewValue);
+        if (Params_Table[Table_Counter].VariableType == VAR_8BITS && NewValue != STORAGEMANAGER.Read_8Bits(Params_Table[Table_Counter].Address))
+        {
+          STORAGEMANAGER.Write_8Bits(Params_Table[Table_Counter].Address, NewValue);
+        }
+        else if (Params_Table[Table_Counter].VariableType == VAR_16BITS && NewValue != STORAGEMANAGER.Read_16Bits(Params_Table[Table_Counter].Address))
+        {
+          STORAGEMANAGER.Write_16Bits(Params_Table[Table_Counter].Address, NewValue);
+        }
+        else if (Params_Table[Table_Counter].VariableType == VAR_32BITS && NewValue != STORAGEMANAGER.Read_32Bits(Params_Table[Table_Counter].Address))
+        {
+          STORAGEMANAGER.Write_32Bits(Params_Table[Table_Counter].Address, NewValue);
+        }
       }
       else
       {

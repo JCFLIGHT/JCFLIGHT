@@ -22,11 +22,14 @@ void MachineInit()
     UART2Mode_Initialization();
     FASTSERIAL.Initialization();
     RGB.Initialization();
+    AUXFLIGHT.LoadEEPROM();
     SPEEDMOTORS.LoadEEPROM();
     FullParamsListInitialization();
-    CurvesRC_Update();
-    CurvesRC_Initialization();
+    //CARREGA OS PARAMETROS DO RADIO CONTROLE
+    CurvesRC_SetValues();
+    CurvesRC_CalculeValue();
     TPA_Initialization();
+    //ATIVA O LED VERMELHO
     PORTB |= 1 << 4;    //PINO DIGITAL 10
     PORTB &= ~(1 << 5); //PINO DIGITAL 11
     PORTB &= ~(1 << 6); //PINO DIGITAL 12
@@ -36,34 +39,32 @@ void MachineInit()
     CheckAndUpdateIMUCalibration();
     //CARREGA OS VALORES DE PID
     LoadPID();
-    //CARREGA OS PARAMETROS DO RADIO CONTROLE
-    CurvesRC_Update();
     //INICIALIZA OS DISPOSITIVOS I2C
     AllI2CInitialization();
     //CARREGA OS PARAMETROS DO GPS
     LoadGPSParameters();
-    //INICIALIZA O KALMAN
+    //INICIALIZA OS FILTROS
     KALMAN.Init();
     IMU_Filters_Initialization();
-    DerivativeLPF_Initialization();
     //CONFIGURA OS 12 CANAIS
     RCCONFIG.Init();
     //CALIBRAÇÃO DOS ESC'S
     ESC.Calibration();
     //AJUSTA O RATE DOS SERVOS
-    Trim_Servo_Initializate();
+    Manual_Trim_Servo_Initializate();
     //CARREGA TODOS OS PARAMETROS DO MODO WAYPOINT
     WayPoint_Initialization();
     //RECOLHE AS PRIMEIRAS AMOSTRAS DO AIR-SPEED PARA CALIBRAR
     AirSpeed_Initialization();
     //CALIBRA O GYRO
     CalibratingGyroscope = 512;
-    //NORMALIZA O BUZZER PARA OPERAÇÃO NORMAL
-    ESC.CalibratingEscBeep = -10;
+    //INICIA O BUZZER EM OPERAÇÃO NORMAL
+    ESC.BeeperMode = NORMAL_OPERATION_MODE;
     //INICIALIZA O AHRS
     AHRS_Initialization();
     //INICIALIZA O BOTÃO DE SEGURANÇA
     SAFETYBUTTON.Initialization();
+    //DESATIVA TODOS OS LEDS
     PORTB &= ~(1 << 4); //PINO DIGITAL 10
     PORTB &= ~(1 << 5); //PINO DIGITAL 11
     PORTB &= ~(1 << 6); //PINO DIGITAL 12
@@ -84,6 +85,7 @@ void MachineInit()
         AVRTIME.SchedulerSleep(133);
         //133 * 3 * 5 = 1.995 SEGUNDO
     }
+    //DESATIVA TODOS OS LEDS
     PORTB &= ~(1 << 4); //PINO DIGITAL 10
     PORTB &= ~(1 << 5); //PINO DIGITAL 11
     PORTB &= ~(1 << 6); //PINO DIGITAL 12

@@ -21,7 +21,7 @@
 
 float GetGForce()
 {
-    return sqrtf(SquareFloat(IMU.AccelerometerRead[0] / 512) +
-                 SquareFloat(IMU.AccelerometerRead[1] / 512) +
-                 SquareFloat(IMU.AccelerometerRead[2] / 512));
+  return sqrtf(SquareFloat(IMU.AccelerometerRead[ROLL] / 512) +
+               SquareFloat(IMU.AccelerometerRead[PITCH] / 512) +
+               SquareFloat(IMU.AccelerometerRead[YAW] / 512));
 }

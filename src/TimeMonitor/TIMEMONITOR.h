@@ -18,16 +18,8 @@
 #ifndef TIMEMONITOR_h
 #define TIMEMONITOR_h
 #include "Arduino.h"
+#include "Common/ENUM.h"
 //#define ENABLE_TIMEMONITOR
-enum Function_Names
-{
-  SLOW_LOOP = 0,
-  MEDIUM_LOOP,
-  FAST_MEDIUM_LOOP,
-  FAST_LOOP,
-  TOTAL_LOOP,
-  SIZE_LOOPS
-};
 class AVRTimeMonitor
 {
 public:

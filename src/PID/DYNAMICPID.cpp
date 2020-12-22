@@ -21,7 +21,11 @@
 #include "TPA.h"
 #include "Math/AVRMATH.h"
 #include "RadioControl/RCSMOOTH.h"
+#include "FrameStatus/FRAMESTATUS.h"
 #include "FastSerial/PRINTF.h"
+
+//lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO
+#define LRintFloat lrint
 
 //DEBUG
 //#define PRINTLN_TPA
@@ -34,7 +38,7 @@ int16_t CalcedAttitudeRC(int16_t Data, int16_t RCExpo)
   int16_t RCValueDeflection;
   RCValueDeflection = Constrain_16Bits(RadioControllOutput[Data] - 1500, -500, 500);
   float ConvertValueToFloat = RCValueDeflection / 100.0f;
-  return lrintf((2500.0f + (float)RCExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
+  return LRintFloat((2500.0f + (float)RCExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
 }
 
 uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
@@ -57,7 +61,7 @@ void DynamicPID()
   //THROTTLE PID ATTENUATION
   //A ATENUAÇÃO OCORRE APENAS NO PROPORCIONAL E NO DERIVATIVO
   //AJUSTE DINAMICO DE ACORDO COM O VALOR DO THROTTLE
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7) //CONFIG PARA DRONES
+  if (GetFrameStateOfMultirotor()) //CONFIG PARA DRONES
   {
     DynamicProportionalTwo = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
 #if defined(PRINTLN_TPA)

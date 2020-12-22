@@ -20,7 +20,6 @@
 #include "Arduino.h"
 extern int32_t BaroPressureRaw;
 extern int16_t BaroTemperatureRaw;
-extern int32_t BaroNotFilter;
 void Baro_Calibration();
 void CalculateBaroAltitude();
 int32_t GetAltitudeForGCS();

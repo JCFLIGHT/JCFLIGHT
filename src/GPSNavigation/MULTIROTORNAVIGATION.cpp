@@ -27,6 +27,7 @@
 #include "PID/GPSPID.h"
 #include "BAR/BAR.h"
 #include "Buzzer/BUZZER.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 #define NavTiltCompensation 20 //RETIRADO DA ARDUPILOT
 
@@ -37,7 +38,9 @@ static void GPS_Calcule_Velocity(void);
 static void GPS_Update_CrossTrackError(void);
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput);
 
-bool DeclinationNotPushed = false;
+bool DeclinationPushed = false;
+
+uint8_t MachineCicleCount = 0;
 
 static float DeltaTimeGPSNavigation;
 float ScaleDownOfLongitude = 1.0f;
@@ -56,123 +59,141 @@ int32_t Original_Target_Bearing;
 int32_t Coordinates_To_Navigation[2];
 static int32_t Coordinates_From_Navigation[2];
 
-void GPS_Compute(void)
+void GPS_Process_FlightModes(void)
 {
   uint32_t CalculateDistance;
   int32_t CalculateDirection;
-  if (GPS_3DFIX && GPS_NumberOfSatellites >= 5)
+  //SAIA DA FUNÇÃO SE O NÚMERO DE SATELITES FOR MENOR QUE 5
+  if (GPS_NumberOfSatellites < 5 && !GPS_3DFIX)
   {
-    if (!COMMAND_ARM_DISARM)
-      Home_Point = false;
-    if (!Home_Point && COMMAND_ARM_DISARM)
-      Reset_Home_Point();
-    //OBTÉM A DECLINAÇÃO MAGNETICA AUTOMATICAMENTE
-    if (!COMMAND_ARM_DISARM && !DeclinationNotPushed)
-      Set_Initial_Location(GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1], GPS_3DFIX);
-    if (Declination() != 0)
-      DeclinationNotPushed = true;
-    if (Declination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) &&
-        !COMMAND_ARM_DISARM &&
-        Declination() != 0)
-      STORAGEMANAGER.Write_Float(DECLINATION_ADDR, Declination());
-    uint32_t ActualCurrentTime = AVRTIME.SchedulerMillis();
-    static uint32_t StoredCurrentTime;
-    DeltaTimeGPSNavigation = (ActualCurrentTime - StoredCurrentTime) * 1e-3f;
-    StoredCurrentTime = ActualCurrentTime;
-    DeltaTimeGPSNavigation = MIN_FLOAT(DeltaTimeGPSNavigation, 1.0);
-    GPS_Calcule_Bearing(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &CalculateDirection);
-    DirectionToHome = CalculateDirection / 100;
-    GPS_Calcule_Distance_To_Home(&CalculateDistance);
-    DistanceToHome = CalculateDistance / 100;
-    if (!Home_Point)
+    return;
+  }
+  //SAFE PARA RESETAR O HOME-POINT
+  if (!COMMAND_ARM_DISARM)
+  {
+    Home_Point = false;
+  }
+  //RESETA O HOME-POINT AO ARMAR
+  if (!Home_Point && COMMAND_ARM_DISARM)
+  {
+    Reset_Home_Point();
+  }
+  //OBTÉM A DECLINAÇÃO MAGNETICA AUTOMATICAMENTE
+  if (!COMMAND_ARM_DISARM && !DeclinationPushed)
+  {
+    Set_Initial_Location(GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1]);
+    MachineCicleCount++;
+  }
+  //VERIFICA SE A DECLINAÇÃO MAGNETICA FOI CALCULADA
+  if (Declination() != 0)
+  {
+    if (MachineCicleCount == 5) //UTILIZA 5 CICLOS DE MAQUINA PARA CALCULAR A DECLINAÇÃO
+      DeclinationPushed = true;
+    MachineCicleCount = 6;
+  }
+  //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
+  if (Declination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) &&
+      !COMMAND_ARM_DISARM && Declination() != 0 && DeclinationPushed)
+  {
+    STORAGEMANAGER.Write_Float(DECLINATION_ADDR, Declination());
+  }
+  uint32_t ActualCurrentTime = AVRTIME.SchedulerMillis();
+  static uint32_t StoredCurrentTime;
+  DeltaTimeGPSNavigation = (ActualCurrentTime - StoredCurrentTime) * 1e-3f;
+  StoredCurrentTime = ActualCurrentTime;
+  DeltaTimeGPSNavigation = MIN_FLOAT(DeltaTimeGPSNavigation, 1.0);
+  GPS_Calcule_Bearing(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &CalculateDirection);
+  DirectionToHome = CalculateDirection / 100;
+  GPS_Calcule_Distance_To_Home(&CalculateDistance);
+  DistanceToHome = CalculateDistance / 100;
+  if (!Home_Point)
+  {
+    DistanceToHome = 0;
+    DirectionToHome = 0;
+  }
+  GPS_Calcule_Velocity();
+  if (GPS_Flight_Mode != GPS_MODE_NONE)
+  {
+    GPS_Calcule_Bearing(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
+    GPS_Calcule_Distance_In_CM(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
+
+    int16_t CalculateNavigationSpeed = 0;
+
+    if (GetFrameStateOfAirPlane())
+      NavigationMode = Do_RTH_Enroute;
+
+    switch (NavigationMode)
     {
-      DistanceToHome = 0;
-      DirectionToHome = 0;
-    }
-    GPS_Calcule_Velocity();
-    if (GPS_Flight_Mode != GPS_MODE_NONE)
-    {
-      GPS_Calcule_Bearing(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
-      GPS_Calcule_Distance_In_CM(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
 
-      int16_t CalculateNavigationSpeed = 0;
+    case Do_None:
+      break;
 
-      if (FrameType == 3 || FrameType == 4 || FrameType == 5)
-        NavigationMode = Do_RTH_Enroute;
+    case Do_PositionHold:
+      break;
 
-      switch (NavigationMode)
+    case Do_Start_RTH:
+      if (DistanceToHome <= 10)
       {
-
-      case Do_None:
-        break;
-
-      case Do_PositionHold:
-        break;
-
-      case Do_Start_RTH:
-        if (DistanceToHome <= 10)
-        {
-          NavigationMode = Do_Land_Init;
-          HeadingHoldTarget = Navigation_Bearing_RTH;
-        }
-        else if (GetAltitudeReached())
-        {
-          Set_Points_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1]);
-          NavigationMode = Do_RTH_Enroute;
-        }
-        break;
-
-      case Do_RTH_Enroute:
-        CalculateNavigationSpeed = Calculate_Navigation_Speed(400);
-        GPSCalculateNavigationRate(CalculateNavigationSpeed);
-        GPS_Adjust_Heading();
-        if ((Two_Points_Distance <= 200) || Point_Reached())
-        {
-          if (FrameType < 3 || FrameType == 6 || FrameType == 7)
-            NavigationMode = Do_Land_Init;
-          HeadingHoldTarget = Navigation_Bearing_RTH;
-        }
-        break;
-
-      case Do_Land_Init:
-        Do_GPS_Altitude = true;
-        SetAltitudeHold(ALTITUDE.EstimateAltitude);
-        Time_To_Start_The_Land = AVRTIME.SchedulerMillis() + 100;
-        NavigationMode = Do_Land_Settle;
-        break;
-
-      case Do_Land_Settle:
-        if (AVRTIME.SchedulerMillis() >= Time_To_Start_The_Land)
-        {
-          NavigationMode = Do_LandInProgress;
-        }
-        break;
-
-      case Do_LandInProgress:
-        if (GetLanded())
-        {
-          NavigationMode = Do_Landed;
-        }
-        else if (GetGroundDetected())
-        {
-          NavigationMode = Do_Land_Detected;
-        }
-        break;
-
-      case Do_Land_Detected:
-        if (GetLanded())
-        {
-          NavigationMode = Do_Landed;
-        }
-        break;
-
-      case Do_Landed:
-        COMMAND_ARM_DISARM = false;
-        Do_GPS_Altitude = false;
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
-        GPS_Reset_Navigation();
-        break;
+        NavigationMode = Do_Land_Init;
+        HeadingHoldTarget = Navigation_Bearing_RTH;
       }
+      else if (GetAltitudeReached())
+      {
+        Set_Points_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1]);
+        NavigationMode = Do_RTH_Enroute;
+      }
+      break;
+
+    case Do_RTH_Enroute:
+      CalculateNavigationSpeed = Calculate_Navigation_Speed(400);
+      GPSCalculateNavigationRate(CalculateNavigationSpeed);
+      GPS_Adjust_Heading();
+      if ((Two_Points_Distance <= 200) || Point_Reached())
+      {
+        if (GetFrameStateOfMultirotor())
+          NavigationMode = Do_Land_Init;
+        HeadingHoldTarget = Navigation_Bearing_RTH;
+      }
+      break;
+
+    case Do_Land_Init:
+      Do_GPS_Altitude = true;
+      SetAltitudeHold(ALTITUDE.EstimateAltitude);
+      Time_To_Start_The_Land = AVRTIME.SchedulerMillis() + 100;
+      NavigationMode = Do_Land_Settle;
+      break;
+
+    case Do_Land_Settle:
+      if (AVRTIME.SchedulerMillis() >= Time_To_Start_The_Land)
+      {
+        NavigationMode = Do_LandInProgress;
+      }
+      break;
+
+    case Do_LandInProgress:
+      if (GetLanded())
+      {
+        NavigationMode = Do_Landed;
+      }
+      else if (GetGroundDetected())
+      {
+        NavigationMode = Do_Land_Detected;
+      }
+      break;
+
+    case Do_Land_Detected:
+      if (GetLanded())
+      {
+        NavigationMode = Do_Landed;
+      }
+      break;
+
+    case Do_Landed:
+      COMMAND_ARM_DISARM = false;
+      Do_GPS_Altitude = false;
+      BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+      GPS_Reset_Navigation();
+      break;
     }
   }
 }
@@ -406,7 +427,7 @@ void GPS_Reset_Navigation(void)
   GPSResetPID(&PositionHoldRatePIDArray[1]);
   GPSResetPID(&NavigationPIDArray[1]);
   NavigationMode = Do_None;
-  if (FrameType == 3 || FrameType == 4 || FrameType == 5)
+  if (GetFrameStateOfAirPlane())
     PlaneResetNavigation();
 }
 

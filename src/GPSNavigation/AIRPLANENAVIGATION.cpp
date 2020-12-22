@@ -21,6 +21,7 @@
 #include "FlightModes/FLIGHTMODES.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/AVRMATH.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 //PARAMETROS DE NAVEGAÇÃO
 #define CRUISE_DISTANCE 500   //DISTANCIA (EM CM)
@@ -60,7 +61,7 @@ int32_t GPS_AltitudeHold_For_Plane;
 
 void Cruise_Mode_Update()
 {
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
     return;
   float Latitude_To_Cruise;
   float Longitude_To_Cruise;
@@ -201,7 +202,7 @@ void PlaneUpdateNavigation(void)
     GetThrottleToNavigation += ThrottleBoost;
     GetThrottleToNavigation = Constrain_16Bits(GetThrottleToNavigation, 1300, 1900);
   }
-  if ((!Stabilize_Mode) || (IOCMODE && !Fail_Safe_Event))
+  if ((!Do_Stabilize_Mode) || (Do_IOC_Mode && !Fail_Safe_Event))
   {
     GetThrottleToNavigation = Read_Throttle;
     GPS_Angle[PITCH] = 0;

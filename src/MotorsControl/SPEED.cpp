@@ -24,14 +24,24 @@ SPEEDCLASS SPEEDMOTORS;
 
 void SPEEDCLASS::LoadEEPROM()
 {
-    if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == 0)
+    if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == VERY_LOW_SPEED)
+    {
         MotorSpeed = 1000;
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == 1)
+    }
+    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == LOW_SPEED)
+    {
         MotorSpeed = 1050;
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == 2)
+    }
+    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == MEDIUM_SPEED)
+    {
         MotorSpeed = 1100;
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == 3)
+    }
+    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == HIGH_SPEED)
+    {
         MotorSpeed = 1150;
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == 4)
+    }
+    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == VERY_HIGH_SPEED)
+    {
         MotorSpeed = 1200;
+    }
 }

@@ -18,7 +18,7 @@
 #include "SAVETRIM.h"
 #include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "CalibUsingRC/SWITCHFLAG.h"
+#include "SwitchFlag/SWITCHFLAG.h"
 #include "LedRGB/LEDRGB.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "BAR/BAR.h"
@@ -27,23 +27,24 @@
 /*
   MODO DE USO DO SAVE-TRIM:
   CORRIJA O DRIFT DO DRONE USANDO OS TRIM'S DO RADIO CONTROLE,NÃO SÃO OS STICK'S.
-  SE ESTIVER DERIVANDO PARA FRENTE,DIMINUA O TRIM DO PITCH,
-  SE ESTIVER DERIVANDO PARA A DIREITA,DIMINUA O TRIM DO ROLL,
+  SE ESTIVER DERIVANDO PARA FRENTE,DIMINUA O TRIM DO ROLL,
+  SE ESTIVER DERIVANDO PARA A DIREITA,DIMINUA O TRIM DO PITCH,
   E VICE-VERSA.
   ---------------------------------------------------------------------------------------------------------------------------------------
   PARA ATIVAR:COM A CONTROLADORA ARMADA E EM VOO,BATA A CHAVE AUX DO MODO IOC 4 VEZES
   ---------------------------------------------------------------------------------------------------------------------------------------
   PARA DESATIVAR E SALVAR:COM A CONTROLADORA ARMADA E O DRONE EM VOO,BATA A CHAVE DO IOC 2 VEZES,DESÇA O DRONE,DESARME MANUALMENTE
-  OU ESPERE DESARMAR AUTOMATICAMENTE,E POR FIM ESPERE OS LED'S DE CONFIRMAÇÃO DO SAVE-TRIM.
+  OU ESPERE DESARMAR AUTOMATICAMENTE,E POR FIM ESPERE OS LEDS DE CONFIRMAÇÃO DO SAVE-TRIM.
   ---------------------------------------------------------------------------------------------------------------------------------------
-  PARA DESATIVAR SEM SALVAR:DESARMAR A CONTROLADORA,APÓS DESARMAR BATA A CHAVE DO MODO IOC 2 VEZES
+  PARA DESATIVAR SEM SALVAR:POUSAR O DRONE,DESARMAR A CONTROLADORA MANUALMENTE OU ESPERAR DESARMAR AUTOMATICAMENTE,
+  APÓS DESARMAR BATA A CHAVE DO MODO IOC 2 VEZES E O LED VERMELHO IRÁ PISCAR INDICANDO O ATO.
 */
 
-uint8_t Restore_Acc_Values = 0;
-uint8_t Save_Trim_Count = 0;
 bool Save_Trim_Sucess = false;
 bool Save_Trim_EEPROM = false;
 bool SucessOrFail = false;
+uint8_t Restore_Acc_Values = 0;
+uint8_t Save_Trim_Count = 0;
 
 void Save_Trim_Init()
 {

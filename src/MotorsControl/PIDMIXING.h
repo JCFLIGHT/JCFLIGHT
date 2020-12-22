@@ -19,5 +19,6 @@
 #define PIDMIXING_H_
 #include "Arduino.h"
 extern uint8_t NumberOfMotors;
-void MixingSelectPID();
+extern int16_t MixerThrottleCommand;
+void MixingApplyPIDControl();
 #endif

@@ -25,9 +25,10 @@
 #include "Math/AVRLOWER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/AVRMATH.h"
-#include "FastSerial/PRINTF.h"
 #include "AHRS/AHRS.h"
 #include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
+#include "FastSerial/PRINTF.h"
 
 //STABILIZE
 #define STAB_PITCH_ANGLE_MAX 45 //GRAUS
@@ -43,11 +44,6 @@ int16_t Value_LPF_Derivative = 0;
 uint16_t PID_Integral_Time = 0;
 int32_t IntegralGyroError_Yaw = 0;
 uint32_t PID_Guard_Time = 0;
-
-void DerivativeLPF_Initialization()
-{
-  Value_LPF_Derivative = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
-}
 
 void DerivativeLPF_Update()
 {
@@ -73,12 +69,12 @@ void PID_Update()
 
 void PID_Controll_Roll()
 {
+  int16_t ProportionalTerminate = 0;
+  int16_t DerivativeTerminate;
   static int16_t PIDError;
   static int16_t MaxMinAngle;
   static int16_t SimpleFilterPID;
-  static int16_t ProportionalTerminate = 0;
   static int16_t IntegratorTerminate = 0;
-  static int16_t DerivativeTerminate;
   static int16_t ProportionalTerminateLevel;
   static int16_t IntegratorTerminateLevel;
   static int16_t LastValueOfGyro = 0;
@@ -93,7 +89,7 @@ void PID_Controll_Roll()
     IntegralGyroError[ROLL] = 0;
   IntegratorTerminate = (IntegralGyroError[ROLL] >> 7) * PID[ROLL].IntegratorVector >> 6;
   ProportionalTerminate = Multiplication32Bits(RadioControlToPID, PID[ROLL].ProportionalVector) >> 6;
-  if (Stabilize_Mode)
+  if (Do_Stabilize_Mode)
   {
     if (!SetFlightModes[ATACK_MODE])
     {
@@ -133,12 +129,12 @@ void PID_Controll_Roll()
 
 void PID_Controll_Pitch()
 {
+  int16_t ProportionalTerminate = 0;
+  int16_t DerivativeTerminate;
   static int16_t PIDError;
   static int16_t MaxMinAngle;
   static int16_t SimpleFilterPID;
-  static int16_t ProportionalTerminate = 0;
   static int16_t IntegratorTerminate = 0;
-  static int16_t DerivativeTerminate;
   static int16_t ProportionalTerminateLevel;
   static int16_t IntegratorTerminateLevel;
   static int16_t RadioControlToPID;
@@ -153,7 +149,7 @@ void PID_Controll_Pitch()
     IntegralGyroError[PITCH] = 0;
   IntegratorTerminate = (IntegralGyroError[PITCH] >> 7) * PID[PITCH].IntegratorVector >> 6;
   ProportionalTerminate = Multiplication32Bits(RadioControlToPID, PID[PITCH].ProportionalVector) >> 6;
-  if (Stabilize_Mode)
+  if (Do_Stabilize_Mode)
   {
     if (!SetFlightModes[ATACK_MODE])
     {
@@ -202,19 +198,15 @@ void PID_Controll_Yaw()
   int16_t DerivativeTerminate = 0;
   static int16_t LastGyroYawValue = 0;
   static int16_t DeltaYawSmallFilterStored = 0;
-  if ((FrameType == 3) ||
-      (FrameType == 4) ||
-      (FrameType == 5))
+  if (GetFrameStateOfAirPlane())
     IntegralGyroMax = 200;
   else
     IntegralGyroMax = 250;
   RadioControlToPID = Multiplication32Bits(RCController[YAW], (2 * YawRate + 30)) >> 5;
   PIDError = RadioControlToPID - IMU.GyroscopeRead[YAW];
-  if ((FrameType == 3) ||
-      (FrameType == 4) ||
-      (FrameType == 5))
+  if (GetFrameStateOfAirPlane())
     PIDError = TurnControllerForAirPlane(RadioControlToPID);
-  if (!IOCMODE) //STABILIZE OU ACRO
+  if (!Do_IOC_Mode) //STABILIZE OU ACRO
   {
     DeltaYawSmallFilter = IMU.GyroscopeRead[YAW] - LastGyroYawValue;
     DeltaYawSmallFilterStored = (DeltaYawSmallFilterStored >> 1) + (DeltaYawSmallFilter >> 1);
@@ -223,9 +215,7 @@ void PID_Controll_Yaw()
     DerivativeTerminate = Constrain_16Bits(DerivativeTerminate, -150, 150);
   }
   IntegralGyroError_Yaw += Multiplication32Bits((int16_t)(((int32_t)PIDError * PID_Integral_Time) >> 12), PID[YAW].IntegratorVector);
-  if ((FrameType == 3) ||
-      (FrameType == 4) ||
-      (FrameType == 5))
+  if (GetFrameStateOfAirPlane())
     IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, -(((int32_t)IntegralGyroMax) << 13), (((int32_t)IntegralGyroMax) << 13));
   else
     IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, 2 - ((int32_t)1 << 28), -2 + ((int32_t)1 << 28));
@@ -234,15 +224,11 @@ void PID_Controll_Yaw()
   ProportionalTerminate = Multiplication32Bits(PIDError, PID[YAW].ProportionalVector) >> 6;
   int16_t Limit_Proportional_Z = 300 - PID[YAW].DerivativeVector;
   ProportionalTerminate = Constrain_16Bits(ProportionalTerminate, -Limit_Proportional_Z, +Limit_Proportional_Z);
-  if ((FrameType == 3) ||
-      (FrameType == 4) ||
-      (FrameType == 5))
+  if (GetFrameStateOfAirPlane())
     IntegratorTerminate = constrain((int16_t)(IntegralGyroError_Yaw >> 13), -IntegralGyroMax, +IntegralGyroMax);
   else
     IntegratorTerminate = (IntegralGyroError_Yaw >> 13);
-  if ((FrameType == 3) ||
-      (FrameType == 4) ||
-      (FrameType == 5))
+  if (GetFrameStateOfAirPlane())
     PIDControllerApply[YAW] = Constrain_16Bits(ProportionalTerminate + IntegratorTerminate - DerivativeTerminate, -500, 500);
   else
     PIDControllerApply[YAW] = ProportionalTerminate + IntegratorTerminate;
@@ -278,9 +264,9 @@ int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
   }
 }
 
-void PID_Reset_Accumulators()
+void PID_Reset_Integral_Accumulators()
 {
-  if (Reset_I || (RadioControllOutput[THROTTLE] <= 1100 && (FrameType < 3 || FrameType == 6 || FrameType == 7)))
+  if (Reset_I || (RadioControllOutput[THROTTLE] <= 1100 && GetFrameStateOfMultirotor()))
   {
     IntegralGyroError[ROLL] = 0;
     IntegralGyroError[PITCH] = 0;

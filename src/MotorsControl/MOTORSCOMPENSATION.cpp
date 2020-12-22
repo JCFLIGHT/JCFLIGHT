@@ -15,10 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "COMPENSATIONSPEED.h"
+#include "MOTORSCOMPENSATION.h"
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
 #include "BatteryMonitor/BATTERY.h"
+#include "BatteryMonitor/BATTLEVELS.h"
 
 const int8_t TableSelectDrop3SLipo[] __attribute__((__progmem__)) = {0, 3, 5, 8, 11, 14, 17, 19, 22, 25, 28, 31, 34, 38, 41, 44, 47, 51,
                                                                      54, 58, 61, 65, 68, 72, 76, 79, 83, 87, 91, 95, 99, 104, 108, 112,
@@ -33,14 +34,14 @@ const int8_t TableSelectDrop6SLipo[] __attribute__((__progmem__)) = {0, 1, 3, 4,
                                                                      58, 59, 61, 63, 65, 66, 68, 70, 72, 74, 76, 78, 79, 81, 83, 85, 87, 89,
                                                                      91, 93, 95, 97, 99, 101, 104, 106, 108, 110, 112, 114, 117, 119, 121, 123, 126};
 
-void Compesation_RPM_DropBatt(uint8_t State, uint8_t _NumbOfMotors)
+void Motors_Compensation(uint8_t State, uint8_t _NumbOfMotors)
 {
-  if (!State)
+  if (!State || _NumbOfMotors == 0)
+  {
     return;
-  if (_NumbOfMotors == 0)
-    return;
-  uint8_t VoltageDropCalculate;
-  if (BATTERY.Voltage > 10.0f && BATTERY.Voltage < 13.5f)
+  }
+  uint8_t VoltageDropCalculate = 0;
+  if (BATTERY.Voltage > BATT_3S_SAFE_LOW_VOLTAGE && BATTERY.Voltage < BATT_3S_SAFE_HIGH_VOLTAGE)
   {
     //BATERIA LIPO 3S
     VoltageDropCalculate = Constrain_U8Bits(126 - Constrain_U8Bits(BATTERY.Voltage * 10, 93, 126), 0, 36);
@@ -54,7 +55,7 @@ void Compesation_RPM_DropBatt(uint8_t State, uint8_t _NumbOfMotors)
       MotorControl[MOTOR6] += (((int32_t)(MotorControl[MOTOR6] - 1000) * (int32_t)TableSelectDrop3SLipo[VoltageDropCalculate])) / 500;
     }
   }
-  else if (BATTERY.Voltage > 14.0f && BATTERY.Voltage < 18.0f)
+  else if (BATTERY.Voltage > BATT_4S_SAFE_LOW_VOLTAGE && BATTERY.Voltage < BATT_4S_SAFE_HIGH_VOLTAGE)
   {
     //BATERIA LIPO 4S
     VoltageDropCalculate = Constrain_U8Bits(168 - Constrain_U8Bits(BATTERY.Voltage * 10, 124, 168), 0, 48);
@@ -68,7 +69,7 @@ void Compesation_RPM_DropBatt(uint8_t State, uint8_t _NumbOfMotors)
       MotorControl[MOTOR6] += (((int32_t)(MotorControl[MOTOR6] - 1000) * (int32_t)TableSelectDrop4SLipo[VoltageDropCalculate])) / 500;
     }
   }
-  else if (BATTERY.Voltage > 21.0f && BATTERY.Voltage < 27.0f)
+  else if (BATTERY.Voltage > BATT_6S_SAFE_LOW_VOLTAGE && BATTERY.Voltage < BATT_6S_SAFE_HIGH_VOLTAGE)
   {
     //BATERIA LIPO 6S
     VoltageDropCalculate = Constrain_U16Bits(252 - Constrain_U16Bits(BATTERY.Voltage * 10, 186, 252), 0, 78);
@@ -81,14 +82,5 @@ void Compesation_RPM_DropBatt(uint8_t State, uint8_t _NumbOfMotors)
       MotorControl[MOTOR5] += (((int32_t)(MotorControl[MOTOR5] - 1000) * (int32_t)TableSelectDrop6SLipo[VoltageDropCalculate])) / 500;
       MotorControl[MOTOR6] += (((int32_t)(MotorControl[MOTOR6] - 1000) * (int32_t)TableSelectDrop6SLipo[VoltageDropCalculate])) / 500;
     }
-  }
-  else
-  {
-    MotorControl[MOTOR1] += 0;
-    MotorControl[MOTOR2] += 0;
-    MotorControl[MOTOR3] += 0;
-    MotorControl[MOTOR4] += 0;
-    MotorControl[MOTOR5] += 0;
-    MotorControl[MOTOR6] += 0;
   }
 }

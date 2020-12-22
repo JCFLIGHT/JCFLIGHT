@@ -37,6 +37,7 @@ typedef struct
     float Matrix3x3[3][3];
 } Matrix3x3_Struct;
 
+//VETOR EM INT,PARA EVITAR AVISO DE COPILAÇÃO DO GCC
 typedef union
 {
     int16_t Vector[3];
@@ -137,7 +138,7 @@ void ApplySensorAlignment(int16_t *Vector)
         return;
     Vector3x3_Struct IntVector = {.Vector = {Vector[ROLL], Vector[PITCH], Vector[YAW]}};
     RotationMatrixRotateVector(&IntVector, &IntVector, &SensorRotationMatrix);
-    Vector[ROLL] = lrint(IntVector.Roll);
-    Vector[PITCH] = lrint(IntVector.Pitch);
-    Vector[YAW] = lrint(IntVector.Yaw);
+    Vector[ROLL] = IntVector.Roll;
+    Vector[PITCH] = IntVector.Pitch;
+    Vector[YAW] = IntVector.Yaw;
 }

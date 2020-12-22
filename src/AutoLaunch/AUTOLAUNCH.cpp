@@ -24,6 +24,7 @@
 #include "RadioControl/STATES.h"
 #include "AHRS/VECTOR.h"
 #include "Buzzer/BUZZER.h"
+#include "FrameStatus/FRAMESTATUS.h"
 #include "FastSerial/PRINTF.h"
 
 #define AHRS_BANKED_ANGLE 25                                 //25 GRAUS MAXIMO DE BANK ANGLE (CONSIDERANDO EM RADIANOS = 436)
@@ -38,7 +39,7 @@
 #define AUTO_LAUNCH_THROTTLE_MAX 1700                        //VALOR MAXIMO DE ACELERAÇÃO
 #define AUTO_LAUCH_MAX_ALTITUDE 0                            //ALTITUDE MAXIMA PARA VALIDAR O AUTO-LAUNCH (VALOR EM METROS)
 
-bool PlaneType = 0; //ADICIONAR AO GCS
+bool PlaneType = 0;
 bool AutoLaunchState = false;
 bool StateLaunched = false;
 bool LaunchedDetect = false;
@@ -49,12 +50,6 @@ uint32_t ThrottleStart = 0;
 uint32_t AutoLaunchDetectorPreviousTime = 0;
 uint32_t AutoLaunchDetectorSum = 0;
 uint32_t AbortAutoLaunch = 0;
-
-enum
-{
-  WITHOUT_WHEELS = 0,
-  WITH_WHEELS
-};
 
 const float GetPitchAccelerationInMSS()
 {
@@ -86,7 +81,7 @@ void AutoLaunchDetector()
 
 void Auto_Launch_Update()
 {
-  if ((FrameType < 3) || (FrameType == 5) || (FrameType == 6))
+  if (GetFrameStateOfMultirotor())
     return;
   if (SportControlAux)
   {

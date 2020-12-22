@@ -15,8 +15,6 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include <avr/io.h>
-#include <avr/pgmspace.h>
 #include "VARIABLES.h"
 #include "STRUCTS.h"
 #include "PID/PIDPARAMS.h"
@@ -47,7 +45,7 @@
 #include "Parachute/PARACHUTE.h"
 #include "CrashCheck/CRASHCHECK.h"
 #include "IMU/IMUHEALTH.h"
-#include "CalibUsingRC/SWITCHFLAG.h"
+#include "SwitchFlag/SWITCHFLAG.h"
 #include "MotorsControl/SPEED.h"
 #include "RadioControl/RCCONFIG.h"
 #include "PAA/FLIPMODE.h"
@@ -57,7 +55,7 @@
 #include "EscCalibration/CALIBESC.h"
 #include "SBUS/SBUSREAD.h"
 #include "FastSerial/UART2MODE.h"
-#include "AirPlane/SERVOTRIM.h"
+#include "AirPlane/SERVOMANUALTRIM.h"
 #include "RadioControl/CURVESRC.h"
 #include "AirPlane/AIRPLANE.h"
 #include "AutoLaunch/AUTOLAUNCH.h"

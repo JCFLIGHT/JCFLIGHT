@@ -18,6 +18,10 @@
 #ifndef FUNCTIONSNAME_H_
 #define FUNCTIONSNAME_H_
 #include "Arduino.h"
+#ifdef __AVR_ATmega2560__
 extern char GetFunctionName[20];
+#elif __arm__
+extern char *GetFunctionName;
+#endif
 void UpdateFunctionName(uint8_t FunctionNumber);
 #endif

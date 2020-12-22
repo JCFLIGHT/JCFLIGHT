@@ -26,6 +26,7 @@
 #include "BAR/BAR.h"
 #include "Yaw/YAWMANIPULATION.h"
 #include "QUATERNION.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 #define SPIN_RATE_LIMIT 20        //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
 #define MAX_ACC_SQ_NEARNESS 25    //25% (0.87G - 1.12G)
@@ -374,7 +375,7 @@ void AHRS_Update()
   GetMeasuredRotationRate(&BodyFrameRotation);     //CALCULA A ROTAÇÃO DA IMU EM RADIANOS/S
   GetMeasuredAcceleration(&BodyFrameAcceleration); //CALCULA A ACELERAÇÃO DA IMU EM CM/S^2
 
-  if (FrameType == 3 || FrameType == 4 || FrameType == 5)
+  if (GetFrameStateOfAirPlane())
   {
     //SLIP ANGLE PARA O MODO PLANE
     SlipAngleForAirPlane = ApproximationOfAtan2(IMU.AccelerometerRead[ROLL], ABS_16BITS(IMU.AccelerometerRead[YAW]));
@@ -418,6 +419,7 @@ void AHRS_Update()
   const float CalcedAccelerometerWeight = CalculateAccelerometerWeight(DeltaTime);
   const bool SafeToUseAccelerometer = (CalcedAccelerometerWeight > 0.001f);
 
+  //ATUALIZA O AHRS
   MahonyAHRSUpdate(DeltaTime, &BodyFrameRotation,
                    SafeToUseAccelerometer ? &BodyFrameAcceleration : NULL,
                    SafeToUseCompass ? &MagnetometerBodyFrame : NULL,

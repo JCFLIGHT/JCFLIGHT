@@ -23,7 +23,7 @@ class ClassESC
 public:
   ClassESC(){};
   bool Run_Calibrate;
-  int8_t CalibratingEscBeep;
+  int8_t BeeperMode;
   void Calibration(void);
 };
 extern ClassESC ESC;

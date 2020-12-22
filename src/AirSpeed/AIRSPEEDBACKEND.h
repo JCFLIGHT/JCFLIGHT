@@ -18,12 +18,7 @@
 #ifndef AIRSPEEDBACKEND_H_
 #define AIRSPEEDBACKEND_H_
 #include "Arduino.h"
-enum
-{
-  NONE_AIRSPEED = 0,
-  ANALOG_AIRSPEED,
-  I2C_AIRSPEED
-};
+#include "Common/ENUM.h"
 bool Get_AirSpeed_State(void);
 uint8_t Get_AirSpeed_Type(void);
 void Set_AirSpeed_Type(uint8_t AirSpeedType);

@@ -17,14 +17,13 @@
 
 #ifndef STRINGSUPPORT_H_
 #define STRINGSUPPORT_H_
-#include "Arduino.h"
 
-int ToLower(int chr)
+int inline ToLower(int chr)
 {
     return (chr >= 'A' && chr <= 'Z') ? (chr + 32) : (chr);
 }
 
-int StringCompare(const char *s1, const char *s2, size_t n)
+int inline StringCompare(const char *s1, const char *s2, size_t n)
 {
     if (n == 0)
         return 0;
@@ -38,7 +37,7 @@ int StringCompare(const char *s1, const char *s2, size_t n)
     return ToLower(*(const unsigned char *)s1) - ToLower(*(const unsigned char *)s2);
 }
 
-size_t StringLength(const char *str)
+size_t inline StringLength(const char *str)
 {
     const char *char_ptr;
     const unsigned long int *longword_ptr;

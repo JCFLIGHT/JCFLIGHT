@@ -23,6 +23,7 @@
 
 MEMORYCLASS MEMORY;
 
+#ifdef __AVR_ATmega2560__
 //STACK POINTER STARTA NO TOPO DA MEMORIA RAM E DESCE ATÉ O FINAL
 //HEAP POINTER STARTA JUNTO COM VARIAVEIS STATICAS,STRUTURAS,ETC E VAI ATÉ O FINAL
 //SP É A LARGURA DO HEAP POINTER
@@ -43,3 +44,15 @@ uint8_t MEMORYCLASS::GetPercentageRAMUsed()
 {
   return Free / 8192 * 100;
 }
+
+#elif __arm__
+uint16_t MEMORYCLASS::Check()
+{
+  return 0;
+}
+
+uint8_t MEMORYCLASS::GetPercentageRAMUsed()
+{
+  return 0;
+}
+#endif

@@ -25,7 +25,6 @@ float BarometerPressureSum;
 int32_t BaroPressureRaw;
 int16_t BaroTemperatureRaw;
 int32_t BaroPressureToLogarithm;
-int32_t BaroNotFilter;
 
 AverageFilterInt32_Size5 Baro_Filter; //ISTANCIA DO FILTRO AVERAGE PARA O BARO,TAMANHO = 5 ITERAÇÕES
 
@@ -50,8 +49,9 @@ void CalculateBaroAltitude()
     BarometerTemperatureScale = ((int32_t)BaroTemperatureRaw + 27315) * 29.271267f;
     Baro_Filter.Reset(); //RESETA O FILTRO AVERAGE PARA EVITAR ALTOS DROPS DE VALORES
   }
-  BaroNotFilter = (BarometerPressureSum - log(BaroPressureToLogarithm)) * BarometerTemperatureScale; //APENAS PARA DEBUG,AFIM DE COMPARAÇÃO
-  ALTITUDE.RealBaroAltitude = Baro_Filter.Apply((BarometerPressureSum - log(BaroPressureToLogarithm)) * BarometerTemperatureScale);
+  {
+    ALTITUDE.RealBaroAltitude = Baro_Filter.Apply((BarometerPressureSum - log(BaroPressureToLogarithm)) * BarometerTemperatureScale);
+  }
 }
 
 int32_t GetAltitudeForGCS()

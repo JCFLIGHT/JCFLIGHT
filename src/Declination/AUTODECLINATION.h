@@ -18,6 +18,6 @@
 #ifndef AUTODECLINATION_H_
 #define AUTODECLINATION_H_
 #include "Arduino.h"
-void Set_Initial_Location(int32_t LocationLatitude, int32_t LocationLongitude, bool Auto_Declination);
+void Set_Initial_Location(int32_t LocationLatitude, int32_t LocationLongitude);
 float Declination();
 #endif

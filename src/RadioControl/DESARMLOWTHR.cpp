@@ -19,6 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Buzzer/BUZZER.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 //**************************************************************************
 //TIMER DE DESLIGAMENTO AUTOMATICO DOS MOTORES POR INATIVADADE DO THROTTLE
@@ -32,7 +33,7 @@ uint8_t TimerDesarm, Counter_One_Hertz;
 
 void Desarm_LowThrottle()
 {
-  if (FrameType == 3 || FrameType == 4 || FrameType == 5)
+  if (GetFrameStateOfAirPlane())
     return; //FAÇA UMA RAPIDA SAÍDA SE O MODO AERO OU ASA-FIXA ESTIVER ATIVADO
   if (ArmDisarmConfig != 0)
     return; //FAÇA UMA RAPIDA SAÍDA SE O COMANDO ARMDISARM FOR PELA CHAVE AUX

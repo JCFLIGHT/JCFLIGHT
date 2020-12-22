@@ -19,6 +19,7 @@
 
 AVRTIMECLASS AVRTIME;
 
+#ifdef __AVR_ATmega2560__
 volatile uint32_t Timer0_OverFlow = 0;
 volatile uint32_t Timer0_Scheduler_Millis = 0;
 static uint8_t Timer0_Fraction = 0;
@@ -124,3 +125,28 @@ void __vector_23(void)
   Timer0_Scheduler_Millis = MillisCount;
   Timer0_OverFlow++;
 }
+
+#elif __arm__
+
+void AVRTIMECLASS::SchedulerInit()
+{
+}
+
+uint32_t AVRTIMECLASS::SchedulerMillis()
+{
+  return 0;
+}
+
+uint32_t AVRTIMECLASS::SchedulerMicros()
+{
+  return 0;
+}
+
+void AVRTIMECLASS::SchedulerSleep(uint16_t MillisSeconds)
+{
+}
+
+void AVRTIMECLASS::SchedulerMicroSecondsSleep(uint16_t MicroSeconds)
+{
+}
+#endif

@@ -15,10 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SERVOTRIM_H_
-#define SERVOTRIM_H_
+#ifndef MOTORSCOMPENSATION_H_
+#define MOTORSCOMPENSATION_H_
 #include "Arduino.h"
-extern bool OkToTrimServo;
-void Trim_Servo_Initializate();
-void Trim_Servo_Update();
+void Motors_Compensation(uint8_t State, uint8_t _NumbOfMotors);
 #endif

@@ -19,11 +19,9 @@
 #define SCHEDULERTIME_h
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
-#include <math.h>
-#include <avr/pgmspace.h>
-#include <avr/io.h>
+#ifdef __AVR_ATmega2560__
 #include <avr/interrupt.h>
+#endif
 class AVRTIMECLASS
 {
 public:

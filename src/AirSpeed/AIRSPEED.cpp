@@ -23,6 +23,7 @@
 #include "AIRSPEEDI2C.h"
 #include "AIRSPEEDBACKEND.h"
 #include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 #define AIRSPEED_FACTOR 11.96f
 
@@ -53,7 +54,7 @@ void AirSpeed_Initialization()
 
 void AirSpeed_Update()
 {
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  if (GetFrameStateOfMultirotor())
     return;
   if (Get_AirSpeed_Type() == NONE_AIRSPEED)
   {

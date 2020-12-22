@@ -30,7 +30,7 @@ public:
   void Read_Voltage(void);
   void Read_Current(void);
   void Calculate_Total_Mah(void);
-  uint16_t GetWatts();
+  uint32_t GetWatts();
 
 private:
   uint8_t BattMinVoltageSelect;

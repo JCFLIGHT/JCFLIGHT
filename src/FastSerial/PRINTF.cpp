@@ -21,12 +21,13 @@
 #include "Declination/AUTODECLINATION.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "InertialNavigation/INS.h"
-#include "AVRCheck/FREERAM.h"
+#include "MemoryCheck/FREERAM.h"
 #include "RadioControl/RCCONFIG.h"
 #include "Barometer/BAROREAD.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "RadioControl/STICKS.h"
 #include "BAR/BAR.h"
+#include "ProgMem/PROGMEM.h"
 
 #define FTOA_MINUS 1
 #define FTOA_ZERO 2
@@ -118,8 +119,8 @@ void PrintlnParameters()
 #endif
 
 #if defined(PRINTLN_BATTERY)
-  FastSerialPrintln(PSTR("Tensão:%.2f Porcentagem:%u Corrente:%.2f TotalCurrentInMah:%.2f\n"),
-                    BATTERY.Voltage, BATTERY.GetPercentage(), BATTERY.Total_Current, BATTERY.Get_Current_In_Mah());
+  FastSerialPrintln(PSTR("Tensão:%.2f Porcentagem:%u Corrente:%.2f TotalCurrentInMah:%.2f Watts:%u\n"),
+                    BATTERY.Voltage, BATTERY.GetPercentage(), BATTERY.Total_Current, BATTERY.Get_Current_In_Mah(), BATTERY.GetWatts());
 #endif
 
 #if defined(PRINTLN_ALLSENSORS)
@@ -140,8 +141,8 @@ void PrintlnParameters()
 #endif
 
 #if defined(PRINTLN_BARO)
-  FastSerialPrintln(PSTR("BaroNotFilter:%ld BaroFiltered:%ld INSBaro:%ld\n"),
-                    BaroNotFilter, ALTITUDE.RealBaroAltitude, ALTITUDE.EstimateAltitude);
+  FastSerialPrintln(PSTR("BaroFiltered:%ld INSBaro:%ld\n"),
+                    ALTITUDE.RealBaroAltitude, ALTITUDE.EstimateAltitude);
 #endif
 
 #if defined(PRINTLN_MEMORY)
@@ -308,7 +309,7 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
         p = PSTR("inf");
         if (vtype & FTOA_NAN)
           p = PSTR("nan");
-        while ((ndigs = pgm_read_byte(p)) != 0)
+        while ((ndigs = ProgMemReadByte(p)) != 0)
         {
           if (flags & FL_FLTUPP)
             ndigs += 'I' - 'i';

@@ -19,8 +19,7 @@
 #define MOTORS_H_
 #include "Arduino.h"
 void ConfigureRegisters();
-void MixingSelectPID();
-void PIDMixMotors();
+void PID_MixMotors();
 void PulseInAllMotors(int16_t Pulse);
 void ApplyPWMInAllComponents();
 #endif

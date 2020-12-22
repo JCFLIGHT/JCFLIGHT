@@ -16,17 +16,15 @@
 */
 
 #include "MOTORS.h"
-#include "COMPENSATIONSPEED.h"
 #include "Common/VARIABLES.h"
 #include "EscCalibration/CALIBESC.h"
 #include "Common/STRUCTS.h"
 #include "AirPlane/AIRPLANE.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "StorageManager/EEPROMSTORAGE.h"
 #include "Math/AVRMATH.h"
 #include "PIDMIXING.h"
 #include "SafetyButton/SAFETYBUTTON.h"
-#include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 //#define PWM_PINS_IN_ORDER
 
@@ -56,9 +54,7 @@ void ConfigureRegisters()
   TCCR3A &= ~(1 << WGM30);
   TCCR3B |= (1 << WGM33);
   TCCR3B &= ~(1 << CS31);
-  if (FrameType == 3 ||
-      FrameType == 4 ||
-      FrameType == 5)
+  if (GetFrameStateOfAirPlane())
     ICR3 |= 40000; //50Hz
   else
     ICR3 |= 16383; //490Hz
@@ -73,9 +69,7 @@ void ConfigureRegisters()
   TCCR4A &= ~(1 << WGM40);
   TCCR4B |= (1 << WGM43);
   TCCR4B &= ~(1 << CS41);
-  if (FrameType == 3 ||
-      FrameType == 4 ||
-      FrameType == 5)
+  if (GetFrameStateOfAirPlane())
     ICR4 |= 40000; //50Hz
   else
     ICR4 |= 16383; //490Hz
@@ -104,13 +98,12 @@ void ConfigureRegisters()
   }
 }
 
-void PIDMixMotors()
+void PID_MixMotors()
 {
   if (!SAFETYBUTTON.GetSafeStateToOutput())
     return;
-  MixingSelectPID();
-  Compesation_RPM_DropBatt(STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR), NumberOfMotors);
-  if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+  MixingApplyPIDControl();
+  if (GetFrameStateOfMultirotor())
   {
     int16_t SuportMotor = MotorControl[MOTOR1];
     for (uint8_t i = 1; i < NumberOfMotors; i++)

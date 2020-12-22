@@ -174,11 +174,11 @@ void BEEPERCLASS::Run()
   if (!BuzzerInit)
     DDRH |= (1 << DDD6); //DEFINE A PORTA DIGITAL 9 COMO SAIDA
 
-  if (ESC.CalibratingEscBeep == 1)
+  if (ESC.BeeperMode == ESC_CALIBRATION_MODE)
   {
     BeeperPlay(BEEPER_CALIBRATION_DONE);
   }
-  else if (ESC.CalibratingEscBeep == -10)
+  else if (ESC.BeeperMode == NORMAL_OPERATION_MODE)
   {
     if (!BuzzerInit)
       BeeperPlay(BEEPER_ALGORITHM_INIT);

@@ -19,6 +19,7 @@
 #include "AIRSPEED.h"
 #include "Common/VARIABLES.h"
 #include "Math/AVRMATH.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 bool AutoThrottle_Mode = false;
 
@@ -26,7 +27,7 @@ uint16_t PreviousValueOfAirSpeed = 0;
 
 void Auto_Throttle_Flight_Mode(int16_t InputChannelAux)
 {
-    if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+    if (GetFrameStateOfMultirotor())
         return;
     if (InputChannelAux)
     {
@@ -44,7 +45,7 @@ void Auto_Throttle_Flight_Mode(int16_t InputChannelAux)
 
 void Apply_Controll_For_Throttle()
 {
-    if (FrameType < 3 || FrameType == 6 || FrameType == 7)
+    if (GetFrameStateOfMultirotor())
         return;
     static int16_t CalculateIntegrator;
     if (AutoThrottle_Mode && (RCController[THROTTLE] > 1200))

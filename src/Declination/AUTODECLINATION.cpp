@@ -17,6 +17,7 @@
 
 #include "AUTODECLINATION.h"
 #include "Math/AVRMATH.h"
+#include "ProgMem/PROGMEM.h"
 
 //********************************************************************************************
 //MODO AUTOMATICO PARA OBTER A DECLINAÇÃO MAGNETICA COM BASE NA LATITUDE E LONGITUDE DO GPS
@@ -24,10 +25,14 @@
 
 float ReturnDeclination;
 
-float GPSGetDerivativeeclination(float GPSLatitude, float GPSLongitude);
+float GetDeclinationCalced(float GPSLatitude, float GPSLongitude);
 
 //TABELA PARA DECLINAÇÃO MAGNETICA AUTOMATICA
+#ifdef __AVR_ATmega2560__
 const int16_t Table_Declination[37][73] __attribute__((__progmem__)) =
+#elif __arm__
+const int16_t Table_Declination[37][73] =
+#endif
     {
         {150, 145, 140, 135, 130, 125, 120, 115, 110, 105, 100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0, -4, -9, -14, -19, -24, -29, -34, -39, -44, -49, -54, -59, -64, -69, -74, -79, -84, -89, -94, -99, 104, 109, 114, 119, 124, 129, 134, 139, 144, 149, 154, 159, 164, 169, 174, 179, 175, 170, 165, 160, 155, 150},
         {143, 137, 131, 126, 120, 115, 110, 105, 100, 95, 90, 85, 80, 75, 71, 66, 62, 57, 53, 48, 44, 39, 35, 31, 27, 22, 18, 14, 9, 5, 1, -3, -7, -11, -16, -20, -25, -29, -34, -38, -43, -47, -52, -57, -61, -66, -71, -76, -81, -86, -91, -96, 101, 107, 112, 117, 123, 128, 134, 140, 146, 151, 157, 163, 169, 175, 178, 172, 166, 160, 154, 148, 143},
@@ -68,7 +73,7 @@ const int16_t Table_Declination[37][73] __attribute__((__progmem__)) =
         {168, 173, 178, 176, 171, 166, 161, 156, 151, 146, 141, 136, 131, 126, 121, 116, 111, 106, 101, -96, -91, -86, -81, -76, -71, -66, -61, -56, -51, -46, -41, -36, -31, -26, -21, -16, -11, -6, -1, 3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58, 63, 68, 73, 78, 83, 88, 93, 98, 103, 108, 113, 118, 123, 128, 133, 138, 143, 148, 153, 158, 163, 168},
 };
 
-float GPSGetDerivativeeclination(float GPSLatitude, float GPSLongitude)
+float GetDeclinationCalced(float GPSLatitude, float GPSLongitude)
 {
   int16_t DeclinationSW, DeclinationSE, DeclinationNW, DeclinationNE, LongitudeMin, LatitudeMin;
   float DeclinationMin, DeclinationMax;
@@ -79,21 +84,20 @@ float GPSGetDerivativeeclination(float GPSLatitude, float GPSLongitude)
   LongitudeMin = floor(GPSLongitude / 5) * 5;
   LatitudeMin_Index = (90 + LatitudeMin) / 5;
   LongitudeMin_Index = (180 + LongitudeMin) / 5;
-  DeclinationSW = (pgm_read_dword(&Table_Declination[LatitudeMin_Index][LongitudeMin_Index]));
-  DeclinationSE = (pgm_read_dword(&Table_Declination[LatitudeMin_Index][LongitudeMin_Index + 1]));
-  DeclinationNE = (pgm_read_dword(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index + 1]));
-  DeclinationNW = (pgm_read_dword(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index]));
+  DeclinationSW = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index][LongitudeMin_Index]));
+  DeclinationSE = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index][LongitudeMin_Index + 1]));
+  DeclinationNE = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index + 1]));
+  DeclinationNW = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index]));
   DeclinationMin = (GPSLongitude - LongitudeMin) / 5 * (DeclinationSE - DeclinationSW) + DeclinationSW;
   DeclinationMax = (GPSLongitude - LongitudeMin) / 5 * (DeclinationNE - DeclinationNW) + DeclinationNW;
   //RETORNA O VALOR DA DECLINAÇÃO MAGNETICA
   return (GPSLatitude - LatitudeMin) / 5 * (DeclinationMax - DeclinationMin) + DeclinationMin;
 }
 
-void Set_Initial_Location(int32_t LocationLatitude, int32_t LocationLongitude, bool Auto_Declination)
+void Set_Initial_Location(int32_t LocationLatitude, int32_t LocationLongitude)
 {
   //CALCULA A DECLINAÇÃO MAGNETICA COM BASE NA LATITUDE E LONGITUDE DADA PELO GPS
-  if (Auto_Declination)
-    ReturnDeclination = GPSGetDerivativeeclination((float)LocationLatitude / 10000000, (float)LocationLongitude / 10000000);
+  ReturnDeclination = GetDeclinationCalced((float)LocationLatitude / 10000000, (float)LocationLongitude / 10000000);
 }
 
 float Declination()

@@ -17,6 +17,7 @@
 
 #include "FLIPMODE.h"
 #include "Common/VARIABLES.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 //*******************************************************
 //PROCEDIMENTO AUTOMATICO DE ACROBACIA
@@ -28,16 +29,6 @@
 #define FLIP_RECOVERY_ANGLE 450 //VALOR DO CONTROLADOR DE ATTITUDE PARA DETECTAR QUE OS ANGULOS NORMALIZARAM (45 GRAUS)
 #define GRAVITY_1G 512          //VALOR DE 1G DA GRAVIDADE NA IMU
 #define FLIP_TIMEOUT 100        //ESTOURO DE TEMPO PARA CONSIDERAR QUE O FLIP ACONTECEU (1 SEGUNDO)
-
-enum
-{
-  STAGEONE = 0,
-  STAGETWO,
-  STAGETHREE,
-  STAGERECOVER,
-  STAGEABANDON,
-  STAGEWAITING
-};
 
 bool LockPitchAndRollRC = false;
 bool LockProtection = false;
@@ -55,9 +46,9 @@ uint16_t ValueOfFlipToPitch = 0;
 
 void FlipModeRun()
 {
-  if (FrameType == 3 || FrameType == 4 || FrameType == 5)
+  if (GetFrameStateOfAirPlane())
   {
-    if (Flip_Mode)
+    if (SetFlightModes[FLIP_MODE])
       TurnCoordinatorMode = true;
     else
       TurnCoordinatorMode = false;
@@ -70,7 +61,7 @@ void FlipModeRun()
   if (!COMMAND_ARM_DISARM)
     return; //FAÇA UMA RAPIDA SAIDA SE A CONTROLADORA ESTIVER DESARMADA
 
-  if (Flip_Mode) //MODO FLIP ATIVADO?SIM...
+  if (SetFlightModes[FLIP_MODE]) //MODO FLIP ATIVADO?SIM...
   {
     LockPitchAndRollRC = true; //BLOQUEIA OS VALORES DE PITCH E ROLL PARA O CONTROLADOR PID
     //RADIO READ ROLL

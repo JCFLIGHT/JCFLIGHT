@@ -22,6 +22,7 @@
 #include "MotorsControl/MOTORS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "Build/BOARDDEFS.h"
 
 SAFETYBUTTONCLASS SAFETYBUTTON;
 
@@ -33,9 +34,8 @@ SAFETYBUTTONCLASS SAFETYBUTTON;
 
 void SAFETYBUTTONCLASS::Initialization()
 {
-
-    DDRK &= ~(1 << 6); //DECLARA COMO ENTRADA (BOTÃO)
-    DDRA |= (1 << 3);  //DEFINE A PORTA DIGITAL 25 COMO SAIDA
+    SAFETY_BUTTON_PININPUT;
+    SAFETY_BUTTON_LED_PINOUT;
 }
 
 bool SAFETYBUTTONCLASS::GetButtonInterval()
@@ -50,7 +50,7 @@ bool SAFETYBUTTONCLASS::GetButtonInterval()
 
 bool SAFETYBUTTONCLASS::GetButtonState()
 {
-    return ((*(volatile uint8_t *)(0x106)) & 64 ? false : true);
+    return (SAFETY_BUTTON_PIN_READ_STATE ? false : true);
 }
 
 void SAFETYBUTTONCLASS::FlashButton()
@@ -132,11 +132,11 @@ void SAFETYBUTTONCLASS::SetStateToLed(bool State)
 {
     if (!State)
     {
-        PORTA |= 1 << 3; //DESATIVA O LED DO SAFE BUTTON
+        SAFETY_BUTTON_LED_OFF;
     }
     else
     {
-        PORTA &= ~(1 << 3); //ATIVA O LED DO SAFE BUTTON
+        SAFETY_BUTTON_LED_ON;
     }
 }
 

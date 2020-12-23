@@ -22,6 +22,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Buzzer/BUZZER.h"
 #include "BATTLEVELS.h"
+#include "Build/BOARDDEFS.h"
 
 BATT BATTERY;
 
@@ -40,7 +41,7 @@ float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE
 void BATT::Read_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  Voltage = Voltage_Filter.Apply(Voltage * 0.92f + (float)(ADCPIN.Read(ADC_NUM_0) / BattVoltageFactor));
+  Voltage = Voltage_Filter.Apply(Voltage * 0.92f + (float)(ADCPIN.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
   //TENSÃO DA BATERIA ACIMA DE 5V?SIM...
   if (Voltage > 5)
   {
@@ -169,7 +170,7 @@ void BATT::Do_RTH_With_Low_Batt(bool FailSafeBatt)
 void BATT::Read_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  Total_Current = ((ADCPIN.Read(ADC_NUM_1)) - Amps_OffSet) * Amps_Per_Volt;
+  Total_Current = ((ADCPIN.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt;
 }
 
 void BATT::Calculate_Total_Mah(void)

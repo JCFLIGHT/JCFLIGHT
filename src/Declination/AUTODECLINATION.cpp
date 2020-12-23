@@ -30,7 +30,7 @@ float GetDeclinationCalced(float GPSLatitude, float GPSLongitude);
 //TABELA PARA DECLINAÇÃO MAGNETICA AUTOMATICA
 #ifdef __AVR_ATmega2560__
 const int16_t Table_Declination[37][73] __attribute__((__progmem__)) =
-#elif __arm__
+#elif defined __arm__
 const int16_t Table_Declination[37][73] =
 #endif
     {

@@ -41,7 +41,7 @@ void Operator_Check_Values_In_Address(uint16_t Size)
     }
 }
 
-#elif __arm__
+#elif defined __arm__
 
 void Operator_Check_Values_In_Address(uint16_t Size)
 {

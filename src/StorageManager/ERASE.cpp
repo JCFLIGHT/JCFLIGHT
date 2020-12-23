@@ -34,7 +34,7 @@ void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t 
     }
 }
 
-#elif __arm__
+#elif defined __arm__
 
 void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size)
 {

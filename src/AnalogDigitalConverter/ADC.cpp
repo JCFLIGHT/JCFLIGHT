@@ -37,7 +37,7 @@ int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
   return (HighByte << 8) | LowByte;
 }
 
-#elif __arm__
+#elif defined __arm__
 int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
 {
   return 0;

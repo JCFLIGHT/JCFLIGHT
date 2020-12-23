@@ -58,7 +58,7 @@
     __Result;                                                    \
 }))
 
-#elif __arm__
+#elif defined __arm__
 
 #endif
 

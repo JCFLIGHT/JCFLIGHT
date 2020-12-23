@@ -41,7 +41,7 @@ void UpdateFunctionName(uint8_t FunctionNumber)
     strcpy_P(GetFunctionName, (char *)ProgMemReadDWord((uint16_t)(&(Function_Table[FunctionNumber]))));
 }
 
-#elif __arm__
+#elif defined __arm__
 
 char *GetFunctionName;
 

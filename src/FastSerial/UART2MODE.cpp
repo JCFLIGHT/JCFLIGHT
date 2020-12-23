@@ -33,7 +33,7 @@ void UART2Mode_Initialization()
     }
 }
 
-#elif __arm__
+#elif defined __arm__
 void UART2Mode_Initialization()
 {
 }

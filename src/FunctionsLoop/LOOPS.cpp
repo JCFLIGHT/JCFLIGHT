@@ -107,7 +107,7 @@ void Fast_Medium_Loop()
 void Fast_Loop()
 {
         static Scheduler_Struct FastLoop;
-        if (SchedulerTimer(&FastLoop, 2000)) //500HZ
+        if (SchedulerTimer(&FastLoop, 2500)) //400HZ
         {
 
 #ifdef ENABLE_TIMEMONITOR
@@ -115,16 +115,6 @@ void Fast_Loop()
 #endif
 
                 Update_PrecisionLand();
-#ifdef I2C_AND_SERIAL_500HZ
-                SBUS_Update();
-                IBUS_Update();
-                Acc_ReadBufferData();
-                Gyro_ReadBufferData();
-                COMPASS.Constant_Read();
-                Barometer_Update();
-                GPS_Serial_Read();
-                AHRS_Update();
-#endif
 
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringFinishTime();
@@ -146,7 +136,6 @@ void Integral_Loop()
 
                 RGB.Update();
                 SAFETYBUTTON.UpdateRoutine();
-#ifndef I2C_AND_SERIAL_500HZ
                 SBUS_Update();
                 IBUS_Update();
                 Acc_ReadBufferData();
@@ -155,7 +144,6 @@ void Integral_Loop()
                 Barometer_Update();
                 GPS_Serial_Read();
                 AHRS_Update();
-#endif
                 DynamicPID();
                 Auto_Launch_Update();
                 GPS_Process_FlightModes();

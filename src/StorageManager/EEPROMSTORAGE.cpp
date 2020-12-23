@@ -63,7 +63,7 @@ float EEPROMSTORAGE::Read_Float(int16_t Address)
   return _Type_Union.FloatValue;
 }
 
-#elif __arm__
+#elif defined __arm__
 
 void EEPROMSTORAGE::Write_8Bits(int16_t Address, int8_t Value)
 {

@@ -93,7 +93,7 @@ void ConfigureRegisters()
   TCCR5A |= _BV(COM4B1); //CONECTA O PINO 45 AO TIMER4 CANAL B
   //TCCR5A |= _BV(COM4C1); //CONECTA O PINO 44 AO TIMER4 CANAL C
 
-#elif __arm__
+#elif defined __arm__
 
 #endif
 
@@ -167,7 +167,7 @@ void ApplyPWMInAllComponents()
   OCR5A = MotorControl[GIMBAL] << 3;         //PINO DIGITAL 46
   OCR5B = MotorControl[PARACHUTESERVO] << 3; //PINO DIGITAL 45
 
-#elif __arm__
+#elif defined __arm__
 
 #endif
 }

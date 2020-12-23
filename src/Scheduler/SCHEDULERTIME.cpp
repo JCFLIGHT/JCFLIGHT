@@ -126,7 +126,7 @@ void __vector_23(void)
   Timer0_OverFlow++;
 }
 
-#elif __arm__
+#elif defined __arm__
 
 void AVRTIMECLASS::SchedulerInit()
 {

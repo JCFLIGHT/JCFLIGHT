@@ -45,7 +45,7 @@ uint8_t MEMORYCLASS::GetPercentageRAMUsed()
   return Free / 8192 * 100;
 }
 
-#elif __arm__
+#elif defined __arm__
 uint16_t MEMORYCLASS::Check()
 {
   return 0;

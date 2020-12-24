@@ -55,7 +55,7 @@ bool SAFETYBUTTONCLASS::GetButtonState()
 
 void SAFETYBUTTONCLASS::FlashButton()
 {
-    Led_Pattern Pattern;
+    static Led_Pattern Pattern;
 
     if (DetectRise < FIRST_CYCLE_COUNT)
     {

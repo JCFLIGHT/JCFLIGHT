@@ -349,10 +349,14 @@ static void __attribute__((noinline)) GCS_Get_Struct_Params(uint8_t *CheckBuffer
 static void SendStringToGCS(const char *String)
 {
     Communication_Passed(false, strlen_P(String));
+#ifdef __AVR_ATmega2560__
     for (const char *StringCount = String; ProgMemReadByte(StringCount); StringCount++)
     {
         GCS_Send_Data(ProgMemReadByte(StringCount));
     }
+#elif defined __arm__
+
+#endif
     GCS_Send_Data(SerialCheckSum);
     FASTSERIAL.UartSendData(UART0);
 }

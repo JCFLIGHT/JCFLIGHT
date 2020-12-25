@@ -90,7 +90,11 @@ static union
   uint8_t Bytes_Array[464];
 } Buffer;
 
+#ifdef __AVR_ATmega2560__
 const uint8_t Ublox_Set_Configuration[] __attribute__((__progmem__)) = {
+#elif defined __arm__
+const uint8_t Ublox_Set_Configuration[] = {
+#endif
     0xB5, 0x62, 0x06, 0x01, 0x03, 0x00, 0xF0, 0x05, 0x00, 0xFF, 0x19,
     0xB5, 0x62, 0x06, 0x01, 0x03, 0x00, 0xF0, 0x03, 0x00, 0xFD, 0x15,
     0xB5, 0x62, 0x06, 0x01, 0x03, 0x00, 0xF0, 0x01, 0x00, 0xFB, 0x11,
@@ -110,12 +114,16 @@ const uint8_t Ublox_Set_Configuration[] __attribute__((__progmem__)) = {
 
 static void SerialSendConfigToGPS(const char *STR)
 {
+#ifdef __AVR_ATmega2560__
   char ProgramMemory;
   while (STR && (ProgramMemory = ProgMemReadByte(STR++)))
   {
     FASTSERIAL.Write(UART1, ProgramMemory);
     AVRTIME.SchedulerSleep(5);
   }
+#elif defined __arm__
+
+#endif
 }
 
 void GPS_SerialInit(uint32_t Get_BaudRate)

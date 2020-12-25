@@ -18,6 +18,8 @@
 #include "SERVOSPWR.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
+#ifdef __AVR_ATmega2560__
+
 void ServosPWR(void)
 {
     DDRA |= (1 << DDD1); //DEFINE A PORTA DIGITAL 23 COMO SAIDA
@@ -33,3 +35,17 @@ void ServosPWR(void)
         PORTA |= 1 << 2;    //DESATIVA A ALIMENTAÇÃO DOS SERVOS
     }
 }
+
+#elif defined __arm__
+
+void ServosPWR(void)
+{
+    if (GetFrameStateOfAirPlane())
+    {
+    }
+    else
+    {
+    }
+}
+
+#endif

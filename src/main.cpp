@@ -17,6 +17,8 @@
 
 #include "MachineMain/MACHINEMAIN.h"
 
+#ifdef __AVR_ATmega2560__
+
 #define JCFLIGHT_INITIALIZE_ALGORITHM() \
   extern "C"                            \
   {                                     \
@@ -31,3 +33,5 @@
     }                                   \
   }
 JCFLIGHT_INITIALIZE_ALGORITHM();
+
+#endif

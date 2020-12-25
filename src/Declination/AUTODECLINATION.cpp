@@ -84,10 +84,17 @@ float GetDeclinationCalced(float GPSLatitude, float GPSLongitude)
   LongitudeMin = floor(GPSLongitude / 5) * 5;
   LatitudeMin_Index = (90 + LatitudeMin) / 5;
   LongitudeMin_Index = (180 + LongitudeMin) / 5;
+#ifdef __AVR_ATmega2560__
   DeclinationSW = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index][LongitudeMin_Index]));
   DeclinationSE = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index][LongitudeMin_Index + 1]));
   DeclinationNE = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index + 1]));
   DeclinationNW = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index]));
+#elif defined __arm__
+  DeclinationSW = (Table_Declination[LatitudeMin_Index][LongitudeMin_Index]);
+  DeclinationSE = (Table_Declination[LatitudeMin_Index][LongitudeMin_Index + 1]);
+  DeclinationNE = (Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index + 1]);
+  DeclinationNW = (Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index]);
+#endif
   DeclinationMin = (GPSLongitude - LongitudeMin) / 5 * (DeclinationSE - DeclinationSW) + DeclinationSW;
   DeclinationMax = (GPSLongitude - LongitudeMin) / 5 * (DeclinationNE - DeclinationNW) + DeclinationNW;
   //RETORNA O VALOR DA DECLINAÇÃO MAGNETICA

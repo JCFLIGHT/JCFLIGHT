@@ -18,6 +18,7 @@
 #ifndef PRINTF_H_
 #define PRINTF_H_
 #include "Arduino.h"
+#ifdef __AVR_ATmega2560__
 extern "C"
 {
   int __ftoa_engine(double val, char *buf, unsigned char prec, unsigned char maxdgs);
@@ -26,4 +27,10 @@ extern "C"
 void PrintlnParameters();
 void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
 void FastSerialPrintln(const char *fmt, ...);
+#endif
+#ifdef __arm__
+void FastSerialPrintln();
+void SerialPrintF();
+void PrintlnParameters();
+#endif
 #endif

@@ -58,6 +58,28 @@
     __Result;                                                    \
 }))
 
+static inline uint16_t PGM_Read_Pointer(const void *FN)
+{
+    if (sizeof(uint16_t) == sizeof(uint16_t))
+    {
+        return (uint16_t)ProgMemReadWord(FN);
+    }
+    else
+    {
+        union
+        {
+            uint16_t Pointer;
+            uint8_t Array[sizeof(uint16_t)];
+        } Union;
+        uint8_t i;
+        for (i = 0; i < sizeof(uint16_t); i++)
+        {
+            Union.Array[i] = ProgMemReadByte(i + (const char *)FN);
+        }
+        return Union.Pointer;
+    }
+}
+
 #elif defined __arm__
 
 #endif

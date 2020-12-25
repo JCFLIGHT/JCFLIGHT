@@ -17,7 +17,7 @@
 
 #include "AVRLOWER.h"
 
-#define AVR_MULTIPLICATION
+#ifdef __AVR_ATmega2560__
 
 #define MultiS16X16to32(OperationResult, ValueIntA, ValueIntB) \
   asm volatile(                                                \
@@ -45,16 +45,17 @@
 int32_t __attribute__((noinline)) Multiplication32Bits(int16_t ValueA, int16_t ValueB)
 {
   int32_t Result;
-
-#ifdef AVR_MULTIPLICATION
-
   MultiS16X16to32(Result, ValueA, ValueB);
-
-#else
-
-  Result = ValueA * ValueB;
-
-#endif
-
   return Result;
 }
+
+#elif defined __arm__
+
+int32_t __attribute__((noinline)) Multiplication32Bits(int16_t ValueA, int16_t ValueB)
+{
+  int32_t Result;
+  Result = ValueA * ValueB;
+  return Result;
+}
+
+#endif

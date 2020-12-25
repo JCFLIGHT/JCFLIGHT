@@ -31,8 +31,6 @@ class Fast_Serial
     void    TX_Send(uint8_t SerialPort, uint8_t WriteTX);
     void    UartSendData(uint8_t SerialPort);
     void    UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort);
-  private:
-    void   ConfigureUart();
 };
 extern Fast_Serial FASTSERIAL;
 #endif

@@ -54,12 +54,12 @@ void RCSticks_Update()
       if (ArmDisarmConfig > 0)
       {
         if (ArmDisarmControlAux)
-          SetFlightModes[ARMDISARM_MODE] = true;
+          SetFlightModes[ARM_DISARM_MODE] = true;
         else
-          SetFlightModes[ARMDISARM_MODE] = false;
-        if (SetFlightModes[ARMDISARM_MODE])
+          SetFlightModes[ARM_DISARM_MODE] = false;
+        if (SetFlightModes[ARM_DISARM_MODE])
         {
-          if (Fail_Safe_System < 5 && !SetFlightModes[RTH_MODE] && !SetFlightModes[GPSHOLD_MODE])
+          if (Fail_Safe_System < 5 && !SetFlightModes[RTH_MODE] && !SetFlightModes[GPS_HOLD_MODE])
           {
             if (!COMMAND_ARM_DISARM)
             {
@@ -87,7 +87,7 @@ void Pre_Arm(void)
     if (Arm_Delay_Count > 30)
     {
       if (CALIBRATION.AccelerometerCalibration[ROLL] > 2000 ||
-          SetFlightModes[ALTITUDEHOLD_MODE] ||
+          SetFlightModes[ALTITUDE_HOLD_MODE] ||
           GPS_Flight_Mode != GPS_MODE_NONE ||
           Fail_Safe_System > 5 ||
           CalibratingGyroscope > 0 ||
@@ -117,7 +117,7 @@ void Pre_Arm_Leds(void)
     BEEPER.BeeperPlay(BEEPER_ARM);
   }
   if (CALIBRATION.AccelerometerCalibration[ROLL] > 2000 ||
-      SetFlightModes[ALTITUDEHOLD_MODE] ||
+      SetFlightModes[ALTITUDE_HOLD_MODE] ||
       GPS_Flight_Mode != GPS_MODE_NONE ||
       Fail_Safe_System > 5 ||
       CalibratingGyroscope > 0 ||

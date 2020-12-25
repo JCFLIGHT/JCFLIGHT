@@ -23,6 +23,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "Build/BOARDDEFS.h"
+#include "AnalogDigitalConverter/ADC.h"
 
 SAFETYBUTTONCLASS SAFETYBUTTON;
 
@@ -50,7 +51,11 @@ bool SAFETYBUTTONCLASS::GetButtonInterval()
 
 bool SAFETYBUTTONCLASS::GetButtonState()
 {
+#ifdef __AVR_ATmega2560__
     return (SAFETY_BUTTON_PIN_READ_STATE ? false : true);
+#elif defined __arm__
+    return (ADCPIN.Read(SAFETY_BUTTON_PIN_READ_STATE) ? false : true);
+#endif
 }
 
 void SAFETYBUTTONCLASS::FlashButton()

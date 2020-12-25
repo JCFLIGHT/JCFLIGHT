@@ -1104,14 +1104,14 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
     SetFlightModes[IOC_MODE] = false;
   //ALTITUDE-HOLD
   if (AltitudeHoldControlAux)
-    SetFlightModes[ALTITUDEHOLD_MODE] = true;
+    SetFlightModes[ALTITUDE_HOLD_MODE] = true;
   else
-    SetFlightModes[ALTITUDEHOLD_MODE] = false;
+    SetFlightModes[ALTITUDE_HOLD_MODE] = false;
   //GPS-HOLD
   if (GPSHoldControlAux)
-    SetFlightModes[GPSHOLD_MODE] = true;
+    SetFlightModes[GPS_HOLD_MODE] = true;
   else
-    SetFlightModes[GPSHOLD_MODE] = false;
+    SetFlightModes[GPS_HOLD_MODE] = false;
   //AUTO LAND
   if (AutoLandControlAux)
     SetFlightModes[LAND_MODE] = true;

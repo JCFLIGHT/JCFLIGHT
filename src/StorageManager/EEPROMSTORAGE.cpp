@@ -16,10 +16,12 @@
 */
 
 #include "EEPROMSTORAGE.h"
-#ifdef __AVR_ATmega2560__
-#include <avr/eeprom.h>
 
 EEPROMSTORAGE STORAGEMANAGER;
+
+#ifdef __AVR_ATmega2560__
+
+#include <avr/eeprom.h>
 
 void EEPROMSTORAGE::Write_8Bits(int16_t Address, int8_t Value)
 {

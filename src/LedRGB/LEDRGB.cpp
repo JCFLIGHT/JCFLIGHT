@@ -35,9 +35,13 @@ void LEDRGB::Initialization()
 void LEDRGB::Update()
 {
   //REGISTRADORES DE MANIPULAÇÃO DO LED RGB
+#ifdef __AVR_ATmega2560__
   RED_LED_PWM_REGISTER = LedRGB[RED];     //PINO DIGITAL 10
   GREEN_LED_PWM_REGISTER = LedRGB[GREEN]; //PINO DIGITAL 11
   BLUE_LED_PWM_REGISTER = LedRGB[BLUE];   //PINO DIGITAL 12
+#elif defined __arm__
+
+#endif
   if ((CalibratingAccelerometer == 0) &&
       (!GCS.ConfigFlight) &&
       (!CalibratingCompass) &&

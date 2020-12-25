@@ -65,8 +65,8 @@ void NormalizeFailSafe()
 {
   SetFlightModes[STABILIZE_MODE] = true;
   SetFlightModes[IOC_MODE] = false;
-  SetFlightModes[ALTITUDEHOLD_MODE] = false;
-  SetFlightModes[GPSHOLD_MODE] = false;
+  SetFlightModes[ALTITUDE_HOLD_MODE] = false;
+  SetFlightModes[GPS_HOLD_MODE] = false;
   SetFlightModes[RTH_MODE] = true;
   SetFlightModes[ATACK_MODE] = false;
   SetFlightModes[FLIP_MODE] = false;

@@ -27,6 +27,8 @@
 
 Fast_Serial FASTSERIAL;
 
+#ifdef __AVR_ATmega2560__
+
 static uint8_t UARTBufferRX[256][4];
 static uint8_t UARTBufferTX[128][4];
 static volatile uint8_t UARTHeadRX[4];
@@ -251,3 +253,101 @@ void Fast_Serial::Write(uint8_t SerialPort, uint8_t WriteData)
   TX_Send(SerialPort, WriteData);
   UartSendData(SerialPort);
 }
+
+#elif defined __arm__
+
+void Fast_Serial::Initialization()
+{
+  //DEBUG E GCS
+  FASTSERIAL.Begin(UART0, 115200);
+  //GPS
+  FASTSERIAL.Begin(UART1, 57600);
+  GPS_SerialInit(57600);
+  //IBUS & SBUS
+  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 0)
+    FASTSERIAL.Begin(UART2, 115200);
+  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+  {
+    //CONFIGURAÇÃO DA UART2 PARA SBUS
+    FASTSERIAL.Begin(UART2, 100000);
+  }
+  else if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2)
+  {
+    //CONFIGURAÇÃO DA UART2 PARA IBUS
+    FASTSERIAL.Begin(UART2, 115200);
+  }
+  //MATEK3901L0X
+  FASTSERIAL.Begin(UART3, 115200);
+}
+
+void Fast_Serial::UartSendData(uint8_t SerialPort)
+{
+  switch (SerialPort)
+  {
+
+  case UART0:
+    break;
+
+  case UART1:
+    break;
+
+  case UART2:
+    break;
+
+  case UART3:
+    break;
+  }
+}
+
+bool Fast_Serial::Flush(uint8_t SerialPort)
+{
+  return 0;
+}
+
+void Fast_Serial::Begin(uint8_t SerialPort, uint32_t BaudRate)
+{
+  switch (SerialPort)
+  {
+
+  case UART0:
+    break;
+
+  case UART1:
+    break;
+
+  case UART2:
+    break;
+
+  case UART3:
+    break;
+  }
+}
+
+void Fast_Serial::UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort)
+{
+}
+
+uint8_t Fast_Serial::Read(uint8_t SerialPort)
+{
+  return 0;
+}
+
+uint8_t Fast_Serial::Available(uint8_t SerialPort)
+{
+  return 0;
+}
+
+uint8_t Fast_Serial::TXBuffer(uint8_t SerialPort)
+{
+  return 0;
+}
+
+void Fast_Serial::TX_Send(uint8_t SerialPort, uint8_t WriteTX)
+{
+}
+
+void Fast_Serial::Write(uint8_t SerialPort, uint8_t WriteData)
+{
+}
+
+#endif

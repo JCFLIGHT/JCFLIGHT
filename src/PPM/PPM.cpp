@@ -31,6 +31,8 @@
 volatile uint16_t PPMReadChannels[12];
 static uint8_t PPMChannelMap[12];
 
+#ifdef __AVR_ATmega2560__
+
 void ConfigurePPMRegisters()
 {
   if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 2))
@@ -170,3 +172,50 @@ void DecodeAllReceiverChannels()
     }
   }
 }
+
+#elif defined __arm__
+
+void ConfigurePPMRegisters()
+{
+  if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 2))
+  {
+  }
+  //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
+  if (ReceiverModel <= 7)
+  {
+    PPMChannelMap[0] = PITCH;
+    PPMChannelMap[1] = ROLL;
+    PPMChannelMap[2] = THROTTLE;
+    PPMChannelMap[3] = YAW;
+  }
+  else
+  { //FUTABA OU D4R-II
+    PPMChannelMap[0] = ROLL;
+    PPMChannelMap[1] = PITCH;
+    PPMChannelMap[2] = THROTTLE;
+    PPMChannelMap[3] = YAW;
+  }
+  PPMChannelMap[4] = AUX1;
+  PPMChannelMap[5] = AUX2;
+  PPMChannelMap[6] = AUX3;
+  PPMChannelMap[7] = AUX4;
+  PPMChannelMap[8] = AUX5;
+  PPMChannelMap[9] = AUX6;
+  PPMChannelMap[10] = AUX7;
+  PPMChannelMap[11] = AUX8;
+}
+
+void InterruptRoutine(void)
+{
+}
+
+uint16_t LearningAllChannels(uint8_t Channels)
+{
+  return 0;
+}
+
+void DecodeAllReceiverChannels()
+{
+}
+
+#endif

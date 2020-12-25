@@ -39,7 +39,11 @@ void AVRTimeMonitor::MeasuringStartTime(uint8_t FunctionNumber)
     FunctionNumberCount++;
     if (FunctionNumberCount >= SIZE_LOOPS + 500)
     {
+#ifdef __AVR_ATmega2560__
       FastSerialPrintln(PSTR("\n"));
+#elif defined __arm__
+
+#endif
       FunctionNumberCount = 0;
     }
   }
@@ -54,9 +58,13 @@ void AVRTimeMonitor::MeasuringFinishTime()
   AVRTotalTime = EndTime - StartTime;
   if (SafeToPrint)
   {
+#ifdef __AVR_ATmega2560__
     FastSerialPrintln(PSTR("%-20s\tTempo Gasto:%.5f us\n"),
                       GetFunctionName,
                       AVRTotalTime / 1000);
+#elif defined __arm__
+
+#endif
     SafeToPrint = false;
   }
 }

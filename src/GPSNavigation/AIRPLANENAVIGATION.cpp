@@ -113,7 +113,7 @@ void PlaneUpdateNavigation(void)
       GetThrottleToNavigation = Constrain_16Bits(1500 - (AltitudeError * 8), 1300, 1900);
     if (CLIMBOUT_FW && AltitudeError >= 0)
       CLIMBOUT_FW = false;
-    if (GPS_HOME_MODE)
+    if (GPS_HOME_MODE_FW)
     {
       if (CLIMBOUT_FW)
       {

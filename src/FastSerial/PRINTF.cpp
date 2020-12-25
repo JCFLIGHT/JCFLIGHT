@@ -29,6 +29,8 @@
 #include "BAR/BAR.h"
 #include "ProgMem/PROGMEM.h"
 
+#ifdef __AVR_ATmega2560__
+
 #define FTOA_MINUS 1
 #define FTOA_ZERO 2
 #define FTOA_INF 4
@@ -588,3 +590,21 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
     }
   }
 }
+
+#endif
+
+#ifdef __arm__
+
+void FastSerialPrintln()
+{
+}
+
+void SerialPrintF()
+{
+}
+
+void PrintlnParameters()
+{
+}
+
+#endif

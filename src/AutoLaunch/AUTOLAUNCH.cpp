@@ -81,19 +81,21 @@ void AutoLaunchDetector()
 
 void Auto_Launch_Update()
 {
-  if (GetFrameStateOfMultirotor())
+  if (SetFlightModes[ATACK_MODE] || GetFrameStateOfMultirotor())
+  {
     return;
-  if (SetFlightModes[ATACK_MODE])
+  }
+  else
   {
     if (GetValidStateToRunLaunch() && !LaunchedDetect)
     {
       if (!AutoLaunchState)
       {
-        BEEPER.BeeperPlay(BEEPER_AUTOLAUNCH);
+        BEEPER.Play(BEEPER_AUTOLAUNCH);
       }
       else
       {
-        BEEPER.BeeperPlay(BEEPER_LAUNCHED);
+        BEEPER.Play(BEEPER_LAUNCHED);
       }
       if (PlaneType == WITH_WHEELS)
       {
@@ -154,7 +156,7 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
       if (IgnoreFirstPeak)
       {
         RCController[THROTTLE] = AUTO_LAUNCH_THROTTLE_MAX;
-        BEEPER.BeeperSilence();
+        BEEPER.Silence();
       }
       else
         ThrottleStart = AVRTIME.SchedulerMillis();

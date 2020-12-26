@@ -52,7 +52,9 @@ void BATT::Read_Voltage(void)
     else
     {
       if (BEEPER.SafeToOthersBeepsCounter > 200)
-        BEEPER.BeeperPlay(BEEPER_BAT_CRIT_LOW);
+      {
+        BEEPER.Play(BEEPER_BAT_CRIT_LOW);
+      }
       LowBattPreventArm = false;
     }
   }

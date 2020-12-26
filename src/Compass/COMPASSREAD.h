@@ -28,6 +28,12 @@ public:
   void Rotate();
 
 private:
+  float MagnetometerRead[3];
+  int16_t MagCalibrationMinVector[3];
+  int16_t MagCalibrationMaxVector[3];
+  uint32_t NextUpdate = 0;
+  uint32_t CalibrationTime = 0;
+  uint32_t CompassTimer = 0;
   bool PushBias(uint8_t bias);
   void InitialReadBufferData();
   void ReadBufferData();

@@ -59,7 +59,7 @@ void AVRTimeMonitor::MeasuringFinishTime()
   if (SafeToPrint)
   {
 #ifdef __AVR_ATmega2560__
-    FastSerialPrintln(PSTR("%-20s\tTempo Gasto:%.5f us\n"),
+    FastSerialPrintln(PSTR("%-20s\tTempo Gasto:%.5f ms\n"),
                       GetFunctionName,
                       AVRTotalTime / 1000);
 #elif defined __arm__

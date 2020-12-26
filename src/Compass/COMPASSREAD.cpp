@@ -153,12 +153,16 @@ void CompassReadClass::ReadBufferData()
     SetOrientation(MagOrientation, Compass_Type);
     I2C.WriteRegister(0x0C, 0x0A, 0x01);
   }
-  if ((Compass_Type == COMPASS_HMC5843) || (Compass_Type == COMPASS_HMC5883))
+  else if ((Compass_Type == COMPASS_HMC5843) || (Compass_Type == COMPASS_HMC5883))
   {
     if ((COMPASS.FakeHMC5883Address != 0x0D) && (Compass_Type == COMPASS_HMC5883))
+    {
       I2C.SensorsRead(0x68, 0x49);
+    }
     else
+    {
       I2C.SensorsRead(MagAddress, MagRegister);
+    }
     SetOrientation(MagOrientation, Compass_Type);
   }
 }
@@ -167,18 +171,17 @@ void CompassReadClass::Constant_Read()
 {
   //SAIA DA FUNÇÃO SE NÃO FOR ENCONTRADO NENHUM COMPASS NO BARRAMENTO I2C
   if (!I2C.CompassFound)
+  {
     return;
+  }
 
-  static float MagnetometerRead[3];
-  static int16_t MagCalibrationMinVector[3];
-  static int16_t MagCalibrationMaxVector[3];
-  static uint32_t NextUpdate = 0;
-  static uint32_t CalibrationTime = 0;
-  uint32_t CompassTimer = AVRTIME.SchedulerMicros();
+  CompassTimer = AVRTIME.SchedulerMicros();
 
   //SAIA DA FUNÇÃO SE O TEMPO DE ATUALIZAÇÃO NÃO FOR VALIDO
   if (!CalibratingCompass && CompassTimer < NextUpdate)
+  {
     return;
+  }
 
   //CALCULA O PROXIMO VALOR DE ATUALIZAÇÃO DO COMPASS
   NextUpdate = CompassTimer + COMPASS_UPDATE_FREQUENCY;
@@ -253,7 +256,7 @@ void CompassReadClass::Constant_Read()
       STORAGEMANAGER.Write_16Bits(MAG_PITCH_ADDR, CALIBRATION.MagnetometerCalibration[PITCH]);
       STORAGEMANAGER.Write_16Bits(MAG_YAW_ADDR, CALIBRATION.MagnetometerCalibration[YAW]);
       CheckAndUpdateIMUCalibration();
-      BEEPER.BeeperPlay(BEEPER_CALIBRATION_DONE);
+      BEEPER.Play(BEEPER_CALIBRATION_DONE);
     }
   }
   COMPASS.Rotate();

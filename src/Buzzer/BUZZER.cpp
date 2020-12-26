@@ -100,7 +100,7 @@ static const Struct_BeeperEntry *BeeperEntry = NULL;
 
 #define BEEPER_TABLE_ENTRY_COUNT (sizeof(BeeperTable) / sizeof(Struct_BeeperEntry))
 
-void BEEPERCLASS::BeeperPlay(Beeper_Mode Mode)
+void BEEPERCLASS::Play(Beeper_Mode Mode)
 {
   const Struct_BeeperEntry *SelectedSong = NULL;
   for (uint8_t i = 0; i < BEEPER_TABLE_ENTRY_COUNT; i++)
@@ -124,7 +124,7 @@ void BEEPERCLASS::BeeperPlay(Beeper_Mode Mode)
   BeeperNextNote = 0;
 }
 
-void BEEPERCLASS::BeeperSilence()
+void BEEPERCLASS::Silence()
 {
   BEEP_OFF;
   BeeperState = 0;
@@ -134,12 +134,16 @@ void BEEPERCLASS::BeeperSilence()
   SafeToOthersBeeps = true;
 }
 
-void BEEPERCLASS::BeeperUpdate()
+void BEEPERCLASS::Update()
 {
   if (BeeperEntry == NULL)
+  {
     return;
+  }
   if (BeeperNextNote > AVRTIME.SchedulerMicros() / 1000)
+  {
     return;
+  }
   if (!BeeperState)
   {
     BeeperState = 1;
@@ -152,13 +156,15 @@ void BEEPERCLASS::BeeperUpdate()
     if (BeeperEntry->Sequence[BeeperPositionArray] != 0)
       BEEP_OFF;
   }
-  BeeperProcessCommand();
+  ProcessCommand();
 }
 
-void BEEPERCLASS::BeeperProcessCommand()
+void BEEPERCLASS::ProcessCommand()
 {
   if (BeeperEntry->Sequence[BeeperPositionArray] == BEEPER_COMMAND_STOP)
-    BeeperSilence();
+  {
+    Silence();
+  }
   else
   {
     BeeperNextNote = AVRTIME.SchedulerMillis() + 10 * BeeperEntry->Sequence[BeeperPositionArray];
@@ -179,17 +185,23 @@ void BEEPERCLASS::Run()
   }
   if (ESC.BeeperMode == ESC_CALIBRATION_MODE)
   {
-    BeeperPlay(BEEPER_CALIBRATION_DONE);
+    Play(BEEPER_CALIBRATION_DONE);
   }
   else if (ESC.BeeperMode == NORMAL_OPERATION_MODE)
   {
     if (!BuzzerInit)
-      BeeperPlay(BEEPER_ALGORITHM_INIT);
+    {
+      Play(BEEPER_ALGORITHM_INIT);
+    }
   }
   //NÃO FAÇA A MUDANÇA DO SOM TÃO RAPIDO PARA NÃO EMBOLAR COM O BEEP DA BATERIA SE A MESMA ESTIVER COM BAIXA TENSÃO
   if (SafeToOthersBeeps && SafeToOthersBeepsCounter < 254)
+  {
     SafeToOthersBeepsCounter++;
-  BeeperUpdate();
+  }
+  Update();
   if (!BuzzerInit)
+  {
     BuzzerInit = true;
+  }
 }

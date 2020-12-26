@@ -24,12 +24,12 @@ class BEEPERCLASS
 public:
   uint8_t SafeToOthersBeepsCounter;
   void Run();
-  void BeeperPlay(Beeper_Mode Mode);
-  void BeeperSilence();
+  void Play(Beeper_Mode Mode);
+  void Silence();
 
 private:
-  void BeeperUpdate();
-  void BeeperProcessCommand();
+  void Update();
+  void ProcessCommand();
 };
 extern BEEPERCLASS BEEPER;
 #endif

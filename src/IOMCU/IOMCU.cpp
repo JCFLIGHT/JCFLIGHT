@@ -446,7 +446,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 3:
         EEPROM_Function = 1;
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
@@ -454,7 +454,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 4:
         EEPROM_Function = 2;
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
@@ -531,7 +531,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 16:
         GCS.Save_Basic_Configuration();
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(0, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
@@ -539,7 +539,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 17:
         GCS.Dafult_Basic_Configuration();
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
@@ -554,7 +554,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 19:
         GCS.Save_Medium_Configuration();
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);
@@ -562,7 +562,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 20:
         GCS.Dafult_Medium_Configuration();
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART0);

@@ -188,7 +188,7 @@ void GPS_Process_FlightModes(void)
     case Do_Landed:
       COMMAND_ARM_DISARM = false;
       Do_GPS_Altitude = false;
-      BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS);
+      BEEPER.Play(BEEPER_ACTION_SUCCESS);
       GPS_Reset_Navigation();
       break;
     }

@@ -42,7 +42,7 @@ void RCSticks_Update()
     if ((ArmDisarmConfig == 0) && (StickStateToDisarm()))
     {
       COMMAND_ARM_DISARM = false;
-      BEEPER.BeeperPlay(BEEPER_DISARMING);
+      BEEPER.Play(BEEPER_DISARMING);
     }
   }
   if (RadioControllOutput[THROTTLE] <= 1100)
@@ -109,7 +109,7 @@ void Pre_Arm_Leds(void)
   if ((Arm_Delay_Count > 0 && Arm_Delay_Count <= 20))
   {
     RGB.Function(PREARMINIT);
-    BEEPER.BeeperPlay(BEEPER_ARM);
+    BEEPER.Play(BEEPER_ARM);
   }
   if (PREARM.Checking()) //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
   {
@@ -117,7 +117,7 @@ void Pre_Arm_Leds(void)
     {
       RGB.Function(PREARMFAIL);
       if (Arm_Delay_Count == 21)
-        BEEPER.BeeperPlay(BEEPER_ACTION_FAIL);
+        BEEPER.Play(BEEPER_ACTION_FAIL);
       if (Arm_Delay_Count == 30)
         NotPriorit = false;
     }

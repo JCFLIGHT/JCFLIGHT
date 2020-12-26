@@ -81,14 +81,14 @@ void Gyroscope_Calibration()
           (GyroDeviation[YAW] > 32))
       {                                        //CHECA SE A IMU FOI MOVIDA DURANTE A CALIBRAÇÃO
         CalibratingGyroscope = 513;            //REINICIA A CALIBRAÇÃO
-        BEEPER.BeeperPlay(BEEPER_ACTION_FAIL); //SINALIZA COM O BUZZER QUE HOUVE UM ERRO
+        BEEPER.Play(BEEPER_ACTION_FAIL); //SINALIZA COM O BUZZER QUE HOUVE UM ERRO
       }
       else
       {
         StoredGyroZero[ROLL] /= 512;
         StoredGyroZero[PITCH] /= 512;
         StoredGyroZero[YAW] /= 512;
-        BEEPER.BeeperPlay(BEEPER_ACTION_SUCCESS); //SINALIZA COM O BUZZER QUE TUDO OCORREU BEM
+        BEEPER.Play(BEEPER_ACTION_SUCCESS); //SINALIZA COM O BUZZER QUE TUDO OCORREU BEM
       }
       break;
 
@@ -140,7 +140,7 @@ void Accelerometer_Calibration()
       (AccCalibratedPosition[GetPositionActualOfAcc] && CalibratingAccelerometer > 0))
   {
     CalibratingAccelerometer = 0;
-    BEEPER.BeeperPlay(BEEPER_ACTION_FAIL);
+    BEEPER.Play(BEEPER_ACTION_FAIL);
     return;
   }
 
@@ -196,7 +196,7 @@ void Accelerometer_Calibration()
       STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, CALIBRATION.AccelerometerCalibrationScale[PITCH]);
       STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, CALIBRATION.AccelerometerCalibrationScale[YAW]);
       CheckAndUpdateIMUCalibration();
-      BEEPER.BeeperPlay(BEEPER_CALIBRATION_DONE);
+      BEEPER.Play(BEEPER_CALIBRATION_DONE);
     }
     CalibratingAccelerometer--;
   }

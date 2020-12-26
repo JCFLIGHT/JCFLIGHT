@@ -70,7 +70,7 @@ void SAFETYBUTTONCLASS::FlashButton()
     {
         Pattern = Led_Pattern::FMU_INIT_ARM;
         if (DetectRise == FIRST_CYCLE_COUNT + 1)
-            BEEPER.BeeperPlay(BEEPER_FMU_INIT);
+            BEEPER.Play(BEEPER_FMU_INIT);
         if (GetButtonState())
         {
             WaitToNextProcess = true;
@@ -87,7 +87,7 @@ void SAFETYBUTTONCLASS::FlashButton()
         Pattern = Led_Pattern::FMU_SAFE_TO_ARM;
         if (DetectRise == SECOND_CYCLE_COUNT + 1)
         {
-            BEEPER.BeeperPlay(BEEPER_FMU_SAFE_TO_ARM);
+            BEEPER.Play(BEEPER_FMU_SAFE_TO_ARM);
             WaitToNextProcess = false;
         }
         if (GetButtonState())
@@ -105,7 +105,7 @@ void SAFETYBUTTONCLASS::FlashButton()
     {
         if (DetectRise == RESET_CYCLE_COUNT + 1)
         {
-            BEEPER.BeeperPlay(BEEPER_ACTION_FAIL);
+            BEEPER.Play(BEEPER_ACTION_FAIL);
             WaitToNextProcess = false;
         }
         else

@@ -50,7 +50,7 @@ void Desarm_LowThrottle()
         if (COMMAND_ARM_DISARM && !Cancel_Arm_Disarm)
         {
           COMMAND_ARM_DISARM = false;          //DESARMA OS MOTORES
-          BEEPER.BeeperPlay(BEEPER_DISARMING); //TOCA A MÚSICA INDICANDO O DESARM
+          BEEPER.Play(BEEPER_DISARMING); //TOCA A MÚSICA INDICANDO O DESARM
         }
       }
       else if (TimerDesarm > 254)

@@ -23,15 +23,13 @@
 #include "RadioControl/RCCONFIG.h"
 #include "STATES.h"
 #include "Buzzer/BUZZER.h"
-#include "SafetyButton/SAFETYBUTTON.h"
+#include "Arming/ARMING.h"
 
 bool ArmDelay = false;
 uint8_t Arm_Delay_Count = 0;
 
 void RCSticks_Update()
 {
-  if (!SAFETYBUTTON.GetSafeStateToOutput())
-    return;
   if (!COMMAND_ARM_DISARM)
   {
     if ((ArmDisarmConfig == 0) && (StickStateToArm()) && (!BATTERY.LowBattPreventArm))
@@ -86,15 +84,12 @@ void Pre_Arm(void)
     Arm_Delay_Count++;
     if (Arm_Delay_Count > 30)
     {
-      if (CALIBRATION.AccelerometerCalibration[ROLL] > 2000 ||
-          SetFlightModes[ALTITUDE_HOLD_MODE] ||
-          GPS_Flight_Mode != GPS_MODE_NONE ||
-          Fail_Safe_System > 5 ||
-          CalibratingGyroscope > 0 ||
-          CheckInclinationForCopter())
-        COMMAND_ARM_DISARM = false; //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
-      else
-      { //IMU CALIBRADA?SIM...ARMA OS MOTORES
+      if (PREARM.Checking()) //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
+      {
+        COMMAND_ARM_DISARM = false;
+      }
+      else //IMU CALIBRADA?SIM...ARMA OS MOTORES
+      {
         if (!COMMAND_ARM_DISARM)
         {
           COMMAND_ARM_DISARM = true;
@@ -116,13 +111,8 @@ void Pre_Arm_Leds(void)
     RGB.Function(PREARMINIT);
     BEEPER.BeeperPlay(BEEPER_ARM);
   }
-  if (CALIBRATION.AccelerometerCalibration[ROLL] > 2000 ||
-      SetFlightModes[ALTITUDE_HOLD_MODE] ||
-      GPS_Flight_Mode != GPS_MODE_NONE ||
-      Fail_Safe_System > 5 ||
-      CalibratingGyroscope > 0 ||
-      CheckInclinationForCopter())
-  { //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
+  if (PREARM.Checking()) //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
+  {
     if ((Arm_Delay_Count > 20 && Arm_Delay_Count <= 30))
     {
       RGB.Function(PREARMFAIL);
@@ -132,8 +122,8 @@ void Pre_Arm_Leds(void)
         NotPriorit = false;
     }
   }
-  else
-  { //CASO CONTRARIO
+  else //CASO CONTRARIO
+  {
     if ((Arm_Delay_Count > 20 && Arm_Delay_Count <= 30))
     {
       RGB.Function(PREARMSUCESS);

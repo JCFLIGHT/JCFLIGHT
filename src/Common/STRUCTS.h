@@ -78,4 +78,13 @@ typedef struct
   int16_t ThrottleIdleValue = 0;
   uint16_t TPAThrottlePercent = 0;
 } TPA_Parameters_Struct;
+
+typedef struct Device_Struct
+{
+  float OldMeasure;
+  float NewMeasure;
+  float OldValue;
+  float NewValue;
+  int16_t MeasureCount;
+} Device_Struct;
 #endif

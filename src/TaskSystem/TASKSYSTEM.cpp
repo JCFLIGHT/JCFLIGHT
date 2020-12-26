@@ -19,7 +19,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "ProgMem/PROGMEM.h"
 
-TaskSystem_Class TaskSystem;
+TaskSystem_Class TASKSYSTEM;
 
 void TaskSystem_Class::Initialization(const TaskSystem_Class::Task *Tasks, uint8_t Number_Of_Tasks)
 {

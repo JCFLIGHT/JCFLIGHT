@@ -122,7 +122,7 @@ void setup()
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
     //INICIA O SISTEMA DE TASKS
-    TaskSystem.Initialization(&Scheduler_Tasks[0], sizeof(Scheduler_Tasks) / sizeof(Scheduler_Tasks[0]));
+    TASKSYSTEM.Initialization(&Scheduler_Tasks[0], sizeof(Scheduler_Tasks) / sizeof(Scheduler_Tasks[0]));
 }
 
 #ifdef __AVR_ATmega2560__
@@ -137,7 +137,7 @@ void loop()
 {
     //RODA EM LOOP O SISTEMA DE TASKS
     uint32_t Get_Timer_Now = AVRTIME.SchedulerMicros();
-    TaskSystem.UpdateTick();
+    TASKSYSTEM.UpdateTick();
     uint32_t Time_Available = (Get_Timer_Now + MAIN_LOOP_MICROS) - AVRTIME.SchedulerMicros();
-    TaskSystem.RunProcess(Time_Available);
+    TASKSYSTEM.RunProcess(Time_Available);
 }

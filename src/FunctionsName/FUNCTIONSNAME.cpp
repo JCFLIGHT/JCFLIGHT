@@ -28,13 +28,13 @@ const char Function_2[] __attribute__((__progmem__)) = "Fast_Medium_Loop()";
 const char Function_3[] __attribute__((__progmem__)) = "Fast_Loop()";
 const char Function_4[] __attribute__((__progmem__)) = "Integral_Loop()";
 
-const char *const Function_Table[] __attribute__((__progmem__)) =
-    {
-        Function_0,
-        Function_1,
-        Function_2,
-        Function_3,
-        Function_4};
+const char *const Function_Table[] __attribute__((__progmem__)) = {
+    Function_0,
+    Function_1,
+    Function_2,
+    Function_3,
+    Function_4,
+};
 
 void UpdateFunctionName(uint8_t FunctionNumber)
 {

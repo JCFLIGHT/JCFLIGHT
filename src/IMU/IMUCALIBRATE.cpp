@@ -30,15 +30,6 @@
 int16_t StoredValueOfGyro[3] = {0, 0, 0};
 int32_t StoredGyroZero[3] = {0, 0, 0};
 
-typedef struct Device_Struct
-{
-  float OldMeasure;
-  float NewMeasure;
-  float OldValue;
-  float NewValue;
-  int16_t MeasureCount;
-} Device_Struct;
-
 static void DeviceClear(Device_Struct *Device)
 {
   Device->MeasureCount = 0;

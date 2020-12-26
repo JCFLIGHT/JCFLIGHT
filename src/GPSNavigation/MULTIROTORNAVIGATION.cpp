@@ -409,7 +409,7 @@ void Reset_Home_Point(void)
     GPS_Calcule_Longitude_Scaling(GPS_Coordinates_Vector[0]);
     Navigation_Bearing_RTH = ATTITUDE.CalculedHeading;
     GPS_Altitude_For_Plane = GPS_Altitude;
-    Home_Point = 1;
+    Home_Point = true;
   }
 }
 

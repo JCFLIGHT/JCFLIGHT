@@ -19,6 +19,8 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "ProgMem/PROGMEM.h"
 
+TaskSystem_Class TaskSystem;
+
 void TaskSystem_Class::Initialization(const TaskSystem_Class::Task *Tasks, uint8_t Number_Of_Tasks)
 {
   _Tasks = Tasks;
@@ -47,7 +49,7 @@ void TaskSystem_Class::RunProcess(uint16_t Time_Available)
       if (_Task_Time_Allowed <= Time_Available)
       {
         _Task_Time_Started = Time_Now;
-        TaskSystem_FN func = (TaskSystem_FN)PGM_Read_Pointer(&_Tasks[i].Function);
+        TaskSystem_FN func = (TaskSystem_FN)(uint16_t)ProgMemReadWord(&_Tasks[i].Function);
         func();
         _Last_Run[i] = _Tick_Counter;
         Time_Now = AVRTIME.SchedulerMicros();
@@ -61,6 +63,7 @@ void TaskSystem_Class::RunProcess(uint16_t Time_Available)
     }
   }
   _Spare_Micros += Time_Available;
+
 update_Spare_Ticks:
   _Spare_Ticks++;
   if (_Spare_Ticks == 32)
@@ -68,14 +71,4 @@ update_Spare_Ticks:
     _Spare_Ticks /= 2;
     _Spare_Micros /= 2;
   }
-}
-
-uint8_t TaskSystem_Class::Calced_CPU_Load_Average(uint32_t Tick_Time_Usec) const
-{
-  if (_Spare_Ticks == 0)
-  {
-    return 0.0f;
-  }
-  uint32_t used_time = Tick_Time_Usec - (_Spare_Micros / _Spare_Ticks);
-  return (used_time / (float)Tick_Time_Usec) * 100;
 }

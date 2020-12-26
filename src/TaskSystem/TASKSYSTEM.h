@@ -31,7 +31,6 @@ public:
   void Initialization(const Task *Tasks, uint8_t Number_Of_Tasks);
   void UpdateTick(void);
   void RunProcess(uint16_t Time_Available);
-  uint8_t Calced_CPU_Load_Average(uint32_t Tick_Time_Usec) const;
 
 private:
   const struct Task *_Tasks;
@@ -43,4 +42,5 @@ private:
   uint32_t _Spare_Micros;
   uint8_t _Spare_Ticks;
 };
+extern TaskSystem_Class TaskSystem;
 #endif

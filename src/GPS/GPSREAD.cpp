@@ -209,7 +209,11 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
   FASTSERIAL.Begin(UART1, Get_BaudRate);
   for (uint8_t SizeOfCount = 0; SizeOfCount < sizeof(Ublox_Set_Configuration); SizeOfCount++)
   {
+#ifdef __AVR_ATmega2560__
     FASTSERIAL.Write(UART1, ProgMemReadByte(Ublox_Set_Configuration + SizeOfCount));
+#elif defined __arm__
+
+#endif
     AVRTIME.SchedulerSleep(5);
   }
 }

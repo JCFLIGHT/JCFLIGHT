@@ -20,6 +20,7 @@
 AnalogPinClass ADCPIN;
 
 #ifdef __AVR_ATmega2560__
+
 int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
 {
   uint8_t LowByte;
@@ -38,8 +39,10 @@ int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
 }
 
 #elif defined __arm__
+
 int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
 {
   return 0;
 }
+
 #endif

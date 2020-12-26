@@ -118,7 +118,7 @@ void FlightModesUpdate()
         GPS_HOME_MODE_FW = false;
         if (SetFlightModes[GPS_HOLD_MODE] && SticksInAutoPilotPosition(20))
         {
-          if (!GPS_HOLD_MODE)
+          if (!GPS_HOLD_MODE_FW)
           {
             GPS_HOLD_MODE_FW = true;
             GPSNavReset = false;

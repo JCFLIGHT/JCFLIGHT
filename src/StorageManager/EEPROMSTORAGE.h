@@ -25,7 +25,7 @@ public:
   int16_t Read_16Bits(int16_t Address);
   int32_t Read_32Bits(int16_t Address);
   float Read_Float(int16_t Address);
-  void Write_8Bits(int16_t Address, int8_t Value);
+  void Write_8Bits(int16_t Address, uint8_t Value);
   void Write_16Bits(int16_t Address, int16_t Value);
   void Write_32Bits(int16_t Address, int32_t Value);
   void Write_Float(int16_t Address, float Value);

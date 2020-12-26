@@ -23,7 +23,7 @@ EEPROMSTORAGE STORAGEMANAGER;
 
 #include <avr/eeprom.h>
 
-void EEPROMSTORAGE::Write_8Bits(int16_t Address, int8_t Value)
+void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)
 {
   eeprom_write_byte((uint8_t *)Address, Value);
 }

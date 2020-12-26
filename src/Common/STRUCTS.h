@@ -25,9 +25,9 @@
 typedef struct
 {
   int16_t AccelerometerRead[3];
-  int16_t AccelerometerReadNF[3];
+  int16_t AccelerometerReadNotFiltered[3];
   int16_t GyroscopeRead[3];
-  int16_t GyroscopeReadNF[3];
+  int16_t GyroscopeReadNotFiltered[3];
   int16_t CompassRead[3];
 } IMU_STRUCT;
 

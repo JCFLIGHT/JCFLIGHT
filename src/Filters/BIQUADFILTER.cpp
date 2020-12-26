@@ -15,14 +15,15 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-
 #include "BIQUADFILTER.h"
 #include "Math/AVRLOWER.h"
 #include "Math/AVRMATH.h"
 
 void BiQuadFilter::Settings(int16_t CutOffFreq, int16_t SampleFreq, uint8_t FilterType)
 {
-  float COF = MIN_FLOAT(float(CutOffFreq), float((SampleFreq / 2) - 1)); //CALCULA A FREQUENCIA DE CORTE
+  //CALCULA A FREQUENCIA DE CORTE
+  //A FREQUENCIA DE CORTE TEM QUE SER METADE DO RATE DA FUNÇÃO APLICADA
+  float COF = MIN_FLOAT(float(CutOffFreq), float((SampleFreq / 2) - 1));
   //GERA OS COEFICIENTES DO FILTRO BIQUADRATICO
   float Omega = tan(3.1415927f * COF / SampleFreq);
   float Normal = 1.0f / (1.0f + Omega / 0.7071f + Omega * Omega);

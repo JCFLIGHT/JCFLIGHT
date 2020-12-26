@@ -188,9 +188,9 @@ void Acc_ReadBufferData()
     return;
 
   //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS
-  IMU.AccelerometerReadNF[ROLL] = IMU.AccelerometerRead[ROLL];
-  IMU.AccelerometerReadNF[PITCH] = IMU.AccelerometerRead[PITCH];
-  IMU.AccelerometerReadNF[YAW] = IMU.AccelerometerRead[YAW];
+  IMU.AccelerometerReadNotFiltered[ROLL] = IMU.AccelerometerRead[ROLL];
+  IMU.AccelerometerReadNotFiltered[PITCH] = IMU.AccelerometerRead[PITCH];
+  IMU.AccelerometerReadNotFiltered[YAW] = IMU.AccelerometerRead[YAW];
 
   ApplySensorAlignment(IMU.AccelerometerRead);
 
@@ -230,9 +230,9 @@ void Gyro_ReadBufferData()
     return;
 
   //OBTÉM OS VALORES DO GYROSCOPIO ANTES DOS FILTROS
-  IMU.GyroscopeReadNF[ROLL] = IMU.GyroscopeRead[ROLL];
-  IMU.GyroscopeReadNF[PITCH] = IMU.GyroscopeRead[PITCH];
-  IMU.GyroscopeReadNF[YAW] = IMU.GyroscopeRead[YAW];
+  IMU.GyroscopeReadNotFiltered[ROLL] = IMU.GyroscopeRead[ROLL];
+  IMU.GyroscopeReadNotFiltered[PITCH] = IMU.GyroscopeRead[PITCH];
+  IMU.GyroscopeReadNotFiltered[YAW] = IMU.GyroscopeRead[YAW];
 
   //KALMAN
   if (ActiveKalman)

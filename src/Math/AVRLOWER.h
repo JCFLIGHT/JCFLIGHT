@@ -18,5 +18,5 @@
 #ifndef AVRLOWER_H_
 #define AVRLOWER_H_
 #include "Arduino.h"
-int32_t Multiplication32Bits(int16_t a, int16_t b);
+int32_t Multiplication32Bits(int16_t ValueA, int16_t ValueB);
 #endif

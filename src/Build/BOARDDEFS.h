@@ -35,7 +35,7 @@
 #define SAFETY_BUTTON_LED_ON PORTA &= ~(1 << 3)                          //ATIVA O LED DO SAFE BUTTON
 #define SAFETY_BUTTON_LED_OFF PORTA |= 1 << 3                            //DESATIVA O LED DO SAFE BUTTON
 #define BEEP_PINOUT DDRH |= (1 << DDD6)                                  //PORTA DIGITAL 9
-#define BEEP_ON OCR2B = 1000 >> 3                                        //REGISTRADOR PWM DO PINO 0
+#define BEEP_ON OCR2B = 1000 >> 3                                        //REGISTRADOR PWM DO PINO 9
 #define BEEP_OFF OCR2B = 0                                               //REGISTRADOR PWM DO PINO 9
 #define RED_LED_PINOUT DDRB |= (1 << DDD4)                               //DEFINE A PORTA DIGITAL 10 COMO SAIDA
 #define GREEN_LED_PINOUT DDRB |= (1 << DDD5)                             //DEFINE A PORTA DIGITAL 11 COMO SAIDA

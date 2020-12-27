@@ -25,6 +25,7 @@
 #include "PIDMIXING.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "WatchDog/REBOOT.h"
 
 //#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
 
@@ -114,8 +115,10 @@ void ConfigureRegisters()
 
 void PID_MixMotors()
 {
-  if (!SAFETYBUTTON.GetSafeStateToOutput())
+  if (!SAFETYBUTTON.GetSafeStateToOutput() || InShutDown)
+  {
     return;
+  }
   MixingApplyPIDControl();
   if (GetFrameStateOfMultirotor())
   {
@@ -147,8 +150,23 @@ void PulseInAllMotors(int16_t Pulse)
   ApplyPWMInAllComponents();
 }
 
+void ShutDownAllMotorsAndServos()
+{
+  InShutDown = true;
+  OCR3A = 0;
+  OCR3B = 0;
+  OCR3C = 0;
+  OCR4A = 0;
+  OCR4B = 0;
+  OCR4C = 0;
+}
+
 void ApplyPWMInAllComponents()
 {
+  if (InShutDown)
+  {
+    return;
+  }
 
 #ifdef __AVR_ATmega2560__
 

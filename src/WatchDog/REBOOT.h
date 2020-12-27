@@ -15,12 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MOTORS_H_
-#define MOTORS_H_
-#include "Arduino.h"
-void ConfigureRegisters();
-void PID_MixMotors();
-void PulseInAllMotors(int16_t Pulse);
-void ShutDownAllMotorsAndServos();
-void ApplyPWMInAllComponents();
+#ifndef REBOOT_H_
+#define REBOOT_H_
+extern bool InShutDown;
+void RebootThisBoard(void);
 #endif

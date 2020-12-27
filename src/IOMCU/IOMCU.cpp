@@ -41,6 +41,7 @@
 #include "AirSpeed/AIRSPEED.h"
 #include "Build/VERSION.h"
 #include "ProgMem/PROGMEM.h"
+#include "WatchDog/REBOOT.h"
 
 #include "PID/PIDXYZ.h" //APENAS PARA VISUALIZAR O CICLO DE MAQUINA
 
@@ -590,6 +591,14 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 26:
         SendStringToGCS(BuildTime);
+        break;
+
+    case 27:
+        //SendStringToGCS(BuildTime); PRE ARM ERROR
+        break;
+
+    case 28:
+        RebootThisBoard();
         break;
 
     default:

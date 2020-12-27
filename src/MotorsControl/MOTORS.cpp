@@ -26,7 +26,7 @@
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
-//#define PWM_PINS_IN_ORDER
+//#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
 
 void ConfigureRegisters()
 {
@@ -57,9 +57,13 @@ void ConfigureRegisters()
   TCCR3B |= (1 << WGM33);
   TCCR3B &= ~(1 << CS31);
   if (GetFrameStateOfAirPlane())
+  {
     ICR3 |= 40000; //50Hz
+  }
   else
+  {
     ICR3 |= 16383; //490Hz
+  }
 
   //CONFIGURA O TIMER 3
   TCCR3A |= _BV(COM3A1); //CONECTA O PINO 5 AO TIMER1 CANAL A
@@ -72,9 +76,13 @@ void ConfigureRegisters()
   TCCR4B |= (1 << WGM43);
   TCCR4B &= ~(1 << CS41);
   if (GetFrameStateOfAirPlane())
+  {
     ICR4 |= 40000; //50Hz
+  }
   else
+  {
     ICR4 |= 16383; //490Hz
+  }
 
   //CONFIGURA O TIMER 4
   TCCR4A |= _BV(COM4A1); //CONECTA O PINO 6 AO TIMER4 CANAL A
@@ -111,7 +119,7 @@ void PID_MixMotors()
   MixingApplyPIDControl();
   if (GetFrameStateOfMultirotor())
   {
-    int16_t SuportMotor = MotorControl[MOTOR1];
+    int16_t SuportMotor = MotorControl[MOTOR4];
     for (uint8_t i = 1; i < NumberOfMotors; i++)
       if (MotorControl[i] > SuportMotor)
         SuportMotor = MotorControl[i];
@@ -130,12 +138,12 @@ void PID_MixMotors()
 
 void PulseInAllMotors(int16_t Pulse)
 {
-  MotorControl[MOTOR1] = Pulse;
-  MotorControl[MOTOR2] = Pulse;
-  MotorControl[MOTOR3] = Pulse;
   MotorControl[MOTOR4] = Pulse;
-  MotorControl[MOTOR5] = Pulse;
+  MotorControl[MOTOR3] = Pulse;
+  MotorControl[MOTOR2] = Pulse;
+  MotorControl[MOTOR1] = Pulse;
   MotorControl[MOTOR6] = Pulse;
+  MotorControl[MOTOR5] = Pulse;
   ApplyPWMInAllComponents();
 }
 
@@ -146,21 +154,21 @@ void ApplyPWMInAllComponents()
 
 #ifndef PWM_PINS_IN_ORDER
 
-  OCR3C = MotorControl[MOTOR1] << 3; //PINO DIGITAL 3 (MOTOR 4 NO FRAME)
-  OCR3A = MotorControl[MOTOR2] << 3; //PINO DIGITAL 5 (MOTOR 3 NO FRAME)
-  OCR4A = MotorControl[MOTOR3] << 3; //PINO DIGITAL 6 (MOTOR 2 NO FRAME)
-  OCR3B = MotorControl[MOTOR4] << 3; //PINO DIGITAL 2 (MOTOR 1 NO FRAME)
-  OCR4B = MotorControl[MOTOR5] << 3; //PINO DIGITAL 7 (MOTOR 6 NO FRAME)
-  OCR4C = MotorControl[MOTOR6] << 3; //PINO DIGITAL 8 (MOTOR 5 NO FRAME)
+  OCR3C = MotorControl[MOTOR4] << 3; //PINO DIGITAL 3 (MOTOR 4 NO FRAME)
+  OCR3A = MotorControl[MOTOR3] << 3; //PINO DIGITAL 5 (MOTOR 3 NO FRAME)
+  OCR4A = MotorControl[MOTOR2] << 3; //PINO DIGITAL 6 (MOTOR 2 NO FRAME)
+  OCR3B = MotorControl[MOTOR1] << 3; //PINO DIGITAL 2 (MOTOR 1 NO FRAME)
+  OCR4B = MotorControl[MOTOR6] << 3; //PINO DIGITAL 7 (MOTOR 6 NO FRAME)
+  OCR4C = MotorControl[MOTOR5] << 3; //PINO DIGITAL 8 (MOTOR 5 NO FRAME)
 
 #else
 
-  OCR3B = MotorControl[MOTOR4] << 3; //PINO DIGITAL 2 (MOTOR 1 NO FRAME)
-  OCR3C = MotorControl[MOTOR3] << 3; //PINO DIGITAL 3 (MOTOR 2 NO FRAME)
-  OCR3A = MotorControl[MOTOR2] << 3; //PINO DIGITAL 5 (MOTOR 3 NO FRAME)
-  OCR4A = MotorControl[MOTOR1] << 3; //PINO DIGITAL 6 (MOTOR 4 NO FRAME)
-  OCR4B = MotorControl[MOTOR6] << 3; //PINO DIGITAL 7 (MOTOR 5 NO FRAME)
-  OCR4C = MotorControl[MOTOR5] << 3; //PINO DIGITAL 8 (MOTOR 6 NO FRAME)
+  OCR3B = MotorControl[MOTOR1] << 3; //PINO DIGITAL 2 (MOTOR 1 NO FRAME)
+  OCR3C = MotorControl[MOTOR2] << 3; //PINO DIGITAL 3 (MOTOR 2 NO FRAME)
+  OCR3A = MotorControl[MOTOR3] << 3; //PINO DIGITAL 5 (MOTOR 3 NO FRAME)
+  OCR4A = MotorControl[MOTOR4] << 3; //PINO DIGITAL 6 (MOTOR 4 NO FRAME)
+  OCR4B = MotorControl[MOTOR5] << 3; //PINO DIGITAL 7 (MOTOR 5 NO FRAME)
+  OCR4C = MotorControl[MOTOR6] << 3; //PINO DIGITAL 8 (MOTOR 6 NO FRAME)
 
 #endif
 

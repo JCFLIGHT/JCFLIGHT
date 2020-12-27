@@ -74,9 +74,9 @@ void Save_Trim_Run()
   //SALVA OS VALORES DE CALIBRAÇÃO ORIGINAIS PARA RESTAURAÇÃO CASO O SAVE-TRIM NÃO SEJA SALVO PELO USUARIO
   if (Save_Trim_Count == 50 && Restore_Acc_Values > 0 && Restore_Acc_Values < 10)
   {
-    Acc_Orig_Values[PITCH] = CALIBRATION.AccelerometerCalibration[PITCH]; //SALVA OS VALORES ORIGINAIS DO EIXO PITCH
-    Acc_Orig_Values[ROLL] = CALIBRATION.AccelerometerCalibration[ROLL];   //SALVA OS VALORES ORIGINAIS DO EIXO ROLL
-    Acc_Orig_Values[YAW] = CALIBRATION.AccelerometerCalibration[YAW];     //SALVA OS VALORES ORIGINAIS DO EIXO YAW
+    Acc_Orig_Values[PITCH] = CALIBRATION.AccelerometerZero[PITCH]; //SALVA OS VALORES ORIGINAIS DO EIXO PITCH
+    Acc_Orig_Values[ROLL] = CALIBRATION.AccelerometerZero[ROLL];   //SALVA OS VALORES ORIGINAIS DO EIXO ROLL
+    Acc_Orig_Values[YAW] = CALIBRATION.AccelerometerZero[YAW];     //SALVA OS VALORES ORIGINAIS DO EIXO YAW
   }
   if (Save_Trim_Count > 0 && Restore_Acc_Values > 10)
   {
@@ -94,9 +94,9 @@ void Save_Trim_Run()
     IMU.AccelerometerRead[PITCH] = 0;
     IMU.AccelerometerRead[ROLL] = 0;
     IMU.AccelerometerRead[YAW] = 0;
-    CALIBRATION.AccelerometerCalibration[PITCH] = 0;
-    CALIBRATION.AccelerometerCalibration[ROLL] = 0;
-    CALIBRATION.AccelerometerCalibration[YAW] = 0;
+    CALIBRATION.AccelerometerZero[PITCH] = 0;
+    CALIBRATION.AccelerometerZero[ROLL] = 0;
+    CALIBRATION.AccelerometerZero[YAW] = 0;
     if (Save_Trim_Count == 1)
     {
       /*
@@ -104,9 +104,9 @@ void Save_Trim_Run()
         SE O SAVE-TRIM FOR SALVO PELO USUARIO O SAVE-TRIM IRÁ PARA O PROXIMO PASSO (SALVAR NA EEPROM E APLICAR),
         CASO CONTRARIO OS VALORES DE CALIBRAÇÃO VOLTAM AOS VALORES ORIGINAIS DA CALIBRAÇÃO DE 6 EIXOS.
       */
-      CALIBRATION.AccelerometerCalibration[ROLL] = Acc_Orig_Values[ROLL];
-      CALIBRATION.AccelerometerCalibration[PITCH] = Acc_Orig_Values[PITCH];
-      CALIBRATION.AccelerometerCalibration[YAW] = Acc_Orig_Values[YAW];
+      CALIBRATION.AccelerometerZero[ROLL] = Acc_Orig_Values[ROLL];
+      CALIBRATION.AccelerometerZero[PITCH] = Acc_Orig_Values[PITCH];
+      CALIBRATION.AccelerometerZero[YAW] = Acc_Orig_Values[YAW];
       if (!SaveTrimState && COMMAND_ARM_DISARM)
         Save_Trim_Sucess = true;
     }
@@ -116,14 +116,14 @@ void Save_Trim_Run()
   {
     //O USUARIO QUIS SALVAR OS VALORES NA EEPROM?O DRONE FOI DESARMADO?SIM...
     //CALCULA A TRIMAGEM DE TODOS OS ANGULOS E CONVERTE PARA UM NOVO VALOR DE CALIBRAÇÃO E TERMINA TODO O PROCESSO DO SAVE-TRIM
-    CALIBRATION.AccelerometerCalibration[ROLL] = Angle_Trim[ROLL] / 50;
-    CALIBRATION.AccelerometerCalibration[PITCH] = Angle_Trim[PITCH] / 50;
-    CALIBRATION.AccelerometerCalibration[YAW] = Angle_Trim[YAW] / (-462);
-    //CALIBRATION.AccelerometerCalibration[YAW] = Angle_Trim[YAW] / 50 - 512;
+    CALIBRATION.AccelerometerZero[ROLL] = Angle_Trim[ROLL] / 50;
+    CALIBRATION.AccelerometerZero[PITCH] = Angle_Trim[PITCH] / 50;
+    CALIBRATION.AccelerometerZero[YAW] = Angle_Trim[YAW] / (-462);
+    //CALIBRATION.AccelerometerZero[YAW] = Angle_Trim[YAW] / 50 - 512;
     //SALVA TODOS OS VALORES DO SAVE-TRIM NA EEPROM
-    STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADDR, CALIBRATION.AccelerometerCalibration[ROLL]);
-    STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADDR, CALIBRATION.AccelerometerCalibration[PITCH]);
-    STORAGEMANAGER.Write_16Bits(ACC_YAW_ADDR, CALIBRATION.AccelerometerCalibration[YAW]);
+    STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADDR, CALIBRATION.AccelerometerZero[ROLL]);
+    STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADDR, CALIBRATION.AccelerometerZero[PITCH]);
+    STORAGEMANAGER.Write_16Bits(ACC_YAW_ADDR, CALIBRATION.AccelerometerZero[YAW]);
     CheckAndUpdateIMUCalibration();
     SucessOrFail = true;
     Save_Trim_EEPROM = false;

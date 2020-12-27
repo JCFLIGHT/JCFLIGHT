@@ -196,7 +196,7 @@ void CompassReadClass::Constant_Read()
     MagnetometerRead[ROLL] = MagnetometerRead[ROLL] * 0.9f + IMU.CompassRead[ROLL] * 0.1f;
   //AJUSTA O VALOR DO COMPASS COM A CALIBRAÇÃO GUARDADA NA EEPROM
   if (!CalibratingCompass)
-    IMU.CompassRead[ROLL] -= CALIBRATION.MagnetometerCalibration[ROLL];
+    IMU.CompassRead[ROLL] -= CALIBRATION.Magnetometer[ROLL];
 
   //APLICA O GANHO CALCULADO
   IMU.CompassRead[PITCH] = IMU.CompassRead[PITCH] * MagnetometerGain[PITCH];
@@ -205,7 +205,7 @@ void CompassReadClass::Constant_Read()
     MagnetometerRead[PITCH] = MagnetometerRead[PITCH] * 0.9f + IMU.CompassRead[PITCH] * 0.1f;
   //AJUSTA O VALOR DO COMPASS COM A CALIBRAÇÃO GUARDADA NA EEPROM
   if (!CalibratingCompass)
-    IMU.CompassRead[PITCH] -= CALIBRATION.MagnetometerCalibration[PITCH];
+    IMU.CompassRead[PITCH] -= CALIBRATION.Magnetometer[PITCH];
 
   //APLICA O GANHO CALCULADO
   IMU.CompassRead[YAW] = IMU.CompassRead[YAW] * MagnetometerGain[YAW];
@@ -214,7 +214,7 @@ void CompassReadClass::Constant_Read()
     MagnetometerRead[YAW] = MagnetometerRead[YAW] * 0.9f + IMU.CompassRead[YAW] * 0.1f;
   //AJUSTA O VALOR DO COMPASS COM A CALIBRAÇÃO GUARDADA NA EEPROM
   if (!CalibratingCompass)
-    IMU.CompassRead[YAW] -= CALIBRATION.MagnetometerCalibration[YAW];
+    IMU.CompassRead[YAW] -= CALIBRATION.Magnetometer[YAW];
 
   if (CalibratingCompass)
   {
@@ -244,17 +244,17 @@ void CompassReadClass::Constant_Read()
         MagCalibrationMaxVector[PITCH] = MagnetometerRead[PITCH];
       if (((int16_t)MagnetometerRead[YAW]) > MagCalibrationMaxVector[YAW])
         MagCalibrationMaxVector[YAW] = MagnetometerRead[YAW];
-      CALIBRATION.MagnetometerCalibration[ROLL] = (MagCalibrationMinVector[ROLL] + MagCalibrationMaxVector[ROLL]) >> 1;
-      CALIBRATION.MagnetometerCalibration[PITCH] = (MagCalibrationMinVector[PITCH] + MagCalibrationMaxVector[PITCH]) >> 1;
-      CALIBRATION.MagnetometerCalibration[YAW] = (MagCalibrationMinVector[YAW] + MagCalibrationMaxVector[YAW]) >> 1;
+      CALIBRATION.Magnetometer[ROLL] = (MagCalibrationMinVector[ROLL] + MagCalibrationMaxVector[ROLL]) >> 1;
+      CALIBRATION.Magnetometer[PITCH] = (MagCalibrationMinVector[PITCH] + MagCalibrationMaxVector[PITCH]) >> 1;
+      CALIBRATION.Magnetometer[YAW] = (MagCalibrationMinVector[YAW] + MagCalibrationMaxVector[YAW]) >> 1;
     }
     else
     {
       CalibratingCompass = false;
       CalibrationTime = 0;
-      STORAGEMANAGER.Write_16Bits(MAG_ROLL_ADDR, CALIBRATION.MagnetometerCalibration[ROLL]);
-      STORAGEMANAGER.Write_16Bits(MAG_PITCH_ADDR, CALIBRATION.MagnetometerCalibration[PITCH]);
-      STORAGEMANAGER.Write_16Bits(MAG_YAW_ADDR, CALIBRATION.MagnetometerCalibration[YAW]);
+      STORAGEMANAGER.Write_16Bits(MAG_ROLL_ADDR, CALIBRATION.Magnetometer[ROLL]);
+      STORAGEMANAGER.Write_16Bits(MAG_PITCH_ADDR, CALIBRATION.Magnetometer[PITCH]);
+      STORAGEMANAGER.Write_16Bits(MAG_YAW_ADDR, CALIBRATION.Magnetometer[YAW]);
       CheckAndUpdateIMUCalibration();
       BEEPER.Play(BEEPER_CALIBRATION_DONE);
     }

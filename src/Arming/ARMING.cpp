@@ -66,7 +66,7 @@ void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 
 bool PreArmClass::Checking(void)
 {
-    if (CALIBRATION.AccelerometerCalibration[ROLL] > 0x7D0) //IMU NÃO CALIBRADA
+    if (CALIBRATION.AccelerometerZero[ROLL] > 0x7D0) //IMU NÃO CALIBRADA
     {
         UpdateGCSErrorText(IMU_ERROR);
         return true;
@@ -76,11 +76,6 @@ bool PreArmClass::Checking(void)
     {
         UpdateGCSErrorText(FLIGHT_MODES_ERROR);
         return true;
-    }
-
-    if (!GLITCH.CheckGPS()) //CHECA O GPS,FAÇA APENAS A NOTIFICAÇÃO,NÃO IMPEÇA DE ARMAR
-    {
-        UpdateGCSErrorText(GPS_ERROR);
     }
 
     if (Fail_Safe_System > 5) //MODO FAIL-SAFE ATIVO
@@ -111,6 +106,11 @@ bool PreArmClass::Checking(void)
     {
         UpdateGCSErrorText(BATTERY_ERROR);
         return true;
+    }
+
+    if (!GLITCH.CheckGPS()) //CHECA O GPS,FAÇA APENAS A NOTIFICAÇÃO,NÃO IMPEÇA DE ARMAR
+    {
+        UpdateGCSErrorText(GPS_ERROR);
     }
 
     //TUDO ESTÁ OK,A CONTROLADORA ESTÁ PRONTA PARA ARMAR

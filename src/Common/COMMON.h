@@ -74,6 +74,5 @@
 #include "TimeMonitor/TIMEMONITOR.h"
 #include "FunctionsLoop/LOOPS.h"
 #include "ParamsToGCS/FULLPARAMS.h"
-#include "ServosPWR/SERVOSPWR.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "Build/BOARDDEFS.h"

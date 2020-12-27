@@ -22,18 +22,18 @@
 
 void CheckAndUpdateIMUCalibration()
 {
-  CALIBRATION.AccelerometerCalibration[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADDR);
-  CALIBRATION.AccelerometerCalibration[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADDR);
-  CALIBRATION.AccelerometerCalibration[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_ADDR);
-  CALIBRATION.AccelerometerCalibrationScale[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_SCALE_ADDR);
-  CALIBRATION.AccelerometerCalibrationScale[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_SCALE_ADDR);
-  CALIBRATION.AccelerometerCalibrationScale[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_SCALE_ADDR);
-  CALIBRATION.MagnetometerCalibration[ROLL] = STORAGEMANAGER.Read_16Bits(MAG_ROLL_ADDR);
-  CALIBRATION.MagnetometerCalibration[PITCH] = STORAGEMANAGER.Read_16Bits(MAG_PITCH_ADDR);
-  CALIBRATION.MagnetometerCalibration[YAW] = STORAGEMANAGER.Read_16Bits(MAG_YAW_ADDR);
+  CALIBRATION.AccelerometerZero[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADDR);
+  CALIBRATION.AccelerometerZero[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADDR);
+  CALIBRATION.AccelerometerZero[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_ADDR);
+  CALIBRATION.AccelerometerScale[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_SCALE_ADDR);
+  CALIBRATION.AccelerometerScale[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_SCALE_ADDR);
+  CALIBRATION.AccelerometerScale[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_SCALE_ADDR);
+  CALIBRATION.Magnetometer[ROLL] = STORAGEMANAGER.Read_16Bits(MAG_ROLL_ADDR);
+  CALIBRATION.Magnetometer[PITCH] = STORAGEMANAGER.Read_16Bits(MAG_PITCH_ADDR);
+  CALIBRATION.Magnetometer[YAW] = STORAGEMANAGER.Read_16Bits(MAG_YAW_ADDR);
   //APENAS PARA INDICAR PARA O GCS QUE A IMU NÃO ESTÁ CALIBRADA
-  if (CALIBRATION.AccelerometerCalibration[ROLL] == 0 &&
-      CALIBRATION.AccelerometerCalibration[PITCH] == 0 &&
-      CALIBRATION.AccelerometerCalibration[YAW] == 0)
-    CALIBRATION.AccelerometerCalibration[ROLL] = 0x10FE;
+  if (CALIBRATION.AccelerometerZero[ROLL] == 0 &&
+      CALIBRATION.AccelerometerZero[PITCH] == 0 &&
+      CALIBRATION.AccelerometerZero[YAW] == 0)
+    CALIBRATION.AccelerometerZero[ROLL] = 0x10FE;
 }

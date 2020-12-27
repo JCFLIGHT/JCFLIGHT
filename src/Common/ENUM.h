@@ -107,12 +107,12 @@ enum AuxiliarChannels_EEPROM_Enum
 
 enum PWM_Output_Enum
 {
-    MOTOR1 = 0,
-    MOTOR2,
+    MOTOR4 = 0,
     MOTOR3,
-    MOTOR4,
-    MOTOR5,
+    MOTOR2,
+    MOTOR1,
     MOTOR6,
+    MOTOR5,
     GIMBAL,
     PARACHUTESERVO
 };

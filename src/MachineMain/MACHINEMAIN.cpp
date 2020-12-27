@@ -32,7 +32,7 @@ A 100HZ,LOGO 100HZ SERÁ = 1,50HZ = 2,E ASSIM VAI,É SÓ IR DIVIDINDO O VALOR MA
   1000 = 0.1hz
 */
 
-static const TaskSystem_Class::Task Scheduler_Tasks[] PROGMEM = {
+static const TaskSystem_Class::Task Scheduler_Tasks[] __attribute__((__progmem__)) = {
     {Slow_Loop, 10, 100},
     {Medium_Loop, 2, 100},
     {Fast_Medium_Loop, 1, 100},

@@ -58,9 +58,9 @@ typedef struct
 
 typedef struct
 {
-  int16_t AccelerometerCalibration[3];
-  uint16_t AccelerometerCalibrationScale[3];
-  int16_t MagnetometerCalibration[3];
+  int16_t AccelerometerZero[3];
+  uint16_t AccelerometerScale[3];
+  int16_t Magnetometer[3];
 } CALIBRATION_STRUCT;
 
 struct PID_TERMS
@@ -87,4 +87,16 @@ typedef struct Device_Struct
   float NewValue;
   int16_t MeasureCount;
 } Device_Struct;
+
+typedef struct
+{
+  float Roll;
+  float Pitch;
+  float Yaw;
+} PID_Mixer_Struct;
+
+typedef struct
+{
+  uint8_t FrameMotorsCount;
+} Motors_Count_Struct;
 #endif

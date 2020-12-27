@@ -135,7 +135,9 @@ void ApplySensorAlignment(int16_t *Vector)
         SensorAlignmentInit = true;
     }
     if (WithoutSensorAlignment)
+    {
         return;
+    }
     Vector3x3_Struct IntVector = {.Vector = {Vector[ROLL], Vector[PITCH], Vector[YAW]}};
     RotationMatrixRotateVector(&IntVector, &IntVector, &SensorRotationMatrix);
     Vector[ROLL] = IntVector.Roll;

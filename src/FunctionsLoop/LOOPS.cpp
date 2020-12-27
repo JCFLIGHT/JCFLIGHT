@@ -33,7 +33,6 @@ void Slow_Loop()
         PID_DerivativeLPF_Update();
         UpdateValuesOfPID();
         UpdateServosDirection();
-        ServosPWR();
         GCS.UpdateParametersToGCS();
         PushWayPointParameters();
 

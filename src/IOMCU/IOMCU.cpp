@@ -604,7 +604,7 @@ void GCSClass::GCS_Request_Parameters()
 {
     //ENVIA OS PARAMETROS FUNDAMENTAIS PARA O GCS
     GCSParameters.SendAttitudePitch = Constrain_16Bits(ATTITUDE.AngleOut[PITCH], -900, 900);
-    if (CALIBRATION.AccelerometerCalibration[ROLL] > 1000)
+    if (CALIBRATION.AccelerometerZero[ROLL] > 1000)
         GCSParameters.SendAttitudeRoll = 3000; //INDICA PARA O GCS QUE A IMU NÃO ESTÁ CALIBRADA
     else
         GCSParameters.SendAttitudeRoll = Constrain_16Bits(ATTITUDE.AngleOut[ROLL], -900, 900);

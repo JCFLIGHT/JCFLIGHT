@@ -58,6 +58,22 @@
     __Result;                                                    \
 }))
 
+#define ProgMemReadFloat(Address) (__extension__({               \
+    uint16_t __Address16Bits = (uint16_t)(Address);              \
+    float __Result;                                              \
+    __asm__ __volatile__("lpm %A0, Z+"                           \
+                         "\n\t"                                  \
+                         "lpm %B0, Z+"                           \
+                         "\n\t"                                  \
+                         "lpm %C0, Z+"                           \
+                         "\n\t"                                  \
+                         "lpm %D0, Z"                            \
+                         "\n\t"                                  \
+                         : "=r"(__Result), "=z"(__Address16Bits) \
+                         : "1"(__Address16Bits));                \
+    __Result;                                                    \
+}))
+
 #elif defined __arm__
 
 #define ProgMemReadByte(Address) (*(const unsigned char *)(Address))

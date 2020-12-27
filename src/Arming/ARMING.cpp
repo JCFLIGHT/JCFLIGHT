@@ -36,6 +36,8 @@ enum GCS_Message_Type_Enum
     INCLINATION_ERROR,
     BUTTON_ERROR,
     BATTERY_ERROR,
+    COMPASS_ERROR,
+    BAROMETER_ERROR,
     NONE_ERROR = 254
 };
 
@@ -48,6 +50,8 @@ const char Message_5[] __attribute__((__progmem__)) = "Erro:Controladora muito i
 const char Message_6[] __attribute__((__progmem__)) = "Erro:O switch nao foi ativado para o modo safe;";
 const char Message_7[] __attribute__((__progmem__)) = "Erro:Bateria ruim;";
 const char Message_8[] __attribute__((__progmem__)) = "Nenhum erro,seguro para armar;";
+const char Message_9[] __attribute__((__progmem__)) = "Compass ruim;";
+const char Message_10[] __attribute__((__progmem__)) = "Barometro ruim;";
 
 void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 {
@@ -84,6 +88,14 @@ void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 
     case BATTERY_ERROR:
         GCS.SendStringToGCS(Message_7);
+        break;
+
+    case COMPASS_ERROR:
+        GCS.SendStringToGCS(Message_9);
+        break;
+
+    case BAROMETER_ERROR:
+        GCS.SendStringToGCS(Message_10);
         break;
 
     case NONE_ERROR:
@@ -132,6 +144,16 @@ uint8_t PreArmClass::Checking(void)
     if (!GLITCH.CheckGPS()) //CHECA O GPS
     {
         return GPS_ERROR;
+    }
+
+    if (!GLITCH.CheckCompass()) //CHECA O COMPASS
+    {
+        return COMPASS_ERROR;
+    }
+
+    if (!GLITCH.CheckBarometer()) //CHECA O BAROMETRO
+    {
+        return BAROMETER_ERROR;
     }
 
     //TUDO ESTÁ OK,A CONTROLADORA ESTÁ PRONTA PARA ARMAR

@@ -68,7 +68,9 @@ void RCSticks_Update()
           }
         }
         else
+        {
           COMMAND_ARM_DISARM = false;
+        }
       }
     }
   }
@@ -77,14 +79,16 @@ void RCSticks_Update()
 void Pre_Arm(void)
 {
   if (ArmDisarmConfig != 0)
+  {
     return; //FAÇA UMA RAPIDA SAÍDA SE O ARMDISARM ESTIVE CONFIGURADO PELA CHAVE AUX
+  }
   //ROTINA PRE-ARM
   if (ArmDelay)
   {
     Arm_Delay_Count++;
     if (Arm_Delay_Count > 30)
     {
-      if (PREARM.Checking()) //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
+      if (!PREARM.CheckSafeState()) //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
       {
         COMMAND_ARM_DISARM = false;
       }
@@ -111,7 +115,7 @@ void Pre_Arm_Leds(void)
     RGB.Function(PREARMINIT);
     BEEPER.Play(BEEPER_ARM);
   }
-  if (PREARM.Checking()) //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
+  if (!PREARM.CheckSafeState()) //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
   {
     if ((Arm_Delay_Count > 20 && Arm_Delay_Count <= 30))
     {

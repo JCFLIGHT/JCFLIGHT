@@ -22,10 +22,11 @@
 #include "BatteryMonitor/BATTERY.h"
 #include "ProgMem/PROGMEM.h"
 #include "Glitch/GLITCH.h"
+#include "IOMCU/IOMCU.h"
 
 PreArmClass PREARM;
 
-enum GCS_Error_Type_Enum
+enum GCS_Message_Type_Enum
 {
     IMU_ERROR = 0,
     FLIGHT_MODES_ERROR,
@@ -34,85 +35,112 @@ enum GCS_Error_Type_Enum
     GYRO_EEROR,
     INCLINATION_ERROR,
     BUTTON_ERROR,
-    BATTERY_ERROR
+    BATTERY_ERROR,
+    NONE_ERROR = 254
 };
 
-char SendGCSErrorText[40];
-
-const char Error_0[] __attribute__((__progmem__)) = "ACELEROMETRO RUIM";
-const char Error_1[] __attribute__((__progmem__)) = "MODOS DE VOO ATIVADOS";
-const char Error_2[] __attribute__((__progmem__)) = "GPS RUIM";
-const char Error_3[] __attribute__((__progmem__)) = "FAIL-SAFE ATIVADO";
-const char Error_4[] __attribute__((__progmem__)) = "GYROSCOPIO RUIM";
-const char Error_5[] __attribute__((__progmem__)) = "CONTROLADORA INCLINADA DEMAIS";
-const char Error_6[] __attribute__((__progmem__)) = "MODO SAFE NÃO ATIVADO COM O BOTÃO";
-const char Error_7[] __attribute__((__progmem__)) = "BATERIA RUIM";
-
-const char *const Error_Table[] __attribute__((__progmem__)) = {
-    Error_0,
-    Error_1,
-    Error_2,
-    Error_3,
-    Error_4,
-    Error_5,
-    Error_6,
-    Error_7,
-};
+const char Message_0[] __attribute__((__progmem__)) = "Erro:Acelerometro ruim;";
+const char Message_1[] __attribute__((__progmem__)) = "Erro:Modo de voo ativo;";
+const char Message_2[] __attribute__((__progmem__)) = "Erro:GPS Glitch;";
+const char Message_3[] __attribute__((__progmem__)) = "Erro:Fail-Safe ativo;";
+const char Message_4[] __attribute__((__progmem__)) = "Erro:Gyroscopio ruim;";
+const char Message_5[] __attribute__((__progmem__)) = "Erro:Controladora muito inclinada;";
+const char Message_6[] __attribute__((__progmem__)) = "Erro:O switch nao foi ativado para o modo safe;";
+const char Message_7[] __attribute__((__progmem__)) = "Erro:Bateria ruim;";
+const char Message_8[] __attribute__((__progmem__)) = "Nenhum erro,seguro para armar;";
 
 void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 {
-    strcpy_P(SendGCSErrorText, (char *)ProgMemReadDWord((uint16_t)(&(Error_Table[GCSErrorType]))));
+    switch (GCSErrorType)
+    {
+
+    case IMU_ERROR:
+        GCS.SendStringToGCS(Message_0);
+        break;
+
+    case FLIGHT_MODES_ERROR:
+        GCS.SendStringToGCS(Message_1);
+        break;
+
+    case GPS_ERROR:
+        GCS.SendStringToGCS(Message_2);
+        break;
+
+    case FAIL_SAFE_ERROR:
+        GCS.SendStringToGCS(Message_3);
+        break;
+
+    case GYRO_EEROR:
+        GCS.SendStringToGCS(Message_4);
+        break;
+
+    case INCLINATION_ERROR:
+        GCS.SendStringToGCS(Message_5);
+        break;
+
+    case BUTTON_ERROR:
+        GCS.SendStringToGCS(Message_6);
+        break;
+
+    case BATTERY_ERROR:
+        GCS.SendStringToGCS(Message_7);
+        break;
+
+    case NONE_ERROR:
+        GCS.SendStringToGCS(Message_8);
+        break;
+    }
 }
 
-bool PreArmClass::Checking(void)
+uint8_t PreArmClass::Checking(void)
 {
     if (CALIBRATION.AccelerometerZero[ROLL] > 0x7D0) //IMU NÃO CALIBRADA
     {
-        UpdateGCSErrorText(IMU_ERROR);
-        return true;
+        return IMU_ERROR;
     }
 
     if (SetFlightModes[ALTITUDE_HOLD_MODE] || GPS_Flight_Mode != GPS_MODE_NONE) //MODOS DE VOO ATIVOS
     {
-        UpdateGCSErrorText(FLIGHT_MODES_ERROR);
-        return true;
+        return FLIGHT_MODES_ERROR;
     }
 
     if (Fail_Safe_System > 5) //MODO FAIL-SAFE ATIVO
     {
-        UpdateGCSErrorText(FAIL_SAFE_ERROR);
-        return true;
+        return FAIL_SAFE_ERROR;
     }
 
     if (CalibratingGyroscope > 0) //GYROSCOPIO EM CALIBRAÇÃO
     {
-        UpdateGCSErrorText(GYRO_EEROR);
-        return true;
+        return GYRO_EEROR;
     }
 
     if (CheckInclinationForCopter()) //INCLINAÇÃO DE 25 GRAUS DETECTADA
     {
-        UpdateGCSErrorText(INCLINATION_ERROR);
-        return true;
+        return INCLINATION_ERROR;
     }
 
     if (!SAFETYBUTTON.GetSafeStateToOutput()) //SAFETY-BUTTON EMBARCADO,PORÉM NÃO ESTÁ NO MODE "SAFE"
     {
-        UpdateGCSErrorText(BUTTON_ERROR);
-        return true;
+        return BUTTON_ERROR;
     }
 
     if (BATTERY.LowBattPreventArm) //BATERIA COM BAIXA TENSÃO
     {
-        UpdateGCSErrorText(BATTERY_ERROR);
-        return true;
+        return BATTERY_ERROR;
     }
 
-    if (!GLITCH.CheckGPS()) //CHECA O GPS,FAÇA APENAS A NOTIFICAÇÃO,NÃO IMPEÇA DE ARMAR
+    if (!GLITCH.CheckGPS()) //CHECA O GPS
     {
-        UpdateGCSErrorText(GPS_ERROR);
+        return GPS_ERROR;
     }
 
     //TUDO ESTÁ OK,A CONTROLADORA ESTÁ PRONTA PARA ARMAR
+    return 254;
+}
+
+bool PreArmClass::CheckSafeState(void)
+{
+    if (Checking() == 254)
+        return true;
     return false;
 }

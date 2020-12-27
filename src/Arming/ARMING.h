@@ -21,8 +21,9 @@
 class PreArmClass
 {
 public:
-    bool Checking(void);
-    void UpdateGCSErrorText(uint8_t GCSErrorType);
+  bool CheckSafeState(void);
+  uint8_t Checking(void);
+  void UpdateGCSErrorText(uint8_t GCSErrorType);
 };
 extern PreArmClass PREARM;
 #endif

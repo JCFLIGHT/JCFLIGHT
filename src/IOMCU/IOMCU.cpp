@@ -347,7 +347,7 @@ static void __attribute__((noinline)) GCS_Get_Struct_Params(uint8_t *CheckBuffer
         *CheckBuffer++ = SerialInputBuffer[VectorCount++] & 0xff;
 }
 
-static void SendStringToGCS(const char *String)
+void GCSClass::SendStringToGCS(const char *String)
 {
     Communication_Passed(false, strlen_P(String));
 #ifdef __AVR_ATmega2560__
@@ -361,7 +361,7 @@ static void SendStringToGCS(const char *String)
     GCS_Send_Data(SerialCheckSum);
     FASTSERIAL.UartSendData(UART0);
 }
-
+#include "Arming/ARMING.h"
 void GCSClass::Serial_Parse_Protocol()
 {
 #ifdef LOCK_GCS
@@ -594,11 +594,17 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 27:
-        //SendStringToGCS(BuildTime); PRE ARM ERROR
+        if (!COMMAND_ARM_DISARM)
+        {
+            PREARM.UpdateGCSErrorText(PREARM.Checking());
+        }
         break;
 
     case 28:
-        RebootThisBoard();
+        if (!COMMAND_ARM_DISARM)
+        {
+            RebootThisBoard();
+        }
         break;
 
     default:

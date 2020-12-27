@@ -25,6 +25,7 @@ public:
   bool UpdatePID = false;
   void Serial_Parse_Protocol();
   void UpdateParametersToGCS();
+  void SendStringToGCS(const char *String);
 
 private:
   uint8_t GetDevicesActived();

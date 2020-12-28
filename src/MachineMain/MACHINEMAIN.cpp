@@ -16,29 +16,6 @@
 */
 
 #include "MACHINEMAIN.h"
-#include "TaskSystem/TASKSYSTEM.h"
-
-/*
-OS NÚMEROS SÃO CALCULADOS A PARTIR DO VALOR DO LOOP EM MICROSEGUNDOS,NO ATMEGA2560 É 1000,O QUE EQUIVALE
-A 100HZ,LOGO 100HZ SERÁ = 1,50HZ = 2,E ASSIM VAI,É SÓ IR DIVIDINDO O VALOR MAIS SIGNIFICANTE PARA OBTER OS OUTROS
-  1    = 100hz
-  2    = 50hz
-  4    = 25hz
-  10   = 10hz
-  20   = 5hz
-  33   = 3hz
-  50   = 2hz
-  100  = 1hz
-  1000 = 0.1hz
-*/
-
-static const TaskSystem_Class::Task Scheduler_Tasks[] __attribute__((__progmem__)) = {
-    {Slow_Loop, 10, 100},
-    {Medium_Loop, 2, 100},
-    {Fast_Medium_Loop, 1, 100},
-    {Fast_Loop, 1, 100},
-    {Integral_Loop, 1, 100},
-};
 
 #ifdef __AVR_ATmega2560__
 
@@ -121,8 +98,6 @@ void setup()
     BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
-    //INICIA O SISTEMA DE TASKS
-    TASKSYSTEM.Initialization(&Scheduler_Tasks[0], sizeof(Scheduler_Tasks) / sizeof(Scheduler_Tasks[0]));
 }
 
 #ifdef __AVR_ATmega2560__
@@ -135,9 +110,9 @@ void loop()
 
 #endif
 {
-    //RODA EM LOOP O SISTEMA DE TASKS
-    uint32_t Get_Timer_Now = AVRTIME.SchedulerMicros();
-    TASKSYSTEM.UpdateTick();
-    uint32_t Time_Available = (Get_Timer_Now + MAIN_LOOP_MICROS) - AVRTIME.SchedulerMicros();
-    TASKSYSTEM.RunProcess(Time_Available);
+    Slow_Loop();
+    Medium_Loop();
+    Fast_Medium_Loop();
+    Fast_Loop();
+    Integral_Loop();
 }

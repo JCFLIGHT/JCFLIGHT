@@ -86,7 +86,7 @@ void Switch_Flag(void)
   }
   else
   { //CONTROLADORA DESARMADA?SIM...
-    if (GuardValue == 8 && CloseReset > 2 && CloseReset < 5)
+    if (GuardValue == 8 && CloseReset > 2 && CloseReset < 4)
       CalibratingCompass = true; //O VALOR GUARDADO É IGUAL A 8?E A DECREMENTAÇÃO ACABOU?SIM...INICIA A CALIBRAÇÃO DO COMPASS
     if (GuardValue == 8 && CloseReset == 2)
       GuardValue = 0;

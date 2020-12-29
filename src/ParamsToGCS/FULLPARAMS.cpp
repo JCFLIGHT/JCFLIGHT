@@ -194,7 +194,7 @@ void SetNewValue(const char *ParamName, int32_t NewValue)
 {
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
-    if (StringCompare(ParamName, Params_Table[Table_Counter].Param_Name, StringLength(Params_Table[Table_Counter].Param_Name)) == 0)
+    if (StringCompare(ParamName, Params_Table[Table_Counter].Param_Name, strlen_P(Params_Table[Table_Counter].Param_Name)) == 0)
     {
       if (NewValue >= Params_Table[Table_Counter].Value_Min && NewValue <= Params_Table[Table_Counter].Value_Max)
       {

@@ -29,9 +29,9 @@ BATT BATTERY;
 AverageFilterFloat_Size12 Voltage_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A TENSÃO,TAMANHO = 12 ITERAÇÕES
 AverageFilterFloat_Size12 Current_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A CORRENTE,TAMANHO = 12 ITERAÇÕES
 
-#define THIS_LOOP_RATE 100      //HZ
-#define TIMER_TO_DETECT_BATT 3  //SEGUNDOS
-#define PREVENT_ARM_LOW_BATT 20 //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
+#define THIS_LOOP_RATE 100          //HZ
+#define TIMER_TO_AUTO_DETECT_BATT 3 //SEGUNDOS
+#define PREVENT_ARM_LOW_BATT 20     //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
 
 //VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
 float BattVoltageFactor = 237.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
@@ -45,16 +45,16 @@ void BATT::Read_Voltage(void)
   //TENSÃO DA BATERIA ACIMA DE 5V?SIM...
   if (Voltage > 5)
   {
-    if (BATTERY.GetPercentage() < PREVENT_ARM_LOW_BATT && !LowBattPreventArm) //MENOR QUE 20%
+    if (BATTERY.GetPercentage() < PREVENT_ARM_LOW_BATT) //MENOR QUE 20%
     {
       LowBattPreventArm = true;
-    }
-    else
-    {
       if (BEEPER.SafeToOthersBeepsCounter > 200)
       {
         BEEPER.Play(BEEPER_BAT_CRIT_LOW);
       }
+    }
+    else
+    {
       LowBattPreventArm = false;
     }
   }
@@ -86,19 +86,19 @@ float BATT::AutoBatteryMin(float BattVoltage)
       return BATT_6S_LOW_VOLTAGE;
     if (BattVoltage > BATT_3S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_3S_SAFE_HIGH_VOLTAGE)
     { //BATERIA 3S (3.6 x 3 = 10.8v)
-      if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_DETECT_BATT)
+      if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
         BattMinVoltageSelect = BATTERY_3S;
       return BATT_3S_LOW_VOLTAGE;
     }
     else if (BattVoltage > BATT_4S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_4S_SAFE_HIGH_VOLTAGE)
     { //BATERIA 4S (3.6 x 4 = 14.4v)
-      if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_DETECT_BATT)
+      if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
         BattMinVoltageSelect = BATTERY_4S;
       return BATT_4S_LOW_VOLTAGE;
     }
     else if (BattVoltage > BATT_6S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_6S_SAFE_HIGH_VOLTAGE)
     { //BATERIA 6S (3.6 x 6 = 21.6v)
-      if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_DETECT_BATT)
+      if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
         BattMinVoltageSelect = BATTERY_6S;
       return BATT_6S_LOW_VOLTAGE;
     }
@@ -120,19 +120,19 @@ float BATT::AutoBatteryMax(float BattVoltage)
       return BATT_6S_SAFE_HIGH_VOLTAGE;
     if (BattVoltage > BATT_3S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_3S_SAFE_HIGH_VOLTAGE)
     { //BATERIA 3S (4.2 x 3 = 12.6v)
-      if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_DETECT_BATT)
+      if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
         BattMaxVoltageSelect = BATTERY_3S;
       return BATT_3S_SAFE_HIGH_VOLTAGE;
     }
     else if (BattVoltage > BATT_4S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_4S_SAFE_HIGH_VOLTAGE)
     { //BATERIA 4S (4.2 x 4 = 16.8v)
-      if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_DETECT_BATT)
+      if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
         BattMaxVoltageSelect = BATTERY_4S;
       return BATT_4S_SAFE_HIGH_VOLTAGE;
     }
     else if (BattVoltage > BATT_6S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_6S_SAFE_HIGH_VOLTAGE)
     { //BATERIA 6S (4.2 x 6 = 25.2v)
-      if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_DETECT_BATT)
+      if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
         BattMaxVoltageSelect = BATTERY_6S;
       return BATT_6S_SAFE_HIGH_VOLTAGE;
     }

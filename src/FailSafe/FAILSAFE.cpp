@@ -28,9 +28,13 @@
 void FailSafeCheck()
 {
   if (Fail_Safe_System > (THIS_LOOP_RATE * FAILSAFE_DELAY2) && COMMAND_ARM_DISARM)
+  {
     ImmediatelyFailSafe = true;
+  }
   else
+  {
     ImmediatelyFailSafe = false;
+  }
   if (Fail_Safe_System > (THIS_LOOP_RATE * FAILSAFE_DELAY) && COMMAND_ARM_DISARM)
   {
     NormalizeFailSafe();
@@ -57,7 +61,9 @@ void FailSafeCheck()
   else
   {
     if (!RTHControlAux)
+    {
       SetFlightModes[RTH_MODE] = false;
+    }
   }
 }
 

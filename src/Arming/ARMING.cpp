@@ -141,11 +141,6 @@ uint8_t PreArmClass::Checking(void)
         return BATTERY_ERROR;
     }
 
-    if (!GLITCH.CheckGPS()) //CHECA O GPS
-    {
-        return GPS_ERROR;
-    }
-
     if (!GLITCH.CheckCompass()) //CHECA O COMPASS
     {
         return COMPASS_ERROR;
@@ -156,13 +151,23 @@ uint8_t PreArmClass::Checking(void)
         return BAROMETER_ERROR;
     }
 
+    if (!GLITCH.CheckGPS()) //CHECA O GPS
+    {
+        return GPS_ERROR;
+    }
+
     //TUDO ESTÁ OK,A CONTROLADORA ESTÁ PRONTA PARA ARMAR
-    return 254;
+    return NONE_ERROR;
 }
 
 bool PreArmClass::CheckSafeState(void)
 {
-    if (Checking() == 254)
+    if (Checking() == NONE_ERROR ||    //NENHUM DISPOSITVO ESTÁ RUIM
+        Checking() == GPS_ERROR ||     //NOTIFIQUE QUE O GPS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+        Checking() == COMPASS_ERROR || //NOTIFIQUE QUE O COMPASS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+        Checking() == BAROMETER_ERROR) //NOTIFIQUE QUE O BAROMETRO ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+    {
         return true;
+    }
     return false;
 }

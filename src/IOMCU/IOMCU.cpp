@@ -42,6 +42,7 @@
 #include "Build/VERSION.h"
 #include "ProgMem/PROGMEM.h"
 #include "WatchDog/REBOOT.h"
+#include "Arming/ARMING.h"
 
 #include "PID/PIDXYZ.h" //APENAS PARA VISUALIZAR O CICLO DE MAQUINA
 
@@ -361,7 +362,7 @@ void GCSClass::SendStringToGCS(const char *String)
     GCS_Send_Data(SerialCheckSum);
     FASTSERIAL.UartSendData(UART0);
 }
-#include "Arming/ARMING.h"
+
 void GCSClass::Serial_Parse_Protocol()
 {
 #ifdef LOCK_GCS

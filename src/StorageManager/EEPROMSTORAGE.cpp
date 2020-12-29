@@ -67,7 +67,7 @@ float EEPROMSTORAGE::Read_Float(int16_t Address)
 
 #elif defined __arm__
 
-void EEPROMSTORAGE::Write_8Bits(int16_t Address, int8_t Value)
+void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)
 {
 }
 

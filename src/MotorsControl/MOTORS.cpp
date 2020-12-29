@@ -153,12 +153,16 @@ void PulseInAllMotors(int16_t Pulse)
 void ShutDownAllMotorsAndServos()
 {
   InShutDown = true;
+#ifdef __AVR_ATmega2560__
   OCR3A = 0;
   OCR3B = 0;
   OCR3C = 0;
   OCR4A = 0;
   OCR4B = 0;
   OCR4C = 0;
+#elif defined __arm__
+
+#endif
 }
 
 void ApplyPWMInAllComponents()

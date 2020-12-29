@@ -21,6 +21,8 @@
 
 bool InShutDown = false;
 
+#ifdef __AVR_ATmega2560__
+
 static __inline__ __attribute__((__always_inline__)) void WatchDogReset(const uint8_t ResetDelay)
 {
     if (_SFR_IO_REG_P(WDTCSR))
@@ -69,13 +71,23 @@ static __inline__ __attribute__((__always_inline__)) void WatchDogReset(const ui
     }
 }
 
+#elif defined __arm__
+
+#endif
+
 void RebootThisBoard(void)
 {
     ShutDownAllMotorsAndServos();
     AVRTIME.SchedulerSleep(1000); //ESPERA O MICROCONTROLADOR DOS ESCS REAGIREM AO PULSO EM LOW
+#ifdef __AVR_ATmega2560__
+
     __asm__ __volatile__("cli" ::
                              : "memory");
     WatchDogReset(0); //WATCHDOG 15MS
     for (;;)
         ;
+
+#elif defined __arm__
+
+#endif
 }

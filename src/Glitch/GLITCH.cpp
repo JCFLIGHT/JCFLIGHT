@@ -17,6 +17,7 @@
 
 #include "GLITCH.h"
 #include "Common/VARIABLES.h"
+#include "I2C/I2C.h"
 
 GlitchClass GLITCH;
 
@@ -31,10 +32,20 @@ bool GlitchClass::CheckGPS(void)
 
 bool GlitchClass::CheckBarometer(void)
 {
+    //BAROMETRO NÃO ENCONTRADO NO BARRAMENTO I2C
+    if (!I2C.BarometerFound)
+    {
+        return false;
+    }
     return true;
 }
 
 bool GlitchClass::CheckCompass(void)
 {
+    //COMPASS NÃO ENCONTRADO NO BARRAMENTO I2C
+    if (!I2C.CompassFound)
+    {
+        return false;
+    }
     return true;
 }

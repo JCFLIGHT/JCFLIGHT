@@ -148,7 +148,7 @@ void Integral_Loop()
                 AirSpeed_Update();
                 Apply_Controll_For_Throttle();
                 GPS_Orientation_Update();
-                PID_Time();
+                Update_Loop_Time();
                 PID_Update();
                 PID_Reset_Integral_Accumulators();
                 PID_MixMotors();

@@ -20,12 +20,9 @@
 #include "Arduino.h"
 typedef struct PT1Filter
 {
-    float State;
-    float RC;
-    float DeltaTime;
+  float State;
+  float RC;
+  float DeltaTime;
 } PT1_Filter_Struct;
-void PT1FilterInit(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime);
-void PT1FilterInitRC(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime);
 float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime);
-float PT1FilterApply2(PT1_Filter_Struct *Filter, float Input);
 #endif

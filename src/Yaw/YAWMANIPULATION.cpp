@@ -21,6 +21,7 @@
 #include "AHRS/AHRS.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Filters/PT1.h"
+#include "Scheduler/SCHEDULER.h"
 
 #define HEADING_HOLD_ERROR_LPF_FREQ 2
 
@@ -72,7 +73,7 @@ float GetHeadingHoldValue()
   //APLICA LIMITES MIN E MAX NO RATE
   HeadingHoldRate = Constrain_Float(HeadingHoldRate, -Heading_Hold_Rate_Limit, Heading_Hold_Rate_Limit);
   //REALIZA FILTRAGEM DO RATE COM O PT1
-  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, AVRTIME.SchedulerMicros() * 1e-6);
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, Loop_Integral_Time * 1e-6);
   //APLICA O CONTROLE DO YAW
   return HeadingHoldRate;
 }

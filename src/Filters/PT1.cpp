@@ -22,18 +22,6 @@
 //T = DURAÇÃO
 //1 = PRIMEIRA ORDEM
 
-void PT1FilterInit(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime)
-{
-    PT1FilterInitRC(Filter, 1.0f / (2.0f * 3.14159265358979323846f * CutOff), DeltaTime);
-}
-
-void PT1FilterInitRC(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime)
-{
-    Filter->State = 0.0f;
-    Filter->RC = CutOff;
-    Filter->DeltaTime = DeltaTime;
-}
-
 float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime)
 {
     //CALCULA O VALOR RC DO FILTRO
@@ -42,7 +30,10 @@ float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequen
     {
         Filter->RC = 1.0f / (2.0f * 3.14159265358979323846f * CutOffFrequency);
     }
-    Filter->DeltaTime = DeltaTime;                                                                  //GUARDA O ÚLTIMO VALOR DO DELTA TIME
-    Filter->State = Filter->State + DeltaTime / (Filter->RC + DeltaTime) * (Input - Filter->State); //CALCULA O VALOR DO FILTRO
-    return Filter->State;                                                                           //RETORNA O VALOR FILTRADO
+    //GUARDA O ÚLTIMO VALOR DO DELTA TIME
+    Filter->DeltaTime = DeltaTime;
+    //CALCULA O VALOR DO FILTRO
+    Filter->State = Filter->State + DeltaTime / (Filter->RC + DeltaTime) * (Input - Filter->State);
+    //RETORNA O VALOR FILTRADO
+    return Filter->State;
 }

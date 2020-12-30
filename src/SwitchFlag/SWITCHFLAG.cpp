@@ -34,7 +34,7 @@
 //SAVE-TRIM SÓ FUNCIONA COM A CONTROLADORA ARMADA E EM VOO COM O PERFIL DE QUAD OU HEXA
 //********************************************************************************************
 
-uint8_t SaveTrimState;
+uint8_t SaveTrimState; //REMOVIDO DO ALGORITIMO
 uint8_t FlagParameterFunction;
 uint8_t GuardValue;
 float CloseReset;
@@ -46,8 +46,8 @@ void Switch_Flag(void)
   //INICIA A CONTAGEM DA FLAG PRINCIPAL
   if (IOCControlAux)
   {
-    if ((AVRTIME.SchedulerMillis() - TimerFunction) > 50)
-    { //DEBOUNCE
+    if ((AVRTIME.SchedulerMillis() - TimerFunction) > 50) //DEBOUNCE
+    {
       FlagParameterFunction += 1;
       if (GuardValue >= 4 && GuardValue <= 12)
         GuardValue += 1;

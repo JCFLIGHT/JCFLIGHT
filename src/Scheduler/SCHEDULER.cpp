@@ -18,6 +18,8 @@
 #include "SCHEDULER.h"
 #include "SCHEDULERTIME.h"
 
+uint16_t Loop_Integral_Time = 0;
+
 bool SchedulerTimer(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime)
 {
   uint32_t StoredTime = AVRTIME.SchedulerMicros();
@@ -28,6 +30,13 @@ bool SchedulerTimer(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime)
     SchedulerPointer->StoredTime = StoredTime;
     return true;
   }
-  else
-    return false;
+  return false;
+}
+
+void Update_Loop_Time()
+{
+  static uint32_t Loop_Guard_Time = 0;
+  uint32_t Actual_Loop_TIme = AVRTIME.SchedulerMicros();
+  Loop_Integral_Time = Actual_Loop_TIme - Loop_Guard_Time;
+  Loop_Guard_Time = Actual_Loop_TIme;
 }

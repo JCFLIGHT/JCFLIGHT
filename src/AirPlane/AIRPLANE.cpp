@@ -23,6 +23,9 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
+
+#include "Filters/PT1.h"
+
 #include "FastSerial/PRINTF.h"
 
 #define PULSE_MIN 500                                                                     //PULSO MINIMO PARA OS SERVOS
@@ -160,18 +163,17 @@ void Servo_Rate_Adjust()
     DeviceFiltered[SERVO2] = (int16_t)LowPassFilter(&LPFDevice[SERVO2], MotorControl[MOTOR3], Servo_LPF_CutOff, LPF_SETPOINT);
     DeviceFiltered[SERVO3] = (int16_t)LowPassFilter(&LPFDevice[SERVO3], MotorControl[MOTOR4], Servo_LPF_CutOff, LPF_SETPOINT);
     DeviceFiltered[SERVO4] = (int16_t)LowPassFilter(&LPFDevice[SERVO4], MotorControl[MOTOR5], Servo_LPF_CutOff, LPF_SETPOINT);
+
+#if defined(PRINTLN_SERVO_SIGNAL)
+    FastSerialPrintln(PSTR("Servo1:%d Servo1Filt:%d\n"),
+                      MotorControl[MOTOR2],
+                      DeviceFiltered[SERVO1]);
+#endif
+
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
     MotorControl[MOTOR2] = Constrain_16Bits(DeviceFiltered[SERVO1], PULSE_MIN, PULSE_MAX); //SERVO 1
     MotorControl[MOTOR3] = Constrain_16Bits(DeviceFiltered[SERVO2], PULSE_MIN, PULSE_MAX); //SERVO 2
     MotorControl[MOTOR4] = Constrain_16Bits(DeviceFiltered[SERVO3], PULSE_MIN, PULSE_MAX); //SERVO 3
     MotorControl[MOTOR5] = Constrain_16Bits(DeviceFiltered[SERVO4], PULSE_MIN, PULSE_MAX); //SERVO 4
   }
-
-#if defined(PRINTLN_SERVO_SIGNAL)
-  FastSerialPrintln(PSTR("Servo1:%d COMMAND_ARM_DISARM:%d AirPlaneMotor:%d RCController[YAW]:%d\n"),
-                    MotorControl[MOTOR2],
-                    COMMAND_ARM_DISARM,
-                    AirPlaneMotor,
-                    RCController[YAW]);
-#endif
 }

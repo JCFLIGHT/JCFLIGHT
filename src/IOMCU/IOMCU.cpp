@@ -667,7 +667,7 @@ void GCSClass::GCS_Request_Parameters()
 #ifndef MACHINE_CYCLE
     GCSParameters.SendCourseOverGround = GPS_Ground_Course;
 #else
-    GCSParameters.SendCourseOverGround = PID_Integral_Time;
+    GCSParameters.SendCourseOverGround = Loop_Integral_Time;
 #endif
     GCSParameters.SendCrosstrack = Target_Bearing;
     GCSParameters.SendAccGForce = GetGForce() * 100;

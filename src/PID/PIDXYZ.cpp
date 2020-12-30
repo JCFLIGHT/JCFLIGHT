@@ -30,6 +30,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Yaw/YAWMANIPULATION.h"
 #include "RadioControl/CURVESRC.h"
+#include "Scheduler/SCHEDULER.h"
 
 //STABILIZE
 #define STAB_PITCH_ANGLE_MAX 45 //GRAUS
@@ -47,20 +48,11 @@ int16_t Get_LPF_Derivative_Value = 0;
 int16_t CalcedRateTargetRoll = 0;
 int16_t CalcedRateTargetPitch = 0;
 int16_t CalcedRateTargetYaw = 0;
-uint16_t PID_Integral_Time = 0;
 int32_t IntegralGyroError_Yaw = 0;
-uint32_t PID_Guard_Time = 0;
 
 void PID_DerivativeLPF_Update()
 {
   Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
-}
-
-void PID_Time()
-{
-  uint32_t PIDTimer = AVRTIME.SchedulerMicros();
-  PID_Integral_Time = PIDTimer - PID_Guard_Time;
-  PID_Guard_Time = PIDTimer;
 }
 
 void PID_Update()
@@ -100,7 +92,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   static int16_t SimpleFilterPIDThree;
   int16_t RadioControlToPID;
   RadioControlToPID = RateTargetInput << 1;
-  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * PID_Integral_Time) >> 12);
+  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * Loop_Integral_Time) >> 12);
   IntegralGyroError[ROLL] = Constrain_16Bits(IntegralGyroError[ROLL] + PIDError, -16000, +16000);
   if (ABS_16BITS(IMU.GyroscopeRead[ROLL]) > 640)
     IntegralGyroError[ROLL] = 0;
@@ -122,7 +114,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
     {
       MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -SPORT_ROLL_ANGLE_MAX * 10, +SPORT_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
     }
-    IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * PID_Integral_Time) >> 12)), -10000, +10000);
+    IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_X = PID[PIDAUTOLEVEL].DerivativeVector * 5;
     ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_X, +Limit_Proportional_X);
@@ -165,7 +157,7 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   static int16_t SimpleFilterPIDTwo;
   static int16_t SimpleFilterPIDThree;
   RadioControlToPID = RateTargetInput << 1;
-  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * PID_Integral_Time) >> 12);
+  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * Loop_Integral_Time) >> 12);
   IntegralGyroError[PITCH] = Constrain_16Bits(IntegralGyroError[PITCH] + PIDError, -16000, +16000);
   if (ABS_16BITS(IMU.GyroscopeRead[PITCH]) > 640)
     IntegralGyroError[PITCH] = 0;
@@ -187,7 +179,7 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
     {
       MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -SPORT_PITCH_ANGLE_MAX * 10, +SPORT_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
     }
-    IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * PID_Integral_Time) >> 12)), -10000, +10000);
+    IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_Y = PID[PIDAUTOLEVEL].DerivativeVector * 5;
     ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_Y, +Limit_Proportional_Y);
@@ -242,7 +234,7 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
     DerivativeTerminate = Multiplication32Bits(DeltaYawSmallFilterStored, PID[YAW].DerivativeVector) >> 6;
     DerivativeTerminate = Constrain_16Bits(DerivativeTerminate, -150, 150);
   }
-  IntegralGyroError_Yaw += Multiplication32Bits((int16_t)(((int32_t)PIDError * PID_Integral_Time) >> 12), PID[YAW].IntegratorVector);
+  IntegralGyroError_Yaw += Multiplication32Bits((int16_t)(((int32_t)PIDError * Loop_Integral_Time) >> 12), PID[YAW].IntegratorVector);
   if (GetFrameStateOfAirPlane())
     IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, -(((int32_t)IntegralGyroMax) << 13), (((int32_t)IntegralGyroMax) << 13));
   else

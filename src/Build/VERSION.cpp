@@ -19,8 +19,10 @@
 
 #ifdef __AVR_ATmega2560__
 #define FC_FIRMWARE_NAME "JCFLIGHT-ZION"
-#elif defined __arm__
+#elif defined ARDUINO_GENERICSTM32F411CE
 #define FC_FIRMWARE_NAME "JCFLIGHT-PASCAL"
+#elif defined STM32F407xx
+#define FC_FIRMWARE_NAME "JCFLIGHT-EXTREME"
 #endif
 #define FC_VERSION_MAJOR 1
 #define FC_VERSION_MINOR 0

@@ -41,6 +41,8 @@ enum GCS_Message_Type_Enum
     NONE_ERROR = 254
 };
 
+#ifdef __AVR_ATmega2560__
+
 const char Message_0[] __attribute__((__progmem__)) = "Erro:Acelerometro ruim;";
 const char Message_1[] __attribute__((__progmem__)) = "Erro:Modo de voo ativo;";
 const char Message_2[] __attribute__((__progmem__)) = "Erro:GPS Glitch;";
@@ -52,6 +54,22 @@ const char Message_7[] __attribute__((__progmem__)) = "Erro:Bateria ruim;";
 const char Message_8[] __attribute__((__progmem__)) = "Nenhum erro,seguro para armar;";
 const char Message_9[] __attribute__((__progmem__)) = "Compass ruim;";
 const char Message_10[] __attribute__((__progmem__)) = "Barometro ruim;";
+
+#elif defined __arm__
+
+const char *const Message_0 = "Erro:Acelerometro ruim;";
+const char *const Message_1 = "Erro:Modo de voo ativo;";
+const char *const Message_2 = "Erro:GPS Glitch;";
+const char *const Message_3 = "Erro:Fail-Safe ativo;";
+const char *const Message_4 = "Erro:Gyroscopio ruim;";
+const char *const Message_5 = "Erro:Controladora muito inclinada;";
+const char *const Message_6 = "Erro:O switch nao foi ativado para o modo safe;";
+const char *const Message_7 = "Erro:Bateria ruim;";
+const char *const Message_8 = "Nenhum erro,seguro para armar;";
+const char *const Message_9 = "Compass ruim;";
+const char *const Message_10 = "Barometro ruim;";
+
+#endif
 
 void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 {

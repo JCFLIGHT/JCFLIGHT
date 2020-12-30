@@ -20,6 +20,8 @@
 #include "Arduino.h"
 #include "Common/STRUCTS.h"
 
+#ifdef __AVR_ATmega2560__
+
 static const PID_Mixer_Struct Pid_Mixer_Quad_X[] __attribute__((__progmem__)) = {
     {+1.0f, -1.0f, -1.0f}, //MOTOR 1
     {+1.0f, +1.0f, +1.0f}, //MOTOR 2
@@ -69,5 +71,59 @@ static const Motors_Count_Struct Motors_Count[] __attribute__((__progmem__)) = {
     {4}, //ZMR250
     {4}, //TBS
 };
+
+#elif defined __arm__
+
+static const PID_Mixer_Struct Pid_Mixer_Quad_X[] = {
+    {+1.0f, -1.0f, -1.0f}, //MOTOR 1
+    {+1.0f, +1.0f, +1.0f}, //MOTOR 2
+    {-1.0f, -1.0f, +1.0f}, //MOTOR 3
+    {-1.0f, +1.0f, -1.0f}, //MOTOR 4
+};
+
+static const PID_Mixer_Struct Pid_Mixer_Hexa_X[] = {
+    {+0.8f, -0.9f, -1.0f}, //MOTOR 1
+    {+0.8f, +0.9f, -1.0f}, //MOTOR 2
+    {-0.8f, -0.9f, +1.0f}, //MOTOR 3
+    {-0.8f, +0.9f, +1.0f}, //MOTOR 4
+    {+0.8f, +0.0f, +1.0f}, //MOTOR 5
+    {-0.8f, +0.0f, -1.0f}, //MOTOR 6
+};
+
+static const PID_Mixer_Struct Pid_Mixer_Hexa_I[] = {
+    {+0.9f, -0.8f, -1.0f}, //MOTOR 1
+    {+0.9f, +0.8f, +1.0f}, //MOTOR 2
+    {-0.9f, -0.8f, -1.0f}, //MOTOR 3
+    {-0.9f, +0.8f, +1.0f}, //MOTOR 4
+    {+0.0f, +0.8f, -1.0f}, //MOTOR 5
+    {+0.0f, -0.8f, +1.0f}, //MOTOR 6
+};
+
+static const PID_Mixer_Struct Pid_Mixer_ZMR250[] = {
+    {+1.0f, -0.772f, -1.0f}, //MOTOR 1
+    {+1.0f, +0.772f, +1.0f}, //MOTOR 2
+    {-1.0f, -0.772f, +1.0f}, //MOTOR 3
+    {-1.0f, +0.772f, -1.0f}, //MOTOR 4
+};
+
+static const PID_Mixer_Struct Pid_Mixer_TBS[] = {
+    {+1.0f, -0.647f, -1.0f},   //MOTOR 1
+    {+0.848f, +0.647f, +1.0f}, //MOTOR 2
+    {-1.0f, -0.647f, +1.0f},   //MOTOR 3
+    {-0.848f, +0.647f, -1.0f}, //MOTOR 4
+};
+
+static const Motors_Count_Struct Motors_Count[] = {
+    {4}, //QUAD X
+    {6}, //HEXA X
+    {6}, //HEXA I
+    {0}, //AEROMODELO
+    {0}, //ASA-FIXA
+    {0}, //AEROMODELO DO TIPO V-TAIL
+    {4}, //ZMR250
+    {4}, //TBS
+};
+
+#endif
 
 #endif

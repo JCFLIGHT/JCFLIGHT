@@ -62,11 +62,11 @@ void LEDRGB::Function(uint8_t Mode)
     break;
 
   case ACCLED:
-    RGB.ACC_Led();
+    RGB.CalibAccLed();
     break;
 
   case MAGLED:
-    RGB.MAG_Led();
+    RGB.CalibMagLed();
     break;
 
   case CONFIGFLIGHT:
@@ -79,21 +79,6 @@ void LEDRGB::Function(uint8_t Mode)
 
   case CALIBRATIONESCFINISH:
     RGB.CalibEscFinish_Led();
-    break;
-
-  case SAVINGVALUESSAVETRIM:
-    RGB.Saving_SaveTrim_Led();
-    NotPriorit = true;
-    break;
-
-  case SUCESSSAVETRIM:
-    RGB.Sucess_SaveTrim_Led();
-    NotPriorit = true;
-    break;
-
-  case FAILSAVETRIM:
-    RGB.Fail_SaveTrim_Led();
-    NotPriorit = true;
     break;
 
   case PREARMINIT:
@@ -118,7 +103,7 @@ void LEDRGB::Function(uint8_t Mode)
   }
 }
 
-void LEDRGB::ACC_Led(void)
+void LEDRGB::CalibAccLed(void)
 {
   //LED RGB
   LedRGB[RED] = 0;     //VERMELHO
@@ -126,7 +111,7 @@ void LEDRGB::ACC_Led(void)
   LedRGB[BLUE] = 220;  //AZUL
 }
 
-void LEDRGB::MAG_Led(void)
+void LEDRGB::CalibMagLed(void)
 {
   //LED RGB
   LedRGB[RED] = 180;  //VERMELHO
@@ -287,27 +272,6 @@ void LEDRGB::GPS_Led(void)
     else
       RGB.Off_All_Leds();
   }
-}
-
-void LEDRGB::Saving_SaveTrim_Led(void)
-{
-  LedRGB[RED] = 0;    //VERMELHO
-  LedRGB[GREEN] = 0;  //VERDE
-  LedRGB[BLUE] = 254; //AZUL
-}
-
-void LEDRGB::Sucess_SaveTrim_Led(void)
-{
-  LedRGB[RED] = 0;     //VERMELHO
-  LedRGB[GREEN] = 254; //VERDE
-  LedRGB[BLUE] = 0;    //AZUL
-}
-
-void LEDRGB::Fail_SaveTrim_Led(void)
-{
-  LedRGB[RED] = 254; //VERMELHO
-  LedRGB[GREEN] = 0; //VERDE
-  LedRGB[BLUE] = 0;  //AZUL
 }
 
 void LEDRGB::Pre_Arm_Initializing(void)

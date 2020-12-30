@@ -29,15 +29,12 @@ public:
   void Off_All_Leds(void);
 
 private:
-  void ACC_Led(void);
-  void MAG_Led(void);
+  void CalibAccLed(void);
+  void CalibMagLed(void);
   void ConfigFlight_Led(void);
   void CalibEsc_Led(void);
   void CalibEscFinish_Led(void);
   void GPS_Led(void);
-  void Saving_SaveTrim_Led(void);
-  void Sucess_SaveTrim_Led(void);
-  void Fail_SaveTrim_Led(void);
   void Pre_Arm_Initializing(void);
   void Pre_Arm_Sucess(void);
   void Pre_Arm_Fail(void);

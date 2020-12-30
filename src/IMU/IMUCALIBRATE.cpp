@@ -20,7 +20,6 @@
 #include "PID/PIDPARAMS.h"
 #include "LedRGB/LEDRGB.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "SAVETRIM.h"
 #include "Math/AVRMATH.h"
 #include "Buzzer/BUZZER.h"
 #include "ParamsToGCS/IMUCALGCS.h"
@@ -79,8 +78,8 @@ void Gyroscope_Calibration()
       if ((GyroDeviation[ROLL] > 32) ||
           (GyroDeviation[PITCH] > 32) ||
           (GyroDeviation[YAW] > 32))
-      {                                        //CHECA SE A IMU FOI MOVIDA DURANTE A CALIBRAÇÃO
-        CalibratingGyroscope = 513;            //REINICIA A CALIBRAÇÃO
+      {                                  //CHECA SE A IMU FOI MOVIDA DURANTE A CALIBRAÇÃO
+        CalibratingGyroscope = 513;      //REINICIA A CALIBRAÇÃO
         BEEPER.Play(BEEPER_ACTION_FAIL); //SINALIZA COM O BUZZER QUE HOUVE UM ERRO
       }
       else
@@ -155,10 +154,10 @@ void Accelerometer_Calibration()
         int8_t AccCalibIndexThree = (AccCalibIndex + 2) % 3;
         if (ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
                        CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexTwo] -
-                                                                                         CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
+                                                                                  CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
             ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
                        CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexThree] -
-                                                                                         CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
+                                                                                  CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
         {
           AxisToCalibration = AccCalibIndex;
           CALIBRATION.AccelerometerZero[AxisToCalibration] = 0;
@@ -200,7 +199,6 @@ void Accelerometer_Calibration()
     }
     CalibratingAccelerometer--;
   }
-  Save_Trim_Init();
   if (CALIBRATION.AccelerometerScale[ROLL] ||
       CALIBRATION.AccelerometerScale[PITCH] ||
       CALIBRATION.AccelerometerScale[YAW]) //APLICA ACELERAÇÃO ZERO

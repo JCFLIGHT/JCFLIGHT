@@ -44,7 +44,7 @@ bool GetSafeStateOfHeadingHold()
   if (GPS_Flight_Mode == Do_None) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
     return false;
 
-  if (ABS_16BITS(RCController[YAW]) > 10) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
+  if (ABS_16BITS(RCController[YAW]) > 5) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
     return false;
 
   return true; //TUDO ESTÁ OK

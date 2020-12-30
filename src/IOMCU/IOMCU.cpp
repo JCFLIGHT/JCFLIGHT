@@ -43,8 +43,8 @@
 #include "ProgMem/PROGMEM.h"
 #include "WatchDog/REBOOT.h"
 #include "Arming/ARMING.h"
-
-#include "PID/PIDXYZ.h" //APENAS PARA VISUALIZAR O CICLO DE MAQUINA
+#include "PID/PIDXYZ.h"
+#include "Scheduler/SCHEDULER.h"
 
 GCSClass GCS;
 

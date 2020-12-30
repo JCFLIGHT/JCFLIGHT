@@ -23,9 +23,6 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
-
-#include "Filters/PT1.h"
-
 #include "FastSerial/PRINTF.h"
 
 #define PULSE_MIN 500                                                                     //PULSO MINIMO PARA OS SERVOS
@@ -134,7 +131,9 @@ void AirPlane_Mode_PlaneVTail_Run()
 void Servo_Rate_Adjust()
 {
   if (GetFrameStateOfMultirotor())
+  {
     return;
+  }
   //CASO OS SERVOS INICIEM COM O PULSO MINIMO É POR QUE O SERVO TRIM NÃO FOI FEITO,OS VALORES GUARDADOS NA EEPROM SERÃO 0 (ZERO),ZERO É IGUAL A -127 NO TRIM
   //RATE PARA OS SERVOS
   //SERVO 1

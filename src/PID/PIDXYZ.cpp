@@ -59,7 +59,7 @@ void PID_Update()
 {
   CalcedRateTargetRoll = RCControllerToRate(RCController[ROLL], RCRate);
   CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
-  if (Do_HeadingHold_Mode && GetSafeStateOfHeadingHold())
+  if (GetSafeStateOfHeadingHold())
   {
     CalcedRateTargetYaw = GetHeadingHoldValue();
   }

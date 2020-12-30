@@ -38,14 +38,25 @@ void UpdateStateOfHeadingHold(void)
 
 bool GetSafeStateOfHeadingHold()
 {
-  if (CheckAnglesInclination(25)) //NÃO APLICA A CORREÇÃO DO YAW SE OS ANGULOS FOREM MAIOR QUE 25 GRAUS
+  if (!Do_HeadingHold_Mode) //NÃO APLICA A CORREÇÃO DO YAW SE O MODO NÃO ESTIVER ATIVO
+  {
     return false;
+  }
+
+  if (CheckAnglesInclination(25)) //NÃO APLICA A CORREÇÃO DO YAW SE OS ANGULOS FOREM MAIOR QUE 25 GRAUS
+  {
+    return false;
+  }
 
   if (GPS_Flight_Mode == Do_None) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
+  {
     return false;
+  }
 
   if (ABS_16BITS(RCController[YAW]) > 5) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
+  {
     return false;
+  }
 
   return true; //TUDO ESTÁ OK
 }

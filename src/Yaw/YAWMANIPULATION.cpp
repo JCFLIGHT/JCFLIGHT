@@ -31,9 +31,9 @@ void UpdateStateOfHeadingHold(void)
 {
   if (!COMMAND_ARM_DISARM)
   {
-    HeadingHoldRateFilter.State = 0.0f; //RESETA O FILTRO
+    HeadingHoldRateFilter.State = 0.0f;           //RESETA O FILTRO
+    HeadingHoldTarget = ATTITUDE.CalculedHeading; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
   }
-  HeadingHoldTarget = ATTITUDE.CalculedHeading; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
 }
 
 bool GetSafeStateOfHeadingHold()
@@ -53,7 +53,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (ABS_16BITS(RCController[YAW]) > 5) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
+  if (ABS_16BITS(RCController[YAW]) > 10) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
   {
     return false;
   }

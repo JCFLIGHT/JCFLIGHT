@@ -63,7 +63,6 @@ void RCSticks_Update()
             {
               COMMAND_ARM_DISARM = true;
               IOC_Initial_Compass = ATTITUDE.CalculedHeading;
-              HeadingHoldTarget = ATTITUDE.CalculedHeading;
             }
           }
         }
@@ -98,7 +97,6 @@ void Pre_Arm(void)
         {
           COMMAND_ARM_DISARM = true;
           IOC_Initial_Compass = ATTITUDE.CalculedHeading;
-          HeadingHoldTarget = ATTITUDE.CalculedHeading;
         }
       }
       ArmDelay = false;

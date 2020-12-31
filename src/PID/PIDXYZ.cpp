@@ -32,11 +32,15 @@
 #include "RadioControl/CURVESRC.h"
 #include "Scheduler/SCHEDULER.h"
 
-//STABILIZE
+//STABILIZE PARA MULTIROTORES
 #define STAB_PITCH_ANGLE_MAX 45 //GRAUS
 #define STAB_ROLL_ANGLE_MAX 45  //GRAUS
 
-//SPORT
+//STABILIZE PARA AEROS
+#define STAB_PLANE_PITCH_ANGLE_MAX 35 //GRAUS
+#define STAB_PLANE_ROLL_ANGLE_MAX 35  //GRAUS
+
+//SPORT PARA MULTIROTORES
 #define SPORT_PITCH_ANGLE_MAX 55 //GRAUS
 #define SPORT_ROLL_ANGLE_MAX 55  //GRAUS
 
@@ -120,7 +124,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
     }
     else
     {
-      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_ROLL_ANGLE_MAX * 10, +STAB_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
+      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_PLANE_ROLL_ANGLE_MAX * 10, +STAB_PLANE_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
     }
     IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
@@ -193,7 +197,7 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
     }
     else
     {
-      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PITCH_ANGLE_MAX * 10, +STAB_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
+      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PLANE_PITCH_ANGLE_MAX * 10, +STAB_PLANE_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
     }
     IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;

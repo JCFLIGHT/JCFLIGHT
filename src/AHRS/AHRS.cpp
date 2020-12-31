@@ -85,7 +85,7 @@ void AHRS_Initialization(void)
   CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedvalueInRadians);
   CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedvalueInRadians);
   CorrectedMagneticFieldNorth.Yaw = 0;
-  //RESETA O QUATERNION,A MATRIX E O FILTRO
+  //RESETA O QUATERNION E A MATRIX
   QuaternionInitUnit(&Orientation);
   ComputeRotationMatrix();
 }

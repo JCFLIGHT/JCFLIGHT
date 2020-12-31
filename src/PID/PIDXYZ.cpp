@@ -105,14 +105,22 @@ void PID_Controll_Roll(int16_t RateTargetInput)
       if (!SetFlightModes[ATACK_MODE])
       {
         if (!ApplyFlipRoll)
+        {
           MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_ROLL_ANGLE_MAX * 10, +STAB_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
+        }
         else
+        {
           MaxMinAngle = FlipAngleValue;
+        }
+      }
+      else
+      {
+        MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -SPORT_ROLL_ANGLE_MAX * 10, +SPORT_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
       }
     }
     else
     {
-      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -SPORT_ROLL_ANGLE_MAX * 10, +SPORT_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
+      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_ROLL_ANGLE_MAX * 10, +STAB_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
     }
     IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
@@ -170,14 +178,22 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
       if (!SetFlightModes[ATACK_MODE])
       {
         if (!ApplyFlipPitch)
+        {
           MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PITCH_ANGLE_MAX * 10, +STAB_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
+        }
         else
+        {
           MaxMinAngle = FlipAngleValue;
+        }
+      }
+      else
+      {
+        MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -SPORT_PITCH_ANGLE_MAX * 10, +SPORT_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
       }
     }
     else
     {
-      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -SPORT_PITCH_ANGLE_MAX * 10, +SPORT_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
+      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PITCH_ANGLE_MAX * 10, +STAB_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
     }
     IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
@@ -218,15 +234,23 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
   static int16_t LastGyroYawValue = 0;
   static int16_t DeltaYawSmallFilterStored = 0;
   if (GetFrameStateOfAirPlane())
+  {
     IntegralGyroMax = 200;
+  }
   else
+  {
     IntegralGyroMax = 250;
+  }
   RadioControlToPID = Multiplication32Bits(RateTargetInput, (2 * YawRate + 30)) >> 5;
   if (GetFrameStateOfAirPlane())
+  {
     PIDError = TurnControllerForAirPlane(RadioControlToPID);
+  }
   else
+  {
     PIDError = RadioControlToPID - IMU.GyroscopeRead[YAW];
-  if (!Do_IOC_Mode) //STABILIZE OU ACRO
+  }
+  if (!Do_IOC_Mode && GetFrameStateOfAirPlane()) //MODO MANUAL DESATIVADO E PERFIL DE AERO?SIM...
   {
     DeltaYawSmallFilter = IMU.GyroscopeRead[YAW] - LastGyroYawValue;
     DeltaYawSmallFilterStored = (DeltaYawSmallFilterStored >> 1) + (DeltaYawSmallFilter >> 1);
@@ -236,22 +260,36 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
   }
   IntegralGyroError_Yaw += Multiplication32Bits((int16_t)(((int32_t)PIDError * Loop_Integral_Time) >> 12), PID[YAW].IntegratorVector);
   if (GetFrameStateOfAirPlane())
+  {
     IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, -(((int32_t)IntegralGyroMax) << 13), (((int32_t)IntegralGyroMax) << 13));
+  }
   else
+  {
     IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, 2 - ((int32_t)1 << 28), -2 + ((int32_t)1 << 28));
+  }
   if (ABS_16BITS(RadioControlToPID) > 50)
+  {
     IntegralGyroError_Yaw = 0;
+  }
   ProportionalTerminate = Multiplication32Bits(PIDError, PID[YAW].ProportionalVector) >> 6;
   int16_t Limit_Proportional_Z = 300 - PID[YAW].DerivativeVector;
   ProportionalTerminate = Constrain_16Bits(ProportionalTerminate, -Limit_Proportional_Z, +Limit_Proportional_Z);
   if (GetFrameStateOfAirPlane())
+  {
     IntegratorTerminate = constrain((int16_t)(IntegralGyroError_Yaw >> 13), -IntegralGyroMax, +IntegralGyroMax);
+  }
   else
+  {
     IntegratorTerminate = (IntegralGyroError_Yaw >> 13);
+  }
   if (GetFrameStateOfAirPlane())
+  {
     PIDControllerApply[YAW] = Constrain_16Bits(ProportionalTerminate + IntegratorTerminate - DerivativeTerminate, -500, 500);
+  }
   else
+  {
     PIDControllerApply[YAW] = ProportionalTerminate + IntegratorTerminate;
+  }
 }
 
 int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)

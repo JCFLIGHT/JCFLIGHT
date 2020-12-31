@@ -58,7 +58,7 @@ void AirPlane_Mode_ConventionalPlane_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   if (!OkToTrimServo)
   {
-    if (Do_IOC_Mode) //MANUAL
+    if (Do_IOC_Mode) //MODO MANUAL
     {
       MotorControl[MOTOR2] = RCController[PITCH] * ServoDirection[0]; //WING     (SERVO 1 DA ASA)
       MotorControl[MOTOR3] = RCController[PITCH] * ServoDirection[1]; //WING     (SERVO 2 DA ASA)
@@ -86,7 +86,7 @@ void AirPlane_Mode_FixedWing_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   if (!OkToTrimServo)
   {
-    if (Do_IOC_Mode) //MANUAL
+    if (Do_IOC_Mode) //MODO MANUAL
     {
       MotorControl[MOTOR2] = (RCController[PITCH] * ServoDirection[0]) + (RCController[ROLL] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
       MotorControl[MOTOR3] = (RCController[PITCH] * ServoDirection[0]) - (RCController[ROLL] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
@@ -110,7 +110,7 @@ void AirPlane_Mode_PlaneVTail_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   if (!OkToTrimServo)
   {
-    if (Do_IOC_Mode) //MANUAL
+    if (Do_IOC_Mode) //MODO MANUAL
     {
       MotorControl[MOTOR2] = RCController[ROLL] * ServoDirection[0];                        //WING     (SERVO 1 DA ASA)
       MotorControl[MOTOR3] = RCController[ROLL] * ServoDirection[1];                        //WING     (SERVO 2 DA ASA)

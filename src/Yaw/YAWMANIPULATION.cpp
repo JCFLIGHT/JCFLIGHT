@@ -22,7 +22,9 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Filters/PT1.h"
 #include "Scheduler/SCHEDULER.h"
+#include "FastSerial/PRINTF.h"
 
+//#define DEBUG
 #define HEADING_HOLD_ERROR_LPF_FREQ 2
 
 static PT1_Filter_Struct HeadingHoldRateFilter;
@@ -53,7 +55,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (ABS_16BITS(RCController[YAW]) > 10) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
+  if (ABS_16BITS(RCController[YAW]) != 0) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
   {
     return false;
   }
@@ -83,8 +85,20 @@ float GetHeadingHoldValue()
   HeadingHoldRate = YawError * PID[PIDYAWVELOCITY].ProportionalVector / 30.0f;
   //APLICA LIMITES MIN E MAX NO RATE
   HeadingHoldRate = Constrain_Float(HeadingHoldRate, -Heading_Hold_Rate_Limit, Heading_Hold_Rate_Limit);
+
+#ifdef DEBUG
+  float HeadingHoldRateNF = HeadingHoldRate;
+#endif
+
   //REALIZA FILTRAGEM DO RATE COM O PT1
   HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, Loop_Integral_Time * 1e-6);
+
+#ifdef DEBUG
+  FastSerialPrintln(PSTR("HHR:%.2f HHRF:%.2f\n"),
+                    HeadingHoldRateNF,
+                    HeadingHoldRate);
+#endif
+
   //APLICA O CONTROLE DO YAW
   return HeadingHoldRate;
 }

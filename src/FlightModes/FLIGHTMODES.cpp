@@ -73,8 +73,8 @@ void FlightModesUpdate()
   {
     if (!Do_HeadingHold_Mode)
     {
-      Do_HeadingHold_Mode = true;
       HeadingHoldTarget = ATTITUDE.CalculedHeading;
+      Do_HeadingHold_Mode = true;
     }
   }
   else
@@ -212,20 +212,17 @@ void FlightModesUpdate()
         }
         else
         {
-          if (GPS_NumberOfSatellites < 4)
+          if (GPS_Flight_Mode != GPS_MODE_NONE)
           {
-            if (GPS_Flight_Mode != GPS_MODE_NONE)
+            if (Do_GPS_Altitude)
             {
-              if (Do_GPS_Altitude)
-              {
-                SetAltitudeHold(ALTITUDE.EstimateAltitude);
-              }
-              GPS_Flight_Mode = GPS_MODE_NONE;
-              NavigationMode = Do_None;
+              SetAltitudeHold(ALTITUDE.EstimateAltitude);
             }
-            GPS_Navigation_Array[0] = 0;
-            GPS_Navigation_Array[1] = 0;
+            GPS_Flight_Mode = GPS_MODE_NONE;
+            NavigationMode = Do_None;
           }
+          GPS_Navigation_Array[0] = 0;
+          GPS_Navigation_Array[1] = 0;
         }
       }
       else

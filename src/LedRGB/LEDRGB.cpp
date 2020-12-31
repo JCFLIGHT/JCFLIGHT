@@ -34,7 +34,7 @@ void LEDRGB::Initialization()
 
 void LEDRGB::Update()
 {
-  //REGISTRADORES DE MANIPULAÇÃO DO LED RGB
+  //REGISTRADORES DE MANIPULAÇÃO PWM DO LED RGB
 #ifdef __AVR_ATmega2560__
   RED_LED_PWM_REGISTER = LedRGB[RED];     //PINO DIGITAL 10
   GREEN_LED_PWM_REGISTER = LedRGB[GREEN]; //PINO DIGITAL 11
@@ -46,9 +46,13 @@ void LEDRGB::Update()
       (!GCS.ConfigFlight) &&
       (!CalibratingCompass) &&
       (!NotPriorit))
+  {
     RGB.Function(GPSLED);
+  }
   if (GCS.ConfigFlight)
+  {
     RGB.Function(CONFIGFLIGHT);
+  }
 }
 
 void LEDRGB::Function(uint8_t Mode)
@@ -212,7 +216,9 @@ void LEDRGB::GPS_Led(void)
       LedRGB[BLUE] = 0;  //AZUL
     }
     else
+    {
       RGB.Off_All_Leds();
+    }
     return; //NÃO FAÇA O QUE ESTÁ ABAIXO
   }
   //SE O NUMERO DE GPS FOR MAIOR OU IGUAL A 5,O LED VERDE IRÁ PISCAR DE ACORDO COM O NÚMERO DE SATELITES
@@ -254,11 +260,15 @@ void LEDRGB::GPS_Led(void)
         }
       }
       else
+      {
         BlinkCount = 0;
+      }
       BlinkTime = AVRTIME.SchedulerMillis();
     }
     else
+    {
       RGB.Off_All_Leds();
+    }
   }
   //INDICAÇÃO DO MODO DE VOO RTH
   if (GPS_Flight_Mode == GPS_MODE_RTH)
@@ -270,7 +280,9 @@ void LEDRGB::GPS_Led(void)
       LedRGB[BLUE] = 254; //AZUL
     }
     else
+    {
       RGB.Off_All_Leds();
+    }
   }
 }
 

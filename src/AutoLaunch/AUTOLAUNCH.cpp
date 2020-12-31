@@ -81,7 +81,7 @@ void AutoLaunchDetector()
 
 void Auto_Launch_Update()
 {
-  if (SetFlightModes[ATACK_MODE] || GetFrameStateOfMultirotor())
+  if (!SetFlightModes[ATACK_MODE] || GetFrameStateOfMultirotor())
   {
     return;
   }

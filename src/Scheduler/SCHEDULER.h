@@ -1,6 +1,7 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 #include "Arduino.h"
+#define SCHEDULER_PERIOD_HZ(Frequecy, Unidad) (1000000 / (Frequecy))
 typedef struct
 {
   uint32_t ActualTime;

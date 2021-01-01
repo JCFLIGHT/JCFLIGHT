@@ -21,7 +21,7 @@
 void Slow_Loop()
 {
         static Scheduler_Struct Slow_Loop;
-        if (SchedulerTimer(&Slow_Loop, 100000)) //10HZ
+        if (SchedulerTimer(&Slow_Loop, SCHEDULER_PERIOD_HZ(10, "Hz")))
         {
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(SLOW_LOOP);
@@ -47,7 +47,7 @@ void Slow_Loop()
 void Medium_Loop()
 {
         static Scheduler_Struct Medium_Loop;
-        if (SchedulerTimer(&Medium_Loop, 20000)) //50HZ
+        if (SchedulerTimer(&Medium_Loop, SCHEDULER_PERIOD_HZ(50, "Hz")))
         {
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(MEDIUM_LOOP);
@@ -76,7 +76,7 @@ void Fast_Medium_Loop()
 {
 
         static Scheduler_Struct Fast_Medium_Loop;
-        if (SchedulerTimer(&Fast_Medium_Loop, 10000)) //100HZ
+        if (SchedulerTimer(&Fast_Medium_Loop, SCHEDULER_PERIOD_HZ(100, "Hz")))
         {
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(FAST_MEDIUM_LOOP);
@@ -103,7 +103,7 @@ void Fast_Medium_Loop()
 void Fast_Loop()
 {
         static Scheduler_Struct Fast_Loop;
-        if (SchedulerTimer(&Fast_Loop, 2500)) //400HZ
+        if (SchedulerTimer(&Fast_Loop, SCHEDULER_PERIOD_HZ(400, "Hz")))
         {
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(FAST_LOOP);
@@ -119,9 +119,9 @@ void Fast_Loop()
 
 void Integral_Loop()
 {
-#ifdef MAIN_LOOP_MICROS
+#ifdef THIS_LOOP_FREQUENCY
         static Scheduler_Struct Integral_Loop;
-        if (SchedulerTimer(&Integral_Loop, MAIN_LOOP_MICROS))
+        if (SchedulerTimer(&Integral_Loop, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz ou KHz")))
         {
 #endif
 
@@ -161,7 +161,7 @@ void Integral_Loop()
                 AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
 
-#ifdef MAIN_LOOP_MICROS
+#ifdef THIS_LOOP_FREQUENCY
         }
 #endif
 }

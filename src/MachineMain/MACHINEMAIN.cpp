@@ -16,6 +16,7 @@
 */
 
 #include "MACHINEMAIN.h"
+#include "TaskSystem/TASKSYSTEM.h"
 
 #ifdef __AVR_ATmega2560__
 
@@ -98,6 +99,9 @@ void setup()
     BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
+#ifdef __arm__
+    TaskSystemInitialization();
+#endif
 }
 
 #ifdef __AVR_ATmega2560__
@@ -110,9 +114,17 @@ void loop()
 
 #endif
 {
+#ifdef __AVR_ATmega2560__
+
     Slow_Loop();
     Medium_Loop();
     Fast_Medium_Loop();
     Fast_Loop();
     Integral_Loop();
+
+#elif defined __arm__
+
+    TaskSystemRun();
+
+#endif
 }

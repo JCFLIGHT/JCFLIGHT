@@ -20,9 +20,12 @@
 
 void Slow_Loop()
 {
+#ifdef __AVR_ATmega2560__
         static Scheduler_Struct Slow_Loop;
         if (SchedulerTimer(&Slow_Loop, SCHEDULER_PERIOD_HZ(10, "Hz")))
         {
+#endif
+
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(SLOW_LOOP);
 #endif
@@ -41,14 +44,20 @@ void Slow_Loop()
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
+
+#ifdef __AVR_ATmega2560__
         }
+#endif
 }
 
 void Medium_Loop()
 {
+#ifdef __AVR_ATmega2560__
         static Scheduler_Struct Medium_Loop;
         if (SchedulerTimer(&Medium_Loop, SCHEDULER_PERIOD_HZ(50, "Hz")))
         {
+#endif
+
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(MEDIUM_LOOP);
 #endif
@@ -69,15 +78,20 @@ void Medium_Loop()
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
+
+#ifdef __AVR_ATmega2560__
         }
+#endif
 }
 
 void Fast_Medium_Loop()
 {
-
+#ifdef __AVR_ATmega2560__
         static Scheduler_Struct Fast_Medium_Loop;
         if (SchedulerTimer(&Fast_Medium_Loop, SCHEDULER_PERIOD_HZ(100, "Hz")))
         {
+#endif
+
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(FAST_MEDIUM_LOOP);
 #endif
@@ -97,14 +111,20 @@ void Fast_Medium_Loop()
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
+
+#ifdef __AVR_ATmega2560__
         }
+#endif
 }
 
 void Fast_Loop()
 {
+#ifdef __AVR_ATmega2560__
         static Scheduler_Struct Fast_Loop;
         if (SchedulerTimer(&Fast_Loop, SCHEDULER_PERIOD_HZ(400, "Hz")))
         {
+#endif
+
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringStartTime(FAST_LOOP);
 #endif
@@ -114,15 +134,20 @@ void Fast_Loop()
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
+
+#ifdef __AVR_ATmega2560__
         }
+#endif
 }
 
 void Integral_Loop()
 {
+#ifdef __AVR_ATmega2560__
 #ifdef THIS_LOOP_FREQUENCY
         static Scheduler_Struct Integral_Loop;
         if (SchedulerTimer(&Integral_Loop, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz ou KHz")))
         {
+#endif
 #endif
 
 #ifdef ENABLE_TIMEMONITOR
@@ -161,7 +186,9 @@ void Integral_Loop()
                 AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
 
+#ifdef __AVR_ATmega2560__
 #ifdef THIS_LOOP_FREQUENCY
         }
+#endif
 #endif
 }

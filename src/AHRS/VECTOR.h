@@ -2,18 +2,8 @@
 #define VECTOR_H_
 
 #include <stdint.h>
+#include "Common/STRUCTS.h"
 #include "Math/AVRMATH.h"
-
-typedef union
-{
-    float Vector[3];
-    struct
-    {
-        float Roll;
-        float Pitch;
-        float Yaw;
-    };
-} Struct_Vector3x3;
 
 static inline float VectorNormSquared(const Struct_Vector3x3 *Vector)
 {

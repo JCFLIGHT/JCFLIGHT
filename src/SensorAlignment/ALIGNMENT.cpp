@@ -19,36 +19,6 @@
 #include "Math/AVRMATH.h"
 #include "Common/STRUCTS.h"
 
-typedef struct
-{
-    float Roll;
-    float Pitch;
-    float Yaw;
-} Angles_Struct;
-
-typedef union
-{
-    float RawAngles[3];
-    Angles_Struct Angles;
-} Union_Angles_Struct;
-
-typedef struct
-{
-    float Matrix3x3[3][3];
-} Matrix3x3_Struct;
-
-//VETOR EM INT,PARA EVITAR AVISO DE COPILAÇÃO DO GCC
-typedef union
-{
-    int16_t Vector[3];
-    struct
-    {
-        int16_t Roll;
-        int16_t Pitch;
-        int16_t Yaw;
-    };
-} Vector3x3_Struct;
-
 static Matrix3x3_Struct SensorRotationMatrix;
 
 static bool SensorAlignmentInit = false;

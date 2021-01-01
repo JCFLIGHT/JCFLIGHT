@@ -35,14 +35,6 @@
 #define GYRO_SCALE (1.0f / 16.4f) //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GRAVITY_CMSS 980.665f     //VALOR DA GRAVIDADE EM CM/S^2
 
-typedef struct
-{
-  float kP_Accelerometer = 0.25f;
-  float kI_Accelerometer = 0.0050f;
-  float kP_Magnetometer = 1;
-  float ki_Magnetometer = 0;
-} Struct_IMURuntimeConfiguration;
-
 Struct_Vector3x3 BodyFrameAcceleration;
 Struct_Vector3x3 BodyFrameRotation;
 Struct_Quaternion Orientation;

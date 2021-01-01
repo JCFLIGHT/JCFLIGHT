@@ -3,14 +3,6 @@
 
 #include "VECTOR.h"
 
-typedef struct
-{
-    float q0;
-    float q1;
-    float q2;
-    float q3;
-} Struct_Quaternion;
-
 static inline Struct_Quaternion *QuaternionInitUnit(Struct_Quaternion *Result)
 {
     Result->q0 = 1.0f;

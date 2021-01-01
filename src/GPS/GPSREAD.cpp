@@ -26,19 +26,6 @@
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464
 
-//CHECAGEM DE STATUS DO 3D FIX
-static bool Next_GPSFix;
-
-//VERIFICAÇÃO DOS PACOTES DE DADOS
-static uint8_t Check_Packet_A;
-static uint8_t Check_Packet_B;
-
-//ESTADO DE MAQUINA
-static uint8_t Step_Counter;
-static uint8_t Get_GPS_Message_ID;
-static uint16_t Payload_Length;
-static uint16_t Payload_Counter;
-
 struct Ublox_Navigation_PosLLH
 {
   uint32_t time;
@@ -49,6 +36,7 @@ struct Ublox_Navigation_PosLLH
   uint32_t horizontal_accuracy;
   uint32_t vertical_accuracy;
 };
+
 struct Ublox_Navigation_Solution
 {
   uint32_t time;
@@ -69,6 +57,7 @@ struct Ublox_Navigation_Solution
   uint8_t satellites;
   uint32_t res2;
 };
+
 struct Ublox_Navigation_VelNED
 {
   uint32_t time;
@@ -89,6 +78,19 @@ static union
   Ublox_Navigation_VelNED VelocityNED;
   uint8_t Bytes_Array[464];
 } Buffer;
+
+//CHECAGEM DE STATUS DO 3D FIX
+static bool Next_GPSFix;
+
+//VERIFICAÇÃO DOS PACOTES DE DADOS
+static uint8_t Check_Packet_A;
+static uint8_t Check_Packet_B;
+
+//ESTADO DE MAQUINA
+static uint8_t Step_Counter;
+static uint8_t Get_GPS_Message_ID;
+static uint16_t Payload_Length;
+static uint16_t Payload_Counter;
 
 #ifdef __AVR_ATmega2560__
 const uint8_t Ublox_Set_Configuration[] __attribute__((__progmem__)) = {

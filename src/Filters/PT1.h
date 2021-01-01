@@ -18,11 +18,6 @@
 #ifndef PT1_H_
 #define PT1_H_
 #include "Arduino.h"
-typedef struct PT1Filter
-{
-  float State;
-  float RC;
-  float DeltaTime;
-} PT1_Filter_Struct;
+#include "Common/STRUCTS.h"
 float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime);
 #endif

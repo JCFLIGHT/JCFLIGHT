@@ -18,20 +18,7 @@
 #ifndef GPSPID_H_
 #define GPSPID_H_
 #include "Arduino.h"
-typedef struct _PID_PARAM
-{
-    float kP;
-    float kI;
-    float kD;
-    float IntegratorMax;
-} PID_PARAM;
-typedef struct _GPS_PID
-{
-    float Integrator;
-    int32_t Last_Input;
-    float Last_Derivative;
-    float Derivative;
-} GPS_PID;
+#include "Common/STRUCTS.h"
 int32_t GPSGetProportional(int32_t Error, struct _PID_PARAM *PID);
 int32_t GPSGetIntegral(int32_t Error, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);
 int32_t GPSGetDerivative(int32_t Input, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);

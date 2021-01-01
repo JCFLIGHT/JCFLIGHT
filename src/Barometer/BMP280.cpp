@@ -20,9 +20,6 @@
 #include "BAROREAD.h"
 #include "Scheduler/SCHEDULERTIME.h"
 
-uint32_t BMP280_StoredTime;
-int64_t BMP280_Pressure;
-
 static union
 {
   uint8_t BMP280_CalculationArray[0x1A];
@@ -43,6 +40,9 @@ static union
     int16_t dig_P9;
   };
 } BMP280_Calculation;
+
+uint32_t BMP280_StoredTime;
+int64_t BMP280_Pressure;
 
 static void BMP280_Get_Calibration(void)
 {

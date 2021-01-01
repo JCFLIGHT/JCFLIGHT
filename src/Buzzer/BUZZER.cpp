@@ -24,6 +24,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "Build/BOARDDEFS.h"
+#include "Common/STRUCTS.h"
 
 BEEPERCLASS BEEPER;
 
@@ -75,13 +76,6 @@ static const uint8_t FMU_Safe_Beep[] = {
 static uint8_t BeeperState = 0;
 static uint16_t BeeperPositionArray = 0;
 static uint32_t BeeperNextNote = 0;
-
-typedef struct
-{
-  uint8_t Mode;
-  uint8_t Priority;
-  const uint8_t *Sequence;
-} Struct_BeeperEntry;
 
 const Struct_BeeperEntry BeeperTable[] = {
     {BEEPER_CALIBRATION_DONE, 0, Calibration_Beep},

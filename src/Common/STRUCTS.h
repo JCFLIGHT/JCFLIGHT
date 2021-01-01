@@ -79,7 +79,7 @@ typedef struct
   uint16_t TPAThrottlePercent = 0;
 } TPA_Parameters_Struct;
 
-typedef struct Device_Struct
+typedef struct
 {
   float OldMeasure;
   float NewMeasure;
@@ -99,4 +99,97 @@ typedef struct
 {
   uint8_t FrameMotorsCount;
 } Motors_Count_Struct;
+
+typedef struct
+{
+  uint8_t Mode;
+  uint8_t Priority;
+  const uint8_t *Sequence;
+} Struct_BeeperEntry;
+
+typedef struct
+{
+  float kP_Accelerometer = 0.25f;
+  float kI_Accelerometer = 0.0050f;
+  float kP_Magnetometer = 1;
+  float ki_Magnetometer = 0;
+} Struct_IMURuntimeConfiguration;
+
+typedef struct
+{
+  float q0;
+  float q1;
+  float q2;
+  float q3;
+} Struct_Quaternion;
+
+typedef struct
+{
+  float Roll;
+  float Pitch;
+  float Yaw;
+} Angles_Struct;
+
+typedef union
+{
+  float RawAngles[3];
+  Angles_Struct Angles;
+} Union_Angles_Struct;
+
+typedef struct
+{
+  float Matrix3x3[3][3];
+} Matrix3x3_Struct;
+
+//VETOR EM INT,PARA EVITAR AVISO DE COPILAÇÃO DO GCC
+typedef union
+{
+  int16_t Vector[3];
+  struct
+  {
+    int16_t Roll;
+    int16_t Pitch;
+    int16_t Yaw;
+  };
+} Vector3x3_Struct;
+
+typedef union
+{
+  float Vector[3];
+  struct
+  {
+    float Roll;
+    float Pitch;
+    float Yaw;
+  };
+} Struct_Vector3x3;
+
+typedef struct _PID_PARAM
+{
+  float kP;
+  float kI;
+  float kD;
+  float IntegratorMax;
+} PID_PARAM;
+
+typedef struct _GPS_PID
+{
+  float Integrator;
+  int32_t Last_Input;
+  float Last_Derivative;
+  float Derivative;
+} GPS_PID;
+
+typedef struct
+{
+  uint32_t ActualTime;
+  uint32_t StoredTime;
+} Scheduler_Struct;
+
+typedef struct PT1Filter
+{
+  float State;
+  float RC;
+  float DeltaTime;
+} PT1_Filter_Struct;
 #endif

@@ -33,6 +33,7 @@ void Slow_Loop()
                 Pre_Arm();
                 CurvesRC_SetValues();
                 AUXFLIGHT.LoadEEPROM();
+                COMPASS.Constant_Read();
                 RTH_Altitude_EEPROM();
                 IMU_Filters_Update();
                 PID_DerivativeLPF_Update();
@@ -68,6 +69,7 @@ void Medium_Loop()
                 Desarm_LowThrottle();
                 FailSafeCheck();
                 RCSticks_Update();
+                GPS_Process_FlightModes();
                 AUXFLIGHT.SelectMode();
                 AUXFLIGHT.FlightModesAuxSelect();
                 FlightModesUpdate();
@@ -160,13 +162,11 @@ void Integral_Loop()
                 IBUS_Update();
                 Acc_ReadBufferData();
                 Gyro_ReadBufferData();
-                COMPASS.Constant_Read();
                 Barometer_Update();
                 GPS_Serial_Read();
                 AHRS_Update();
                 DynamicPID();
                 Auto_Launch_Update();
-                GPS_Process_FlightModes();
                 CalculateAccelerationXYZ();
                 INS_Calculate_AccelerationZ();
                 CalculateXY_INS();

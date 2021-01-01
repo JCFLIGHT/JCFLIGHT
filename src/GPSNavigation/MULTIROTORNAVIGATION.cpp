@@ -117,7 +117,9 @@ void GPS_Process_FlightModes(void)
     int16_t CalculateNavigationSpeed = 0;
 
     if (GetFrameStateOfAirPlane())
+    {
       NavigationMode = Do_RTH_Enroute;
+    }
 
     switch (NavigationMode)
     {
@@ -148,7 +150,9 @@ void GPS_Process_FlightModes(void)
       if ((Two_Points_Distance <= 200) || Point_Reached())
       {
         if (GetFrameStateOfMultirotor())
+        {
           NavigationMode = Do_Land_Init;
+        }
         HeadingHoldTarget = Navigation_Bearing_RTH;
       }
       break;

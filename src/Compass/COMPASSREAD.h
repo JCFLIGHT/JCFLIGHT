@@ -34,7 +34,7 @@ private:
   uint32_t NextUpdate = 0;
   uint32_t CalibrationTime = 0;
   uint32_t CompassTimer = 0;
-  bool PushBias(uint8_t bias);
+  bool PushBias(uint8_t InputBias);
   void InitialReadBufferData();
   void ReadBufferData();
 };

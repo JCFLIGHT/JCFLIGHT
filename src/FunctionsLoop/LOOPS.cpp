@@ -148,7 +148,7 @@ void Integral_Loop()
 #ifdef __AVR_ATmega2560__
 #ifdef THIS_LOOP_FREQUENCY
         static Scheduler_Struct Integral_Loop;
-        if (SchedulerTimer(&Integral_Loop, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz ou KHz")))
+        if (SchedulerTimer(&Integral_Loop, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz")))
         {
 #endif
 #endif

@@ -18,6 +18,7 @@
 #include "MS5611.h"
 #include "BAROREAD.h"
 #include "I2C/I2C.h"
+#include "Scheduler/SCHEDULERTIME.h"
 
 static struct
 {

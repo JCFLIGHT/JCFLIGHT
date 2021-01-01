@@ -18,7 +18,6 @@
 #include "BMP280.h"
 #include "I2C/I2C.h"
 #include "BAROREAD.h"
-#include "Scheduler/SCHEDULERTIME.h"
 
 static union
 {
@@ -41,7 +40,6 @@ static union
   };
 } BMP280_Calculation;
 
-uint32_t BMP280_StoredTime;
 int64_t BMP280_Pressure;
 
 static void BMP280_Get_Calibration(void)
@@ -104,15 +102,10 @@ void BMP280_Initialization()
   //SPIModeEnabled:0x00 (MODO SPI DESATIVADO)
   BMP280_Set_Operation_Mode(0, 4, 0);
   BMP280_Set_Control_Mode(2, 5, 3);
-  BMP280_StoredTime = AVRTIME.SchedulerMicros() + 5000;
 }
 
 void BMP280_Update()
 {
-  uint32_t BMP280_Refresh = AVRTIME.SchedulerMicros();
-  if (BMP280_Refresh < BMP280_StoredTime)
-    return;
-  BMP280_StoredTime = BMP280_Refresh + 3000;
   Baro_Calibration();
   CalculatePressure();
 }

@@ -69,6 +69,7 @@ void Medium_Loop()
                 Desarm_LowThrottle();
                 FailSafeCheck();
                 RCSticks_Update();
+                Barometer_Update();
                 GPS_Process_FlightModes();
                 AUXFLIGHT.SelectMode();
                 AUXFLIGHT.FlightModesAuxSelect();
@@ -162,7 +163,6 @@ void Integral_Loop()
                 IBUS_Update();
                 Acc_ReadBufferData();
                 Gyro_ReadBufferData();
-                Barometer_Update();
                 GPS_Serial_Read();
                 AHRS_Update();
                 DynamicPID();

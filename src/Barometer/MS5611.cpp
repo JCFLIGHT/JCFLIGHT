@@ -17,7 +17,6 @@
 
 #include "MS5611.h"
 #include "BAROREAD.h"
-#include "Scheduler/SCHEDULERTIME.h"
 #include "I2C/I2C.h"
 
 static struct
@@ -26,7 +25,6 @@ static struct
   uint32_t UT;
   uint32_t UP;
   uint8_t CountState;
-  uint16_t Refresh;
 } StructBarometer;
 
 void MS5611_Initialization()
@@ -120,16 +118,12 @@ void MS5611_Update()
 {
   uint8_t Command_UT_UP;
   uint32_t *RawValue_UT_UP;
-  uint32_t BarometerTimer = AVRTIME.SchedulerMicros();
   if (StructBarometer.CountState == 2)
   {
-    StructBarometer.CountState = 0;
     CalculatePressure();
+    StructBarometer.CountState = 0;
     return;
   }
-  if ((int16_t)(BarometerTimer - StructBarometer.Refresh) < 0)
-    return;
-  StructBarometer.Refresh = BarometerTimer + 10000;
   if (StructBarometer.CountState == 0)
   {
     Baro_Calibration();

@@ -37,6 +37,9 @@ void SAFETYBUTTONCLASS::Initialization()
 {
     SAFETY_BUTTON_PININPUT;
     SAFETY_BUTTON_LED_PINOUT;
+#ifdef ESP32
+    AnalogWriteSetSettings(GPIO_NUM_5, 490, 12);
+#endif
 }
 
 bool SAFETYBUTTONCLASS::GetButtonInterval()

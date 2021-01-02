@@ -83,6 +83,11 @@ void AnalogWriteSetSettings(uint8_t Pin, double Frequency, uint8_t Resolution)
     ledcSetup(11, Frequency, Resolution);
     ledcAttachPin(Pin, 11);
   }
+  else if (Pin == GPIO_NUM_5)
+  {
+    ledcSetup(13, Frequency, Resolution);
+    ledcAttachPin(Pin, 13);
+  }
 }
 
 void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
@@ -143,5 +148,9 @@ void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
   {
     Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(11, Pulse);
+  }
+  else if (Pin == GPIO_NUM_5)
+  {
+    ledcWrite(13, Pulse);
   }
 }

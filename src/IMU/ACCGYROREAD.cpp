@@ -185,7 +185,9 @@ void Acc_ReadBufferData()
   Accelerometer_Calibration();
 
   if (CalibratingAccelerometer > 0)
+  {
     return;
+  }
 
   //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS
   IMU.AccelerometerReadNotFiltered[ROLL] = IMU.AccelerometerRead[ROLL];
@@ -227,7 +229,9 @@ void Gyro_ReadBufferData()
   Gyroscope_Calibration();
 
   if (CalibratingGyroscope > 0)
+  {
     return;
+  }
 
   //OBTÉM OS VALORES DO GYROSCOPIO ANTES DOS FILTROS
   IMU.GyroscopeReadNotFiltered[ROLL] = IMU.GyroscopeRead[ROLL];

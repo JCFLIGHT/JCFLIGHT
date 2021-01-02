@@ -18,7 +18,6 @@
 #include "ACCGYROREAD.h"
 #include "I2C/I2C.h"
 #include "Common/VARIABLES.h"
-#include "IMUCALIBRATE.h"
 #include "Filters/KALMANFILTER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "StorageManager/EEPROMSTORAGE.h"
@@ -28,6 +27,7 @@
 #include "BAR/BAR.h"
 #include "SensorAlignment/ALIGNMENT.h"
 #include "Build/BOARDDEFS.h"
+#include "IMUCALIBRATE.h"
 
 //INSTANCIAS PARA O LPF
 BiQuadFilter BiquadAccLPF[3];
@@ -181,8 +181,9 @@ void Acc_ReadBufferData()
   IMU.AccelerometerRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
   IMU.AccelerometerRead[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
 
-  //CALIBRAÇÃO DO ACELEROMETRO
+#ifdef __AVR_ATmega2560__
   Accelerometer_Calibration();
+#endif
 
   if (CalibratingAccelerometer > 0)
   {
@@ -225,8 +226,9 @@ void Gyro_ReadBufferData()
   IMU.GyroscopeRead[ROLL] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
   IMU.GyroscopeRead[YAW] = -((BufferData[4] << 8) | BufferData[5]) >> 2;
 
-  //CALIBRAÇÃO DO GYROSCOPIO
+#ifdef __AVR_ATmega2560__
   Gyroscope_Calibration();
+#endif
 
   if (CalibratingGyroscope > 0)
   {

@@ -20,4 +20,5 @@
 #include "Arduino.h"
 void Accelerometer_Calibration();
 void Gyroscope_Calibration();
+void UpdateIMUCalibration();
 #endif

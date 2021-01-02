@@ -223,3 +223,9 @@ void Accelerometer_Calibration()
     IMU.AccelerometerRead[YAW] -= CALIBRATION.AccelerometerZero[YAW];
   }
 }
+
+void UpdateIMUCalibration()
+{
+  Accelerometer_Calibration();
+  Gyroscope_Calibration();
+}

@@ -18,9 +18,10 @@
 #include "TASKS.h"
 #include "Scheduler/SCHEDULER.h"
 #include "FunctionsLoop/LOOPS.h"
+#include "IMU/IMUCALIBRATE.h"
 #include "Build/BOARDDEFS.h"
 
-Task_Recurses_Struct Task_Recurses[TASK_COUNT] = {
+Task_Resources_Struct Task_Resources[TASK_COUNT] = {
 
     [TASK_SLOW_LOOP] = {
         .TaskName = "SLOW_LOOP",
@@ -53,7 +54,7 @@ Task_Recurses_Struct Task_Recurses[TASK_COUNT] = {
     [TASK_SUPER_FAST_LOOP] = {
         .TaskName = "SUPER_FAST_LOOP",
         .TaskFunction = Super_Fast_Loop,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(1000, "Hz"),
+        .DesiredPeriod = SCHEDULER_PERIOD_HZ(500, "Hz"),
         .StaticPriority = TASK_PRIORITY_HIGH,
     },
 
@@ -63,4 +64,12 @@ Task_Recurses_Struct Task_Recurses[TASK_COUNT] = {
         .DesiredPeriod = SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "KHz"),
         .StaticPriority = TASK_PRIORITY_REALTIME,
     },
+
+    [TASK_IMU_CALIBRATION] = {
+        .TaskName = "IMU_CALIBRATION",
+        .TaskFunction = UpdateIMUCalibration,
+        .DesiredPeriod = SCHEDULER_PERIOD_HZ(200, "Hz"),
+        .StaticPriority = TASK_PRIORITY_MEDIUM,
+    },
+
 };

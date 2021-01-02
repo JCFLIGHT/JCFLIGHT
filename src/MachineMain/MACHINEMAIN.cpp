@@ -102,7 +102,7 @@ void setup()
 #if defined(__arm__) || defined(ESP32)
     TaskSystemInitialization();
 #endif
-Serial.begin(115200);
+    //Serial.begin(115200);
 }
 
 #ifdef __AVR_ATmega2560__
@@ -121,6 +121,7 @@ void loop()
     Medium_Loop();
     Fast_Medium_Loop();
     Fast_Loop();
+    Super_Fast_Loop();
     Integral_Loop();
 
 #elif defined __arm__ || defined ESP32
@@ -128,5 +129,5 @@ void loop()
     TaskSystemRun();
 
 #endif
-Serial.println(GetTaskDeltaTime(TASK_INTEGRAL_LOOP));
+    //Serial.println(GetTaskDeltaTime(TASK_INTEGRAL_LOOP));
 }

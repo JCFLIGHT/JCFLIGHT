@@ -18,5 +18,5 @@
 #ifndef TASKS_H_
 #define TASKS_H_
 #include "TASKSYSTEM.h"
-extern Task_Recurses_Struct Task_Recurses[TASK_COUNT];
+extern Task_Resources_Struct Task_Resources[TASK_COUNT];
 #endif

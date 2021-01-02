@@ -203,5 +203,5 @@ typedef struct
   uint16_t TaskAgeCycles;
   uint32_t LastExecuted;
   int32_t TaskLatestDeltaTime;
-} Task_Recurses_Struct;
+} Task_Resources_Struct;
 #endif

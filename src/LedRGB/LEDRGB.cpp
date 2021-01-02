@@ -39,6 +39,9 @@ void LEDRGB::Update()
   RED_LED_PWM_REGISTER = LedRGB[RED];     //PINO DIGITAL 10
   GREEN_LED_PWM_REGISTER = LedRGB[GREEN]; //PINO DIGITAL 11
   BLUE_LED_PWM_REGISTER = LedRGB[BLUE];   //PINO DIGITAL 12
+
+#elif defined ESP32
+
 #elif defined __arm__
 
 #endif

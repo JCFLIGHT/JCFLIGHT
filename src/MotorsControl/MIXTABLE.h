@@ -72,7 +72,7 @@ static const Motors_Count_Struct Motors_Count[] __attribute__((__progmem__)) = {
     {4}, //TBS
 };
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 static const PID_Mixer_Struct Pid_Mixer_Quad_X[] = {
     {+1.0f, -1.0f, -1.0f}, //MOTOR 1

@@ -74,7 +74,7 @@
     __Result;                                                    \
 }))
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 #define ProgMemReadByte(Address) (*(const unsigned char *)(Address))
 
@@ -82,7 +82,7 @@
 
 #define ProgMemReadWord(Address) ({ typeof(Address) _Address = (Address); *(const unsigned short *)(_Address); })
 
-#define ProgMemReadFloat(Address)  ({ typeof(Address) _Address = (Address); *(const float *)(_Address); })
+#define ProgMemReadFloat(Address) ({ typeof(Address) _Address = (Address); *(const float *)(_Address); })
 
 #endif
 

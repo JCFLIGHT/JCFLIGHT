@@ -306,6 +306,109 @@ void AllI2CInitialization()
   }
 }
 
+#elif defined ESP32
+
+void I2CPROTOCOL::Initialization(void)
+{
+  //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
+  if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
+    Compass_Type = COMPASS_AK8975;
+  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
+    Compass_Type = COMPASS_HMC5843;
+  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
+    Compass_Type = COMPASS_HMC5883;
+
+  /*
+   if (NumbGenerator == 0x0D)
+        COMPASS.FakeHMC5883Address = 0x0D;
+
+      if (NumbGenerator == 0x77)
+        SetBaroType(0x77);
+
+      if (NumbGenerator == 0x76)
+        SetBaroType(0x76);
+
+      if ((NumbGenerator == 0x0C) || (NumbGenerator == 0x1E) || (NumbGenerator == 0x0D))
+      {
+        CompassFound = true;
+      }
+      if ((NumbGenerator == 0x77) || (NumbGenerator == 0x76))
+        BarometerFound = true;
+*/
+
+  //AK8975 ENDEREÇO:0x0C
+  //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
+  if (Compass_Type == COMPASS_AK8975)
+  {
+    MagAddress = 0x0C;
+    MagRegister = 0x03;
+  }
+  else if ((Compass_Type == COMPASS_HMC5843) || (Compass_Type == COMPASS_HMC5883))
+  {
+    if (COMPASS.FakeHMC5883Address == 0x0D)
+    {
+      MagAddress = 0x0D;
+      MagRegister = 0x00;
+    }
+    else
+    {
+      MagAddress = 0x1E;
+      MagRegister = 0x03;
+    }
+  }
+}
+
+void I2CPROTOCOL::Restart(uint8_t Address)
+{
+}
+
+void I2CPROTOCOL::Stop(void)
+{
+}
+
+void I2CPROTOCOL::Write(uint8_t SendData)
+{
+}
+
+uint8_t I2CPROTOCOL::ReadACK()
+{
+  return 0;
+}
+
+uint8_t I2CPROTOCOL::ReadNAK()
+{
+  return 0;
+}
+
+void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size)
+{
+}
+
+void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
+{
+}
+
+void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
+{
+}
+
+void AllI2CInitialization()
+{
+  uint8_t ForceInitialization = 5;
+  AVRTIME.SchedulerSleep(200);
+  while (ForceInitialization)
+  {
+    ForceInitialization--;
+    I2C.Initialization();
+    Gyro_Initialization();
+    if (I2C.BarometerFound)
+      Baro_Initialization();
+    if (I2C.CompassFound)
+      COMPASS.Initialization();
+    Acc_Initialization();
+  }
+}
+
 #elif defined __arm__
 
 void I2CPROTOCOL::Initialization(void)

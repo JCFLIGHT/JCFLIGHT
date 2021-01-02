@@ -33,6 +33,11 @@ void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t 
         InitialAddress++;
     }
 }
+#elif defined ESP32
+
+void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size)
+{
+}
 
 #elif defined __arm__
 

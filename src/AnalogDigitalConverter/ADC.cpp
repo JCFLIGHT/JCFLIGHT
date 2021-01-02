@@ -38,6 +38,13 @@ int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
   return (HighByte << 8) | LowByte;
 }
 
+#elif defined ESP32
+
+int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
+{
+  return 0;
+}
+
 #elif defined __arm__
 
 int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)

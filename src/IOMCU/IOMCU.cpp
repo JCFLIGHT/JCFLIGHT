@@ -356,6 +356,8 @@ void GCSClass::SendStringToGCS(const char *String)
     {
         GCS_Send_Data(ProgMemReadByte(StringCount));
     }
+#elif defined ESP32
+
 #elif defined __arm__
 
 #endif

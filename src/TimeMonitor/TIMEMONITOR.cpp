@@ -41,6 +41,8 @@ void AVRTimeMonitor::MeasuringStartTime(uint8_t FunctionNumber)
     {
 #ifdef __AVR_ATmega2560__
       FastSerialPrintln(PSTR("\n"));
+#elif defined ESP32
+
 #elif defined __arm__
 
 #endif
@@ -62,6 +64,8 @@ void AVRTimeMonitor::MeasuringFinishTime()
     FastSerialPrintln(PSTR("%-20s\tTempo Gasto:%.5f ms\n"),
                       GetFunctionName,
                       AVRTotalTime / 1000);
+#elif defined ESP32
+
 #elif defined __arm__
 
 #endif

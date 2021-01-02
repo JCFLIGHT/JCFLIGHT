@@ -46,6 +46,18 @@ uint8_t MEMORYCLASS::GetPercentageRAMUsed()
   return Free / 8192 * 100;
 }
 
+#elif defined ESP32
+
+uint16_t MEMORYCLASS::Check()
+{
+  return 0;
+}
+
+uint8_t MEMORYCLASS::GetPercentageRAMUsed()
+{
+  return 0;
+}
+
 #elif defined __arm__
 
 uint16_t MEMORYCLASS::Check()

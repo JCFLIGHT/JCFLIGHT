@@ -126,6 +126,30 @@ void __vector_23(void)
   Timer0_OverFlow++;
 }
 
+#elif defined ESP32
+
+void AVRTIMECLASS::SchedulerInit()
+{
+}
+
+uint32_t AVRTIMECLASS::SchedulerMillis()
+{
+  return 0;
+}
+
+uint32_t AVRTIMECLASS::SchedulerMicros()
+{
+  return 0;
+}
+
+void AVRTIMECLASS::SchedulerSleep(uint16_t MillisSeconds)
+{
+}
+
+void AVRTIMECLASS::SchedulerMicroSecondsSleep(uint16_t MicroSeconds)
+{
+}
+
 #elif defined __arm__
 
 void AVRTIMECLASS::SchedulerInit()

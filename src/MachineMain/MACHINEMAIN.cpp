@@ -22,7 +22,7 @@
 
 void MachineInit()
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 void setup()
 
@@ -99,7 +99,7 @@ void setup()
     BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
-#ifdef __arm__
+#ifdef __arm__ || defined ESP32
     TaskSystemInitialization();
 #endif
 }
@@ -108,7 +108,7 @@ void setup()
 
 void MachineRun()
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 void loop()
 
@@ -122,7 +122,7 @@ void loop()
     Fast_Loop();
     Integral_Loop();
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
     TaskSystemRun();
 

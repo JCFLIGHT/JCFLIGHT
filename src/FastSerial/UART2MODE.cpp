@@ -33,7 +33,7 @@ void UART2Mode_Initialization()
     }
 }
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 void UART2Mode_Initialization()
 {
 }

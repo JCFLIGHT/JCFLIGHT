@@ -20,7 +20,7 @@
 #include "Arduino.h"
 #ifdef __AVR_ATmega2560__
 extern char GetFunctionName[20];
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 extern char *GetFunctionName;
 #endif
 void UpdateFunctionName(uint8_t FunctionNumber);

@@ -102,6 +102,8 @@ void ConfigureRegisters()
   TCCR5A |= _BV(COM4B1); //CONECTA O PINO 45 AO TIMER4 CANAL B
   //TCCR5A |= _BV(COM4C1); //CONECTA O PINO 44 AO TIMER4 CANAL C
 
+#elif defined ESP32
+
 #elif defined __arm__
 
 #endif
@@ -160,6 +162,9 @@ void ShutDownAllMotorsAndServos()
   OCR4A = 0;
   OCR4B = 0;
   OCR4C = 0;
+  
+#elif defined ESP32
+
 #elif defined __arm__
 
 #endif
@@ -196,6 +201,8 @@ void ApplyPWMInAllComponents()
 
   OCR5A = MotorControl[GIMBAL] << 3;         //PINO DIGITAL 46
   OCR5B = MotorControl[PARACHUTESERVO] << 3; //PINO DIGITAL 45
+
+#elif defined ESP32
 
 #elif defined __arm__
 

@@ -24,7 +24,7 @@ extern const char FirmwareVersion[];
 extern const char CompilerVersion[];
 extern const char BuildDate[];
 extern const char BuildTime[];
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 extern const char *const PlatformName;
 extern const char *const FirwareName;
 extern const char *const FirmwareVersion;

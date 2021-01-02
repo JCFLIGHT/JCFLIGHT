@@ -30,7 +30,7 @@ float GetDeclinationCalced(float GPSLatitude, float GPSLongitude);
 //TABELA PARA DECLINAÇÃO MAGNETICA AUTOMATICA
 #ifdef __AVR_ATmega2560__
 const int16_t Table_Declination[37][73] __attribute__((__progmem__)) =
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 const int16_t Table_Declination[37][73] =
 #endif
     {
@@ -89,7 +89,7 @@ float GetDeclinationCalced(float GPSLatitude, float GPSLongitude)
   DeclinationSE = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index][LongitudeMin_Index + 1]));
   DeclinationNE = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index + 1]));
   DeclinationNW = (ProgMemReadDWord(&Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index]));
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
   DeclinationSW = (Table_Declination[LatitudeMin_Index][LongitudeMin_Index]);
   DeclinationSE = (Table_Declination[LatitudeMin_Index][LongitudeMin_Index + 1]);
   DeclinationNE = (Table_Declination[LatitudeMin_Index + 1][LongitudeMin_Index + 1]);

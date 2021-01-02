@@ -53,7 +53,7 @@ bool SAFETYBUTTONCLASS::GetButtonState()
 {
 #ifdef __AVR_ATmega2560__
     return (SAFETY_BUTTON_PIN_READ_STATE ? false : true);
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
     return (ADCPIN.Read(SAFETY_BUTTON_PIN_READ_STATE) ? false : true);
 #endif
 }

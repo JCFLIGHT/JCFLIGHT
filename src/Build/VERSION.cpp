@@ -21,7 +21,7 @@
 #define FC_FIRMWARE_NAME "JCFLIGHT-ZION"
 #elif defined STM32F103xB
 #define FC_FIRMWARE_NAME "JCFLIGHT-PASCAL"
-#elif defined STM32F407xx
+#elif defined STM32F407xx || defined ESP32
 #define FC_FIRMWARE_NAME "JCFLIGHT-EXTREME"
 #endif
 #define FC_VERSION_MAJOR 1
@@ -41,8 +41,12 @@ const char FirmwareVersion[] __attribute__((__progmem__)) = FC_VERSION_STRING SE
 const char CompilerVersion[] __attribute__((__progmem__)) = __VERSION__ SEPARATOR;
 const char BuildDate[] __attribute__((__progmem__)) = __DATE__ SEPARATOR;
 const char BuildTime[] __attribute__((__progmem__)) = __TIME__ SEPARATOR;
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
+#ifdef __arm__
 const char *const PlatformName = "STM32" SEPARATOR;
+#elif defined ESP32
+const char *const PlatformName = "ESP32" SEPARATOR;
+#endif
 const char *const FirwareName = FC_FIRMWARE_NAME SEPARATOR;
 const char *const FirmwareVersion = FC_VERSION_STRING SEPARATOR;
 const char *const CompilerVersion = __VERSION__ SEPARATOR;

@@ -65,6 +65,44 @@ float EEPROMSTORAGE::Read_Float(int16_t Address)
   return _Type_Union.FloatValue;
 }
 
+#elif defined ESP32
+
+void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)
+{
+}
+
+void EEPROMSTORAGE::Write_16Bits(int16_t Address, int16_t Value)
+{
+}
+
+void EEPROMSTORAGE::Write_32Bits(int16_t Address, int32_t Value)
+{
+}
+
+void EEPROMSTORAGE::Write_Float(int16_t Address, float Value)
+{
+}
+
+uint8_t EEPROMSTORAGE::Read_8Bits(int16_t Address)
+{
+  return 0;
+}
+
+int16_t EEPROMSTORAGE::Read_16Bits(int16_t Address)
+{
+  return 0;
+}
+
+int32_t EEPROMSTORAGE::Read_32Bits(int16_t Address)
+{
+  return 0;
+}
+
+float EEPROMSTORAGE::Read_Float(int16_t Address)
+{
+  return 0;
+}
+
 #elif defined __arm__
 
 void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)

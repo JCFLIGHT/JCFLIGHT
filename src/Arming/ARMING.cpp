@@ -55,7 +55,7 @@ const char Message_8[] __attribute__((__progmem__)) = "Nenhum erro,seguro para a
 const char Message_9[] __attribute__((__progmem__)) = "Compass ruim;";
 const char Message_10[] __attribute__((__progmem__)) = "Barometro ruim;";
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 const char *const Message_0 = "Erro:Acelerometro ruim;";
 const char *const Message_1 = "Erro:Modo de voo ativo;";

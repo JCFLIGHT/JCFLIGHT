@@ -593,7 +593,7 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
 
 #endif
 
-#ifdef __arm__
+#if defined(__arm__) || defined(ESP32)
 
 void FastSerialPrintln()
 {

@@ -28,7 +28,7 @@ void PrintlnParameters();
 void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
 void FastSerialPrintln(const char *fmt, ...);
 #endif
-#ifdef __arm__
+#if defined (__arm__) || defined (ESP32)
 void FastSerialPrintln();
 void SerialPrintF();
 void PrintlnParameters();

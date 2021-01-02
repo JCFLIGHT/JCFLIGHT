@@ -41,6 +41,15 @@ void Operator_Check_Values_In_Address(uint16_t Size)
     }
 }
 
+#elif defined ESP32
+
+void Operator_Check_Values_In_Address(uint16_t Size)
+{
+    while (true)
+    {
+    }
+}
+
 #elif defined __arm__
 
 void Operator_Check_Values_In_Address(uint16_t Size)

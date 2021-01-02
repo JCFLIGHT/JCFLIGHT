@@ -94,7 +94,7 @@ static uint16_t Payload_Counter;
 
 #ifdef __AVR_ATmega2560__
 const uint8_t Ublox_Set_Configuration[] __attribute__((__progmem__)) = {
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 const uint8_t Ublox_Set_Configuration[] = {
 #endif
     0xB5, 0x62, 0x06, 0x01, 0x03, 0x00, 0xF0, 0x05, 0x00, 0xFF, 0x19,
@@ -123,7 +123,7 @@ static void SerialSendConfigToGPS(const char *STR)
     FASTSERIAL.Write(UART1, ProgramMemory);
     AVRTIME.SchedulerSleep(5);
   }
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 #endif
 }
@@ -213,7 +213,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
   {
 #ifdef __AVR_ATmega2560__
     FASTSERIAL.Write(UART1, ProgMemReadByte(Ublox_Set_Configuration + SizeOfCount));
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 #endif
     AVRTIME.SchedulerSleep(5);

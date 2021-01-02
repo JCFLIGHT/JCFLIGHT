@@ -49,7 +49,7 @@ int32_t __attribute__((noinline)) Multiplication32Bits(int16_t ValueA, int16_t V
   return Result;
 }
 
-#elif defined __arm__
+#elif defined __arm__ || defined ESP32
 
 int32_t __attribute__((noinline)) Multiplication32Bits(int16_t ValueA, int16_t ValueB)
 {

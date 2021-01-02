@@ -41,7 +41,9 @@ void LEDRGB::Update()
   BLUE_LED_PWM_REGISTER = LedRGB[BLUE];   //PINO DIGITAL 12
 
 #elif defined ESP32
-  AnalogWriteApplyDuty(2, LedRGB[RED]);
+  AnalogWriteApplyDuty(RED_LED_PWM_REGISTER, LedRGB[RED]);     //GPIO4
+  AnalogWriteApplyDuty(GREEN_LED_PWM_REGISTER, LedRGB[GREEN]); //GPIO2
+  AnalogWriteApplyDuty(BLUE_LED_PWM_REGISTER, LedRGB[BLUE]);   //GPIO15
 #elif defined __arm__
 
 #endif

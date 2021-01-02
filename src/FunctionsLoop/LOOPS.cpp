@@ -143,6 +143,36 @@ void Fast_Loop()
 #endif
 }
 
+void Super_Fast_Loop()
+{
+#ifdef __AVR_ATmega2560__
+        static Scheduler_Struct Integral_Loop;
+        if (SchedulerTimer(&Integral_Loop, SCHEDULER_PERIOD_HZ(500, "Hz")))
+        {
+#endif
+                RGB.Update();
+                SAFETYBUTTON.UpdateRoutine();
+                SBUS_Update();
+                IBUS_Update();
+                GPS_Serial_Read();
+                AHRS_Update();
+                DynamicPID();
+                Auto_Launch_Update();
+                CalculateAccelerationXYZ();
+                INS_Calculate_AccelerationZ();
+                CalculateXY_INS();
+                AirSpeed_Update();
+                Apply_Controll_For_Throttle();
+                GPS_Orientation_Update();
+                Servo_Rate_Adjust();
+                ApplyPWMInAllComponents();
+                Switch_Flag();
+                BATTERY.Calculate_Total_Mah();
+#ifdef __AVR_ATmega2560__
+        }
+#endif
+}
+
 void Integral_Loop()
 {
 #ifdef __AVR_ATmega2560__
@@ -157,30 +187,12 @@ void Integral_Loop()
                 AVRTIMEMONITOR.MeasuringStartTime(TOTAL_LOOP);
 #endif
 
-                RGB.Update();
-                SAFETYBUTTON.UpdateRoutine();
-                SBUS_Update();
-                IBUS_Update();
                 Acc_ReadBufferData();
                 Gyro_ReadBufferData();
-                GPS_Serial_Read();
-                AHRS_Update();
-                DynamicPID();
-                Auto_Launch_Update();
-                CalculateAccelerationXYZ();
-                INS_Calculate_AccelerationZ();
-                CalculateXY_INS();
-                AirSpeed_Update();
-                Apply_Controll_For_Throttle();
-                GPS_Orientation_Update();
                 Update_Loop_Time();
                 PID_Update();
                 PID_Reset_Integral_Accumulators();
                 PID_MixMotors();
-                Servo_Rate_Adjust();
-                ApplyPWMInAllComponents();
-                Switch_Flag();
-                BATTERY.Calculate_Total_Mah();
 
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringFinishTime();

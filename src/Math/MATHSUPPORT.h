@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef AVRMATH_H_
-#define AVRMATH_H_
+#ifndef _MATHSUPPORT_H_
+#define _MATHSUPPORT_H_
 #include "Arduino.h"
 float ABS_FLOAT(float X);
 int16_t ABS_16BITS(int16_t X);
@@ -25,6 +25,7 @@ float MIN_FLOAT(float X, float Y);
 float MAX_FLOAT(float X, float Y);
 int8_t MIN_8BITS(int8_t X, int8_t Y);
 uint16_t MIN_U16BITS(uint16_t X, uint16_t Y);
+uint32_t MIN_U32BITS(uint32_t X, uint32_t Y);
 uint16_t MAX_U16BITS(uint16_t X, uint16_t Y);
 float Constrain_Float(float ValueInput, float ValueInputMin, float ValueInputMax);
 int8_t Constrain_8Bits(int8_t ValueInput, int8_t ValueInputMin, int8_t ValueInputMax);

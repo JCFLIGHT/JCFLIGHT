@@ -18,12 +18,6 @@
 #ifndef _GPIOPWM_H_
 #define _GPIOPWM_H_
 #include "Arduino.h"
-typedef struct analog_write_channel
-{
-  int8_t Pin;
-  double Frequency;
-  uint8_t Resolution;
-} ESP32_Analog_Write_Struct;
-void AnalogWriteSetFrequency(uint8_t Pin, double Frequency);
-void AnalogWriteApplyDuty(uint8_t Pin, uint32_t DutyCycle);
+void AnalogWriteSetSettings(uint8_t Pin, double Frequency, uint8_t Resolution);
+void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse);
 #endif

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "Common/STRUCTS.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 static inline float VectorNormSquared(const Struct_Vector3x3 *Vector)
 {

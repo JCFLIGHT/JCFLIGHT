@@ -18,7 +18,7 @@
 #include "AUTOTHROTTLE.h"
 #include "AIRSPEED.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
 bool AutoThrottle_Mode = false;

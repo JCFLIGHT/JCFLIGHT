@@ -50,6 +50,13 @@ Task_Recurses_Struct Task_Recurses[TASK_COUNT] = {
         .StaticPriority = TASK_PRIORITY_LOW,
     },
 
+    [TASK_SUPER_FAST_LOOP] = {
+        .TaskName = "SUPER_FAST_LOOP",
+        .TaskFunction = Super_Fast_Loop,
+        .DesiredPeriod = SCHEDULER_PERIOD_HZ(1000, "Hz"),
+        .StaticPriority = TASK_PRIORITY_HIGH,
+    },
+
     [TASK_INTEGRAL_LOOP] = {
         .TaskName = "INTEGRAL_LOOP",
         .TaskFunction = Integral_Loop,

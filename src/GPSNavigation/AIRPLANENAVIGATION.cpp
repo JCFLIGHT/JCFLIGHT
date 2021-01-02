@@ -20,7 +20,7 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/FLIGHTMODES.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
 //PARAMETROS DE NAVEGAÇÃO

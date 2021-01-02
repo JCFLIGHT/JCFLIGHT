@@ -18,41 +18,8 @@
 #ifndef TASKSYSTEM_H_
 #define TASKSYSTEM_H_
 #include "Arduino.h"
-enum TaskPriority_Enum
-{
-  TASK_PRIORITY_LOW = 1,
-  TASK_PRIORITY_MEDIUM = 3,
-  TASK_PRIORITY_MEDIUM_HIGH = 4,
-  TASK_PRIORITY_HIGH = 5,
-  TASK_PRIORITY_REALTIME = 6
-};
-
-typedef enum
-{
-  TASK_SLOW_LOOP = 0,
-  TASK_MEDIUM_LOOP,
-  TASK_FAST_MEDIUM_LOOP,
-  TASK_FAST_LOOP,
-  TASK_INTEGRAL_LOOP,
-  //NÃO MOVA DE LUGAR O RESTANTE DOS ENUM ABAIXO
-  TASK_COUNT,
-  TASK_NONE = TASK_COUNT,
-  TASK_SELF
-} Tasks_ID_Enum;
-
-typedef struct
-{
-  const char *TaskName;
-  void (*TaskFunction)();
-  int32_t DesiredPeriod;
-  const uint8_t StaticPriority;
-  uint16_t DynamicPriority;
-  uint16_t TaskAgeCycles;
-  uint32_t LastExecuted;
-  int32_t TaskLatestDeltaTime;
-} Task_Recurses_Struct;
-
+#include "Common/STRUCTS.h"
 void TaskSystemInitialization(void);
 void TaskSystemRun(void);
-
+int32_t GetTaskDeltaTime(Tasks_ID_Enum TaskId);
 #endif

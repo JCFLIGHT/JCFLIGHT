@@ -20,7 +20,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "AHRS/AHRS.h"
 #include "FlightModes/AUXFLIGHT.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "RadioControl/STATES.h"
 #include "AHRS/VECTOR.h"
 #include "Buzzer/BUZZER.h"

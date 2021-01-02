@@ -192,4 +192,16 @@ typedef struct PT1Filter
   float RC;
   float DeltaTime;
 } PT1_Filter_Struct;
+
+typedef struct
+{
+  const char *TaskName;
+  void (*TaskFunction)();
+  int32_t DesiredPeriod;
+  const uint8_t StaticPriority;
+  uint16_t DynamicPriority;
+  uint16_t TaskAgeCycles;
+  uint32_t LastExecuted;
+  int32_t TaskLatestDeltaTime;
+} Task_Recurses_Struct;
 #endif

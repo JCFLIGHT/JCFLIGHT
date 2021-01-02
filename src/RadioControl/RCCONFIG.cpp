@@ -23,7 +23,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "SBUS/SBUSREAD.h"
 #include "IBUS/IBUSREAD.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "BAR/BAR.h"
 
 #define THROTTLE_FAIL_SAFE 975

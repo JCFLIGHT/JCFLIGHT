@@ -19,7 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 bool TakeOffInProgress = false;
 int16_t HoveringThrottle = 0;

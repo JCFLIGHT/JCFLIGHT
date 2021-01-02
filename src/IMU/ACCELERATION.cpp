@@ -17,7 +17,7 @@
 
 #include "ACCELERATION.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "FastSerial/PRINTF.h"
 
 //#define DEBUG_ACCELERATION

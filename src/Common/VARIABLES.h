@@ -43,7 +43,7 @@ extern bool TurnCoordinatorMode;
 //UNSIGNED 8 BITS (0 - 255)
 //*******************************************************
 extern uint8_t RTH_Altitude;
-extern uint8_t LedRGB[3];
+extern uint16_t LedRGB[3];
 extern uint8_t Compass_Type;
 extern uint8_t MagAddress;
 extern uint8_t MagRegister;

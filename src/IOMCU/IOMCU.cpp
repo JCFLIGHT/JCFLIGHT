@@ -27,7 +27,7 @@
 #include "BatteryMonitor/BATTERY.h"
 #include "LedRGB/LEDRGB.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "BAR/BAR.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "Buzzer/BUZZER.h"

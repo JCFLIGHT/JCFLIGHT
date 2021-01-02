@@ -16,7 +16,7 @@
 */
 
 #include "AUTODECLINATION.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "ProgMem/PROGMEM.h"
 
 //********************************************************************************************

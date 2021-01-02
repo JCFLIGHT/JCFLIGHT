@@ -22,5 +22,6 @@ void Slow_Loop();
 void Medium_Loop();
 void Fast_Medium_Loop();
 void Fast_Loop();
+void Super_Fast_Loop();
 void Integral_Loop();
 #endif

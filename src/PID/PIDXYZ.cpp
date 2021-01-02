@@ -24,7 +24,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Math/AVRLOWER.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"

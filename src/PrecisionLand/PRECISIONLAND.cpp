@@ -18,7 +18,7 @@
 #include "PRECISIONLAND.h"
 #include "Filters/LPFACCEF.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "FastSerial/PRINTF.h"
 
 #define LOOP_RATE_IN_HZ 500          //HZ

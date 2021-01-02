@@ -22,7 +22,7 @@
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Barometer/BAROREAD.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 uint8_t HistoryZCount;
 int32_t HistoryZPosition[10];

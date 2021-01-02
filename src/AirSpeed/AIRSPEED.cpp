@@ -18,7 +18,7 @@
 #include "AIRSPEED.h"
 #include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "AIRSPEEDANALOG.h"
 #include "AIRSPEEDI2C.h"
 #include "AIRSPEEDBACKEND.h"

@@ -17,7 +17,7 @@
 
 #include "MOTORSCOMPENSATION.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "BatteryMonitor/BATTLEVELS.h"
 

@@ -16,7 +16,7 @@
 */
 
 #include "LPFACCEF.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 void LowPassFilter::Apply(const float Sample, float CutOff_Freq, float DeltaTime)
 {

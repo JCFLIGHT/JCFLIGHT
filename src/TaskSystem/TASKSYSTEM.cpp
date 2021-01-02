@@ -19,7 +19,7 @@
 #include "TASKS.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Scheduler/SCHEDULER.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "Build/BOARDDEFS.h"
 
 static Task_Recurses_Struct *TaskQueueArray[TASK_COUNT + 1];
@@ -93,31 +93,27 @@ static inline Task_Recurses_Struct *QueueFirst(void)
 
 void RescheduleTask(Tasks_ID_Enum TaskId, int32_t NewTimePeriod)
 {
-  if (TaskId == TASK_SELF)
+  Task_Recurses_Struct *Task = &Task_Recurses[TaskId];
+  if (NewTimePeriod > 10000)
   {
-    Task_Recurses_Struct *Task = CurrentTask;
-    Task->DesiredPeriod = max(100, NewTimePeriod);
+    Task->DesiredPeriod = 10000;
   }
-  else if (TaskId < TASK_COUNT)
+  else
   {
-    Task_Recurses_Struct *Task = &Task_Recurses[TaskId];
-    Task->DesiredPeriod = max(100, NewTimePeriod);
+    Task->DesiredPeriod = NewTimePeriod;
   }
 }
 
 void SetTaskEnabled(Tasks_ID_Enum TaskID, bool Enabled)
 {
-  if (TaskID == TASK_SELF || TaskID < TASK_COUNT)
+  Task_Recurses_Struct *TaskPointer = &Task_Recurses[TaskID];
+  if (Enabled && TaskPointer->TaskFunction)
   {
-    Task_Recurses_Struct *TaskPointer = TaskID == TASK_SELF ? CurrentTask : &Task_Recurses[TaskID];
-    if (Enabled && TaskPointer->TaskFunction)
-    {
-      TaskQueueAdd(TaskPointer);
-    }
-    else
-    {
-      TaskQueueRemove(TaskPointer);
-    }
+    TaskQueueAdd(TaskPointer);
+  }
+  else
+  {
+    TaskQueueRemove(TaskPointer);
   }
 }
 
@@ -129,6 +125,7 @@ void TaskSystemInitialization(void)
   SetTaskEnabled(TASK_MEDIUM_LOOP, true);
   SetTaskEnabled(TASK_FAST_MEDIUM_LOOP, true);
   SetTaskEnabled(TASK_FAST_LOOP, true);
+  SetTaskEnabled(TASK_SUPER_FAST_LOOP, true);
   RescheduleTask(TASK_INTEGRAL_LOOP, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "KHz"));
   SetTaskEnabled(TASK_INTEGRAL_LOOP, true);
 }
@@ -136,21 +133,21 @@ void TaskSystemInitialization(void)
 void TaskSystemRun(void)
 {
   const uint32_t ActualCurrentTime = AVRTIME.SchedulerMicros();
-  uint32_t TimeToNextRealtimeTask = (__CONCAT(INT32_MAX, U) * 2UL + 1UL);
+  uint32_t TimeToNextRealTimeTask = (__CONCAT(INT32_MAX, U) * 2UL + 1UL);
   for (const Task_Recurses_Struct *TaskPointer = QueueFirst(); TaskPointer != NULL && TaskPointer->StaticPriority >= TASK_PRIORITY_REALTIME; TaskPointer = TaskQueueNext())
   {
     const uint32_t NextExecuteTask = TaskPointer->LastExecuted + TaskPointer->DesiredPeriod;
     if ((int32_t)(ActualCurrentTime - NextExecuteTask) >= 0)
     {
-      TimeToNextRealtimeTask = 0;
+      TimeToNextRealTimeTask = 0;
     }
     else
     {
       const uint32_t NewTimeInterval = NextExecuteTask - ActualCurrentTime;
-      TimeToNextRealtimeTask = min(TimeToNextRealtimeTask, NewTimeInterval);
+      TimeToNextRealTimeTask = MIN_U32BITS(TimeToNextRealTimeTask, NewTimeInterval);
     }
   }
-  const bool OutsideRealtimeGuardInterval = (TimeToNextRealtimeTask > 0);
+  const bool OutsideRealtimeGuardInterval = (TimeToNextRealTimeTask > 0);
   Task_Recurses_Struct *SelectedTask = NULL;
   uint16_t SelectedTaskDynamicPriority = 0;
   uint16_t WaitingTasks = 0;
@@ -187,16 +184,5 @@ void TaskSystemRun(void)
 
 int32_t GetTaskDeltaTime(Tasks_ID_Enum TaskId)
 {
-  if (TaskId == TASK_SELF)
-  {
-    return CurrentTask->TaskLatestDeltaTime;
-  }
-  else if (TaskId < TASK_COUNT)
-  {
-    return Task_Recurses[TaskId].TaskLatestDeltaTime;
-  }
-  else
-  {
-    return 0;
-  }
+  return Task_Recurses[TaskId].TaskLatestDeltaTime;
 }

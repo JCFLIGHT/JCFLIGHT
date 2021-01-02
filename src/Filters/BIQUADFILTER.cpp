@@ -17,7 +17,7 @@
 
 #include "BIQUADFILTER.h"
 #include "Math/AVRLOWER.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 void BiQuadFilter::Settings(int16_t CutOffFreq, int16_t SampleFreq, uint8_t FilterType)
 {

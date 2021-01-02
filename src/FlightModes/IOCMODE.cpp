@@ -17,7 +17,7 @@
 
 #include "IOCMODE.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "FastSerial/PRINTF.h"
 

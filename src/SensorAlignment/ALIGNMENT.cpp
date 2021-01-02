@@ -16,7 +16,7 @@
 */
 
 #include "ALIGNMENT.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "Common/STRUCTS.h"
 
 static Matrix3x3_Struct SensorRotationMatrix;

@@ -96,11 +96,13 @@ static const Struct_BeeperEntry *BeeperEntry = NULL;
 
 void BEEPERCLASS::Play(Beeper_Mode Mode)
 {
+  /*
   if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
       STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_SWITCH)
   {
     return;
   }
+  */
   const Struct_BeeperEntry *SelectedSong = NULL;
   for (uint8_t i = 0; i < BEEPER_TABLE_ENTRY_COUNT; i++)
   {
@@ -173,14 +175,19 @@ void BEEPERCLASS::ProcessCommand()
 
 void BEEPERCLASS::Run()
 {
+  /*
   if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
       STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_SWITCH)
   {
     return;
   }
+  */
   if (!BuzzerInit)
   {
     BEEP_PINOUT;
+#if defined ESP32
+    AnalogWriteSetSettings(GPIO_NUM_18, 490, 12);
+#endif
   }
   if (ESC.BeeperMode == ESC_CALIBRATION_MODE)
   {

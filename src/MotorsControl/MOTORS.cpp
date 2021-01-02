@@ -21,11 +21,14 @@
 #include "Common/STRUCTS.h"
 #include "AirPlane/AIRPLANE.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "PIDMIXING.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "WatchDog/REBOOT.h"
+#ifdef ESP32
+#include "ESP32_HAL/GPIOPWM.h"
+#endif
 
 //#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
 
@@ -42,7 +45,6 @@ void ConfigureRegisters()
   DDRH |= (1 << DDD5); //DEFINE A PORTA DIGITAL 8 COMO SAIDA
   DDRL |= (1 << DDD3); //DEFINE A PORTA DIGITAL 46 COMO SAIDA
   DDRL |= (1 << DDD4); //DEFINE A PORTA DIGITAL 45 COMO SAIDA
-  DDRA |= (1 << DDD0); //DEFINE A PORTA DIGITAL 22 COMO SAIDA
 
   //CONFIGURA O TIMER1 CANAIS A E B E TAMBÉM O TIMER2 CANAL A PARA O CONTROLE DO LED RGB
   TCCR1A |= _BV(COM1A1); //CONECTA O PINO 12 AO TIMER1 CANAL A
@@ -104,6 +106,42 @@ void ConfigureRegisters()
 
 #elif defined ESP32
 
+  //6 MOTORES
+  pinMode(GPIO_NUM_25, OUTPUT);
+  pinMode(GPIO_NUM_26, OUTPUT);
+  pinMode(GPIO_NUM_27, OUTPUT);
+  pinMode(GPIO_NUM_14, OUTPUT);
+  pinMode(GPIO_NUM_12, OUTPUT);
+  pinMode(GPIO_NUM_13, OUTPUT);
+  //GIMBAL
+  pinMode(GPIO_NUM_23, OUTPUT);
+  AnalogWriteSetSettings(GPIO_NUM_23, 50, 12);
+  //PARACHUTE
+  pinMode(GPIO_NUM_19, OUTPUT);
+  AnalogWriteSetSettings(GPIO_NUM_19, 50, 12);
+  //BUZZER
+  //A DECLARAÇÃO DE SAÍDA É FEITA NA EXTENSÃO DO BUZZER
+  AnalogWriteSetSettings(GPIO_NUM_18, 490, 12);
+
+  if (GetFrameStateOfAirPlane())
+  {
+    AnalogWriteSetSettings(GPIO_NUM_25, 490, 12);
+    AnalogWriteSetSettings(GPIO_NUM_26, 50, 12);
+    AnalogWriteSetSettings(GPIO_NUM_27, 50, 12);
+    AnalogWriteSetSettings(GPIO_NUM_14, 50, 12);
+    AnalogWriteSetSettings(GPIO_NUM_12, 50, 12);
+    AnalogWriteSetSettings(GPIO_NUM_13, 50, 12);
+  }
+  else
+  {
+    AnalogWriteSetSettings(GPIO_NUM_25, 490, 12);
+    AnalogWriteSetSettings(GPIO_NUM_26, 490, 12);
+    AnalogWriteSetSettings(GPIO_NUM_27, 490, 12);
+    AnalogWriteSetSettings(GPIO_NUM_14, 490, 12);
+    AnalogWriteSetSettings(GPIO_NUM_12, 490, 12);
+    AnalogWriteSetSettings(GPIO_NUM_13, 490, 12);
+  }
+
 #elif defined __arm__
 
 #endif
@@ -162,8 +200,15 @@ void ShutDownAllMotorsAndServos()
   OCR4A = 0;
   OCR4B = 0;
   OCR4C = 0;
-  
+
 #elif defined ESP32
+
+  AnalogWriteApplyPulse(GPIO_NUM_25, 0);
+  AnalogWriteApplyPulse(GPIO_NUM_26, 0);
+  AnalogWriteApplyPulse(GPIO_NUM_27, 0);
+  AnalogWriteApplyPulse(GPIO_NUM_14, 0);
+  AnalogWriteApplyPulse(GPIO_NUM_12, 0);
+  AnalogWriteApplyPulse(GPIO_NUM_13, 0);
 
 #elif defined __arm__
 
@@ -203,6 +248,15 @@ void ApplyPWMInAllComponents()
   OCR5B = MotorControl[PARACHUTESERVO] << 3; //PINO DIGITAL 45
 
 #elif defined ESP32
+
+  AnalogWriteApplyPulse(GPIO_NUM_25, MotorControl[MOTOR1]);
+  AnalogWriteApplyPulse(GPIO_NUM_26, MotorControl[MOTOR2]);
+  AnalogWriteApplyPulse(GPIO_NUM_27, MotorControl[MOTOR3]);
+  AnalogWriteApplyPulse(GPIO_NUM_14, MotorControl[MOTOR4]);
+  AnalogWriteApplyPulse(GPIO_NUM_12, MotorControl[MOTOR5]);
+  AnalogWriteApplyPulse(GPIO_NUM_13, MotorControl[MOTOR6]);
+  AnalogWriteApplyPulse(GPIO_NUM_23, MotorControl[GIMBAL]);
+  AnalogWriteApplyPulse(GPIO_NUM_19, MotorControl[PARACHUTESERVO]);
 
 #elif defined __arm__
 

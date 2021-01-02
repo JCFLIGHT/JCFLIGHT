@@ -23,6 +23,12 @@
 
 LEDRGB RGB;
 
+#ifdef __AVR_ATmega2560__
+#define PWM 254
+#elif defined ESP32
+#define PWM 4095
+#endif
+
 bool NotPriorit = false;
 
 void LEDRGB::Initialization()
@@ -30,6 +36,11 @@ void LEDRGB::Initialization()
   RED_LED_PINOUT;
   GREEN_LED_PINOUT;
   BLUE_LED_PINOUT;
+#if defined ESP32
+  AnalogWriteSetSettings(RED_LED_PWM_REGISTER, 490, 12);
+  AnalogWriteSetSettings(GREEN_LED_PWM_REGISTER, 490, 12);
+  AnalogWriteSetSettings(BLUE_LED_PWM_REGISTER, 490, 12);
+#endif
 }
 
 void LEDRGB::Update()
@@ -43,9 +54,9 @@ void LEDRGB::Update()
 
 #elif defined ESP32
 
-  AnalogWriteApplyDuty(RED_LED_PWM_REGISTER, LedRGB[RED]);     //GPIO4
-  AnalogWriteApplyDuty(GREEN_LED_PWM_REGISTER, LedRGB[GREEN]); //GPIO2
-  AnalogWriteApplyDuty(BLUE_LED_PWM_REGISTER, LedRGB[BLUE]);   //GPIO15
+  AnalogWriteApplyPulse(RED_LED_PWM_REGISTER, LedRGB[RED]);     //GPIO4
+  AnalogWriteApplyPulse(GREEN_LED_PWM_REGISTER, LedRGB[GREEN]); //GPIO2
+  AnalogWriteApplyPulse(BLUE_LED_PWM_REGISTER, LedRGB[BLUE]);   //GPIO15
 
 #elif defined __arm__
 
@@ -118,17 +129,29 @@ void LEDRGB::Function(uint8_t Mode)
 void LEDRGB::CalibAccLed(void)
 {
   //LED RGB
+#ifdef __AVR_ATmega2560__
   LedRGB[RED] = 0;     //VERMELHO
-  LedRGB[GREEN] = 254; //VERDE
+  LedRGB[GREEN] = PWM; //VERDE
   LedRGB[BLUE] = 220;  //AZUL
+#elif defined ESP32
+  LedRGB[RED] = 0;                                              //VERMELHO
+  LedRGB[GREEN] = PWM;                                          //VERDE
+  LedRGB[BLUE] = 4061;                                          //AZUL
+#endif
 }
 
 void LEDRGB::CalibMagLed(void)
 {
-  //LED RGB
+//LED RGB
+#ifdef __AVR_ATmega2560__
   LedRGB[RED] = 180;  //VERMELHO
   LedRGB[GREEN] = 0;  //VERDE
   LedRGB[BLUE] = 220; //AZUL
+#elif defined ESP32
+  LedRGB[RED] = 4021;                                           //VERMELHO
+  LedRGB[GREEN] = 0;                                            //VERDE
+  LedRGB[BLUE] = 4061;                                          //AZUL
+#endif
 }
 
 void LEDRGB::ConfigFlight_Led(void)
@@ -143,12 +166,20 @@ void LEDRGB::ConfigFlight_Led(void)
   if (ToogleBlinkConfig)
   {
     //LED RGB
+#ifdef __AVR_ATmega2560__
     LedRGB[RED] = 190;   //VERMELHO
     LedRGB[GREEN] = 240; //VERDE
     LedRGB[BLUE] = 0;    //AZUL
+#elif defined ESP32
+    LedRGB[RED] = 4031;                                         //VERMELHO
+    LedRGB[GREEN] = 4081;                                       //VERDE
+    LedRGB[BLUE] = 0;                                           //AZUL
+#endif
   }
   else
+  {
     RGB.Off_All_Leds();
+  }
 }
 
 void LEDRGB::CalibEsc_Led(void)
@@ -166,21 +197,21 @@ void LEDRGB::CalibEsc_Led(void)
   {
 
   case 1:
-    LedRGB[RED] = 254; //VERMELHO
+    LedRGB[RED] = PWM; //VERMELHO
     LedRGB[GREEN] = 0; //VERDE
     LedRGB[BLUE] = 0;  //AZUL
     break;
 
   case 2:
     LedRGB[RED] = 0;     //VERMELHO
-    LedRGB[GREEN] = 254; //VERDE
+    LedRGB[GREEN] = PWM; //VERDE
     LedRGB[BLUE] = 0;    //AZUL
     break;
 
   case 3:
     LedRGB[RED] = 0;    //VERMELHO
     LedRGB[GREEN] = 0;  //VERDE
-    LedRGB[BLUE] = 254; //AZUL
+    LedRGB[BLUE] = PWM; //AZUL
     break;
 
   case 4:
@@ -200,7 +231,7 @@ void LEDRGB::CalibEscFinish_Led(void)
 {
   //LED RGB
   LedRGB[RED] = 0;     //VERMELHO
-  LedRGB[GREEN] = 254; //VERDE
+  LedRGB[GREEN] = PWM; //VERDE
   LedRGB[BLUE] = 0;    //AZUL
 }
 
@@ -219,7 +250,7 @@ void LEDRGB::GPS_Led(void)
     if (GPS_Fail_Toggle)
     {
       //LIGA O LED VERMELHO
-      LedRGB[RED] = 254; //VERMELHO
+      LedRGB[RED] = PWM; //VERMELHO
       LedRGB[GREEN] = 0; //VERDE
       LedRGB[BLUE] = 0;  //AZUL
     }
@@ -256,7 +287,7 @@ void LEDRGB::GPS_Led(void)
         {
           //INDICA O NÚM. DE SAT.(VERDE)
           LedRGB[RED] = 0;     //VERMELHO
-          LedRGB[GREEN] = 254; //VERDE
+          LedRGB[GREEN] = PWM; //VERDE
           LedRGB[BLUE] = 0;    //AZUL
         }
         if (BlinkCount == 6 && ((BlinkCount % 2) == 0))
@@ -264,7 +295,7 @@ void LEDRGB::GPS_Led(void)
           //INDICA O HOME POINT (AZUL)
           LedRGB[RED] = 0;    //VERMELHO
           LedRGB[GREEN] = 0;  //VERDE
-          LedRGB[BLUE] = 254; //AZUL
+          LedRGB[BLUE] = PWM; //AZUL
         }
       }
       else
@@ -285,7 +316,7 @@ void LEDRGB::GPS_Led(void)
     {
       LedRGB[RED] = 0;    //VERMELHO
       LedRGB[GREEN] = 0;  //VERDE
-      LedRGB[BLUE] = 254; //AZUL
+      LedRGB[BLUE] = PWM; //AZUL
     }
     else
     {
@@ -298,19 +329,19 @@ void LEDRGB::Pre_Arm_Initializing(void)
 {
   LedRGB[RED] = 0;    //VERMELHO
   LedRGB[GREEN] = 0;  //VERDE
-  LedRGB[BLUE] = 254; //AZUL
+  LedRGB[BLUE] = PWM; //AZUL
 }
 
 void LEDRGB::Pre_Arm_Sucess(void)
 {
   LedRGB[RED] = 0;     //VERMELHO
-  LedRGB[GREEN] = 254; //VERDE
+  LedRGB[GREEN] = PWM; //VERDE
   LedRGB[BLUE] = 0;    //AZUL
 }
 
 void LEDRGB::Pre_Arm_Fail(void)
 {
-  LedRGB[RED] = 254; //VERMELHO
+  LedRGB[RED] = PWM; //VERMELHO
   LedRGB[GREEN] = 0; //VERDE
   LedRGB[BLUE] = 0;  //AZUL
 }

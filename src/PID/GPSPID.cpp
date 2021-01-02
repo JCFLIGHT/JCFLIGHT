@@ -16,7 +16,7 @@
 */
 
 #include "GPSPID.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 PID_PARAM PositionHoldPID;
 PID_PARAM PositionHoldRatePID;

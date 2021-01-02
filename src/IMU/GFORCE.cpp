@@ -17,7 +17,7 @@
 
 #include "GFORCE.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 float GetGForce()
 {

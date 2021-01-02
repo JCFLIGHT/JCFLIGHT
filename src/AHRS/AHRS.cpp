@@ -20,7 +20,7 @@
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "I2C/I2C.h"
 #include "BAR/BAR.h"

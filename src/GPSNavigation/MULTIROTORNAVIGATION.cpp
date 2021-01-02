@@ -23,7 +23,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "PID/GPSPID.h"
 #include "BAR/BAR.h"
 #include "Buzzer/BUZZER.h"

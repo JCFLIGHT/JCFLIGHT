@@ -16,7 +16,7 @@
 */
 
 #include "CHECK2D.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 bool CrashCheck2D(int16_t ValueA, int16_t ValueB, float CrashAngle)
 {

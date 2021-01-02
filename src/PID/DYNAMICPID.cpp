@@ -19,7 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/IOCMODE.h"
 #include "TPA.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "RadioControl/RCSMOOTH.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/CURVESRC.h"

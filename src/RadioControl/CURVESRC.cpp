@@ -19,7 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 #define THROTTLE_LOOKUP_LENGTH 11
 //lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO (1.5 = 2 / 2.5 = 2)

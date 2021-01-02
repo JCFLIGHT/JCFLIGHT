@@ -20,7 +20,7 @@
 #include "PID/PIDPARAMS.h"
 #include "LedRGB/LEDRGB.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "Buzzer/BUZZER.h"
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "BAR/BAR.h"

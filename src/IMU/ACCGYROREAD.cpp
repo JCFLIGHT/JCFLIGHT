@@ -22,7 +22,7 @@
 #include "Filters/KALMANFILTER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "Filters/BIQUADFILTER.h"
 #include "Compass/COMPASSREAD.h"
 #include "BAR/BAR.h"

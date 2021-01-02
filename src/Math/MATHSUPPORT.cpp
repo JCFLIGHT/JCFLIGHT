@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "AVRMATH.h"
+#include "MATHSUPPORT.h"
 
 float ABS_FLOAT(float X)
 {
@@ -48,6 +48,11 @@ int8_t MIN_8BITS(int8_t X, int8_t Y)
 }
 
 uint16_t MIN_U16BITS(uint16_t X, uint16_t Y)
+{
+    return ((X) < (Y) ? (X) : (Y));
+}
+
+uint32_t MIN_U32BITS(uint32_t X, uint32_t Y)
 {
     return ((X) < (Y) ? (X) : (Y));
 }

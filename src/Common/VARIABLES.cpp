@@ -42,7 +42,7 @@ bool TurnCoordinatorMode = false;
 //*******************************************************
 uint8_t FrameType = 0;
 uint8_t RTH_Altitude = 0;
-uint8_t LedRGB[3] = {0, 0, 0};
+uint16_t LedRGB[3] = {0, 0, 0};
 uint8_t Compass_Type = 0;
 uint8_t MagAddress = 0;
 uint8_t MagRegister = 0;

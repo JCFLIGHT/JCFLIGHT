@@ -18,7 +18,7 @@
 #include "AIRPLANE.h"
 #include "Common/VARIABLES.h"
 #include "Filters/LPFSERVO.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "SERVOMANUALTRIM.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"

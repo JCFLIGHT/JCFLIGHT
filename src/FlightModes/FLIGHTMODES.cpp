@@ -22,7 +22,7 @@
 #include "PID/PIDXYZ.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "RadioControl/STATES.h"
 #include "FrameStatus/FRAMESTATUS.h"
 

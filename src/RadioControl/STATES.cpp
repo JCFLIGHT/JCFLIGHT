@@ -18,7 +18,7 @@
 #include "STATES.h"
 #include "RCCONFIG.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
 #include "FrameStatus/FRAMESTATUS.h"
 

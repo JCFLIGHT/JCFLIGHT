@@ -18,7 +18,7 @@
 #include "TPA.h"
 #include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "BAR/BAR.h"
 
 TPA_Parameters_Struct TPA_Parameters;

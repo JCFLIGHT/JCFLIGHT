@@ -23,7 +23,7 @@
 #include "RadioControl/RCCONFIG.h"
 #include "Buzzer/BUZZER.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 
 ClassESC ESC;
 

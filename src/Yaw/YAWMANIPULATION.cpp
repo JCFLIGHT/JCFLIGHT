@@ -17,7 +17,7 @@
 
 #include "YAWMANIPULATION.h"
 #include "Common/VARIABLES.h"
-#include "Math/AVRMATH.h"
+#include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Filters/PT1.h"

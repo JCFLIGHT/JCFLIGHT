@@ -301,7 +301,7 @@ void Fast_Serial::UartSendData(uint8_t SerialPort)
 
 bool Fast_Serial::Flush(uint8_t SerialPort)
 {
-  return 0;
+  return true;
 }
 
 void Fast_Serial::Begin(uint8_t SerialPort, uint32_t BaudRate)
@@ -397,7 +397,7 @@ void Fast_Serial::UartSendData(uint8_t SerialPort)
 
 bool Fast_Serial::Flush(uint8_t SerialPort)
 {
-  return 0;
+  return true;
 }
 
 void Fast_Serial::Begin(uint8_t SerialPort, uint32_t BaudRate)

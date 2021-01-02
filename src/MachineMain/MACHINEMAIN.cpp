@@ -99,7 +99,7 @@ void setup()
     BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
-#ifdef __arm__ || defined ESP32
+#if defined(__arm__) || defined(ESP32)
     TaskSystemInitialization();
 #endif
 }

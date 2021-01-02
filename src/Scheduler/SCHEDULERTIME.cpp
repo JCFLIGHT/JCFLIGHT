@@ -134,20 +134,22 @@ void AVRTIMECLASS::SchedulerInit()
 
 uint32_t AVRTIMECLASS::SchedulerMillis()
 {
-  return 0;
+  return millis();
 }
 
 uint32_t AVRTIMECLASS::SchedulerMicros()
 {
-  return 0;
+  return micros();
 }
 
 void AVRTIMECLASS::SchedulerSleep(uint16_t MillisSeconds)
 {
+  delay(MillisSeconds);
 }
 
 void AVRTIMECLASS::SchedulerMicroSecondsSleep(uint16_t MicroSeconds)
 {
+  delayMicroseconds(MicroSeconds);
 }
 
 #elif defined __arm__

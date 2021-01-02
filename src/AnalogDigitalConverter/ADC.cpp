@@ -17,6 +17,10 @@
 
 #include "ADC.h"
 
+#if defined ESP32
+#include "ESP32_HAL/GPIOANALOGREAD.h"
+#endif
+
 AnalogPinClass ADCPIN;
 
 #ifdef __AVR_ATmega2560__
@@ -42,7 +46,7 @@ int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
 
 int16_t AnalogPinClass::Read(uint8_t NumbAnalogPin)
 {
-  return 0;
+  return GPIOAnalogRead(NumbAnalogPin);
 }
 
 #elif defined __arm__

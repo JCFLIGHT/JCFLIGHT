@@ -595,6 +595,8 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
 
 #if defined(__arm__) || defined(ESP32)
 
+bool Init = false;
+
 void FastSerialPrintln()
 {
 }
@@ -605,6 +607,12 @@ void SerialPrintF()
 
 void PrintlnParameters()
 {
+  if (!Init)
+  {
+    Serial.begin(115200);
+    Init = true;
+  }
+  Serial.println(Throttle.Output);
 }
 
 #endif

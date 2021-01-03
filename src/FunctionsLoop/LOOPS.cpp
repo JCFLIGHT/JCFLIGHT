@@ -168,6 +168,7 @@ void Super_Fast_Loop()
                 ApplyPWMInAllComponents();
                 Switch_Flag();
                 BATTERY.Calculate_Total_Mah();
+
 #ifdef __AVR_ATmega2560__
         }
 #endif

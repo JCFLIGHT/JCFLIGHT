@@ -183,8 +183,8 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
           break;
       }
       if (c == '\n')
-        FASTSERIAL.Write(UART0, '\r');
-      FASTSERIAL.Write(UART0, c);
+        FASTSERIAL.Write(UART_NUMB_0, '\r');
+      FASTSERIAL.Write(UART_NUMB_0, c);
     }
     flags = 0;
     width = 0;
@@ -298,7 +298,7 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
           {
             do
             {
-              FASTSERIAL.Write(UART0, ' ');
+              FASTSERIAL.Write(UART_NUMB_0, ' ');
             } while (--width);
           }
         }
@@ -307,7 +307,7 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
           width = 0;
         }
         if (sign)
-          FASTSERIAL.Write(UART0, sign);
+          FASTSERIAL.Write(UART_NUMB_0, sign);
         p = PSTR("inf");
         if (vtype & FTOA_NAN)
           p = PSTR("nan");
@@ -315,7 +315,7 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
         {
           if (flags & FL_FLTUPP)
             ndigs += 'I' - 'i';
-          FASTSERIAL.Write(UART0, ndigs);
+          FASTSERIAL.Write(UART_NUMB_0, ndigs);
           p++;
         }
         goto tail;
@@ -357,17 +357,17 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
       {
         while (width)
         {
-          FASTSERIAL.Write(UART0, ' ');
+          FASTSERIAL.Write(UART_NUMB_0, ' ');
           width--;
         }
       }
       if (sign)
-        FASTSERIAL.Write(UART0, sign);
+        FASTSERIAL.Write(UART_NUMB_0, sign);
       if (!(flags & FL_LPAD))
       {
         while (width)
         {
-          FASTSERIAL.Write(UART0, '0');
+          FASTSERIAL.Write(UART_NUMB_0, '0');
           width--;
         }
       }
@@ -377,46 +377,46 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
         do
         {
           if (n == -1)
-            FASTSERIAL.Write(UART0, '.');
+            FASTSERIAL.Write(UART_NUMB_0, '.');
           flags = (n <= exp && n > exp - ndigs)
                       ? buf[exp - n + 1]
                       : '0';
           if (--n < -prec)
             break;
-          FASTSERIAL.Write(UART0, flags);
+          FASTSERIAL.Write(UART_NUMB_0, flags);
         } while (1);
         if (n == exp && (buf[1] > '5' || (buf[1] == '5' && !(vtype & FTOA_CARRY))))
         {
           flags = '1';
         }
-        FASTSERIAL.Write(UART0, flags);
+        FASTSERIAL.Write(UART_NUMB_0, flags);
       }
       else
       {
         if (buf[1] != '1')
           vtype &= ~FTOA_CARRY;
-        FASTSERIAL.Write(UART0, buf[1]);
+        FASTSERIAL.Write(UART_NUMB_0, buf[1]);
         if (prec)
         {
-          FASTSERIAL.Write(UART0, '.');
+          FASTSERIAL.Write(UART_NUMB_0, '.');
           sign = 2;
           do
           {
-            FASTSERIAL.Write(UART0, buf[sign++]);
+            FASTSERIAL.Write(UART_NUMB_0, buf[sign++]);
           } while (--prec);
         }
-        FASTSERIAL.Write(UART0, flags & FL_FLTUPP ? 'E' : 'e');
+        FASTSERIAL.Write(UART_NUMB_0, flags & FL_FLTUPP ? 'E' : 'e');
         ndigs = '+';
         if (exp < 0 || (exp == 0 && (vtype & FTOA_CARRY) != 0))
         {
           exp = -exp;
           ndigs = '-';
         }
-        FASTSERIAL.Write(UART0, ndigs);
+        FASTSERIAL.Write(UART_NUMB_0, ndigs);
         for (ndigs = '0'; exp >= 10; exp -= 10)
           ndigs += 1;
-        FASTSERIAL.Write(UART0, ndigs);
-        FASTSERIAL.Write(UART0, '0' + exp);
+        FASTSERIAL.Write(UART_NUMB_0, ndigs);
+        FASTSERIAL.Write(UART_NUMB_0, '0' + exp);
       }
       goto tail;
     }
@@ -444,13 +444,13 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
       {
         while (size < width)
         {
-          FASTSERIAL.Write(UART0, ' ');
+          FASTSERIAL.Write(UART_NUMB_0, ' ');
           width--;
         }
       }
       while (size)
       {
-        FASTSERIAL.Write(UART0, GETBYTE(flags, FL_PGMSTRING, pnt));
+        FASTSERIAL.Write(UART_NUMB_0, GETBYTE(flags, FL_PGMSTRING, pnt));
         if (width)
           width -= 1;
         size -= 1;
@@ -553,16 +553,16 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
       }
       while (len < width)
       {
-        FASTSERIAL.Write(UART0, ' ');
+        FASTSERIAL.Write(UART_NUMB_0, ' ');
         len++;
       }
     }
     width = (len < width) ? width - len : 0;
     if (flags & FL_ALT)
     {
-      FASTSERIAL.Write(UART0, '0');
+      FASTSERIAL.Write(UART_NUMB_0, '0');
       if (flags & FL_ALTHEX)
-        FASTSERIAL.Write(UART0, flags & FL_ALTUPP ? 'X' : 'x');
+        FASTSERIAL.Write(UART_NUMB_0, flags & FL_ALTUPP ? 'X' : 'x');
     }
     else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE))
     {
@@ -571,21 +571,21 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
         z = '+';
       if (flags & FL_NEGATIVE)
         z = '-';
-      FASTSERIAL.Write(UART0, z);
+      FASTSERIAL.Write(UART_NUMB_0, z);
     }
     while (prec > c)
     {
-      FASTSERIAL.Write(UART0, '0');
+      FASTSERIAL.Write(UART_NUMB_0, '0');
       prec--;
     }
     do
     {
-      FASTSERIAL.Write(UART0, buf[--c]);
+      FASTSERIAL.Write(UART_NUMB_0, buf[--c]);
     } while (c);
   tail:
     while (width)
     {
-      FASTSERIAL.Write(UART0, ' ');
+      FASTSERIAL.Write(UART_NUMB_0, ' ');
       width--;
     }
   }
@@ -594,8 +594,6 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
 #endif
 
 #if defined(__arm__) || defined(ESP32)
-
-bool Init = false;
 
 void FastSerialPrintln()
 {
@@ -607,12 +605,7 @@ void SerialPrintF()
 
 void PrintlnParameters()
 {
-  if (!Init)
-  {
-    Serial.begin(115200);
-    Init = true;
-  }
-  Serial.println(Throttle.Output);
+  //Serial.println(Throttle.Output);
 }
 
 #endif

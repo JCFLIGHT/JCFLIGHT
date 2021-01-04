@@ -82,15 +82,15 @@ void setup()
         RED_LED_ON;
         GREEN_LED_OFF;
         BLUE_LED_OFF;
-        AVRTIME.SchedulerSleep(133);
+        SCHEDULERTIME.Sleep(133);
         RED_LED_OFF;
         GREEN_LED_ON;
         BLUE_LED_OFF;
-        AVRTIME.SchedulerSleep(133);
+        SCHEDULERTIME.Sleep(133);
         RED_LED_OFF;
         GREEN_LED_OFF;
         BLUE_LED_ON;
-        AVRTIME.SchedulerSleep(133);
+        SCHEDULERTIME.Sleep(133);
         //133 * 3 * 5 = 1.995 SEGUNDO
     }
     //DESATIVA TODOS OS LEDS

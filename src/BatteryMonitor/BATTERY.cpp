@@ -177,7 +177,7 @@ void BATT::Read_Current(void)
 
 void BATT::Calculate_Total_Mah(void)
 {
-  uint32_t TimeNow = AVRTIME.SchedulerMicros();
+  uint32_t TimeNow = SCHEDULERTIME.GetMicros();
   static uint32_t Last_Time_Stored;
   float Delta_Time = TimeNow - Last_Time_Stored;
   if (Last_Time_Stored != 0 && Delta_Time < 2000000.0f)

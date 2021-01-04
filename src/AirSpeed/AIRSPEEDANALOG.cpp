@@ -31,7 +31,7 @@ float AirSpeed_Analog_Get_Calibration(void)
     for (uint8_t CountSamples = 0; CountSamples < INITIAL_SAMPLES; CountSamples++)
     {
         AirSpeedAnalogReturnValue = ADCPIN.Read(ADC_ANALOG_AIRSPEED);
-        AVRTIME.SchedulerSleep(20);
+        SCHEDULERTIME.Sleep(20);
     }
     return AirSpeedAnalogReturnValue;
 }

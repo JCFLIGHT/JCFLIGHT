@@ -32,17 +32,17 @@ uint16_t SBUSReadChannels[12];
 
 void SBUS_Update()
 {
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 1)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1)
     return;
   SBUSRC.Read(&SBUSReadChannels[0], &SBUSRC.FailSafe, &LostFrame);
 #if defined(DEBUG_MODE)
   static uint32_t SBUS_Serial_Refresh;
-  if (AVRTIME.SchedulerMillis() - SBUS_Serial_Refresh >= 20)
+  if (SCHEDULERTIME.GetMillis() - SBUS_Serial_Refresh >= 20)
   {
     FastSerialPrintln(PSTR("Thr:%d Yaw:%d Pitch:%d Roll:%d Aux1:%d Aux2:%d Aux3:%d Aux4:%d Aux5:%d Aux6:%d Aux7:%d Aux8:%d FailSafe:%d\n"),
                       SBUSReadChannels[0], SBUSReadChannels[1], SBUSReadChannels[2], SBUSReadChannels[3], SBUSReadChannels[4],
                       SBUSReadChannels[5], SBUSReadChannels[6], SBUSReadChannels[7], SBUSRC.FailSafe);
-    SBUS_Serial_Refresh = AVRTIME.SchedulerMillis();
+    SBUS_Serial_Refresh = SCHEDULERTIME.GetMillis();
   }
 #endif
 }
@@ -102,15 +102,15 @@ void SBUS::Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame)
 bool SBUS::SerialParse()
 {
   static uint32_t SBUS_Stored_Time = 0;
-  if (AVRTIME.SchedulerMillis() - SBUS_Stored_Time > SBUS_TIMEOUT_US)
+  if (SCHEDULERTIME.GetMillis() - SBUS_Stored_Time > SBUS_TIMEOUT_US)
   {
     ParserState = 0;
-    SBUS_Stored_Time = AVRTIME.SchedulerMillis();
+    SBUS_Stored_Time = SCHEDULERTIME.GetMillis();
   }
-  while (FASTSERIAL.Available(UART2) > 0)
+  while (FASTSERIAL.Available(UART_NUMB_2) > 0)
   {
     SBUS_Stored_Time = 0;
-    ActualByte = FASTSERIAL.Read(UART2);
+    ActualByte = FASTSERIAL.Read(UART_NUMB_2);
     if (ParserState == 0)
     {
       if ((ActualByte == 0x0F) && ((PrevByte == 0x00) || ((PrevByte & 0x0F) == 0x04)))

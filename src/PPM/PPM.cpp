@@ -35,7 +35,7 @@ static uint8_t PPMChannelMap[12];
 
 void ConfigurePPMRegisters()
 {
-  if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2))
   {
     DDRK &= ~(1 << 7);  //DECLARA COMO ENTRADA
     PORTK |= (1 << 7);  //ATIVA O PULL-UP
@@ -70,7 +70,7 @@ void ConfigurePPMRegisters()
 extern "C" void __vector_11(void) __attribute__((signal, __INTR_ATTRS));
 void __vector_11(void)
 {
-  if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
     return;
   if ((*(volatile uint8_t *)(0x106)) & 128)
     InterruptRoutine();
@@ -83,7 +83,7 @@ void InterruptRoutine(void)
   uint16_t PPMTimer;
   uint16_t PPMTimerDifference;
   static uint16_t PPMStoredTimer = 0;
-  PPMTimer = AVRTIME.SchedulerMicros();
+  PPMTimer = SCHEDULERTIME.GetMicros();
   __asm__ __volatile__("sei" ::
                            : "memory");
   PPMTimerDifference = PPMTimer - PPMStoredTimer;
@@ -113,11 +113,11 @@ void InterruptRoutine(void)
 uint16_t LearningAllChannels(uint8_t Channels)
 {
   uint16_t ReceiverData;
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
   {
     ReceiverData = SBUSReadChannels[PPMChannelMap[Channels]];
   }
-  else if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2)
+  else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
   {
     ReceiverData = IBUSReadChannels[PPMChannelMap[Channels]];
   }
@@ -146,11 +146,11 @@ void DecodeAllReceiverChannels()
   for (uint8_t Channels = 0; Channels < 12; Channels++)
   {
     RadioControllOutputDecoded = LearningAllChannels(Channels);
-    if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
       CheckFailSafeState = SBUSRC.FailSafe || !COMMAND_ARM_DISARM;
     else
       CheckFailSafeState = RadioControllOutputDecoded > FAILSAFE_DETECT_TRESHOLD || !COMMAND_ARM_DISARM;
-    if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2))
+    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
     {
       if (CheckFailSafeState)
         DirectRadioControllRead[Channels] = RadioControllOutputDecoded;
@@ -177,7 +177,7 @@ void DecodeAllReceiverChannels()
 
 void ConfigurePPMRegisters()
 {
-  if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2))
   {
     pinMode(GPIO_NUM_36, INPUT);
     attachInterrupt(GPIO_NUM_36, InterruptRoutine, FALLING);
@@ -214,7 +214,7 @@ void IRAM_ATTR InterruptRoutine(void)
   uint16_t PPMTimer;
   uint16_t PPMTimerDifference;
   static uint16_t PPMStoredTimer = 0;
-  PPMTimer = AVRTIME.SchedulerMicros();
+  PPMTimer = SCHEDULERTIME.GetMicros();
   PPMTimerDifference = PPMTimer - PPMStoredTimer;
   PPMStoredTimer = PPMTimer;
   if (PPMTimerDifference > 2700)
@@ -242,11 +242,11 @@ void IRAM_ATTR InterruptRoutine(void)
 uint16_t LearningAllChannels(uint8_t Channels)
 {
   uint16_t ReceiverData;
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
   {
     ReceiverData = SBUSReadChannels[PPMChannelMap[Channels]];
   }
-  else if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2)
+  else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
   {
     ReceiverData = IBUSReadChannels[PPMChannelMap[Channels]];
   }
@@ -270,11 +270,11 @@ void DecodeAllReceiverChannels()
   for (uint8_t Channels = 0; Channels < 12; Channels++)
   {
     RadioControllOutputDecoded = LearningAllChannels(Channels);
-    if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
       CheckFailSafeState = SBUSRC.FailSafe || !COMMAND_ARM_DISARM;
     else
       CheckFailSafeState = RadioControllOutputDecoded > FAILSAFE_DETECT_TRESHOLD || !COMMAND_ARM_DISARM;
-    if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2))
+    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
     {
       if (CheckFailSafeState)
         DirectRadioControllRead[Channels] = RadioControllOutputDecoded;
@@ -301,7 +301,7 @@ void DecodeAllReceiverChannels()
 
 void ConfigurePPMRegisters()
 {
-  if ((STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2))
   {
   }
   //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)

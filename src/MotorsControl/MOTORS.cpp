@@ -149,7 +149,7 @@ void ConfigureRegisters()
   if (!ESC.Run_Calibrate && !SAFETYBUTTON.SafeButtonEnabled())
   {
     PulseInAllMotors(1000);
-    AVRTIME.SchedulerSleep(300);
+    SCHEDULERTIME.Sleep(300);
   }
 }
 

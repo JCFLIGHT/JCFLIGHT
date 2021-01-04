@@ -17,14 +17,14 @@
 
 #include "SCHEDULERTIME.h"
 
-AVRTIMECLASS AVRTIME;
+SchedulerTimeClass SCHEDULERTIME;
 
 #ifdef __AVR_ATmega2560__
 volatile uint32_t Timer0_OverFlow = 0;
 volatile uint32_t Timer0_Scheduler_Millis = 0;
 static uint8_t Timer0_Fraction = 0;
 
-void AVRTIMECLASS::SchedulerInit()
+void SchedulerTimeClass::Initialization()
 {
   __asm__ __volatile__("sei" ::
                            : "memory");
@@ -54,7 +54,7 @@ void AVRTIMECLASS::SchedulerInit()
   _SFR_BYTE(ADCSRA) |= _BV(ADEN);
 }
 
-uint32_t AVRTIMECLASS::SchedulerMillis()
+uint32_t SchedulerTimeClass::GetMillis()
 {
   uint32_t MillisCount;
   uint8_t oldSREG = SREG;
@@ -65,7 +65,7 @@ uint32_t AVRTIMECLASS::SchedulerMillis()
   return MillisCount;
 }
 
-uint32_t AVRTIMECLASS::SchedulerMicros()
+uint32_t SchedulerTimeClass::GetMicros()
 {
   uint32_t MillisCount;
   uint8_t oldSREG = SREG, TCNTCount;
@@ -79,14 +79,14 @@ uint32_t AVRTIMECLASS::SchedulerMicros()
   return ((MillisCount << 8) + TCNTCount) * 4;
 }
 
-void AVRTIMECLASS::SchedulerSleep(uint16_t MillisSeconds)
+void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
 {
-  uint32_t Start = AVRTIME.SchedulerMicros();
+  uint32_t Start = SCHEDULERTIME.GetMicros();
   while (MillisSeconds > 0)
   {
-    AVRTIME.SchedulerMicros();
-    AVRTIME.SchedulerMillis();
-    while ((AVRTIME.SchedulerMicros() - Start) >= 1000)
+    SCHEDULERTIME.GetMicros();
+    SCHEDULERTIME.GetMillis();
+    while ((SCHEDULERTIME.GetMicros() - Start) >= 1000)
     {
       MillisSeconds--;
       if (MillisSeconds == 0)
@@ -96,7 +96,7 @@ void AVRTIMECLASS::SchedulerSleep(uint16_t MillisSeconds)
   }
 }
 
-void AVRTIMECLASS::SchedulerMicroSecondsSleep(uint16_t MicroSeconds)
+void SchedulerTimeClass::MicroSecondsSleep(uint16_t MicroSeconds)
 {
   if (--MicroSeconds == 0)
     return;
@@ -128,51 +128,51 @@ void __vector_23(void)
 
 #elif defined ESP32
 
-void AVRTIMECLASS::SchedulerInit()
+void SchedulerTimeClass::Initialization()
 {
 }
 
-uint32_t AVRTIMECLASS::SchedulerMillis()
+uint32_t SchedulerTimeClass::GetMillis()
 {
   return millis();
 }
 
-uint32_t AVRTIMECLASS::SchedulerMicros()
+uint32_t SchedulerTimeClass::GetMicros()
 {
   return micros();
 }
 
-void AVRTIMECLASS::SchedulerSleep(uint16_t MillisSeconds)
+void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
 {
   delay(MillisSeconds);
 }
 
-void AVRTIMECLASS::SchedulerMicroSecondsSleep(uint16_t MicroSeconds)
+void SchedulerTimeClass::MicroSecondsSleep(uint16_t MicroSeconds)
 {
   delayMicroseconds(MicroSeconds);
 }
 
 #elif defined __arm__
 
-void AVRTIMECLASS::SchedulerInit()
+void SchedulerTimeClass::Initialization()
 {
 }
 
-uint32_t AVRTIMECLASS::SchedulerMillis()
-{
-  return 0;
-}
-
-uint32_t AVRTIMECLASS::SchedulerMicros()
+uint32_t SchedulerTimeClass::GetMillis()
 {
   return 0;
 }
 
-void AVRTIMECLASS::SchedulerSleep(uint16_t MillisSeconds)
+uint32_t SchedulerTimeClass::GetMicros()
+{
+  return 0;
+}
+
+void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
 {
 }
 
-void AVRTIMECLASS::SchedulerMicroSecondsSleep(uint16_t MicroSeconds)
+void SchedulerTimeClass::MicroSecondsSleep(uint16_t MicroSeconds)
 {
 }
 #endif

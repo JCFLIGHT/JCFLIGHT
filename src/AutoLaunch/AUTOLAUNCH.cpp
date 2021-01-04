@@ -67,14 +67,14 @@ void AutoLaunchDetector()
   if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), CheckAnglesInclination(AHRS_BANKED_ANGLE)) ||
       GetSwingVelocityState())
   {
-    AutoLaunchDetectorSum += (AVRTIME.SchedulerMillis() - AutoLaunchDetectorPreviousTime);
-    AutoLaunchDetectorPreviousTime = AVRTIME.SchedulerMillis();
+    AutoLaunchDetectorSum += (SCHEDULERTIME.GetMillis() - AutoLaunchDetectorPreviousTime);
+    AutoLaunchDetectorPreviousTime = SCHEDULERTIME.GetMillis();
     if (AutoLaunchDetectorSum >= 40)
       AutoLaunchState = true;
   }
   else
   {
-    AutoLaunchDetectorPreviousTime = AVRTIME.SchedulerMillis();
+    AutoLaunchDetectorPreviousTime = SCHEDULERTIME.GetMillis();
     AutoLaunchDetectorSum = 0;
   }
 }
@@ -136,7 +136,7 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
   if (SlowThr)
   {
     RCController[THROTTLE] = ThrottleIteration;
-    if (AVRTIME.SchedulerMillis() - ThrottleStart >= MOTOR_SPINUP_TIME)
+    if (SCHEDULERTIME.GetMillis() - ThrottleStart >= MOTOR_SPINUP_TIME)
     {
       if (IgnoreFirstPeak)
       {
@@ -146,12 +146,12 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
           ThrottleIteration = AUTO_LAUNCH_THROTTLE_MAX;
       }
       IgnoreFirstPeak = true;
-      ThrottleStart = AVRTIME.SchedulerMillis();
+      ThrottleStart = SCHEDULERTIME.GetMillis();
     }
   }
   else
   {
-    if (AVRTIME.SchedulerMillis() - ThrottleStart >= LAUNCH_MOTOR_IDLE_SPINUP_TIME)
+    if (SCHEDULERTIME.GetMillis() - ThrottleStart >= LAUNCH_MOTOR_IDLE_SPINUP_TIME)
     {
       if (IgnoreFirstPeak)
       {
@@ -159,7 +159,7 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
         BEEPER.Silence();
       }
       else
-        ThrottleStart = AVRTIME.SchedulerMillis();
+        ThrottleStart = SCHEDULERTIME.GetMillis();
       IgnoreFirstPeak = true;
     }
     else
@@ -214,10 +214,10 @@ bool GetIMUAngleBanked(float VectorRoll, bool CheckIMUInclination)
 
 bool AutoLaunchTimerOverFlow()
 {
-  if (AVRTIME.SchedulerMillis() - AbortAutoLaunch >= AUTO_LAUCH_EXIT_FUNCTION)
+  if (SCHEDULERTIME.GetMillis() - AbortAutoLaunch >= AUTO_LAUCH_EXIT_FUNCTION)
   {
     if (!IgnoreFirstPeakOverFlow)
-      AbortAutoLaunch = AVRTIME.SchedulerMillis();
+      AbortAutoLaunch = SCHEDULERTIME.GetMillis();
     if (IgnoreFirstPeakOverFlow)
       return true;
     IgnoreFirstPeakOverFlow = true;

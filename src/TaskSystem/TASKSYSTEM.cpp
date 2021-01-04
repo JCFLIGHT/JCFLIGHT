@@ -119,7 +119,7 @@ void TaskSystemInitialization(void)
 
 void TaskSystemRun(void)
 {
-  const uint32_t ActualCurrentTime = AVRTIME.SchedulerMicros();
+  const uint32_t ActualCurrentTime = SCHEDULERTIME.GetMicros();
   uint32_t TimeToNextRealTimeTask = (__CONCAT(INT32_MAX, U) * 2UL + 1UL);
   for (const Task_Resources_Struct *TaskPointer = QueueFirst(); TaskPointer != NULL && TaskPointer->StaticPriority >= TASK_PRIORITY_REALTIME; TaskPointer = TaskQueueNext())
   {

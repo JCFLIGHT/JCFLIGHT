@@ -94,7 +94,7 @@ void GPS_Process_FlightModes(void)
     STORAGEMANAGER.Write_Float(DECLINATION_ADDR, Declination());
     DeclinationPushed = true;
   }
-  uint32_t ActualCurrentTime = AVRTIME.SchedulerMillis();
+  uint32_t ActualCurrentTime = SCHEDULERTIME.GetMillis();
   static uint32_t StoredCurrentTime;
   DeltaTimeGPSNavigation = (ActualCurrentTime - StoredCurrentTime) * 1e-3f;
   StoredCurrentTime = ActualCurrentTime;
@@ -160,12 +160,12 @@ void GPS_Process_FlightModes(void)
     case Do_Land_Init:
       Do_GPS_Altitude = true;
       SetAltitudeHold(ALTITUDE.EstimateAltitude);
-      Time_To_Start_The_Land = AVRTIME.SchedulerMillis() + 100;
+      Time_To_Start_The_Land = SCHEDULERTIME.GetMillis() + 100;
       NavigationMode = Do_Land_Settle;
       break;
 
     case Do_Land_Settle:
-      if (AVRTIME.SchedulerMillis() >= Time_To_Start_The_Land)
+      if (SCHEDULERTIME.GetMillis() >= Time_To_Start_The_Land)
       {
         NavigationMode = Do_LandInProgress;
       }

@@ -49,14 +49,14 @@ void AVRTimeMonitor::MeasuringStartTime(uint8_t FunctionNumber)
       FunctionNumberCount = 0;
     }
   }
-  StartTime = AVRTIME.SchedulerMicros();
+  StartTime = SCHEDULERTIME.GetMicros();
   EndTime = 0;
 }
 
 void AVRTimeMonitor::MeasuringFinishTime()
 {
   if (EndTime == 0)
-    EndTime = AVRTIME.SchedulerMicros();
+    EndTime = SCHEDULERTIME.GetMicros();
   AVRTotalTime = EndTime - StartTime;
   if (SafeToPrint)
   {

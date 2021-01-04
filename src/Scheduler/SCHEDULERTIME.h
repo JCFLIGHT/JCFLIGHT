@@ -21,14 +21,14 @@
 #ifdef __AVR_ATmega2560__
 #include <avr/interrupt.h>
 #endif
-class AVRTIMECLASS
+class SchedulerTimeClass
 {
 public:
-  void SchedulerInit(void);
-  void SchedulerSleep(uint16_t MillisSeconds);
-  void SchedulerMicroSecondsSleep(uint16_t MicroSeconds);
-  uint32_t SchedulerMillis(void);
-  uint32_t SchedulerMicros(void);
+  void Initialization(void);
+  void Sleep(uint16_t MillisSeconds);
+  void MicroSecondsSleep(uint16_t MicroSeconds);
+  uint32_t GetMillis(void);
+  uint32_t GetMicros(void);
 };
-extern AVRTIMECLASS AVRTIME;
+extern SchedulerTimeClass SCHEDULERTIME;
 #endif

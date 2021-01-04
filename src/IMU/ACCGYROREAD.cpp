@@ -143,7 +143,7 @@ void Acc_Initialization()
 void Gyro_Initialization()
 {
   I2C.WriteRegister(0x68, 0x6B, 0x80);
-  AVRTIME.SchedulerSleep(50);
+  SCHEDULERTIME.Sleep(50);
   I2C.WriteRegister(0x68, 0x6B, 0x03);
   GyroLPF = STORAGEMANAGER.Read_8Bits(GYRO_LPF_ADDR);
   switch (GyroLPF)

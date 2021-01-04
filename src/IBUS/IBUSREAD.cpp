@@ -27,13 +27,13 @@ uint16_t IBUSReadChannels[12];
 
 void IBUS_Update(void)
 {
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) != 2)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2)
     return;
   uint16_t CheckSum;
   uint16_t ReceiverSum;
-  while (FASTSERIAL.Available(UART2))
+  while (FASTSERIAL.Available(UART_NUMB_2))
   {
-    uint8_t IBUS_SerialRead = FASTSERIAL.Read(UART2);
+    uint8_t IBUS_SerialRead = FASTSERIAL.Read(UART_NUMB_2);
     if (IBUSIndex == 0 && IBUS_SerialRead != 0x20)
     {
       continue;

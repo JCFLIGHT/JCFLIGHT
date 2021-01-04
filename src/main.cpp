@@ -24,7 +24,7 @@
   {                                     \
     int main(void)                      \
     {                                   \
-      AVRTIME.SchedulerInit();          \
+      SCHEDULERTIME.Initialization();          \
       MachineInit();                    \
       while (true)                      \
       {                                 \

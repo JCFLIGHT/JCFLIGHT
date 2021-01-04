@@ -226,10 +226,10 @@ enum Compass_Rotation_Enum
 
 enum UART_Type_Enum
 {
-    UART0 = 0,
-    UART1,
-    UART2,
-    UART3
+    UART_NUMB_0 = 0,
+    UART_NUMB_1,
+    UART_NUMB_2,
+    UART_NUMB_3
 };
 
 enum Barometer_Type_Enum

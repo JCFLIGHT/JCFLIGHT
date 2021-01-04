@@ -54,8 +54,10 @@ GCSClass GCS;
 uint8_t SerialCheckSum;
 uint8_t ProtocolCommand;
 uint8_t SerialInputBuffer[64];
+uint8_t SerialOutputBuffer[128];
+uint8_t SerialOutputBufferSizeCount;
 uint8_t VectorCount;
-uint8_t SeriaBuffer;
+uint8_t SerialBuffer;
 uint8_t SerialAvailableGuard;
 uint8_t ProtocolTaskOrder;
 uint8_t SerialOffSet;
@@ -153,7 +155,7 @@ struct _SendUserBasicGCSParameters
     uint8_t SendGimbalType;
     uint8_t SendParachuteType;
     uint8_t SendSPIType;
-    uint8_t SendUART2Type;
+    uint8_t SendUART_NUMB_2Type;
     uint8_t SendCompassType;
     uint8_t SendCompassRotationType;
     uint8_t SendRTHAltitudeType;
@@ -179,7 +181,7 @@ struct _GetUserBasicGCSParameters
     uint8_t GetGimbalType;
     uint8_t GetParachuteType;
     uint8_t GetSPIType;
-    uint8_t GetUART2Type;
+    uint8_t GetUART_NUMB_2Type;
     uint8_t GetCompassType;
     uint8_t GetCompassRotationType;
     uint8_t GetRTHAltitudeType;
@@ -312,57 +314,112 @@ struct _SendWayPointGCSOthersParameters
     uint8_t SendGPSHoldTimedTen;
 } SendWayPointGCSOthersParameters;
 
+#ifdef __AVR_ATmega2560__
+
 static void GCS_Send_Data(uint8_t Buffer)
 {
-    FASTSERIAL.TX_Send(UART0, Buffer);
+    FASTSERIAL.TX_Send(UART_NUMB_0, Buffer);
     SerialCheckSum ^= Buffer;
+
+#elif defined ESP32
+
+static void GCS_Send_Data(int32_t Buffer)
+{
+    int32_t MemGetBuffer;
+    memcpy(&MemGetBuffer, &Buffer, sizeof(int32_t));
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = MemGetBuffer & 0xFF;
+    SerialCheckSum ^= MemGetBuffer & 0xFF;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGetBuffer >> 8) & 0xFF;
+    SerialCheckSum ^= (MemGetBuffer >> 8) & 0xFF;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGetBuffer >> 16) & 0xFF;
+    SerialCheckSum ^= (MemGetBuffer >> 16) & 0xFF;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGetBuffer >> 24) & 0xFF;
+    SerialCheckSum ^= (MemGetBuffer >> 24) & 0xFF;
+
+#endif
 }
 
 static void Communication_Passed(bool Error, uint8_t Buffer)
 {
-    FASTSERIAL.TX_Send(UART0, 0x4a);
+#ifdef __AVR_ATmega2560__
+
+    FASTSERIAL.TX_Send(UART_NUMB_0, 0x4a);
     SerialCheckSum ^= 0x4a;
-    FASTSERIAL.TX_Send(UART0, 0x43);
+    FASTSERIAL.TX_Send(UART_NUMB_0, 0x43);
     SerialCheckSum ^= 0x43;
-    FASTSERIAL.TX_Send(UART0, Error ? 0x21 : 0x46);
+    FASTSERIAL.TX_Send(UART_NUMB_0, Error ? 0x21 : 0x46);
     SerialCheckSum ^= Error ? 0x21 : 0x46;
     SerialCheckSum = 0;
-    FASTSERIAL.TX_Send(UART0, Buffer);
+    FASTSERIAL.TX_Send(UART_NUMB_0, Buffer);
     SerialCheckSum ^= Buffer;
-    FASTSERIAL.TX_Send(UART0, ProtocolCommand);
+    FASTSERIAL.TX_Send(UART_NUMB_0, ProtocolCommand);
     SerialCheckSum ^= ProtocolCommand;
+
+#elif defined ESP32
+
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x4c;
+    SerialCheckSum ^= 0x4c;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x43;
+    SerialCheckSum ^= 0x43;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = Error ? 0x21 : 0x46;
+    SerialCheckSum ^= Error ? 0x21 : 0x46;
+    SerialCheckSum = 0;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = Buffer;
+    SerialCheckSum ^= Buffer;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = ProtocolCommand;
+    SerialCheckSum ^= ProtocolCommand;
+
+#endif
 }
+
+#ifdef __AVR_ATmega2560__
 
 static void GCS_Send_Struct_Params(uint8_t *CheckBuffer, uint8_t SizeOfBuffer)
 {
     Communication_Passed(false, SizeOfBuffer);
     while (SizeOfBuffer--)
+    {
         GCS_Send_Data(*CheckBuffer++);
+    }
     GCS_Send_Data(SerialCheckSum);
-    FASTSERIAL.UartSendData(UART0);
+    FASTSERIAL.UartSendData(UART_NUMB_0);
 }
 
 static void __attribute__((noinline)) GCS_Get_Struct_Params(uint8_t *CheckBuffer, uint8_t SizeOfBuffer)
 {
     while (SizeOfBuffer--)
+    {
         *CheckBuffer++ = SerialInputBuffer[VectorCount++] & 0xff;
+    }
 }
+
+#endif
+
+#ifdef ESP32
+uint8_t GetBufferDataToSend(void)
+{
+    SerialOutputBufferSizeCount--;
+    return SerialOutputBuffer[VectorCount++];
+}
+#endif
 
 void GCSClass::SendStringToGCS(const char *String)
 {
-    Communication_Passed(false, strlen_P(String));
 #ifdef __AVR_ATmega2560__
+
+    Communication_Passed(false, strlen_P(String));
     for (const char *StringCount = String; ProgMemReadByte(StringCount); StringCount++)
     {
         GCS_Send_Data(ProgMemReadByte(StringCount));
     }
+    GCS_Send_Data(SerialCheckSum);
+    FASTSERIAL.UartSendData(UART_NUMB_0);
+
 #elif defined ESP32
 
 #elif defined __arm__
 
 #endif
-    GCS_Send_Data(SerialCheckSum);
-    FASTSERIAL.UartSendData(UART0);
 }
 
 void GCSClass::Serial_Parse_Protocol()
@@ -373,57 +430,64 @@ void GCSClass::Serial_Parse_Protocol()
 #ifdef ENABLE_TIMEMONITOR
     return;
 #endif
-    SerialAvailableGuard = FASTSERIAL.Available(UART0);
+    SerialAvailableGuard = FASTSERIAL.Available(UART_NUMB_0);
     while (SerialAvailableGuard--)
     {
-        if (FASTSERIAL.TXBuffer(UART0) > 78)
+        if (FASTSERIAL.TXBuffer(UART_NUMB_0) > 78)
+        {
             return;
-        SeriaBuffer = FASTSERIAL.Read(UART0);
+        }
+        SerialBuffer = FASTSERIAL.Read(UART_NUMB_0);
         ProtocolTaskOrder = PreviousProtocolTaskOrder;
         switch (ProtocolTaskOrder)
         {
+
         case 0:
-            if (SeriaBuffer == 0x4a)
+            if (SerialBuffer == 0x4a || SerialBuffer == 0x4c)
+            {
                 ProtocolTaskOrder = 1;
+            }
             break;
 
         case 1:
-            ProtocolTaskOrder = (SeriaBuffer == 0x43) ? 2 : 0;
+            ProtocolTaskOrder = (SerialBuffer == 0x43) ? 2 : 0;
             break;
 
         case 2:
-            ProtocolTaskOrder = (SeriaBuffer == 0x3c) ? 3 : 0;
+            ProtocolTaskOrder = (SerialBuffer == 0x3c) ? 3 : 0;
             break;
 
         case 3:
-            if (SeriaBuffer > 64)
+            if (SerialBuffer > 64)
             {
                 ProtocolTaskOrder = 0;
                 continue;
             }
-            SerialDataSize = SeriaBuffer;
-            SerialCheckSum = SeriaBuffer;
+            SerialDataSize = SerialBuffer;
+            SerialCheckSum = SerialBuffer;
             SerialOffSet = 0;
             VectorCount = 0;
             ProtocolTaskOrder = 4;
             break;
 
         case 4:
-            ProtocolCommand = SeriaBuffer;
-            SerialCheckSum ^= SeriaBuffer;
+            ProtocolCommand = SerialBuffer;
+            SerialCheckSum ^= SerialBuffer;
             ProtocolTaskOrder = 5;
             break;
 
         case 5:
             if (SerialOffSet < SerialDataSize)
             {
-                SerialCheckSum ^= SeriaBuffer;
-                SerialInputBuffer[SerialOffSet++] = SeriaBuffer;
+                SerialCheckSum ^= SerialBuffer;
+                SerialInputBuffer[SerialOffSet++] = SerialBuffer;
             }
             else
             {
-                if (SerialCheckSum == SeriaBuffer)
+                if (SerialCheckSum == SerialBuffer)
+                {
                     BiDirectionalCommunication(ProtocolCommand);
+                }
                 ProtocolTaskOrder = 0;
                 SerialAvailableGuard = 0;
             }
@@ -431,10 +495,18 @@ void GCSClass::Serial_Parse_Protocol()
         }
         PreviousProtocolTaskOrder = ProtocolTaskOrder;
     }
+#ifdef ESP32
+    while (SerialOutputBufferSizeCount > 0)
+    {
+        FASTSERIAL.TX_Send(UART_NUMB_0, GetBufferDataToSend());
+    }
+#endif
 }
 
 void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 {
+#ifdef __AVR_ATmega2560__
+
     switch (TaskOrderGCS)
     {
 
@@ -453,7 +525,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 4:
@@ -461,20 +533,20 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 5:
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParameters, sizeof(_GetWayPointGCSParameters));
         break;
 
     case 6:
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParametersTwo, sizeof(_GetWayPointGCSParametersTwo));
         break;
 
@@ -501,7 +573,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
             CalibratingAccelerometer = 512;
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 12:
@@ -509,27 +581,27 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
             CalibratingCompass = true;
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 13:
         GCS.ConfigFlight = true;
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 14:
         GCS.ConfigFlight = false;
         Communication_Passed(0, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 15:
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         GCS_Get_Struct_Params((uint8_t *)&GetUserBasicGCSParameters, sizeof(_GetUserBasicGCSParameters));
         break;
 
@@ -538,7 +610,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(0, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 17:
@@ -546,13 +618,13 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 18:
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         GCS_Get_Struct_Params((uint8_t *)&GetUserMediumGCSParameters, sizeof(_GetUserMediumGCSParameters));
         break;
 
@@ -561,7 +633,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 20:
@@ -569,7 +641,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
 
     case 21:
@@ -613,9 +685,151 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     default:
         Communication_Passed(true, 0);
         GCS_Send_Data(SerialCheckSum);
-        FASTSERIAL.UartSendData(UART0);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
         break;
     }
+
+#elif defined ESP32
+
+    switch (TaskOrderGCS)
+    {
+
+    case 7:
+        GCS.GCS_Request_Parameters();
+        //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
+        SerialOutputBufferSizeCount = 0;
+        VectorCount = 0;
+        Communication_Passed(false, sizeof(int32_t) * 43);
+        GCS_Send_Data(GCSParameters.SendAttitudePitch);
+        GCS_Send_Data(GCSParameters.SendAttitudeRoll);
+        GCS_Send_Data(GCSParameters.SendAttitudeYaw);
+        GCS_Send_Data(GCSParameters.DevicesOnBoard);
+        GCS_Send_Data(GCSParameters.SendThrottleValue);
+        GCS_Send_Data(GCSParameters.SendYawValue);
+        GCS_Send_Data(GCSParameters.SendPitchValue);
+        GCS_Send_Data(GCSParameters.SendRollValue);
+        GCS_Send_Data(GCSParameters.SendAuxOneValue);
+        GCS_Send_Data(GCSParameters.SendAuxTwoValue);
+        GCS_Send_Data(GCSParameters.SendAuxThreeValue);
+        GCS_Send_Data(GCSParameters.SendAuxFourValue);
+        GCS_Send_Data(GCSParameters.SendAuxFiveValue);
+        GCS_Send_Data(GCSParameters.SendAuxSixValue);
+        GCS_Send_Data(GCSParameters.SendAuxSevenValue);
+        GCS_Send_Data(GCSParameters.SendAuxEightValue);
+        GCS_Send_Data(GCSParameters.SendGPSNumberOfSat);
+        GCS_Send_Data(GCSParameters.SendGPSLatitude);
+        GCS_Send_Data(GCSParameters.SendGPSLongitude);
+        GCS_Send_Data(GCSParameters.SendHomePointLatitude);
+        GCS_Send_Data(GCSParameters.SendHomePointLongitude);
+        GCS_Send_Data(GCSParameters.SendBarometerValue);
+        GCS_Send_Data(GCSParameters.SendFailSafeState);
+        GCS_Send_Data(GCSParameters.SendBatteryVoltageValue);
+        GCS_Send_Data(GCSParameters.SendBatteryPercentageValue);
+        GCS_Send_Data(GCSParameters.SendArmDisarmState);
+        GCS_Send_Data(GCSParameters.SendHDOPValue);
+        GCS_Send_Data(GCSParameters.SendCurrentValue);
+        GCS_Send_Data(GCSParameters.SendWattsValue);
+        GCS_Send_Data(GCSParameters.SendDeclinationValue);
+        GCS_Send_Data(GCSParameters.SendActualFlightMode);
+        GCS_Send_Data(GCSParameters.SendFrameType);
+        GCS_Send_Data(GCSParameters.SendHomePointState);
+        GCS_Send_Data(GCSParameters.SendTemperature);
+        GCS_Send_Data(GCSParameters.SendHomePointDistance);
+        GCS_Send_Data(GCSParameters.SendCurrentInMah);
+        GCS_Send_Data(GCSParameters.SendCourseOverGround);
+        GCS_Send_Data(GCSParameters.SendCrosstrack);
+        GCS_Send_Data(GCSParameters.SendAccGForce);
+        GCS_Send_Data(GCSParameters.SendAccImageBitMap);
+        GCS_Send_Data(GCSParameters.SendCompassRoll);
+        GCS_Send_Data(GCSParameters.SendCompassPitch);
+        GCS_Send_Data(GCSParameters.SendCompassYaw);
+        //SOMA DO BUFFER
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
+        SerialCheckSum ^= SerialCheckSum;
+        break;
+
+    case 8:
+        //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
+        SerialOutputBufferSizeCount = 0;
+        VectorCount = 0;
+        Communication_Passed(false, sizeof(int32_t) * 22);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendFrameType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendReceiverType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendGimbalType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendParachuteType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendSPIType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendUART_NUMB_2Type);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendCompassType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendCompassRotationType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendRTHAltitudeType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendMotorSpeedType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAcroType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAltitudeHoldType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendPositionHoldType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendInteligentOrientationControlType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendReturnToHomeType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAtackType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAutomaticFlipType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAutomaticMissonType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendArmDisarmType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAutoLandType);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendSafeBtnState);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAirSpeedState);
+        //SOMA DO BUFFER
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
+        SerialCheckSum ^= SerialCheckSum;
+        break;
+
+    case 9:
+
+        break;
+
+    case 10:
+        GCS.GCS_Request_Parameters_Two();
+        //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
+        SerialOutputBufferSizeCount = 0;
+        VectorCount = 0;
+        Communication_Passed(false, sizeof(int32_t) * 33);
+        GCS_Send_Data(GCSParameters_Two.SendActualThrottleValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualYawValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualPitchValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualRollValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxOneValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxTwoValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxThreeValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxFourValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxFiveValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxSixValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxSevenValue);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxEightValue);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudeThrottleValue);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudeYawValue);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudePitchValue);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudeRollValue);
+        GCS_Send_Data(GCSParameters_Two.SendMemoryRamUsed);
+        GCS_Send_Data(GCSParameters_Two.SendMemoryRamUsedPercent);
+        GCS_Send_Data(GCSParameters_Two.SendAccXNotFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendAccYNotFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendAccZNotFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendAccXFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendAccYFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendAccZFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendGyroXNotFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendGyroYNotFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendGyroZNotFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendGyroXFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendGyroYFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendGyroZFiltered);
+        GCS_Send_Data(GCSParameters_Two.SendGPSGroundSpeed);
+        GCS_Send_Data(GCSParameters_Two.SendI2CError);
+        GCS_Send_Data(GCSParameters_Two.SendAirSpeedValue);
+        //SOMA DO BUFFER
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
+        SerialCheckSum ^= SerialCheckSum;
+        break;
+    }
+
+#endif
 }
 
 void GCSClass::GCS_Request_Parameters()
@@ -788,7 +1002,7 @@ uint8_t GCSClass::GetDevicesActived()
         ParachuteDetect = true;
     else
         ParachuteDetect = false;
-    if (STORAGEMANAGER.Read_8Bits(UART3_ADDR) == 1)
+    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR) == 1)
         MatekDetect = true;
     else
         MatekDetect = false;
@@ -811,11 +1025,11 @@ void GCSClass::Save_Basic_Configuration()
     if (GetUserBasicGCSParameters.GetParachuteType != STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR))
         STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, GetUserBasicGCSParameters.GetParachuteType);
 
-    if (GetUserBasicGCSParameters.GetSPIType != STORAGEMANAGER.Read_8Bits(UART3_ADDR))
-        STORAGEMANAGER.Write_8Bits(UART3_ADDR, GetUserBasicGCSParameters.GetSPIType);
+    if (GetUserBasicGCSParameters.GetSPIType != STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR))
+        STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, GetUserBasicGCSParameters.GetSPIType);
 
-    if (GetUserBasicGCSParameters.GetUART2Type != STORAGEMANAGER.Read_8Bits(UART2_ADDR))
-        STORAGEMANAGER.Write_8Bits(UART2_ADDR, GetUserBasicGCSParameters.GetUART2Type);
+    if (GetUserBasicGCSParameters.GetUART_NUMB_2Type != STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR))
+        STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, GetUserBasicGCSParameters.GetUART_NUMB_2Type);
 
     if (GetUserBasicGCSParameters.GetCompassType != STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR))
         STORAGEMANAGER.Write_8Bits(COMPASS_TYPE_ADDR, GetUserBasicGCSParameters.GetCompassType);
@@ -878,11 +1092,11 @@ void GCSClass::Dafult_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, 0);        //LIMPA A CONFIGURAÇÃO DO TIPO DE FRAME
     STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO MODULO RECEPTOR PPM
     STORAGEMANAGER.Write_8Bits(MOTORSPEED_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DO MOTOR SPEED
-    STORAGEMANAGER.Write_8Bits(UART2_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DA UART2
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DA UART_NUMB_2
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, 0); //LIMPA A CONFIGURAÇÃO DE ROTAÇÃO DO COMPASS
     STORAGEMANAGER.Write_8Bits(COMPASS_TYPE_ADDR, 0);     //LIMPA A CONFIGURAÇÃO DO MODELO DO COMPASS
     STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 0);     //LIMPA A CONFIGURAÇÃO DA ALTITUDE AO FAZER O RTH
-    STORAGEMANAGER.Write_8Bits(UART3_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DA SPI
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DA SPI
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO MODO ACRO
     STORAGEMANAGER.Write_8Bits(ATACK_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DO MODO ATAQUE
     STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO MODO AUTO-FLIP
@@ -1032,8 +1246,8 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendReceiverType = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);
     SendUserBasicGCSParameters.SendGimbalType = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);
     SendUserBasicGCSParameters.SendParachuteType = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR);
-    SendUserBasicGCSParameters.SendSPIType = STORAGEMANAGER.Read_8Bits(UART3_ADDR);
-    SendUserBasicGCSParameters.SendUART2Type = STORAGEMANAGER.Read_8Bits(UART2_ADDR);
+    SendUserBasicGCSParameters.SendSPIType = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR);
+    SendUserBasicGCSParameters.SendUART_NUMB_2Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
     SendUserBasicGCSParameters.SendCompassType = STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR);
     SendUserBasicGCSParameters.SendCompassRotationType = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
     SendUserBasicGCSParameters.SendRTHAltitudeType = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);

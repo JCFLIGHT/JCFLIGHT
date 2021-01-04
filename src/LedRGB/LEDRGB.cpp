@@ -157,11 +157,11 @@ void LEDRGB::CalibMagLed(void)
 void LEDRGB::ConfigFlight_Led(void)
 {
   static bool ToogleBlinkConfig = true;
-  static uint32_t StoreBlinkConfig = AVRTIME.SchedulerMillis();
-  if (AVRTIME.SchedulerMillis() - StoreBlinkConfig >= 500)
+  static uint32_t StoreBlinkConfig = SCHEDULERTIME.GetMillis();
+  if (SCHEDULERTIME.GetMillis() - StoreBlinkConfig >= 500)
   {
     ToogleBlinkConfig = !ToogleBlinkConfig;
-    StoreBlinkConfig = AVRTIME.SchedulerMillis();
+    StoreBlinkConfig = SCHEDULERTIME.GetMillis();
   }
   if (ToogleBlinkConfig)
   {
@@ -185,12 +185,12 @@ void LEDRGB::ConfigFlight_Led(void)
 void LEDRGB::CalibEsc_Led(void)
 {
   static uint8_t FlashLedCount = 0;
-  static uint32_t FlashTimer = AVRTIME.SchedulerMillis();
+  static uint32_t FlashTimer = SCHEDULERTIME.GetMillis();
   //TEMPO DE ATUALIZAÇÃO DO LED FLASHER
-  if (AVRTIME.SchedulerMillis() - FlashTimer >= 170)
+  if (SCHEDULERTIME.GetMillis() - FlashTimer >= 170)
   {
     FlashLedCount += 1;
-    FlashTimer = AVRTIME.SchedulerMillis();
+    FlashTimer = SCHEDULERTIME.GetMillis();
   }
   //LED FLASHER POR PARTES
   switch (FlashLedCount)
@@ -239,13 +239,13 @@ void LEDRGB::GPS_Led(void)
 {
   //SE O NÚMERO DE SATELITES FOR MENOR OU IGUAL A 4,O LED VERMELHO IRÁ FICAR PISCANDO SEM PARAR
   static bool GPS_Fail_Toggle = false;
-  static uint32_t GPS_Fail = AVRTIME.SchedulerMillis();
+  static uint32_t GPS_Fail = SCHEDULERTIME.GetMillis();
   if (GPS_NumberOfSatellites <= 4)
   {
-    if (AVRTIME.SchedulerMillis() - GPS_Fail >= 350)
+    if (SCHEDULERTIME.GetMillis() - GPS_Fail >= 350)
     {
       GPS_Fail_Toggle = !GPS_Fail_Toggle;
-      GPS_Fail = AVRTIME.SchedulerMillis();
+      GPS_Fail = SCHEDULERTIME.GetMillis();
     }
     if (GPS_Fail_Toggle)
     {
@@ -266,10 +266,10 @@ void LEDRGB::GPS_Led(void)
   //7 SATELITES         = 3 PISCADAS
   //8 SATELITES OU MAIS = 4 PISCADAS
   static uint8_t BlinkCount;
-  static uint32_t BlinkTime = AVRTIME.SchedulerMillis();
+  static uint32_t BlinkTime = SCHEDULERTIME.GetMillis();
   if (GPS_Flight_Mode != GPS_MODE_RTH)
   {
-    if (AVRTIME.SchedulerMillis() - BlinkTime >= 150)
+    if (SCHEDULERTIME.GetMillis() - BlinkTime >= 150)
     {
       if (GPS_NumberOfSatellites >= 5)
       {
@@ -302,7 +302,7 @@ void LEDRGB::GPS_Led(void)
       {
         BlinkCount = 0;
       }
-      BlinkTime = AVRTIME.SchedulerMillis();
+      BlinkTime = SCHEDULERTIME.GetMillis();
     }
     else
     {
@@ -312,7 +312,7 @@ void LEDRGB::GPS_Led(void)
   //INDICAÇÃO DO MODO DE VOO RTH
   if (GPS_Flight_Mode == GPS_MODE_RTH)
   {
-    if (AVRTIME.SchedulerMicros() % 100000 > 50000)
+    if (SCHEDULERTIME.GetMicros() % 100000 > 50000)
     {
       LedRGB[RED] = 0;    //VERMELHO
       LedRGB[GREEN] = 0;  //VERDE

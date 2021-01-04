@@ -120,8 +120,8 @@ static void SerialSendConfigToGPS(const char *STR)
   char ProgramMemory;
   while (STR && (ProgramMemory = ProgMemReadByte(STR++)))
   {
-    FASTSERIAL.Write(UART1, ProgramMemory);
-    AVRTIME.SchedulerSleep(5);
+    FASTSERIAL.Write(UART_NUMB_1, ProgramMemory);
+    SCHEDULERTIME.Sleep(5);
   }
 #elif defined __arm__ || defined ESP32
 
@@ -131,11 +131,11 @@ static void SerialSendConfigToGPS(const char *STR)
 void GPS_SerialInit(uint32_t Get_BaudRate)
 {
   static uint8_t Parse_Baud_Rate = 0;
-  FASTSERIAL.Begin(UART1, Get_BaudRate);
-  AVRTIME.SchedulerSleep(1000);
+  FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
+  SCHEDULERTIME.Sleep(1000);
   if (Parse_Baud_Rate == 0)
   {
-    FASTSERIAL.Begin(UART1, 9600);
+    FASTSERIAL.Begin(UART_NUMB_1, 9600);
     if (Get_BaudRate == 19200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
     else if (Get_BaudRate == 38400)
@@ -144,13 +144,13 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART1))
-      AVRTIME.SchedulerSleep(50);
+    while (!FASTSERIAL.Flush(UART_NUMB_1))
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 1;
   }
   else if (Parse_Baud_Rate == 1)
   {
-    FASTSERIAL.Begin(UART1, 19200);
+    FASTSERIAL.Begin(UART_NUMB_1, 19200);
     if (Get_BaudRate == 19200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
     else if (Get_BaudRate == 38400)
@@ -159,13 +159,13 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART1))
-      AVRTIME.SchedulerSleep(50);
+    while (!FASTSERIAL.Flush(UART_NUMB_1))
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 2;
   }
   else if (Parse_Baud_Rate == 2)
   {
-    FASTSERIAL.Begin(UART1, 38400);
+    FASTSERIAL.Begin(UART_NUMB_1, 38400);
     if (Get_BaudRate == 19200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
     else if (Get_BaudRate == 38400)
@@ -174,13 +174,13 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART1))
-      AVRTIME.SchedulerSleep(50);
+    while (!FASTSERIAL.Flush(UART_NUMB_1))
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 3;
   }
   else if (Parse_Baud_Rate == 3)
   {
-    FASTSERIAL.Begin(UART1, 57600);
+    FASTSERIAL.Begin(UART_NUMB_1, 57600);
     if (Get_BaudRate == 19200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
     else if (Get_BaudRate == 38400)
@@ -189,13 +189,13 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART1))
-      AVRTIME.SchedulerSleep(50);
+    while (!FASTSERIAL.Flush(UART_NUMB_1))
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 4;
   }
   else if (Parse_Baud_Rate == 4)
   {
-    FASTSERIAL.Begin(UART1, 115200);
+    FASTSERIAL.Begin(UART_NUMB_1, 115200);
     if (Get_BaudRate == 19200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
     else if (Get_BaudRate == 38400)
@@ -204,19 +204,19 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART1))
-      AVRTIME.SchedulerSleep(50);
+    while (!FASTSERIAL.Flush(UART_NUMB_1))
+      SCHEDULERTIME.Sleep(50);
   }
-  AVRTIME.SchedulerSleep(200);
-  FASTSERIAL.Begin(UART1, Get_BaudRate);
+  SCHEDULERTIME.Sleep(200);
+  FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
   for (uint8_t SizeOfCount = 0; SizeOfCount < sizeof(Ublox_Set_Configuration); SizeOfCount++)
   {
 #ifdef __AVR_ATmega2560__
-    FASTSERIAL.Write(UART1, ProgMemReadByte(Ublox_Set_Configuration + SizeOfCount));
+    FASTSERIAL.Write(UART_NUMB_1, ProgMemReadByte(Ublox_Set_Configuration + SizeOfCount));
 #elif defined __arm__ || defined ESP32
 
 #endif
-    AVRTIME.SchedulerSleep(5);
+    SCHEDULERTIME.Sleep(5);
   }
 }
 

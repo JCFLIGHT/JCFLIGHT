@@ -39,41 +39,41 @@ static volatile uint8_t UARTTailTX[4];
 void Fast_Serial::Initialization()
 {
   //DEBUG E GCS
-  FASTSERIAL.Begin(UART0, 115200);
+  FASTSERIAL.Begin(UART_NUMB_0, 115200);
   //GPS
-  FASTSERIAL.Begin(UART1, 57600);
+  FASTSERIAL.Begin(UART_NUMB_1, 57600);
   GPS_SerialInit(57600);
   //IBUS & SBUS
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 0)
-    FASTSERIAL.Begin(UART2, 115200);
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 0)
+    FASTSERIAL.Begin(UART_NUMB_2, 115200);
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
   {
-    //CONFIGURAÇÃO DA UART2 PARA SBUS
-    FASTSERIAL.Begin(UART2, 100000);
+    //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
+    FASTSERIAL.Begin(UART_NUMB_2, 100000);
     UCSR2C |= (1 << UPM21) | (1 << USBS2);
   }
-  else if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2)
+  else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
   {
-    //CONFIGURAÇÃO DA UART2 PARA IBUS
-    FASTSERIAL.Begin(UART2, 115200);
+    //CONFIGURAÇÃO DA UART_NUMB_2 PARA IBUS
+    FASTSERIAL.Begin(UART_NUMB_2, 115200);
   }
   //MATEK3901L0X
-  FASTSERIAL.Begin(UART3, 115200);
+  FASTSERIAL.Begin(UART_NUMB_3, 115200);
 }
 
 //SERIAL 0 DO MEGA (DEBUG E OSD)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
 ISR(USART0_UDRE_vect)
 {
-  uint8_t TXBuffer = UARTTailTX[UART0];
-  if (UARTHeadTX[UART0] != TXBuffer)
+  uint8_t TXBuffer = UARTTailTX[UART_NUMB_0];
+  if (UARTHeadTX[UART_NUMB_0] != TXBuffer)
   {
     if (++TXBuffer >= 128)
       TXBuffer = 0;
-    UDR0 = UARTBufferTX[TXBuffer][UART0];
-    UARTTailTX[UART0] = TXBuffer;
+    UDR0 = UARTBufferTX[TXBuffer][UART_NUMB_0];
+    UARTTailTX[UART_NUMB_0] = TXBuffer;
   }
-  if (TXBuffer == UARTHeadTX[UART0])
+  if (TXBuffer == UARTHeadTX[UART_NUMB_0])
     UCSR0B &= ~(1 << UDRIE0);
 }
 
@@ -81,15 +81,15 @@ ISR(USART0_UDRE_vect)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
 ISR(USART1_UDRE_vect)
 {
-  uint8_t TXBuffer = UARTTailTX[UART1];
-  if (UARTHeadTX[UART1] != TXBuffer)
+  uint8_t TXBuffer = UARTTailTX[UART_NUMB_1];
+  if (UARTHeadTX[UART_NUMB_1] != TXBuffer)
   {
     if (++TXBuffer >= 128)
       TXBuffer = 0;
-    UDR1 = UARTBufferTX[TXBuffer][UART1];
-    UARTTailTX[UART1] = TXBuffer;
+    UDR1 = UARTBufferTX[TXBuffer][UART_NUMB_1];
+    UARTTailTX[UART_NUMB_1] = TXBuffer;
   }
-  if (TXBuffer == UARTHeadTX[UART1])
+  if (TXBuffer == UARTHeadTX[UART_NUMB_1])
     UCSR1B &= ~(1 << UDRIE1);
 }
 
@@ -97,15 +97,15 @@ ISR(USART1_UDRE_vect)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
 ISR(USART2_UDRE_vect)
 {
-  uint8_t TXBuffer = UARTTailTX[UART2];
-  if (UARTHeadTX[UART2] != TXBuffer)
+  uint8_t TXBuffer = UARTTailTX[UART_NUMB_2];
+  if (UARTHeadTX[UART_NUMB_2] != TXBuffer)
   {
     if (++TXBuffer >= 128)
       TXBuffer = 0;
-    UDR2 = UARTBufferTX[TXBuffer][UART2];
-    UARTTailTX[UART2] = TXBuffer;
+    UDR2 = UARTBufferTX[TXBuffer][UART_NUMB_2];
+    UARTTailTX[UART_NUMB_2] = TXBuffer;
   }
-  if (TXBuffer == UARTHeadTX[UART2])
+  if (TXBuffer == UARTHeadTX[UART_NUMB_2])
     UCSR2B &= ~(1 << UDRIE2);
 }
 
@@ -113,15 +113,15 @@ ISR(USART2_UDRE_vect)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
 ISR(USART3_UDRE_vect)
 {
-  uint8_t TXBuffer = UARTTailTX[UART3];
-  if (UARTHeadTX[UART3] != TXBuffer)
+  uint8_t TXBuffer = UARTTailTX[UART_NUMB_3];
+  if (UARTHeadTX[UART_NUMB_3] != TXBuffer)
   {
     if (++TXBuffer >= 128)
       TXBuffer = 0;
-    UDR3 = UARTBufferTX[TXBuffer][UART3];
-    UARTTailTX[UART3] = TXBuffer;
+    UDR3 = UARTBufferTX[TXBuffer][UART_NUMB_3];
+    UARTTailTX[UART_NUMB_3] = TXBuffer;
   }
-  if (TXBuffer == UARTHeadTX[UART3])
+  if (TXBuffer == UARTHeadTX[UART_NUMB_3])
     UCSR3B &= ~(1 << UDRIE3);
 }
 
@@ -130,19 +130,19 @@ void Fast_Serial::UartSendData(uint8_t SerialPort)
   switch (SerialPort)
   {
 
-  case UART0:
+  case UART_NUMB_0:
     UCSR0B |= (1 << UDRIE0);
     break;
 
-  case UART1:
+  case UART_NUMB_1:
     UCSR1B |= (1 << UDRIE1);
     break;
 
-  case UART2:
+  case UART_NUMB_2:
     UCSR2B |= (1 << UDRIE2);
     break;
 
-  case UART3:
+  case UART_NUMB_3:
     UCSR3B |= (1 << UDRIE3);
     break;
   }
@@ -160,28 +160,28 @@ void Fast_Serial::Begin(uint8_t SerialPort, uint32_t BaudRate)
   switch (SerialPort)
   {
 
-  case UART0:
+  case UART_NUMB_0:
     UCSR0A = (1 << U2X0);
     UBRR0H = h;
     UBRR0L = l;
     UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
     break;
 
-  case UART1:
+  case UART_NUMB_1:
     UCSR1A = (1 << U2X1);
     UBRR1H = h;
     UBRR1L = l;
     UCSR1B |= (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);
     break;
 
-  case UART2:
+  case UART_NUMB_2:
     UCSR2A = (1 << U2X2);
     UBRR2H = h;
     UBRR2L = l;
     UCSR2B |= (1 << RXEN2) | (1 << TXEN2) | (1 << RXCIE2);
     break;
 
-  case UART3:
+  case UART_NUMB_3:
     UCSR3A = (1 << U2X3);
     UBRR3H = h;
     UBRR3L = l;
@@ -201,19 +201,19 @@ void Fast_Serial::UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort)
 
 ISR(USART0_RX_vect)
 {
-  FASTSERIAL.UartBufferStore(UDR0, UART0);
+  FASTSERIAL.UartBufferStore(UDR0, UART_NUMB_0);
 }
 ISR(USART1_RX_vect)
 {
-  FASTSERIAL.UartBufferStore(UDR1, UART1);
+  FASTSERIAL.UartBufferStore(UDR1, UART_NUMB_1);
 }
 ISR(USART2_RX_vect)
 {
-  FASTSERIAL.UartBufferStore(UDR2, UART2);
+  FASTSERIAL.UartBufferStore(UDR2, UART_NUMB_2);
 }
 ISR(USART3_RX_vect)
 {
-  FASTSERIAL.UartBufferStore(UDR3, UART3);
+  FASTSERIAL.UartBufferStore(UDR3, UART_NUMB_3);
 }
 
 uint8_t Fast_Serial::Read(uint8_t SerialPort)
@@ -259,25 +259,25 @@ void Fast_Serial::Write(uint8_t SerialPort, uint8_t WriteData)
 void Fast_Serial::Initialization()
 {
   //DEBUG E GCS
-  FASTSERIAL.Begin(UART0, 115200);
+  FASTSERIAL.Begin(UART_NUMB_0, 115200);
   //GPS
-  FASTSERIAL.Begin(UART1, 57600);
+  FASTSERIAL.Begin(UART_NUMB_1, 57600);
   GPS_SerialInit(57600);
   //IBUS & SBUS
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 0)
-    FASTSERIAL.Begin(UART2, 115200);
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 0)
+    FASTSERIAL.Begin(UART_NUMB_2, 115200);
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
   {
-    //CONFIGURAÇÃO DA UART2 PARA SBUS
-    FASTSERIAL.Begin(UART2, 100000);
+    //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
+    FASTSERIAL.Begin(UART_NUMB_2, 100000);
   }
-  else if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2)
+  else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
   {
-    //CONFIGURAÇÃO DA UART2 PARA IBUS
-    FASTSERIAL.Begin(UART2, 115200);
+    //CONFIGURAÇÃO DA UART_NUMB_2 PARA IBUS
+    FASTSERIAL.Begin(UART_NUMB_2, 115200);
   }
   //MATEK3901L0X
-  FASTSERIAL.Begin(UART3, 115200);
+  FASTSERIAL.Begin(UART_NUMB_3, 115200);
 }
 
 void Fast_Serial::UartSendData(uint8_t SerialPort)
@@ -285,16 +285,16 @@ void Fast_Serial::UartSendData(uint8_t SerialPort)
   switch (SerialPort)
   {
 
-  case UART0:
+  case UART_NUMB_0:
     break;
 
-  case UART1:
+  case UART_NUMB_1:
     break;
 
-  case UART2:
+  case UART_NUMB_2:
     break;
 
-  case UART3:
+  case UART_NUMB_3:
     break;
   }
 }
@@ -309,16 +309,19 @@ void Fast_Serial::Begin(uint8_t SerialPort, uint32_t BaudRate)
   switch (SerialPort)
   {
 
-  case UART0:
+  case UART_NUMB_0:
+    Serial.begin(BaudRate);
     break;
 
-  case UART1:
+  case UART_NUMB_1:
+    Serial1.begin(BaudRate);
     break;
 
-  case UART2:
+  case UART_NUMB_2:
+    Serial2.begin(BaudRate);
     break;
 
-  case UART3:
+  case UART_NUMB_3:
     break;
   }
 }
@@ -329,11 +332,47 @@ void Fast_Serial::UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort)
 
 uint8_t Fast_Serial::Read(uint8_t SerialPort)
 {
+  switch (SerialPort)
+  {
+
+  case UART_NUMB_0:
+    return Serial.read();
+    break;
+
+  case UART_NUMB_1:
+    return Serial1.read();
+    break;
+
+  case UART_NUMB_2:
+    return Serial2.read();
+    break;
+
+  case UART_NUMB_3:
+    break;
+  }
   return 0;
 }
 
 uint8_t Fast_Serial::Available(uint8_t SerialPort)
 {
+  switch (SerialPort)
+  {
+
+  case UART_NUMB_0:
+    return Serial.available();
+    break;
+
+  case UART_NUMB_1:
+    return Serial1.available();
+    break;
+
+  case UART_NUMB_2:
+    return Serial2.available();
+    break;
+
+  case UART_NUMB_3:
+    break;
+  }
   return 0;
 }
 
@@ -344,6 +383,24 @@ uint8_t Fast_Serial::TXBuffer(uint8_t SerialPort)
 
 void Fast_Serial::TX_Send(uint8_t SerialPort, uint8_t WriteTX)
 {
+  switch (SerialPort)
+  {
+
+  case UART_NUMB_0:
+    Serial.write(WriteTX);
+    break;
+
+  case UART_NUMB_1:
+    Serial1.write(WriteTX);
+    break;
+
+  case UART_NUMB_2:
+    Serial2.write(WriteTX);
+    break;
+
+  case UART_NUMB_3:
+    break;
+  }
 }
 
 void Fast_Serial::Write(uint8_t SerialPort, uint8_t WriteData)
@@ -355,25 +412,25 @@ void Fast_Serial::Write(uint8_t SerialPort, uint8_t WriteData)
 void Fast_Serial::Initialization()
 {
   //DEBUG E GCS
-  FASTSERIAL.Begin(UART0, 115200);
+  FASTSERIAL.Begin(UART_NUMB_0, 115200);
   //GPS
-  FASTSERIAL.Begin(UART1, 57600);
+  FASTSERIAL.Begin(UART_NUMB_1, 57600);
   GPS_SerialInit(57600);
   //IBUS & SBUS
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 0)
-    FASTSERIAL.Begin(UART2, 115200);
-  if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 1)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 0)
+    FASTSERIAL.Begin(UART_NUMB_2, 115200);
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
   {
-    //CONFIGURAÇÃO DA UART2 PARA SBUS
-    FASTSERIAL.Begin(UART2, 100000);
+    //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
+    FASTSERIAL.Begin(UART_NUMB_2, 100000);
   }
-  else if (STORAGEMANAGER.Read_8Bits(UART2_ADDR) == 2)
+  else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
   {
-    //CONFIGURAÇÃO DA UART2 PARA IBUS
-    FASTSERIAL.Begin(UART2, 115200);
+    //CONFIGURAÇÃO DA UART_NUMB_2 PARA IBUS
+    FASTSERIAL.Begin(UART_NUMB_2, 115200);
   }
   //MATEK3901L0X
-  FASTSERIAL.Begin(UART3, 115200);
+  FASTSERIAL.Begin(UART_NUMB_3, 115200);
 }
 
 void Fast_Serial::UartSendData(uint8_t SerialPort)
@@ -381,16 +438,16 @@ void Fast_Serial::UartSendData(uint8_t SerialPort)
   switch (SerialPort)
   {
 
-  case UART0:
+  case UART_NUMB_0:
     break;
 
-  case UART1:
+  case UART_NUMB_1:
     break;
 
-  case UART2:
+  case UART_NUMB_2:
     break;
 
-  case UART3:
+  case UART_NUMB_3:
     break;
   }
 }
@@ -405,16 +462,16 @@ void Fast_Serial::Begin(uint8_t SerialPort, uint32_t BaudRate)
   switch (SerialPort)
   {
 
-  case UART0:
+  case UART_NUMB_0:
     break;
 
-  case UART1:
+  case UART_NUMB_1:
     break;
 
-  case UART2:
+  case UART_NUMB_2:
     break;
 
-  case UART3:
+  case UART_NUMB_3:
     break;
   }
 }

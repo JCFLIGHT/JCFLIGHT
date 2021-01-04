@@ -23,6 +23,7 @@
 
 void AnalogWriteSetSettings(uint8_t Pin, double Frequency, uint8_t Resolution)
 {
+#ifdef ESP32
   if (Pin == GPIO_NUM_25)
   {
     ledcSetup(12, Frequency, Resolution);
@@ -88,10 +89,12 @@ void AnalogWriteSetSettings(uint8_t Pin, double Frequency, uint8_t Resolution)
     ledcSetup(13, Frequency, Resolution);
     ledcAttachPin(Pin, 13);
   }
+#endif
 }
 
 void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
 {
+#ifdef ESP32
   if (Pin == GPIO_NUM_25)
   {
     Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
@@ -153,4 +156,5 @@ void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
   {
     ledcWrite(13, Pulse);
   }
+#endif
 }

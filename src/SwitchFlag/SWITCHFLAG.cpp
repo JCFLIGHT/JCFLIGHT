@@ -46,20 +46,20 @@ void Switch_Flag(void)
   //INICIA A CONTAGEM DA FLAG PRINCIPAL
   if (IOCControlAux)
   {
-    if ((AVRTIME.SchedulerMillis() - TimerFunction) > 50) //DEBOUNCE
+    if ((SCHEDULERTIME.GetMillis() - TimerFunction) > 50) //DEBOUNCE
     {
       FlagParameterFunction += 1;
       if (GuardValue >= 4 && GuardValue <= 12)
         GuardValue += 1;
     }
     CloseReset = 5; //5 SEGUNDOS
-    TimerFunction = AVRTIME.SchedulerMillis();
+    TimerFunction = SCHEDULERTIME.GetMillis();
   }
   //DELAY PARA RESETAR A FLAG PRINCIPAL
-  if (CloseReset > 0 && (AVRTIME.SchedulerMillis() - CR_Clear) > 100)
+  if (CloseReset > 0 && (SCHEDULERTIME.GetMillis() - CR_Clear) > 100)
   {
     CloseReset -= 0.10f;
-    CR_Clear = AVRTIME.SchedulerMillis();
+    CR_Clear = SCHEDULERTIME.GetMillis();
   }
   if (CloseReset < 0)
     CloseReset = 0; //EVITA GUARDAR VALORES NEGATIVOS CAUSADO PELA DECREMENTAÇÃO DA FUNÇÃO ACIMA

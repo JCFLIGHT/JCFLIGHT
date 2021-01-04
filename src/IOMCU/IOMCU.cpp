@@ -837,13 +837,21 @@ void GCSClass::GCS_Request_Parameters()
     //ENVIA OS PARAMETROS FUNDAMENTAIS PARA O GCS
     GCSParameters.SendAttitudePitch = Constrain_16Bits(ATTITUDE.AngleOut[PITCH], -900, 900);
     if (CALIBRATION.AccelerometerZero[ROLL] > 1000)
+    {
         GCSParameters.SendAttitudeRoll = 3000; //INDICA PARA O GCS QUE A IMU NÃO ESTÁ CALIBRADA
+    }
     else
+    {
         GCSParameters.SendAttitudeRoll = Constrain_16Bits(ATTITUDE.AngleOut[ROLL], -900, 900);
+    }
     if (I2C.CompassFound)
+    {
         GCSParameters.SendAttitudeYaw = ATTITUDE.CalculedHeading;
+    }
     else
+    {
         GCSParameters.SendAttitudeYaw = GPS_Ground_Course / 10;
+    }
     GCSParameters.DevicesOnBoard = GCS.GetDevicesActived();
     GCSParameters.SendThrottleValue = Throttle.Output;
     GCSParameters.SendYawValue = Yaw.Output;
@@ -863,9 +871,13 @@ void GCSClass::GCS_Request_Parameters()
     GCSParameters.SendHomePointLatitude = Stored_Coordinates_Home_Point[0];
     GCSParameters.SendHomePointLongitude = Stored_Coordinates_Home_Point[1];
     if (I2C.BarometerFound)
+    {
         GCSParameters.SendBarometerValue = GetAltitudeForGCS();
+    }
     else
+    {
         GCSParameters.SendBarometerValue = (GPS_Altitude - GPS_Altitude_For_Plane) * 100;
+    }
     GCSParameters.SendFailSafeState = Fail_Safe_Event;
     GCSParameters.SendBatteryVoltageValue = BATTERY.Voltage * 100;
     GCSParameters.SendBatteryPercentageValue = BATTERY.GetPercentage();
@@ -990,23 +1002,10 @@ void GCSClass::WayPoint_Request_Others_Parameters()
 
 uint8_t GCSClass::GetDevicesActived()
 {
-    static bool CompassDetect = false;
-    static bool ParachuteDetect = false;
-    static bool MatekDetect = false;
-    static bool PitotDetect = false;
-    if (I2C.CompassFound)
-        CompassDetect = true;
-    else
-        CompassDetect = false;
-    if (ParachuteDetectTrigger > 0)
-        ParachuteDetect = true;
-    else
-        ParachuteDetect = false;
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR) == 1)
-        MatekDetect = true;
-    else
-        MatekDetect = false;
-    PitotDetect = Get_AirSpeed_State();
+    const bool CompassDetect = I2C.CompassFound;
+    const bool ParachuteDetect = ParachuteDetectTrigger > 0 ? true : false;
+    const bool MatekDetect = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR) == 1 ? true : false;
+    const bool PitotDetect = Get_AirSpeed_State();
     uint8_t CheckDevices = CompassDetect | ParachuteDetect << 1 | MatekDetect << 2 | PitotDetect << 3;
     return CheckDevices;
 }

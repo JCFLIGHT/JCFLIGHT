@@ -134,6 +134,10 @@ void Fast_Loop()
 
                 Update_PrecisionLand();
 
+#ifdef __AVR_ATmega2560__
+                Super_Fast_Loop();
+#endif
+
 #ifdef ENABLE_TIMEMONITOR
                 AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
@@ -145,63 +149,40 @@ void Fast_Loop()
 
 void Super_Fast_Loop()
 {
-#ifdef __AVR_ATmega2560__
-        static Scheduler_Struct Integral_Loop;
-        if (SchedulerTimer(&Integral_Loop, SCHEDULER_PERIOD_HZ(500, "Hz")))
-        {
-#endif
-                RGB.Update();
-                SAFETYBUTTON.UpdateRoutine();
-                SBUS_Update();
-                IBUS_Update();
-                GPS_Serial_Read();
-                AHRS_Update();
-                DynamicPID();
-                Auto_Launch_Update();
-                CalculateAccelerationXYZ();
-                INS_Calculate_AccelerationZ();
-                CalculateXY_INS();
-                AirSpeed_Update();
-                Apply_Controll_For_Throttle();
-                GPS_Orientation_Update();
-                Servo_Rate_Adjust();
-                ApplyPWMInAllComponents();
-                Switch_Flag();
-                BATTERY.Calculate_Total_Mah();
-
-#ifdef __AVR_ATmega2560__
-        }
-#endif
+        RGB.Update();
+        SAFETYBUTTON.UpdateRoutine();
+        SBUS_Update();
+        IBUS_Update();
+        GPS_Serial_Read();
+        AHRS_Update();
+        DynamicPID();
+        Auto_Launch_Update();
+        CalculateAccelerationXYZ();
+        INS_Calculate_AccelerationZ();
+        CalculateXY_INS();
+        AirSpeed_Update();
+        Apply_Controll_For_Throttle();
+        GPS_Orientation_Update();
+        Servo_Rate_Adjust();
+        ApplyPWMInAllComponents();
+        Switch_Flag();
+        BATTERY.Calculate_Total_Mah();
 }
 
 void Integral_Loop()
 {
-#ifdef __AVR_ATmega2560__
-#ifdef THIS_LOOP_FREQUENCY
-        static Scheduler_Struct Integral_Loop;
-        if (SchedulerTimer(&Integral_Loop, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz")))
-        {
+#ifdef ENABLE_TIMEMONITOR
+        AVRTIMEMONITOR.MeasuringStartTime(TOTAL_LOOP);
 #endif
-#endif
+
+        Acc_ReadBufferData();
+        Gyro_ReadBufferData();
+        Update_Loop_Time();
+        PID_Update();
+        PID_Reset_Integral_Accumulators();
+        PID_MixMotors();
 
 #ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringStartTime(TOTAL_LOOP);
-#endif
-
-                Acc_ReadBufferData();
-                Gyro_ReadBufferData();
-                Update_Loop_Time();
-                PID_Update();
-                PID_Reset_Integral_Accumulators();
-                PID_MixMotors();
-
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringFinishTime();
-#endif
-
-#ifdef __AVR_ATmega2560__
-#ifdef THIS_LOOP_FREQUENCY
-        }
-#endif
+        AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
 }

@@ -395,14 +395,6 @@ static void __attribute__((noinline)) GCS_Get_Struct_Params(uint8_t *CheckBuffer
 
 #endif
 
-#ifdef ESP32
-uint8_t GetBufferDataToSend(void)
-{
-    SerialOutputBufferSizeCount--;
-    return SerialOutputBuffer[VectorCount++];
-}
-#endif
-
 void GCSClass::SendStringToGCS(const char *String)
 {
 #ifdef __AVR_ATmega2560__
@@ -498,7 +490,8 @@ void GCSClass::Serial_Parse_Protocol()
 #ifdef ESP32
     while (SerialOutputBufferSizeCount > 0)
     {
-        FASTSERIAL.TX_Send(UART_NUMB_0, GetBufferDataToSend());
+        SerialOutputBufferSizeCount--;
+        FASTSERIAL.TX_Send(UART_NUMB_0, SerialOutputBuffer[VectorCount++]);
     }
 #endif
 }

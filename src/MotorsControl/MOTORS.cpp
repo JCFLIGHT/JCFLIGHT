@@ -27,7 +27,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "WatchDog/REBOOT.h"
 #ifdef ESP32
-#include "ESP32_HAL/GPIOPWM.h"
+#include "HAL_ESP32/GPIOPWM.h"
 #endif
 
 //#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
@@ -149,7 +149,7 @@ void ConfigureRegisters()
   if (!ESC.Run_Calibrate && !SAFETYBUTTON.SafeButtonEnabled())
   {
     PulseInAllMotors(1000);
-    SCHEDULERTIME.Sleep(300);
+    SCHEDULER.Sleep(300);
   }
 }
 

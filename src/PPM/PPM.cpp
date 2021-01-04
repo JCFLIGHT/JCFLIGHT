@@ -83,7 +83,7 @@ void InterruptRoutine(void)
   uint16_t PPMTimer;
   uint16_t PPMTimerDifference;
   static uint16_t PPMStoredTimer = 0;
-  PPMTimer = SCHEDULERTIME.GetMicros();
+  PPMTimer = SCHEDULER.GetMicros();
   __asm__ __volatile__("sei" ::
                            : "memory");
   PPMTimerDifference = PPMTimer - PPMStoredTimer;
@@ -214,7 +214,7 @@ void IRAM_ATTR InterruptRoutine(void)
   uint16_t PPMTimer;
   uint16_t PPMTimerDifference;
   static uint16_t PPMStoredTimer = 0;
-  PPMTimer = SCHEDULERTIME.GetMicros();
+  PPMTimer = SCHEDULER.GetMicros();
   PPMTimerDifference = PPMTimer - PPMStoredTimer;
   PPMStoredTimer = PPMTimer;
   if (PPMTimerDifference > 2700)

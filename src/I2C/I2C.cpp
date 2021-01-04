@@ -215,7 +215,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
         BarometerFound = true;
       Devices++;
 #ifdef DEBUG_I2C
-      SCHEDULERTIME.Sleep(20);
+      SCHEDULER.Sleep(20);
 #endif
     }
     I2C.Stop();
@@ -236,11 +236,11 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
 uint8_t I2CPROTOCOL::StartToSearchDevices()
 {
-  uint32_t I2COldTime = SCHEDULERTIME.GetMillis();
+  uint32_t I2COldTime = SCHEDULER.GetMillis();
   TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
   while (!(TWCR & (1 << TWINT)))
   {
-    if ((SCHEDULERTIME.GetMillis() - I2COldTime) >= 80)
+    if ((SCHEDULER.GetMillis() - I2COldTime) >= 80)
     {
       TWCR = 0;
       TWCR = _BV(TWEN) | _BV(TWEA);
@@ -262,11 +262,11 @@ uint8_t I2CPROTOCOL::StartToSearchDevices()
 uint8_t I2CPROTOCOL::SendHexadecimalValues(uint8_t Address)
 {
   TWDR = Address;
-  uint32_t I2COldTime = SCHEDULERTIME.GetMillis();
+  uint32_t I2COldTime = SCHEDULER.GetMillis();
   TWCR = (1 << TWINT) | (1 << TWEN);
   while (!(TWCR & (1 << TWINT)))
   {
-    if ((SCHEDULERTIME.GetMillis() - I2COldTime) >= 80)
+    if ((SCHEDULER.GetMillis() - I2COldTime) >= 80)
     {
       TWCR = 0;
       TWCR = _BV(TWEN) | _BV(TWEA);
@@ -292,7 +292,7 @@ uint8_t I2CPROTOCOL::SendHexadecimalValues(uint8_t Address)
 void AllI2CInitialization()
 {
   uint8_t ForceInitialization = 5;
-  SCHEDULERTIME.Sleep(200);
+  SCHEDULER.Sleep(200);
   while (ForceInitialization)
   {
     ForceInitialization--;
@@ -395,7 +395,7 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
 void AllI2CInitialization()
 {
   uint8_t ForceInitialization = 5;
-  SCHEDULERTIME.Sleep(200);
+  SCHEDULER.Sleep(200);
   while (ForceInitialization)
   {
     ForceInitialization--;
@@ -498,7 +498,7 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
 void AllI2CInitialization()
 {
   uint8_t ForceInitialization = 5;
-  SCHEDULERTIME.Sleep(200);
+  SCHEDULER.Sleep(200);
   while (ForceInitialization)
   {
     ForceInitialization--;

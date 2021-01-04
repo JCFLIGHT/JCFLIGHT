@@ -18,7 +18,7 @@
 #include "ADC.h"
 
 #if defined ESP32
-#include "ESP32_HAL/GPIOANALOGREAD.h"
+#include "HAL_ESP32/GPIOANALOGREAD.h"
 #endif
 
 AnalogPinClass ADCPIN;

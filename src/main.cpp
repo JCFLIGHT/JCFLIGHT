@@ -24,7 +24,7 @@
   {                                     \
     int main(void)                      \
     {                                   \
-      SCHEDULERTIME.Initialization();          \
+      SCHEDULER.Initialization();       \
       MachineInit();                    \
       while (true)                      \
       {                                 \

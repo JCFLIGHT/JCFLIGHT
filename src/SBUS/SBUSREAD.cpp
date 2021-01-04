@@ -37,12 +37,12 @@ void SBUS_Update()
   SBUSRC.Read(&SBUSReadChannels[0], &SBUSRC.FailSafe, &LostFrame);
 #if defined(DEBUG_MODE)
   static uint32_t SBUS_Serial_Refresh;
-  if (SCHEDULERTIME.GetMillis() - SBUS_Serial_Refresh >= 20)
+  if (SCHEDULER.GetMillis() - SBUS_Serial_Refresh >= 20)
   {
     FastSerialPrintln(PSTR("Thr:%d Yaw:%d Pitch:%d Roll:%d Aux1:%d Aux2:%d Aux3:%d Aux4:%d Aux5:%d Aux6:%d Aux7:%d Aux8:%d FailSafe:%d\n"),
                       SBUSReadChannels[0], SBUSReadChannels[1], SBUSReadChannels[2], SBUSReadChannels[3], SBUSReadChannels[4],
                       SBUSReadChannels[5], SBUSReadChannels[6], SBUSReadChannels[7], SBUSRC.FailSafe);
-    SBUS_Serial_Refresh = SCHEDULERTIME.GetMillis();
+    SBUS_Serial_Refresh = SCHEDULER.GetMillis();
   }
 #endif
 }
@@ -102,10 +102,10 @@ void SBUS::Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame)
 bool SBUS::SerialParse()
 {
   static uint32_t SBUS_Stored_Time = 0;
-  if (SCHEDULERTIME.GetMillis() - SBUS_Stored_Time > SBUS_TIMEOUT_US)
+  if (SCHEDULER.GetMillis() - SBUS_Stored_Time > SBUS_TIMEOUT_US)
   {
     ParserState = 0;
-    SBUS_Stored_Time = SCHEDULERTIME.GetMillis();
+    SBUS_Stored_Time = SCHEDULER.GetMillis();
   }
   while (FASTSERIAL.Available(UART_NUMB_2) > 0)
   {

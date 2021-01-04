@@ -361,8 +361,8 @@ void AHRS_Update()
   bool GPS_HeadingState = false;
   float CourseOverGround = 0;
   static uint32_t previousIMUUpdateTimeUs;
-  const float DeltaTime = (SCHEDULERTIME.GetMicros() - previousIMUUpdateTimeUs) * 1e-6;
-  previousIMUUpdateTimeUs = SCHEDULERTIME.GetMicros();
+  const float DeltaTime = (SCHEDULER.GetMicros() - previousIMUUpdateTimeUs) * 1e-6;
+  previousIMUUpdateTimeUs = SCHEDULER.GetMicros();
 
   GetMeasuredRotationRate(&BodyFrameRotation);     //CALCULA A ROTAÇÃO DA IMU EM RADIANOS/S
   GetMeasuredAcceleration(&BodyFrameAcceleration); //CALCULA A ACELERAÇÃO DA IMU EM CM/S^2

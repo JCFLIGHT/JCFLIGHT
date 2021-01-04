@@ -40,7 +40,7 @@ void ParachuteClass::Auto_Do_Now(bool ActiveParachute)
 void ParachuteClass::Manual_Do_Now()
 {
   if (!ParachuteReleased)
-    OverFlowTime += SCHEDULERTIME.GetMillis();
+    OverFlowTime += SCHEDULER.GetMillis();
   if (ParachuteInAuto)
     return;
   if (!ManualDetectTrigger)
@@ -172,7 +172,7 @@ bool ParachuteClass::Released()
 
 bool ParachuteClass::ReleasedOverFlowTime()
 {
-  if (SCHEDULERTIME.GetMillis() - OverFlowTime >= MOTORS_DISARM_TIME)
+  if (SCHEDULER.GetMillis() - OverFlowTime >= MOTORS_DISARM_TIME)
     return true;
   return false;
 }

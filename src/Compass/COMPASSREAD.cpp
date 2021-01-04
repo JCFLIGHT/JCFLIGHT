@@ -51,21 +51,21 @@ void CompassReadClass::Initialization()
 
   if (Compass_Type == COMPASS_AK8975)
   {
-    SCHEDULERTIME.Sleep(100);
+    SCHEDULER.Sleep(100);
     I2C.WriteRegister(0x0C, 0x0A, 0x01);
-    SCHEDULERTIME.Sleep(100);
+    SCHEDULER.Sleep(100);
   }
 
   if (Compass_Type == COMPASS_HMC5843)
   {
-    SCHEDULERTIME.Sleep(100);
+    SCHEDULER.Sleep(100);
     I2C.WriteRegister(MagAddress, 0x00, 0x71);
-    SCHEDULERTIME.Sleep(50);
+    SCHEDULER.Sleep(50);
     I2C.WriteRegister(MagAddress, 0x01, 0x60);
     I2C.WriteRegister(MagAddress, 0x02, 0x01);
-    SCHEDULERTIME.Sleep(100);
+    SCHEDULER.Sleep(100);
     InitialReadBufferData();
-    SCHEDULERTIME.Sleep(10);
+    SCHEDULER.Sleep(10);
     MagnetometerGain[ROLL] = 1000.0 / ABS_16BITS(IMU.CompassRead[ROLL]);
     MagnetometerGain[PITCH] = 1000.0 / ABS_16BITS(IMU.CompassRead[PITCH]);
     MagnetometerGain[YAW] = 1000.0 / ABS_16BITS(IMU.CompassRead[YAW]);
@@ -86,7 +86,7 @@ void CompassReadClass::Initialization()
       bool BiasOk = true;
       I2C.WriteRegister(MagAddress, 1, 40);
       I2C.WriteRegister(MagAddress, 2, 1);
-      SCHEDULERTIME.Sleep(100);
+      SCHEDULER.Sleep(100);
       InitialReadBufferData();
       if (!PushBias(0x011))
         BiasOk = false;
@@ -102,7 +102,7 @@ void CompassReadClass::Initialization()
       I2C.WriteRegister(MagAddress, 0, 0x70);
       I2C.WriteRegister(MagAddress, 1, 0x20);
       I2C.WriteRegister(MagAddress, 2, 0x00);
-      SCHEDULERTIME.Sleep(100);
+      SCHEDULER.Sleep(100);
     }
   }
 }
@@ -114,7 +114,7 @@ bool CompassReadClass::PushBias(uint8_t InputBias)
   for (uint8_t GetSamplesOfMag = 0; GetSamplesOfMag < 10; GetSamplesOfMag++) //RECOLHE 10 AMOSTRAS
   {
     I2C.WriteRegister(MagAddress, 2, 1);
-    SCHEDULERTIME.Sleep(100);
+    SCHEDULER.Sleep(100);
     InitialReadBufferData();
     //VERIFICA SE NENHUMA LEITURA DO MAG IRÁ EXCEDER O LIMITE DE 2^12
     //ROLL
@@ -175,7 +175,7 @@ void CompassReadClass::Constant_Read()
     return;
   }
 
-  CompassTimer = SCHEDULERTIME.GetMicros();
+  CompassTimer = SCHEDULER.GetMicros();
 
   //SAIA DA FUNÇÃO SE O TEMPO DE ATUALIZAÇÃO NÃO FOR VALIDO
   if (!CalibratingCompass && CompassTimer < NextUpdate)

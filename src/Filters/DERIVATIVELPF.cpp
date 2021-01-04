@@ -29,7 +29,7 @@ int16_t DiscreteLPF_To_Derivative_PID(int16_t DerivativeInput, int16_t CutOff)
   int16_t Derivative_To_LPF = DerivativeInput;
   static float Store_Previous_Derivative;
   static uint32_t Store_Previous_Time;
-  uint32_t LPF_StoreTime = SCHEDULERTIME.GetMillis();
+  uint32_t LPF_StoreTime = SCHEDULER.GetMillis();
   uint32_t LPF_DeltaTime = LPF_StoreTime - Store_Previous_Time;
   float LPF_Delta_Time;
   Store_Previous_Time = LPF_StoreTime;

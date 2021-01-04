@@ -183,7 +183,7 @@ uint32_t TimeOnLand;
 void RunLandDetector()
 {
   if (GetGroundDetected())
-    TimeOnLand = SCHEDULERTIME.GetMillis() - LandDetectorStartTime;
+    TimeOnLand = SCHEDULER.GetMillis() - LandDetectorStartTime;
   else
     ResetLandDetector();
   if (!GroundAltitudeSet && (TimeOnLand >= 100))
@@ -195,7 +195,7 @@ void RunLandDetector()
 
 void ResetLandDetector()
 {
-  LandDetectorStartTime = SCHEDULERTIME.GetMillis();
+  LandDetectorStartTime = SCHEDULER.GetMillis();
   TimeOnLand = 0;
   GroundAltitudeSet = false;
 }

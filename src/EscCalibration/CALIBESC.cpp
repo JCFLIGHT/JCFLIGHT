@@ -45,25 +45,25 @@ void ClassESC::Calibration(void)
     PulseInAllMotors(2000); //ENVIA PWM MAXIMO A TODOS OS ESC'S
     while (true)
     {
-      static uint32_t CountDelay = SCHEDULERTIME.GetMillis();
+      static uint32_t CountDelay = SCHEDULER.GetMillis();
       static bool IgnoreThis = false;
       RGB.Function(CALIBRATIONESC);                       //ATIVA O LED VERMELHO
       RGB.Update();                                       //ATUALIZA O ESTADO DOS LED'S
-      if (SCHEDULERTIME.GetMillis() - CountDelay >= 5000) //ROTINA DE CONTAGEM DE 5 SEGUNDOS
+      if (SCHEDULER.GetMillis() - CountDelay >= 5000) //ROTINA DE CONTAGEM DE 5 SEGUNDOS
       {
         IgnoreThis = true;
-        CountDelay = SCHEDULERTIME.GetMillis();
+        CountDelay = SCHEDULER.GetMillis();
       }
       if (IgnoreThis)
         PulseInAllMotors(1000); //ENVIA PWM MINIMO A TODOS OS ESC'S
-      if (IgnoreThis && SCHEDULERTIME.GetMillis() - CountDelay >= 5000)
+      if (IgnoreThis && SCHEDULER.GetMillis() - CountDelay >= 5000)
         break; //QUEBRA O WHILE
     }
     BeeperMode = ESC_FINISH_CALIBRATION_MODE;
     while (true) //FICA TRAVADO AQUI NO WHILE ATÉ QUE A CONTROLADORA SEJA REINICIADA MANUALMENTE
     {
       Run_Calibrate = false;
-      if (SCHEDULERTIME.GetMillis() - EscLoopRefresh >= 20) //ROTINA DE 50Hz
+      if (SCHEDULER.GetMillis() - EscLoopRefresh >= 20) //ROTINA DE 50Hz
       {
         DecodeAllReceiverChannels(); //FAZ A LEITURA DE TODOS OS CANAIS DO RECEPTOR DO RADIO
         RCCONFIG.Set_Pulse();        //SETA A SAÍDA PARA CONFIGURAÇÃO PARA O RECEPTOR DO RADIO
@@ -81,7 +81,7 @@ void ClassESC::Calibration(void)
         if (RadioControllOutput[THROTTLE] < 1100 && RadioControllOutput[YAW] < 1100 &&
             RadioControllOutput[PITCH] > 1900 && RadioControllOutput[ROLL] < 1100 && ArmTest)
           ArmCount = ArmTest = false; //DESARMA OS MOTORES E RESETA A CONTAGEM
-        EscLoopRefresh = SCHEDULERTIME.GetMillis();
+        EscLoopRefresh = SCHEDULER.GetMillis();
       }
       if (ArmTest)
         PulseInAllMotors(Constrain_16Bits(RadioControllOutput[THROTTLE], 1000, 2000)); //REALIZA O BY-PASS DO THROTTLE

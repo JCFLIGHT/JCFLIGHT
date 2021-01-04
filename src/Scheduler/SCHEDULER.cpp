@@ -22,7 +22,7 @@ uint16_t Loop_Integral_Time = 0;
 
 bool SchedulerTimer(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime)
 {
-  uint32_t StoredTime = SCHEDULERTIME.GetMicros();
+  uint32_t StoredTime = SCHEDULER.GetMicros();
   uint32_t ActualTime = StoredTime - SchedulerPointer->StoredTime;
   if (ActualTime >= RefreshTime)
   {
@@ -36,7 +36,7 @@ bool SchedulerTimer(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime)
 void Update_Loop_Time()
 {
   static uint32_t Loop_Guard_Time = 0;
-  uint32_t Actual_Loop_TIme = SCHEDULERTIME.GetMicros();
+  uint32_t Actual_Loop_TIme = SCHEDULER.GetMicros();
   Loop_Integral_Time = Actual_Loop_TIme - Loop_Guard_Time;
   Loop_Guard_Time = Actual_Loop_TIme;
 }

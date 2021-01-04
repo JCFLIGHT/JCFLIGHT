@@ -17,7 +17,7 @@
 
 #include "SCHEDULERTIME.h"
 
-SchedulerTimeClass SCHEDULERTIME;
+SchedulerTimeClass SCHEDULER;
 
 #ifdef __AVR_ATmega2560__
 volatile uint32_t Timer0_OverFlow = 0;
@@ -81,12 +81,12 @@ uint32_t SchedulerTimeClass::GetMicros()
 
 void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
 {
-  uint32_t Start = SCHEDULERTIME.GetMicros();
+  uint32_t Start = SCHEDULER.GetMicros();
   while (MillisSeconds > 0)
   {
-    SCHEDULERTIME.GetMicros();
-    SCHEDULERTIME.GetMillis();
-    while ((SCHEDULERTIME.GetMicros() - Start) >= 1000)
+    SCHEDULER.GetMicros();
+    SCHEDULER.GetMillis();
+    while ((SCHEDULER.GetMicros() - Start) >= 1000)
     {
       MillisSeconds--;
       if (MillisSeconds == 0)

@@ -316,25 +316,47 @@ struct _SendWayPointGCSOthersParameters
 
 #ifdef __AVR_ATmega2560__
 
-static void GCS_Send_Data(uint8_t Buffer)
+static void GCS_Send_Data(uint8_t Buffer, uint8_t Length)
 {
+    (void)(Length);
     FASTSERIAL.TX_Send(UART_NUMB_0, Buffer);
     SerialCheckSum ^= Buffer;
 
 #elif defined ESP32
 
-static void GCS_Send_Data(int32_t Buffer)
+static void GCS_Send_Data(int32_t Buffer, uint8_t Length)
 {
-    int32_t MemGetBuffer;
-    memcpy(&MemGetBuffer, &Buffer, sizeof(int32_t));
-    SerialOutputBuffer[SerialOutputBufferSizeCount++] = MemGetBuffer & 0xFF;
-    SerialCheckSum ^= MemGetBuffer & 0xFF;
-    SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGetBuffer >> 8) & 0xFF;
-    SerialCheckSum ^= (MemGetBuffer >> 8) & 0xFF;
-    SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGetBuffer >> 16) & 0xFF;
-    SerialCheckSum ^= (MemGetBuffer >> 16) & 0xFF;
-    SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGetBuffer >> 24) & 0xFF;
-    SerialCheckSum ^= (MemGetBuffer >> 24) & 0xFF;
+    switch (Length)
+    {
+    case VAR_8BITS:
+        uint8_t MemGet8BitsBuffer;
+        memcpy(&MemGet8BitsBuffer, &Buffer, sizeof(uint8_t));
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = MemGet8BitsBuffer & 0xff;
+        SerialCheckSum ^= MemGet8BitsBuffer & 0xff;
+        break;
+
+    case VAR_16BITS:
+        int16_t MemGet16BitsBuffer;
+        memcpy(&MemGet16BitsBuffer, &Buffer, sizeof(int16_t));
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = MemGet16BitsBuffer & 0xff;
+        SerialCheckSum ^= MemGet16BitsBuffer & 0xff;
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGet16BitsBuffer >> 8) & 0xff;
+        SerialCheckSum ^= (MemGet16BitsBuffer >> 8) & 0xff;
+        break;
+
+    case VAR_32BITS:
+        int32_t MemGet32BitsBuffer;
+        memcpy(&MemGet32BitsBuffer, &Buffer, sizeof(int32_t));
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = MemGet32BitsBuffer & 0xff;
+        SerialCheckSum ^= MemGet32BitsBuffer & 0xff;
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGet32BitsBuffer >> 8) & 0xff;
+        SerialCheckSum ^= (MemGet32BitsBuffer >> 8) & 0xff;
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGet32BitsBuffer >> 16) & 0xff;
+        SerialCheckSum ^= (MemGet32BitsBuffer >> 16) & 0xff;
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = (MemGet32BitsBuffer >> 24) & 0xff;
+        SerialCheckSum ^= (MemGet32BitsBuffer >> 24) & 0xff;
+        break;
+    }
 
 #endif
 }
@@ -357,8 +379,8 @@ static void Communication_Passed(bool Error, uint8_t Buffer)
 
 #elif defined ESP32
 
-    SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x4c;
-    SerialCheckSum ^= 0x4c;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x4a;
+    SerialCheckSum ^= 0x4a;
     SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x43;
     SerialCheckSum ^= 0x43;
     SerialOutputBuffer[SerialOutputBufferSizeCount++] = Error ? 0x21 : 0x46;
@@ -385,6 +407,8 @@ static void GCS_Send_Struct_Params(uint8_t *CheckBuffer, uint8_t SizeOfBuffer)
     FASTSERIAL.UartSendData(UART_NUMB_0);
 }
 
+#endif
+
 static void __attribute__((noinline)) GCS_Get_Struct_Params(uint8_t *CheckBuffer, uint8_t SizeOfBuffer)
 {
     while (SizeOfBuffer--)
@@ -392,8 +416,6 @@ static void __attribute__((noinline)) GCS_Get_Struct_Params(uint8_t *CheckBuffer
         *CheckBuffer++ = SerialInputBuffer[VectorCount++] & 0xff;
     }
 }
-
-#endif
 
 void GCSClass::SendStringToGCS(const char *String)
 {
@@ -408,6 +430,13 @@ void GCSClass::SendStringToGCS(const char *String)
     FASTSERIAL.UartSendData(UART_NUMB_0);
 
 #elif defined ESP32
+
+    Communication_Passed(false, strlen_P(String));
+    for (const char *StringCount = String; ProgMemReadByte(StringCount); StringCount++)
+    {
+        GCS_Send_Data(ProgMemReadByte(StringCount), VAR_8BITS);
+    }
+    GCS_Send_Data(SerialCheckSum, VAR_8BITS);
 
 #elif defined __arm__
 
@@ -435,7 +464,7 @@ void GCSClass::Serial_Parse_Protocol()
         {
 
         case 0:
-            if (SerialBuffer == 0x4a || SerialBuffer == 0x4c)
+            if (SerialBuffer == 0x4a)
             {
                 ProtocolTaskOrder = 1;
             }
@@ -488,11 +517,13 @@ void GCSClass::Serial_Parse_Protocol()
         PreviousProtocolTaskOrder = ProtocolTaskOrder;
     }
 #ifdef ESP32
+
     while (SerialOutputBufferSizeCount > 0)
     {
         SerialOutputBufferSizeCount--;
         FASTSERIAL.TX_Send(UART_NUMB_0, SerialOutputBuffer[VectorCount++]);
     }
+
 #endif
 }
 
@@ -563,7 +594,9 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 11:
         if (!COMMAND_ARM_DISARM)
+        {
             CalibratingAccelerometer = 512;
+        }
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART_NUMB_0);
@@ -571,7 +604,9 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 12:
         if (!COMMAND_ARM_DISARM)
+        {
             CalibratingCompass = true;
+        }
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
         FASTSERIAL.UartSendData(UART_NUMB_0);
@@ -687,55 +722,83 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     switch (TaskOrderGCS)
     {
 
+    case 3:
+        EEPROM_Function = 1;
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 4:
+        EEPROM_Function = 2;
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 5:
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParameters, sizeof(_GetWayPointGCSParameters));
+        break;
+
+    case 6:
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParametersTwo, sizeof(_GetWayPointGCSParametersTwo));
+        break;
+
     case 7:
         GCS.GCS_Request_Parameters();
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, sizeof(int32_t) * 43);
-        GCS_Send_Data(GCSParameters.SendAttitudePitch);
-        GCS_Send_Data(GCSParameters.SendAttitudeRoll);
-        GCS_Send_Data(GCSParameters.SendAttitudeYaw);
-        GCS_Send_Data(GCSParameters.DevicesOnBoard);
-        GCS_Send_Data(GCSParameters.SendThrottleValue);
-        GCS_Send_Data(GCSParameters.SendYawValue);
-        GCS_Send_Data(GCSParameters.SendPitchValue);
-        GCS_Send_Data(GCSParameters.SendRollValue);
-        GCS_Send_Data(GCSParameters.SendAuxOneValue);
-        GCS_Send_Data(GCSParameters.SendAuxTwoValue);
-        GCS_Send_Data(GCSParameters.SendAuxThreeValue);
-        GCS_Send_Data(GCSParameters.SendAuxFourValue);
-        GCS_Send_Data(GCSParameters.SendAuxFiveValue);
-        GCS_Send_Data(GCSParameters.SendAuxSixValue);
-        GCS_Send_Data(GCSParameters.SendAuxSevenValue);
-        GCS_Send_Data(GCSParameters.SendAuxEightValue);
-        GCS_Send_Data(GCSParameters.SendGPSNumberOfSat);
-        GCS_Send_Data(GCSParameters.SendGPSLatitude);
-        GCS_Send_Data(GCSParameters.SendGPSLongitude);
-        GCS_Send_Data(GCSParameters.SendHomePointLatitude);
-        GCS_Send_Data(GCSParameters.SendHomePointLongitude);
-        GCS_Send_Data(GCSParameters.SendBarometerValue);
-        GCS_Send_Data(GCSParameters.SendFailSafeState);
-        GCS_Send_Data(GCSParameters.SendBatteryVoltageValue);
-        GCS_Send_Data(GCSParameters.SendBatteryPercentageValue);
-        GCS_Send_Data(GCSParameters.SendArmDisarmState);
-        GCS_Send_Data(GCSParameters.SendHDOPValue);
-        GCS_Send_Data(GCSParameters.SendCurrentValue);
-        GCS_Send_Data(GCSParameters.SendWattsValue);
-        GCS_Send_Data(GCSParameters.SendDeclinationValue);
-        GCS_Send_Data(GCSParameters.SendActualFlightMode);
-        GCS_Send_Data(GCSParameters.SendFrameType);
-        GCS_Send_Data(GCSParameters.SendHomePointState);
-        GCS_Send_Data(GCSParameters.SendTemperature);
-        GCS_Send_Data(GCSParameters.SendHomePointDistance);
-        GCS_Send_Data(GCSParameters.SendCurrentInMah);
-        GCS_Send_Data(GCSParameters.SendCourseOverGround);
-        GCS_Send_Data(GCSParameters.SendCrosstrack);
-        GCS_Send_Data(GCSParameters.SendAccGForce);
-        GCS_Send_Data(GCSParameters.SendAccImageBitMap);
-        GCS_Send_Data(GCSParameters.SendCompassRoll);
-        GCS_Send_Data(GCSParameters.SendCompassPitch);
-        GCS_Send_Data(GCSParameters.SendCompassYaw);
+        Communication_Passed(false, (sizeof(uint8_t) * 10) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 27) + //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+                                        (sizeof(int32_t) * 6));  //NÚMERO TOTAL DE VARIAVEIS DE 32 BITS CONTIDO AQUI
+        GCS_Send_Data(GCSParameters.SendAttitudePitch, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAttitudeRoll, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAttitudeYaw, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.DevicesOnBoard, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendThrottleValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendYawValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendPitchValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendRollValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxOneValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxTwoValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxThreeValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxFourValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxFiveValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxSixValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxSevenValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAuxEightValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendGPSNumberOfSat, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendGPSLatitude, VAR_32BITS);
+        GCS_Send_Data(GCSParameters.SendGPSLongitude, VAR_32BITS);
+        GCS_Send_Data(GCSParameters.SendHomePointLatitude, VAR_32BITS);
+        GCS_Send_Data(GCSParameters.SendHomePointLongitude, VAR_32BITS);
+        GCS_Send_Data(GCSParameters.SendBarometerValue, VAR_32BITS);
+        GCS_Send_Data(GCSParameters.SendFailSafeState, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendBatteryVoltageValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendBatteryPercentageValue, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendArmDisarmState, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendHDOPValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendCurrentValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendWattsValue, VAR_32BITS);
+        GCS_Send_Data(GCSParameters.SendDeclinationValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendActualFlightMode, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendFrameType, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendHomePointState, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendTemperature, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendHomePointDistance, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendCurrentInMah, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendCourseOverGround, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendCrosstrack, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAccGForce, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendAccImageBitMap, VAR_8BITS);
+        GCS_Send_Data(GCSParameters.SendCompassRoll, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendCompassPitch, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendCompassYaw, VAR_16BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -745,36 +808,67 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, sizeof(int32_t) * 22);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendFrameType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendReceiverType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendGimbalType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendParachuteType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendSPIType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendUART_NUMB_2Type);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendCompassType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendCompassRotationType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendRTHAltitudeType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendMotorSpeedType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAcroType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAltitudeHoldType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendPositionHoldType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendInteligentOrientationControlType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendReturnToHomeType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAtackType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAutomaticFlipType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAutomaticMissonType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendArmDisarmType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAutoLandType);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendSafeBtnState);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAirSpeedState);
+        Communication_Passed(false, sizeof(uint8_t) * 22); //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        GCS_Send_Data(SendUserBasicGCSParameters.SendFrameType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendReceiverType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendGimbalType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendParachuteType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendSPIType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendUART_NUMB_2Type, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendCompassType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendCompassRotationType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendRTHAltitudeType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendMotorSpeedType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAcroType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAltitudeHoldType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendPositionHoldType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendInteligentOrientationControlType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendReturnToHomeType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAtackType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAutomaticFlipType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAutomaticMissonType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendArmDisarmType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAutoLandType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendSafeBtnState, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAirSpeedState, VAR_8BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
         break;
 
     case 9:
-
+        //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
+        SerialOutputBufferSizeCount = 0;
+        VectorCount = 0;
+        Communication_Passed(false, (sizeof(uint8_t) * 16) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 8)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        GCS_Send_Data(SendUserMediumGCSParameters.SendTPAInPercent, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendBreakPointValue, VAR_16BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendGyroLPF, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendDerivativeLPF, VAR_16BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendRCLPF, VAR_16BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendKalmanState, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendBiQuadAccLPF, VAR_16BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendBiQuadGyroLPF, VAR_16BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendBiQuadAccNotch, VAR_16BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendBiQuadGyroNotch, VAR_16BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendMotorCompensationState, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendProportionalPitch, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendIntegralPitch, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendDerivativePitch, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendProportionalRoll, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendIntegralRoll, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendDerivativeRoll, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendProportionalYaw, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendIntegralYaw, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendDerivativeYaw, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendProportionalAltitudeHold, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendProportionalGPSHold, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendIntegralGPSHold, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendServosLPF, VAR_16BITS);
+        //SOMA DO BUFFER
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
+        SerialCheckSum ^= SerialCheckSum;
         break;
 
     case 10:
@@ -782,43 +876,152 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, sizeof(int32_t) * 33);
-        GCS_Send_Data(GCSParameters_Two.SendActualThrottleValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualYawValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualPitchValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualRollValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxOneValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxTwoValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxThreeValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxFourValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxFiveValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxSixValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxSevenValue);
-        GCS_Send_Data(GCSParameters_Two.SendActualAuxEightValue);
-        GCS_Send_Data(GCSParameters_Two.SendAttitudeThrottleValue);
-        GCS_Send_Data(GCSParameters_Two.SendAttitudeYawValue);
-        GCS_Send_Data(GCSParameters_Two.SendAttitudePitchValue);
-        GCS_Send_Data(GCSParameters_Two.SendAttitudeRollValue);
-        GCS_Send_Data(GCSParameters_Two.SendMemoryRamUsed);
-        GCS_Send_Data(GCSParameters_Two.SendMemoryRamUsedPercent);
-        GCS_Send_Data(GCSParameters_Two.SendAccXNotFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendAccYNotFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendAccZNotFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendAccXFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendAccYFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendAccZFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendGyroXNotFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendGyroYNotFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendGyroZNotFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendGyroXFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendGyroYFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendGyroZFiltered);
-        GCS_Send_Data(GCSParameters_Two.SendGPSGroundSpeed);
-        GCS_Send_Data(GCSParameters_Two.SendI2CError);
-        GCS_Send_Data(GCSParameters_Two.SendAirSpeedValue);
+        Communication_Passed(false, (sizeof(uint8_t) * 1) +      //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 32)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        GCS_Send_Data(GCSParameters_Two.SendActualThrottleValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualYawValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualPitchValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualRollValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxOneValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxTwoValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxThreeValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxFourValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxFiveValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxSixValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxSevenValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendActualAuxEightValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudeThrottleValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudeYawValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudePitchValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAttitudeRollValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendMemoryRamUsed, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendMemoryRamUsedPercent, VAR_8BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAccXNotFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAccYNotFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAccZNotFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAccXFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAccYFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAccZFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendGyroXNotFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendGyroYNotFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendGyroZNotFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendGyroXFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendGyroYFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendGyroZFiltered, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendGPSGroundSpeed, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendI2CError, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendAirSpeedValue, VAR_16BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
+        break;
+
+    case 11:
+        if (!COMMAND_ARM_DISARM)
+        {
+            CalibratingAccelerometer = 512;
+        }
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 12:
+        if (!COMMAND_ARM_DISARM)
+        {
+            CalibratingCompass = true;
+        }
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 13:
+        GCS.ConfigFlight = true;
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 14:
+        GCS.ConfigFlight = false;
+        Communication_Passed(0, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 15:
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        GCS_Get_Struct_Params((uint8_t *)&GetUserBasicGCSParameters, sizeof(_GetUserBasicGCSParameters));
+        break;
+
+    case 16:
+        GCS.Save_Basic_Configuration();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(0, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 17:
+        GCS.Dafult_Basic_Configuration();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 18:
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        GCS_Get_Struct_Params((uint8_t *)&GetUserMediumGCSParameters, sizeof(_GetUserMediumGCSParameters));
+        break;
+
+    case 19:
+        GCS.Save_Medium_Configuration();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 20:
+        GCS.Dafult_Medium_Configuration();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
+        break;
+
+    case 21:
+        SendStringToGCS(PlatformName);
+        break;
+
+    case 22:
+        SendStringToGCS(FirwareName);
+        break;
+
+    case 23:
+        SendStringToGCS(FirmwareVersion);
+        break;
+
+    case 24:
+        SendStringToGCS(CompilerVersion);
+        break;
+
+    case 25:
+        SendStringToGCS(BuildDate);
+        break;
+
+    case 26:
+        SendStringToGCS(BuildTime);
+        break;
+
+    case 27:
+        if (!COMMAND_ARM_DISARM)
+        {
+            PREARM.UpdateGCSErrorText(PREARM.Checking());
+        }
+        break;
+
+    case 28:
+        if (!COMMAND_ARM_DISARM)
+        {
+            RebootThisBoard();
+        }
         break;
     }
 

@@ -35,7 +35,6 @@
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "IMU/GFORCE.h"
 #include "ParamsToGCS/IMUCALGCS.h"
-#include "TimeMonitor/TIMEMONITOR.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "MemoryCheck/FREERAM.h"
 #include "AirSpeed/AIRSPEED.h"
@@ -445,9 +444,6 @@ void GCSClass::SendStringToGCS(const char *String)
 void GCSClass::Serial_Parse_Protocol()
 {
 #ifdef LOCK_GCS
-    return;
-#endif
-#ifdef ENABLE_TIMEMONITOR
     return;
 #endif
     SerialAvailableGuard = FASTSERIAL.Available(UART_NUMB_0);

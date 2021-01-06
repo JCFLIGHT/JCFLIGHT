@@ -26,10 +26,6 @@ void Slow_Loop()
         {
 #endif
 
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringStartTime(SLOW_LOOP);
-#endif
-
                 Pre_Arm();
                 CurvesRC_SetValues();
                 AUXFLIGHT.LoadEEPROM();
@@ -42,10 +38,6 @@ void Slow_Loop()
                 GCS.UpdateParametersToGCS();
                 PushWayPointParameters();
 
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringFinishTime();
-#endif
-
 #ifdef __AVR_ATmega2560__
         }
 #endif
@@ -57,10 +49,6 @@ void Medium_Loop()
         static Scheduler_Struct Medium_Loop;
         if (SchedulerTimer(&Medium_Loop, SCHEDULER_PERIOD_HZ(50, "Hz")))
         {
-#endif
-
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringStartTime(MEDIUM_LOOP);
 #endif
 
                 DecodeAllReceiverChannels();
@@ -78,10 +66,6 @@ void Medium_Loop()
                 Manual_Trim_Servo_Update();
                 Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDE_HOLD_MODE]);
 
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringFinishTime();
-#endif
-
 #ifdef __AVR_ATmega2560__
         }
 #endif
@@ -93,10 +77,6 @@ void Fast_Medium_Loop()
         static Scheduler_Struct Fast_Medium_Loop;
         if (SchedulerTimer(&Fast_Medium_Loop, SCHEDULER_PERIOD_HZ(100, "Hz")))
         {
-#endif
-
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringStartTime(FAST_MEDIUM_LOOP);
 #endif
 
                 BEEPER.Run();
@@ -111,10 +91,6 @@ void Fast_Medium_Loop()
                 WayPointRun();
                 GCS.Serial_Parse_Protocol();
 
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringFinishTime();
-#endif
-
 #ifdef __AVR_ATmega2560__
         }
 #endif
@@ -128,18 +104,10 @@ void Fast_Loop()
         {
 #endif
 
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringStartTime(FAST_LOOP);
-#endif
-
                 Update_PrecisionLand();
 
 #ifdef __AVR_ATmega2560__
                 Super_Fast_Loop();
-#endif
-
-#ifdef ENABLE_TIMEMONITOR
-                AVRTIMEMONITOR.MeasuringFinishTime();
 #endif
 
 #ifdef __AVR_ATmega2560__
@@ -171,18 +139,10 @@ void Super_Fast_Loop()
 
 void Integral_Loop()
 {
-#ifdef ENABLE_TIMEMONITOR
-        AVRTIMEMONITOR.MeasuringStartTime(TOTAL_LOOP);
-#endif
-
         Acc_ReadBufferData();
         Gyro_ReadBufferData();
         Update_Loop_Time();
         PID_Update();
         PID_Reset_Integral_Accumulators();
         PID_MixMotors();
-
-#ifdef ENABLE_TIMEMONITOR
-        AVRTIMEMONITOR.MeasuringFinishTime();
-#endif
 }

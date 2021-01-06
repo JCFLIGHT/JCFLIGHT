@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "PASSEEPROM.h"
+#include "HALEEPROM.h"
 #include "HAL_AVR/AVREEPROM.h"
 #include "HAL_ESP32/FLASHSTORAGE.h"
 

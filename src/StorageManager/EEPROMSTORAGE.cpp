@@ -16,7 +16,7 @@
 */
 
 #include "EEPROMSTORAGE.h"
-#include "HAL/PASSEEPROM.h"
+#include "HAL/HALEEPROM.h"
 
 EEPROMSTORAGE STORAGEMANAGER;
 

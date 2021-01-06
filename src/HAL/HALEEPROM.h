@@ -15,12 +15,20 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "ADC.h"
-#include "HAL/HALADC.h"
-
-AnalogPinClass ADCPIN;
-
-int16_t AnalogPinClass::Read(uint8_t AnalogPin)
+#ifndef HALEEPROM_H_
+#define HALEEPROM_H_
+#include "Arduino.h"
+class HALEEPROMClass
 {
-  return HAL_ADC.AnalogRead(AnalogPin);
-}
+public:
+    void Write_8Bits(int16_t Address, uint8_t Value);
+    void Write_16Bits(int16_t Address, int16_t Value);
+    void Write_32Bits(int16_t Address, int32_t Value);
+    void Write_Float(int16_t Address, float Value);
+    uint8_t Read_8Bits(int16_t Address);
+    int16_t Read_16Bits(int16_t Address);
+    int32_t Read_32Bits(int16_t Address);
+    float Read_Float(int16_t Address);
+};
+extern HALEEPROMClass HAL_EEPROM;
+#endif

@@ -15,12 +15,13 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "ADC.h"
-#include "HAL/HALADC.h"
-
-AnalogPinClass ADCPIN;
-
-int16_t AnalogPinClass::Read(uint8_t AnalogPin)
+#ifndef HALADC_H_
+#define HALADC_H_
+#include "Arduino.h"
+class HAL_ADC_Class
 {
-  return HAL_ADC.AnalogRead(AnalogPin);
-}
+public:
+    int16_t AnalogRead(uint8_t AnalogPin);
+};
+extern HAL_ADC_Class HAL_ADC;
+#endif

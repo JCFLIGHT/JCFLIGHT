@@ -17,6 +17,8 @@
 
 #ifndef _GPIOANALOGREAD_H_
 #define _GPIOANALOGREAD_H_
+#ifdef ESP32
 #include "Arduino.h"
 int16_t GPIOAnalogRead(uint8_t AnalogPin);
+#endif
 #endif

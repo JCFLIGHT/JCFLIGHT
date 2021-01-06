@@ -16,6 +16,7 @@
 */
 
 #include "GPIOANALOGREAD.h"
+
 #ifdef ESP32
 #include "esp_adc_cal.h"
 
@@ -34,11 +35,8 @@ int16_t GetADCValue(adc1_channel_t Channel)
 	return adc1_get_raw(Channel);
 }
 
-#endif
-
 int16_t GPIOAnalogRead(uint8_t AnalogPin)
 {
-#ifdef ESP32
 	ConfigureADCCaptureWidth(ADC_WIDTH_BIT_12);
 	adc1_channel_t ADC_Channel = ADC1_CHANNEL_0;
 	switch (AnalogPin)
@@ -81,7 +79,7 @@ int16_t GPIOAnalogRead(uint8_t AnalogPin)
 	}
 	ConfigureADCAttenuationInDB(ADC_Channel, ADC_ATTEN_DB_11);
 	return GetADCValue(ADC_Channel);
-#else
 	return 0;
-#endif
 }
+
+#endif

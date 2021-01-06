@@ -316,9 +316,8 @@ struct _SendWayPointGCSOthersParameters
 
 #ifdef __AVR_ATmega2560__
 
-static void GCS_Send_Data(uint8_t Buffer, uint8_t Length)
+static void GCS_Send_Data(uint8_t Buffer)
 {
-    (void)(Length);
     FASTSERIAL.TX_Send(UART_NUMB_0, Buffer);
     SerialCheckSum ^= Buffer;
 
@@ -725,26 +724,18 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 3:
         EEPROM_Function = 1;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 4:
         EEPROM_Function = 2;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 5:
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParameters, sizeof(_GetWayPointGCSParameters));
         break;
 
     case 6:
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         GCS_Get_Struct_Params((uint8_t *)&GetWayPointGCSParametersTwo, sizeof(_GetWayPointGCSParametersTwo));
         break;
 
@@ -921,69 +912,49 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         {
             CalibratingAccelerometer = 512;
         }
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 12:
-        if (!COMMAND_ARM_DISARM)
+        if (!COMMAND_ARM_DISARM && I2C.CompassFound)
         {
             CalibratingCompass = true;
         }
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 13:
         GCS.ConfigFlight = true;
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 14:
         GCS.ConfigFlight = false;
-        Communication_Passed(0, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 15:
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         GCS_Get_Struct_Params((uint8_t *)&GetUserBasicGCSParameters, sizeof(_GetUserBasicGCSParameters));
         break;
 
     case 16:
         GCS.Save_Basic_Configuration();
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(0, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 17:
         GCS.Dafult_Basic_Configuration();
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 18:
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         GCS_Get_Struct_Params((uint8_t *)&GetUserMediumGCSParameters, sizeof(_GetUserMediumGCSParameters));
         break;
 
     case 19:
         GCS.Save_Medium_Configuration();
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 20:
         GCS.Dafult_Medium_Configuration();
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
-        Communication_Passed(false, 0);
-        GCS_Send_Data(SerialCheckSum, VAR_8BITS);
         break;
 
     case 21:

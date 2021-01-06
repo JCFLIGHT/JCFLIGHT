@@ -67,40 +67,46 @@ float EEPROMSTORAGE::Read_Float(int16_t Address)
 
 #elif defined ESP32
 
+#include "HAL_ESP32/FLASHSTORAGE.h"
+
 void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)
 {
+  EEPROM_Write_8Bits(Address, Value);
 }
 
 void EEPROMSTORAGE::Write_16Bits(int16_t Address, int16_t Value)
 {
+  EEPROM_Write_16Bits(Address, Value);
 }
 
 void EEPROMSTORAGE::Write_32Bits(int16_t Address, int32_t Value)
 {
+  EEPROM_Write_32Bits(Address, Value);
 }
 
 void EEPROMSTORAGE::Write_Float(int16_t Address, float Value)
 {
+  EEPROM_Write_Float(Address, Value);
 }
 
 uint8_t EEPROMSTORAGE::Read_8Bits(int16_t Address)
 {
-  return 0;
+  return EEPROM_Read_8Bits(Address);
 }
 
 int16_t EEPROMSTORAGE::Read_16Bits(int16_t Address)
 {
-  return 0;
+  return EEPROM_Read_16Bits(Address);
 }
 
 int32_t EEPROMSTORAGE::Read_32Bits(int16_t Address)
 {
-  return 0;
+  return EEPROM_Read_32Bits(Address);
 }
 
 float EEPROMSTORAGE::Read_Float(int16_t Address)
 {
-  return 0;
+  return EEPROM_Read_Float(Address);
 }
 
 #elif defined __arm__

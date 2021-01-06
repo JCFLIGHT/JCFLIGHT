@@ -171,7 +171,7 @@ void Accelerometer_Calibration()
     if (CalibratingAccelerometer == 1)
     {
       int8_t MeasuredLimit = AccReadVector[AxisToCalibration] > 0 ? 0 : 1;
-      AccMinMaxValue[AxisToCalibration][MeasuredLimit] = AccReadVector[AxisToCalibration] >> 9;
+      AccMinMaxValue[AxisToCalibration][MeasuredLimit] = AccReadVector[AxisToCalibration] / 512;
       if (AccMinMaxValue[AxisToCalibration][0] > 0 && AccMinMaxValue[AxisToCalibration][1] < 0)
       {
         CALIBRATION.AccelerometerZero[AxisToCalibration] = (AccMinMaxValue[AxisToCalibration][0] + AccMinMaxValue[AxisToCalibration][1]) / 2;
@@ -179,9 +179,9 @@ void Accelerometer_Calibration()
       }
       else if (AxisToCalibration == YAW && MeasuredLimit == 0)
       {
-        CALIBRATION.AccelerometerZero[ROLL] = AccReadVector[ROLL] >> 9;
-        CALIBRATION.AccelerometerZero[PITCH] = AccReadVector[PITCH] >> 9;
-        CALIBRATION.AccelerometerZero[YAW] = AccReadVector[YAW] >> 9;
+        CALIBRATION.AccelerometerZero[ROLL] = AccReadVector[ROLL] / 512;
+        CALIBRATION.AccelerometerZero[PITCH] = AccReadVector[PITCH] / 512;
+        CALIBRATION.AccelerometerZero[YAW] = AccReadVector[YAW] / 512;
         CALIBRATION.AccelerometerZero[YAW] -= 512;
         CALIBRATION.AccelerometerScale[ROLL] = 0;
         CALIBRATION.AccelerometerScale[PITCH] = 0;
@@ -205,16 +205,16 @@ void Accelerometer_Calibration()
   {
     IMU.AccelerometerRead[ROLL] = (((int32_t)(IMU.AccelerometerRead[ROLL] -
                                               CALIBRATION.AccelerometerZero[ROLL])) *
-                                   CALIBRATION.AccelerometerScale[ROLL]) >>
-                                  10;
+                                   CALIBRATION.AccelerometerScale[ROLL]) /
+                                  1024;
     IMU.AccelerometerRead[PITCH] = (((int32_t)(IMU.AccelerometerRead[PITCH] -
                                                CALIBRATION.AccelerometerZero[PITCH])) *
-                                    CALIBRATION.AccelerometerScale[PITCH]) >>
-                                   10;
+                                    CALIBRATION.AccelerometerScale[PITCH]) /
+                                   1024;
     IMU.AccelerometerRead[YAW] = (((int32_t)(IMU.AccelerometerRead[YAW] -
                                              CALIBRATION.AccelerometerZero[YAW])) *
-                                  CALIBRATION.AccelerometerScale[YAW]) >>
-                                 10;
+                                  CALIBRATION.AccelerometerScale[YAW]) /
+                                 1024;
   }
   else
   {

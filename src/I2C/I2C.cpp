@@ -41,11 +41,17 @@ void I2CPROTOCOL::Initialization(void)
   TWCR = 4;
   //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
   if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
+  {
     Compass_Type = COMPASS_AK8975;
+  }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
+  {
     Compass_Type = COMPASS_HMC5843;
+  }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
+  {
     Compass_Type = COMPASS_HMC5883;
+  }
   I2C.SearchDevicesInBarrament();
   //AK8975 ENDEREÇO:0x0C
   //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
@@ -308,15 +314,26 @@ void AllI2CInitialization()
 
 #elif defined ESP32
 
+#include <Wire.h>
+
 void I2CPROTOCOL::Initialization(void)
 {
+  Wire.begin();
+  Wire.setClock(400000);
+
   //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
   if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
+  {
     Compass_Type = COMPASS_AK8975;
+  }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
+  {
     Compass_Type = COMPASS_HMC5843;
+  }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
+  {
     Compass_Type = COMPASS_HMC5883;
+  }
 
   /*
    if (NumbGenerator == 0x0D)
@@ -380,16 +397,40 @@ uint8_t I2CPROTOCOL::ReadNAK()
   return 0;
 }
 
+void i2cRead(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t *Data)
+{
+  Wire.beginTransmission(Address);
+  Wire.write(Register);
+  Wire.endTransmission(true);
+  Wire.requestFrom(Address, Nbytes);
+  uint8_t index = 0;
+  while (Wire.available())
+  {
+    Data[index++] = Wire.read();
+  }
+}
+
+void i2cWriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
+{
+  Wire.beginTransmission(Address);
+  Wire.write(Register);
+  Wire.write(Data);
+  Wire.endTransmission(true);
+}
+
 void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size)
 {
+  i2cRead(Address, Register, Size, Buffer);
 }
 
 void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
 {
+  RegisterBuffer(Address, Register, BufferData, 6);
 }
 
 void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
 {
+  i2cWriteByte(Address, Register, Value);
 }
 
 void AllI2CInitialization()
@@ -415,11 +456,17 @@ void I2CPROTOCOL::Initialization(void)
 {
   //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
   if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
+  {
     Compass_Type = COMPASS_AK8975;
+  }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
+  {
     Compass_Type = COMPASS_HMC5843;
+  }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
+  {
     Compass_Type = COMPASS_HMC5883;
+  }
 
   /*
    if (NumbGenerator == 0x0D)

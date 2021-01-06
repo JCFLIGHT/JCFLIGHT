@@ -17,6 +17,9 @@
 
 #include "MACHINEMAIN.h"
 #include "TaskSystem/TASKSYSTEM.h"
+#ifdef ESP32
+#include "EEPROM.h"
+#endif
 
 #ifdef __AVR_ATmega2560__
 
@@ -28,6 +31,9 @@ void setup()
 
 #endif
 {
+#ifdef ESP32
+    EEPROM.begin(1000);
+#endif
     UART2Mode_Initialization();
     FASTSERIAL.Initialization();
     RGB.Initialization();

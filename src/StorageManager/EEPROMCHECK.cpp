@@ -47,6 +47,19 @@ void Operator_Check_Values_In_Address(uint16_t Size)
 {
     while (true)
     {
+        Serial.print("Address:");
+        Serial.print(EPPROM_Address);
+        Serial.print("  ");
+        Serial.print("Valor Guardado:");
+        Serial.println(STORAGEMANAGER.Read_8Bits(EPPROM_Address));
+        EPPROM_Address++;
+        if (EPPROM_Address == Size)
+        {
+            Serial.println("Completo!");
+            while (true)
+                ;
+        }
+        SCHEDULER.Sleep(4);
     }
 }
 

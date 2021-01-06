@@ -17,5 +17,15 @@
 
 #ifndef FLASHSTORAGE_H_
 #define FLASHSTORAGE_H_
+#ifdef ESP32
 #include "Arduino.h"
+void EEPROM_Write_8Bits(int16_t Address, uint8_t Value);
+void EEPROM_Write_16Bits(int16_t Address, int16_t Value);
+void EEPROM_Write_32Bits(int16_t Address, int32_t Value);
+void EEPROM_Write_Float(int16_t Address, float Value);
+uint8_t EEPROM_Read_8Bits(int16_t Address);
+int16_t EEPROM_Read_16Bits(int16_t Address);
+int32_t EEPROM_Read_32Bits(int16_t Address);
+float EEPROM_Read_Float(int16_t Address);
+#endif
 #endif

@@ -16,3 +16,52 @@
 */
 
 #include "FLASHSTORAGE.h"
+#include <EEPROM.h>
+
+#ifdef ESP32
+
+void EEPROM_Write_8Bits(int16_t Address, uint8_t Value)
+{
+  EEPROM.writeByte(Address, Value);
+  EEPROM.commit();
+}
+
+void EEPROM_Write_16Bits(int16_t Address, int16_t Value)
+{
+  EEPROM.writeShort(Address, Value);
+  EEPROM.commit();
+}
+
+void EEPROM_Write_32Bits(int16_t Address, int32_t Value)
+{
+  EEPROM.writeInt(Address, Value);
+  EEPROM.commit();
+}
+
+void EEPROM_Write_Float(int16_t Address, float Value)
+{
+  EEPROM.writeFloat(Address, Value);
+  EEPROM.commit();
+}
+
+uint8_t EEPROM_Read_8Bits(int16_t Address)
+{
+  return EEPROM.read(Address);
+}
+
+int16_t EEPROM_Read_16Bits(int16_t Address)
+{
+  return EEPROM.readShort(Address);
+}
+
+int32_t EEPROM_Read_32Bits(int16_t Address)
+{
+  return EEPROM.readInt(Address);
+}
+
+float EEPROM_Read_Float(int16_t Address)
+{
+  return EEPROM.readFloat(Address);
+}
+
+#endif

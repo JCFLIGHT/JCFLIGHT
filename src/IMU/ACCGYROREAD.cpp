@@ -199,7 +199,9 @@ void Acc_ReadBufferData()
 
   //KALMAN
   if (ActiveKalman)
+  {
     KALMAN.Apply_In_Acc(IMU.AccelerometerRead);
+  }
 
   //LPF
   if (Acc_LPFStoredInEEPROM > 0)
@@ -242,7 +244,9 @@ void Gyro_ReadBufferData()
 
   //KALMAN
   if (ActiveKalman)
+  {
     KALMAN.Apply_In_Gyro(IMU.GyroscopeRead);
+  }
 
   //LPF
   if (Gyro_LPFStoredInEEPROM > 0)

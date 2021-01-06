@@ -35,8 +35,22 @@ void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t 
 }
 #elif defined ESP32
 
+#include "EEPROM.h"
+
 void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size)
 {
+    uint16_t InitialAddress = GetInitialAddress;
+    Size += 1;
+    while (Size--)
+    {
+        uint16_t GetAddrUsed = EEPROM.read(InitialAddress);
+        if (GetAddrUsed != 0) //LIMPA APENAS OS ENDEREÇOS UTILIZADOS
+        {
+            EEPROM.write(InitialAddress, 0);
+        }
+        InitialAddress++;
+    }
+    EEPROM.commit();
 }
 
 #elif defined __arm__

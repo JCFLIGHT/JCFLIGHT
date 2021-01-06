@@ -16,135 +16,46 @@
 */
 
 #include "EEPROMSTORAGE.h"
+#include "HAL/PASSEEPROM.h"
 
 EEPROMSTORAGE STORAGEMANAGER;
 
-#ifdef __AVR_ATmega2560__
-
-#include <avr/eeprom.h>
-
 void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)
 {
-  eeprom_write_byte((uint8_t *)Address, Value);
+  HAL_EEPROM.Write_8Bits(Address, Value);
 }
 
 void EEPROMSTORAGE::Write_16Bits(int16_t Address, int16_t Value)
 {
-  eeprom_write_word((uint16_t *)Address, Value);
+  HAL_EEPROM.Write_16Bits(Address, Value);
 }
 
 void EEPROMSTORAGE::Write_32Bits(int16_t Address, int32_t Value)
 {
-  eeprom_write_dword((uint32_t *)Address, Value);
+  HAL_EEPROM.Write_32Bits(Address, Value);
 }
 
 void EEPROMSTORAGE::Write_Float(int16_t Address, float Value)
 {
-  _Type_Union.FloatValue = Value;
-  Write_32Bits(Address, _Type_Union.LongValue);
+  HAL_EEPROM.Write_Float(Address, Value);
 }
 
 uint8_t EEPROMSTORAGE::Read_8Bits(int16_t Address)
 {
-  return eeprom_read_byte((const uint8_t *)Address);
+  return HAL_EEPROM.Read_8Bits(Address);
 }
 
 int16_t EEPROMSTORAGE::Read_16Bits(int16_t Address)
 {
-  return eeprom_read_word((const uint16_t *)Address);
+  return HAL_EEPROM.Read_16Bits(Address);
 }
 
 int32_t EEPROMSTORAGE::Read_32Bits(int16_t Address)
 {
-  return eeprom_read_dword((const uint32_t *)Address);
+  return HAL_EEPROM.Read_32Bits(Address);
 }
 
 float EEPROMSTORAGE::Read_Float(int16_t Address)
 {
-  _Type_Union.LongValue = eeprom_read_dword((const uint32_t *)Address);
-  return _Type_Union.FloatValue;
+  return HAL_EEPROM.Read_Float(Address);
 }
-
-#elif defined ESP32
-
-#include "HAL_ESP32/FLASHSTORAGE.h"
-
-void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)
-{
-  EEPROM_Write_8Bits(Address, Value);
-}
-
-void EEPROMSTORAGE::Write_16Bits(int16_t Address, int16_t Value)
-{
-  EEPROM_Write_16Bits(Address, Value);
-}
-
-void EEPROMSTORAGE::Write_32Bits(int16_t Address, int32_t Value)
-{
-  EEPROM_Write_32Bits(Address, Value);
-}
-
-void EEPROMSTORAGE::Write_Float(int16_t Address, float Value)
-{
-  EEPROM_Write_Float(Address, Value);
-}
-
-uint8_t EEPROMSTORAGE::Read_8Bits(int16_t Address)
-{
-  return EEPROM_Read_8Bits(Address);
-}
-
-int16_t EEPROMSTORAGE::Read_16Bits(int16_t Address)
-{
-  return EEPROM_Read_16Bits(Address);
-}
-
-int32_t EEPROMSTORAGE::Read_32Bits(int16_t Address)
-{
-  return EEPROM_Read_32Bits(Address);
-}
-
-float EEPROMSTORAGE::Read_Float(int16_t Address)
-{
-  return EEPROM_Read_Float(Address);
-}
-
-#elif defined __arm__
-
-void EEPROMSTORAGE::Write_8Bits(int16_t Address, uint8_t Value)
-{
-}
-
-void EEPROMSTORAGE::Write_16Bits(int16_t Address, int16_t Value)
-{
-}
-
-void EEPROMSTORAGE::Write_32Bits(int16_t Address, int32_t Value)
-{
-}
-
-void EEPROMSTORAGE::Write_Float(int16_t Address, float Value)
-{
-}
-
-uint8_t EEPROMSTORAGE::Read_8Bits(int16_t Address)
-{
-  return 0;
-}
-
-int16_t EEPROMSTORAGE::Read_16Bits(int16_t Address)
-{
-  return 0;
-}
-
-int32_t EEPROMSTORAGE::Read_32Bits(int16_t Address)
-{
-  return 0;
-}
-
-float EEPROMSTORAGE::Read_Float(int16_t Address)
-{
-  return 0;
-}
-
-#endif

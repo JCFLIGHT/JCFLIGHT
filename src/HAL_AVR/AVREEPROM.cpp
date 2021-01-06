@@ -15,54 +15,60 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "FLASHSTORAGE.h"
+#include "AVREEPROM.h"
 
-#ifdef ESP32
+#ifdef __AVR_ATmega2560__
 
-#include "EEPROM.h"
+#include <avr/eeprom.h>
+
+union Type_Union
+{
+    int8_t BytesArray[4];
+    long LongValue;
+    int16_t ShortValue;
+    float FloatValue;
+} _Type_Union;
 
 void EEPROM_Write_8Bits(int16_t Address, uint8_t Value)
 {
-  EEPROM.writeByte(Address, Value);
-  EEPROM.commit();
+    eeprom_write_byte((uint8_t *)Address, Value);
 }
 
 void EEPROM_Write_16Bits(int16_t Address, int16_t Value)
 {
-  EEPROM.writeShort(Address, Value);
-  EEPROM.commit();
+    eeprom_write_word((uint16_t *)Address, Value);
 }
 
 void EEPROM_Write_32Bits(int16_t Address, int32_t Value)
 {
-  EEPROM.writeInt(Address, Value);
-  EEPROM.commit();
+    eeprom_write_dword((uint32_t *)Address, Value);
 }
 
 void EEPROM_Write_Float(int16_t Address, float Value)
 {
-  EEPROM.writeFloat(Address, Value);
-  EEPROM.commit();
+    _Type_Union.FloatValue = Value;
+    EEPROM_Write_32Bits(Address, _Type_Union.LongValue);
 }
 
 uint8_t EEPROM_Read_8Bits(int16_t Address)
 {
-  return EEPROM.read(Address);
+    return eeprom_read_byte((const uint8_t *)Address);
 }
 
 int16_t EEPROM_Read_16Bits(int16_t Address)
 {
-  return EEPROM.readShort(Address);
+    return eeprom_read_word((const uint16_t *)Address);
 }
 
 int32_t EEPROM_Read_32Bits(int16_t Address)
 {
-  return EEPROM.readInt(Address);
+    return eeprom_read_dword((const uint32_t *)Address);
 }
 
 float EEPROM_Read_Float(int16_t Address)
 {
-  return EEPROM.readFloat(Address);
+    _Type_Union.LongValue = eeprom_read_dword((const uint32_t *)Address);
+    return _Type_Union.FloatValue;
 }
 
 #endif

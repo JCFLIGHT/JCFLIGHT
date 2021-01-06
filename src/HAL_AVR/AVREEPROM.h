@@ -15,20 +15,17 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef EEPROMSTORAGE_H_
-#define EEPROMSTORAGE_H_
+#ifndef AVREEPROM_H_
+#define AVREEPROM_H_
+#ifdef __AVR_ATmega2560__
 #include "Arduino.h"
-class EEPROMSTORAGE
-{
-public:
-  uint8_t Read_8Bits(int16_t Address);
-  int16_t Read_16Bits(int16_t Address);
-  int32_t Read_32Bits(int16_t Address);
-  float Read_Float(int16_t Address);
-  void Write_8Bits(int16_t Address, uint8_t Value);
-  void Write_16Bits(int16_t Address, int16_t Value);
-  void Write_32Bits(int16_t Address, int32_t Value);
-  void Write_Float(int16_t Address, float Value);
-};
-extern EEPROMSTORAGE STORAGEMANAGER;
+void EEPROM_Write_8Bits(int16_t Address, uint8_t Value);
+void EEPROM_Write_16Bits(int16_t Address, int16_t Value);
+void EEPROM_Write_32Bits(int16_t Address, int32_t Value);
+void EEPROM_Write_Float(int16_t Address, float Value);
+uint8_t EEPROM_Read_8Bits(int16_t Address);
+int16_t EEPROM_Read_16Bits(int16_t Address);
+int32_t EEPROM_Read_32Bits(int16_t Address);
+float EEPROM_Read_Float(int16_t Address);
+#endif
 #endif

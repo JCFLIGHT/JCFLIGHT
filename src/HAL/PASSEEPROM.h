@@ -15,20 +15,20 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef EEPROMSTORAGE_H_
-#define EEPROMSTORAGE_H_
+#ifndef PASSEEPROM_H_
+#define PASSEEPROM_H_
 #include "Arduino.h"
-class EEPROMSTORAGE
+class HALEEPROMClass
 {
 public:
-  uint8_t Read_8Bits(int16_t Address);
-  int16_t Read_16Bits(int16_t Address);
-  int32_t Read_32Bits(int16_t Address);
-  float Read_Float(int16_t Address);
-  void Write_8Bits(int16_t Address, uint8_t Value);
-  void Write_16Bits(int16_t Address, int16_t Value);
-  void Write_32Bits(int16_t Address, int32_t Value);
-  void Write_Float(int16_t Address, float Value);
+    void Write_8Bits(int16_t Address, uint8_t Value);
+    void Write_16Bits(int16_t Address, int16_t Value);
+    void Write_32Bits(int16_t Address, int32_t Value);
+    void Write_Float(int16_t Address, float Value);
+    uint8_t Read_8Bits(int16_t Address);
+    int16_t Read_16Bits(int16_t Address);
+    int32_t Read_32Bits(int16_t Address);
+    float Read_Float(int16_t Address);
 };
-extern EEPROMSTORAGE STORAGEMANAGER;
+extern HALEEPROMClass HAL_EEPROM;
 #endif

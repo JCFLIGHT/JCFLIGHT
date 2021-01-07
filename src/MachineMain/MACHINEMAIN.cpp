@@ -125,8 +125,6 @@ void loop()
     Slow_Loop();
     Medium_Loop();
     Fast_Medium_Loop();
-    Fast_Loop();
-    Integral_Loop();
 
 #elif defined __arm__ || defined ESP32
 

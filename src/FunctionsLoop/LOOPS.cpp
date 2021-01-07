@@ -92,26 +92,20 @@ void Fast_Medium_Loop()
                 GCS.Serial_Parse_Protocol();
 
 #ifdef __AVR_ATmega2560__
+                Fast_Loop();
+#endif
+
+#ifdef __AVR_ATmega2560__
         }
 #endif
 }
 
 void Fast_Loop()
 {
-#ifdef __AVR_ATmega2560__
-        static Scheduler_Struct Fast_Loop;
-        if (SchedulerTimer(&Fast_Loop, SCHEDULER_PERIOD_HZ(400, "Hz")))
-        {
-#endif
-
-                Update_PrecisionLand();
+        Update_PrecisionLand();
 
 #ifdef __AVR_ATmega2560__
-                Super_Fast_Loop();
-#endif
-
-#ifdef __AVR_ATmega2560__
-        }
+        Super_Fast_Loop();
 #endif
 }
 
@@ -135,6 +129,10 @@ void Super_Fast_Loop()
         ApplyPWMInAllComponents();
         Switch_Flag();
         BATTERY.Calculate_Total_Mah();
+
+#ifdef __AVR_ATmega2560__
+        Integral_Loop();
+#endif
 }
 
 void Integral_Loop()

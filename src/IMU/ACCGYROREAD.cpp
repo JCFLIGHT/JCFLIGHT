@@ -29,6 +29,7 @@
 #include "Build/BOARDDEFS.h"
 #include "IMUCALIBRATE.h"
 
+#ifndef __AVR_ATmega2560__
 //INSTANCIAS PARA O LPF
 BiQuadFilter BiquadAccLPF[3];
 BiQuadFilter BiquadGyroLPF[3];
@@ -36,28 +37,29 @@ BiQuadFilter BiquadGyroLPF[3];
 //INSTANCIAS PARA O NOTCH
 BiQuadFilter BiquadAccNotch[3];
 BiQuadFilter BiquadGyroNotch[3];
+#endif
 
 bool ActiveKalman = false;
 uint8_t GyroLPF = 0;
 int16_t Acc_LPF = 0;
 int16_t Gyro_LPF = 0;
+#ifndef __AVR_ATmega2560__
 int16_t Acc_Notch = 0;
 int16_t Gyro_Notch = 0;
+#endif
 int16_t Acc_LPFStoredInEEPROM = 0;
 int16_t Gyro_LPFStoredInEEPROM = 0;
+#ifndef __AVR_ATmega2560__
 int16_t Acc_NotchStoredInEEPROM = 0;
 int16_t Gyro_NotchStoredInEEPROM = 0;
+#endif
 
 void IMU_Filters_Initialization()
 {
-  //CARREGA O VALOR GUARDADO DO ESTADO DO KALMAN
-  if (STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == 0)
-    ActiveKalman = false;
-  else
-    ActiveKalman = true;
   //CARREGA OS VALORES GUARDADOS DO LPF
   Acc_LPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Gyro_LPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
+#ifndef __AVR_ATmega2560__
   //CARREGA OS VALORES GUARDADOS DO NOTCH
   Acc_Notch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
   Gyro_Notch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
@@ -77,18 +79,24 @@ void IMU_Filters_Initialization()
   BiquadGyroNotch[ROLL].Settings(Gyro_Notch, THIS_LOOP_FREQUENCY, NOTCH);
   BiquadGyroNotch[PITCH].Settings(Gyro_Notch, THIS_LOOP_FREQUENCY, NOTCH);
   BiquadGyroNotch[YAW].Settings(Gyro_Notch, THIS_LOOP_FREQUENCY, NOTCH);
+#endif
 }
 
 void IMU_Filters_Update()
 {
   //ATUALIZA O VALOR GUARDADO DO ESTADO DO KALMAN
   if (STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == 0)
+  {
     ActiveKalman = false;
+  }
   else
+  {
     ActiveKalman = true;
+  }
   //ATUALIZA OS VALORES GUARDADOS DO LPF
   Acc_LPFStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Gyro_LPFStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
+#ifndef __AVR_ATmega2560__
   //ATUALIZA OS VALORES GUARDADOS DO NOTCH
   Acc_NotchStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
   Gyro_NotchStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
@@ -124,6 +132,7 @@ void IMU_Filters_Update()
     BiquadGyroNotch[YAW].Settings(Gyro_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
     Gyro_Notch = Gyro_NotchStoredInEEPROM;
   }
+#endif
 }
 
 void Acc_Initialization()
@@ -171,7 +180,9 @@ void Gyro_Initialization()
   }
   I2C.WriteRegister(0x68, 0x1B, 0x18);
   if (I2C.CompassFound)
+  {
     I2C.WriteRegister(0x68, 0x37, 0x02);
+  }
 }
 
 void Acc_ReadBufferData()
@@ -206,11 +217,14 @@ void Acc_ReadBufferData()
   //LPF
   if (Acc_LPFStoredInEEPROM > 0)
   {
+#ifndef __AVR_ATmega2560__
     //APLICA O FILTRO
     IMU.AccelerometerRead[ROLL] = BiquadAccLPF[ROLL].FilterOutput(IMU.AccelerometerRead[ROLL]);
     IMU.AccelerometerRead[PITCH] = BiquadAccLPF[PITCH].FilterOutput(IMU.AccelerometerRead[PITCH]);
     IMU.AccelerometerRead[YAW] = BiquadAccLPF[YAW].FilterOutput(IMU.AccelerometerRead[YAW]);
+#endif
   }
+#ifndef __AVR_ATmega2560__
   //NOTCH
   if (Acc_NotchStoredInEEPROM > 0)
   {
@@ -219,6 +233,7 @@ void Acc_ReadBufferData()
     IMU.AccelerometerRead[PITCH] = BiquadAccNotch[PITCH].FilterOutput(IMU.AccelerometerRead[PITCH]);
     IMU.AccelerometerRead[YAW] = BiquadAccNotch[YAW].FilterOutput(IMU.AccelerometerRead[YAW]);
   }
+#endif
 }
 
 void Gyro_ReadBufferData()
@@ -251,11 +266,14 @@ void Gyro_ReadBufferData()
   //LPF
   if (Gyro_LPFStoredInEEPROM > 0)
   {
+#ifndef __AVR_ATmega2560__
     //APLICA O FILTRO
     IMU.GyroscopeRead[ROLL] = BiquadGyroLPF[ROLL].FilterOutput(IMU.GyroscopeRead[ROLL]);
     IMU.GyroscopeRead[PITCH] = BiquadGyroLPF[PITCH].FilterOutput(IMU.GyroscopeRead[PITCH]);
     IMU.GyroscopeRead[YAW] = BiquadGyroLPF[YAW].FilterOutput(IMU.GyroscopeRead[YAW]);
+#endif
   }
+#ifndef __AVR_ATmega2560__
   //NOTCH
   if (Gyro_NotchStoredInEEPROM > 0)
   {
@@ -264,4 +282,5 @@ void Gyro_ReadBufferData()
     IMU.GyroscopeRead[PITCH] = BiquadGyroNotch[PITCH].FilterOutput(IMU.GyroscopeRead[PITCH]);
     IMU.GyroscopeRead[YAW] = BiquadGyroNotch[YAW].FilterOutput(IMU.GyroscopeRead[YAW]);
   }
+#endif
 }

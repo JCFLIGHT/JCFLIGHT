@@ -18,7 +18,7 @@
 #ifndef I2C_H_
 #define I2C_H_
 #include "Arduino.h"
-void AllI2CInitialization();
+void All_I2C_Initialization();
 class I2CPROTOCOL
 {
 public:

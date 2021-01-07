@@ -55,7 +55,7 @@ void setup()
     //CARREGA OS VALORES DE PID
     LoadPID();
     //INICIALIZA OS DISPOSITIVOS I2C
-    AllI2CInitialization();
+    All_I2C_Initialization();
     //CARREGA OS PARAMETROS DO GPS
     LoadGPSParameters();
     //INICIALIZA OS FILTROS

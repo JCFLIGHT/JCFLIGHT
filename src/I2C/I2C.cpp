@@ -295,23 +295,6 @@ uint8_t I2CPROTOCOL::SendHexadecimalValues(uint8_t Address)
   }
 }
 
-void AllI2CInitialization()
-{
-  uint8_t ForceInitialization = 5;
-  SCHEDULER.Sleep(200);
-  while (ForceInitialization)
-  {
-    ForceInitialization--;
-    I2C.Initialization();
-    Gyro_Initialization();
-    if (I2C.BarometerFound)
-      Baro_Initialization();
-    if (I2C.CompassFound)
-      COMPASS.Initialization();
-    Acc_Initialization();
-  }
-}
-
 #elif defined ESP32
 
 #include <Wire.h>
@@ -320,7 +303,6 @@ void I2CPROTOCOL::Initialization(void)
 {
   Wire.begin();
   Wire.setClock(400000);
-
   //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
   if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
   {
@@ -334,25 +316,7 @@ void I2CPROTOCOL::Initialization(void)
   {
     Compass_Type = COMPASS_HMC5883;
   }
-
-  /*
-   if (NumbGenerator == 0x0D)
-        COMPASS.FakeHMC5883Address = 0x0D;
-
-      if (NumbGenerator == 0x77)
-        SetBaroType(0x77);
-
-      if (NumbGenerator == 0x76)
-        SetBaroType(0x76);
-
-      if ((NumbGenerator == 0x0C) || (NumbGenerator == 0x1E) || (NumbGenerator == 0x0D))
-      {
-        CompassFound = true;
-      }
-      if ((NumbGenerator == 0x77) || (NumbGenerator == 0x76))
-        BarometerFound = true;
-*/
-
+  I2C.SearchDevicesInBarrament();
   //AK8975 ENDEREÇO:0x0C
   //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
   if (Compass_Type == COMPASS_AK8975)
@@ -401,7 +365,7 @@ void i2cRead(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t *Data)
 {
   Wire.beginTransmission(Address);
   Wire.write(Register);
-  Wire.endTransmission(true);
+  Wire.endTransmission();
   Wire.requestFrom(Address, Nbytes);
   uint8_t index = 0;
   while (Wire.available())
@@ -415,7 +379,7 @@ void i2cWriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
   Wire.beginTransmission(Address);
   Wire.write(Register);
   Wire.write(Data);
-  Wire.endTransmission(true);
+  Wire.endTransmission();
 }
 
 void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size)
@@ -433,20 +397,51 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
   i2cWriteByte(Address, Register, Value);
 }
 
-void AllI2CInitialization()
+void I2CPROTOCOL::SearchDevicesInBarrament()
 {
-  uint8_t ForceInitialization = 5;
-  SCHEDULER.Sleep(200);
-  while (ForceInitialization)
+  Serial.println("ESCANEANDO O BARRAMENTO I2C,AGUARDE...");
+  Serial.println("\n");
+  Wire.begin();
+  for (uint8_t NumbGenerator = 0; NumbGenerator <= 0x7F; NumbGenerator++)
   {
-    ForceInitialization--;
-    I2C.Initialization();
-    Gyro_Initialization();
-    if (I2C.BarometerFound)
-      Baro_Initialization();
-    if (I2C.CompassFound)
-      COMPASS.Initialization();
-    Acc_Initialization();
+    Wire.beginTransmission(NumbGenerator);
+    if (Wire.endTransmission() == 0)
+    {
+      if (NumbGenerator == 0x68)
+      {
+        Serial.println("MPU6050 ENCONTRADO!");
+      }
+      if (NumbGenerator == 0x1E || NumbGenerator == 0x0D)
+      {
+        Serial.println("HMC5843 OU HMC5883 ENCONTRADO!");
+        if (NumbGenerator == 0x0D)
+        {
+          COMPASS.FakeHMC5883Address = 0x0D;
+        }
+      }
+      if (NumbGenerator == 0x0C)
+      {
+        Serial.println("AK8975 ENCONTRADO!");
+      }
+      if (NumbGenerator == 0x77)
+      {
+        SetBaroType(0x77);
+        Serial.println("MS-5611 ENCONTRADO!");
+      }
+      if (NumbGenerator == 0x76)
+      {
+        SetBaroType(0x76);
+        Serial.println("BMP-280 ENCONTRADO!");
+      }
+      if ((NumbGenerator == 0x0C) || (NumbGenerator == 0x1E) || (NumbGenerator == 0x0D))
+      {
+        CompassFound = true;
+      }
+      if ((NumbGenerator == 0x77) || (NumbGenerator == 0x76))
+      {
+        BarometerFound = true;
+      }
+    }
   }
 }
 
@@ -542,21 +537,24 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
 {
 }
 
-void AllI2CInitialization()
+#endif
+
+void All_I2C_Initialization()
 {
   uint8_t ForceInitialization = 5;
   SCHEDULER.Sleep(200);
-  while (ForceInitialization)
+  I2C.Initialization();
+  while (ForceInitialization--)
   {
-    ForceInitialization--;
-    I2C.Initialization();
     Gyro_Initialization();
     if (I2C.BarometerFound)
+    {
       Baro_Initialization();
+    }
     if (I2C.CompassFound)
+    {
       COMPASS.Initialization();
+    }
     Acc_Initialization();
   }
 }
-
-#endif

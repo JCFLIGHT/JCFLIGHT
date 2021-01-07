@@ -62,12 +62,7 @@ void BiQuadFilter::Settings(int16_t CutOffFreq, int16_t SampleFreq, uint8_t Filt
 int16_t BiQuadFilter::FilterOutput(int16_t DeviveToFilter)
 {
   //ENTRADA DO DISPOSITIVO PARA O FILTRO
-  //UTILIZA A MULTIPLICAÇÃO AVR EM ASSEMBLY PARA PREVENIR ERROS DE ARREDONDAMENTO DE VALORES
-  Result.LongValue = Multiplication32Bits(DeviveToFilter, Coeff1) +
-                     Multiplication32Bits(GuardInput1, Coeff2) +
-                     Multiplication32Bits(GuardInput2, Coeff3) -
-                     Multiplication32Bits(GuardOutput1, Coeff4) -
-                     Multiplication32Bits(GuardOutput2, Coeff5);
+  Result.LongValue = DeviveToFilter * Coeff1 + GuardInput1 * Coeff2 + GuardInput2 * Coeff3 - GuardOutput1 * Coeff4 - GuardOutput2 * Coeff5;
   Result.LongValue = Result.LongValue << 2;
   GuardInput2 = GuardInput1;
   GuardInput1 = DeviveToFilter;

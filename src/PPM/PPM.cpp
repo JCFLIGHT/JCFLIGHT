@@ -115,7 +115,9 @@ void IRAM_ATTR InterruptRoutine(void)
     {
       PPMReadChannels[Channels] = PPMTimerDifference;
       if (Channels < 4 && PPMTimerDifference > FAILSAFE_DETECT_TRESHOLD)
+      {
         CheckFailSafe |= (1 << Channels);
+      }
       if (CheckFailSafe == 0x0F)
       {
         CheckFailSafe = 0;
@@ -170,13 +172,19 @@ void DecodeAllReceiverChannels()
   {
     RadioControllOutputDecoded = LearningAllChannels(Channels);
     if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
+    {
       CheckFailSafeState = SBUSRC.FailSafe || !COMMAND_ARM_DISARM;
+    }
     else
+    {
       CheckFailSafeState = RadioControllOutputDecoded > FAILSAFE_DETECT_TRESHOLD || !COMMAND_ARM_DISARM;
+    }
     if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
     {
       if (CheckFailSafeState)
+      {
         DirectRadioControllRead[Channels] = RadioControllOutputDecoded;
+      }
     }
     else
     {

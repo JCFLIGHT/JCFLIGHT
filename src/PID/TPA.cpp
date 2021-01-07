@@ -26,7 +26,9 @@ TPA_Parameters_Struct TPA_Parameters;
 void TPA_Initialization()
 {
   if (STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR) < 1000)
+  {
     STORAGEMANAGER.Write_16Bits(BREAKPOINT_ADDR, 1000); //AQUI NÃO PODE SER MENOR QUE 1000
+  }
   TPA_Parameters.TPABreakPointer = STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR);
   TPA_Parameters.TPAThrottlePercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
 }

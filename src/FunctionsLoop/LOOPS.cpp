@@ -20,83 +20,53 @@
 
 void Slow_Loop()
 {
-#ifdef __AVR_ATmega2560__
-        static Scheduler_Struct Slow_Loop;
-        if (SchedulerTimer(&Slow_Loop, SCHEDULER_PERIOD_HZ(10, "Hz")))
-        {
-#endif
-
-                Pre_Arm();
-                CurvesRC_SetValues();
-                AUXFLIGHT.LoadEEPROM();
-                COMPASS.Constant_Read();
-                RTH_Altitude_EEPROM();
-                IMU_Filters_Update();
-                PID_DerivativeLPF_Update();
-                UpdateValuesOfPID();
-                UpdateServosDirection();
-                GCS.UpdateParametersToGCS();
-                PushWayPointParameters();
-
-#ifdef __AVR_ATmega2560__
-        }
-#endif
+        Pre_Arm();
+        CurvesRC_SetValues();
+        AUXFLIGHT.LoadEEPROM();
+        COMPASS.Constant_Read();
+        RTH_Altitude_EEPROM();
+        IMU_Filters_Update();
+        PID_DerivativeLPF_Update();
+        UpdateValuesOfPID();
+        UpdateServosDirection();
+        GCS.UpdateParametersToGCS();
+        PushWayPointParameters();
 }
 
 void Medium_Loop()
 {
-#ifdef __AVR_ATmega2560__
-        static Scheduler_Struct Medium_Loop;
-        if (SchedulerTimer(&Medium_Loop, SCHEDULER_PERIOD_HZ(50, "Hz")))
-        {
-#endif
-
-                DecodeAllReceiverChannels();
-                RCCONFIG.Set_Pulse();
-                RCCONFIG.Update_Channels();
-                Desarm_LowThrottle();
-                FailSafeCheck();
-                RCSticks_Update();
-                Barometer_Update();
-                GPS_Process_FlightModes();
-                AUXFLIGHT.SelectMode();
-                AUXFLIGHT.FlightModesAuxSelect();
-                FlightModesUpdate();
-                PrintlnParameters();
-                Manual_Trim_Servo_Update();
-                Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDE_HOLD_MODE]);
-
-#ifdef __AVR_ATmega2560__
-        }
-#endif
+        DecodeAllReceiverChannels();
+        RCCONFIG.Set_Pulse();
+        RCCONFIG.Update_Channels();
+        Desarm_LowThrottle();
+        FailSafeCheck();
+        RCSticks_Update();
+        Barometer_Update();
+        GPS_Process_FlightModes();
+        AUXFLIGHT.SelectMode();
+        AUXFLIGHT.FlightModesAuxSelect();
+        FlightModesUpdate();
+        PrintlnParameters();
+        Manual_Trim_Servo_Update();
+        Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDE_HOLD_MODE]);
 }
 
 void Fast_Medium_Loop()
 {
-#ifdef __AVR_ATmega2560__
-        static Scheduler_Struct Fast_Medium_Loop;
-        if (SchedulerTimer(&Fast_Medium_Loop, SCHEDULER_PERIOD_HZ(100, "Hz")))
-        {
-#endif
-
-                BEEPER.Run();
-                BATTERY.Read_Voltage();
-                BATTERY.Read_Current();
-                Pre_Arm_Leds();
-                GimbalControll();
-                CrashCheck();
-                PARACHUTE.Manual_Detect_Channel();
-                PARACHUTE.Manual_Do_Now();
-                FlipModeRun();
-                WayPointRun();
-                GCS.Serial_Parse_Protocol();
+        BEEPER.Run();
+        BATTERY.Read_Voltage();
+        BATTERY.Read_Current();
+        Pre_Arm_Leds();
+        GimbalControll();
+        CrashCheck();
+        PARACHUTE.Manual_Detect_Channel();
+        PARACHUTE.Manual_Do_Now();
+        FlipModeRun();
+        WayPointRun();
+        GCS.Serial_Parse_Protocol();
 
 #ifdef __AVR_ATmega2560__
-                Fast_Loop();
-#endif
-
-#ifdef __AVR_ATmega2560__
-        }
+        Fast_Loop();
 #endif
 }
 

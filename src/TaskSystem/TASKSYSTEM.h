@@ -21,5 +21,4 @@
 #include "Common/STRUCTS.h"
 void TaskSystemInitialization(void);
 void TaskSystemRun(void);
-int32_t GetTaskDeltaTime(Tasks_ID_Enum TaskId);
 #endif

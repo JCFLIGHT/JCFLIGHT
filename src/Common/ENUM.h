@@ -342,16 +342,6 @@ enum class Led_Pattern : uint16_t
     FMU_SAFE_TO_ARM = 0xffff,
 };
 
-enum Function_Names
-{
-    SLOW_LOOP = 0,
-    MEDIUM_LOOP,
-    FAST_MEDIUM_LOOP,
-    FAST_LOOP,
-    TOTAL_LOOP,
-    SIZE_LOOPS
-};
-
 enum WayPoint_States_Enum
 {
     WP_MISSION_INIT = 0,
@@ -446,10 +436,12 @@ typedef enum
     TASK_SLOW_LOOP = 0,
     TASK_MEDIUM_LOOP,
     TASK_FAST_MEDIUM_LOOP,
+#ifndef __AVR_ATmega2560__
     TASK_FAST_LOOP,
     TASK_SUPER_FAST_LOOP,
     TASK_INTEGRAL_LOOP,
     TASK_IMU_CALIBRATION,
+#endif
     //TASK COUNT SEMPRE EM ÚLTIMO LUGAR
     TASK_COUNT
 } Tasks_ID_Enum;

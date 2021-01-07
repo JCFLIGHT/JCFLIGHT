@@ -97,23 +97,11 @@ void MachineInit()
     BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
-#if defined(__arm__) || defined(ESP32)
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
-#endif
 }
 
 void MachineRun()
 {
-#ifdef __AVR_ATmega2560__
-
-    Slow_Loop();
-    Medium_Loop();
-    Fast_Medium_Loop();
-
-#elif defined __arm__ || defined ESP32
-
     TaskSystemRun();
-
-#endif
 }

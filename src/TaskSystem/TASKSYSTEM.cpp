@@ -111,10 +111,12 @@ void TaskSystemInitialization(void)
   SetTaskEnabled(TASK_SLOW_LOOP, true);
   SetTaskEnabled(TASK_MEDIUM_LOOP, true);
   SetTaskEnabled(TASK_FAST_MEDIUM_LOOP, true);
+#ifndef __AVR_ATmega2560__
   SetTaskEnabled(TASK_FAST_LOOP, true);
   SetTaskEnabled(TASK_SUPER_FAST_LOOP, true);
   SetTaskEnabled(TASK_INTEGRAL_LOOP, true);
   SetTaskEnabled(TASK_IMU_CALIBRATION, true);
+#endif
 }
 
 void TaskSystemRun(void)
@@ -167,9 +169,4 @@ void TaskSystemRun(void)
     SelectedTask->DynamicPriority = 0;
     SelectedTask->TaskFunction();
   }
-}
-
-int32_t GetTaskDeltaTime(Tasks_ID_Enum TaskId)
-{
-  return Task_Resources[TaskId].TaskLatestDeltaTime;
 }

@@ -21,15 +21,7 @@
 #include "EEPROM.h"
 #endif
 
-#ifdef __AVR_ATmega2560__
-
 void MachineInit()
-
-#elif defined __arm__ || defined ESP32
-
-void setup()
-
-#endif
 {
 #ifdef ESP32
     EEPROM.begin(1000);
@@ -106,19 +98,12 @@ void setup()
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters();
 #if defined(__arm__) || defined(ESP32)
+    //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
 #endif
 }
 
-#ifdef __AVR_ATmega2560__
-
 void MachineRun()
-
-#elif defined __arm__ || defined ESP32
-
-void loop()
-
-#endif
 {
 #ifdef __AVR_ATmega2560__
 

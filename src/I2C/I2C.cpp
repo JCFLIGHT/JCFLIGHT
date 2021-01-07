@@ -426,12 +426,12 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
       if (NumbGenerator == 0x77)
       {
         SetBaroType(0x77);
-        Serial.println("MS-5611 ENCONTRADO!");
+        Serial.println("MS5611 ENCONTRADO!");
       }
       if (NumbGenerator == 0x76)
       {
         SetBaroType(0x76);
-        Serial.println("BMP-280 ENCONTRADO!");
+        Serial.println("BMP280 ENCONTRADO!");
       }
       if ((NumbGenerator == 0x0C) || (NumbGenerator == 0x1E) || (NumbGenerator == 0x0D))
       {

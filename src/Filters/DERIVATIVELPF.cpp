@@ -40,7 +40,9 @@ int16_t DiscreteLPF_To_Derivative_PID(int16_t DerivativeInput, int16_t CutOff)
     Reset_I = true; //RESETA O INTEGRAL DO CONTROLADOR PID
   }
   else
+  {
     Reset_I = false;
+  }
   float CutOffEquation = 1 / (2 * PI * Frequency_CutOff);
   Derivative_To_LPF = Store_Previous_Derivative + ((LPF_Delta_Time / (CutOffEquation + LPF_Delta_Time)) *
                                                    (Derivative_To_LPF - Store_Previous_Derivative));

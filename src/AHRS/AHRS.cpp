@@ -186,7 +186,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
       Struct_Vector3x3 MagnetormeterVector;
 
       //CALCULA O NORTE MAGNETICO
-      QuaternionRotateVectorInv(&MagnetormeterVector, MagnetometerBodyFrame, &Orientation);
+      QuaternionRotateVectorInverse(&MagnetormeterVector, MagnetometerBodyFrame, &Orientation);
 
       //IGNORA A INCLINAÇÃO Z DO MAGNETOMETRO
       MagnetormeterVector.Yaw = 0.0f;
@@ -219,7 +219,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
       Struct_Vector3x3 vCoG = {.Vector = {-Fast_Cosine(CourseOverGround), Fast_Sine(CourseOverGround), 0.0f}};
 
       //ROTACIONA O VETOR DO BODY FRAME PARA EARTH FRAME
-      QuaternionRotateVectorInv(&HeadingEarthFrame, &Forward, &Orientation);
+      QuaternionRotateVectorInverse(&HeadingEarthFrame, &Forward, &Orientation);
       HeadingEarthFrame.Yaw = 0.0f;
 
       //CORRIJA APENAS SE O SQUARE FOR POSITIVO E MAIOR QUE ZERO

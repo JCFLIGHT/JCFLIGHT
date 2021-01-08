@@ -17,7 +17,7 @@
 
 #include "COMPASSCAL.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Bar/BAR.h"
+#include "BAR/BAR.h"
 #include "Common/VARIABLES.h"
 #include "LedRGB/LEDRGB.h"
 #include "IMU/IMUHEALTH.h"

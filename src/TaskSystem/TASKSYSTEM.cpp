@@ -115,7 +115,6 @@ void TaskSystemInitialization(void)
   SetTaskEnabled(TASK_FAST_LOOP, true);
   SetTaskEnabled(TASK_SUPER_FAST_LOOP, true);
   SetTaskEnabled(TASK_INTEGRAL_LOOP, true);
-  SetTaskEnabled(TASK_IMU_CALIBRATION, true);
 #endif
 }
 

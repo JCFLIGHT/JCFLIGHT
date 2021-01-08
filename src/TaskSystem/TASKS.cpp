@@ -75,13 +75,6 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
         .StaticPriority = TASK_PRIORITY_REALTIME,
     },
 
-    [TASK_IMU_CALIBRATION] = {
-        .TaskName = "IMU_CALIBRATION",
-        .TaskFunction = UpdateIMUCalibration,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(200, "Hz"),
-        .StaticPriority = TASK_PRIORITY_MEDIUM,
-    },
-
 #endif
 
 };

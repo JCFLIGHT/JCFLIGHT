@@ -301,8 +301,7 @@ uint8_t I2CPROTOCOL::SendHexadecimalValues(uint8_t Address)
 
 void I2CPROTOCOL::Initialization(void)
 {
-  Wire.begin();
-  Wire.setClock(400000);
+  Wire.begin(21, 22, 400000);
   //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
   if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
   {
@@ -361,40 +360,29 @@ uint8_t I2CPROTOCOL::ReadNAK()
   return 0;
 }
 
-void i2cRead(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t *Data)
+void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size)
 {
   Wire.beginTransmission(Address);
   Wire.write(Register);
-  Wire.endTransmission();
-  Wire.requestFrom(Address, Nbytes);
+  Wire.endTransmission(false);
+  Wire.requestFrom(Address, Size);
   uint8_t index = 0;
   while (Wire.available())
   {
-    Data[index++] = Wire.read();
+    Buffer[index++] = Wire.read();
   }
-}
-
-void i2cWriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
-{
-  Wire.beginTransmission(Address);
-  Wire.write(Register);
-  Wire.write(Data);
-  Wire.endTransmission();
-}
-
-void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size)
-{
-  i2cRead(Address, Register, Size, Buffer);
 }
 
 void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
 {
-  RegisterBuffer(Address, Register, BufferData, 6);
 }
 
 void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
 {
-  i2cWriteByte(Address, Register, Value);
+  Wire.beginTransmission(Address);
+  Wire.write(Register);
+  Wire.write(Value);
+  Wire.endTransmission();
 }
 
 void I2CPROTOCOL::SearchDevicesInBarrament()

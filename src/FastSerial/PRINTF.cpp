@@ -614,6 +614,24 @@ void PrintlnParameters()
   Serial.print("  ");
   Serial.println(STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADDR));
 */
+
+  /*
+  Serial.print(IMU.AccelerometerRead[PITCH]);
+  Serial.print("  ");
+  Serial.print(IMU.AccelerometerRead[ROLL]);
+  Serial.print("  ");
+  Serial.println(IMU.AccelerometerRead[YAW]);
+  */
+
+  /*
+  Serial.print(ATTITUDE.AngleOut[ROLL]);
+  Serial.print("  ");
+  Serial.print(ATTITUDE.AngleOut[PITCH]);
+  Serial.print("  ");
+  Serial.println(ATTITUDE.CalculedHeading);
+  */
+
+  //Serial.println(STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR));
 }
 
 #endif

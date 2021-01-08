@@ -25,6 +25,7 @@
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "BAR/BAR.h"
 #include "IMUHEALTH.h"
+#include "Scheduler/SCHEDULER.h"
 
 int16_t StoredValueOfGyro[3] = {0, 0, 0};
 int32_t StoredGyroZero[3] = {0, 0, 0};
@@ -143,62 +144,73 @@ void Accelerometer_Calibration()
     return;
   }
 
-  if (CalibratingAccelerometer > 0)
+#ifndef __AVR_ATmega2560__
+  static Scheduler_Struct ACC_Calibration_Timer;
+  if (SchedulerTimer(&ACC_Calibration_Timer, 5000))
   {
-    RGB.Function(ACCLED);
-    for (uint8_t AccCalibIndex = 0; AccCalibIndex < 3; AccCalibIndex++)
+#endif
+
+    if (CalibratingAccelerometer > 0)
     {
-      if (CalibratingAccelerometer == 512)
+      RGB.Function(ACCLED);
+      for (uint8_t AccCalibIndex = 0; AccCalibIndex < 3; AccCalibIndex++)
       {
-        int8_t AccCalibIndexTwo = (AccCalibIndex + 1) % 3;
-        int8_t AccCalibIndexThree = (AccCalibIndex + 2) % 3;
-        if (ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
-                       CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexTwo] -
-                                                                                  CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
-            ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
-                       CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexThree] -
-                                                                                  CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
+        if (CalibratingAccelerometer == 512)
         {
-          AxisToCalibration = AccCalibIndex;
-          CALIBRATION.AccelerometerZero[AxisToCalibration] = 0;
-          CALIBRATION.AccelerometerScale[AxisToCalibration] = 0;
+          int8_t AccCalibIndexTwo = (AccCalibIndex + 1) % 3;
+          int8_t AccCalibIndexThree = (AccCalibIndex + 2) % 3;
+          if (ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
+                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexTwo] -
+                                                                                    CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
+              ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
+                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexThree] -
+                                                                                    CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
+          {
+            AxisToCalibration = AccCalibIndex;
+            CALIBRATION.AccelerometerZero[AxisToCalibration] = 0;
+            CALIBRATION.AccelerometerScale[AxisToCalibration] = 0;
+          }
+          AccReadVector[AccCalibIndex] = 0;
         }
-        AccReadVector[AccCalibIndex] = 0;
+        AccReadVector[AccCalibIndex] += IMU.AccelerometerRead[AccCalibIndex];
       }
-      AccReadVector[AccCalibIndex] += IMU.AccelerometerRead[AccCalibIndex];
-    }
-    IMU.AccelerometerRead[AxisToCalibration] = 0;
-    if (CalibratingAccelerometer == 1)
-    {
-      int8_t MeasuredLimit = AccReadVector[AxisToCalibration] > 0 ? 0 : 1;
-      AccMinMaxValue[AxisToCalibration][MeasuredLimit] = AccReadVector[AxisToCalibration] / 512;
-      if (AccMinMaxValue[AxisToCalibration][0] > 0 && AccMinMaxValue[AxisToCalibration][1] < 0)
+      IMU.AccelerometerRead[AxisToCalibration] = 0;
+      if (CalibratingAccelerometer == 1)
       {
-        CALIBRATION.AccelerometerZero[AxisToCalibration] = (AccMinMaxValue[AxisToCalibration][0] + AccMinMaxValue[AxisToCalibration][1]) / 2;
-        CALIBRATION.AccelerometerScale[AxisToCalibration] = ((int32_t)512) * 2048 / (AccMinMaxValue[AxisToCalibration][0] - AccMinMaxValue[AxisToCalibration][1]);
+        int8_t MeasuredLimit = AccReadVector[AxisToCalibration] > 0 ? 0 : 1;
+        AccMinMaxValue[AxisToCalibration][MeasuredLimit] = AccReadVector[AxisToCalibration] / 512;
+        if (AccMinMaxValue[AxisToCalibration][0] > 0 && AccMinMaxValue[AxisToCalibration][1] < 0)
+        {
+          CALIBRATION.AccelerometerZero[AxisToCalibration] = (AccMinMaxValue[AxisToCalibration][0] + AccMinMaxValue[AxisToCalibration][1]) / 2;
+          CALIBRATION.AccelerometerScale[AxisToCalibration] = ((int32_t)512) * 2048 / (AccMinMaxValue[AxisToCalibration][0] - AccMinMaxValue[AxisToCalibration][1]);
+        }
+        else if (AxisToCalibration == YAW && MeasuredLimit == 0)
+        {
+          CALIBRATION.AccelerometerZero[ROLL] = AccReadVector[ROLL] / 512;
+          CALIBRATION.AccelerometerZero[PITCH] = AccReadVector[PITCH] / 512;
+          CALIBRATION.AccelerometerZero[YAW] = AccReadVector[YAW] / 512;
+          CALIBRATION.AccelerometerZero[YAW] -= 512;
+          CALIBRATION.AccelerometerScale[ROLL] = 0;
+          CALIBRATION.AccelerometerScale[PITCH] = 0;
+          CALIBRATION.AccelerometerScale[YAW] = 0;
+        }
+        AccCalibratedPosition[GetPositionActualOfAcc] = true;
+        STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADDR, CALIBRATION.AccelerometerZero[ROLL]);
+        STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADDR, CALIBRATION.AccelerometerZero[PITCH]);
+        STORAGEMANAGER.Write_16Bits(ACC_YAW_ADDR, CALIBRATION.AccelerometerZero[YAW]);
+        STORAGEMANAGER.Write_16Bits(ACC_ROLL_SCALE_ADDR, CALIBRATION.AccelerometerScale[ROLL]);
+        STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, CALIBRATION.AccelerometerScale[PITCH]);
+        STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, CALIBRATION.AccelerometerScale[YAW]);
+        CheckAndUpdateIMUCalibration();
+        BEEPER.Play(BEEPER_CALIBRATION_DONE);
       }
-      else if (AxisToCalibration == YAW && MeasuredLimit == 0)
-      {
-        CALIBRATION.AccelerometerZero[ROLL] = AccReadVector[ROLL] / 512;
-        CALIBRATION.AccelerometerZero[PITCH] = AccReadVector[PITCH] / 512;
-        CALIBRATION.AccelerometerZero[YAW] = AccReadVector[YAW] / 512;
-        CALIBRATION.AccelerometerZero[YAW] -= 512;
-        CALIBRATION.AccelerometerScale[ROLL] = 0;
-        CALIBRATION.AccelerometerScale[PITCH] = 0;
-        CALIBRATION.AccelerometerScale[YAW] = 0;
-      }
-      AccCalibratedPosition[GetPositionActualOfAcc] = true;
-      STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADDR, CALIBRATION.AccelerometerZero[ROLL]);
-      STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADDR, CALIBRATION.AccelerometerZero[PITCH]);
-      STORAGEMANAGER.Write_16Bits(ACC_YAW_ADDR, CALIBRATION.AccelerometerZero[YAW]);
-      STORAGEMANAGER.Write_16Bits(ACC_ROLL_SCALE_ADDR, CALIBRATION.AccelerometerScale[ROLL]);
-      STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, CALIBRATION.AccelerometerScale[PITCH]);
-      STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, CALIBRATION.AccelerometerScale[YAW]);
-      CheckAndUpdateIMUCalibration();
-      BEEPER.Play(BEEPER_CALIBRATION_DONE);
+      CalibratingAccelerometer--;
     }
-    CalibratingAccelerometer--;
+
+#ifndef __AVR_ATmega2560__
   }
+#endif
+
   if (CALIBRATION.AccelerometerScale[ROLL] ||
       CALIBRATION.AccelerometerScale[PITCH] ||
       CALIBRATION.AccelerometerScale[YAW]) //APLICA ACELERAÇÃO ZERO
@@ -222,10 +234,4 @@ void Accelerometer_Calibration()
     IMU.AccelerometerRead[PITCH] -= CALIBRATION.AccelerometerZero[PITCH];
     IMU.AccelerometerRead[YAW] -= CALIBRATION.AccelerometerZero[YAW];
   }
-}
-
-void UpdateIMUCalibration()
-{
-  Accelerometer_Calibration();
-  Gyroscope_Calibration();
 }

@@ -34,9 +34,13 @@ uint8_t TimerDesarm, Counter_One_Hertz;
 void Desarm_LowThrottle()
 {
   if (GetFrameStateOfAirPlane())
+  {
     return; //FAÇA UMA RAPIDA SAÍDA SE O MODO AERO OU ASA-FIXA ESTIVER ATIVADO
+  }
   if (ArmDisarmConfig != 0)
+  {
     return; //FAÇA UMA RAPIDA SAÍDA SE O COMANDO ARMDISARM FOR PELA CHAVE AUX
+  }
   //THROTTLE NO MINIMO,DRONE ARMADO,FAIL-SAFE DESATIVADO?SIM...
   if (Check_Throttle() && Check_Others_Channels() && COMMAND_ARM_DISARM && Fail_Safe_System < 5)
   {
@@ -49,7 +53,7 @@ void Desarm_LowThrottle()
       {
         if (COMMAND_ARM_DISARM && !Cancel_Arm_Disarm)
         {
-          COMMAND_ARM_DISARM = false;          //DESARMA OS MOTORES
+          COMMAND_ARM_DISARM = false;    //DESARMA OS MOTORES
           BEEPER.Play(BEEPER_DISARMING); //TOCA A MÚSICA INDICANDO O DESARM
         }
       }

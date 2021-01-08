@@ -52,9 +52,13 @@ void RCSticks_Update()
       if (ArmDisarmConfig > 0)
       {
         if (ArmDisarmControlAux)
+        {
           SetFlightModes[ARM_DISARM_MODE] = true;
+        }
         else
+        {
           SetFlightModes[ARM_DISARM_MODE] = false;
+        }
         if (SetFlightModes[ARM_DISARM_MODE])
         {
           if (Fail_Safe_System < 5 && !SetFlightModes[RTH_MODE] && !SetFlightModes[GPS_HOLD_MODE])
@@ -119,9 +123,13 @@ void Pre_Arm_Leds(void)
     {
       RGB.Function(PREARMFAIL);
       if (Arm_Delay_Count == 21)
+      {
         BEEPER.Play(BEEPER_ACTION_FAIL);
+      }
       if (Arm_Delay_Count == 30)
+      {
         NotPriorit = false;
+      }
     }
   }
   else //CASO CONTRARIO
@@ -130,7 +138,9 @@ void Pre_Arm_Leds(void)
     {
       RGB.Function(PREARMSUCESS);
       if (Arm_Delay_Count == 30)
+      {
         NotPriorit = false;
+      }
     }
   }
 }

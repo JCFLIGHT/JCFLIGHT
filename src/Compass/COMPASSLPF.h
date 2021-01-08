@@ -15,25 +15,13 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef COMPASSREAD_H_
-#define COMPASSREAD_H_
-#include "Arduino.h"
-class CompassReadClass
+#ifndef COMPASSLPF_H_
+#define COMPASSLPF_H_
+#include "COMPASSREAD.h"
+class CompassLPFClass : CompassReadClass
 {
 public:
-  uint8_t FakeHMC5883Address = 0;
-  float MagnetometerRead[3];
-  float MagnetometerGain[3] = {1.0f, 1.0f, 1.0f};
-  int16_t MagCalibrationMinVector[3];
-  int16_t MagCalibrationMaxVector[3];
-  int16_t CalibrationCount = 0;
-  void Initialization();
-  void Constant_Read();
-
-private:
-  bool PushBias(uint8_t InputBias);
-  void InitialReadBufferData();
-  void ReadBufferData();
+    void Apply();
 };
-extern CompassReadClass COMPASS;
+extern CompassLPFClass COMPASSLPF;
 #endif

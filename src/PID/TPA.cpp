@@ -43,7 +43,9 @@ void TPA_Update()
 int16_t GetThrottleIdleValue(void)
 {
   if (!TPA_Parameters.ThrottleIdleValue)
+  {
     TPA_Parameters.ThrottleIdleValue = MotorSpeed + (((TPA_Parameters.MaxThrottle - MotorSpeed) / 100.0f) * TPA_Parameters.ThrottleIdleFactor);
+  }
   return TPA_Parameters.ThrottleIdleValue;
 }
 

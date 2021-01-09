@@ -26,7 +26,9 @@ bool GetFrameStateOfMultirotor()
         FrameType == HEXA_I ||
         FrameType == ZMR250 ||
         FrameType == TBS)
+    {
         return true;
+    }
     return false;
 }
 
@@ -35,6 +37,8 @@ bool GetFrameStateOfAirPlane()
     if (FrameType == AIRPLANE ||
         FrameType == FIXED_WING ||
         FrameType == PLANE_VTAIL)
+    {
         return true;
+    }
     return false;
 }

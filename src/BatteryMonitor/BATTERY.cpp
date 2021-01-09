@@ -68,9 +68,13 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
 {
   BATTERY.Percentage = (BattVoltage - BattMinVolt) / (BattMaxVolt - BattMinVolt);
   if (BATTERY.Percentage < 0)
+  {
     BATTERY.Percentage = 0;
+  }
   else if (BATTERY.Percentage > 1)
+  {
     BATTERY.Percentage = 1;
+  }
   return 100 * BATTERY.Percentage;
 }
 
@@ -79,27 +83,39 @@ float BATT::AutoBatteryMin(float BattVoltage)
   if (BattVoltage > 5)
   {
     if (BattMinVoltageSelect == BATTERY_3S)
+    {
       return BATT_3S_LOW_VOLTAGE;
+    }
     else if (BattMinVoltageSelect == BATTERY_4S)
+    {
       return BATT_4S_LOW_VOLTAGE;
+    }
     else if (BattMinVoltageSelect == BATTERY_6S)
+    {
       return BATT_6S_LOW_VOLTAGE;
-    if (BattVoltage > BATT_3S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_3S_SAFE_HIGH_VOLTAGE)
-    { //BATERIA 3S (3.6 x 3 = 10.8v)
+    }
+    if (BattVoltage > BATT_3S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_3S_SAFE_HIGH_VOLTAGE) //BATERIA 3S (3.6 x 3 = 10.8v)
+    {
       if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      {
         BattMinVoltageSelect = BATTERY_3S;
+      }
       return BATT_3S_LOW_VOLTAGE;
     }
-    else if (BattVoltage > BATT_4S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_4S_SAFE_HIGH_VOLTAGE)
-    { //BATERIA 4S (3.6 x 4 = 14.4v)
+    else if (BattVoltage > BATT_4S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_4S_SAFE_HIGH_VOLTAGE) //BATERIA 4S (3.6 x 4 = 14.4v)
+    {
       if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      {
         BattMinVoltageSelect = BATTERY_4S;
+      }
       return BATT_4S_LOW_VOLTAGE;
     }
-    else if (BattVoltage > BATT_6S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_6S_SAFE_HIGH_VOLTAGE)
-    { //BATERIA 6S (3.6 x 6 = 21.6v)
+    else if (BattVoltage > BATT_6S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_6S_SAFE_HIGH_VOLTAGE) //BATERIA 6S (3.6 x 6 = 21.6v)
+    {
       if (BattMinCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      {
         BattMinVoltageSelect = BATTERY_6S;
+      }
       return BATT_6S_LOW_VOLTAGE;
     }
   }
@@ -113,27 +129,39 @@ float BATT::AutoBatteryMax(float BattVoltage)
   if (BattVoltage > 5)
   {
     if (BattMaxVoltageSelect == BATTERY_3S)
+    {
       return BATT_3S_SAFE_HIGH_VOLTAGE;
+    }
     else if (BattMaxVoltageSelect == BATTERY_4S)
+    {
       return BATT_4S_SAFE_HIGH_VOLTAGE;
+    }
     else if (BattMaxVoltageSelect == BATTERY_6S)
+    {
       return BATT_6S_SAFE_HIGH_VOLTAGE;
-    if (BattVoltage > BATT_3S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_3S_SAFE_HIGH_VOLTAGE)
-    { //BATERIA 3S (4.2 x 3 = 12.6v)
+    }
+    if (BattVoltage > BATT_3S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_3S_SAFE_HIGH_VOLTAGE) //BATERIA 3S (4.2 x 3 = 12.6v)
+    {
       if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      {
         BattMaxVoltageSelect = BATTERY_3S;
+      }
       return BATT_3S_SAFE_HIGH_VOLTAGE;
     }
-    else if (BattVoltage > BATT_4S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_4S_SAFE_HIGH_VOLTAGE)
-    { //BATERIA 4S (4.2 x 4 = 16.8v)
+    else if (BattVoltage > BATT_4S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_4S_SAFE_HIGH_VOLTAGE) //BATERIA 4S (4.2 x 4 = 16.8v)
+    {
       if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      {
         BattMaxVoltageSelect = BATTERY_4S;
+      }
       return BATT_4S_SAFE_HIGH_VOLTAGE;
     }
-    else if (BattVoltage > BATT_6S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_6S_SAFE_HIGH_VOLTAGE)
-    { //BATERIA 6S (4.2 x 6 = 25.2v)
+    else if (BattVoltage > BATT_6S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_6S_SAFE_HIGH_VOLTAGE) //BATERIA 6S (4.2 x 6 = 25.2v)
+    {
       if (BattMaxCount++ >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      {
         BattMaxVoltageSelect = BATTERY_6S;
+      }
       return BATT_6S_SAFE_HIGH_VOLTAGE;
     }
   }

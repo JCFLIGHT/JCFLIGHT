@@ -99,7 +99,9 @@ void FlightModesUpdate()
     if (GPS_NumberOfSatellites >= 5 && COMMAND_ARM_DISARM)
     {
       if (GPS_Flight_Mode != GPS_MODE_NONE && !Do_Stabilize_Mode)
-        Do_AltitudeHold_Mode = true;
+      {
+        Do_Stabilize_Mode = true;
+      }
       if (SetFlightModes[RTH_MODE] || Fail_Safe_Event)
       {
         if (!GPS_HOME_MODE_FW)
@@ -158,7 +160,9 @@ void FlightModesUpdate()
     if (!SetFlightModes[RTH_MODE] && !SetFlightModes[LAND_MODE])
     {
       if (Do_GPS_Altitude)
+      {
         Do_GPS_Altitude = false;
+      }
     }
     if (COMMAND_ARM_DISARM)
     {
@@ -230,7 +234,9 @@ void FlightModesUpdate()
         if (GPS_Flight_Mode != GPS_MODE_NONE)
         {
           if (Do_GPS_Altitude)
+          {
             SetAltitudeHold(ALTITUDE.EstimateAltitude);
+          }
           GPS_Flight_Mode = GPS_MODE_NONE;
         }
         GPS_Reset_Navigation();
@@ -257,5 +263,7 @@ bool CheckSafeStateToGPSMode()
     return true;
   }
   else
+  {
     return false;
+  }
 }

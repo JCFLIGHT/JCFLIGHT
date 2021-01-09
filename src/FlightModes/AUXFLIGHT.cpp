@@ -1091,52 +1091,90 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
 {
   SetFlightModesToGCS();
   if (Fail_Safe_Event)
+  {
     return;
+  }
   //ACRO
   if (AcroControlAux)
+  {
     SetFlightModes[STABILIZE_MODE] = false;
+  }
   else
+  {
     SetFlightModes[STABILIZE_MODE] = true;
+  }
   //IOC
   if (IOCControlAux)
+  {
     SetFlightModes[IOC_MODE] = true;
+  }
   else
+  {
     SetFlightModes[IOC_MODE] = false;
+  }
   //ALTITUDE-HOLD
   if (AltitudeHoldControlAux)
+  {
     SetFlightModes[ALTITUDE_HOLD_MODE] = true;
+  }
   else
+  {
     SetFlightModes[ALTITUDE_HOLD_MODE] = false;
+  }
   //GPS-HOLD
   if (GPSHoldControlAux)
+  {
     SetFlightModes[GPS_HOLD_MODE] = true;
+  }
   else
+  {
     SetFlightModes[GPS_HOLD_MODE] = false;
+  }
   //AUTO LAND
   if (AutoLandControlAux)
+  {
     SetFlightModes[LAND_MODE] = true;
+  }
   else
+  {
     SetFlightModes[LAND_MODE] = false;
+  }
   //RTH
   if (RTHControlAux)
+  {
     SetFlightModes[RTH_MODE] = true;
+  }
   else
+  {
     SetFlightModes[RTH_MODE] = false;
+  }
   //SPORT
   if (SportControlAux)
+  {
     SetFlightModes[ATACK_MODE] = true;
+  }
   else
+  {
     SetFlightModes[ATACK_MODE] = false;
+  }
   //AUTO-FLIP
   if (AutoFlipControlAux)
+  {
     SetFlightModes[FLIP_MODE] = true;
+  }
   else
+  {
     SetFlightModes[FLIP_MODE] = false;
+  }
   //AUTO
   if (AutoPilotControlAux)
+  {
     SetFlightModes[WAYPOINT_MODE] = true;
+  }
   else
+  {
     SetFlightModes[WAYPOINT_MODE] = false;
+  }
 
   //Throttle_LockUp(true); //TRAVA DO ACELERADOR PARA TER FACILIDADE DE MOVER NO YAW
 }

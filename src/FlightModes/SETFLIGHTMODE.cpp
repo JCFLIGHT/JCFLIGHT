@@ -27,32 +27,57 @@ void SetFlightModesToGCS()
       (NavigationMode == Do_Landed))
   {
     if (NavigationMode == Do_Landed)
+    {
       FlightMode = 13;
+    }
     else
+    {
       FlightMode = 8;
+    }
   }
   else
   {
     if (AcroControlAux)
+    {
       FlightMode = 0;
+    }
     if (IOCControlAux)
+    {
       FlightMode = 5;
+    }
     if (AltitudeHoldControlAux)
+    {
       FlightMode = 2;
+    }
     if (GPSHoldControlAux)
+    {
       FlightMode = 4;
+    }
     if (RTHControlAux)
+    {
       FlightMode = 6;
+    }
     if (SportControlAux)
+    {
       FlightMode = 3;
+    }
     if (AutoFlipControlAux)
+    {
       FlightMode = 11;
+    }
     if (AutoPilotControlAux)
+    {
       FlightMode = 12;
+    }
     if (AutoLandControlAux && !COMMAND_ARM_DISARM)
+    {
       FlightMode = 8;
-    if (!AcroControlAux && !IOCControlAux && !AltitudeHoldControlAux && !GPSHoldControlAux &&
-        !RTHControlAux && !SportControlAux && !AutoFlipControlAux && !AutoPilotControlAux && !AutoLandControlAux)
+    }
+    if (!AcroControlAux && !IOCControlAux && !AltitudeHoldControlAux &&
+        !GPSHoldControlAux && !RTHControlAux && !SportControlAux &&
+        !AutoFlipControlAux && !AutoPilotControlAux && !AutoLandControlAux)
+    {
       FlightMode = 1;
+    }
   }
 }

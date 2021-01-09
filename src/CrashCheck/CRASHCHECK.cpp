@@ -103,11 +103,17 @@ void CrashCheck()
 
     //DESARMA OS MOTORES
     if (PARACHUTE.GetSafeStateToDisarmMotors())
+    {
       COMMAND_ARM_DISARM = false;
+    }
     //CHAMA O PARACHUTE SE ESTIVER EQUIPADO
     if (ParachuteDetectTrigger > 0)
+    {
       PARACHUTE.Auto_Do_Now(true);
+    }
     else
+    {
       PARACHUTE.Auto_Do_Now(false);
+    }
   }
 }

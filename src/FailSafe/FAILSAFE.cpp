@@ -53,7 +53,9 @@ void FailSafeCheck()
     RadioControllOutput[AUX8] = 1000;
   }
   else
+  {
     Fail_Safe_Event = false;
+  }
   if (COMMAND_ARM_DISARM)
   {
     Fail_Safe_System++;

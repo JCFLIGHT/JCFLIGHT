@@ -62,13 +62,17 @@ int32_t GPS_AltitudeHold_For_Plane;
 void Cruise_Mode_Update()
 {
   if (GetFrameStateOfMultirotor())
+  {
     return;
+  }
   float Latitude_To_Cruise;
   float Longitude_To_Cruise;
   float Scale_Of_Cruise;
   int32_t HeadingToCruise = GPS_Ground_Course / 10;
   if (HeadingToCruise > 180)
+  {
     HeadingToCruise -= 360;
+  }
   Scale_Of_Cruise = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
   Latitude_To_Cruise = cos(HeadingToCruise * 0.0174532925f);
   Longitude_To_Cruise = sin(HeadingToCruise * 0.0174532925f) * ScaleDownOfLongitude;
@@ -108,11 +112,17 @@ void PlaneUpdateNavigation(void)
   {
     NavTimer = SCHEDULER.GetMillis();
     if (ABS_16BITS(AltitudeError) < 1)
+    {
       GetThrottleToNavigation = 1500;
+    }
     else
+    {
       GetThrottleToNavigation = Constrain_16Bits(1500 - (AltitudeError * 8), 1300, 1900);
+    }
     if (CLIMBOUT_FW && AltitudeError >= 0)
+    {
       CLIMBOUT_FW = false;
+    }
     if (GPS_HOME_MODE_FW)
     {
       if (CLIMBOUT_FW)
@@ -120,10 +130,14 @@ void PlaneUpdateNavigation(void)
         AltitudeError = -(150);
         GetThrottleToNavigation = 1800;
         if (CurrentAltitude < SAFE_NAV_ALT)
+        {
           HeadingDifference = 0;
+        }
       }
       if ((DistanceToHome < SAFE_DECSCEND_ZONE) && CurrentAltitude > RTH_AltitudeOfPlane)
+      {
         GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + RTH_AltitudeOfPlane;
+      }
     }
     if (Fail_Safe_Event && (DistanceToHome < 10))
     {
@@ -132,10 +146,14 @@ void PlaneUpdateNavigation(void)
       GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + 5;
     }
     if (DistanceToHome < 10)
+    {
       HeadingDifference *= 0.1f;
+    }
     HeadingDifference = WRap_180(HeadingDifference * 100) / 100;
     if (ABS_16BITS(HeadingDifference) > 170)
+    {
       HeadingDifference = 175;
+    }
     TimePIDOfNavigationPrimary = (float)(SCHEDULER.GetMillis() - TimePIDOfNavigation) / 1000;
     TimePIDOfNavigation = SCHEDULER.GetMillis();
     if (ABS_16BITS(AltitudeError) <= 3)
@@ -146,7 +164,9 @@ void PlaneUpdateNavigation(void)
     Saturation[0] = (AltitudeError - PreviousAltitudeDifference);
     PreviousAltitudeDifference = AltitudeError;
     if (ABS_16BITS(Saturation[0]) > 100)
+    {
       Saturation[0] = 0;
+    }
     AltitudeVector[0] = AltitudeVector[1];
     AltitudeVector[1] = AltitudeVector[2];
     AltitudeVector[2] = AltitudeVector[3];
@@ -163,14 +183,18 @@ void PlaneUpdateNavigation(void)
     AltitudeDifference = AltitudeError * Alt_kP;
     AltitudeDifference += (IntegralErrorOfAltitude);
     if (ABS_16BITS(HeadingDifference) <= 3)
+    {
       IntegralErrorOfNavigation *= TimePIDOfNavigationPrimary;
+    }
     HeadingDifference *= 10;
     IntegralErrorOfNavigation += (HeadingDifference * Nav_kI) * TimePIDOfNavigationPrimary;
     IntegralErrorOfNavigation = Constrain_Float(IntegralErrorOfNavigation, -500, 500);
     Saturation[1] = (HeadingDifference - PreviousHeadingDifference);
     PreviousHeadingDifference = HeadingDifference;
     if (ABS_16BITS(Saturation[1]) > 100)
+    {
       Saturation[1] = 0;
+    }
     NavigationDifferenceVector[0] = NavigationDifferenceVector[1];
     NavigationDifferenceVector[1] = NavigationDifferenceVector[2];
     NavigationDifferenceVector[2] = NavigationDifferenceVector[3];
@@ -190,14 +214,20 @@ void PlaneUpdateNavigation(void)
     GPS_Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -200, 200) + NavigationDeltaSumPID;
     GPS_Angle[YAW] = Constrain_16Bits(HeadingDifference / 10, -150, 150) + NavigationDeltaSumPID;
     if (!COMMAND_ARM_DISARM)
+    {
       GPS_Angle[PITCH] = Constrain_16Bits(GPS_Angle[PITCH], 0, 150);
+    }
     if (!CLIMBOUT_FW)
+    {
       GPS_Angle[PITCH] -= (ABS_16BITS(ATTITUDE.AngleOut[ROLL]));
+    }
     GetThrottleToNavigation -= Constrain_16Bits(ATTITUDE.AngleOut[PITCH] * PITCH_COMP, 0, 450);
     GroundSpeed = GPS_Ground_Speed;
     SpeedDifference = (GPS_MINSPEED - GroundSpeed) * I_TERM;
     if (GPS_Ground_Speed < GPS_MINSPEED - 50 || GPS_Ground_Speed > GPS_MINSPEED + 50)
+    {
       ThrottleBoost += SpeedDifference;
+    }
     ThrottleBoost = Constrain_16Bits(ThrottleBoost, 0, 500);
     GetThrottleToNavigation += ThrottleBoost;
     GetThrottleToNavigation = Constrain_16Bits(GetThrottleToNavigation, 1300, 1900);

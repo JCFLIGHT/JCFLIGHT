@@ -240,7 +240,9 @@ void GPS_Calcule_Bearing(int32_t *Latitude_One, int32_t *Longitude_One, int32_t 
   int32_t off_y = (*Latitude_Two - *Latitude_One) / ScaleDownOfLongitude;
   *bearing = 9000 + atan2(-off_y, off_x) * 5729.57795f;
   if (*bearing < 0)
+  {
     *bearing += 36000;
+  }
 }
 
 void GPS_Calcule_Distance_In_CM(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, uint32_t *CalculateDistance)
@@ -361,10 +363,14 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
     {
       NavCompensation = Target_Speed[axis] * Target_Speed[axis] * ((float)NavTiltCompensation * 0.0001f);
       if (Target_Speed[axis] < 0)
+      {
         NavCompensation = -NavCompensation;
+      }
     }
     else
+    {
       NavCompensation = 0;
+    }
     GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis] + NavCompensation, -3000, 3000);
     PositionHoldRatePIDArray[axis].Integrator = NavigationPIDArray[axis].Integrator;
   }
@@ -429,7 +435,9 @@ void GPS_Reset_Navigation(void)
   GPSResetPID(&NavigationPIDArray[1]);
   NavigationMode = Do_None;
   if (GetFrameStateOfAirPlane())
+  {
     PlaneResetNavigation();
+  }
 }
 
 void LoadGPSParameters(void)
@@ -450,9 +458,13 @@ void LoadGPSParameters(void)
 int32_t WRap_180(int32_t AngleInput)
 {
   if (AngleInput > 18000)
+  {
     AngleInput -= 36000;
+  }
   if (AngleInput < -18000)
+  {
     AngleInput += 36000;
+  }
   return AngleInput;
 }
 

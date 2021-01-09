@@ -26,21 +26,6 @@
 
 PreArmClass PREARM;
 
-enum GCS_Message_Type_Enum
-{
-    IMU_ERROR = 0,
-    FLIGHT_MODES_ERROR,
-    GPS_ERROR,
-    FAIL_SAFE_ERROR,
-    GYRO_EEROR,
-    INCLINATION_ERROR,
-    BUTTON_ERROR,
-    BATTERY_ERROR,
-    COMPASS_ERROR,
-    BAROMETER_ERROR,
-    NONE_ERROR = 254
-};
-
 #ifdef __AVR_ATmega2560__
 
 const char Message_0[] __attribute__((__progmem__)) = "Erro:Acelerometro ruim;";

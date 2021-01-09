@@ -47,15 +47,21 @@ bool ApplyAltitudeHoldControl()
       if (Do_GPS_Altitude)
       {
         if (TakeOffInProgress)
+        {
           TakeOffInProgress = false;
+        }
         if (NavigationMode == Do_LandInProgress || NavigationMode == Do_Land_Detected || NavigationMode == Do_Landed)
         {
           if (HoveringState)
+          {
             HoveringState = false;
+          }
           SetAltitudeHold(ALTITUDE.EstimateAltitude);
           TargetVariometer = 50;
           if (ALTITUDE.EstimateAltitude > 500)
+          {
             TargetVariometer += (int32_t)200 * (ALTITUDE.EstimateAltitude - 500) / (RTH_Altitude * 100 - 500);
+          }
           TargetVariometer = -TargetVariometer;
         }
         else
@@ -66,9 +72,13 @@ bool ApplyAltitudeHoldControl()
           }
           TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimateAltitude) * 3) / 2;
           if (ALTITUDE.EstimateAltitude > 500)
+          {
             TargetVariometer = Constrain_32Bits(TargetVariometer, -250, 250);
+          }
           else
+          {
             TargetVariometer = Constrain_32Bits(TargetVariometer, -83, 83);
+          }
         }
       }
       else
@@ -94,9 +104,13 @@ bool ApplyAltitudeHoldControl()
           if (HoveringState)
             HoveringState = false;
           if (ABS_16BITS(ThrottleDifference) <= 70)
+          {
             TargetVariometer = 0;
+          }
           else
+          {
             TargetVariometer = ((ThrottleDifference - ((ThrottleDifference > 0) ? 70 : -70)) * 3) / 4;
+          }
         }
         else
         {
@@ -167,7 +181,9 @@ void InitializeHoveringThrottle()
 void SetAltitudeHold(int32_t ValueOfNewAltitudeHold)
 {
   if (ValueOfNewAltitudeHold > 15000)
+  {
     ValueOfNewAltitudeHold = 15000;
+  }
   AltitudeToHold = ValueOfNewAltitudeHold;
 }
 
@@ -183,9 +199,13 @@ uint32_t TimeOnLand;
 void RunLandDetector()
 {
   if (GetGroundDetected())
+  {
     TimeOnLand = SCHEDULER.GetMillis() - LandDetectorStartTime;
+  }
   else
+  {
     ResetLandDetector();
+  }
   if (!GroundAltitudeSet && (TimeOnLand >= 100))
   {
     GroundAltitudeSet = true;

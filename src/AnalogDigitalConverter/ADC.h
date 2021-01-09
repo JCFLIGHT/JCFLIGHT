@@ -21,8 +21,7 @@
 class AnalogPinClass
 {
 public:
-  AnalogPinClass(){};
-  int16_t Read(uint8_t NumbAnalogPin);
+  int16_t Read(uint8_t AnalogPin);
 };
 extern AnalogPinClass ADCPIN;
 #endif

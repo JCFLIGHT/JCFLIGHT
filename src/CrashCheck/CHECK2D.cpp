@@ -18,16 +18,13 @@
 #include "CHECK2D.h"
 #include "Math/MATHSUPPORT.h"
 
-bool CrashCheck2D(int16_t ValueA, int16_t ValueB, float CrashAngle)
+bool CrashCheck2D(int16_t AngleRoll, int16_t AnglePitch, float CrashAngle)
 {
-  //NÃO ERA NECESSARIO ESSAS DUAS VARIAVIES,MAS EU COLOQUEI POR QUE SOU UM BOBÃO
-  static int16_t ConstrainAngleRoll = 0;
-  static int16_t ConstrainAnglePitch = 0;
-  CrashAngle = CrashAngle * (3.14f / 180.0f) * 1000.0f;
-  ConstrainAngleRoll = Constrain_16Bits(ValueA, -1000, 1000);  //ANGULO MAXIMO DE -1000 A +1000
-  ConstrainAnglePitch = Constrain_16Bits(ValueB, -1000, 1000); //ANGULO MAXIMO DE -1000 A +1000
-  if ((ConstrainAngleRoll > CrashAngle) || (ConstrainAngleRoll < (-CrashAngle)) ||
-      (ConstrainAnglePitch > CrashAngle) || (ConstrainAnglePitch < (-CrashAngle)))
+  CrashAngle = ConvertToRadians(CrashAngle) * 1000.0f;
+  AngleRoll = Constrain_16Bits(AngleRoll, -1000, 1000);   //ANGULO MAXIMO DE -1000 A +1000
+  AnglePitch = Constrain_16Bits(AnglePitch, -1000, 1000); //ANGULO MAXIMO DE -1000 A +1000
+  if ((AngleRoll > CrashAngle) || (AngleRoll < (-CrashAngle)) ||
+      (AnglePitch > CrashAngle) || (AnglePitch < (-CrashAngle)))
   {
     return true;
   }

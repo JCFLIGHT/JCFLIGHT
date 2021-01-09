@@ -21,7 +21,11 @@
 #include "Math/MATHSUPPORT.h"
 #include "FastSerial/PRINTF.h"
 
-#define LOOP_RATE_IN_HZ 500          //HZ
+#ifndef __AVR_ATmega2560__
+#define LOOP_RATE_IN_HZ 400 //HZ
+#else
+#define LOOP_RATE_IN_HZ 1000 //HZ - O LOOP É 100HZ,MAS O FILTRO SÓ FUNCIONA CORRETAMENTE COM ESSE VALOR EM 1KHZ
+#endif
 #define LAND_CHECK_ACCEL_MOVING 3.0f //M/S^2
 #define LPF_CUTOFF_IN_HZ 1.0f        //HZ
 

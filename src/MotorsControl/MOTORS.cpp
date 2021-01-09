@@ -163,18 +163,28 @@ void PID_MixMotors()
   if (GetFrameStateOfMultirotor())
   {
     int16_t SuportMotor = MotorControl[MOTOR4];
-    for (uint8_t i = 1; i < NumberOfMotors; i++)
-      if (MotorControl[i] > SuportMotor)
-        SuportMotor = MotorControl[i];
-    for (uint8_t i = 0; i < NumberOfMotors; i++)
+    for (uint8_t MotorsCount = 1; MotorsCount < NumberOfMotors; MotorsCount++)
+    {
+      if (MotorControl[MotorsCount] > SuportMotor)
+      {
+        SuportMotor = MotorControl[MotorsCount];
+      }
+    }
+    for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
     {
       if (SuportMotor > 1900)
-        MotorControl[i] -= SuportMotor - 1900;
-      MotorControl[i] = Constrain_16Bits(MotorControl[i], MotorSpeed, 1900);
+      {
+        MotorControl[MotorsCount] -= SuportMotor - 1900;
+      }
+      MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], MotorSpeed, 1900);
       if (RadioControllOutput[THROTTLE] < 1100)
-        MotorControl[i] = MotorSpeed;
+      {
+        MotorControl[MotorsCount] = MotorSpeed;
+      }
       if (!COMMAND_ARM_DISARM)
-        MotorControl[i] = 1000;
+      {
+        MotorControl[MotorsCount] = 1000;
+      }
     }
   }
 }

@@ -24,7 +24,7 @@
 void MachineInit()
 {
 #ifdef ESP32
-    EEPROM.begin(1000);
+    EEPROM.begin(2000);
 #endif
     UART2Mode_Initialization();
     FASTSERIAL.Initialization();

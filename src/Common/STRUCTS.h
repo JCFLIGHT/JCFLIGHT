@@ -193,11 +193,6 @@ typedef struct PT1Filter
   float DeltaTime;
 } PT1_Filter_Struct;
 
-typedef union
-{
-  PT1_Filter_Struct PT1;
-} PT1Filter_Struct;
-
 typedef struct
 {
   const char *TaskName;

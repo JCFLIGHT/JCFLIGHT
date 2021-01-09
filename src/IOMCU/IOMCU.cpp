@@ -47,7 +47,6 @@
 
 GCSClass GCS;
 
-//#define LOCK_GCS //É NECESSARIO ATIVAR ESSE PARAMETRO PARA FAZER O DEBUG SERIAL NA EXTENSÃO PRINTF.cpp
 //#define MACHINE_CYCLE
 
 uint8_t SerialCheckSum;
@@ -443,9 +442,6 @@ void GCSClass::SendStringToGCS(const char *String)
 
 void GCSClass::Serial_Parse_Protocol()
 {
-#ifdef LOCK_GCS
-    return;
-#endif
     SerialAvailableGuard = FASTSERIAL.Available(UART_NUMB_0);
     while (SerialAvailableGuard--)
     {

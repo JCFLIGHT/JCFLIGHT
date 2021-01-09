@@ -19,8 +19,5 @@
 #define PT1_H_
 #include "Arduino.h"
 #include "Common/STRUCTS.h"
-typedef float (*FilterApplyFnPTR)(void *Filter, float Input);
-void PT1FilterInit(PT1_Filter_Struct *Filter, float CutOff, float DeltaTime);
 float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime);
-float PT1FilterApply2(PT1_Filter_Struct *Filter, float Input);
 #endif

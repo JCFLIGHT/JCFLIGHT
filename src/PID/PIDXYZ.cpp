@@ -20,7 +20,6 @@
 #include "DYNAMICPID.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "PAA/FLIPMODE.h"
-#include "Filters/DERIVATIVELPF.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Math/AVRLOWER.h"
 #include "Scheduler/SCHEDULERTIME.h"
@@ -31,6 +30,10 @@
 #include "Yaw/YAWMANIPULATION.h"
 #include "RadioControl/CURVESRC.h"
 #include "Scheduler/SCHEDULER.h"
+#include "Filters/PT1.h"
+
+static PT1_Filter_Struct DerivativeRollFilter;
+static PT1_Filter_Struct DerivativePitchFilter;
 
 //STABILIZE PARA MULTIROTORES
 #define STAB_PITCH_ANGLE_MAX 45 //GRAUS
@@ -86,20 +89,18 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   int16_t DerivativeTerminate;
   static int16_t PIDError;
   static int16_t MaxMinAngle;
-  static int16_t SimpleFilterPID;
   static int16_t IntegratorTerminate = 0;
   static int16_t ProportionalTerminateLevel;
   static int16_t IntegratorTerminateLevel;
   static int16_t LastValueOfGyro = 0;
-  static int16_t SimpleFilterPIDOne;
-  static int16_t SimpleFilterPIDTwo;
-  static int16_t SimpleFilterPIDThree;
   int16_t RadioControlToPID;
   RadioControlToPID = RateTargetInput << 1;
   PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * Loop_Integral_Time) >> 12);
   IntegralGyroError[ROLL] = Constrain_16Bits(IntegralGyroError[ROLL] + PIDError, -16000, +16000);
   if (ABS_16BITS(IMU.GyroscopeRead[ROLL]) > 640)
+  {
     IntegralGyroError[ROLL] = 0;
+  }
   IntegratorTerminate = (IntegralGyroError[ROLL] >> 7) * PID[ROLL].IntegratorVector >> 6;
   ProportionalTerminate = Multiplication32Bits(RadioControlToPID, PID[ROLL].ProportionalVector) >> 6;
   if (Do_Stabilize_Mode)
@@ -135,16 +136,11 @@ void PID_Controll_Roll(int16_t RateTargetInput)
     ProportionalTerminate = ProportionalTerminateLevel + ((ProportionalTerminate - ProportionalTerminateLevel) * ValueOfFlipToRoll >> 9);
   }
   ProportionalTerminate -= Multiplication32Bits(IMU.GyroscopeRead[ROLL], DynamicProportionalVector[ROLL]) >> 6;
-  SimpleFilterPID = IMU.GyroscopeRead[ROLL] - LastValueOfGyro;
+  DerivativeTerminate = IMU.GyroscopeRead[ROLL] - LastValueOfGyro;
   LastValueOfGyro = IMU.GyroscopeRead[ROLL];
-  DerivativeTerminate = SimpleFilterPIDOne + SimpleFilterPIDTwo + SimpleFilterPID;
-  DerivativeTerminate += SimpleFilterPIDThree;
-  SimpleFilterPIDThree = SimpleFilterPIDTwo;
-  SimpleFilterPIDTwo = SimpleFilterPIDOne;
-  SimpleFilterPIDOne = SimpleFilterPID;
   if (Get_LPF_Derivative_Value > 0)
   {
-    DiscreteLPF_To_Derivative_PID(Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value);
+    DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6);
   }
   else
   {
@@ -159,20 +155,18 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   int16_t DerivativeTerminate;
   static int16_t PIDError;
   static int16_t MaxMinAngle;
-  static int16_t SimpleFilterPID;
   static int16_t IntegratorTerminate = 0;
   static int16_t ProportionalTerminateLevel;
   static int16_t IntegratorTerminateLevel;
   static int16_t RadioControlToPID;
   static int16_t LastValueOfGyro = 0;
-  static int16_t SimpleFilterPIDOne;
-  static int16_t SimpleFilterPIDTwo;
-  static int16_t SimpleFilterPIDThree;
   RadioControlToPID = RateTargetInput << 1;
   PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * Loop_Integral_Time) >> 12);
   IntegralGyroError[PITCH] = Constrain_16Bits(IntegralGyroError[PITCH] + PIDError, -16000, +16000);
   if (ABS_16BITS(IMU.GyroscopeRead[PITCH]) > 640)
+  {
     IntegralGyroError[PITCH] = 0;
+  }
   IntegratorTerminate = (IntegralGyroError[PITCH] >> 7) * PID[PITCH].IntegratorVector >> 6;
   ProportionalTerminate = Multiplication32Bits(RadioControlToPID, PID[PITCH].ProportionalVector) >> 6;
   if (Do_Stabilize_Mode)
@@ -208,16 +202,11 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
     ProportionalTerminate = ProportionalTerminateLevel + ((ProportionalTerminate - ProportionalTerminateLevel) * ValueOfFlipToPitch >> 9);
   }
   ProportionalTerminate -= Multiplication32Bits(IMU.GyroscopeRead[PITCH], DynamicProportionalVector[PITCH]) >> 6;
-  SimpleFilterPID = IMU.GyroscopeRead[PITCH] - LastValueOfGyro;
+  DerivativeTerminate = IMU.GyroscopeRead[PITCH] - LastValueOfGyro;
   LastValueOfGyro = IMU.GyroscopeRead[PITCH];
-  DerivativeTerminate = SimpleFilterPIDOne + SimpleFilterPIDTwo + SimpleFilterPID;
-  DerivativeTerminate += SimpleFilterPIDThree;
-  SimpleFilterPIDThree = SimpleFilterPIDTwo;
-  SimpleFilterPIDTwo = SimpleFilterPIDOne;
-  SimpleFilterPIDOne = SimpleFilterPID;
   if (Get_LPF_Derivative_Value > 0)
   {
-    DiscreteLPF_To_Derivative_PID(Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value);
+    DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6);
   }
   else
   {
@@ -328,7 +317,7 @@ int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
 
 void PID_Reset_Integral_Accumulators()
 {
-  if (Reset_I || (RadioControllOutput[THROTTLE] <= 1100 && GetFrameStateOfMultirotor()))
+  if (RadioControllOutput[THROTTLE] <= 1100 && GetFrameStateOfMultirotor())
   {
     IntegralGyroError[ROLL] = 0;
     IntegralGyroError[PITCH] = 0;

@@ -24,9 +24,6 @@
 #include "Math/MATHSUPPORT.h"
 #ifndef __AVR_ATmega2560__
 #include "Filters/BIQUADFILTER.h"
-#else
-#include "Filters/PT1.h"
-#include "Scheduler/SCHEDULER.h"
 #endif
 #include "Compass/COMPASSREAD.h"
 #include "BAR/BAR.h"
@@ -41,11 +38,6 @@ BiQuadFilter BiquadGyroLPF[3];
 //INSTANCIAS PARA O NOTCH
 BiQuadFilter BiquadAccNotch[3];
 BiQuadFilter BiquadGyroNotch[3];
-#else
-static FilterApplyFnPTR AccelerometerLPFApplyFn;
-static FilterApplyFnPTR GyroscopeLPFApplyFn;
-static PT1Filter_Struct AccelerometerLPFState[3];
-static PT1Filter_Struct GyroscopeLPFState[3];
 #endif
 
 bool ActiveKalman = false;
@@ -61,24 +53,6 @@ int16_t Gyro_LPFStoredInEEPROM = 0;
 #ifndef __AVR_ATmega2560__
 int16_t Acc_NotchStoredInEEPROM = 0;
 int16_t Gyro_NotchStoredInEEPROM = 0;
-#endif
-
-#ifdef __AVR_ATmega2560__
-static void AccFilterLPF_Initialization(FilterApplyFnPTR *ApplyFn, PT1Filter_Struct State[], uint16_t CutOff)
-{
-  *ApplyFn = (FilterApplyFnPTR)PT1FilterApply2;
-  PT1FilterInit(&State[ROLL].PT1, CutOff, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz") * 1e-6f);
-  PT1FilterInit(&State[PITCH].PT1, CutOff, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz") * 1e-6f);
-  PT1FilterInit(&State[YAW].PT1, CutOff, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz") * 1e-6f);
-}
-
-static void GyroFilterLPF_Initialization(FilterApplyFnPTR *ApplyFn, PT1Filter_Struct State[], uint16_t CutOff)
-{
-  *ApplyFn = (FilterApplyFnPTR)PT1FilterApply2;
-  PT1FilterInit(&State[ROLL].PT1, CutOff, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz") * 1e-6f);
-  PT1FilterInit(&State[PITCH].PT1, CutOff, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz") * 1e-6f);
-  PT1FilterInit(&State[YAW].PT1, CutOff, SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "Hz") * 1e-6f);
-}
 #endif
 
 void IMU_Filters_Initialization()
@@ -106,11 +80,6 @@ void IMU_Filters_Initialization()
   BiquadGyroNotch[ROLL].Settings(Gyro_Notch, THIS_LOOP_FREQUENCY, NOTCH);
   BiquadGyroNotch[PITCH].Settings(Gyro_Notch, THIS_LOOP_FREQUENCY, NOTCH);
   BiquadGyroNotch[YAW].Settings(Gyro_Notch, THIS_LOOP_FREQUENCY, NOTCH);
-#else
-  //GERA UMA NOVA FREQUENCIA DE CORTE PARA O LPF DO ACELEROMETRO
-  AccFilterLPF_Initialization(&AccelerometerLPFApplyFn, AccelerometerLPFState, Acc_LPF);
-  //GERA UMA NOVA FREQUENCIA DE CORTE PARA O LPF DO GYROSCOPIO
-  GyroFilterLPF_Initialization(&GyroscopeLPFApplyFn, GyroscopeLPFState, Gyro_LPF);
 #endif
 }
 
@@ -163,19 +132,6 @@ void IMU_Filters_Update()
     BiquadGyroNotch[PITCH].Settings(Gyro_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
     BiquadGyroNotch[YAW].Settings(Gyro_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
     Gyro_Notch = Gyro_NotchStoredInEEPROM;
-  }
-#else
-  //SE NECESSARIO GERA UMA NOVA FREQUENCIA DE CORTE PARA O LPF NO ACC
-  if (Acc_LPFStoredInEEPROM != Acc_LPF)
-  {
-    AccFilterLPF_Initialization(&AccelerometerLPFApplyFn, AccelerometerLPFState, Acc_LPFStoredInEEPROM);
-    Acc_LPF = Acc_LPFStoredInEEPROM;
-  }
-  //SE NECESSARIO GERA UMA NOVA FREQUENCIA DE CORTE PARA O LPF NO GYRO
-  if (Gyro_LPFStoredInEEPROM != Gyro_LPF)
-  {
-    GyroFilterLPF_Initialization(&GyroscopeLPFApplyFn, GyroscopeLPFState, Gyro_LPFStoredInEEPROM);
-    Gyro_LPF = Gyro_LPFStoredInEEPROM;
   }
 #endif
 }
@@ -246,12 +202,13 @@ void IMU_Get_Data()
 
 void Acc_ReadBufferData()
 {
-  IMU_Get_Data();
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(0x68, 0x3B);
   IMU.AccelerometerRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]) >> 3;
   IMU.AccelerometerRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
   IMU.AccelerometerRead[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
+#elif defined ESP32
+  IMU_Get_Data();
 #endif
 
   Accelerometer_Calibration();
@@ -282,11 +239,6 @@ void Acc_ReadBufferData()
     IMU.AccelerometerRead[ROLL] = BiquadAccLPF[ROLL].FilterOutput(IMU.AccelerometerRead[ROLL]);
     IMU.AccelerometerRead[PITCH] = BiquadAccLPF[PITCH].FilterOutput(IMU.AccelerometerRead[PITCH]);
     IMU.AccelerometerRead[YAW] = BiquadAccLPF[YAW].FilterOutput(IMU.AccelerometerRead[YAW]);
-#else
-    //APLICA O FILTRO
-    IMU.AccelerometerRead[ROLL] = AccelerometerLPFApplyFn((PT1Filter_Struct *)&AccelerometerLPFState[ROLL], IMU.AccelerometerReadNotFiltered[ROLL]);
-    IMU.AccelerometerRead[PITCH] = AccelerometerLPFApplyFn((PT1Filter_Struct *)&AccelerometerLPFState[PITCH], IMU.AccelerometerReadNotFiltered[PITCH]);
-    IMU.AccelerometerRead[YAW] = AccelerometerLPFApplyFn((PT1Filter_Struct *)&AccelerometerLPFState[YAW], IMU.AccelerometerReadNotFiltered[YAW]);
 #endif
   }
 #ifndef __AVR_ATmega2560__
@@ -336,11 +288,6 @@ void Gyro_ReadBufferData()
     IMU.GyroscopeRead[ROLL] = BiquadGyroLPF[ROLL].FilterOutput(IMU.GyroscopeRead[ROLL]);
     IMU.GyroscopeRead[PITCH] = BiquadGyroLPF[PITCH].FilterOutput(IMU.GyroscopeRead[PITCH]);
     IMU.GyroscopeRead[YAW] = BiquadGyroLPF[YAW].FilterOutput(IMU.GyroscopeRead[YAW]);
-#else
-    //APLICA O FILTRO
-    IMU.GyroscopeRead[ROLL] = GyroscopeLPFApplyFn((PT1Filter_Struct *)&GyroscopeLPFState[ROLL], IMU.GyroscopeReadNotFiltered[ROLL]);
-    IMU.GyroscopeRead[PITCH] = GyroscopeLPFApplyFn((PT1Filter_Struct *)&GyroscopeLPFState[PITCH], IMU.GyroscopeReadNotFiltered[PITCH]);
-    IMU.GyroscopeRead[YAW] = GyroscopeLPFApplyFn((PT1Filter_Struct *)&GyroscopeLPFState[YAW], IMU.GyroscopeReadNotFiltered[YAW]);
 #endif
   }
 #ifndef __AVR_ATmega2560__

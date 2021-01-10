@@ -23,7 +23,6 @@ extern int16_t IntegralGyroError[2];
 extern int16_t CalcedRateTargetRoll;
 extern int16_t CalcedRateTargetPitch;
 extern int16_t CalcedRateTargetYaw;
-extern uint16_t Loop_Integral_Time;
 void PID_DerivativeLPF_Update();
 void PID_Update();
 void PID_Controll_Pitch(int16_t RateTargetInput);

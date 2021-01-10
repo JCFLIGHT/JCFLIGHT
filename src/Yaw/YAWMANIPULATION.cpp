@@ -90,8 +90,14 @@ float GetHeadingHoldValue()
   float HeadingHoldRateNF = HeadingHoldRate;
 #endif
 
-  //REALIZA FILTRAGEM DO RATE COM O PT1
+//REALIZA FILTRAGEM DO RATE COM O PT1
+#ifndef __AVR_ATmega2560__
   HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, Loop_Integral_Time * 1e-6);
+#else
+  //DEVIDO O CICLO DE MAQUINA EM 100HZ,NÃO É POSSIVEL FILTRAR A 2HZ USANDO O VALOR MEDIDO DO PROPRIO CICLO DE MAQUINA
+  //É NECESSARIO "ENGANAR" O ALGORITIMO,E FINGIR QUE ELE ESTÁ TRABALHANDO A 1KHZ PARA FREQUENCIA DE CORTE DE 2HZ SER APLICADA CORRETAMENTE
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, 1.0f / 1000);
+#endif
 
 #ifdef DEBUG
   FastSerialPrintln(PSTR("HHR:%.2f HHRF:%.2f\n"),

@@ -21,7 +21,6 @@
 //AVR
 #ifdef __AVR_ATmega2560__
 #define MEGA2560                                                         //APENAS PARA OTIMIZAR A LISTA DE PARAMETROS
-#define THIS_LOOP_FREQUENCY 100                                          //HZ - RATE PARA OS FILTROS LPF E NOTCH DA IMU
 #define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0                                //ENDEREÇO INIACIAL PARA ERASE
 #define FINAL_ADDRESS_EEPROM_TO_CLEAR 4096                               //ENDEREÇO FINAL PARA EASE
 #define SIZE_OF_EEPROM 4096                                              //TAMANHO TOTAL DA EEPROM

@@ -26,10 +26,7 @@ float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequen
 {
     //CALCULA O VALOR RC DO FILTRO
     //ESTAMOS CALCULANDO UM RESISTOR E UM CAPACITOR DIGITALMENTE
-    if (!Filter->RC)
-    {
-        Filter->RC = 1.0f / (6.283185307179586476925286766559f * CutOffFrequency);
-    }
+    Filter->RC = 1.0f / (6.283185307179586476925286766559f * CutOffFrequency);
     //GUARDA O ÚLTIMO VALOR DO DELTA TIME
     Filter->DeltaTime = DeltaTime;
     //CALCULA O VALOR DO FILTRO

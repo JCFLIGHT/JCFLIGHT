@@ -33,7 +33,9 @@ uint16_t SBUSReadChannels[12];
 void SBUS_Update()
 {
   if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1)
+  {
     return;
+  }
   SBUSRC.Read(&SBUSReadChannels[0], &SBUSRC.FailSafe, &LostFrame);
 #if defined(DEBUG_MODE)
   static uint32_t SBUS_Serial_Refresh;
@@ -91,9 +93,13 @@ void SBUS::Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame)
       {
         *FailSafe = false;
         if (Fail_Safe_System > 20)
+        {
           Fail_Safe_System -= 20;
+        }
         else
+        {
           Fail_Safe_System = 0;
+        }
       }
     }
   }

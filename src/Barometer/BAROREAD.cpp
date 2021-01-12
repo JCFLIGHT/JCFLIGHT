@@ -34,7 +34,9 @@ void Baro_Calibration()
   static uint8_t BaroIndex;
   uint8_t IndexFilter = (BaroIndex + 1);
   if (IndexFilter == 21)
+  {
     IndexFilter = 0;
+  }
   BaroVector[BaroIndex] = BaroPressureRaw;
   BaroPressureToLogarithm += BaroVector[BaroIndex];
   BaroPressureToLogarithm -= BaroVector[IndexFilter];
@@ -49,6 +51,7 @@ void CalculateBaroAltitude()
     BarometerTemperatureScale = ((int32_t)BaroTemperatureRaw + 27315) * 29.271267f;
     Baro_Filter.Reset(); //RESETA O FILTRO AVERAGE PARA EVITAR ALTOS DROPS DE VALORES
   }
+  else
   {
     ALTITUDE.RealBaroAltitude = Baro_Filter.Apply((BarometerPressureSum - log(BaroPressureToLogarithm)) * BarometerTemperatureScale);
   }
@@ -56,12 +59,14 @@ void CalculateBaroAltitude()
 
 int32_t GetAltitudeForGCS()
 {
-  static uint8_t InitialSamples = 200;
+  static uint8_t InitialSamples = 0xB4;
   static float BarometerTemperatureScaleTwo;
   static float BarometerPressureSumTwo;
 
   if (COMMAND_ARM_DISARM)
+  {
     return ALTITUDE.RealBaroAltitude;
+  }
 
   if (InitialSamples > 0)
   {

@@ -24,12 +24,24 @@
 #include "Math/MATHSUPPORT.h"
 #ifndef __AVR_ATmega2560__
 #include "Filters/BIQUADFILTER.h"
+#else
+#include "Filters/AVERAGEFILTER.h"
 #endif
 #include "Compass/COMPASSREAD.h"
 #include "BAR/BAR.h"
 #include "SensorAlignment/ALIGNMENT.h"
 #include "Build/BOARDDEFS.h"
 #include "IMUCALIBRATE.h"
+
+#ifdef __AVR_ATmega2560__
+//FILTRO MEDIA MOVEL COM 8 MEDIAS,VALOR BAIXO POR QUE AINDA TEM O FILTRO DE KALMAN
+AverageFilterInt16_Size8 AccRollAverage;
+AverageFilterInt16_Size8 AccPitchAverage;
+AverageFilterInt16_Size8 AccYawAverage;
+//NÃO NECESSARIO PARA O GYRO,POR CAUSA DO FILTRO DE KALMAN E DO LPF INTERNO DA MPU (AJUSTAVEL PELO GCS)
+//TALVEZ SE FOR NECESSARIO COLOCAR PARA O GYRO,VAI SER UMA MEDIA MOVEL COM POUCAS ITERAÇÕES,TALVEZ 4 OU 3
+//MAS ATÉ O MOMENTO EU IREI DEIXAR SEM
+#endif
 
 #ifndef __AVR_ATmega2560__
 //INSTANCIAS PARA O LPF
@@ -221,7 +233,15 @@ void Acc_ReadBufferData()
   IMU.AccelerometerReadNotFiltered[PITCH] = IMU.AccelerometerRead[PITCH];
   IMU.AccelerometerReadNotFiltered[YAW] = IMU.AccelerometerRead[YAW];
 
+  //APLICA O AJUSTE DO ACELEROMETRO
   ApplySensorAlignment(IMU.AccelerometerRead);
+
+#ifdef __AVR_ATmega2560__
+  //APLICA O FILTRO MEDIA MOVEL
+  IMU.AccelerometerRead[ROLL] = AccRollAverage.Apply(IMU.AccelerometerReadNotFiltered[ROLL]);
+  IMU.AccelerometerRead[PITCH] = AccPitchAverage.Apply(IMU.AccelerometerReadNotFiltered[PITCH]);
+  IMU.AccelerometerRead[YAW] = AccYawAverage.Apply(IMU.AccelerometerReadNotFiltered[YAW]);
+#endif
 
   //KALMAN
   if (ActiveKalman)

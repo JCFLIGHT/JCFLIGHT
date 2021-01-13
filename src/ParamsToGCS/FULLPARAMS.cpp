@@ -90,9 +90,6 @@ typedef struct
   uint8_t Param_GPS_TiltCompensation;
   uint8_t Param_AirSpeed_Samples;
   uint16_t Param_AirSpeed_Factor;
-  int16_t Param_Acc_Adjust_Roll;
-  int16_t Param_Acc_Adjust_Pitch;
-  int16_t Param_Acc_Adjust_Yaw;
 #endif
 } Struct_FullParamsList;
 
@@ -170,9 +167,6 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GPS_TiltCompensation", GPS_TILT_COMP_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_TiltCompensation, 0, 100},
     {"AirSpeed_Samples", AIRSPEED_SAMPLES_ADDR, VAR_8BITS, &FullParamsList.Param_AirSpeed_Samples, 0, 255},
     {"AirSpeed_Factor", AIRSPEED_FACTOR_ADDR, VAR_16BITS, &FullParamsList.Param_AirSpeed_Factor, 0, 5000},
-    {"Adjust_Roll", ROLL_ADJ_ADDR, VAR_16BITS, &FullParamsList.Param_Acc_Adjust_Roll, -800, 800},
-    {"Adjust_Pitch", PITCH_ADJ_ADDR, VAR_16BITS, &FullParamsList.Param_Acc_Adjust_Pitch, -800, 800},
-    {"Adjust_Yaw", YAW_ADJ_ADDR, VAR_16BITS, &FullParamsList.Param_Acc_Adjust_Yaw, -800, 800},
 #endif
 };
 

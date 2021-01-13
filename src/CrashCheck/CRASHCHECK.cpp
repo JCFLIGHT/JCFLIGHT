@@ -23,6 +23,7 @@
 #include "PrecisionLand/PRECISIONLAND.h"
 #include "CHECK2D.h"
 #include "FastSerial/PRINTF.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 #define CRASH_CHECK_TIMER 2                 //TEMPO MAXIMO DE CRASH EM SEGUNDOS
 #define MAIN_LOOP_RATE 100                  //100HZ
@@ -61,7 +62,7 @@ void CrashCheck()
 
   //VERIFICA SE ESTÁ EM QUALQUER MODO DE VOO,MENOS NO MODO ACRO E FLIP
   //SE ESTIVER NO MODO ACRO OU FLIP O DETECTOR DE CRASH NÃO IRÁ FUNCIOANAR
-  if (!SetFlightModes[STABILIZE_MODE] || SetFlightModes[FLIP_MODE])
+  if (!SetFlightModes[STABILIZE_MODE] || (SetFlightModes[FLIP_MODE] && GetFrameStateOfMultirotor()))
   {
     Crash_Counter = 0;
     return;

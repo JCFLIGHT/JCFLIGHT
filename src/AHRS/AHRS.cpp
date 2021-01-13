@@ -370,7 +370,7 @@ void AHRS_Update()
   if (GetFrameStateOfAirPlane())
   {
     //SLIP ANGLE PARA O MODO PLANE
-    SlipAngleForAirPlane = ApproximationOfAtan2(IMU.AccelerometerRead[ROLL], ABS_16BITS(IMU.AccelerometerRead[YAW]));
+    SlipAngleForAirPlane = ApproximationOfAtan2ForTurnAssist(IMU.AccelerometerRead[ROLL], ABS_16BITS(IMU.AccelerometerRead[YAW]));
     SlipAngleForAirPlane = Constrain_16Bits(SlipAngleForAirPlane, -900, 900); //APLICA LIMITES DE -90 Á +90 GRAUS
 
     bool canUseCOG = (GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300);

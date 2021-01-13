@@ -43,7 +43,7 @@ float ConvertToRadians(float InputValue);
 float ConvertRadiansToDeciDegrees(float Inputvalue);
 float ConvertDeciDegreesToRadians(float Inputvalue);
 float ConvertDeciDegreesToDegrees(float Inputvalue);
-int16_t ApproximationOfAtan2(int16_t AccRoll, int16_t AccYaw);
+int16_t ApproximationOfAtan2ForTurnAssist(int16_t AccRoll, int16_t AccYaw);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);
 float InvertSquareRootFloat(float InputValue);

@@ -22,19 +22,20 @@
 #include "FrameStatus/FRAMESTATUS.h"
 
 bool AutoThrottle_Mode = false;
-
 uint16_t PreviousValueOfAirSpeed = 0;
 
 void Auto_Throttle_Flight_Mode(int16_t InputChannelAux)
 {
     if (GetFrameStateOfMultirotor())
+    {
         return;
+    }
     if (InputChannelAux)
     {
         if (!AutoThrottle_Mode)
         {
             AutoThrottle_Mode = true;
-            PreviousValueOfAirSpeed = AirSpeedCalculedPressure;
+            PreviousValueOfAirSpeed = AirSpeedCalcedInKM;
         }
     }
     else
@@ -46,11 +47,13 @@ void Auto_Throttle_Flight_Mode(int16_t InputChannelAux)
 void Apply_Controll_For_Throttle()
 {
     if (GetFrameStateOfMultirotor())
+    {
         return;
+    }
     static int16_t CalculateIntegrator;
     if (AutoThrottle_Mode && (RCController[THROTTLE] > 1200))
     {
-        int16_t CalculateError = PreviousValueOfAirSpeed - AirSpeedCalculedPressure;
+        int16_t CalculateError = PreviousValueOfAirSpeed - AirSpeedCalcedInKM;
         int16_t CalculateProportional = (CalculateError * PID[PIDALTITUDE].ProportionalVector >> 3);
         CalculateIntegrator += (CalculateError * PID[PIDALTITUDE].IntegratorVector >> 5);
         CalculateIntegrator = Constrain_16Bits(CalculateIntegrator, -24000, 24000);

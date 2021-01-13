@@ -31,6 +31,8 @@
 #include "RadioControl/CURVESRC.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Filters/PT1.h"
+#include "AirSpeed/AIRSPEED.h"
+#include "AirSpeed/AIRSPEEDBACKEND.h"
 
 static PT1_Filter_Struct DerivativeRollFilter;
 static PT1_Filter_Struct DerivativePitchFilter;
@@ -43,11 +45,17 @@ static PT1_Filter_Struct DerivativePitchFilter;
 #define STAB_PLANE_PITCH_ANGLE_MAX 35 //GRAUS
 #define STAB_PLANE_ROLL_ANGLE_MAX 35  //GRAUS
 
+//RATE MAXIMO DE SAÍDA DO PID YAW PARA AEROS E ASA-FIXA
+#define YAW_RATE_MAX_FOR_PLANE 36 //GRAUS
+
 //SPORT PARA MULTIROTORES
 #define SPORT_PITCH_ANGLE_MAX 55 //GRAUS
 #define SPORT_ROLL_ANGLE_MAX 55  //GRAUS
 
 #define GYRO_SATURATION_LIMIT 1800 //DPS
+
+//MIGRAR ESSE PARAMETRO PARA A LISTA COMPLETA DE PARAMETROS
+int16_t ReferenceAirSpeed = 1000; //VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 
 int16_t IntegralAccError[2] = {0, 0};
 int16_t IntegralGyroError[2] = {0, 0};
@@ -277,7 +285,7 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
   }
   if (GetFrameStateOfAirPlane())
   {
-    PIDControllerApply[YAW] = Constrain_16Bits(ProportionalTerminate + IntegratorTerminate - DerivativeTerminate, -500, 500);
+    PIDControllerApply[YAW] = Constrain_16Bits(ProportionalTerminate + IntegratorTerminate - DerivativeTerminate, -YAW_RATE_MAX_FOR_PLANE * 10, +YAW_RATE_MAX_FOR_PLANE * 10);
   }
   else
   {
@@ -290,7 +298,7 @@ int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
   static bool OkToTurnCoordination = false;
   if (!TurnCoordinatorMode)
   {
-    return (RadioControlToTurn + (SlipAngleForAirPlane >> 1));
+    return (RadioControlToTurn - IMU.GyroscopeRead[YAW]);
   }
   else
   {
@@ -301,6 +309,11 @@ int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
         IntegralGyroError_Yaw = 0;
         OkToTurnCoordination = true;
       }
+      //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1000CM/S = 36KM/H
+      int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_State() ? AirSpeedCalcedInCM : ReferenceAirSpeed;
+      //10KM/H - 216KM/H
+      AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 360, 6000);
+      SlipAngleForAirPlane *= 980.665f / AirSpeedForCoordinatedTurn;
       return (RadioControlToTurn + SlipAngleForAirPlane);
     }
     else
@@ -319,10 +332,10 @@ void PID_Reset_Integral_Accumulators()
 {
   if (RadioControllOutput[THROTTLE] <= 1100 && GetFrameStateOfMultirotor())
   {
-    IntegralGyroError[ROLL] = 0;
-    IntegralGyroError[PITCH] = 0;
     IntegralAccError[ROLL] = 0;
     IntegralAccError[PITCH] = 0;
+    IntegralGyroError[ROLL] = 0;
+    IntegralGyroError[PITCH] = 0;
     IntegralGyroError_Yaw = 0;
   }
 }

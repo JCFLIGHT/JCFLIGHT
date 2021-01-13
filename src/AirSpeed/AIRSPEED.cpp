@@ -30,7 +30,8 @@
 float AirSpeedPressureRead;
 float AirSpeedAdjustOffSet;
 
-uint16_t AirSpeedCalculedPressure = 0;
+uint16_t AirSpeedCalcedInCM = 0;
+uint16_t AirSpeedCalcedInKM = 0;
 
 void AirSpeed_Initialization()
 {
@@ -68,10 +69,11 @@ void AirSpeed_Update()
   }
   if ((AirSpeedPressureRead - AirSpeedAdjustOffSet) < 0)
   {
-    AirSpeedCalculedPressure = 0;
+    AirSpeedCalcedInCM = AirSpeedCalcedInKM = 0;
   }
   else
   {
-    AirSpeedCalculedPressure = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 3.6f;
+    AirSpeedCalcedInCM = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 100;  //EM CM/H
+    AirSpeedCalcedInKM = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 3.6f; //EM KM/H
   }
 }

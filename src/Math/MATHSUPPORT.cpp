@@ -143,7 +143,7 @@ float ConvertDeciDegreesToDegrees(float Inputvalue)
 }
 
 //ESSA FUNÇÃO GASTA 199us PARA CALCULAR O RESULTADO
-int16_t ApproximationOfAtan2(int16_t AccRoll, int16_t AccYaw)
+int16_t ApproximationOfAtan2ForTurnAssist(int16_t AccRoll, int16_t AccYaw)
 {
     float Difference = AccRoll;
     int16_t Ata2Result;

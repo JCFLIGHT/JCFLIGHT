@@ -60,10 +60,14 @@ void FlipModeRun()
   }
 
   if (!SetFlightModes[STABILIZE_MODE])
+  {
     return; //FAÇA UMA RAPIDA SAIDA SE O MODO ACRO ESTIVER ATIVADO
+  }
 
   if (!COMMAND_ARM_DISARM)
+  {
     return; //FAÇA UMA RAPIDA SAIDA SE A CONTROLADORA ESTIVER DESARMADA
+  }
 
   if (SetFlightModes[FLIP_MODE]) //MODO FLIP ATIVADO?SIM...
   {

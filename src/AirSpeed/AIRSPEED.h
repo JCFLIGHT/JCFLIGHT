@@ -18,7 +18,8 @@
 #ifndef AIRSPEED_H_
 #define AIRSPEED_H_
 #include "Arduino.h"
-extern uint16_t AirSpeedCalculedPressure;
+extern uint16_t AirSpeedCalcedInKM;
+extern uint16_t AirSpeedCalcedInCM;
 void AirSpeed_Initialization();
 void AirSpeed_Update();
 #endif

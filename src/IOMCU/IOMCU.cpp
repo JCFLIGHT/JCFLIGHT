@@ -170,6 +170,9 @@ struct _SendUserBasicGCSParameters
     uint8_t SendAutoLandType;
     uint8_t SendSafeBtnState;
     uint8_t SendAirSpeedState;
+    int16_t SendAccRollAdjust;
+    int16_t SendAccPitchAdjust;
+    int16_t SendAccYawAdjust;
 } SendUserBasicGCSParameters;
 
 struct _GetUserBasicGCSParameters
@@ -196,6 +199,9 @@ struct _GetUserBasicGCSParameters
     uint8_t GetAutoLandType;
     uint8_t GetSafeBtnState;
     uint8_t GetAirSpeedState;
+    int16_t GetAccRollAdjust;
+    int16_t GetAccPitchAdjust;
+    int16_t GetAccYawAdjust;
 } GetUserBasicGCSParameters;
 
 struct _SendUserMediumGCSParameters
@@ -814,6 +820,9 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendUserBasicGCSParameters.SendAutoLandType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendSafeBtnState, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAirSpeedState, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAccRollAdjust, VAR_16BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAccPitchAdjust, VAR_16BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendAccYawAdjust, VAR_16BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1236,6 +1245,15 @@ void GCSClass::Save_Basic_Configuration()
 
     if (GetUserBasicGCSParameters.GetAirSpeedState != STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR))
         STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, GetUserBasicGCSParameters.GetAirSpeedState);
+
+    if (GetUserBasicGCSParameters.GetAccRollAdjust != STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADJUST_ADDR))
+        STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADJUST_ADDR, GetUserBasicGCSParameters.GetAccRollAdjust);
+
+    if (GetUserBasicGCSParameters.GetAccPitchAdjust != STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADJUST_ADDR))
+        STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADJUST_ADDR, GetUserBasicGCSParameters.GetAccPitchAdjust);
+
+    if (GetUserBasicGCSParameters.GetAccYawAdjust != STORAGEMANAGER.Read_16Bits(ACC_YAW_ADJUST_ADDR))
+        STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, GetUserBasicGCSParameters.GetAccYawAdjust);
 }
 
 void GCSClass::Dafult_Basic_Configuration()
@@ -1422,6 +1440,9 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendAutoLandType = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);
     SendUserBasicGCSParameters.SendSafeBtnState = STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR);
     SendUserBasicGCSParameters.SendAirSpeedState = STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR);
+    SendUserBasicGCSParameters.SendAccRollAdjust = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADJUST_ADDR);
+    SendUserBasicGCSParameters.SendAccPitchAdjust = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADJUST_ADDR);
+    SendUserBasicGCSParameters.SendAccYawAdjust = STORAGEMANAGER.Read_16Bits(ACC_YAW_ADJUST_ADDR);
 
     //ENVIA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     SendUserMediumGCSParameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);

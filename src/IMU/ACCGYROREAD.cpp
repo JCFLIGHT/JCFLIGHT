@@ -233,15 +233,15 @@ void Acc_ReadBufferData()
   IMU.AccelerometerReadNotFiltered[PITCH] = IMU.AccelerometerRead[PITCH];
   IMU.AccelerometerReadNotFiltered[YAW] = IMU.AccelerometerRead[YAW];
 
-  //APLICA O AJUSTE DO ACELEROMETRO
-  ApplySensorAlignment(IMU.AccelerometerRead);
-
 #ifdef __AVR_ATmega2560__
   //APLICA O FILTRO MEDIA MOVEL
   IMU.AccelerometerRead[ROLL] = AccRollAverage.Apply(IMU.AccelerometerReadNotFiltered[ROLL]);
   IMU.AccelerometerRead[PITCH] = AccPitchAverage.Apply(IMU.AccelerometerReadNotFiltered[PITCH]);
   IMU.AccelerometerRead[YAW] = AccYawAverage.Apply(IMU.AccelerometerReadNotFiltered[YAW]);
 #endif
+
+  //APLICA O AJUSTE DO ACELEROMETRO
+  ApplySensorAlignment(IMU.AccelerometerRead);
 
   //KALMAN
   if (ActiveKalman)

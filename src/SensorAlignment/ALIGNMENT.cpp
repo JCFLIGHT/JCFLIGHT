@@ -18,18 +18,19 @@
 #include "ALIGNMENT.h"
 #include "Math/MATHSUPPORT.h"
 #include "Common/STRUCTS.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 
 static Matrix3x3_Struct SensorRotationMatrix;
 
 static bool SensorAlignmentInit = false;
 static bool WithoutSensorAlignment = true;
 
-//VARIAVEIS DE USO EXTERNO PARA SETAR NOVOS VALORES
 int16_t RollDeciDegrees = 0;
 int16_t PitchDeciDegrees = 0;
 int16_t YawDeciDegrees = 0;
 
-static inline Vector3x3_Struct *RotationMatrixRotateVector(Vector3x3_Struct *Result, const Vector3x3_Struct *VectorPointer, const Matrix3x3_Struct *RotationMath)
+static inline Vector3x3_Struct *MatrixRotationToVector(Vector3x3_Struct *Result, const Vector3x3_Struct *VectorPointer, const Matrix3x3_Struct *RotationMath)
 {
     Vector3x3_Struct CalcedResult;
     CalcedResult.Roll = RotationMath->Matrix3x3[0][0] * VectorPointer->Roll + RotationMath->Matrix3x3[1][0] * VectorPointer->Pitch + RotationMath->Matrix3x3[2][0] * VectorPointer->Yaw;
@@ -99,6 +100,15 @@ void UpdateSensorAlignment(void)
 
 void ApplySensorAlignment(int16_t *Vector)
 {
+    if (RollDeciDegrees != STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADJUST_ADDR) ||
+        PitchDeciDegrees != STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADJUST_ADDR) ||
+        YawDeciDegrees != STORAGEMANAGER.Read_16Bits(ACC_YAW_ADJUST_ADDR))
+    {
+        RollDeciDegrees = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADJUST_ADDR);
+        PitchDeciDegrees = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADJUST_ADDR);
+        YawDeciDegrees = STORAGEMANAGER.Read_16Bits(ACC_YAW_ADJUST_ADDR);
+        SensorAlignmentInit = false;
+    }
     if (!SensorAlignmentInit)
     {
         UpdateSensorAlignment();
@@ -109,7 +119,7 @@ void ApplySensorAlignment(int16_t *Vector)
         return;
     }
     Vector3x3_Struct IntVector = {.Vector = {Vector[ROLL], Vector[PITCH], Vector[YAW]}};
-    RotationMatrixRotateVector(&IntVector, &IntVector, &SensorRotationMatrix);
+    MatrixRotationToVector(&IntVector, &IntVector, &SensorRotationMatrix);
     Vector[ROLL] = IntVector.Roll;
     Vector[PITCH] = IntVector.Pitch;
     Vector[YAW] = IntVector.Yaw;

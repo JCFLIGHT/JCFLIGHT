@@ -34,8 +34,8 @@ AverageFilterFloat_Size12 Current_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A CO
 #define PREVENT_ARM_LOW_BATT 20     //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
 
 //VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
-float BattVoltageFactor = 237.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
-float Amps_Per_Volt = 17.0f;        //FATOR DE DIVISÃO DA TENSÃO DO PINO ANALOGICO PARA CONVERTER EM CORRENTE (AMPERES)
+float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
+float Amps_Per_Volt = 62.0f;        //FATOR DE MULTIPLICAÇÃO DA TENSÃO DO PINO ANALOGICO PARA CONVERTER EM CORRENTE (AMPERES)
 float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE)
 
 void BATT::Read_Voltage(void)
@@ -62,6 +62,7 @@ void BATT::Read_Voltage(void)
   {
     LowBattPreventArm = false;
   }
+  Do_RTH_With_Low_Batt(LowBattPreventArm);
 }
 
 uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt)
@@ -200,7 +201,7 @@ void BATT::Do_RTH_With_Low_Batt(bool FailSafeBatt)
 void BATT::Read_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  Total_Current = ((ADCPIN.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt;
+  Total_Current = Current_Filter.Apply(((ADCPIN.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
 }
 
 void BATT::Calculate_Total_Mah(void)

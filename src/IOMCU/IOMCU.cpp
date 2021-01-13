@@ -1098,7 +1098,7 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendGyroZFiltered = IMU.GyroscopeRead[PITCH];
     GCSParameters_Two.SendGPSGroundSpeed = GPS_Ground_Speed;
     GCSParameters_Two.SendI2CError = ErrorI2C;
-    GCSParameters_Two.SendAirSpeedValue = AirSpeedCalcedInKM;
+    GCSParameters_Two.SendAirSpeedValue = AirSpeedCalcedInCM;
 }
 
 void GCSClass::WayPoint_Request_Coordinates_Parameters()

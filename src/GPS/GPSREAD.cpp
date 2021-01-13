@@ -299,20 +299,24 @@ void GetAllGPSData(void)
   case MSG_POSLLH:
     GPS_Coordinates_Vector[1] = Buffer.PositionLLH.longitude;
     GPS_Coordinates_Vector[0] = Buffer.PositionLLH.latitude;
-    GPS_Altitude = Buffer.PositionLLH.altitude_msl / 10 / 100;
+    GPS_Altitude = Buffer.PositionLLH.altitude_msl / 1000;
     GPS_3DFIX = Next_GPSFix;
     break;
 
   case MSG_STATUS:
     Next_GPSFix = ((Buffer.Solution.fix_status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.fix_type == FIX_3D));
     if (!Next_GPSFix)
+    {
       GPS_3DFIX = false;
+    }
     break;
 
   case MSG_SOL:
     Next_GPSFix = (Buffer.Solution.fix_status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.fix_type == FIX_3D);
     if (!Next_GPSFix)
+    {
       GPS_3DFIX = false;
+    }
     GPS_NumberOfSatellites = Buffer.Solution.satellites;
     GPS_HDOP = Buffer.Solution.position_DOP;
     break;

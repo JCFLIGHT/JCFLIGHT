@@ -49,13 +49,13 @@ void Medium_Loop()
         PrintlnParameters();
         Manual_Trim_Servo_Update();
         Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDE_HOLD_MODE]);
+        BATTERY.Read_Voltage();
+        BATTERY.Read_Current();
 }
 
 void Fast_Medium_Loop()
 {
         BEEPER.Run();
-        BATTERY.Read_Voltage();
-        BATTERY.Read_Current();
         Pre_Arm_Leds();
         GimbalControll();
         CrashCheck();

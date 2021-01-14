@@ -52,15 +52,15 @@ void ConfigurePPMRegisters()
   //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
   if (ReceiverModel <= 7)
   {
-    PPMChannelMap[0] = PITCH;
-    PPMChannelMap[1] = ROLL;
+    PPMChannelMap[0] = ROLL;
+    PPMChannelMap[1] = PITCH;
     PPMChannelMap[2] = THROTTLE;
     PPMChannelMap[3] = YAW;
   }
   else
   { //FUTABA OU D4R-II
-    PPMChannelMap[0] = ROLL;
-    PPMChannelMap[1] = PITCH;
+    PPMChannelMap[0] = PITCH;
+    PPMChannelMap[1] = ROLL;
     PPMChannelMap[2] = THROTTLE;
     PPMChannelMap[3] = YAW;
   }

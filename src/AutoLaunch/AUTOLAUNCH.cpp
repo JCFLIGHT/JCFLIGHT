@@ -167,7 +167,7 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
   }
 }
 
-int16_t CalculeControllToRoll(float AngleInDegrees, int16_t InclinationMaxOfStabilize)
+int16_t CalculeControllToPitch(float AngleInDegrees, int16_t InclinationMaxOfStabilize)
 {
   AngleInDegrees *= 10;
   AngleInDegrees = Constrain_Float(AngleInDegrees, (float)-InclinationMaxOfStabilize, (float)InclinationMaxOfStabilize);
@@ -183,16 +183,16 @@ void RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
     if (GetStateOfThrottle())
     {
       //PARA PLANES COM RODAS O PITCH INCLINA QUANDO O THROTTLE CHEGAR EM UM DETERMINADO VALOR
-      RCController[ROLL] = CalculeControllToRoll(-AUTO_LAUNCH_ANGLE, 300);
-      RCController[PITCH] = 0;
+      RCController[ROLL] = 0;
+      RCController[PITCH] = CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
       RCController[YAW] = 0;
     }
   }
   else
   {
     //PARA PLANES SEM RODAS O PITCH FICA SEMPRE INCLINADO
-    RCController[ROLL] = CalculeControllToRoll(-AUTO_LAUNCH_ANGLE, 300);
-    RCController[PITCH] = 0;
+    RCController[ROLL] = 0;
+    RCController[PITCH] = CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
     RCController[YAW] = 0;
   }
 }

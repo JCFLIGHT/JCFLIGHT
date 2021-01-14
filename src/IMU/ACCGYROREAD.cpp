@@ -214,7 +214,7 @@ void Acc_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(0x68, 0x3B);
-  IMU.AccelerometerRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]) >> 3;
+  IMU.AccelerometerRead[ROLL] = -((BufferData[0] << 8) | BufferData[1]) >> 3;
   IMU.AccelerometerRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
   IMU.AccelerometerRead[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
 #elif defined ESP32

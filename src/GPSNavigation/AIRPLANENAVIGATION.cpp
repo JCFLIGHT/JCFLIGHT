@@ -245,19 +245,19 @@ void PlaneUpdateNavigation(void)
 
 void PlaneResetNavigation(void)
 {
+  ThrottleBoost = 0;
   IntegralErrorOfNavigation = 0;
   IntegralErrorOfAltitude = 0;
   PreviousAltitudeDifference = 0;
   PreviousHeadingDifference = 0;
-  ThrottleBoost = 0;
   AltitudeVector[0] = 0;
-  NavigationDifferenceVector[0] = 0;
   AltitudeVector[1] = 0;
-  NavigationDifferenceVector[1] = 0;
   AltitudeVector[2] = 0;
-  NavigationDifferenceVector[2] = 0;
   AltitudeVector[3] = 0;
-  NavigationDifferenceVector[3] = 0;
   AltitudeVector[4] = 0;
+  NavigationDifferenceVector[0] = 0;
+  NavigationDifferenceVector[1] = 0;
+  NavigationDifferenceVector[2] = 0;
+  NavigationDifferenceVector[3] = 0;
   NavigationDifferenceVector[4] = 0;
 }

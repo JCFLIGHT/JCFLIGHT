@@ -129,7 +129,7 @@ uint8_t PreArmClass::Checking(void)
         return GYRO_EEROR;
     }
 
-    if (CheckInclinationForCopter()) //INCLINAÇÃO DE 25 GRAUS DETECTADA
+    if (CheckInclinationForArm()) //INCLINAÇÃO DE 25 GRAUS DETECTADA
     {
         return INCLINATION_ERROR;
     }

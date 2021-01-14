@@ -92,7 +92,9 @@ static bool ValidateQuaternion(const Struct_Quaternion *Quaternion)
     return true;
   const float normSq = QuaternionNormalizedSquared(&Orientation);
   if (normSq > (1.0f - 1e-6f) && normSq < (1.0f + 1e-6f))
+  {
     return true;
+  }
   return false;
 }
 
@@ -111,7 +113,9 @@ static void CheckAndResetOrientationQuaternion(const Struct_Quaternion *Quaterni
 {
   //CHECA SE O QUATERNION ESTÁ NORMAL
   if (ValidateQuaternion(&Orientation))
+  {
     return;
+  }
   //ORIENTAÇÃO INVALIDA,É NECESSARIO RESETAR O QUATERNION
   if (ValidateQuaternion(Quaternion))
   {
@@ -210,10 +214,14 @@ static void MahonyAHRSUpdate(float DeltaTime,
 
       //USE O COG DO GPS PARA CALCULAR O HEADING
       while (CourseOverGround > 3.14159265358979323846f)
+      {
         CourseOverGround -= (2.0f * 3.14159265358979323846f);
+      }
 
       while (CourseOverGround < -3.14159265358979323846f)
+      {
         CourseOverGround += (2.0f * 3.14159265358979323846f);
+      }
 
       //CALCULA O VALOR DE HEADING COM BASE NO COG
       Struct_Vector3x3 vCoG = {.Vector = {-Fast_Cosine(CourseOverGround), Fast_Sine(CourseOverGround), 0.0f}};
@@ -316,13 +324,19 @@ static float CalculateAccelerometerWeight(const float DeltaTime)
 static void ComputeQuaternionFromRPY(int16_t initialRoll, int16_t initialPitch, int16_t initialYaw)
 {
   if (initialRoll > 1800)
+  {
     initialRoll -= 3600;
+  }
 
   if (initialPitch > 1800)
+  {
     initialPitch -= 3600;
+  }
 
   if (initialYaw > 1800)
+  {
     initialYaw -= 3600;
+  }
 
   const float cosRoll = Fast_Cosine(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
   const float sinRoll = Fast_Sine(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
@@ -433,10 +447,14 @@ void AHRS_Update()
   ATTITUDE.AngleOut[YAW] = ConvertDeciDegreesToDegrees(ATTITUDE.CompassHeading);
 }
 
+float CosineAHRSTiltAngle(void)
+{
+  return 1.0f - 2.0f * SquareFloat(Orientation.q1) - 2.0f * SquareFloat(Orientation.q2);
+}
+
 bool CheckAnglesInclination(int16_t Angle)
 {
-  Angle = Angle * 10;
-  if ((ABS_16BITS(ATTITUDE.AngleOut[ROLL]) > Angle) || (ABS_16BITS(ATTITUDE.AngleOut[PITCH]) > Angle))
+  if (CosineAHRSTiltAngle() < Fast_Cosine(ConvertToRadians(Angle)))
   {
     return true;
   }

@@ -33,7 +33,7 @@ void UpdateStateOfHeadingHold(void)
 {
   if (!COMMAND_ARM_DISARM)
   {
-    HeadingHoldRateFilter.State = 0.0f;           //RESETA O FILTRO
+    HeadingHoldRateFilter.State = 0.0f;         //RESETA O FILTRO
     HeadingHoldTarget = ATTITUDE.AngleOut[YAW]; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
   }
 }

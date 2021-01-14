@@ -18,7 +18,7 @@
 #ifndef STATES_H_
 #define STATES_H_
 #include "Arduino.h"
-bool CheckInclinationForCopter(void);
+bool CheckInclinationForArm(void);
 bool StickStateToArm(void);
 bool StickStateToDisarm(void);
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue);

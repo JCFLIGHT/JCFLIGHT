@@ -22,7 +22,7 @@
 #include "AHRS/AHRS.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
-bool CheckInclinationForCopter(void)
+bool CheckInclinationForArm(void)
 {
     if (GetFrameStateOfAirPlane())
     {

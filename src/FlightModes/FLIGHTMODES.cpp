@@ -73,7 +73,7 @@ void FlightModesUpdate()
   {
     if (!Do_HeadingHold_Mode)
     {
-      HeadingHoldTarget = ATTITUDE.CalculedHeading;
+      HeadingHoldTarget = ATTITUDE.AngleOut[YAW];
       Do_HeadingHold_Mode = true;
     }
   }

@@ -117,7 +117,7 @@ void PrintlnParameters()
 
 #if defined(PRINTLN_ATTITUDE)
   FastSerialPrintln(PSTR("Pitch:%d Roll:%d Yaw:%d\n"),
-                    ATTITUDE.AngleOut[PITCH], ATTITUDE.AngleOut[ROLL], ATTITUDE.CalculedHeading);
+                    ATTITUDE.AngleOut[PITCH], ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[YAW]);
 #endif
 
 #if defined(PRINTLN_BATTERY)
@@ -628,7 +628,7 @@ void PrintlnParameters()
   Serial.print("  ");
   Serial.print(ATTITUDE.AngleOut[PITCH]);
   Serial.print("  ");
-  Serial.println(ATTITUDE.CalculedHeading);
+  Serial.println(ATTITUDE.AngleOut[YAW]);
   */
 
   //Serial.println(STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR));

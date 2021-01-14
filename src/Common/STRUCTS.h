@@ -51,8 +51,7 @@ typedef struct
 
 typedef struct
 {
-  int16_t AngleOut[2];
-  int16_t CalculedHeading;
+  int16_t AngleOut[3];
   int16_t CompassHeading;
 } ATTITUDE_STRUCT;
 

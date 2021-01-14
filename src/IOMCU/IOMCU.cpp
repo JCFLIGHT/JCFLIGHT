@@ -1014,7 +1014,7 @@ void GCSClass::GCS_Request_Parameters()
     }
     if (I2C.CompassFound)
     {
-        GCSParameters.SendAttitudeYaw = ATTITUDE.CalculedHeading;
+        GCSParameters.SendAttitudeYaw = ATTITUDE.AngleOut[YAW];
     }
     else
     {

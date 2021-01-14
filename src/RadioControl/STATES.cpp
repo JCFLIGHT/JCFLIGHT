@@ -25,10 +25,14 @@
 bool CheckInclinationForCopter(void)
 {
     if (GetFrameStateOfAirPlane())
+    {
         return false; //PULA A CHECAGEM DE INCLINAÇÃO NO MODO PLANE
+    }
     if (GetFrameStateOfMultirotor() && CheckAnglesInclination(25))
+    {
         return true; //INVALIDA O ARMAMENTO DO SISTEMA SE HOUVER INCLINAÇÃO NOS EIXOS
-    return false;    //INCLINAÇÃO NÃO DETECTADA
+    }
+    return false; //INCLINAÇÃO NÃO DETECTADA
 }
 
 bool StickStateToArm(void)
@@ -43,8 +47,8 @@ bool StickStateToDisarm(void)
 {
     return (Throttle.Output) < 1100 &&
            (Yaw.Output < 1100) &&
-           (Pitch.Output > 1900) &&
-           (Roll.Output < 1100);
+           (Pitch.Output < 1100) &&
+           (Roll.Output > 1900);
 }
 
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue)

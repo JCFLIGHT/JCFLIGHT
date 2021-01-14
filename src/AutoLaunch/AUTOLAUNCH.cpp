@@ -25,7 +25,6 @@
 #include "AHRS/VECTOR.h"
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "FastSerial/PRINTF.h"
 
 #define AHRS_BANKED_ANGLE 25                                 //25 GRAUS MAXIMO DE BANK ANGLE (CONSIDERANDO EM RADIANOS = 436)
 #define IMU_BANKED_ANGLE -450.0f                             //-45 GRAUS DE INCLINAÇÃO NA IMU
@@ -53,24 +52,25 @@ uint32_t AbortAutoLaunch = 0;
 
 const float GetPitchAccelerationInMSS()
 {
-  return BodyFrameAcceleration.Pitch;
+  return BodyFrameAcceleration.Roll; //????
 }
 
 const bool GetSwingVelocityState()
 {
-  const float SwingVelocity = (ABS_FLOAT(BodyFrameRotation.Yaw) * 10 > SWING_LAUNCH_MIN_ROTATION_RATE) ? (BodyFrameAcceleration.Pitch / BodyFrameRotation.Yaw) : 0;
-  return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (BodyFrameAcceleration.Roll > 0);
+  const float SwingVelocity = (ABS_FLOAT(BodyFrameRotation.Yaw) * 10 > SWING_LAUNCH_MIN_ROTATION_RATE) ? (BodyFrameAcceleration.Roll / BodyFrameRotation.Yaw) : 0;
+  return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (BodyFrameAcceleration.Pitch > 0);
 }
 
 void AutoLaunchDetector()
 {
-  if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), CheckAnglesInclination(AHRS_BANKED_ANGLE)) ||
-      GetSwingVelocityState())
+  if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), CheckAnglesInclination(AHRS_BANKED_ANGLE)) || GetSwingVelocityState())
   {
     AutoLaunchDetectorSum += (SCHEDULER.GetMillis() - AutoLaunchDetectorPreviousTime);
     AutoLaunchDetectorPreviousTime = SCHEDULER.GetMillis();
     if (AutoLaunchDetectorSum >= 40)
+    {
       AutoLaunchState = true;
+    }
   }
   else
   {
@@ -101,17 +101,25 @@ void Auto_Launch_Update()
       {
         AutoLaunchState = true;
         if (!COMMAND_ARM_DISARM)
+        {
           COMMAND_ARM_DISARM = true;
+        }
         RCControllerThrottle_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
       }
       if (AutoLaunchState)
       {
         if (PlaneType == WITHOUT_WHEELS)
+        {
           RCControllerThrottle_Apply_Logic(false); //FALSE PARA PLANES SEM TREM DE POUSO
+        }
         if (PlaneType == WITH_WHEELS)
+        {
           RCControllerYawPitchRoll_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
+        }
         if (!COMMAND_ARM_DISARM)
+        {
           COMMAND_ARM_DISARM = true;
+        }
         if (AutoLaunchCompleted())
         {
           LaunchedDetect = true;
@@ -124,11 +132,15 @@ void Auto_Launch_Update()
         AutoLaunchDetector();
       }
       if (PlaneType == WITHOUT_WHEELS && !LaunchedDetect)
+      {
         RCControllerYawPitchRoll_Apply_Logic(false); //A FUNÇÃO FICA SEMPRE ATIVA PARA PLANES SEM TREM DE POUSO
+      }
     }
   }
   if (!COMMAND_ARM_DISARM && !GetValidStateToRunLaunch())
+  {
     ResetParameters();
+  }
 }
 
 void RCControllerThrottle_Apply_Logic(bool SlowThr)
@@ -141,9 +153,13 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
       if (IgnoreFirstPeak)
       {
         if (ThrottleIteration < AUTO_LAUNCH_THROTTLE_MAX)
+        {
           ThrottleIteration += MOTOR_SPINUP_VALUE;
+        }
         else
+        {
           ThrottleIteration = AUTO_LAUNCH_THROTTLE_MAX;
+        }
       }
       IgnoreFirstPeak = true;
       ThrottleStart = SCHEDULER.GetMillis();
@@ -159,11 +175,15 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
         BEEPER.Silence();
       }
       else
+      {
         ThrottleStart = SCHEDULER.GetMillis();
+      }
       IgnoreFirstPeak = true;
     }
     else
+    {
       RCController[THROTTLE] = MotorSpeed; //VAMOS MANTER A VELOCIDADE MINIMA DEFINIDA PELO USUARIO
+    }
   }
 }
 
@@ -217,9 +237,13 @@ bool AutoLaunchTimerOverFlow()
   if (SCHEDULER.GetMillis() - AbortAutoLaunch >= AUTO_LAUCH_EXIT_FUNCTION)
   {
     if (!IgnoreFirstPeakOverFlow)
+    {
       AbortAutoLaunch = SCHEDULER.GetMillis();
+    }
     if (IgnoreFirstPeakOverFlow)
+    {
       return true;
+    }
     IgnoreFirstPeakOverFlow = true;
   }
   return false;
@@ -232,10 +256,13 @@ bool AutoLaunchMaxAltitudeReached(void)
 
 bool AutoLaunchCompleted()
 {
-  if (AUTO_LAUCH_EXIT_FUNCTION == 0) //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
+  //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
+  if (AUTO_LAUCH_EXIT_FUNCTION == 0)
+  {
     return (SticksDeflected(15)) || (AutoLaunchMaxAltitudeReached());
-  else
-    return (AutoLaunchTimerOverFlow()) || (SticksDeflected(15)) || (AutoLaunchMaxAltitudeReached());
+  }
+  //FAÇA A MESMA VERIFICAÇÃO DE CIMA,PORÉM COM O ESTOURO DO TEMPO MAXIMO DE LAUNCH
+  return (AutoLaunchTimerOverFlow()) || (SticksDeflected(15)) || (AutoLaunchMaxAltitudeReached());
 }
 
 void ResetParameters()

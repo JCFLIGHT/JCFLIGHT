@@ -74,7 +74,9 @@ uint32_t SchedulerTimeClass::GetMicros()
   MillisCount = Timer0_OverFlow;
   TCNTCount = TCNT0;
   if ((TIFR0 & _BV(TOV0)) && (TCNTCount < 255))
+  {
     MillisCount++;
+  }
   SREG = oldSREG;
   return ((MillisCount << 8) + TCNTCount) * 4;
 }
@@ -90,7 +92,9 @@ void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
     {
       MillisSeconds--;
       if (MillisSeconds == 0)
+      {
         break;
+      }
       Start += 1000;
     }
   }

@@ -97,7 +97,9 @@ void FlipModeRun()
   }
 
   if (FlipDirection == 0)
+  {
     return; //NÃO FAZ O QUE ESTÁ ABAIXO SE FLIP DIRECTION FOR IGUAL A ZERO
+  }
 
   //ESTADO DE MAQUINA
   switch (FlipState)
@@ -117,9 +119,13 @@ void FlipModeRun()
   case STAGETHREE:
     FlipAngleValue = FLIP_ROTATION_RATE * FlipDirection;
     if (ApplyFlipPitch)
+    {
       FlipRollPitchAxis(true, PITCH);
+    }
     if (ApplyFlipRoll)
+    {
       FlipRollPitchAxis(true, ROLL);
+    }
     RadioControllOutput[THROTTLE] -= THROTTLE_DECREMENT;
     FlipTimer = 0;
     FlipState = STAGERECOVER;
@@ -158,7 +164,9 @@ void FlipModeRun()
     LockPitchAndRollRC = false;
     RecoverThrottle = 0;
     if (FlipDirection != 0)
+    {
       FlipState = STAGEONE;
+    }
     break;
   }
 }

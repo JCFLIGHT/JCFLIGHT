@@ -79,8 +79,11 @@ void ConfigurePPMRegisters()
 extern "C" void __vector_11(void) __attribute__((signal, __INTR_ATTRS));
 void __vector_11(void)
 {
-  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) ||
+      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
+  {
     return;
+  }
   if ((*(volatile uint8_t *)(0x106)) & 128)
   {
     InterruptRoutine();
@@ -108,7 +111,9 @@ void IRAM_ATTR InterruptRoutine(void)
   PPMTimerDifference = PPMTimer - PPMStoredTimer;
   PPMStoredTimer = PPMTimer;
   if (PPMTimerDifference > 2700)
+  {
     Channels = RESET_PPM;
+  }
   else
   {
     if (PPMTimerDifference > 750 && PPMTimerDifference < 2250)
@@ -122,9 +127,13 @@ void IRAM_ATTR InterruptRoutine(void)
       {
         CheckFailSafe = 0;
         if (Fail_Safe_System > 20)
+        {
           Fail_Safe_System -= 20;
+        }
         else
+        {
           Fail_Safe_System = 0;
+        }
       }
     }
     Channels++;
@@ -167,7 +176,9 @@ void DecodeAllReceiverChannels()
   uint16_t RadioControllOutputDecoded;
   TYPRIndex++;
   if (TYPRIndex == 3)
+  {
     TYPRIndex = 0;
+  }
   for (uint8_t Channels = 0; Channels < 12; Channels++)
   {
     RadioControllOutputDecoded = LearningAllChannels(Channels);
@@ -192,12 +203,18 @@ void DecodeAllReceiverChannels()
       {
         RadioControllOutputMeasured = RadioControllOutputDecoded;
         for (uint8_t TYPR = 0; TYPR < 3; TYPR++)
+        {
           RadioControllOutputMeasured += RadioControllOutputTYPR[Channels][TYPR];
+        }
         RadioControllOutputMeasured = (RadioControllOutputMeasured + 2) / 4;
         if (RadioControllOutputMeasured < (uint16_t)DirectRadioControllRead[Channels] - 3)
+        {
           DirectRadioControllRead[Channels] = RadioControllOutputMeasured + 2;
+        }
         if (RadioControllOutputMeasured > (uint16_t)DirectRadioControllRead[Channels] + 3)
+        {
           DirectRadioControllRead[Channels] = RadioControllOutputMeasured - 2;
+        }
         RadioControllOutputTYPR[Channels][TYPRIndex] = RadioControllOutputDecoded;
       }
     }

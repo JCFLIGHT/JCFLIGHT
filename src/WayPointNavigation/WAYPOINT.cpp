@@ -202,7 +202,9 @@ void WayPointRun()
   }
 
   if (WayPointLatitude[0] == 0 || WayPointLongitude[0] == 0)
+  {
     return;
+  }
 
   switch (WayPointMode)
   {
@@ -215,9 +217,13 @@ void WayPointRun()
         WayPointFlightMode[3] == WP_TAKEOFF || WayPointFlightMode[4] == WP_TAKEOFF || WayPointFlightMode[5] == WP_TAKEOFF ||
         WayPointFlightMode[6] == WP_TAKEOFF || WayPointFlightMode[7] == WP_TAKEOFF || WayPointFlightMode[8] == WP_TAKEOFF ||
         WayPointFlightMode[9] == WP_TAKEOFF)
+    {
       WayPointMode = GET_ALTITUDE_TAKEOFF;
+    }
     else
+    {
       WayPointMode = GET_ALTITUDE;
+    }
     break;
 
   case GET_ALTITUDE_TAKEOFF:
@@ -247,7 +253,9 @@ void WayPointRun()
     SetThisPointToPositionHold();
     NavigationMode = Do_PositionHold;
     if (GetAltitudeReached())
+    {
       WayPointMode = WP_START_MISSION;
+    }
     break;
 
   case WP_START_MISSION:
@@ -329,7 +337,9 @@ void WayPointRun()
         GPS_Flight_Mode = WAYPOINT;
         NavigationMode = Do_PositionHold;
         if (Mission_Timed_Count >= WayPointTimed[MissionNumber] * THIS_LOOP_RATE)
+        {
           WayPointMode = GET_ALTITUDE;
+        }
       }
       //LAND
       if (WayPointFlightMode[MissionNumber] == WP_LAND)
@@ -356,14 +366,20 @@ void AutoTakeOff(bool _TAKEOFF)
   Auto_TakeOff = _TAKEOFF;
   Cancel_Arm_Disarm = _TAKEOFF;
   if (!_TAKEOFF)
+  {
     return;
+  }
   ThrottleIncrementCount++;
   if (ThrottleIncrementCount >= THROTTLE_INCREMENT_TIME)
   {
     if (Normalize_Throttle_TakeOff)
+    {
       ThrottleIncrement = THROTTLE_TAKEOFF_NORMALIZE;
+    }
     if (ThrottleIncrement < THROTTLE_TAKEOFF_ASCENT && !Normalize_Throttle_TakeOff)
+    {
       ThrottleIncrement += THROTTLE_INCREMENT;
+    }
     ThrottleIncrementCount = 0;
   }
 }

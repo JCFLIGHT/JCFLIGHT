@@ -62,61 +62,99 @@ void Switch_Flag(void)
     CR_Clear = SCHEDULER.GetMillis();
   }
   if (CloseReset < 0)
+  {
     CloseReset = 0; //EVITA GUARDAR VALORES NEGATIVOS CAUSADO PELA DECREMENTAÇÃO DA FUNÇÃO ACIMA
+  }
   //RESETA A FLAG SE O VALOR DELA FOR IGUAL A 8,E A CHAVE AUX DO MODO IOC FOR FALSA
   if (FlagParameterFunction == 8 && !IOCControlAux)
+  {
     FlagParameterFunction = 0;
+  }
   //ESPERA A DECREMENTAÇÃO DA VARIAVEL ACABAR E RESETA A FLAG PRINCIPAL
   if (!IOCControlAux && CloseReset == 0)
+  {
     FlagParameterFunction = 0;
+  }
   //FLAG PRINCIPAL IGUAL A 4?CHAVE AUX ATIVADA?CAL DO MAG ACABOU?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
   if (FlagParameterFunction == 4 && IOCControlAux && !CalibratingCompass)
+  {
     GuardValue = FlagParameterFunction;
+  }
   //FLAG PRINCIPAL IGUAL A 8?CHAVE AUX ATIVADA?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
   if (FlagParameterFunction == 8 && IOCControlAux)
+  {
     GuardValue = FlagParameterFunction;
+  }
   if (COMMAND_ARM_DISARM)
   { //CONTROLADORA ARMADA?SIM...
     //O VALOR GUARDADO É IGUAL A 4?E A DECREMENTAÇÃO ACABOU?SIM...INICIA O SAVE-TRIM
     if (GuardValue == 4 && CloseReset < 2.51f)
+    {
       SaveTrimState = 1;
+    }
     //O VALOR GUARDADO É IGUAL A 6?E A DECREMENTAÇÃO ACABOU?SIM...DESATIVA O SAVE-TRIM
     if (GuardValue == 6 && CloseReset < 2.51f)
+    {
       GuardValue = SaveTrimState = 0;
+    }
   }
-  else
-  { //CONTROLADORA DESARMADA?SIM...
+  else //CONTROLADORA DESARMADA?SIM...
+  {
     if (GuardValue == 8 && CloseReset > 2 && CloseReset < 4)
+    {
       CalibratingCompass = true; //O VALOR GUARDADO É IGUAL A 8?E A DECREMENTAÇÃO ACABOU?SIM...INICIA A CALIBRAÇÃO DO COMPASS
+    }
     if (GuardValue == 8 && CloseReset == 2)
+    {
       GuardValue = 0;
+    }
     //ATIVA O SERVOTRIM
     if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
+    {
       OkToTrimServo = true;
+    }
     //DESATIVA O SERVOTRIM
     if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
+    {
       GuardValue = OkToTrimServo = 0;
+    }
   }
   //O VALOR GUARDADO É IGUAL A 12?E A DECREMENTAÇÃO ACABOU?SIM...SE O SAVE-TRIM ESTIVER ATIVADO NÃO LIMPA A FLAG,CASO CONTRARIO LIMPA
   if (GuardValue == 12 && CloseReset == 0)
   {
     if (SaveTrimState == 1 || OkToTrimServo)
+    {
       GuardValue = 4;
+    }
     else
+    {
       GuardValue = 0;
+    }
   }
   ////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////LIMPEZA DE FLAG///////////////////////////////////
   if (GuardValue == 5 && CloseReset == 0)
+  {
     GuardValue = 0;
+  }
   else if (GuardValue == 7 && CloseReset == 0)
+  {
     GuardValue = 0;
+  }
   else if (GuardValue == 9 && CloseReset == 0)
+  {
     GuardValue = 0;
+  }
   else if (GuardValue == 10 && CloseReset == 0)
+  {
     GuardValue = 0;
+  }
   else if (GuardValue == 11 && CloseReset == 0)
+  {
     GuardValue = 0;
+  }
   else if (GuardValue == 13 && CloseReset == 0)
+  {
     GuardValue = 0;
+  }
 }

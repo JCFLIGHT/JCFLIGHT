@@ -73,7 +73,9 @@ void SAFETYBUTTONCLASS::FlashButton()
     {
         Pattern = Led_Pattern::FMU_INIT_ARM;
         if (DetectRise == FIRST_CYCLE_COUNT + 1)
+        {
             BEEPER.Play(BEEPER_FMU_INIT);
+        }
         if (GetButtonState())
         {
             WaitToNextProcess = true;
@@ -82,7 +84,9 @@ void SAFETYBUTTONCLASS::FlashButton()
         else
         {
             if (!WaitToNextProcess)
+            {
                 DetectRise = FIRST_CYCLE_COUNT + 1;
+            }
         }
     }
     else if (DetectRise > SECOND_CYCLE_COUNT && DetectRise < RESET_CYCLE_COUNT) //VERIFICAÇÃO 2
@@ -101,7 +105,9 @@ void SAFETYBUTTONCLASS::FlashButton()
         else
         {
             if (!WaitToNextProcess)
+            {
                 DetectRise = SECOND_CYCLE_COUNT + 1;
+            }
         }
     }
     else if (DetectRise > RESET_CYCLE_COUNT) //RESET
@@ -122,7 +128,9 @@ void SAFETYBUTTONCLASS::FlashButton()
             else
             {
                 if (DetectRise > RESET_CYCLE_COUNT + 1)
+                {
                     DetectRise = MAX_BUTTON_COUNT - 2;
+                }
             }
         }
     }
@@ -133,7 +141,9 @@ void SAFETYBUTTONCLASS::UpdateLedStatus(enum Led_Pattern Instance)
 {
     SetStateToLed(((uint16_t)Instance & (1 << (Blink_Counter++ / 3))));
     if (Blink_Counter > 45)
+    {
         Blink_Counter = 0;
+    }
 }
 
 void SAFETYBUTTONCLASS::SetStateToLed(bool State)
@@ -151,7 +161,9 @@ void SAFETYBUTTONCLASS::SetStateToLed(bool State)
 bool SAFETYBUTTONCLASS::GetSafeStateToOutput()
 {
     if (!SafeButtonEnabled())
+    {
         return true;
+    }
     return SafeStateToApplyPulse;
 }
 
@@ -167,13 +179,13 @@ bool SAFETYBUTTONCLASS::SafeButtonEnabled()
 
 void SAFETYBUTTONCLASS::UpdateRoutine(void)
 {
-    if (!SafeButtonEnabled())
+    if (!SafeButtonEnabled() || !GetButtonInterval() || COMMAND_ARM_DISARM)
+    {
         return;
-    if (!GetButtonInterval())
-        return;
-    if (COMMAND_ARM_DISARM)
-        return;
+    }
     FlashButton();
     if (!GetButtonState() && DetectRise < MAX_BUTTON_COUNT)
+    {
         DetectRise++;
+    }
 }

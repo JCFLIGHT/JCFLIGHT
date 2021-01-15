@@ -20,12 +20,12 @@
 #include "Arduino.h"
 void ResetXYState();
 void CorrectXYStateWithGPS(float *DeltaTime);
-void updateXYState(float *DeltaTime);
+void UpdateXYState(float *DeltaTime);
 void SaveXYPositionToHistory();
 void ResetZState();
 void CorrectZStateWithBaro(float *DeltaTime);
 void UpdateZState(float *DeltaTime);
-void saveZPositionToHistory();
+void SaveZPositionToHistory();
 void CalculateXY_INS();
 void INS_Calculate_AccelerationZ();
 void UpdateAccelerationEarthFrame_Filtered(uint8_t ArrayCount);

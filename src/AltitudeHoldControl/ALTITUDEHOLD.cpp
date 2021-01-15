@@ -56,11 +56,11 @@ bool ApplyAltitudeHoldControl()
           {
             HoveringState = false;
           }
-          SetAltitudeHold(ALTITUDE.EstimateAltitude);
+          SetAltitudeHold(ALTITUDE.EstimatedAltitude);
           TargetVariometer = 50;
-          if (ALTITUDE.EstimateAltitude > 500)
+          if (ALTITUDE.EstimatedAltitude > 500)
           {
-            TargetVariometer += (int32_t)200 * (ALTITUDE.EstimateAltitude - 500) / (RTH_Altitude * 100 - 500);
+            TargetVariometer += (int32_t)200 * (ALTITUDE.EstimatedAltitude - 500) / (RTH_Altitude * 100 - 500);
           }
           TargetVariometer = -TargetVariometer;
         }
@@ -70,8 +70,8 @@ bool ApplyAltitudeHoldControl()
           {
             HoveringState = true;
           }
-          TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimateAltitude) * 3) / 2;
-          if (ALTITUDE.EstimateAltitude > 500)
+          TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimatedAltitude) * 3) / 2;
+          if (ALTITUDE.EstimatedAltitude > 500)
           {
             TargetVariometer = Constrain_32Bits(TargetVariometer, -250, 250);
           }
@@ -96,13 +96,17 @@ bool ApplyAltitudeHoldControl()
         }
         else
         {
-          if ((ThrottleDifference > 70) && (ALTITUDE.EstimateVariometer >= 15))
+          if ((ThrottleDifference > 70) && (ALTITUDE.EstimatedVariometer >= 15))
+          {
             TakeOffInProgress = false;
+          }
         }
         if (TakeOffInProgress || (ABS_16BITS(ThrottleDifference) > 70))
         {
           if (HoveringState)
+          {
             HoveringState = false;
+          }
           if (ABS_16BITS(ThrottleDifference) <= 70)
           {
             TargetVariometer = 0;
@@ -117,9 +121,9 @@ bool ApplyAltitudeHoldControl()
           if (!HoveringState)
           {
             HoveringState = true;
-            AltitudeToHold = ALTITUDE.EstimateAltitude;
+            AltitudeToHold = ALTITUDE.EstimatedAltitude;
           }
-          TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimateAltitude) * 3) / 2;
+          TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimatedAltitude) * 3) / 2;
         }
       }
       ApplyAltitudeHoldPIDControl(AltitudeHoldControlTimer.ActualTime, HoveringState);
@@ -151,7 +155,7 @@ int16_t VariometerErrorIPart = 0;
 void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
 {
   TargetVariometer = Constrain_32Bits(TargetVariometer, -350, 350);
-  int32_t VariometerError = TargetVariometer - ALTITUDE.EstimateVariometer;
+  int32_t VariometerError = TargetVariometer - ALTITUDE.EstimatedVariometer;
   VariometerError = Constrain_32Bits(VariometerError, -600, 600);
   VariometerErrorISum += ((VariometerError * PID[PIDALTITUDE].IntegratorVector * DeltaTime) >> 7) / ((HoveringState && ABS_32BITS(TargetVariometer) < 100) ? 2 : 1);
   VariometerErrorISum = Constrain_32Bits(VariometerErrorISum, -16384000, 16384000);
@@ -189,7 +193,7 @@ void SetAltitudeHold(int32_t ValueOfNewAltitudeHold)
 
 bool GetAltitudeReached()
 {
-  return ABS_32BITS(AltitudeToHold - ALTITUDE.EstimateAltitude) < 50;
+  return ABS_32BITS(AltitudeToHold - ALTITUDE.EstimatedAltitude) < 50;
 }
 
 bool GroundAltitudeSet = false;
@@ -222,7 +226,7 @@ void ResetLandDetector()
 
 bool GetGroundDetected()
 {
-  return (ABS_16BITS(ALTITUDE.EstimateVariometer) < 15) && (VariometerErrorIPart <= -185) && (ALTITUDE.EstimateAltitude < 500);
+  return (ABS_16BITS(ALTITUDE.EstimatedVariometer) < 15) && (VariometerErrorIPart <= -185) && (ALTITUDE.EstimatedAltitude < 500);
 }
 
 bool GetGroundDetectedFor100ms()

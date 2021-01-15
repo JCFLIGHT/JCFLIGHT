@@ -220,7 +220,7 @@ void FlightModesUpdate()
           {
             if (Do_GPS_Altitude)
             {
-              SetAltitudeHold(ALTITUDE.EstimateAltitude);
+              SetAltitudeHold(ALTITUDE.EstimatedAltitude);
             }
             GPS_Flight_Mode = GPS_MODE_NONE;
             NavigationMode = Do_None;
@@ -235,7 +235,7 @@ void FlightModesUpdate()
         {
           if (Do_GPS_Altitude)
           {
-            SetAltitudeHold(ALTITUDE.EstimateAltitude);
+            SetAltitudeHold(ALTITUDE.EstimatedAltitude);
           }
           GPS_Flight_Mode = GPS_MODE_NONE;
         }

@@ -144,7 +144,7 @@ void PrintlnParameters()
 
 #if defined(PRINTLN_BARO)
   FastSerialPrintln(PSTR("BaroFiltered:%ld INSBaro:%ld\n"),
-                    ALTITUDE.RealBaroAltitude, ALTITUDE.EstimateAltitude);
+                    ALTITUDE.RealBaroAltitude, ALTITUDE.EstimatedAltitude);
 #endif
 
 #if defined(PRINTLN_MEMORY)

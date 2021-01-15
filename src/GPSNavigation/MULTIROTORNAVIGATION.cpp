@@ -159,7 +159,7 @@ void GPS_Process_FlightModes(void)
 
     case Do_Land_Init:
       Do_GPS_Altitude = true;
-      SetAltitudeHold(ALTITUDE.EstimateAltitude);
+      SetAltitudeHold(ALTITUDE.EstimatedAltitude);
       Time_To_Start_The_Land = SCHEDULER.GetMillis() + 100;
       NavigationMode = Do_Land_Settle;
       break;
@@ -398,13 +398,13 @@ void Do_Mode_RTH_Now()
 {
   GPS_Flight_Mode = GPS_MODE_RTH;
   Do_GPS_Altitude = true;
-  if (ALTITUDE.EstimateAltitude < RTH_Altitude * 100)
+  if (ALTITUDE.EstimatedAltitude < RTH_Altitude * 100)
   {
     SetAltitudeHold(RTH_Altitude * 100);
   }
   else
   {
-    SetAltitudeHold(ALTITUDE.EstimateAltitude);
+    SetAltitudeHold(ALTITUDE.EstimatedAltitude);
   }
   SetThisPointToPositionHold();
   NavigationMode = Do_Start_RTH;

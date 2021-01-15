@@ -45,13 +45,15 @@ void INS_Calculate_AccelerationZ()
       float DeltaTime = INS_Calculate_AccelerationZTimer.ActualTime * 1e-6f;
       CorrectZStateWithBaro(&DeltaTime);
       UpdateZState(&DeltaTime);
-      saveZPositionToHistory();
+      SaveZPositionToHistory();
       return;
     }
     else
     {
       if (Activated)
+      {
         Activated = false;
+      }
     }
   }
 }
@@ -68,17 +70,19 @@ void UpdateZState(float *DeltaTime)
 {
   float VelocityIncrease = INS.AccelerationEarthFrame_Filtered[2] * *DeltaTime;
   INS.Position_EarthFrame[2] += (INS.Velocity_EarthFrame[2] + VelocityIncrease * 0.5) * *DeltaTime;
-  ALTITUDE.EstimateAltitude = INS.Position_EarthFrame[2];
+  ALTITUDE.EstimatedAltitude = INS.Position_EarthFrame[2];
   INS.Velocity_EarthFrame[2] += VelocityIncrease;
-  ALTITUDE.EstimateVariometer = INS.Velocity_EarthFrame[2];
+  ALTITUDE.EstimatedVariometer = INS.Velocity_EarthFrame[2];
 }
 
-void saveZPositionToHistory()
+void SaveZPositionToHistory()
 {
-  HistoryZPosition[HistoryZCount] = ALTITUDE.EstimateAltitude;
+  HistoryZPosition[HistoryZCount] = ALTITUDE.EstimatedAltitude;
   HistoryZCount++;
   if (HistoryZCount >= 10)
+  {
     HistoryZCount = 0;
+  }
 }
 
 void ResetZState()
@@ -87,7 +91,9 @@ void ResetZState()
   INS.Velocity_EarthFrame[2] = 0.0f;
   HistoryZCount = 0;
   for (uint8_t i = 0; i < 10; i++)
+  {
     HistoryZPosition[i] = 0;
+  }
 }
 
 uint8_t HistoryXYCount;
@@ -110,14 +116,16 @@ void CalculateXY_INS()
       }
       float DeltaTime = CalculateXY_INSTimer.ActualTime * 1e-6f;
       CorrectXYStateWithGPS(&DeltaTime);
-      updateXYState(&DeltaTime);
+      UpdateXYState(&DeltaTime);
       SaveXYPositionToHistory();
       return;
     }
     else
     {
       if (Activated)
+      {
         Activated = false;
+      }
     }
   }
 }
@@ -138,7 +146,7 @@ void CorrectXYStateWithGPS(float *DeltaTime)
   INS.Position_EarthFrame[1] += PositionError[1] * StoredDeltaTime;
 }
 
-void updateXYState(float *DeltaTime)
+void UpdateXYState(float *DeltaTime)
 {
   float VelocityIncrease[2];
   VelocityIncrease[0] = INS.AccelerationEarthFrame_Filtered[0] * *DeltaTime;
@@ -155,7 +163,9 @@ void SaveXYPositionToHistory()
   HistoryXYPosition[1][HistoryXYCount] = INS.Position_EarthFrame[1];
   HistoryXYCount++;
   if (HistoryXYCount >= 10)
+  {
     HistoryXYCount = 0;
+  }
 }
 
 void ResetXYState()
@@ -166,7 +176,9 @@ void ResetXYState()
     INS.Velocity_EarthFrame[i] = (ABS_16BITS(GPSActualSpeed[i]) > 50) ? GPSActualSpeed[i] : 0.0f;
     INS.Position_EarthFrame[i] = GPSDistanceToHome[i];
     for (uint8_t j = 0; j < 10; j++)
+    {
       HistoryXYPosition[i][j] = GPSDistanceToHome[i];
+    }
   }
 }
 

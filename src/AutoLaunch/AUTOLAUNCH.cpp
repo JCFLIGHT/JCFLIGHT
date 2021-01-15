@@ -251,7 +251,7 @@ bool AutoLaunchTimerOverFlow()
 
 bool AutoLaunchMaxAltitudeReached(void)
 {
-  return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (ALTITUDE.EstimateAltitude >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
+  return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (ALTITUDE.EstimatedAltitude >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
 }
 
 bool AutoLaunchCompleted()

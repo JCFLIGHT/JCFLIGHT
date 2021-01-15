@@ -44,8 +44,8 @@ typedef struct
 typedef struct
 {
   int32_t RealBaroAltitude;
-  int32_t EstimateAltitude;
-  int16_t EstimateVariometer;
+  int32_t EstimatedAltitude;
+  int16_t EstimatedVariometer;
   int32_t GroundAltitude;
 } ALTITUDE_STRUCT;
 

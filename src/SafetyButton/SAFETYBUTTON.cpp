@@ -35,7 +35,6 @@ SAFETYBUTTONCLASS SAFETYBUTTON;
 
 void SAFETYBUTTONCLASS::Initialization()
 {
-    SAFETY_BUTTON_PININPUT;
     SAFETY_BUTTON_LED_PINOUT;
 #ifdef ESP32
     AnalogWriteSetSettings(GPIO_NUM_5, 490, 12);
@@ -54,11 +53,7 @@ bool SAFETYBUTTONCLASS::GetButtonInterval()
 
 bool SAFETYBUTTONCLASS::GetButtonState()
 {
-#ifdef __AVR_ATmega2560__
-    return (SAFETY_BUTTON_PIN_READ_STATE ? false : true);
-#elif defined __arm__ || defined ESP32
-    return (ADCPIN.Read(SAFETY_BUTTON_PIN_READ_STATE) ? false : true);
-#endif
+    return (ADCPIN.Read(SAFETY_BUTTON_PIN_READ_STATE) > 512 ? false : true);
 }
 
 void SAFETYBUTTONCLASS::FlashButton()

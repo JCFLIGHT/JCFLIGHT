@@ -54,7 +54,7 @@ bool SAFETYBUTTONCLASS::GetButtonInterval()
 
 bool SAFETYBUTTONCLASS::GetButtonState()
 {
-    return (ADCPIN.Read(SAFETY_BUTTON_PIN_READ_STATE) > 512 ? false : true);
+    return (ADCPIN.Read(SAFETY_BUTTON_PIN_READ_STATE) > 0x200 ? false : true);
 }
 
 void SAFETYBUTTONCLASS::FlashButton()

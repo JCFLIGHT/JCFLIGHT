@@ -24,6 +24,7 @@
 #include "BAR/BAR.h"
 #include "Build/BOARDDEFS.h"
 #include "AnalogDigitalConverter/ADC.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 SAFETYBUTTONCLASS SAFETYBUTTON;
 
@@ -74,7 +75,20 @@ void SAFETYBUTTONCLASS::FlashButton()
         if (GetButtonState())
         {
             WaitToNextProcess = true;
-            PulseInAllMotors(1000);
+            if (GetFrameStateOfMultirotor())
+            {
+                PulseInAllMotors(1000);
+            }
+            else if (GetFrameStateOfAirPlane())
+            {
+                MotorControl[MOTOR1] = 1000;
+                MotorControl[MOTOR2] = 1500;
+                MotorControl[MOTOR3] = 1500;
+                MotorControl[MOTOR4] = 1500;
+                MotorControl[MOTOR5] = 1500;
+                MotorControl[MOTOR6] = 1500;
+                ApplyPWMInAllComponents();
+            }
         }
         else
         {
@@ -117,7 +131,20 @@ void SAFETYBUTTONCLASS::FlashButton()
             if (GetButtonState())
             {
                 DetectRise = 0;
-                PulseInAllMotors(0);
+                if (GetFrameStateOfMultirotor())
+                {
+                    PulseInAllMotors(0);
+                }
+                else if (GetFrameStateOfAirPlane())
+                {
+                    MotorControl[MOTOR1] = 0;
+                    MotorControl[MOTOR2] = 1500;
+                    MotorControl[MOTOR3] = 1500;
+                    MotorControl[MOTOR4] = 1500;
+                    MotorControl[MOTOR5] = 1500;
+                    MotorControl[MOTOR6] = 1500;
+                    ApplyPWMInAllComponents();
+                }
                 SafeStateToApplyPulse = false;
             }
             else

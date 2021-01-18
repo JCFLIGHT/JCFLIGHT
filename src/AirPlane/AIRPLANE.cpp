@@ -23,6 +23,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "SafetyButton/SAFETYBUTTON.h"
 
 Struct_LowPassFilter LPFDevice[4]; //INSTANCIA PARA APLICAR O FILTRO LPF NOS SERVOS
 
@@ -145,7 +146,7 @@ void AirPlane_Mode_PlaneVTail_Run()
 
 void Servo_Rate_Adjust()
 {
-  if (GetFrameStateOfMultirotor())
+  if (GetFrameStateOfMultirotor() || !SAFETYBUTTON.GetSafeStateToOutput())
   {
     return;
   }

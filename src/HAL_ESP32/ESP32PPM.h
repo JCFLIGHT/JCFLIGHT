@@ -15,11 +15,10 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
+#ifndef ESP32PPM_H_
+#define ESP32PPM_H_
 #include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
-void ConfigurePPMRegisters();
-void DecodeAllReceiverChannels();
+#if ESP32
+void ESP32_PPM_Initialization();
+#endif
 #endif

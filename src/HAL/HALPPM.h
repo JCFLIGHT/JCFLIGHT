@@ -15,11 +15,13 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
+#ifndef HALPPM_H_
+#define HALPPM_H_
 #include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
-void ConfigurePPMRegisters();
-void DecodeAllReceiverChannels();
+class ClassHALPPM
+{
+public:
+  void Initialization();
+};
+extern ClassHALPPM HALPPM;
 #endif

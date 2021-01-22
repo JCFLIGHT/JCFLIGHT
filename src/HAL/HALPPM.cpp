@@ -15,11 +15,17 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
-#include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
-void ConfigurePPMRegisters();
-void DecodeAllReceiverChannels();
+#include "HALPPM.h"
+#include "HAL_AVR/AVRPPM.h"
+#include "HAL_ESP32/ESP32PPM.h"
+
+ClassHALPPM HALPPM;
+
+void ClassHALPPM::Initialization()
+{
+#ifdef __AVR_ATmega2560__
+  AVR_PPM_Initialization();
+#elif defined ESP32
+  ESP32_PPM_Initialization();
 #endif
+}

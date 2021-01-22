@@ -25,29 +25,19 @@
 #include "IBUS/IBUSREAD.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "BAR/BAR.h"
+#include "HAL/LEARNINGRECEIVER.h"
+#include "HAL/HALPPM.h"
 
 #define FAILSAFE_DETECT_TRESHOLD 975 //US
 
 volatile uint16_t PPMReadChannels[12];
-static uint8_t PPMChannelMap[12];
+uint8_t PPMChannelMap[12];
 
 void ConfigurePPMRegisters()
 {
   if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2))
   {
-#ifdef __AVR_ATmega2560__
-
-    DDRK &= ~(1 << 7);  //DECLARA COMO ENTRADA
-    PORTK |= (1 << 7);  //ATIVA O PULL-UP
-    PCICR |= (1 << 2);  //CONFIGURA COMO FALLING
-    PCMSK2 |= (1 << 7); //ATIVA A INTERRUPÇÃO
-
-#elif defined ESP32
-
-    pinMode(GPIO_NUM_36, INPUT);
-    attachInterrupt(GPIO_NUM_36, InterruptRoutine, FALLING);
-
-#endif
+    HALPPM.Initialization();
   }
   //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
   if (ReceiverModel <= 7)
@@ -73,7 +63,7 @@ void ConfigurePPMRegisters()
   PPMChannelMap[10] = AUX7;
   PPMChannelMap[11] = AUX8;
 }
-
+/*
 #ifdef __AVR_ATmega2560__
 
 extern "C" void __vector_11(void) __attribute__((signal, __INTR_ATTRS));
@@ -139,34 +129,7 @@ void IRAM_ATTR InterruptRoutine(void)
     Channels++;
   }
 }
-
-uint16_t LearningAllChannels(uint8_t Channels)
-{
-  uint16_t ReceiverData;
-  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
-  {
-    ReceiverData = SBUSReadChannels[PPMChannelMap[Channels]];
-  }
-  else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
-  {
-    ReceiverData = IBUSReadChannels[PPMChannelMap[Channels]];
-  }
-  else
-  {
-#ifdef __AVR_ATmega2560__
-    uint8_t oldSREG;
-    oldSREG = SREG;
-    __asm__ __volatile__("cli" ::
-                             : "memory");
-#endif
-    ReceiverData = PPMReadChannels[PPMChannelMap[Channels]];
-#ifdef __AVR_ATmega2560__
-    SREG = oldSREG;
-#endif
-  }
-  return ReceiverData;
-}
-
+*/
 void DecodeAllReceiverChannels()
 {
   bool CheckFailSafeState = true;
@@ -181,7 +144,7 @@ void DecodeAllReceiverChannels()
   }
   for (uint8_t Channels = 0; Channels < 12; Channels++)
   {
-    RadioControllOutputDecoded = LearningAllChannels(Channels);
+    RadioControllOutputDecoded = LearningChannelsOfReceiver(Channels);
     if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
     {
       CheckFailSafeState = SBUSRC.FailSafe || !COMMAND_ARM_DISARM;

@@ -15,11 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
+#ifndef LEARNINGRECEIVER_H_
+#define LEARNINGRECEIVER_H_
 #include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
-void ConfigurePPMRegisters();
-void DecodeAllReceiverChannels();
+uint16_t LearningChannelsOfReceiver(uint8_t Channels);
 #endif

@@ -114,7 +114,7 @@ uint8_t PreArmClass::Checking(void)
         return IMU_ERROR;
     }
 
-    if (SetFlightModes[ALTITUDE_HOLD_MODE] || GPS_Flight_Mode != GPS_MODE_NONE) //MODOS DE VOO ATIVOS
+    if (GPS_Flight_Mode != GPS_MODE_NONE) //MODOS DE VOO ATIVOS
     {
         return FLIGHT_MODES_ERROR;
     }

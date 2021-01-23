@@ -23,8 +23,14 @@
 
 bool TakeOffInProgress = false;
 int16_t HoveringThrottle = 0;
-int32_t AltitudeToHold;
+int32_t AltitudeToHold = 0;
 int32_t TargetVariometer = 0;
+
+//VARIAVEIS AJUSTAVEIS PELO USUARIO
+uint8_t MinVariometer = 50;             //CM/S
+uint8_t SafeZoneToCompleteTakeOff = 70; //1700uS NO THROTTLE
+uint8_t SafeAltitude = 5;               //METROS
+int16_t ThrottleMiddleValue = 1500;     //uS
 
 bool ApplyAltitudeHoldControl()
 {
@@ -57,10 +63,10 @@ bool ApplyAltitudeHoldControl()
             HoveringState = false;
           }
           SetAltitudeHold(ALTITUDE.EstimatedAltitude);
-          TargetVariometer = 50;
-          if (ALTITUDE.EstimatedAltitude > 500)
+          TargetVariometer = Constrain_8Bits(MinVariometer, 30, 100);
+          if (ALTITUDE.EstimatedAltitude > (SafeAltitude * 100))
           {
-            TargetVariometer += (int32_t)200 * (ALTITUDE.EstimatedAltitude - 500) / (RTH_Altitude * 100 - 500);
+            TargetVariometer += (int32_t)(250 - MinVariometer) * (ALTITUDE.EstimatedAltitude - (SafeAltitude * 100)) / (RTH_Altitude * 100 - (SafeAltitude * 100));
           }
           TargetVariometer = -TargetVariometer;
         }
@@ -71,7 +77,7 @@ bool ApplyAltitudeHoldControl()
             HoveringState = true;
           }
           TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimatedAltitude) * 3) / 2;
-          if (ALTITUDE.EstimatedAltitude > 500)
+          if (ALTITUDE.EstimatedAltitude > (SafeAltitude * 100))
           {
             TargetVariometer = Constrain_32Bits(TargetVariometer, -250, 250);
           }
@@ -83,7 +89,7 @@ bool ApplyAltitudeHoldControl()
       }
       else
       {
-        int16_t ThrottleDifference = RadioControllOutput[THROTTLE] - 1500;
+        int16_t ThrottleDifference = RadioControllOutput[THROTTLE] - ThrottleMiddleValue;
         if (!TakeOffInProgress)
         {
           if ((RadioControllOutput[THROTTLE] < 1100))
@@ -96,24 +102,24 @@ bool ApplyAltitudeHoldControl()
         }
         else
         {
-          if ((ThrottleDifference > 70) && (ALTITUDE.EstimatedVariometer >= 15))
+          if ((ThrottleDifference > SafeZoneToCompleteTakeOff) && (ALTITUDE.EstimatedVariometer >= 15))
           {
             TakeOffInProgress = false;
           }
         }
-        if (TakeOffInProgress || (ABS_16BITS(ThrottleDifference) > 70))
+        if (TakeOffInProgress || (ABS_16BITS(ThrottleDifference) > SafeZoneToCompleteTakeOff))
         {
           if (HoveringState)
           {
             HoveringState = false;
           }
-          if (ABS_16BITS(ThrottleDifference) <= 70)
+          if (ABS_16BITS(ThrottleDifference) <= SafeZoneToCompleteTakeOff)
           {
             TargetVariometer = 0;
           }
           else
           {
-            TargetVariometer = ((ThrottleDifference - ((ThrottleDifference > 0) ? 70 : -70)) * 3) / 4;
+            TargetVariometer = ((ThrottleDifference - ((ThrottleDifference > 0) ? SafeZoneToCompleteTakeOff : -SafeZoneToCompleteTakeOff)) * 3) / 4;
           }
         }
         else
@@ -175,10 +181,10 @@ void ResetIntegralOfVariometerError()
 
 void InitializeHoveringThrottle()
 {
-  if ((HoveringThrottle < 1250) || (HoveringThrottle > 1750))
+  if ((HoveringThrottle < (ThrottleMiddleValue - 250)) || (HoveringThrottle > (ThrottleMiddleValue + 250)))
   {
-    HoveringThrottle = 1500;
-    HoveringThrottle = Constrain_16Bits(HoveringThrottle, 1250, 1750);
+    HoveringThrottle = ThrottleMiddleValue;
+    HoveringThrottle = Constrain_16Bits(HoveringThrottle, ThrottleMiddleValue - 250, ThrottleMiddleValue + 250);
   }
 }
 
@@ -226,7 +232,7 @@ void ResetLandDetector()
 
 bool GetGroundDetected()
 {
-  return (ABS_16BITS(ALTITUDE.EstimatedVariometer) < 15) && (VariometerErrorIPart <= -185) && (ALTITUDE.EstimatedAltitude < 500);
+  return (ABS_16BITS(ALTITUDE.EstimatedVariometer) < 15) && (VariometerErrorIPart <= -185) && (ALTITUDE.EstimatedAltitude < (SafeAltitude * 100));
 }
 
 bool GetGroundDetectedFor100ms()

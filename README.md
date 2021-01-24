@@ -24,8 +24,8 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 ## Contribuidor
 
 [Julio Cesar Matias](https://github.com/JuliooCesarMDM)                                                        
-**Veículo**: Multirotores e Aeros.                                                                    
-**Plataforma**: Microcontrolador AVR ATmega2560     
+**Veículo**: Multirotores,Aeros & Asa-Fixa.                                                                    
+**Plataformas**: JCFLIGHT-CLASSIC,JCFLIGHT-ZION,JCFLIGHT-PASCAL & JCFLIGHT-EXTREME
 
 ## Como construir
 

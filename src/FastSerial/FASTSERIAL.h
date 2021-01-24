@@ -20,17 +20,17 @@
 #include "Arduino.h"
 class Fast_Serial
 {
-  public:
-    void    Initialization();
-    void    Begin(uint8_t SerialPort, uint32_t BaudRate);
-    uint8_t Read(uint8_t SerialPort);
-    void    Write(uint8_t SerialPort, uint8_t WriteData);
-    uint8_t Available(uint8_t SerialPort);
-    bool Flush(uint8_t SerialPort);
-    uint8_t TXBuffer(uint8_t SerialPort);
-    void    TX_Send(uint8_t SerialPort, uint8_t WriteTX);
-    void    UartSendData(uint8_t SerialPort);
-    void    UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort);
+public:
+  void Initialization();
+  void Begin(uint8_t SerialPort, uint32_t BaudRate);
+  uint8_t Read(uint8_t SerialPort);
+  void Write(uint8_t SerialPort, uint8_t WriteData);
+  uint8_t Available(uint8_t SerialPort);
+  bool TXFree(uint8_t SerialPort);
+  uint8_t UsedTXBuffer(uint8_t SerialPort);
+  void StoreTX(uint8_t SerialPort, uint8_t WriteTX);
+  void UartSendData(uint8_t SerialPort);
+  void UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort);
 };
 extern Fast_Serial FASTSERIAL;
 #endif

@@ -16,10 +16,14 @@
 */
 
 #include "SCHEDULERTIME.h"
+#ifdef __AVR_ATmega2560__
+#include <avr/interrupt.h>
+#endif
 
 SchedulerTimeClass SCHEDULER;
 
 #ifdef __AVR_ATmega2560__
+
 volatile uint32_t Timer0_OverFlow = 0;
 volatile uint32_t Timer0_Scheduler_Millis = 0;
 static uint8_t Timer0_Fraction = 0;

@@ -18,9 +18,6 @@
 #ifndef SCHEDULERTIME_h
 #define SCHEDULERTIME_h
 #include "Arduino.h"
-#ifdef __AVR_ATmega2560__
-#include <avr/interrupt.h>
-#endif
 class SchedulerTimeClass
 {
 public:

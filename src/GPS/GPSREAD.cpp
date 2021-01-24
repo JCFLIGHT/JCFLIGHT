@@ -144,7 +144,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART_NUMB_1))
+    while (!FASTSERIAL.TXFree(UART_NUMB_1))
       SCHEDULER.Sleep(50);
     Parse_Baud_Rate = 1;
   }
@@ -159,7 +159,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART_NUMB_1))
+    while (!FASTSERIAL.TXFree(UART_NUMB_1))
       SCHEDULER.Sleep(50);
     Parse_Baud_Rate = 2;
   }
@@ -174,7 +174,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART_NUMB_1))
+    while (!FASTSERIAL.TXFree(UART_NUMB_1))
       SCHEDULER.Sleep(50);
     Parse_Baud_Rate = 3;
   }
@@ -189,7 +189,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART_NUMB_1))
+    while (!FASTSERIAL.TXFree(UART_NUMB_1))
       SCHEDULER.Sleep(50);
     Parse_Baud_Rate = 4;
   }
@@ -204,7 +204,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    while (!FASTSERIAL.Flush(UART_NUMB_1))
+    while (!FASTSERIAL.TXFree(UART_NUMB_1))
       SCHEDULER.Sleep(50);
   }
   SCHEDULER.Sleep(200);

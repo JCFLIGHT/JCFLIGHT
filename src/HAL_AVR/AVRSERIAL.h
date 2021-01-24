@@ -15,25 +15,19 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "GPSSERIALREAD.h"
-#include "FastSerial/FASTSERIAL.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
-#include "GPS/GPSREAD.h"
-#include "Scheduler/SCHEDULERTIME.h"
-#include "Common/VARIABLES.h"
-
-void GPS_Serial_Read()
-{
-    uint8_t SerialAvailableGPS;
-    uint8_t SerialReadGPS;
-    uint8_t CheckGPSTXBuffer;
-    SerialAvailableGPS = FASTSERIAL.Available(UART_NUMB_1);
-    while (SerialAvailableGPS--)
-    {
-        CheckGPSTXBuffer = FASTSERIAL.UsedTXBuffer(UART_NUMB_1);
-        if (CheckGPSTXBuffer > 78)
-            return;
-        SerialReadGPS = FASTSERIAL.Read(UART_NUMB_1);
-        GPS_SerialRead(SerialReadGPS);
-    }
-}
+#ifndef AVRSERIAL_H_
+#define AVRSERIAL_H_
+#ifdef __AVR_ATmega2560__
+#include "Arduino.h"
+void Serial_Initialization();
+void Serial_Begin(uint8_t SerialPort, uint32_t BaudRate);
+uint8_t Serial_Read(uint8_t SerialPort);
+void Serial_Write(uint8_t SerialPort, uint8_t WriteData);
+uint8_t Serial_Available(uint8_t SerialPort);
+bool Serial_TXFree(uint8_t SerialPort);
+uint8_t Serial_UsedTXBuffer(uint8_t SerialPort);
+void Serial_StoreTX(uint8_t SerialPort, uint8_t WriteTX);
+void Serial_UartSendData(uint8_t SerialPort);
+void Serial_UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort);
+#endif
+#endif

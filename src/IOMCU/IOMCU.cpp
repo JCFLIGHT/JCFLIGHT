@@ -322,7 +322,7 @@ struct _SendWayPointGCSOthersParameters
 
 static void GCS_Send_Data(uint8_t Buffer)
 {
-    FASTSERIAL.TX_Send(UART_NUMB_0, Buffer);
+    FASTSERIAL.StoreTX(UART_NUMB_0, Buffer);
     SerialCheckSum ^= Buffer;
 
 #elif defined ESP32
@@ -368,16 +368,16 @@ static void Communication_Passed(bool Error, uint8_t Buffer)
 {
 #ifdef __AVR_ATmega2560__
 
-    FASTSERIAL.TX_Send(UART_NUMB_0, 0x4a);
+    FASTSERIAL.StoreTX(UART_NUMB_0, 0x4a);
     SerialCheckSum ^= 0x4a;
-    FASTSERIAL.TX_Send(UART_NUMB_0, 0x43);
+    FASTSERIAL.StoreTX(UART_NUMB_0, 0x43);
     SerialCheckSum ^= 0x43;
-    FASTSERIAL.TX_Send(UART_NUMB_0, Error ? 0x21 : 0x46);
+    FASTSERIAL.StoreTX(UART_NUMB_0, Error ? 0x21 : 0x46);
     SerialCheckSum ^= Error ? 0x21 : 0x46;
     SerialCheckSum = 0;
-    FASTSERIAL.TX_Send(UART_NUMB_0, Buffer);
+    FASTSERIAL.StoreTX(UART_NUMB_0, Buffer);
     SerialCheckSum ^= Buffer;
-    FASTSERIAL.TX_Send(UART_NUMB_0, ProtocolCommand);
+    FASTSERIAL.StoreTX(UART_NUMB_0, ProtocolCommand);
     SerialCheckSum ^= ProtocolCommand;
 
 #elif defined ESP32
@@ -451,7 +451,7 @@ void GCSClass::Serial_Parse_Protocol()
     SerialAvailableGuard = FASTSERIAL.Available(UART_NUMB_0);
     while (SerialAvailableGuard--)
     {
-        if (FASTSERIAL.TXBuffer(UART_NUMB_0) > 78)
+        if (FASTSERIAL.UsedTXBuffer(UART_NUMB_0) > 78)
         {
             return;
         }
@@ -518,7 +518,7 @@ void GCSClass::Serial_Parse_Protocol()
     while (SerialOutputBufferSizeCount > 0)
     {
         SerialOutputBufferSizeCount--;
-        FASTSERIAL.TX_Send(UART_NUMB_0, SerialOutputBuffer[VectorCount++]);
+        FASTSERIAL.Write(UART_NUMB_0, SerialOutputBuffer[VectorCount++]);
     }
 
 #endif

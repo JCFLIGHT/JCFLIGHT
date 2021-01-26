@@ -256,15 +256,6 @@ enum Flip_Stages_Enum
     STAGEWAITING
 };
 
-enum Speed_Type_Enum
-{
-    VERY_LOW_SPEED = 0,
-    LOW_SPEED,
-    MEDIUM_SPEED,
-    HIGH_SPEED,
-    VERY_HIGH_SPEED
-};
-
 typedef enum
 {
     BEEPER_CALIBRATION_DONE = 0,

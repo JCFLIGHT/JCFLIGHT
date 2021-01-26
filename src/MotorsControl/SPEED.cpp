@@ -22,26 +22,14 @@
 
 SPEEDCLASS SPEEDMOTORS;
 
+int ValueConverterMotorSpeed(int Input, int InMin, int InMax, int OutMin, int OutMax)
+{
+    int ValueA = ((int)OutMax - (int)OutMin) * ((int)Input - (int)InMin);
+    int ValueB = (int)InMax - (int)InMin;
+    return ((ValueA / ValueB) + OutMin);
+}
+
 void SPEEDCLASS::LoadEEPROM()
 {
-    if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == VERY_LOW_SPEED)
-    {
-        MotorSpeed = 1000;
-    }
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == LOW_SPEED)
-    {
-        MotorSpeed = 1050;
-    }
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == MEDIUM_SPEED)
-    {
-        MotorSpeed = 1100;
-    }
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == HIGH_SPEED)
-    {
-        MotorSpeed = 1150;
-    }
-    else if (STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR) == VERY_HIGH_SPEED)
-    {
-        MotorSpeed = 1200;
-    }
+    MotorSpeed = ValueConverterMotorSpeed(STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR), 0, 100, 900, 1500);
 }

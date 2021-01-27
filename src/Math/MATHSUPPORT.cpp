@@ -217,31 +217,29 @@ uint32_t SquareRootU32Bits(uint32_t ValueInput)
     return Result;
 }
 
-float InvertSquareRootFloat(float InputValue)
-{
-    union
-    {
-        int32_t IntegrerValue;
-        float FloatValue;
-    } Convert;
-    Convert.FloatValue = InputValue;
-    Convert.IntegrerValue = 0x5f1ffff9 - (Convert.IntegrerValue >> 1);
-    return Convert.FloatValue * (1.68191409f - 0.703952253f * InputValue * Convert.FloatValue * Convert.FloatValue);
-}
-
 float Fast_Sine(float X)
 {
     int32_t X32BITS = X;
     if (X32BITS < -32 || X32BITS > 32)
+    {
         return 0.0f;
+    }
     while (X > 3.14159265358979323846f)
+    {
         X -= (2.0f * 3.14159265358979323846f);
+    }
     while (X < -3.14159265358979323846f)
+    {
         X += (2.0f * 3.14159265358979323846f);
+    }
     if (X > (0.5f * 3.14159265358979323846f))
+    {
         X = (0.5f * 3.14159265358979323846f) - (X - (0.5f * 3.14159265358979323846f));
+    }
     else if (X < -(0.5f * 3.14159265358979323846f))
+    {
         X = -(0.5f * 3.14159265358979323846f) - ((0.5f * 3.14159265358979323846f) + X);
+    }
     float XFLOAT = X * X;
     return X + X * XFLOAT * (-1.666665710e-1f + XFLOAT * (8.333017292e-3f + XFLOAT * (-1.980661520e-4f + XFLOAT * 2.600054768e-6f)));
 }
@@ -258,19 +256,29 @@ float Fast_Atan2(float Y, float X)
     ABSOfY = ABS_FLOAT(Y);
     Result = MAX_FLOAT(ABSOfX, ABSOfY);
     if (Result)
+    {
         Result = MIN_FLOAT(ABSOfX, ABSOfY) / Result;
+    }
     else
+    {
         Result = 0.0f;
+    }
     Result = -((((0.05030176425872175f * Result - 0.3099814292351353f) * Result - 0.14744007058297684f) * Result - 0.99997356613987f) *
                    Result -
                3.14551665884836e-07f) /
              ((0.6444640676891548f * Result + 0.1471039133652469f) * Result + 1.0f);
     if (ABSOfY > ABSOfX)
+    {
         Result = (3.14159265358979323846f / 2.0f) - Result;
+    }
     if (X < 0)
+    {
         Result = 3.14159265358979323846f - Result;
+    }
     if (Y < 0)
+    {
         Result = -Result;
+    }
     return Result;
 }
 
@@ -279,7 +287,11 @@ float Fast_AtanCosine(float X)
     float ABSFloatOfX = ABS_FLOAT(X);
     float Result = sqrtf(1.0f - ABSFloatOfX) * (1.5707288f + ABSFloatOfX * (-0.2121144f + ABSFloatOfX * (0.0742610f + (-0.0187293f * ABSFloatOfX))));
     if (X < 0.0f)
+    {
         return 3.14159265358979323846f - Result;
+    }
     else
+    {
         return Result;
+    }
 }

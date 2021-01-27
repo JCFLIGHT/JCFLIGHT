@@ -1101,10 +1101,10 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendAccZFiltered = IMU.AccelerometerRead[YAW];
     GCSParameters_Two.SendGyroXNotFiltered = IMU.GyroscopeReadNotFiltered[ROLL];
     GCSParameters_Two.SendGyroYNotFiltered = IMU.GyroscopeReadNotFiltered[PITCH];
-    GCSParameters_Two.SendGyroZNotFiltered = IMU.GyroscopeReadNotFiltered[PITCH];
+    GCSParameters_Two.SendGyroZNotFiltered = IMU.GyroscopeReadNotFiltered[YAW];
     GCSParameters_Two.SendGyroXFiltered = IMU.GyroscopeRead[ROLL];
     GCSParameters_Two.SendGyroYFiltered = IMU.GyroscopeRead[PITCH];
-    GCSParameters_Two.SendGyroZFiltered = IMU.GyroscopeRead[PITCH];
+    GCSParameters_Two.SendGyroZFiltered = IMU.GyroscopeRead[YAW];
     GCSParameters_Two.SendGPSGroundSpeed = GPS_Ground_Speed;
     GCSParameters_Two.SendI2CError = ErrorI2C;
     GCSParameters_Two.SendAirSpeedValue = AirSpeedCalcedInCM;

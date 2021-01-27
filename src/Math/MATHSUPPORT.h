@@ -46,7 +46,6 @@ float ConvertDeciDegreesToDegrees(float Inputvalue);
 int16_t ApproximationOfAtan2ForTurnAssist(int16_t AccRoll, int16_t AccYaw);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);
-float InvertSquareRootFloat(float InputValue);
 float Fast_Sine(float X);
 float Fast_Cosine(float X);
 float Fast_Atan2(float Y, float X);

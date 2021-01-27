@@ -89,9 +89,11 @@ static bool ValidateQuaternion(const Struct_Quaternion *Quaternion)
                                    ABS_FLOAT(Quaternion->q2) +
                                    ABS_FLOAT(Quaternion->q3);
   if (!isnan(CheckAbsoluteValue) && !isinf(CheckAbsoluteValue))
+  {
     return true;
-  const float normSq = QuaternionNormalizedSquared(&Orientation);
-  if (normSq > (1.0f - 1e-6f) && normSq < (1.0f + 1e-6f))
+  }
+  const float QuatSquared = QuaternionNormalizedSquared(&Orientation);
+  if (QuatSquared > (1.0f - 1e-6f) && QuatSquared < (1.0f + 1e-6f))
   {
     return true;
   }
@@ -100,8 +102,8 @@ static bool ValidateQuaternion(const Struct_Quaternion *Quaternion)
 
 static void ResetOrientationQuaternion(const Struct_Vector3x3 *AccelerationBodyFrame)
 {
-  const float accNorm = sqrtf(VectorNormSquared(AccelerationBodyFrame));
-  Orientation.q0 = AccelerationBodyFrame->Yaw + accNorm;
+  const float AccVectorSquared = sqrtf(VectorNormSquared(AccelerationBodyFrame));
+  Orientation.q0 = AccelerationBodyFrame->Yaw + AccVectorSquared;
   Orientation.q1 = AccelerationBodyFrame->Pitch;
   Orientation.q2 = -AccelerationBodyFrame->Roll;
   Orientation.q3 = 0.0f;
@@ -251,7 +253,6 @@ static void MahonyAHRSUpdate(float DeltaTime,
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Struct_Vector3x3 OldVector;
-
         //CALCULA O ERRO INTEGRAL ESCALADO POR Ki
         VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.ki_Magnetometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
@@ -288,9 +289,9 @@ static void MahonyAHRSUpdate(float DeltaTime,
     }
     else
     {
-      const float thetaMagnitude = sqrtf(ThetaSquared);
-      QuaternionScale(&QuaternionDelta, &QuaternionDelta, Fast_Sine(thetaMagnitude) / thetaMagnitude);
-      QuaternionDelta.q0 = Fast_Cosine(thetaMagnitude);
+      const float ThetaMagnitude = sqrtf(ThetaSquared);
+      QuaternionScale(&QuaternionDelta, &QuaternionDelta, Fast_Sine(ThetaMagnitude) / ThetaMagnitude);
+      QuaternionDelta.q0 = Fast_Cosine(ThetaMagnitude);
     }
 
     //CALCULA O VALOR FINA DA ORIENTAÇÃO E RENORMALIZA O QUATERNION

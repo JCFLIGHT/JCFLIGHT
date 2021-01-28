@@ -1525,17 +1525,13 @@ void GCSClass::Save_Medium_Configuration()
     PID[PITCH].ProportionalVector = GetUserMediumGCSParameters.GetProportionalPitch;
     PID[PITCH].IntegratorVector = GetUserMediumGCSParameters.GetIntegralPitch;
     PID[PITCH].DerivativeVector = GetUserMediumGCSParameters.GetDerivativePitch;
-
     PID[ROLL].ProportionalVector = GetUserMediumGCSParameters.GetProportionalRoll;
     PID[ROLL].IntegratorVector = GetUserMediumGCSParameters.GetIntegralRoll;
     PID[ROLL].DerivativeVector = GetUserMediumGCSParameters.GetDerivativeRoll;
-
     PID[YAW].ProportionalVector = GetUserMediumGCSParameters.GetProportionalYaw;
     PID[YAW].IntegratorVector = GetUserMediumGCSParameters.GetIntegralYaw;
     PID[YAW].DerivativeVector = GetUserMediumGCSParameters.GetDerivativeYaw;
-
     PID[PIDALTITUDE].ProportionalVector = GetUserMediumGCSParameters.GetProportionalAltitudeHold;
-
     PID[PIDGPSPOSITION].ProportionalVector = GetUserMediumGCSParameters.GetProportionalGPSHold;
     PID[PIDGPSPOSITION].IntegratorVector = GetUserMediumGCSParameters.GetIntegralGPSHold;
 

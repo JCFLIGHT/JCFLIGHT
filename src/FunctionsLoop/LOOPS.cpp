@@ -29,6 +29,7 @@ void Slow_Loop()
         PID_DerivativeLPF_Update();
         UpdateValuesOfPID();
         UpdateServosDirection();
+        AltitudeHold_Update_Params();
         GCS.UpdateParametersToGCS();
         PushWayPointParameters();
 }

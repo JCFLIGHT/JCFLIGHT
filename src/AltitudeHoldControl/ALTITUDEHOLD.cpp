@@ -20,6 +20,8 @@
 #include "Scheduler/SCHEDULER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 
 bool TakeOffInProgress = false;
 int16_t HoveringThrottle = 0;
@@ -31,6 +33,14 @@ uint8_t MinVariometer = 50;             //CM/S
 uint8_t SafeZoneToCompleteTakeOff = 70; //1700uS NO THROTTLE
 uint8_t SafeAltitude = 5;               //METROS
 int16_t ThrottleMiddleValue = 1500;     //uS
+
+void AltitudeHold_Update_Params()
+{
+  MinVariometer = STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR);
+  SafeZoneToCompleteTakeOff = STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR);
+  SafeAltitude = STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR);
+  ThrottleMiddleValue = STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR);
+}
 
 bool ApplyAltitudeHoldControl()
 {

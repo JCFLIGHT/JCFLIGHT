@@ -36,6 +36,8 @@ void MachineInit()
     CurvesRC_SetValues();
     CurvesRC_CalculeValue();
     TPA_Initialization();
+    //CARREGA OS PARAMETROS DO ALTITUDE-HOLD
+    AltitudeHold_Update_Params();
     //ATIVA O LED VERMELHO
     RED_LED_ON;
     GREEN_LED_OFF;

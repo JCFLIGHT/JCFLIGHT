@@ -49,7 +49,7 @@ extern uint8_t MagAddress;
 extern uint8_t MagRegister;
 extern uint8_t RCRate;
 extern uint8_t RCExpo;
-extern uint8_t RollAndPitchRate;
+extern uint8_t RollAndPitchRate[2];
 extern uint8_t YawRate;
 extern uint8_t ThrottleMiddle;
 extern uint8_t ThrottleExpo;

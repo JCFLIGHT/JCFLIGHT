@@ -22,7 +22,7 @@
 #include "Math/MATHSUPPORT.h"
 
 #define THROTTLE_LOOKUP_LENGTH 11
-//lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO (1.5 = 2 / 2.5 = 2)
+//lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO DE PONTO FLUTUANTE (1.5 = 2 / 2.5 = 2)
 #define LRint lrint
 
 void CurvesRC_CalculeValue()
@@ -34,7 +34,9 @@ void CurvesRC_CalculeValue()
     NewValueCalculed = 10 * IndexOfLookUpThrottle - ThrottleMiddle;
     ThrottleMiddlePoint = ThrottleMiddle;
     if (NewValueCalculed > 0)
+    {
       ThrottleMiddlePoint = 100 - ThrottleMiddlePoint;
+    }
     CalculeLookUpThrottle[IndexOfLookUpThrottle] = 100 * ThrottleMiddle + NewValueCalculed * ((int32_t)ThrottleExpo * (NewValueCalculed * NewValueCalculed) /
                                                                                                   ((uint16_t)ThrottleMiddlePoint * ThrottleMiddlePoint) +
                                                                                               100 - ThrottleExpo);
@@ -59,7 +61,9 @@ int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo)
 uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
 {
   if (CalcedDeflection > 999)
+  {
     return 1900;
+  }
 
   const uint8_t CalcedLookUpStep = CalcedDeflection / 100;
   return CalculeLookUpThrottle[CalcedLookUpStep] +
@@ -71,19 +75,11 @@ uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
 
 void CurvesRC_SetValues()
 {
-  RCRate = 70;
-  RollAndPitchRate = 0;
-  YawRate = 0;
-  ThrottleMiddle = 50;
-  ThrottleExpo = 35;
-  if ((STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) < 3) ||
-      (STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) == 6) ||
-      (STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR) == 7)) //MULTIROTORES
-  {
-    RCExpo = 60;
-  }
-  else //PARA PLANES
-  {
-    RCExpo = 0;
-  }
+  ThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
+  ThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
+  RCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
+  RCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
+  RollAndPitchRate[ROLL] = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
+  RollAndPitchRate[PITCH] = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
+  YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
 }

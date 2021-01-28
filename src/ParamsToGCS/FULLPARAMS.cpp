@@ -66,14 +66,6 @@ typedef struct
   uint16_t Param_GimbalMaxValue;
   uint8_t Param_Land_Check_Acc;
   uint8_t Param_Land_LPF;
-#endif
-  uint8_t Param_RC_Rate;
-  uint8_t Param_RC_Expo;
-  uint8_t Param_Roll_Pitch_Rate;
-  uint8_t Param_Yaw_Rate;
-  uint8_t Param_Throttle_Middle;
-  uint8_t Param_Throttle_Expo;
-#ifndef MEGA2560
   uint8_t Param_Throttle_Idle_Factor;
   int16_t Param_Throttle_Max;
   uint8_t Param_Throttle_Factor;
@@ -143,14 +135,6 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GimbalMaxValue", GIMBAL_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_GimbalMaxValue, 800, 2200},
     {"Land_CheckAcc", LAND_CHECKACC_ADDR, VAR_8BITS, &FullParamsList.Param_Land_Check_Acc, 0, 255},
     {"Land_LPF", LAND_LPF_ADDR, VAR_8BITS, &FullParamsList.Param_Land_LPF, 0, 255},
-#endif
-    {"RC_Rate", RC_RATE_ADDR, VAR_8BITS, &FullParamsList.Param_RC_Rate, 0, 255},
-    {"RC_Expo", RC_EXPO_ADDR, VAR_8BITS, &FullParamsList.Param_RC_Expo, 0, 255},
-    {"Roll_Pitch_Rate", ROLL_PITCH_RATE_ADDR, VAR_8BITS, &FullParamsList.Param_Roll_Pitch_Rate, 0, 255},
-    {"Yaw_Rate", YAW_RATE_ADDR, VAR_8BITS, &FullParamsList.Param_Yaw_Rate, 0, 255},
-    {"ThrottleMiddle", THROTTLE_MIDDLE_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Middle, 0, 255},
-    {"ThrottleExpo", THROTTLE_EXPO_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Expo, 0, 255},
-#ifndef MEGA2560
     {"ThrottleIddleFactor", THROTTLE_IDDLE_FACTOR_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Idle_Factor, 0, 255},
     {"ThrottleMaxValue", THROTTLE_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_Throttle_Max, 1500, 2200},
     {"ThrottleFactor", THROTTLE_FACTOR_ADDR, VAR_16BITS, &FullParamsList.Param_Throttle_Factor, 0, 255},

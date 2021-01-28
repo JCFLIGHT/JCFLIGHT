@@ -69,7 +69,7 @@ void CorrectZStateWithBaro(float *DeltaTime)
 void UpdateZState(float *DeltaTime)
 {
   float VelocityIncrease = INS.AccelerationEarthFrame_Filtered[2] * *DeltaTime;
-  INS.Position_EarthFrame[2] += (INS.Velocity_EarthFrame[2] + VelocityIncrease * 0.5) * *DeltaTime;
+  INS.Position_EarthFrame[2] += (INS.Velocity_EarthFrame[2] + VelocityIncrease * 0.5f) * *DeltaTime;
   ALTITUDE.EstimatedAltitude = INS.Position_EarthFrame[2];
   INS.Velocity_EarthFrame[2] += VelocityIncrease;
   ALTITUDE.EstimatedVariometer = INS.Velocity_EarthFrame[2];
@@ -107,7 +107,7 @@ void CalculateXY_INS()
     static bool Activated = false;
     UpdateAccelerationEarthFrame_Filtered(0);
     UpdateAccelerationEarthFrame_Filtered(1);
-    if (COMMAND_ARM_DISARM && GPS_3DFIX && (GPS_NumberOfSatellites >= 4) && Home_Point)
+    if (COMMAND_ARM_DISARM && GPS_3DFIX && (GPS_NumberOfSatellites >= 5) && Home_Point)
     {
       if (!Activated)
       {
@@ -151,8 +151,8 @@ void UpdateXYState(float *DeltaTime)
   float VelocityIncrease[2];
   VelocityIncrease[0] = INS.AccelerationEarthFrame_Filtered[0] * *DeltaTime;
   VelocityIncrease[1] = INS.AccelerationEarthFrame_Filtered[1] * *DeltaTime;
-  INS.Position_EarthFrame[0] += (INS.Velocity_EarthFrame[0] + VelocityIncrease[0] * 0.5) * *DeltaTime;
-  INS.Position_EarthFrame[1] += (INS.Velocity_EarthFrame[1] + VelocityIncrease[1] * 0.5) * *DeltaTime;
+  INS.Position_EarthFrame[0] += (INS.Velocity_EarthFrame[0] + VelocityIncrease[0] * 0.5f) * *DeltaTime;
+  INS.Position_EarthFrame[1] += (INS.Velocity_EarthFrame[1] + VelocityIncrease[1] * 0.5f) * *DeltaTime;
   INS.Velocity_EarthFrame[0] += VelocityIncrease[0];
   INS.Velocity_EarthFrame[1] += VelocityIncrease[1];
 }

@@ -38,6 +38,7 @@ private:
   void Dafult_Basic_Configuration();
   void Save_Medium_Configuration();
   void Dafult_Medium_Configuration();
+  void RadioControlDefault();
 };
 extern GCSClass GCS;
 #endif

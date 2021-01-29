@@ -52,13 +52,18 @@ uint32_t AbortAutoLaunch = 0;
 
 const float GetPitchAccelerationInMSS()
 {
-  return BodyFrameAcceleration.Roll; //????
+  return BodyFrameAcceleration.Roll;
+}
+
+const float GetRollAccelerationInMSS()
+{
+  return BodyFrameAcceleration.Pitch;
 }
 
 const bool GetSwingVelocityState()
 {
-  const float SwingVelocity = (ABS_FLOAT(BodyFrameRotation.Yaw) * 10 > SWING_LAUNCH_MIN_ROTATION_RATE) ? (BodyFrameAcceleration.Roll / BodyFrameRotation.Yaw) : 0;
-  return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (BodyFrameAcceleration.Pitch > 0);
+  const float SwingVelocity = (ABS_FLOAT(BodyFrameRotation.Yaw) * 10 > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / BodyFrameRotation.Yaw) : 0;
+  return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (GetPitchAccelerationInMSS() > 0);
 }
 
 void AutoLaunchDetector()
@@ -227,9 +232,9 @@ bool GetValidStateToRunLaunch()
   return (RadioControllOutput[THROTTLE] >= 1400);
 }
 
-bool GetIMUAngleBanked(float VectorRoll, bool CheckIMUInclination)
+bool GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination)
 {
-  return (VectorRoll < (IMU_BANKED_ANGLE) && CheckIMUInclination);
+  return (VectorPitch < (IMU_BANKED_ANGLE) && CheckIMUInclination);
 }
 
 bool AutoLaunchTimerOverFlow()

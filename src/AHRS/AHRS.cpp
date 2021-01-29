@@ -247,14 +247,14 @@ static void MahonyAHRSUpdate(float DeltaTime,
     }
 
     //CALCULA E APLICA O FEEDBACK INTEGRAL
-    if (IMURuntimeConfiguration.ki_Magnetometer > 0.0f)
+    if (IMURuntimeConfiguration.kI_Magnetometer > 0.0f)
     {
       //PARE A INTEGRAÇÃO SE O SPIN RATE FOR MAIOR QUE O LIMITE
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Struct_Vector3x3 OldVector;
         //CALCULA O ERRO INTEGRAL ESCALADO POR Ki
-        VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.ki_Magnetometer * DeltaTime);
+        VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.kI_Magnetometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
       }
     }

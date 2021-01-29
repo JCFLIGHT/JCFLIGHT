@@ -111,7 +111,7 @@ typedef struct
   float kP_Accelerometer = 0.25f;
   float kI_Accelerometer = 0.0050f;
   float kP_Magnetometer = 1;
-  float ki_Magnetometer = 0;
+  float kI_Magnetometer = 0;
 } Struct_IMURuntimeConfiguration;
 
 typedef struct

@@ -20,7 +20,7 @@
 #include "Arduino.h"
 bool GetStateOfThrottle();
 bool GetValidStateToRunLaunch();
-bool GetIMUAngleBanked(float VectorRoll, bool CheckIMUInclination);
+bool GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination);
 bool AutoLaunchTimerOverFlow();
 bool AutoLaunchCompleted();
 void Auto_Launch_Update();

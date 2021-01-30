@@ -18,9 +18,11 @@
 #ifndef BAROREAD_H_
 #define BAROREAD_H_
 #include "Arduino.h"
-extern int32_t BaroPressureRaw;
 extern int16_t BaroTemperatureRaw;
-void Baro_Calibration();
-void CalculateBaroAltitude();
+extern int32_t BaroPressureRaw;
+void Baro_AverageFilter();
+void CalculateBaroAltitudeForFlight();
+void DoBaroCalibrationForFlight();
+float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t BaroTemperature);
 int32_t GetAltitudeForGCS();
 #endif

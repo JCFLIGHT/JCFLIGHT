@@ -33,7 +33,7 @@ void INS_Calculate_AccelerationZ()
   if (SchedulerTimer(&INS_Calculate_AccelerationZTimer, 20000))
   {
     static bool Activated = false;
-    CalculateBaroAltitude();
+    CalculateBaroAltitudeForFlight();
     UpdateAccelerationEarthFrame_Filtered(2);
     if (COMMAND_ARM_DISARM)
     {

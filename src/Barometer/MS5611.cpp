@@ -127,7 +127,7 @@ void MS5611_Update()
   }
   if (StructBarometer.CountState == 0)
   {
-    Baro_Calibration();
+    Baro_AverageFilter();
     RawValue_UT_UP = &StructBarometer.UT;
     Command_UT_UP = 0x48;
   }

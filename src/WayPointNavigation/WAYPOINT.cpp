@@ -117,7 +117,9 @@ void PushWayPointParameters()
 {
   //NÃO VAMOS ZERAR AS VARIAVEIS,TALVEZ CONTÉM ALGO NA EEPROM
   if (GetWayPointGCSParameters.LatitudeOne == 0 || GetWayPointGCSParameters.LongitudeOne == 0)
+  {
     return;
+  }
 
   //OBTÉM TODAS AS LATITUDES DE CADA WAYPOINT
   WayPointLatitude[0] = GetWayPointGCSParameters.LatitudeOne;

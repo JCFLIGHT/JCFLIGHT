@@ -75,3 +75,5 @@
 #include "ParamsToGCS/FULLPARAMS.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "Build/BOARDDEFS.h"
+#include "Build/DEFAULT.h"
+#include "TaskSystem/TASKSYSTEM.h"

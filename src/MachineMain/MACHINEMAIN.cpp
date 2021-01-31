@@ -16,19 +16,17 @@
 */
 
 #include "MACHINEMAIN.h"
-#include "TaskSystem/TASKSYSTEM.h"
-#ifdef ESP32
-#include "EEPROM.h"
-#endif
 
 void MachineInit()
 {
-#ifdef ESP32
-    EEPROM.begin(2000);
-#endif
+    RGB.Initialization();
+    //ATIVA O LED VERMELHO
+    RED_LED_ON;
+    GREEN_LED_OFF;
+    BLUE_LED_OFF;
+    CheckFirstLinkOrganizeEEPROM();
     UART2Mode_Initialization();
     FASTSERIAL.Initialization();
-    RGB.Initialization();
     AUXFLIGHT.LoadEEPROM();
     SPEEDMOTORS.LoadEEPROM();
     FullParamsListInitialization();
@@ -38,10 +36,6 @@ void MachineInit()
     TPA_Initialization();
     //CARREGA OS PARAMETROS DO ALTITUDE-HOLD
     AltitudeHold_Update_Params();
-    //ATIVA O LED VERMELHO
-    RED_LED_ON;
-    GREEN_LED_OFF;
-    BLUE_LED_OFF;
     //CONFIGURA OS REGISTRADORES PARA A ROTINA DE INTERRUPÇÃO DA CAPTURA DO SINAL PPM
     ConfigurePPMRegisters();
     //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA E DO COMPASS

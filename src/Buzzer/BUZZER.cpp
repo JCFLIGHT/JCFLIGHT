@@ -176,6 +176,7 @@ void BEEPERCLASS::Run()
   if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
       STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_SWITCH)
   {
+    Silence();
     return;
   }
   if (!BuzzerInit)

@@ -26,6 +26,7 @@ public:
   void Serial_Parse_Protocol();
   void UpdateParametersToGCS();
   void SendStringToGCS(const char *String);
+  void Default_All_Configs();
 
 private:
   uint8_t GetDevicesActived();
@@ -35,9 +36,9 @@ private:
   void WayPoint_Request_Coordinates_Parameters();
   void WayPoint_Request_Others_Parameters();
   void Save_Basic_Configuration();
-  void Dafult_Basic_Configuration();
   void Save_Medium_Configuration();
-  void Dafult_Medium_Configuration();
+  void Default_Basic_Configuration();
+  void Default_Medium_Configuration();
   void Default_RadioControl();
 };
 extern GCSClass GCS;

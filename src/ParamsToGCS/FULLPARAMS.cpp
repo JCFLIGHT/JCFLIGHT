@@ -144,7 +144,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"AutoDisarm_YPR_Max", AUTODISARM_YPR_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_YPR_Max, 800, 2200},
     {"AHRS_Nearness", NEARNESS_ADDR, VAR_8BITS, &FullParamsList.Param_AHRS_Nearness, 0, 255},
     {"AirPlane_Wheels", WHEELS_ADDR, VAR_8BITS, &FullParamsList.Param_AirPlane_Wheels, 0, 255},
-    {"GPS_Baud_Rate", Get_BaudRate_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_Baud_Rate, 0, 4},
+    {"GPS_Baud_Rate", GPS_BAUDRATE_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_Baud_Rate, 0, 4},
     {"Navigation_Vel", NAV_VEL_ADDR, VAR_16BITS, &FullParamsList.Param_Navigation_Vel, 0, 400},
     {"GPS_WP_Radius", WP_RADIUS_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_WP_Radius, 0, 255},
     {"GPS_RTH_Land", RTH_LAND_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_RTH_Land, 0, 255},

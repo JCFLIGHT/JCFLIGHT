@@ -28,8 +28,8 @@ FILE_COMPILE_FOR_SPEED
 static Task_Resources_Struct *TaskQueueArray[TASK_COUNT + 1];
 static Task_Resources_Struct *CurrentTask = NULL;
 
-static int TaskQueuePosition = 0;
-static int TaskQueueSize = 0;
+static int16_t TaskQueuePosition = 0;
+static int16_t TaskQueueSize = 0;
 
 static void TaskQueueClear(void)
 {
@@ -152,10 +152,9 @@ void TaskSystemRun(void)
     }
     if (TaskPointer->DynamicPriority > SelectedTaskDynamicPriority)
     {
-      const bool TaskCanBeChosenForScheduling =
-          (OutsideRealtimeGuardInterval) ||
-          (TaskPointer->TaskAgeCycles > 1) ||
-          (TaskPointer->StaticPriority == TASK_PRIORITY_REALTIME);
+      const bool TaskCanBeChosenForScheduling = (OutsideRealtimeGuardInterval) ||
+                                                (TaskPointer->TaskAgeCycles > 1) ||
+                                                (TaskPointer->StaticPriority == TASK_PRIORITY_REALTIME);
       if (TaskCanBeChosenForScheduling)
       {
         SelectedTaskDynamicPriority = TaskPointer->DynamicPriority;

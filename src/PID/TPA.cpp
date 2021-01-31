@@ -20,6 +20,9 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Math/MATHSUPPORT.h"
 #include "BAR/BAR.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 TPA_Parameters_Struct TPA_Parameters;
 

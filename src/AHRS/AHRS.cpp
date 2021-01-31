@@ -27,6 +27,9 @@
 #include "Yaw/YAWMANIPULATION.h"
 #include "QUATERNION.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 #define SPIN_RATE_LIMIT 20        //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
 #define MAX_ACC_SQ_NEARNESS 25    //25% (0.87G - 1.12G)

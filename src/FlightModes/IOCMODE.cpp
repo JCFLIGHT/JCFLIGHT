@@ -20,6 +20,9 @@
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "FastSerial/PRINTF.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 //#define DEBUG_IOC
 

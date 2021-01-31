@@ -17,6 +17,9 @@
 
 #include "LPFACCEF.h"
 #include "Math/MATHSUPPORT.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 void LowPassFilter::Apply(const float Sample, float CutOff_Freq, float DeltaTime)
 {

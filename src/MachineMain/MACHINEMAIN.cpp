@@ -16,6 +16,9 @@
 */
 
 #include "MACHINEMAIN.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 void MachineInit()
 {

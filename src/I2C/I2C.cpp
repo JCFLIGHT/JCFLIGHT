@@ -78,7 +78,7 @@ void I2CPROTOCOL::Initialization(void)
 void __attribute__((noinline)) WaitTransmission(uint8_t _TWCR)
 {
   TWCR = _TWCR;
-  uint8_t CheckTWCRTWINTState = SizeOfThis;
+  uint8_t CheckTWCRTWINTState = SIZE_OF_I2C_DEVICES;
   while (!(TWCR & (1 << TWINT)))
   {
     CheckTWCRTWINTState--;

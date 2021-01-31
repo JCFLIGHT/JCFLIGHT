@@ -63,73 +63,7 @@ void ConfigurePPMRegisters()
   PPMChannelMap[10] = AUX7;
   PPMChannelMap[11] = AUX8;
 }
-/*
-#ifdef __AVR_ATmega2560__
 
-extern "C" void __vector_11(void) __attribute__((signal, __INTR_ATTRS));
-void __vector_11(void)
-{
-  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) ||
-      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
-  {
-    return;
-  }
-  if ((*(volatile uint8_t *)(0x106)) & 128)
-  {
-    InterruptRoutine();
-  }
-}
-
-void InterruptRoutine(void)
-
-#elif defined ESP32
-
-void IRAM_ATTR InterruptRoutine(void)
-
-#endif
-{
-  static uint8_t Channels = 0;
-  static uint8_t CheckFailSafe;
-  uint16_t PPMTimer;
-  uint16_t PPMTimerDifference;
-  static uint16_t PPMStoredTimer = 0;
-  PPMTimer = SCHEDULER.GetMicros();
-#ifdef __AVR_ATmega2560__
-  __asm__ __volatile__("sei" ::
-                           : "memory");
-#endif
-  PPMTimerDifference = PPMTimer - PPMStoredTimer;
-  PPMStoredTimer = PPMTimer;
-  if (PPMTimerDifference > 2700)
-  {
-    Channels = RESET_PPM;
-  }
-  else
-  {
-    if (PPMTimerDifference > 750 && PPMTimerDifference < 2250)
-    {
-      PPMReadChannels[Channels] = PPMTimerDifference;
-      if (Channels < 4 && PPMTimerDifference > FAILSAFE_DETECT_TRESHOLD)
-      {
-        CheckFailSafe |= (1 << Channels);
-      }
-      if (CheckFailSafe == 0x0F)
-      {
-        CheckFailSafe = 0;
-        if (Fail_Safe_System > 20)
-        {
-          Fail_Safe_System -= 20;
-        }
-        else
-        {
-          Fail_Safe_System = 0;
-        }
-      }
-    }
-    Channels++;
-  }
-}
-*/
 void DecodeAllReceiverChannels()
 {
   bool CheckFailSafeState = true;

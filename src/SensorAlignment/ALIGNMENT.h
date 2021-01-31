@@ -18,6 +18,5 @@
 #ifndef ALIGNMENT_H_
 #define ALIGNMENT_H_
 #include "Arduino.h"
-void UpdateSensorAlignment(void);
 void ApplySensorAlignment(int16_t *Vector);
 #endif

@@ -17,6 +17,9 @@
 
 #include "BIQUADFILTER.h"
 #include "Math/MATHSUPPORT.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 void BiQuadFilter::Settings(int16_t CutOffFreq, int16_t SampleFreq, uint8_t FilterType)
 {

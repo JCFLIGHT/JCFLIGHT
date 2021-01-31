@@ -29,6 +29,9 @@
 #ifdef ESP32
 #include "HAL_ESP32/GPIOPWM.h"
 #endif
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 //#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
 

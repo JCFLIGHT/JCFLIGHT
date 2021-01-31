@@ -19,6 +19,9 @@
 #define FILTER_H_
 
 #include <inttypes.h>
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 template <class T>
 class Filter

@@ -32,6 +32,9 @@
 #include "SensorAlignment/ALIGNMENT.h"
 #include "Build/BOARDDEFS.h"
 #include "IMUCALIBRATE.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 #ifdef __AVR_ATmega2560__
 //FILTRO MEDIA MOVEL COM 8 MEDIAS,VALOR BAIXO POR QUE AINDA TEM O FILTRO DE KALMAN

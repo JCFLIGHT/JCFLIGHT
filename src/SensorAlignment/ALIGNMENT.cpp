@@ -20,6 +20,9 @@
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 static Matrix3x3_Struct SensorRotationMatrix;
 
@@ -81,7 +84,7 @@ static bool CheckValidSensorAlignment()
     return !RollDeciDegrees && !PitchDeciDegrees && !YawDeciDegrees;
 }
 
-void UpdateSensorAlignment(void)
+static void UpdateSensorAlignment(void)
 {
     if (CheckValidSensorAlignment())
     {

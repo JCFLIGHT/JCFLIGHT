@@ -33,6 +33,9 @@
 #include "Filters/PT1.h"
 #include "AirSpeed/AIRSPEED.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 static PT1_Filter_Struct DerivativeRollFilter;
 static PT1_Filter_Struct DerivativePitchFilter;

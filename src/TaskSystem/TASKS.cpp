@@ -20,6 +20,9 @@
 #include "FunctionsLoop/LOOPS.h"
 #include "IMU/IMUCALIBRATE.h"
 #include "Build/BOARDDEFS.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 Task_Resources_Struct Task_Resources[TASK_COUNT] = {
 

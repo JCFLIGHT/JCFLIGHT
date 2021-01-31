@@ -21,6 +21,9 @@
 #include "Scheduler/SCHEDULER.h"
 #include "Math/MATHSUPPORT.h"
 #include "Build/BOARDDEFS.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 static Task_Resources_Struct *TaskQueueArray[TASK_COUNT + 1];
 static Task_Resources_Struct *CurrentTask = NULL;

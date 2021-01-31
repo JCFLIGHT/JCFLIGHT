@@ -24,6 +24,9 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/CURVESRC.h"
 #include "FastSerial/PRINTF.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 //DEBUG
 //#define PRINTLN_TPA

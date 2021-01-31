@@ -24,7 +24,7 @@
 //BOOL OU BOOLEAN (0 - 1) OU (TRUE - FALSE)
 //*******************************************************
 extern bool COMMAND_ARM_DISARM;
-extern bool SetFlightModes[SIZEOFTHIS];
+extern bool SetFlightModes[SIZE_OF_FLIGHT_MODES];
 extern bool CalibratingCompass;
 extern bool Do_GPS_Altitude;
 extern bool GPSHold_CallBaro;
@@ -110,5 +110,5 @@ extern IMU_STRUCT IMU;
 extern INS_STRUCT INS;
 extern ALTITUDE_STRUCT ALTITUDE;
 extern ATTITUDE_STRUCT ATTITUDE;
-extern PID_TERMS PID[SIZE_OF_THIS_PID_PARAMS];
+extern PID_TERMS PID[SIZE_OF_PID_PARAMS];
 #endif

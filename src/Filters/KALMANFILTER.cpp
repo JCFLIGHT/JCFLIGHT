@@ -16,6 +16,9 @@
 */
 
 #include "KALMANFILTER.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 //CALCULO DE FILTRAGEM DO KALMAN
 //x_k = Ax_{k-1} + Bu_k + w_k

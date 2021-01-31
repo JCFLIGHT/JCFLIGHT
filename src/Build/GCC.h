@@ -15,25 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "PT1.h"
-#include "Build/GCC.h"
-
-FILE_COMPILE_FOR_SPEED
-
-//PT1:
-//P = PONTOS
-//T = DURAÇÃO
-//1 = PRIMEIRA ORDEM
-
-float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime)
-{
-    //CALCULA O VALOR RC DO FILTRO
-    //ESTAMOS CALCULANDO UM RESISTOR E UM CAPACITOR DIGITALMENTE
-    Filter->RC = 1.0f / (6.283185307179586476925286766559f * CutOffFrequency);
-    //GUARDA O ÚLTIMO VALOR DO DELTA TIME
-    Filter->DeltaTime = DeltaTime;
-    //CALCULA O VALOR DO FILTRO
-    Filter->State = Filter->State + DeltaTime / (Filter->RC + DeltaTime) * (Input - Filter->State);
-    //RETORNA O VALOR FILTRADO
-    return Filter->State;
-}
+#ifndef GCC_H_
+#define GCC_H_
+#define FILE_COMPILE_FOR_SPEED _Pragma("GCC optimize(\"Ofast\")")
+#endif

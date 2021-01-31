@@ -20,6 +20,9 @@
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 static uint8_t IBUSIndex = 0;
 static uint8_t IBUS_Vector[32];

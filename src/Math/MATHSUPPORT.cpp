@@ -16,6 +16,9 @@
 */
 
 #include "MATHSUPPORT.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 float ABS_FLOAT(float X)
 {

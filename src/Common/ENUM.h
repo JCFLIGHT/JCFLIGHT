@@ -58,7 +58,7 @@ enum PID_Params_Enum
     PIDGPSNAVIGATIONRATE,
     PIDAUTOLEVEL,
     PIDYAWVELOCITY,
-    SIZE_OF_THIS_PID_PARAMS
+    SIZE_OF_PID_PARAMS
 };
 
 enum FlightModes_Enum
@@ -74,7 +74,7 @@ enum FlightModes_Enum
     LAND_MODE,
     FLIP_MODE,
     WAYPOINT_MODE,
-    SIZEOFTHIS
+    SIZE_OF_FLIGHT_MODES
 };
 
 enum AuxiliarChannels_EEPROM_Enum
@@ -288,7 +288,7 @@ enum I2C_Supported_Devices_Enum
     ADDRESS_IMU_MPU6050 = 0X68,
     ADDRESS_BAROMETER_BMP280 = 0x76,
     ADDRESS_BAROMETER_MS5611 = 0x77,
-    SizeOfThis
+    SIZE_OF_I2C_DEVICES
 };
 
 enum Parachute_RCAuxiliaryChannels_Enum

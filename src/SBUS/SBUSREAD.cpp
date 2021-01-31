@@ -22,6 +22,9 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FastSerial/PRINTF.h"
 #include "BAR/BAR.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 SBUS SBUSRC;
 

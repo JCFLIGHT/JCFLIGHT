@@ -22,7 +22,7 @@
 //BOOL OU BOOLEAN (0 - 1) OU (TRUE - FALSE)
 //*******************************************************
 bool COMMAND_ARM_DISARM = false;
-bool SetFlightModes[SIZEOFTHIS];
+bool SetFlightModes[SIZE_OF_FLIGHT_MODES];
 bool CalibratingCompass = false;
 bool Do_GPS_Altitude = false;
 bool GPSHold_CallBaro = false;
@@ -107,4 +107,4 @@ INS_STRUCT INS;
 ALTITUDE_STRUCT ALTITUDE;
 ATTITUDE_STRUCT ATTITUDE;
 CALIBRATION_STRUCT CALIBRATION;
-PID_TERMS PID[SIZE_OF_THIS_PID_PARAMS];
+PID_TERMS PID[SIZE_OF_PID_PARAMS];

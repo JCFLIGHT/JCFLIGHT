@@ -19,6 +19,9 @@
 #define MIXTABLE_H_
 #include "Arduino.h"
 #include "Common/STRUCTS.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 #ifdef __AVR_ATmega2560__
 

@@ -16,6 +16,9 @@
 */
 
 #include "LPFSERVO.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 void LowPassFilterCoefficient(int16_t CutOffFreq, Struct_LowPassFilter *Filter, int16_t InputBias)
 {

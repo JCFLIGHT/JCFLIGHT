@@ -18,6 +18,9 @@
 #include "REBOOT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "MotorsControl/MOTORS.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 bool InShutDown = false;
 

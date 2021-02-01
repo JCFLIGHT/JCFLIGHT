@@ -15,11 +15,30 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
-#include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
-void PPM_Initialization();
-void DecodeAllReceiverChannels();
+#include "ESP32FREERAM.h"
+#include "Math/MATHSUPPORT.h"
+
+#ifdef ESP32
+
+bool MemRamChecked = false;
+uint32_t Free;
+uint32_t SizeOfRamMemory;
+
+uint16_t _MemoryRAM_Check()
+{
+  if (MemRamChecked)
+  {
+    return SizeOfRamMemory; //EVITA REALIZAR UM NOVO CALCULO DE RAM A CADA CICLO DE MAQUINA
+  }
+  MemRamChecked = true;
+  Free = 327680 - ESP.getFreeHeap();
+  SizeOfRamMemory = ESP.getFreeHeap();
+  return ESP.getFreeHeap(); //RETORNA O VALOR DA MEMORIA RAM LIVRE NO ESP32
+}
+
+uint8_t _GetPercentageRAMUsed()
+{
+  return Free / 327680 * 100;
+}
+
 #endif

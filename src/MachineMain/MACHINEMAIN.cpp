@@ -39,8 +39,8 @@ void MachineInit()
     TPA_Initialization();
     //CARREGA OS PARAMETROS DO ALTITUDE-HOLD
     AltitudeHold_Update_Params();
-    //CONFIGURA OS REGISTRADORES PARA A ROTINA DE INTERRUPÇÃO DA CAPTURA DO SINAL PPM
-    ConfigurePPMRegisters();
+    //INICIALIZA AS COFIGURAÇÕES DO PPM
+    PPM_Initialization();
     //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA E DO COMPASS
     CheckAndUpdateIMUCalibration();
     //CARREGA OS VALORES DE PID
@@ -62,8 +62,6 @@ void MachineInit()
     WayPoint_Initialization();
     //RECOLHE AS PRIMEIRAS AMOSTRAS DO AIR-SPEED PARA CALIBRAR
     AirSpeed_Initialization();
-    //CALIBRA O GYRO
-    CalibratingGyroscope = 512;
     //INICIA O BUZZER EM OPERAÇÃO NORMAL
     ESC.BeeperMode = NORMAL_OPERATION_MODE;
     //INICIALIZA O AHRS

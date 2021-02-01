@@ -29,7 +29,7 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
     [TASK_SLOW_LOOP] = {
         .TaskName = "SLOW_LOOP",
         .TaskFunction = Slow_Loop,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(10, "Hz"),
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(10, "Hz"),
 #ifndef __AVR_ATmega2560__
         .StaticPriority = TASK_PRIORITY_LOW,
 #else
@@ -40,14 +40,14 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
     [TASK_MEDIUM_LOOP] = {
         .TaskName = "MEDIUM_LOOP",
         .TaskFunction = Medium_Loop,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(50, "Hz"),
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(50, "Hz"),
         .StaticPriority = TASK_PRIORITY_HIGH,
     },
 
     [TASK_FAST_MEDIUM_LOOP] = {
         .TaskName = "FAST_MEDIUM_LOOP",
         .TaskFunction = Fast_Medium_Loop,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(100, "Hz"),
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(100, "Hz"),
 #ifndef __AVR_ATmega2560__
         .StaticPriority = TASK_PRIORITY_MEDIUM,
 #else
@@ -60,24 +60,31 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
     [TASK_FAST_LOOP] = {
         .TaskName = "FAST_LOOP",
         .TaskFunction = Fast_Loop,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(400, "Hz"),
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(400, "Hz"),
         .StaticPriority = TASK_PRIORITY_LOW,
     },
 
     [TASK_SUPER_FAST_LOOP] = {
         .TaskName = "SUPER_FAST_LOOP",
         .TaskFunction = Super_Fast_Loop,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(500, "Hz"),
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(500, "Hz"),
         .StaticPriority = TASK_PRIORITY_HIGH,
     },
 
     [TASK_INTEGRAL_LOOP] = {
         .TaskName = "INTEGRAL_LOOP",
         .TaskFunction = Integral_Loop,
-        .DesiredPeriod = SCHEDULER_PERIOD_HZ(THIS_LOOP_FREQUENCY, "KHz"),
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"),
         .StaticPriority = TASK_PRIORITY_REALTIME,
     },
 
 #endif
+
+    [TASK_SYSTEM_LOAD] = {
+        .TaskName = "SYSTEM_LOAD",
+        .TaskFunction = SystemLoad,
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(10, "Hz"),
+        .StaticPriority = TASK_PRIORITY_HIGH,
+    },
 
 };

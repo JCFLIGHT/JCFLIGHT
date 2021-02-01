@@ -31,6 +31,11 @@ static Task_Resources_Struct *CurrentTask = NULL;
 static int16_t TaskQueuePosition = 0;
 static int16_t TaskQueueSize = 0;
 
+uint16_t SystemLoadPercent = 0;
+
+static uint32_t TotalWaitingTasks;
+static uint32_t WaitingTasksSamples;
+
 static void TaskQueueClear(void)
 {
   memset(TaskQueueArray, 0, sizeof(TaskQueueArray));
@@ -119,6 +124,7 @@ void TaskSystemInitialization(void)
   SetTaskEnabled(TASK_SUPER_FAST_LOOP, true);
   SetTaskEnabled(TASK_INTEGRAL_LOOP, true);
 #endif
+  SetTaskEnabled(TASK_SYSTEM_LOAD, true);
 }
 
 void TaskSystemRun(void)
@@ -162,6 +168,8 @@ void TaskSystemRun(void)
       }
     }
   }
+  WaitingTasksSamples++;
+  TotalWaitingTasks += WaitingTasks;
   CurrentTask = SelectedTask;
   if (SelectedTask)
   {
@@ -169,5 +177,15 @@ void TaskSystemRun(void)
     SelectedTask->LastExecuted = ActualCurrentTime;
     SelectedTask->DynamicPriority = 0;
     SelectedTask->TaskFunction();
+  }
+}
+
+void SystemLoad()
+{
+  if (WaitingTasksSamples > 0)
+  {
+    SystemLoadPercent = Constrain_16Bits(100 * TotalWaitingTasks / WaitingTasksSamples, 0, 100);
+    WaitingTasksSamples = 0;
+    TotalWaitingTasks = 0;
   }
 }

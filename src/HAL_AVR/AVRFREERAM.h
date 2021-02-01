@@ -15,11 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
+#ifndef AVRFREERAM_H_
+#define AVRFREERAM_H_
+#ifdef __AVR_ATmega2560__
 #include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
-void PPM_Initialization();
-void DecodeAllReceiverChannels();
+uint16_t _MemoryRAM_Check();
+uint8_t _GetPercentageRAMUsed();
+#endif
 #endif

@@ -32,7 +32,9 @@ void Serial_Initialization()
     GPS_SerialInit(57600);
     //IBUS & SBUS
     if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 0)
+    {
         Serial_Begin(UART_NUMB_2, 115200);
+    }
     if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
     {
         //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS

@@ -44,6 +44,7 @@
 #include "Arming/ARMING.h"
 #include "PID/PIDXYZ.h"
 #include "Scheduler/SCHEDULER.h"
+#include "TaskSystem/TASKSYSTEM.h"
 
 GCSClass GCS;
 
@@ -144,6 +145,7 @@ struct _GCSParameters_Two
     uint16_t SendGPSGroundSpeed;
     int16_t SendI2CError;
     uint16_t SendAirSpeedValue;
+    uint8_t SendCPULoad;
 } GCSParameters_Two;
 
 struct _SendUserBasicGCSParameters
@@ -827,7 +829,8 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, sizeof(uint8_t) * 22); //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 32) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 6)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(SendUserBasicGCSParameters.SendFrameType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendReceiverType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendGimbalType, VAR_8BITS);
@@ -866,7 +869,6 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendUserBasicGCSParameters.SendAHDeadZone, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAHSafeAltitude, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAHMinVelVertical, VAR_8BITS);
-
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -912,7 +914,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 1) +      //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 2) +      //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 32)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(GCSParameters_Two.SendActualThrottleValue, VAR_16BITS);
         GCS_Send_Data(GCSParameters_Two.SendActualYawValue, VAR_16BITS);
@@ -947,6 +949,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(GCSParameters_Two.SendGPSGroundSpeed, VAR_16BITS);
         GCS_Send_Data(GCSParameters_Two.SendI2CError, VAR_16BITS);
         GCS_Send_Data(GCSParameters_Two.SendAirSpeedValue, VAR_16BITS);
+        GCS_Send_Data(GCSParameters_Two.SendCPULoad, VAR_8BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1041,7 +1044,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 29:
-        GCS.RadioControlDefault();
+        GCS.Default_RadioControl();
         break;
     }
 
@@ -1156,6 +1159,7 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendGPSGroundSpeed = GPS_Ground_Speed;
     GCSParameters_Two.SendI2CError = ErrorI2C;
     GCSParameters_Two.SendAirSpeedValue = AirSpeedCalcedInCM;
+    GCSParameters_Two.SendCPULoad = SystemLoadPercent;
 }
 
 void GCSClass::WayPoint_Request_Coordinates_Parameters()

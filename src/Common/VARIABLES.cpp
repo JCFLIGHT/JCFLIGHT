@@ -62,7 +62,7 @@ uint8_t ThrottleExpo;
 uint16_t MotorSpeed = 0;
 uint16_t GPS_HDOP;
 uint16_t CalibratingAccelerometer = 0;
-uint16_t CalibratingGyroscope;
+uint16_t CalibratingGyroscope = 512;
 uint16_t CalculeLookUpThrottle[11];
 uint16_t GPS_Ground_Course = 0;
 uint16_t DistanceToHome;

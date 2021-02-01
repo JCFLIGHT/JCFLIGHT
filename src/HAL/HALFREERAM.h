@@ -15,11 +15,9 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
+#ifndef HALFREERAM_H_
+#define HALFREERAM_H_
 #include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
-void PPM_Initialization();
-void DecodeAllReceiverChannels();
+uint16_t _MemoryRAM_Check_();
+uint8_t _GetPercentageRAMUsed_();
 #endif

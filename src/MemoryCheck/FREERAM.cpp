@@ -16,58 +16,16 @@
 */
 
 #include "FREERAM.h"
-
-//******************************************
-//CALCULA A MEMORIA RAM LIVRE DO MEGA2560
-//******************************************
+#include "HAL/HALFREERAM.h"
 
 MEMORYCLASS MEMORY;
 
-#ifdef __AVR_ATmega2560__
-
-//STACK POINTER STARTA NO TOPO DA MEMORIA RAM E DESCE ATÉ O FINAL
-//HEAP POINTER STARTA JUNTO COM VARIAVEIS STATICAS,STRUTURAS,ETC E VAI ATÉ O FINAL
-//SP É A LARGURA DO HEAP POINTER
 uint16_t MEMORYCLASS::Check()
 {
-  if (MemRamChecked)
-    return STACKPTR - HEAPPTR;     //EVITA REALIZAR UM NOVO CALCULO DE RAM A CADA CICLO DE MAQUINA
-  STACKPTR = (uint8_t *)malloc(4); //USA STACKPTR TEMPORIAMENTE
-  HEAPPTR = STACKPTR;              //SALVA O VALOR DO STACKPTR NA VARIAVEL HEAPPTR
-  free(STACKPTR);                  //SETA STACK EM ZERO
-  STACKPTR = (uint8_t *)(SP);      //SALVA O VALOR PARA STACKPTR
-  MemRamChecked = true;
-  Free = 8192 - (STACKPTR - HEAPPTR);
-  return STACKPTR - HEAPPTR; //RETORNA O VALOR DA MEMORIA RAM LIVRE NO MEGA2560
+  return _MemoryRAM_Check_();
 }
 
 uint8_t MEMORYCLASS::GetPercentageRAMUsed()
 {
-  return Free / 8192 * 100;
+  return _GetPercentageRAMUsed_();
 }
-
-#elif defined ESP32
-
-uint16_t MEMORYCLASS::Check()
-{
-  return 0;
-}
-
-uint8_t MEMORYCLASS::GetPercentageRAMUsed()
-{
-  return 0;
-}
-
-#elif defined __arm__
-
-uint16_t MEMORYCLASS::Check()
-{
-  return 0;
-}
-
-uint8_t MEMORYCLASS::GetPercentageRAMUsed()
-{
-  return 0;
-}
-
-#endif

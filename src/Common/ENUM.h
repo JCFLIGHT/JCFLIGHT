@@ -432,6 +432,7 @@ typedef enum
     TASK_SUPER_FAST_LOOP,
     TASK_INTEGRAL_LOOP,
 #endif
+    TASK_SYSTEM_LOAD,
     //TASK COUNT SEMPRE EM ÚLTIMO LUGAR
     TASK_COUNT
 } Tasks_ID_Enum;

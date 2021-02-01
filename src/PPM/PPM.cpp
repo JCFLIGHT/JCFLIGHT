@@ -33,7 +33,7 @@
 volatile uint16_t PPMReadChannels[12];
 uint8_t PPMChannelMap[12];
 
-void ConfigurePPMRegisters()
+void PPM_Initialization()
 {
   if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2))
   {

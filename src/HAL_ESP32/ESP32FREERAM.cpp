@@ -21,7 +21,7 @@
 #ifdef ESP32
 
 bool MemRamChecked = false;
-uint32_t Free;
+float Free;
 uint32_t SizeOfRamMemory;
 
 uint16_t _MemoryRAM_Check()

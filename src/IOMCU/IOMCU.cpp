@@ -731,7 +731,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 28:
         if (!COMMAND_ARM_DISARM)
         {
-            RebootThisBoard();
+            WATCHDOG.Reboot();
         }
         break;
 
@@ -1039,7 +1039,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 28:
         if (!COMMAND_ARM_DISARM)
         {
-            RebootThisBoard();
+            WATCHDOG.Reboot();
         }
         break;
 

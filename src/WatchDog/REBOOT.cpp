@@ -22,7 +22,7 @@
 
 FILE_COMPILE_FOR_SPEED
 
-bool InShutDown = false;
+WatchDogClass WATCHDOG;
 
 #ifdef __AVR_ATmega2560__
 
@@ -80,7 +80,7 @@ static __inline__ __attribute__((__always_inline__)) void WatchDogReset(const ui
 
 #endif
 
-void RebootThisBoard(void)
+void WatchDogClass::Reboot(void)
 {
     ShutDownAllMotorsAndServos();
     SCHEDULER.Sleep(1000); //ESPERA O MICROCONTROLADOR DOS ESCS REAGIREM AO PULSO EM LOW

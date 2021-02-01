@@ -158,7 +158,7 @@ void ConfigureRegisters()
 
 void PID_MixMotors()
 {
-  if (!SAFETYBUTTON.GetSafeStateToOutput() || InShutDown)
+  if (!SAFETYBUTTON.GetSafeStateToOutput() || WATCHDOG.InShutDown)
   {
     return;
   }
@@ -205,7 +205,7 @@ void PulseInAllMotors(int16_t Pulse)
 
 void ShutDownAllMotorsAndServos()
 {
-  InShutDown = true;
+  WATCHDOG.InShutDown = true;
 #ifdef __AVR_ATmega2560__
   OCR3A = 0;
   OCR3B = 0;
@@ -230,7 +230,7 @@ void ShutDownAllMotorsAndServos()
 
 void ApplyPWMInAllComponents()
 {
-  if (InShutDown)
+  if (WATCHDOG.InShutDown)
   {
     return;
   }

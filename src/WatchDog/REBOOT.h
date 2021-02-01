@@ -17,6 +17,11 @@
 
 #ifndef REBOOT_H_
 #define REBOOT_H_
-extern bool InShutDown;
-void RebootThisBoard(void);
+class WatchDogClass
+{
+public:
+  bool InShutDown;
+  void Reboot(void);
+};
+extern WatchDogClass WATCHDOG;
 #endif

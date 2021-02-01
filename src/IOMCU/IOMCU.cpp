@@ -353,7 +353,7 @@ static void GCS_Send_Data(uint8_t Buffer)
     FASTSERIAL.StoreTX(UART_NUMB_0, Buffer);
     SerialCheckSum ^= Buffer;
 
-#elif defined ESP32
+#elif defined ESP32 || defined __arm__
 
 static void GCS_Send_Data(int32_t Buffer, uint8_t Length)
 {
@@ -408,7 +408,7 @@ static void Communication_Passed(bool Error, uint8_t Buffer)
     FASTSERIAL.StoreTX(UART_NUMB_0, ProtocolCommand);
     SerialCheckSum ^= ProtocolCommand;
 
-#elif defined ESP32
+#elif defined ESP32 || defined __arm__
 
     SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x4a;
     SerialCheckSum ^= 0x4a;
@@ -460,7 +460,7 @@ void GCSClass::SendStringToGCS(const char *String)
     GCS_Send_Data(SerialCheckSum);
     FASTSERIAL.UartSendData(UART_NUMB_0);
 
-#elif defined ESP32
+#elif defined ESP32 || defined __arm__
 
     Communication_Passed(false, strlen_P(String));
     for (const char *StringCount = String; ProgMemReadByte(StringCount); StringCount++)
@@ -541,7 +541,7 @@ void GCSClass::Serial_Parse_Protocol()
         }
         PreviousProtocolTaskOrder = ProtocolTaskOrder;
     }
-#ifdef ESP32
+#if defined(ESP32) || (defined __arm__)
 
     while (SerialOutputBufferSizeCount > 0)
     {
@@ -746,7 +746,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
     }
 
-#elif defined ESP32
+#elif defined ESP32 || defined __arm__
 
     switch (TaskOrderGCS)
     {

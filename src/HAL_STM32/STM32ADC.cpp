@@ -15,14 +15,13 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "HALADC.h"
-#include "HAL_AVR/AVRADC.h"
-#include "HAL_ESP32/GPIOANALOGREAD.h"
-#include "HAL_STM32/STM32ADC.h"
+#include "STM32ADC.h"
 
-HAL_ADC_Class HAL_ADC;
+#ifdef __arm__
 
-int16_t HAL_ADC_Class::AnalogRead(uint8_t AnalogPin)
+int16_t GPIOAnalogRead(uint8_t AnalogPin)
 {
-    return GPIOAnalogRead(AnalogPin);
+    return 0;
 }
+
+#endif

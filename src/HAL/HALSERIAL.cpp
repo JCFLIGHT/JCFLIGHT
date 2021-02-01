@@ -18,6 +18,7 @@
 #include "HALSERIAL.h"
 #include "HAL_AVR/AVRSERIAL.h"
 #include "HAL_ESP32/ESP32SERIAL.h"
+#include "HAL_STM32/STM32SERIAL.h"
 
 HALSerialClass HAL_SERIAL;
 

@@ -15,14 +15,10 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "HALADC.h"
-#include "HAL_AVR/AVRADC.h"
-#include "HAL_ESP32/GPIOANALOGREAD.h"
-#include "HAL_STM32/STM32ADC.h"
-
-HAL_ADC_Class HAL_ADC;
-
-int16_t HAL_ADC_Class::AnalogRead(uint8_t AnalogPin)
-{
-    return GPIOAnalogRead(AnalogPin);
-}
+#ifndef STM32ADC_H_
+#define STM32ADC_H_
+#ifdef __arm__
+#include "Arduino.h"
+int16_t GPIOAnalogRead(uint8_t AnalogPin);
+#endif
+#endif

@@ -57,25 +57,39 @@ uint8_t GetImageToGCS(void)
       CALIBRATION.AccelerometerScale[ROLL] != 0 &&
       CALIBRATION.AccelerometerScale[PITCH] != 0 &&
       CALIBRATION.AccelerometerScale[YAW] != 0)
+  {
     return 0x3F;
+  }
 
   if (AccCalibratedPosition[0])
+  {
     FlagCheck |= (1 << ImageBitMap[0]);
+  }
 
   if (AccCalibratedPosition[1])
+  {
     FlagCheck |= (1 << ImageBitMap[1]);
+  }
 
   if (AccCalibratedPosition[2])
+  {
     FlagCheck |= (1 << ImageBitMap[2]);
+  }
 
   if (AccCalibratedPosition[3])
+  {
     FlagCheck |= (1 << ImageBitMap[3]);
+  }
 
   if (AccCalibratedPosition[4])
+  {
     FlagCheck |= (1 << ImageBitMap[4]);
+  }
 
   if (AccCalibratedPosition[5])
+  {
     FlagCheck |= (1 << ImageBitMap[5]);
+  }
 
   return FlagCheck;
 }

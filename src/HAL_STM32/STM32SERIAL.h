@@ -15,14 +15,19 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "HALADC.h"
-#include "HAL_AVR/AVRADC.h"
-#include "HAL_ESP32/GPIOANALOGREAD.h"
-#include "HAL_STM32/STM32ADC.h"
-
-HAL_ADC_Class HAL_ADC;
-
-int16_t HAL_ADC_Class::AnalogRead(uint8_t AnalogPin)
-{
-    return GPIOAnalogRead(AnalogPin);
-}
+#ifndef STM32SERIAL_H_
+#define STM32SERIAL_H_
+#ifdef __arm__
+#include "Arduino.h"
+void Serial_Initialization();
+void Serial_Begin(uint8_t SerialPort, uint32_t BaudRate);
+uint8_t Serial_Read(uint8_t SerialPort);
+void Serial_Write(uint8_t SerialPort, uint8_t WriteData);
+uint8_t Serial_Available(uint8_t SerialPort);
+bool Serial_TXFree(uint8_t SerialPort);
+uint8_t Serial_UsedTXBuffer(uint8_t SerialPort);
+void Serial_StoreTX(uint8_t SerialPort, uint8_t WriteTX);
+void Serial_UartSendData(uint8_t SerialPort);
+void Serial_UartBufferStore(uint8_t UartBuffer, uint8_t SerialPort);
+#endif
+#endif

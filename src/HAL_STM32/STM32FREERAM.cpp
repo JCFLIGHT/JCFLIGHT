@@ -15,14 +15,27 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "HALADC.h"
-#include "HAL_AVR/AVRADC.h"
-#include "HAL_ESP32/GPIOANALOGREAD.h"
-#include "HAL_STM32/STM32ADC.h"
+#include "STM32FREERAM.h"
 
-HAL_ADC_Class HAL_ADC;
+#ifdef __arm__
 
-int16_t HAL_ADC_Class::AnalogRead(uint8_t AnalogPin)
+bool MemRamChecked = false;
+float Free;
+
+uint16_t _MemoryRAM_Check()
 {
-    return GPIOAnalogRead(AnalogPin);
+    if (MemRamChecked)
+    {
+        return 0; //EVITA REALIZAR UM NOVO CALCULO DE RAM A CADA CICLO DE MAQUINA
+    }
+    MemRamChecked = true;
+    //Free = 131072 - (STACKPTR - HEAPPTR);
+    return 0; //RETORNA O VALOR DA MEMORIA RAM LIVRE NO STM32
 }
+
+uint8_t _GetPercentageRAMUsed()
+{
+    return Free / 131072 * 100;
+}
+
+#endif

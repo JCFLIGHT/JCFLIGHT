@@ -108,9 +108,9 @@ void PlaneUpdateNavigation(void)
   GPSTargetBearing = Original_Target_Bearing / 100;
   HeadingDifference = GPSTargetBearing - Current_Heading;
   AltitudeError = CurrentAltitude - TargetAltitude;
-  if (SCHEDULER.GetMillis() - NavTimer >= 200)
+  if (SCHEDULERTIME.GetMillis() - NavTimer >= 200)
   {
-    NavTimer = SCHEDULER.GetMillis();
+    NavTimer = SCHEDULERTIME.GetMillis();
     if (ABS_16BITS(AltitudeError) < 1)
     {
       GetThrottleToNavigation = 1500;
@@ -154,8 +154,8 @@ void PlaneUpdateNavigation(void)
     {
       HeadingDifference = 175;
     }
-    TimePIDOfNavigationPrimary = (float)(SCHEDULER.GetMillis() - TimePIDOfNavigation) / 1000;
-    TimePIDOfNavigation = SCHEDULER.GetMillis();
+    TimePIDOfNavigationPrimary = (float)(SCHEDULERTIME.GetMillis() - TimePIDOfNavigation) / 1000;
+    TimePIDOfNavigation = SCHEDULERTIME.GetMillis();
     if (ABS_16BITS(AltitudeError) <= 3)
       IntegralErrorOfAltitude *= TimePIDOfNavigationPrimary;
     AltitudeError *= 10;

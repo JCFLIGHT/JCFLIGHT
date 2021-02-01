@@ -37,7 +37,7 @@ void Operator_Check_Values_In_Address(uint16_t Size)
             while (true)
                 ;
         }
-        SCHEDULER.Sleep(4);
+        SCHEDULERTIME.Sleep(4);
     }
 }
 
@@ -59,7 +59,7 @@ void Operator_Check_Values_In_Address(uint16_t Size)
             while (true)
                 ;
         }
-        SCHEDULER.Sleep(4);
+        SCHEDULERTIME.Sleep(4);
     }
 }
 

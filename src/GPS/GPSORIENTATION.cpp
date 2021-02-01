@@ -30,7 +30,7 @@ void GPS_Orientation_Update()
   {
     bool AltHoldControlApplied = ApplyAltitudeHoldControl();
     static Scheduler_Struct GPSControlTimer;
-    if (!AltHoldControlApplied && SchedulerTimer(&GPSControlTimer, 20000))
+    if (!AltHoldControlApplied && Scheduler(&GPSControlTimer, 20000))
     {
       if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != Do_None))
       {

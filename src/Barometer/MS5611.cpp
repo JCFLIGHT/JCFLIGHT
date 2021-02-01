@@ -31,7 +31,7 @@ static struct
 void MS5611_Initialization()
 {
   I2C.WriteRegister(0x77, 0x1E, 0);
-  SCHEDULER.Sleep(100);
+  SCHEDULERTIME.Sleep(100);
   union
   {
     uint16_t Value;

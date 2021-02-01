@@ -146,7 +146,7 @@ void Accelerometer_Calibration()
 
 #ifndef __AVR_ATmega2560__
   static Scheduler_Struct ACC_Calibration_Timer;
-  if (SchedulerTimer(&ACC_Calibration_Timer, 5000))
+  if (Scheduler(&ACC_Calibration_Timer, 5000))
   {
 #endif
 

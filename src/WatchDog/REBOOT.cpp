@@ -83,7 +83,7 @@ static __inline__ __attribute__((__always_inline__)) void WatchDogReset(const ui
 void WatchDogClass::Reboot(void)
 {
     ShutDownAllMotorsAndServos();
-    SCHEDULER.Sleep(1000); //ESPERA O MICROCONTROLADOR DOS ESCS REAGIREM AO PULSO EM LOW
+    SCHEDULERTIME.Sleep(1000); //ESPERA O MICROCONTROLADOR DOS ESCS REAGIREM AO PULSO EM LOW
 #ifdef __AVR_ATmega2560__
 
     __asm__ __volatile__("cli" ::

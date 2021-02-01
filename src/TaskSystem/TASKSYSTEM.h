@@ -23,4 +23,5 @@ extern uint16_t SystemLoadPercent;
 void TaskSystemInitialization(void);
 void TaskSystemRun(void);
 void SystemLoad();
+uint32_t GetTaskDeltaTime(Tasks_ID_Enum TaskId);
 #endif

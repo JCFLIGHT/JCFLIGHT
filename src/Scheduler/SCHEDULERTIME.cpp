@@ -20,7 +20,7 @@
 #include <avr/interrupt.h>
 #endif
 
-SchedulerTimeClass SCHEDULER;
+SchedulerTimeClass SCHEDULERTIME;
 
 #ifdef __AVR_ATmega2560__
 
@@ -87,12 +87,12 @@ uint32_t SchedulerTimeClass::GetMicros()
 
 void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
 {
-  uint32_t Start = SCHEDULER.GetMicros();
+  uint32_t Start = SCHEDULERTIME.GetMicros();
   while (MillisSeconds > 0)
   {
-    SCHEDULER.GetMicros();
-    SCHEDULER.GetMillis();
-    while ((SCHEDULER.GetMicros() - Start) >= 1000)
+    SCHEDULERTIME.GetMicros();
+    SCHEDULERTIME.GetMillis();
+    while ((SCHEDULERTIME.GetMicros() - Start) >= 1000)
     {
       MillisSeconds--;
       if (MillisSeconds == 0)

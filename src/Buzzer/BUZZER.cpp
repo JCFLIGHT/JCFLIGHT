@@ -139,7 +139,7 @@ void BEEPERCLASS::Update()
   {
     return;
   }
-  if (BeeperNextNote > SCHEDULER.GetMicros() / 1000)
+  if (BeeperNextNote > SCHEDULERTIME.GetMicros() / 1000)
   {
     return;
   }
@@ -166,7 +166,7 @@ void BEEPERCLASS::ProcessCommand()
   }
   else
   {
-    BeeperNextNote = SCHEDULER.GetMillis() + 10 * BeeperEntry->Sequence[BeeperPositionArray];
+    BeeperNextNote = SCHEDULERTIME.GetMillis() + 10 * BeeperEntry->Sequence[BeeperPositionArray];
     BeeperPositionArray++;
   }
 }

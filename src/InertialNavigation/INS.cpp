@@ -30,7 +30,7 @@ int32_t HistoryZPosition[10];
 void INS_Calculate_AccelerationZ()
 {
   static Scheduler_Struct INS_Calculate_AccelerationZTimer;
-  if (SchedulerTimer(&INS_Calculate_AccelerationZTimer, 20000))
+  if (Scheduler(&INS_Calculate_AccelerationZTimer, 20000))
   {
     static bool Activated = false;
     CalculateBaroAltitudeForFlight();
@@ -102,7 +102,7 @@ int32_t HistoryXYPosition[2][10];
 void CalculateXY_INS()
 {
   static Scheduler_Struct CalculateXY_INSTimer;
-  if (SchedulerTimer(&CalculateXY_INSTimer, 20000))
+  if (Scheduler(&CalculateXY_INSTimer, 20000))
   {
     static bool Activated = false;
     UpdateAccelerationEarthFrame_Filtered(0);

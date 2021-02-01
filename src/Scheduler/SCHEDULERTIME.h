@@ -27,5 +27,5 @@ public:
   uint32_t GetMillis(void);
   uint32_t GetMicros(void);
 };
-extern SchedulerTimeClass SCHEDULER;
+extern SchedulerTimeClass SCHEDULERTIME;
 #endif

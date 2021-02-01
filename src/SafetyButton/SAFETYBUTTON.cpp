@@ -44,11 +44,11 @@ void SAFETYBUTTONCLASS::Initialization()
 
 bool SAFETYBUTTONCLASS::GetButtonInterval()
 {
-    if (SCHEDULER.GetMillis() - LastDebounceTime < BUTTON_SCHEDULE)
+    if (SCHEDULERTIME.GetMillis() - LastDebounceTime < BUTTON_SCHEDULE)
     {
         return false;
     }
-    LastDebounceTime = SCHEDULER.GetMillis();
+    LastDebounceTime = SCHEDULERTIME.GetMillis();
     return true;
 }
 

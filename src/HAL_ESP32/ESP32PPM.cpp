@@ -33,7 +33,7 @@ void IRAM_ATTR ESP32InterruptRoutine(void)
     uint16_t PPMTimer;
     uint16_t PPMTimerDifference;
     static uint16_t PPMStoredTimer = 0;
-    PPMTimer = SCHEDULER.GetMicros();
+    PPMTimer = SCHEDULERTIME.GetMicros();
     PPMTimerDifference = PPMTimer - PPMStoredTimer;
     PPMStoredTimer = PPMTimer;
     if (PPMTimerDifference > 2700)

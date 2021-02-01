@@ -47,20 +47,20 @@ void ClassESC::Calibration(void)
     PulseInAllMotors(2000); //ENVIA PWM MAXIMO A TODOS OS ESC'S
     while (true)
     {
-      static uint32_t CountDelay = SCHEDULER.GetMillis();
+      static uint32_t CountDelay = SCHEDULERTIME.GetMillis();
       static bool IgnoreThis = false;
       RGB.Function(CALIBRATIONESC);                   //ATIVA O LED VERMELHO
       RGB.Update();                                   //ATUALIZA O ESTADO DOS LED'S
-      if (SCHEDULER.GetMillis() - CountDelay >= 5000) //ROTINA DE CONTAGEM DE 5 SEGUNDOS
+      if (SCHEDULERTIME.GetMillis() - CountDelay >= 5000) //ROTINA DE CONTAGEM DE 5 SEGUNDOS
       {
         IgnoreThis = true;
-        CountDelay = SCHEDULER.GetMillis();
+        CountDelay = SCHEDULERTIME.GetMillis();
       }
       if (IgnoreThis)
       {
         PulseInAllMotors(1000); //ENVIA PWM MINIMO A TODOS OS ESC'S
       }
-      if (IgnoreThis && SCHEDULER.GetMillis() - CountDelay >= 5000)
+      if (IgnoreThis && SCHEDULERTIME.GetMillis() - CountDelay >= 5000)
       {
         break; //QUEBRA O WHILE
       }
@@ -69,7 +69,7 @@ void ClassESC::Calibration(void)
     while (true) //FICA TRAVADO AQUI NO WHILE ATÉ QUE A CONTROLADORA SEJA REINICIADA MANUALMENTE
     {
       Run_Calibrate = false;
-      if (SCHEDULER.GetMillis() - EscLoopRefresh >= 20) //ROTINA DE 50Hz
+      if (SCHEDULERTIME.GetMillis() - EscLoopRefresh >= 20) //ROTINA DE 50Hz
       {
         DecodeAllReceiverChannels(); //FAZ A LEITURA DE TODOS OS CANAIS DO RECEPTOR DO RADIO
         RCCONFIG.Set_Pulse();        //SETA A SAÍDA PARA CONFIGURAÇÃO PARA O RECEPTOR DO RADIO
@@ -95,7 +95,7 @@ void ClassESC::Calibration(void)
         {
           ArmCount = ArmTest = false; //DESARMA OS MOTORES E RESETA A CONTAGEM
         }
-        EscLoopRefresh = SCHEDULER.GetMillis();
+        EscLoopRefresh = SCHEDULERTIME.GetMillis();
       }
       if (ArmTest)
       {

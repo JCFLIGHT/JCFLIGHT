@@ -129,7 +129,7 @@ void TaskSystemInitialization(void)
 
 void TaskSystemRun(void)
 {
-  const uint32_t ActualCurrentTime = SCHEDULER.GetMicros();
+  const uint32_t ActualCurrentTime = SCHEDULERTIME.GetMicros();
   uint32_t TimeToNextRealTimeTask = (__CONCAT(INT32_MAX, U) * 2UL + 1UL);
   for (const Task_Resources_Struct *TaskPointer = QueueFirst(); TaskPointer != NULL && TaskPointer->StaticPriority >= TASK_PRIORITY_REALTIME; TaskPointer = TaskQueueNext())
   {
@@ -188,4 +188,13 @@ void SystemLoad()
     WaitingTasksSamples = 0;
     TotalWaitingTasks = 0;
   }
+}
+
+uint32_t GetTaskDeltaTime(Tasks_ID_Enum TaskId)
+{
+  if (TaskId < TASK_COUNT)
+  {
+    return Task_Resources[TaskId].TaskLatestDeltaTime;
+  }
+  return 0;
 }

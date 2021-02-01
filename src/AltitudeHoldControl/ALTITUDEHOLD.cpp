@@ -45,7 +45,7 @@ void AltitudeHold_Update_Params()
 bool ApplyAltitudeHoldControl()
 {
   static Scheduler_Struct AltitudeHoldControlTimer;
-  if (SchedulerTimer(&AltitudeHoldControlTimer, 20000))
+  if (Scheduler(&AltitudeHoldControlTimer, 20000))
   {
     static bool BaroModeActivated = false;
     static bool HoveringState = false;
@@ -220,7 +220,7 @@ void RunLandDetector()
 {
   if (GetGroundDetected())
   {
-    TimeOnLand = SCHEDULER.GetMillis() - LandDetectorStartTime;
+    TimeOnLand = SCHEDULERTIME.GetMillis() - LandDetectorStartTime;
   }
   else
   {
@@ -235,7 +235,7 @@ void RunLandDetector()
 
 void ResetLandDetector()
 {
-  LandDetectorStartTime = SCHEDULER.GetMillis();
+  LandDetectorStartTime = SCHEDULERTIME.GetMillis();
   TimeOnLand = 0;
   GroundAltitudeSet = false;
 }

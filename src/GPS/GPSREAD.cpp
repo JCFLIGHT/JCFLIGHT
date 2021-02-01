@@ -121,7 +121,7 @@ static void SerialSendConfigToGPS(const char *STR)
   while (STR && (ProgramMemory = ProgMemReadByte(STR++)))
   {
     FASTSERIAL.Write(UART_NUMB_1, ProgramMemory);
-    SCHEDULER.Sleep(5);
+    SCHEDULERTIME.Sleep(5);
   }
 #elif defined __arm__ || defined ESP32
 
@@ -132,7 +132,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
 {
   static uint8_t Parse_Baud_Rate = 0;
   FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
-  SCHEDULER.Sleep(1000);
+  SCHEDULERTIME.Sleep(1000);
   if (Parse_Baud_Rate == 0)
   {
     FASTSERIAL.Begin(UART_NUMB_1, 9600);
@@ -145,7 +145,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
-      SCHEDULER.Sleep(50);
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 1;
   }
   else if (Parse_Baud_Rate == 1)
@@ -160,7 +160,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
-      SCHEDULER.Sleep(50);
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 2;
   }
   else if (Parse_Baud_Rate == 2)
@@ -175,7 +175,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
-      SCHEDULER.Sleep(50);
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 3;
   }
   else if (Parse_Baud_Rate == 3)
@@ -190,7 +190,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
-      SCHEDULER.Sleep(50);
+      SCHEDULERTIME.Sleep(50);
     Parse_Baud_Rate = 4;
   }
   else if (Parse_Baud_Rate == 4)
@@ -205,9 +205,9 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
     else if (Get_BaudRate == 115200)
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
-      SCHEDULER.Sleep(50);
+      SCHEDULERTIME.Sleep(50);
   }
-  SCHEDULER.Sleep(200);
+  SCHEDULERTIME.Sleep(200);
   FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
   for (uint8_t SizeOfCount = 0; SizeOfCount < sizeof(Ublox_Set_Configuration); SizeOfCount++)
   {
@@ -216,7 +216,7 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
 #elif defined __arm__ || defined ESP32
 
 #endif
-    SCHEDULER.Sleep(5);
+    SCHEDULERTIME.Sleep(5);
   }
 }
 

@@ -58,12 +58,12 @@ void RCInterpolationApply()
   }
 #if defined(PRINTLN_RC_INTERPOLATION)
   static uint32_t Refresh = 0;
-  if (SCHEDULER.GetMillis() - Refresh >= 20)
+  if (SCHEDULERTIME.GetMillis() - Refresh >= 20)
   {
     FastSerialPrintln(PSTR("NotFiltered:%d Filtered:%d\n"),
                       RCControllerUnFiltered[THROTTLE],
                       RCController[THROTTLE]);
-    Refresh = SCHEDULER.GetMillis();
+    Refresh = SCHEDULERTIME.GetMillis();
   }
 #endif
 }

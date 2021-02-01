@@ -41,7 +41,7 @@ void AVRInterruptRoutine(void)
     uint16_t PPMTimer;
     uint16_t PPMTimerDifference;
     static uint16_t PPMStoredTimer = 0;
-    PPMTimer = SCHEDULER.GetMicros();
+    PPMTimer = SCHEDULERTIME.GetMicros();
     __asm__ __volatile__("sei" ::
                              : "memory");
     PPMTimerDifference = PPMTimer - PPMStoredTimer;

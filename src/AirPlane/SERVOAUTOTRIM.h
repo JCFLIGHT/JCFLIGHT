@@ -15,10 +15,9 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SERVOMANUALTRIM_H_
-#define SERVOMANUALTRIM_H_
+#ifndef SERVOAUTOTRIM_H_
+#define SERVOAUTOTRIM_H_
 #include "Arduino.h"
-extern bool OkToTrimServo;
-void Manual_Trim_Servo_Initializate();
-void Manual_Trim_Servo_Update();
+extern bool ServoAutoTrimEnabled;
+void ServoAutoTrimRun(void);
 #endif

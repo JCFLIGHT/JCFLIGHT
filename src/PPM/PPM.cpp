@@ -27,8 +27,7 @@
 #include "BAR/BAR.h"
 #include "HAL/LEARNINGRECEIVER.h"
 #include "HAL/HALPPM.h"
-
-#define FAILSAFE_DETECT_TRESHOLD 975 //US
+#include "ParamsToGCS/CHECKSUM.h"
 
 volatile uint16_t PPMReadChannels[12];
 uint8_t PPMChannelMap[12];
@@ -85,7 +84,7 @@ void DecodeAllReceiverChannels()
     }
     else
     {
-      CheckFailSafeState = RadioControllOutputDecoded > FAILSAFE_DETECT_TRESHOLD || !COMMAND_ARM_DISARM;
+      CheckFailSafeState = RadioControllOutputDecoded > CHECKSUM.GetFailSafeValue || !COMMAND_ARM_DISARM;
     }
     if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
     {

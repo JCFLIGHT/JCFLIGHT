@@ -18,10 +18,30 @@
 #ifndef AIRPLANE_H_
 #define AIRPLANE_H_
 #include "Arduino.h"
-extern int8_t ServoRate[4];
-void UpdateServosDirection(void);
-void AirPlane_Mode_ConventionalPlane_Run();
-void AirPlane_Mode_FixedWing_Run();
-void AirPlane_Mode_PlaneVTail_Run();
-void Servo_Rate_Adjust();
+#define MAX_SUPPORTED_SERVOS 4
+#define SAVE_SERVO_MIDDLE(Address, Value) STORAGEMANAGER.Write_16Bits(Address, Value) //SALVA O PONTO MÉDIO DOS SERVOS NA EEPROM
+#define GET_SERVO_MIN(Address) STORAGEMANAGER.Read_16Bits(Address)                    //OBTÉM O VALOR DO PULSO MINIMO DOS SERVOS
+#define GET_SERVO_MIDDLE(Address) STORAGEMANAGER.Read_16Bits(Address)                 //OBTÉM O VALOR DO PULSO MÉDIO DOS SERVOS
+#define GET_SERVO_MAX(Address) STORAGEMANAGER.Read_16Bits(Address)                    //OBTÉM O VALOR DO PULSO MAXIMO DOS SERVOS
+#define GET_SERVO_DIRECTION(Bit) (((Bit) > 0) ? -1 : 1)                               //OBTÉM A DIREÇÃO DOS SERVOS
+#define GET_SERVO_RATE(Address) STORAGEMANAGER.Read_16Bits(Address)                   //OBTÉM O VALOR DO RATE DOS SERVOS
+class AirPlaneClass
+{
+public:
+  int8_t ServoDirection[MAX_SUPPORTED_SERVOS] = {1, 1, 1, 1};
+  int8_t ServoRate[MAX_SUPPORTED_SERVOS];
+  int16_t ServoMin[MAX_SUPPORTED_SERVOS];
+  int16_t ServoMiddle[MAX_SUPPORTED_SERVOS];
+  int16_t ServoMax[MAX_SUPPORTED_SERVOS];
+  int16_t ServoToFilter[MAX_SUPPORTED_SERVOS];
+  int16_t DeviceFiltered[MAX_SUPPORTED_SERVOS];
+  void UpdateServosMinAndMax();
+  void UpdateServosMiddlePoint();
+  void UpdateServosDirection(void);
+  void Mode_ConventionalPlane_Run();
+  void Mode_FixedWing_Run();
+  void Mode_PlaneVTail_Run();
+  void Servo_Rate_Adjust_And_Apply_LPF();
+};
+extern AirPlaneClass AIR_PLANE;
 #endif

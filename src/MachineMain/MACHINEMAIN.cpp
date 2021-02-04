@@ -56,8 +56,6 @@ void MachineInit()
     RCCONFIG.Init();
     //CALIBRAÇÃO DOS ESC'S
     ESC.Calibration();
-    //AJUSTA O RATE DOS SERVOS
-    Manual_Trim_Servo_Initializate();
     //CARREGA TODOS OS PARAMETROS DO MODO WAYPOINT
     WayPoint_Initialization();
     //RECOLHE AS PRIMEIRAS AMOSTRAS DO AIR-SPEED PARA CALIBRAR

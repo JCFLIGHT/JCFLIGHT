@@ -25,7 +25,7 @@ public:
   int16_t Output;
   int16_t Min_Pulse;
   int16_t Max_Pulse;
-  int16_t PPM_Range();
+  int16_t Get_Channel_Range();
   void Init();
   void Set_Range(int16_t Min, int16_t Max);
   void Set_Filter(bool Filter);

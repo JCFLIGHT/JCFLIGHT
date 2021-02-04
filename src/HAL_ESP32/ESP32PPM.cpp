@@ -21,10 +21,9 @@
 #include "Common/VARIABLES.h"
 #include "PPM/PPM.h"
 #include "BAR/BAR.h"
+#include "ParamsToGCS/CHECKSUM.h"
 
 #if ESP32
-
-#define FAILSAFE_DETECT_TRESHOLD 975 //US
 
 void IRAM_ATTR ESP32InterruptRoutine(void)
 {
@@ -45,7 +44,7 @@ void IRAM_ATTR ESP32InterruptRoutine(void)
         if (PPMTimerDifference > 750 && PPMTimerDifference < 2250)
         {
             PPMReadChannels[Channels] = PPMTimerDifference;
-            if (Channels < 4 && PPMTimerDifference > FAILSAFE_DETECT_TRESHOLD)
+            if (Channels < 4 && PPMTimerDifference > CHECKSUM.GetFailSafeValue)
             {
                 CheckFailSafe |= (1 << Channels);
             }

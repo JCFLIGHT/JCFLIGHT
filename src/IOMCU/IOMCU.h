@@ -29,17 +29,17 @@ public:
   void Default_All_Configs();
 
 private:
-  uint8_t GetDevicesActived();
   void BiDirectionalCommunication(uint8_t TaskOrderGCS);
   void GCS_Request_Parameters();
   void GCS_Request_Parameters_Two();
   void WayPoint_Request_Coordinates_Parameters();
   void WayPoint_Request_Others_Parameters();
   void Save_Basic_Configuration();
+  void Save_Radio_Control_Configuration();
   void Save_Medium_Configuration();
   void Default_Basic_Configuration();
   void Default_Medium_Configuration();
-  void Default_RadioControl();
+  void Default_RadioControl_Configuration();
 };
 extern GCSClass GCS;
 #endif

@@ -21,10 +21,9 @@
 #include "Common/VARIABLES.h"
 #include "PPM/PPM.h"
 #include "BAR/BAR.h"
+#include "ParamsToGCS/CHECKSUM.h"
 
 #ifdef __AVR_ATmega2560__
-
-#define FAILSAFE_DETECT_TRESHOLD 975 //US
 
 void AVR_PPM_Initialization()
 {
@@ -55,7 +54,7 @@ void AVRInterruptRoutine(void)
         if (PPMTimerDifference > 750 && PPMTimerDifference < 2250)
         {
             PPMReadChannels[Channels] = PPMTimerDifference;
-            if (Channels < 4 && PPMTimerDifference > FAILSAFE_DETECT_TRESHOLD)
+            if (Channels < 4 && PPMTimerDifference > CHECKSUM.GetFailSafeValue)
             {
                 CheckFailSafe |= (1 << Channels);
             }

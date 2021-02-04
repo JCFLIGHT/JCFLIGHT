@@ -34,15 +34,6 @@ typedef struct
   uint8_t Param_kI_Acc_AHRS;
   uint8_t Param_kP_Mag_AHRS;
   uint8_t Param_kI_Mag_AHRS;
-  uint16_t Param_Servo_Pulse_Min;
-  uint16_t Param_Servo_Pulse_Middle;
-  uint16_t Param_Servo_Pulse_Max;
-#endif
-  uint8_t Param_Servo1_Derection;
-  uint8_t Param_Servo2_Derection;
-  uint8_t Param_Servo3_Derection;
-  uint8_t Param_Servo4_Derection;
-#ifndef MEGA2560
   uint8_t Param_AutoLaunch_AHRS_BankAngle;
   uint16_t Param_AutoLaunch_IMU_BankAngle;
   uint8_t Param_AutoLaunch_IMU_Swing;
@@ -58,16 +49,12 @@ typedef struct
   uint16_t Param_Amps_OffSet;
   uint8_t Param_CrashCheck_BankAngle;
   uint8_t Param_CrashCheck_Time;
-#endif
-  uint16_t Param_FailSafeValue;
-#ifndef MEGA2560
   uint16_t Param_GimbalMinValue;
   uint16_t Param_GimbalMiddleValue;
   uint16_t Param_GimbalMaxValue;
   uint8_t Param_Land_Check_Acc;
   uint8_t Param_Land_LPF;
   uint8_t Param_Throttle_Idle_Factor;
-  int16_t Param_Throttle_Max;
   uint8_t Param_Throttle_Factor;
   uint8_t Param_AutoDisarm_Time;
   uint16_t Param_AutoDisarm_Throttle_Min;
@@ -103,15 +90,6 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"kI_Acc_AHRS", KI_ACC_AHRS_ADDR, VAR_8BITS, &FullParamsList.Param_kI_Acc_AHRS, 0, 255},
     {"kP_Mag_AHRS", KP_MAG_AHRS_ADDR, VAR_8BITS, &FullParamsList.Param_kP_Mag_AHRS, 0, 255},
     {"kI_Mag_AHRS", KI_MAG_AHRS_ADDR, VAR_8BITS, &FullParamsList.Param_kI_Mag_AHRS, 0, 255},
-    {"Servo_Pulse_Min", SERVO_PULSE_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Min, 300, 2500},
-    {"Pulse_Middle", SERVO_PULSE_MIDDLE_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Middle, 400, 2500},
-    {"Servo_Pulse_Max", SERVO_PULSE_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_Servo_Pulse_Max, 1000, 2600},
-#endif
-    {"Servo1_Direction", SERVO1_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo1_Derection, 0, 1},
-    {"Servo2_Direction", SERVO2_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo2_Derection, 0, 1},
-    {"Servo3_Direction", SERVO3_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo3_Derection, 0, 1},
-    {"Servo4_Direction", SERVO4_DIRECTION_ADDR, VAR_8BITS, &FullParamsList.Param_Servo4_Derection, 0, 1},
-#ifndef MEGA2560
     {"AutoLaunch_AHRS_BankAngle", AL_AHRS_BA_ADDR, VAR_8BITS, &FullParamsList.Param_AutoLaunch_AHRS_BankAngle, 0, 255},
     {"AutoLaunch_IMU_BankAngle", AL_IMU_BA_ADDR, VAR_16BITS, &FullParamsList.Param_AutoLaunch_IMU_BankAngle, 0, 1000},
     {"AutoLaunch_IMU_Swing", AL_IMU_SWING_ADDR, VAR_8BITS, &FullParamsList.Param_AutoLaunch_IMU_Swing, 0, 255},
@@ -127,16 +105,12 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"AutoLaunch_Batt_Amps_OffSet", BATT_AMPS_OFFSET_ADDR, VAR_16BITS, &FullParamsList.Param_Amps_OffSet, 0, 1000},
     {"CrashCheck_BankAngle", CC_BANKANGLE_ADDR, VAR_8BITS, &FullParamsList.Param_CrashCheck_BankAngle, 0, 255},
     {"CrashCheck_Time", CC_TIME_ADDR, VAR_8BITS, &FullParamsList.Param_CrashCheck_Time, 0, 255},
-#endif
-    {"FailSafeValue", FAILSAFE_ADDR, VAR_16BITS, &FullParamsList.Param_FailSafeValue, 0, 2200},
-#ifndef MEGA2560
     {"GimbalMinValue", GIMBAL_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_GimbalMinValue, 800, 2200},
     {"GimbalMiddleValue", GIMBAL_MID_ADDR, VAR_16BITS, &FullParamsList.Param_GimbalMiddleValue, 800, 2200},
     {"GimbalMaxValue", GIMBAL_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_GimbalMaxValue, 800, 2200},
     {"Land_CheckAcc", LAND_CHECKACC_ADDR, VAR_8BITS, &FullParamsList.Param_Land_Check_Acc, 0, 255},
     {"Land_LPF", LAND_LPF_ADDR, VAR_8BITS, &FullParamsList.Param_Land_LPF, 0, 255},
     {"ThrottleIddleFactor", THROTTLE_IDDLE_FACTOR_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Idle_Factor, 0, 255},
-    {"ThrottleMaxValue", THROTTLE_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_Throttle_Max, 1500, 2200},
     {"ThrottleFactor", THROTTLE_FACTOR_ADDR, VAR_16BITS, &FullParamsList.Param_Throttle_Factor, 0, 255},
     {"AutoDisarm", AUTODISARM_ADDR, VAR_8BITS, &FullParamsList.Param_AutoDisarm_Time, 0, 255},
     {"AutoDisarm_Throttle_Min", AUTODISARM_THR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_Throttle_Min, 800, 1500},

@@ -206,9 +206,12 @@ void CheckFirstLinkOrganizeEEPROM()
 #endif
     if (!StorageCheckPassed())
     {
-        RecallDefaultConfiguration();
-        EEPROMClearSensorsCalibration();
-        EEPROMClearWayPointStorage();
-        SetHighByteInAddress();
+        for (uint8_t i = 0; i < 5; i++) //FORÇA UMA REPETIÇÃO DE 5 VEZES
+        {
+            RecallDefaultConfiguration();
+            EEPROMClearSensorsCalibration();
+            EEPROMClearWayPointStorage();
+            SetHighByteInAddress();
+        }
     }
 }

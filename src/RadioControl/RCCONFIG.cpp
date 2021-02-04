@@ -25,8 +25,11 @@
 #include "IBUS/IBUSREAD.h"
 #include "Math/MATHSUPPORT.h"
 #include "BAR/BAR.h"
+#include "ParamsToGCS/CHECKSUM.h"
+#include "Build/GCC.h"
 
-#define THROTTLE_FAIL_SAFE 975
+FILE_COMPILE_FOR_SPEED
+
 #define MIN_PULSE 1100
 #define MAX_PULSE 1900
 
@@ -60,19 +63,30 @@ void RC_Config::Set_Filter(bool Filter)
 void RC_Config::Set_Pulse(int16_t ChannelInputValue)
 {
   if (_Filter)
-    Input = (ChannelInputValue + Input) >> 1; //SMALL FILTERING NOS CANAIS
-  else
-    Input = ChannelInputValue; //SEM FILTRO
+  {
+    //SMALL FILTERING NOS CANAIS (APENAS UMA MÉDIA ENTRE O VALOR ATUAL E O ANTERIOR)
+    Input = (ChannelInputValue + Input) >> 1;
+  }
+  else //SEM FILTRO
+  {
+    Input = ChannelInputValue;
+  }
   if (!_FailSafe)
+  {
     _Fail_Safe = false;
+  }
   else
   {
-    if (Input > THROTTLE_FAIL_SAFE)
+    if (Input > (int16_t)CHECKSUM.GetFailSafeValue)
+    {
       _Fail_Safe = false;
-    else if (Input < THROTTLE_FAIL_SAFE)
+    }
+    else if (Input < (int16_t)CHECKSUM.GetFailSafeValue)
+    {
       _Fail_Safe = true;
+    }
   }
-  Output = PPM_Range();
+  Output = Get_Channel_Range();
 }
 
 void RC_Config::Set_Reverse(bool Reverse)
@@ -83,10 +97,15 @@ void RC_Config::Set_Reverse(bool Reverse)
 void RC_Config::Set_Dead_Zone(uint8_t DeadZone)
 {
   //NÃO APLICA A ZONA MORTA NO SBUS E IBUS
-  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) ||
+      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
+  {
     _DeadZone = 0;
+  }
   else
+  {
     _DeadZone = Constrain_8Bits(DeadZone, 0, 50);
+  }
 }
 
 void RC_Config::Set_Fail_Safe(bool FailSafe)
@@ -94,39 +113,52 @@ void RC_Config::Set_Fail_Safe(bool FailSafe)
   _FailSafe = FailSafe;
 }
 
-int16_t RC_Config::PPM_Range()
+int16_t RC_Config::Get_Channel_Range()
 {
   if (!_Fail_Safe)
+  {
     RcConstrain = Constrain_16Bits(Input, Min_Pulse, Max_Pulse);
+  }
   else
+  {
     RcConstrain = Constrain_16Bits(Input, 900, Max_Pulse);
+  }
   if (_Reverse)
+  {
     RcConstrain = Max_Pulse - (RcConstrain - Min_Pulse);
+  }
   if (!RCCONFIG.CancelDeadZone)
   {
-    if ((Input > 1450 + _DeadZone) && (Input < 1550 - _DeadZone) &&
-        (_DeadZone > 0))
+    if ((Input > 1450 + _DeadZone) && (Input < 1550 - _DeadZone) && (_DeadZone > 0))
+    {
       return 1500;
+    }
   }
   if (RcConstrain > Min_Pulse)
+  {
     return (_Min_Pulse + ((int32_t)(_Max_Pulse - _Min_Pulse) * (int32_t)(RcConstrain - Min_Pulse)) / (int32_t)(Max_Pulse - Min_Pulse));
+  }
   if (!_Fail_Safe)
+  {
     return _Min_Pulse;
+  }
   else
+  {
     return RcConstrain;
+  }
 }
 
 void RCConfigClass::Init()
 {
-  //PULSO MINIMO E MAXIMO PARA TODOS OS CANAIS PPM
-  Throttle.Min_Pulse = MIN_PULSE;
-  Throttle.Max_Pulse = MAX_PULSE;
-  Yaw.Min_Pulse = MIN_PULSE;
-  Yaw.Max_Pulse = MAX_PULSE;
-  Pitch.Min_Pulse = MIN_PULSE;
-  Pitch.Max_Pulse = MAX_PULSE;
-  Roll.Min_Pulse = MIN_PULSE;
-  Roll.Max_Pulse = MAX_PULSE;
+  //PULSO MINIMO E MAXIMO PARA TODOS OS CANAIS RÁDIO
+  Throttle.Min_Pulse = STORAGEMANAGER.Read_16Bits(THROTTLE_MIN_ADDR);
+  Throttle.Max_Pulse = STORAGEMANAGER.Read_16Bits(THROTTLE_MAX_ADDR);
+  Yaw.Min_Pulse = STORAGEMANAGER.Read_16Bits(YAW_MIN_ADDR);
+  Yaw.Max_Pulse = STORAGEMANAGER.Read_16Bits(YAW_MAX_ADDR);
+  Pitch.Min_Pulse = STORAGEMANAGER.Read_16Bits(PITCH_MIN_ADDR);
+  Pitch.Max_Pulse = STORAGEMANAGER.Read_16Bits(PITCH_MAX_ADDR);
+  Roll.Min_Pulse = STORAGEMANAGER.Read_16Bits(ROLL_MIN_ADDR);
+  Roll.Max_Pulse = STORAGEMANAGER.Read_16Bits(ROLL_MAX_ADDR);
   AuxiliarOne.Min_Pulse = MIN_PULSE;
   AuxiliarOne.Max_Pulse = MAX_PULSE;
   AuxiliarTwo.Min_Pulse = MIN_PULSE;
@@ -143,28 +175,28 @@ void RCConfigClass::Init()
   AuxiliarSeven.Max_Pulse = MAX_PULSE;
   AuxiliarEight.Min_Pulse = MIN_PULSE;
   AuxiliarEight.Max_Pulse = MAX_PULSE;
-  //CONFIGURAÇÃO DE TODOS OS CANAIS PPM
+  //CONFIGURAÇÃO DE TODOS OS CANAIS DO RÁDIO
   //THROTTLE
   Throttle.Set_Range(1000, 2000);
-  Throttle.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ALTITUDE-HOLD)
+  Throttle.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(THROTTLE_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ALTITUDE-HOLD)
   Throttle.Set_Reverse(false);
   Throttle.Set_Filter(true);
   Throttle.Set_Fail_Safe(true);
   //YAW
   Yaw.Set_Range(1000, 2000);
-  Yaw.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
+  Yaw.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(YAW_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
   Yaw.Set_Reverse(false);
   Yaw.Set_Filter(true);
   Yaw.Set_Fail_Safe(false);
   //PITCH
   Pitch.Set_Range(1000, 2000);
-  Pitch.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
+  Pitch.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(PITCH_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
   Pitch.Set_Reverse(false);
   Pitch.Set_Filter(true);
   Pitch.Set_Fail_Safe(false);
   //ROLL
   Roll.Set_Range(1000, 2000);
-  Roll.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
+  Roll.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(ROLL_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
   Roll.Set_Reverse(false);
   Roll.Set_Filter(true);
   Roll.Set_Fail_Safe(false);
@@ -248,12 +280,18 @@ void RCConfigClass::Update_Channels()
   if (!Auto_TakeOff)
   {
     if (!Lock_UP)
+    {
       RadioControllOutput[THROTTLE] = StoredValueOfThrottle = Throttle.Output;
+    }
     else
+    {
       RadioControllOutput[THROTTLE] = StoredValueOfThrottle;
+    }
   }
   else
+  {
     RadioControllOutput[THROTTLE] = ThrottleIncrement;
+  }
   if (!LockPitchAndRollRC)
   {
     RadioControllOutput[YAW] = Yaw.Output;

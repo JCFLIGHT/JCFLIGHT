@@ -27,7 +27,7 @@
 //DEBUG
 //#define PRINTLN_RC_INTERPOLATION
 
-Struct_LowPassFilter LPFDevices[4];
+Struct_LowPassFilter RCSmooth_LPF[4];
 int16_t RCControllerUnFiltered[4];
 int16_t DevicesFiltered[4];
 
@@ -45,10 +45,10 @@ void RCInterpolationApply()
   if (RCFilterFrequencyEEPROM != 0)
   {
     //OBTÉM O VALOR FILTRADO
-    DevicesFiltered[THROTTLE] = (int16_t)LowPassFilter(&LPFDevices[THROTTLE], RCControllerUnFiltered[THROTTLE], RCFilterFrequencyEEPROM, MotorSpeed);
-    DevicesFiltered[YAW] = (int16_t)LowPassFilter(&LPFDevices[YAW], RCControllerUnFiltered[YAW], RCFilterFrequencyEEPROM, 0);
-    DevicesFiltered[PITCH] = (int16_t)LowPassFilter(&LPFDevices[PITCH], RCControllerUnFiltered[PITCH], RCFilterFrequencyEEPROM, 0);
-    DevicesFiltered[ROLL] = (int16_t)LowPassFilter(&LPFDevices[ROLL], RCControllerUnFiltered[ROLL], RCFilterFrequencyEEPROM, 0);
+    DevicesFiltered[THROTTLE] = (int16_t)LowPassFilter(&RCSmooth_LPF[THROTTLE], RCControllerUnFiltered[THROTTLE], RCFilterFrequencyEEPROM, MotorSpeed);
+    DevicesFiltered[YAW] = (int16_t)LowPassFilter(&RCSmooth_LPF[YAW], RCControllerUnFiltered[YAW], RCFilterFrequencyEEPROM, 0);
+    DevicesFiltered[PITCH] = (int16_t)LowPassFilter(&RCSmooth_LPF[PITCH], RCControllerUnFiltered[PITCH], RCFilterFrequencyEEPROM, 0);
+    DevicesFiltered[ROLL] = (int16_t)LowPassFilter(&RCSmooth_LPF[ROLL], RCControllerUnFiltered[ROLL], RCFilterFrequencyEEPROM, 0);
 
     //APLICA O FILTRO
     RCController[THROTTLE] = Constrain_16Bits(DevicesFiltered[THROTTLE], MotorSpeed, 1900);

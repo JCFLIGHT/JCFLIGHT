@@ -451,4 +451,12 @@ enum GCS_Message_Type_Enum
     BAROMETER_ERROR,
     NONE_ERROR = 254
 };
+
+typedef enum
+{
+    SERVO_AUTOTRIM_IDLE = 0,
+    SERVO_AUTOTRIM_COLLECTING,
+    SERVO_AUTOTRIM_SAVE_PENDING,
+    SERVO_AUTOTRIM_DONE,
+} ServoAutoTrimState_Enum;
 #endif

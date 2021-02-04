@@ -27,8 +27,7 @@
 
 void CurvesRC_CalculeValue()
 {
-  //O RETORNO PARA O ESP32 É NECESSARIO,PARA EVITAR REBOOT CASO EXISTA UMA DIVISÃO POR ZERO
-  if (ThrottleMiddle == 0 || ThrottleExpo == 0)
+  if (ThrottleMiddle == 0)
   {
     return;
   }

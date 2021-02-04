@@ -18,26 +18,34 @@
 #include "SWITCHFLAG.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Common/VARIABLES.h"
-#include "AirPlane/SERVOMANUALTRIM.h"
+#include "AirPlane/SERVORATE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "AirPlane/SERVOAUTOTRIM.h"
 
-//********************************************************************************************
-//ATIVAÇÃO PARA O SAVE-TRIM,CALIBRÇÃO DO MAG & TRIMAGEM DOS SERVOS VIA CHAVE AUX
+//***********************************************************************************************
+//ATIVAÇÃO PARA O CALIBRÇÃO DO MAG,SERVO AUTO-TRIM & TRIMAGEM MANUAL DOS SERVOS VIA CHAVE AUX
+//
 //PERFIL MULTIROTOR >> CHAVE DO MODO DE VOO IOC
 //PERFIL AERO E ASA-FIXA >> CHAVE DO MODO DE VOO MANUAL
-//SAVE-TRIM IMPLEMENTADO  >> 07/05/2020 (4 TOQUES PARA ATIVAR,2 TOQUES PARA DESATIVAR)
-//CALIB MAG IMPLEMENTADO  >> 28/06/2020 (8 TOQUES PARA ATIVAR)
-//SERVO-TRIM IMPLEMENTADO >> 24/09/2020 (4 TOQUES PARA ATIVAR,2 TOQUES PARA DESATIVAR)
+//
+//CALIB MAG IMPLEMENTADO       >> 28/06/2020 (8 TOQUES PARA ATIVAR)
+//SERVO-TRIM IMPLEMENTADO      >> 24/09/2020 (4 TOQUES PARA ATIVAR,2 TOQUES PARA DESATIVAR)
+//SERVO AUTO-TRIM IMPLEMENTADO >> 01/02/2021 (4 TOQUES PARA ATIVAR,2 TOQUES PARA DESATIVAR)
+//
 //OBS:
+//CALIB MAG SÓ FUNCIONA COM A CONTROLADORA DESARMADA
 //SERVO-TRIM SÓ FUNCIONA COM A CONTROLADORA DESARMADA E COM O PERFIL DE AERO
-//SAVE-TRIM SÓ FUNCIONA COM A CONTROLADORA ARMADA E EM VOO COM O PERFIL DE QUAD OU HEXA
-//********************************************************************************************
+//SERVO AUTO-TRIM SÓ FUNCIONA COM A CONTROLADORA ARMADA E EM VOO COM O PERFIL DE AERO
+//***********************************************************************************************
 
-uint8_t SaveTrimState; //REMOVIDO DO ALGORITIMO
+bool OkToTrimServo = false; //REMOVIDO DO ALGORITIMO
+
 uint8_t FlagParameterFunction;
 uint8_t GuardValue;
+
 float CloseReset;
+
 uint32_t TimerFunction;
 uint32_t CR_Clear;
 
@@ -85,17 +93,18 @@ void Switch_Flag(void)
   {
     GuardValue = FlagParameterFunction;
   }
-  if (COMMAND_ARM_DISARM)
-  { //CONTROLADORA ARMADA?SIM...
-    //O VALOR GUARDADO É IGUAL A 4?E A DECREMENTAÇÃO ACABOU?SIM...INICIA O SAVE-TRIM
-    if (GuardValue == 4 && CloseReset < 2.51f)
+  if (COMMAND_ARM_DISARM) //CONTROLADORA ARMADA?SIM...
+  {
+    //O VALOR GUARDADO É IGUAL A 4?E A DECREMENTAÇÃO ACABOU?SIM...INICIA O SERVO AUTO-TRIM
+    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
     {
-      SaveTrimState = 1;
+      ServoAutoTrimEnabled = true;
     }
-    //O VALOR GUARDADO É IGUAL A 6?E A DECREMENTAÇÃO ACABOU?SIM...DESATIVA O SAVE-TRIM
-    if (GuardValue == 6 && CloseReset < 2.51f)
+    //O VALOR GUARDADO É IGUAL A 6?E A DECREMENTAÇÃO ACABOU?SIM...DESATIVA O SERVO AUTO-TRIM
+    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
     {
-      GuardValue = SaveTrimState = 0;
+      ServoAutoTrimEnabled = false;
+      GuardValue = 0;
     }
   }
   else //CONTROLADORA DESARMADA?SIM...
@@ -108,21 +117,28 @@ void Switch_Flag(void)
     {
       GuardValue = 0;
     }
-    //ATIVA O SERVOTRIM
-    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
+    //ATIVA O SERVO-TRIM
+    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && !ServoAutoTrimEnabled)
     {
       OkToTrimServo = true;
     }
-    //DESATIVA O SERVOTRIM
-    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
+    //DESATIVA O SERVO-TRIM
+    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && !ServoAutoTrimEnabled)
     {
-      GuardValue = OkToTrimServo = 0;
+      OkToTrimServo = false;
+      GuardValue = 0;
+    }
+    //O VALOR GUARDADO É IGUAL A 6?E A DECREMENTAÇÃO ACABOU?SIM...DESATIVA O SERVO AUTO-TRIM
+    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && ServoAutoTrimEnabled)
+    {
+      ServoAutoTrimEnabled = false;
+      GuardValue = 0;
     }
   }
-  //O VALOR GUARDADO É IGUAL A 12?E A DECREMENTAÇÃO ACABOU?SIM...SE O SAVE-TRIM ESTIVER ATIVADO NÃO LIMPA A FLAG,CASO CONTRARIO LIMPA
+  //O VALOR GUARDADO É IGUAL A 12?E A DECREMENTAÇÃO ACABOU?SIM...SE O SERVO AUTO-TRIM ESTIVER ATIVADO NÃO LIMPA A FLAG,CASO CONTRARIO LIMPA
   if (GuardValue == 12 && CloseReset == 0)
   {
-    if (SaveTrimState == 1 || OkToTrimServo)
+    if (ServoAutoTrimEnabled == true || OkToTrimServo)
     {
       GuardValue = 4;
     }

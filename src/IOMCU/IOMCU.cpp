@@ -45,6 +45,7 @@
 #include "PID/PIDXYZ.h"
 #include "Scheduler/SCHEDULER.h"
 #include "TaskSystem/TASKSYSTEM.h"
+#include "ParamsToGCS/CHECKSUM.h"
 
 GCSClass GCS;
 
@@ -175,19 +176,6 @@ struct _SendUserBasicGCSParameters
     int16_t SendAccRollAdjust;
     int16_t SendAccPitchAdjust;
     int16_t SendAccYawAdjust;
-    uint8_t SendThrottleMiddle;
-    uint8_t SendThrottleExpo;
-    uint8_t SendRCRate;
-    uint8_t SendRCExpo;
-    uint8_t SendRollRate;
-    uint8_t SendPitchRate;
-    uint8_t SendYawRate;
-    int16_t SendRCPulseMin;
-    int16_t SendRCPulseMax;
-    int16_t SendAHThrottleRover;
-    uint8_t SendAHDeadZone;
-    uint8_t SendAHSafeAltitude;
-    uint8_t SendAHMinVelVertical;
 } SendUserBasicGCSParameters;
 
 struct _GetUserBasicGCSParameters
@@ -217,6 +205,58 @@ struct _GetUserBasicGCSParameters
     int16_t GetAccRollAdjust;
     int16_t GetAccPitchAdjust;
     int16_t GetAccYawAdjust;
+} GetUserBasicGCSParameters;
+
+struct _SendRadioControlGCSParameters
+{
+    uint8_t SendThrottleMiddle;
+    uint8_t SendThrottleExpo;
+    uint8_t SendRCRate;
+    uint8_t SendRCExpo;
+    uint8_t SendRollRate;
+    uint8_t SendPitchRate;
+    uint8_t SendYawRate;
+    int16_t SendRCPulseMin;
+    int16_t SendRCPulseMax;
+    int16_t SendAHThrottleRover;
+    uint8_t SendAHDeadZone;
+    uint8_t SendAHSafeAltitude;
+    uint8_t SendAHMinVelVertical;
+    int16_t SendThrottleMin;
+    int16_t SendYawMin;
+    int16_t SendPitchMin;
+    int16_t SendRollMin;
+    int16_t SendThrottleMax;
+    int16_t SendYawMax;
+    int16_t SendPitchMax;
+    int16_t SendRollMax;
+    uint8_t SendThrottleDeadZone;
+    uint8_t SendYawDeadZone;
+    uint8_t SendPitchDeadZone;
+    uint8_t SendRollDeadZone;
+    uint8_t SendChannelsReverse;
+    int16_t SendServo1Rate;
+    int16_t SendServo2Rate;
+    int16_t SendServo3Rate;
+    int16_t SendServo4Rate;
+    uint8_t SendServosReverse;
+    int16_t SendServo1Min;
+    int16_t SendServo2Min;
+    int16_t SendServo3Min;
+    int16_t SendServo4Min;
+    int16_t SendServo1Med;
+    int16_t SendServo2Med;
+    int16_t SendServo3Med;
+    int16_t SendServo4Med;
+    int16_t SendServo1Max;
+    int16_t SendServo2Max;
+    int16_t SendServo3Max;
+    int16_t SendServo4Max;
+    int16_t SendFailSafeValue;
+} SendRadioControlGCSParameters;
+
+struct _GetRadioControlGCSParameters
+{
     uint8_t GetThrottleMiddle;
     uint8_t GetThrottleExpo;
     uint8_t GetRCRate;
@@ -230,7 +270,42 @@ struct _GetUserBasicGCSParameters
     uint8_t GetAHDeadZone;
     uint8_t GetAHSafeAltitude;
     uint8_t GetAHMinVelVertical;
-} GetUserBasicGCSParameters;
+    int16_t GetThrottleMin;
+    int16_t GetYawMin;
+    int16_t GetPitchMin;
+    int16_t GetRollMin;
+    int16_t GetThrottleMax;
+    int16_t GetYawMax;
+    int16_t GetPitchMax;
+    int16_t GetRollMax;
+    uint8_t GetThrottleDeadZone;
+    uint8_t GetYawDeadZone;
+    uint8_t GetPitchDeadZone;
+    uint8_t GetRollDeadZone;
+    uint8_t GetChannelsReverse;
+    int16_t GetFailSafeValue;
+} GetRadioControlGCSParameters;
+
+struct _GetServosGCSParameters
+{
+    int16_t GetServo1Rate;
+    int16_t GetServo2Rate;
+    int16_t GetServo3Rate;
+    int16_t GetServo4Rate;
+    uint8_t GetServosReverse;
+    int16_t GetServo1Min;
+    int16_t GetServo2Min;
+    int16_t GetServo3Min;
+    int16_t GetServo4Min;
+    int16_t GetServo1Med;
+    int16_t GetServo2Med;
+    int16_t GetServo3Med;
+    int16_t GetServo4Med;
+    int16_t GetServo1Max;
+    int16_t GetServo2Max;
+    int16_t GetServo3Max;
+    int16_t GetServo4Max;
+} GetServosGCSParameters;
 
 struct _SendUserMediumGCSParameters
 {
@@ -469,8 +544,6 @@ void GCSClass::SendStringToGCS(const char *String)
     }
     GCS_Send_Data(SerialCheckSum, VAR_8BITS);
 
-#elif defined __arm__
-
 #endif
 }
 
@@ -504,7 +577,7 @@ void GCSClass::Serial_Parse_Protocol()
             break;
 
         case 3:
-            if (SerialBuffer > 64)
+            if (SerialBuffer > 78)
             {
                 ProtocolTaskOrder = 0;
                 continue;
@@ -736,7 +809,37 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 29:
-        GCS.Default_RadioControl();
+        GCS.Default_RadioControl_Configuration();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
+        break;
+
+    case 30:
+        GCS_Send_Struct_Params((uint8_t *)&SendRadioControlGCSParameters, sizeof(_SendRadioControlGCSParameters));
+        break;
+
+    case 31:
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
+        GCS_Get_Struct_Params((uint8_t *)&GetRadioControlGCSParameters, sizeof(_GetRadioControlGCSParameters));
+        break;
+
+    case 32:
+        GCS.Save_Radio_Control_Configuration();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
+        break;
+
+    case 33:
+        Communication_Passed(false, 0);
+        GCS_Send_Data(SerialCheckSum);
+        FASTSERIAL.UartSendData(UART_NUMB_0);
+        GCS_Get_Struct_Params((uint8_t *)&GetServosGCSParameters, sizeof(_GetServosGCSParameters));
         break;
 
     default:
@@ -829,8 +932,8 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 32) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(int16_t) * 6)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 22) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 3)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(SendUserBasicGCSParameters.SendFrameType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendReceiverType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendGimbalType, VAR_8BITS);
@@ -856,19 +959,6 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendUserBasicGCSParameters.SendAccRollAdjust, VAR_16BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAccPitchAdjust, VAR_16BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAccYawAdjust, VAR_16BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendThrottleMiddle, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendThrottleExpo, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendRCRate, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendRCExpo, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendRollRate, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendPitchRate, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendYawRate, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendRCPulseMin, VAR_16BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendRCPulseMax, VAR_16BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAHThrottleRover, VAR_16BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAHDeadZone, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAHSafeAltitude, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendAHMinVelVertical, VAR_8BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1044,7 +1134,66 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 29:
-        GCS.Default_RadioControl();
+        GCS.Default_RadioControl_Configuration();
+        break;
+
+    case 30:
+        //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
+        SerialOutputBufferSizeCount = 0;
+        VectorCount = 0;
+        Communication_Passed(false, (sizeof(uint8_t) * 19) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 23)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleMiddle, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleExpo, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRCRate, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRCExpo, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRollRate, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendPitchRate, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendYawRate, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRCPulseMin, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRCPulseMax, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendAHThrottleRover, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendAHDeadZone, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendAHSafeAltitude, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendAHMinVelVertical, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleMin, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendYawMin, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendPitchMin, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRollMin, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleMax, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendYawMax, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendPitchMax, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRollMax, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleDeadZone, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendYawDeadZone, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendPitchDeadZone, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendRollDeadZone, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendChannelsReverse, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo1Rate, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo2Rate, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo3Rate, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SSendServo4Rate, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServosReverse, VAR_8BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo1Min, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo2Min, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo3Min, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo4Min, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo1Med, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo2Med, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo3Med, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo4Med, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo1Max, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo2Max, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo3Max, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo4Max, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendFailSafeValue, VAR_16BITS);
+        //SOMA DO BUFFER
+        SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
+        SerialCheckSum ^= SerialCheckSum;
+        break;
+
+    case 31:
+        GCS_Get_Struct_Params((uint8_t *)&GetRadioControlGCSParameters, sizeof(_GetRadioControlGCSParameters));
         break;
     }
 
@@ -1071,7 +1220,7 @@ void GCSClass::GCS_Request_Parameters()
     {
         GCSParameters.SendAttitudeYaw = GPS_Ground_Course / 10;
     }
-    GCSParameters.DevicesOnBoard = GCS.GetDevicesActived();
+    GCSParameters.DevicesOnBoard = CHECKSUM.GetDevicesActived();
     GCSParameters.SendThrottleValue = Throttle.Output;
     GCSParameters.SendYawValue = Yaw.Output;
     GCSParameters.SendPitchValue = Pitch.Output;
@@ -1220,16 +1369,6 @@ void GCSClass::WayPoint_Request_Others_Parameters()
     SendWayPointGCSOthersParameters.SendGPSHoldTimedTen = STORAGEMANAGER.Read_8Bits(793);
 }
 
-uint8_t GCSClass::GetDevicesActived()
-{
-    const bool CompassDetect = I2C.CompassFound;
-    const bool ParachuteDetect = ParachuteDetectTrigger > 0 ? true : false;
-    const bool MatekDetect = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR) == 1 ? true : false;
-    const bool PitotDetect = Get_AirSpeed_State();
-    uint8_t CheckDevices = CompassDetect | ParachuteDetect << 1 | MatekDetect << 2 | PitotDetect << 3;
-    return CheckDevices;
-}
-
 void GCSClass::Save_Basic_Configuration()
 {
     if (GetUserBasicGCSParameters.GetFrameType != STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR))
@@ -1356,70 +1495,228 @@ void GCSClass::Save_Basic_Configuration()
     {
         STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, GetUserBasicGCSParameters.GetAccYawAdjust);
     }
+}
 
-    if (GetUserBasicGCSParameters.GetThrottleMiddle != STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR))
+void GCSClass::Save_Radio_Control_Configuration()
+{
+    if (GetRadioControlGCSParameters.GetThrottleMiddle != STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, GetUserBasicGCSParameters.GetThrottleMiddle);
+        STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, GetRadioControlGCSParameters.GetThrottleMiddle);
     }
 
-    if (GetUserBasicGCSParameters.GetThrottleExpo != STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR))
+    if (GetRadioControlGCSParameters.GetThrottleExpo != STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, GetUserBasicGCSParameters.GetThrottleExpo);
+        STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, GetRadioControlGCSParameters.GetThrottleExpo);
     }
 
-    if (GetUserBasicGCSParameters.GetRCRate != STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR))
+    if (GetRadioControlGCSParameters.GetRCRate != STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, GetUserBasicGCSParameters.GetRCRate);
+        STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, GetRadioControlGCSParameters.GetRCRate);
     }
 
-    if (GetUserBasicGCSParameters.GetRCExpo != STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR))
+    if (GetRadioControlGCSParameters.GetRCExpo != STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, GetUserBasicGCSParameters.GetRCExpo);
+        STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, GetRadioControlGCSParameters.GetRCExpo);
     }
 
-    if (GetUserBasicGCSParameters.GetRollRate != STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR))
+    if (GetRadioControlGCSParameters.GetRollRate != STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(ROLL_RATE_ADDR, GetUserBasicGCSParameters.GetRollRate);
+        STORAGEMANAGER.Write_8Bits(ROLL_RATE_ADDR, GetRadioControlGCSParameters.GetRollRate);
     }
 
-    if (GetUserBasicGCSParameters.GetPitchRate != STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR))
+    if (GetRadioControlGCSParameters.GetPitchRate != STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(PITCH_RATE_ADDR, GetUserBasicGCSParameters.GetPitchRate);
+        STORAGEMANAGER.Write_8Bits(PITCH_RATE_ADDR, GetRadioControlGCSParameters.GetPitchRate);
     }
 
-    if (GetUserBasicGCSParameters.GetYawRate != STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR))
+    if (GetRadioControlGCSParameters.GetYawRate != STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, GetUserBasicGCSParameters.GetYawRate);
+        STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, GetRadioControlGCSParameters.GetYawRate);
     }
 
-    if (GetUserBasicGCSParameters.GetRCPulseMin != STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR))
+    if (GetRadioControlGCSParameters.GetRCPulseMin != STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR))
     {
-        STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, GetUserBasicGCSParameters.GetRCPulseMin);
+        STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, GetRadioControlGCSParameters.GetRCPulseMin);
     }
 
-    if (GetUserBasicGCSParameters.GetRCPulseMax != STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR))
+    if (GetRadioControlGCSParameters.GetRCPulseMax != STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR))
     {
-        STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, GetUserBasicGCSParameters.GetRCPulseMax);
+        STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, GetRadioControlGCSParameters.GetRCPulseMax);
     }
 
-    if (GetUserBasicGCSParameters.GetAHThrottleRover != STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR))
+    if (GetRadioControlGCSParameters.GetAHThrottleRover != STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR))
     {
-        STORAGEMANAGER.Write_16Bits(AH_THROTTLE_ROVER_ADDR, GetUserBasicGCSParameters.GetAHThrottleRover);
+        STORAGEMANAGER.Write_16Bits(AH_THROTTLE_ROVER_ADDR, GetRadioControlGCSParameters.GetAHThrottleRover);
     }
 
-    if (GetUserBasicGCSParameters.GetAHDeadZone != STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR))
+    if (GetRadioControlGCSParameters.GetAHDeadZone != STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, GetUserBasicGCSParameters.GetAHDeadZone);
+        STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, GetRadioControlGCSParameters.GetAHDeadZone);
     }
 
-    if (GetUserBasicGCSParameters.GetAHSafeAltitude != STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR))
+    if (GetRadioControlGCSParameters.GetAHSafeAltitude != STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, GetUserBasicGCSParameters.GetAHSafeAltitude);
+        STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, GetRadioControlGCSParameters.GetAHSafeAltitude);
     }
 
-    if (GetUserBasicGCSParameters.GetAHMinVelVertical != STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR))
+    if (GetRadioControlGCSParameters.GetAHMinVelVertical != STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR))
     {
-        STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, GetUserBasicGCSParameters.GetAHMinVelVertical);
+        STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, GetRadioControlGCSParameters.GetAHMinVelVertical);
+    }
+
+    if (GetRadioControlGCSParameters.GetThrottleMin != STORAGEMANAGER.Read_16Bits(THROTTLE_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(THROTTLE_MIN_ADDR, GetRadioControlGCSParameters.GetThrottleMin);
+    }
+
+    if (GetRadioControlGCSParameters.GetYawMin != STORAGEMANAGER.Read_16Bits(YAW_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(YAW_MIN_ADDR, GetRadioControlGCSParameters.GetYawMin);
+    }
+
+    if (GetRadioControlGCSParameters.GetPitchMin != STORAGEMANAGER.Read_16Bits(PITCH_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(PITCH_MIN_ADDR, GetRadioControlGCSParameters.GetPitchMin);
+    }
+
+    if (GetRadioControlGCSParameters.GetRollMin != STORAGEMANAGER.Read_16Bits(ROLL_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(ROLL_MIN_ADDR, GetRadioControlGCSParameters.GetRollMin);
+    }
+
+    if (GetRadioControlGCSParameters.GetThrottleMax != STORAGEMANAGER.Read_16Bits(THROTTLE_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(THROTTLE_MAX_ADDR, GetRadioControlGCSParameters.GetThrottleMax);
+    }
+
+    if (GetRadioControlGCSParameters.GetYawMax != STORAGEMANAGER.Read_16Bits(YAW_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(YAW_MAX_ADDR, GetRadioControlGCSParameters.GetYawMax);
+    }
+
+    if (GetRadioControlGCSParameters.GetPitchMax != STORAGEMANAGER.Read_16Bits(PITCH_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(PITCH_MAX_ADDR, GetRadioControlGCSParameters.GetPitchMax);
+    }
+
+    if (GetRadioControlGCSParameters.GetRollMax != STORAGEMANAGER.Read_16Bits(ROLL_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(ROLL_MAX_ADDR, GetRadioControlGCSParameters.GetRollMax);
+    }
+
+    if (GetRadioControlGCSParameters.GetThrottleDeadZone != STORAGEMANAGER.Read_8Bits(THROTTLE_DZ_ADDR))
+    {
+        STORAGEMANAGER.Write_8Bits(THROTTLE_DZ_ADDR, GetRadioControlGCSParameters.GetThrottleDeadZone);
+    }
+
+    if (GetRadioControlGCSParameters.GetYawDeadZone != STORAGEMANAGER.Read_8Bits(YAW_DZ_ADDR))
+    {
+        STORAGEMANAGER.Write_8Bits(YAW_DZ_ADDR, GetRadioControlGCSParameters.GetYawDeadZone);
+    }
+
+    if (GetRadioControlGCSParameters.GetPitchDeadZone != STORAGEMANAGER.Read_8Bits(PITCH_DZ_ADDR))
+    {
+        STORAGEMANAGER.Write_8Bits(PITCH_DZ_ADDR, GetRadioControlGCSParameters.GetPitchDeadZone);
+    }
+
+    if (GetRadioControlGCSParameters.GetRollDeadZone != STORAGEMANAGER.Read_8Bits(ROLL_DZ_ADDR))
+    {
+        STORAGEMANAGER.Write_8Bits(ROLL_DZ_ADDR, GetRadioControlGCSParameters.GetRollDeadZone);
+    }
+
+    if (GetRadioControlGCSParameters.GetChannelsReverse != STORAGEMANAGER.Read_8Bits(CH_REVERSE_ADDR))
+    {
+        STORAGEMANAGER.Write_8Bits(CH_REVERSE_ADDR, GetRadioControlGCSParameters.GetChannelsReverse);
+    }
+
+    if (GetServosGCSParameters.GetServo1Rate != STORAGEMANAGER.Read_16Bits(SERVO1_RATE_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO1_RATE_ADDR, GetServosGCSParameters.GetServo1Rate);
+    }
+
+    if (GetServosGCSParameters.GetServo2Rate != STORAGEMANAGER.Read_16Bits(SERVO2_RATE_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO2_RATE_ADDR, GetServosGCSParameters.GetServo2Rate);
+    }
+
+    if (GetServosGCSParameters.GetServo3Rate != STORAGEMANAGER.Read_16Bits(SERVO3_RATE_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO3_RATE_ADDR, GetServosGCSParameters.GetServo3Rate);
+    }
+
+    if (GetServosGCSParameters.GetServo4Rate != STORAGEMANAGER.Read_16Bits(SERVO4_RATE_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO4_RATE_ADDR, GetServosGCSParameters.GetServo4Rate);
+    }
+
+    if (GetServosGCSParameters.GetServosReverse != STORAGEMANAGER.Read_8Bits(SERVOS_REVERSE_ADDR))
+    {
+        STORAGEMANAGER.Write_8Bits(SERVOS_REVERSE_ADDR, GetServosGCSParameters.GetServosReverse);
+    }
+
+    if (GetServosGCSParameters.GetServo1Min != STORAGEMANAGER.Read_16Bits(SERVO1_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO1_MIN_ADDR, GetServosGCSParameters.GetServo1Min);
+    }
+
+    if (GetServosGCSParameters.GetServo2Min != STORAGEMANAGER.Read_16Bits(SERVO2_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO2_MIN_ADDR, GetServosGCSParameters.GetServo2Min);
+    }
+
+    if (GetServosGCSParameters.GetServo3Min != STORAGEMANAGER.Read_16Bits(SERVO3_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO3_MIN_ADDR, GetServosGCSParameters.GetServo3Min);
+    }
+
+    if (GetServosGCSParameters.GetServo4Min != STORAGEMANAGER.Read_16Bits(SERVO4_MIN_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO4_MIN_ADDR, GetServosGCSParameters.GetServo4Min);
+    }
+
+    if (GetServosGCSParameters.GetServo1Med != STORAGEMANAGER.Read_16Bits(SERVO1_MID_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO1_MID_ADDR, GetServosGCSParameters.GetServo1Med);
+    }
+
+    if (GetServosGCSParameters.GetServo2Med != STORAGEMANAGER.Read_16Bits(SERVO2_MID_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO2_MID_ADDR, GetServosGCSParameters.GetServo2Med);
+    }
+
+    if (GetServosGCSParameters.GetServo3Med != STORAGEMANAGER.Read_16Bits(SERVO3_MID_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO3_MID_ADDR, GetServosGCSParameters.GetServo3Med);
+    }
+
+    if (GetServosGCSParameters.GetServo4Med != STORAGEMANAGER.Read_16Bits(SERVO4_MID_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO4_MID_ADDR, GetServosGCSParameters.GetServo4Med);
+    }
+
+    if (GetServosGCSParameters.GetServo1Max != STORAGEMANAGER.Read_16Bits(SERVO1_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO1_MAX_ADDR, GetServosGCSParameters.GetServo1Max);
+    }
+
+    if (GetServosGCSParameters.GetServo2Max != STORAGEMANAGER.Read_16Bits(SERVO2_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO2_MAX_ADDR, GetServosGCSParameters.GetServo2Max);
+    }
+
+    if (GetServosGCSParameters.GetServo3Max != STORAGEMANAGER.Read_16Bits(SERVO3_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO3_MAX_ADDR, GetServosGCSParameters.GetServo3Max);
+    }
+
+    if (GetServosGCSParameters.GetServo4Max != STORAGEMANAGER.Read_16Bits(SERVO4_MAX_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(SERVO4_MAX_ADDR, GetServosGCSParameters.GetServo4Max);
+    }
+
+    if (GetRadioControlGCSParameters.GetFailSafeValue != STORAGEMANAGER.Read_16Bits(FAILSAFE_VAL_ADDR))
+    {
+        STORAGEMANAGER.Write_16Bits(FAILSAFE_VAL_ADDR, GetRadioControlGCSParameters.GetFailSafeValue);
     }
 }
 
@@ -1592,7 +1889,7 @@ void GCSClass::Default_Basic_Configuration()
     STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, 0);   //LIMPA A CONFIGURAÇÃO DO AJUSTE DO ACC NO YAW
 }
 
-void GCSClass::Default_RadioControl()
+void GCSClass::Default_RadioControl_Configuration()
 {
     STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, 50);      //VOLTA A CONFIGURAÇÃO DE FABRICA DO THROTTLE MÉDIO
     STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, 35);        //VOLTA A CONFIGURAÇÃO DE FABRICA DO EXPO DO THROTTLE
@@ -1607,6 +1904,36 @@ void GCSClass::Default_RadioControl()
     STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, 70);          //VOLTA A CONFIGURAÇÃO DE FABRICA DO DEADZONE DO ALT-HOLD
     STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, 5);           //VOLTA A CONFIGURAÇÃO DE FABRICA DO SAFE-ALT DO ALT-HOLD
     STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, 50);      //VOLTA A CONFIGURAÇÃO DE FABRICA DA VELOCIDADE VERTICAL MINIMA DO ALT-HOLD
+    STORAGEMANAGER.Write_16Bits(THROTTLE_MIN_ADDR, 1050);
+    STORAGEMANAGER.Write_16Bits(YAW_MIN_ADDR, 1050);
+    STORAGEMANAGER.Write_16Bits(PITCH_MIN_ADDR, 1050);
+    STORAGEMANAGER.Write_16Bits(ROLL_MIN_ADDR, 1050);
+    STORAGEMANAGER.Write_16Bits(THROTTLE_MAX_ADDR, 1950);
+    STORAGEMANAGER.Write_16Bits(YAW_MAX_ADDR, 1950);
+    STORAGEMANAGER.Write_16Bits(PITCH_MAX_ADDR, 1950);
+    STORAGEMANAGER.Write_16Bits(ROLL_MAX_ADDR, 1950);
+    STORAGEMANAGER.Write_8Bits(THROTTLE_DZ_ADDR, 45);
+    STORAGEMANAGER.Write_8Bits(YAW_DZ_ADDR, 45);
+    STORAGEMANAGER.Write_8Bits(PITCH_DZ_ADDR, 45);
+    STORAGEMANAGER.Write_8Bits(ROLL_DZ_ADDR, 45);
+    STORAGEMANAGER.Write_8Bits(CH_REVERSE_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(SERVO1_MIN_ADDR, 1000);
+    STORAGEMANAGER.Write_16Bits(SERVO2_MIN_ADDR, 1000);
+    STORAGEMANAGER.Write_16Bits(SERVO3_MIN_ADDR, 1000);
+    STORAGEMANAGER.Write_16Bits(SERVO4_MIN_ADDR, 1000);
+    STORAGEMANAGER.Write_16Bits(SERVO1_MID_ADDR, 1500);
+    STORAGEMANAGER.Write_16Bits(SERVO2_MID_ADDR, 1500);
+    STORAGEMANAGER.Write_16Bits(SERVO3_MID_ADDR, 1500);
+    STORAGEMANAGER.Write_16Bits(SERVO4_MID_ADDR, 1500);
+    STORAGEMANAGER.Write_16Bits(SERVO1_MAX_ADDR, 2000);
+    STORAGEMANAGER.Write_16Bits(SERVO2_MAX_ADDR, 2000);
+    STORAGEMANAGER.Write_16Bits(SERVO3_MAX_ADDR, 2000);
+    STORAGEMANAGER.Write_16Bits(SERVO4_MAX_ADDR, 2000);
+    STORAGEMANAGER.Write_16Bits(SERVO1_RATE_ADDR, 100);
+    STORAGEMANAGER.Write_16Bits(SERVO2_RATE_ADDR, 100);
+    STORAGEMANAGER.Write_16Bits(SERVO3_RATE_ADDR, 100);
+    STORAGEMANAGER.Write_16Bits(SERVO4_RATE_ADDR, 100);
+    STORAGEMANAGER.Write_16Bits(FAILSAFE_VAL_ADDR, 975);
 }
 
 void GCSClass::Default_Medium_Configuration()
@@ -1650,12 +1977,12 @@ void GCSClass::Default_All_Configs()
 {
     Default_Basic_Configuration();
     Default_Medium_Configuration();
-    Default_RadioControl();
+    Default_RadioControl_Configuration();
 }
 
 void GCSClass::UpdateParametersToGCS()
 {
-    //ENVIA OS PARAMETROS BASICOS AJUSTAVEIS PELO USUARIO
+    //ATUALIZA OS PARAMETROS BASICOS AJUSTAVEIS PELO USUARIO
     SendUserBasicGCSParameters.SendFrameType = FrameType;
     SendUserBasicGCSParameters.SendReceiverType = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);
     SendUserBasicGCSParameters.SendGimbalType = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);
@@ -1681,21 +2008,54 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendAccRollAdjust = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADJUST_ADDR);
     SendUserBasicGCSParameters.SendAccPitchAdjust = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADJUST_ADDR);
     SendUserBasicGCSParameters.SendAccYawAdjust = STORAGEMANAGER.Read_16Bits(ACC_YAW_ADJUST_ADDR);
-    SendUserBasicGCSParameters.SendThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
-    SendUserBasicGCSParameters.SendThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
-    SendUserBasicGCSParameters.SendRCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
-    SendUserBasicGCSParameters.SendRCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
-    SendUserBasicGCSParameters.SendRollRate = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
-    SendUserBasicGCSParameters.SendPitchRate = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
-    SendUserBasicGCSParameters.SendYawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
-    SendUserBasicGCSParameters.SendRCPulseMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
-    SendUserBasicGCSParameters.SendRCPulseMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
-    SendUserBasicGCSParameters.SendAHThrottleRover = STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR);
-    SendUserBasicGCSParameters.SendAHDeadZone = STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR);
-    SendUserBasicGCSParameters.SendAHSafeAltitude = STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR);
-    SendUserBasicGCSParameters.SendAHMinVelVertical = STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR);
 
-    //ENVIA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
+    //ATUALIZA OS PARAMETROS DO RADIO CONTROLE
+    SendRadioControlGCSParameters.SendThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
+    SendRadioControlGCSParameters.SendThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
+    SendRadioControlGCSParameters.SendRCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
+    SendRadioControlGCSParameters.SendRCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
+    SendRadioControlGCSParameters.SendRollRate = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
+    SendRadioControlGCSParameters.SendPitchRate = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
+    SendRadioControlGCSParameters.SendYawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
+    SendRadioControlGCSParameters.SendRCPulseMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
+    SendRadioControlGCSParameters.SendRCPulseMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
+    SendRadioControlGCSParameters.SendAHThrottleRover = STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR);
+    SendRadioControlGCSParameters.SendAHDeadZone = STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR);
+    SendRadioControlGCSParameters.SendAHSafeAltitude = STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR);
+    SendRadioControlGCSParameters.SendAHMinVelVertical = STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR);
+    SendRadioControlGCSParameters.SendThrottleMin = STORAGEMANAGER.Read_16Bits(THROTTLE_MIN_ADDR);
+    SendRadioControlGCSParameters.SendYawMin = STORAGEMANAGER.Read_16Bits(YAW_MIN_ADDR);
+    SendRadioControlGCSParameters.SendPitchMin = STORAGEMANAGER.Read_16Bits(PITCH_MIN_ADDR);
+    SendRadioControlGCSParameters.SendRollMin = STORAGEMANAGER.Read_16Bits(ROLL_MIN_ADDR);
+    SendRadioControlGCSParameters.SendThrottleMax = STORAGEMANAGER.Read_16Bits(THROTTLE_MAX_ADDR);
+    SendRadioControlGCSParameters.SendYawMax = STORAGEMANAGER.Read_16Bits(YAW_MAX_ADDR);
+    SendRadioControlGCSParameters.SendPitchMax = STORAGEMANAGER.Read_16Bits(PITCH_MAX_ADDR);
+    SendRadioControlGCSParameters.SendRollMax = STORAGEMANAGER.Read_16Bits(ROLL_MAX_ADDR);
+    SendRadioControlGCSParameters.SendThrottleDeadZone = STORAGEMANAGER.Read_8Bits(THROTTLE_DZ_ADDR);
+    SendRadioControlGCSParameters.SendYawDeadZone = STORAGEMANAGER.Read_8Bits(YAW_DZ_ADDR);
+    SendRadioControlGCSParameters.SendPitchDeadZone = STORAGEMANAGER.Read_8Bits(PITCH_DZ_ADDR);
+    SendRadioControlGCSParameters.SendRollDeadZone = STORAGEMANAGER.Read_8Bits(ROLL_DZ_ADDR);
+    SendRadioControlGCSParameters.SendChannelsReverse = STORAGEMANAGER.Read_8Bits(CH_REVERSE_ADDR);
+    SendRadioControlGCSParameters.SendServo1Rate = STORAGEMANAGER.Read_16Bits(SERVO1_RATE_ADDR);
+    SendRadioControlGCSParameters.SendServo2Rate = STORAGEMANAGER.Read_16Bits(SERVO2_RATE_ADDR);
+    SendRadioControlGCSParameters.SendServo3Rate = STORAGEMANAGER.Read_16Bits(SERVO3_RATE_ADDR);
+    SendRadioControlGCSParameters.SendServo4Rate = STORAGEMANAGER.Read_16Bits(SERVO4_RATE_ADDR);
+    SendRadioControlGCSParameters.SendServosReverse = STORAGEMANAGER.Read_8Bits(SERVOS_REVERSE_ADDR);
+    SendRadioControlGCSParameters.SendServo1Min = STORAGEMANAGER.Read_16Bits(SERVO1_MIN_ADDR);
+    SendRadioControlGCSParameters.SendServo2Min = STORAGEMANAGER.Read_16Bits(SERVO2_MIN_ADDR);
+    SendRadioControlGCSParameters.SendServo3Min = STORAGEMANAGER.Read_16Bits(SERVO3_MIN_ADDR);
+    SendRadioControlGCSParameters.SendServo4Min = STORAGEMANAGER.Read_16Bits(SERVO4_MIN_ADDR);
+    SendRadioControlGCSParameters.SendServo1Med = STORAGEMANAGER.Read_16Bits(SERVO1_MID_ADDR);
+    SendRadioControlGCSParameters.SendServo2Med = STORAGEMANAGER.Read_16Bits(SERVO2_MID_ADDR);
+    SendRadioControlGCSParameters.SendServo3Med = STORAGEMANAGER.Read_16Bits(SERVO3_MID_ADDR);
+    SendRadioControlGCSParameters.SendServo4Med = STORAGEMANAGER.Read_16Bits(SERVO4_MID_ADDR);
+    SendRadioControlGCSParameters.SendServo1Max = STORAGEMANAGER.Read_16Bits(SERVO1_MAX_ADDR);
+    SendRadioControlGCSParameters.SendServo2Max = STORAGEMANAGER.Read_16Bits(SERVO2_MAX_ADDR);
+    SendRadioControlGCSParameters.SendServo3Max = STORAGEMANAGER.Read_16Bits(SERVO3_MAX_ADDR);
+    SendRadioControlGCSParameters.SendServo4Max = STORAGEMANAGER.Read_16Bits(SERVO4_MAX_ADDR);
+    SendRadioControlGCSParameters.SendFailSafeValue = STORAGEMANAGER.Read_16Bits(FAILSAFE_VAL_ADDR);
+
+    //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     SendUserMediumGCSParameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
     SendUserMediumGCSParameters.SendBreakPointValue = STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR);
     SendUserMediumGCSParameters.SendGyroLPF = STORAGEMANAGER.Read_8Bits(GYRO_LPF_ADDR);

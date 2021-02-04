@@ -130,6 +130,7 @@ static void SerialSendConfigToGPS(const char *STR)
 
 void GPS_SerialInit(uint32_t Get_BaudRate)
 {
+  //GPS AUTO BAUD-RATE
   static uint8_t Parse_Baud_Rate = 0;
   FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
   SCHEDULERTIME.Sleep(1000);
@@ -137,75 +138,125 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
   {
     FASTSERIAL.Begin(UART_NUMB_1, 9600);
     if (Get_BaudRate == 19200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+    }
     else if (Get_BaudRate == 38400)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+    }
     else if (Get_BaudRate == 57600)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+    }
     else if (Get_BaudRate == 115200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+    }
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
+    {
       SCHEDULERTIME.Sleep(50);
+    }
     Parse_Baud_Rate = 1;
   }
   else if (Parse_Baud_Rate == 1)
   {
     FASTSERIAL.Begin(UART_NUMB_1, 19200);
     if (Get_BaudRate == 19200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+    }
     else if (Get_BaudRate == 38400)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+    }
     else if (Get_BaudRate == 57600)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+    }
     else if (Get_BaudRate == 115200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+    }
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
+    {
       SCHEDULERTIME.Sleep(50);
+    }
     Parse_Baud_Rate = 2;
   }
   else if (Parse_Baud_Rate == 2)
   {
     FASTSERIAL.Begin(UART_NUMB_1, 38400);
     if (Get_BaudRate == 19200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+    }
     else if (Get_BaudRate == 38400)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+    }
     else if (Get_BaudRate == 57600)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+    }
     else if (Get_BaudRate == 115200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+    }
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
+    {
       SCHEDULERTIME.Sleep(50);
+    }
     Parse_Baud_Rate = 3;
   }
   else if (Parse_Baud_Rate == 3)
   {
     FASTSERIAL.Begin(UART_NUMB_1, 57600);
     if (Get_BaudRate == 19200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+    }
     else if (Get_BaudRate == 38400)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+    }
     else if (Get_BaudRate == 57600)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+    }
     else if (Get_BaudRate == 115200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+    }
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
+    {
       SCHEDULERTIME.Sleep(50);
+    }
     Parse_Baud_Rate = 4;
   }
   else if (Parse_Baud_Rate == 4)
   {
     FASTSERIAL.Begin(UART_NUMB_1, 115200);
     if (Get_BaudRate == 19200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+    }
     else if (Get_BaudRate == 38400)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+    }
     else if (Get_BaudRate == 57600)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+    }
     else if (Get_BaudRate == 115200)
+    {
       SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+    }
     while (!FASTSERIAL.TXFree(UART_NUMB_1))
+    {
       SCHEDULERTIME.Sleep(50);
+    }
   }
   SCHEDULERTIME.Sleep(200);
   FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);

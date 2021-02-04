@@ -22,13 +22,16 @@ void Slow_Loop()
 {
         Pre_Arm();
         CurvesRC_SetValues();
+        CHECKSUM.UpdateChannelsReverse();
         AUXFLIGHT.LoadEEPROM();
         COMPASS.Constant_Read();
         RTH_Altitude_EEPROM();
         IMU_Filters_Update();
         PID_DerivativeLPF_Update();
         UpdateValuesOfPID();
-        UpdateServosDirection();
+        AIR_PLANE.UpdateServosMinAndMax();
+        AIR_PLANE.UpdateServosMiddlePoint();
+        AIR_PLANE.UpdateServosDirection();
         AltitudeHold_Update_Params();
         GCS.UpdateParametersToGCS();
         PushWayPointParameters();
@@ -48,7 +51,7 @@ void Medium_Loop()
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
         PrintlnParameters();
-        Manual_Trim_Servo_Update();
+        Servo_Rate_Update();
         Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDE_HOLD_MODE]);
         BATTERY.Read_Voltage();
         BATTERY.Read_Current();
@@ -96,7 +99,7 @@ void Super_Fast_Loop()
         AirSpeed_Update();
         Apply_Controll_For_Throttle();
         GPS_Orientation_Update();
-        Servo_Rate_Adjust();
+        AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         ApplyPWMInAllComponents();
         Switch_Flag();
         BATTERY.Calculate_Total_Mah();
@@ -111,6 +114,7 @@ void Integral_Loop()
         Acc_ReadBufferData();
         Gyro_ReadBufferData();
         Update_Loop_Time();
+        ServoAutoTrimRun();
         PID_Update();
         PID_Reset_Integral_Accumulators();
         PID_MixMotors();

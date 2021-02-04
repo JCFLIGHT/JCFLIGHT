@@ -19,39 +19,80 @@
 #include "Common/VARIABLES.h"
 #include "Filters/LPFSERVO.h"
 #include "Math/MATHSUPPORT.h"
-#include "SERVOMANUALTRIM.h"
+#include "SERVORATE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "SafetyButton/SAFETYBUTTON.h"
+#include "SwitchFlag/SWITCHFLAG.h"
+#include "ParamsToGCS/CHECKSUM.h"
+#include "Build/GCC.h"
 
-Struct_LowPassFilter LPFDevice[4]; //INSTANCIA PARA APLICAR O FILTRO LPF NOS SERVOS
+FILE_COMPILE_FOR_SPEED
 
-#define PULSE_MIN 500                                                                     //PULSO MINIMO PARA OS SERVOS
-#define PULSE_MIDDLE 1500                                                                 //PULSO MEDIO PARA OS SERVOS
-#define PULSE_MAX 2200                                                                    //PULSO MAXIMO PARA OS SERVOS
-#define LPF_SETPOINT 1500                                                                 //PONTO MEDIO DOS SERVOS PARA O FILTRO
-#define GET_SERVO_DIRECTION(Address) ((STORAGEMANAGER.Read_8Bits(Address) == 1) ? -1 : 1) //OBTÉM A DIREÇÃO DOS SERVOS
+AirPlaneClass AIR_PLANE;
 
-int8_t ServoDirection[4] = {1, 1, 1, 1}; //CONTROLE DE DIREÇÃO DOS SERVOS
-int8_t ServoRate[4];                     //AJUSTE DE RATE DOS SERVOS DE -127 - +127
-int16_t ServoToFilter[4];                //SINAL DO SERVO PARA APLICAR NO FILTRO
-int16_t DeviceFiltered[4];               //SAIDA FILTRADADA DOS PULSOS PWM DOS SERVOS
+Struct_LowPassFilter ServosSmooth_LPF[MAX_SUPPORTED_SERVOS]; //INSTANCIA PARA APLICAR O FILTRO LPF NOS SERVOS
 
-void UpdateServosDirection(void)
+#define LPF_SETPOINT 1500 //PONTO MEDIO DOS SERVOS PARA O FILTRO LPF
+
+void AirPlaneClass::UpdateServosMinAndMax()
 {
-  ServoDirection[SERVO1] = GET_SERVO_DIRECTION(SERVO1_DIRECTION_ADDR);
-  ServoDirection[SERVO2] = GET_SERVO_DIRECTION(SERVO2_DIRECTION_ADDR);
-  ServoDirection[SERVO3] = GET_SERVO_DIRECTION(SERVO3_DIRECTION_ADDR);
-  ServoDirection[SERVO4] = GET_SERVO_DIRECTION(SERVO4_DIRECTION_ADDR);
+  if (GetFrameStateOfMultirotor())
+  {
+    return;
+  }
+
+  //OBTÉM O PULSO MINIMO DOS SERVOS
+  ServoMin[SERVO1] = GET_SERVO_MIN(SERVO1_MIN_ADDR);
+  ServoMin[SERVO2] = GET_SERVO_MIN(SERVO2_MIN_ADDR);
+  ServoMin[SERVO3] = GET_SERVO_MIN(SERVO3_MIN_ADDR);
+  ServoMin[SERVO4] = GET_SERVO_MIN(SERVO4_MIN_ADDR);
+
+  //OBTÉM O PULSO MAXIMO DOS SERVOS
+  ServoMax[SERVO1] = GET_SERVO_MAX(SERVO1_MAX_ADDR);
+  ServoMax[SERVO2] = GET_SERVO_MAX(SERVO2_MAX_ADDR);
+  ServoMax[SERVO3] = GET_SERVO_MAX(SERVO3_MAX_ADDR);
+  ServoMax[SERVO4] = GET_SERVO_MAX(SERVO4_MAX_ADDR);
 }
 
-void AirPlane_Mode_ConventionalPlane_Run()
+void AirPlaneClass::UpdateServosMiddlePoint(void)
+{
+  if (GetFrameStateOfMultirotor())
+  {
+    return;
+  }
+
+  if (GET_SERVO_MIDDLE(SERVO1_MID_ADDR) == 0)
+  {
+    SAVE_SERVO_MIDDLE(SERVO1_MID_ADDR, 1500);
+    SAVE_SERVO_MIDDLE(SERVO2_MID_ADDR, 1500);
+    SAVE_SERVO_MIDDLE(SERVO3_MID_ADDR, 1500);
+    SAVE_SERVO_MIDDLE(SERVO4_MID_ADDR, 1500);
+  }
+  ServoMiddle[SERVO1] = GET_SERVO_MIDDLE(SERVO1_MID_ADDR);
+  ServoMiddle[SERVO2] = GET_SERVO_MIDDLE(SERVO2_MID_ADDR);
+  ServoMiddle[SERVO3] = GET_SERVO_MIDDLE(SERVO3_MID_ADDR);
+  ServoMiddle[SERVO4] = GET_SERVO_MIDDLE(SERVO4_MID_ADDR);
+}
+
+void AirPlaneClass::UpdateServosDirection(void)
+{
+  if (GetFrameStateOfMultirotor())
+  {
+    return;
+  }
+
+  CHECKSUM.UpdateServosReverse();
+}
+
+void AirPlaneClass::Mode_ConventionalPlane_Run()
 {
   if (FrameType != AIRPLANE)
   {
     return;
   }
+
   if (!COMMAND_ARM_DISARM)
   {
     MotorControl[MOTOR1] = 1000;
@@ -60,32 +101,31 @@ void AirPlane_Mode_ConventionalPlane_Run()
   {
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
-  if (!OkToTrimServo)
+
+  if (Do_IOC_Mode) //MODO MANUAL
   {
-    if (Do_IOC_Mode) //MODO MANUAL
-    {
-      ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[0];  //WING     (SERVO 1 DA ASA)
-      ServoToFilter[SERVO2] = RCController[ROLL] * ServoDirection[1];  //WING     (SERVO 2 DA ASA)
-      ServoToFilter[SERVO3] = RCController[YAW] * ServoDirection[2];   //RUDDER   (LEME)
-      ServoToFilter[SERVO4] = RCController[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
-    }
-    else //STABILIZE OU ACRO
-    {
-      //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-      ServoToFilter[SERVO1] = PIDControllerApply[ROLL] * ServoDirection[0];  //WING     (SERVO 1 DA ASA)
-      ServoToFilter[SERVO2] = PIDControllerApply[ROLL] * ServoDirection[1];  //WING     (SERVO 2 DA ASA)
-      ServoToFilter[SERVO3] = PIDControllerApply[YAW] * ServoDirection[2];   //RUDDER   (LEME)
-      ServoToFilter[SERVO4] = PIDControllerApply[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
-    }
+    ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[0];  //WING     (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = RCController[ROLL] * ServoDirection[1];  //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = RCController[YAW] * ServoDirection[2];   //RUDDER   (LEME)
+    ServoToFilter[SERVO4] = RCController[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
+  }
+  else //STABILIZE OU ACRO
+  {
+    //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
+    ServoToFilter[SERVO1] = PIDControllerApply[ROLL] * ServoDirection[0];  //WING     (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = PIDControllerApply[ROLL] * ServoDirection[1];  //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = PIDControllerApply[YAW] * ServoDirection[2];   //RUDDER   (LEME)
+    ServoToFilter[SERVO4] = PIDControllerApply[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
   }
 }
 
-void AirPlane_Mode_FixedWing_Run()
+void AirPlaneClass::Mode_FixedWing_Run()
 {
   if (FrameType != FIXED_WING)
   {
     return;
   }
+
   if (!COMMAND_ARM_DISARM)
   {
     MotorControl[MOTOR1] = 1000;
@@ -94,28 +134,27 @@ void AirPlane_Mode_FixedWing_Run()
   {
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
-  if (!OkToTrimServo)
+
+  if (Do_IOC_Mode) //MODO MANUAL
   {
-    if (Do_IOC_Mode) //MODO MANUAL
-    {
-      ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[0]) + (RCController[PITCH] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
-      ServoToFilter[SERVO2] = (RCController[ROLL] * ServoDirection[0]) - (RCController[PITCH] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
-    }
-    else //STABILIZE OU ACRO
-    {
-      //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-      ServoToFilter[SERVO1] = (PIDControllerApply[ROLL] * ServoDirection[0]) + (PIDControllerApply[PITCH] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
-      ServoToFilter[SERVO2] = (PIDControllerApply[ROLL] * ServoDirection[0]) - (PIDControllerApply[PITCH] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
-    }
+    ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[0]) + (RCController[PITCH] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = (RCController[ROLL] * ServoDirection[0]) - (RCController[PITCH] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
+  }
+  else //STABILIZE OU ACRO
+  {
+    //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
+    ServoToFilter[SERVO1] = (PIDControllerApply[ROLL] * ServoDirection[0]) + (PIDControllerApply[PITCH] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = (PIDControllerApply[ROLL] * ServoDirection[0]) - (PIDControllerApply[PITCH] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
   }
 }
 
-void AirPlane_Mode_PlaneVTail_Run()
+void AirPlaneClass::Mode_PlaneVTail_Run()
 {
   if (FrameType != PLANE_VTAIL)
   {
     return;
   }
+
   if (!COMMAND_ARM_DISARM)
   {
     MotorControl[MOTOR1] = 1000;
@@ -124,59 +163,55 @@ void AirPlane_Mode_PlaneVTail_Run()
   {
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
-  if (!OkToTrimServo)
+
+  if (Do_IOC_Mode) //MODO MANUAL
   {
-    if (Do_IOC_Mode) //MODO MANUAL
-    {
-      ServoToFilter[SERVO1] = RCController[PITCH] * ServoDirection[0];                      //WING     (SERVO 1 DA ASA)
-      ServoToFilter[SERVO2] = RCController[PITCH] * ServoDirection[1];                      //WING     (SERVO 2 DA ASA)
-      ServoToFilter[SERVO3] = (RCController[ROLL] + RCController[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
-      ServoToFilter[SERVO4] = (RCController[ROLL] - RCController[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
-    }
-    else //STABILIZE OU ACRO
-    {
-      //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-      ServoToFilter[SERVO1] = PIDControllerApply[PITCH] * ServoDirection[0];                            //WING     (SERVO 1 DA ASA)
-      ServoToFilter[SERVO2] = PIDControllerApply[PITCH] * ServoDirection[1];                            //WING     (SERVO 2 DA ASA)
-      ServoToFilter[SERVO3] = (PIDControllerApply[ROLL] + PIDControllerApply[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
-      ServoToFilter[SERVO4] = (PIDControllerApply[ROLL] - PIDControllerApply[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
-    }
+    ServoToFilter[SERVO1] = RCController[PITCH] * ServoDirection[0];                      //WING     (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = RCController[PITCH] * ServoDirection[1];                      //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = (RCController[ROLL] + RCController[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
+    ServoToFilter[SERVO4] = (RCController[ROLL] - RCController[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
+  }
+  else //STABILIZE OU ACRO
+  {
+    //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
+    ServoToFilter[SERVO1] = PIDControllerApply[PITCH] * ServoDirection[0];                            //WING     (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = PIDControllerApply[PITCH] * ServoDirection[1];                            //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = (PIDControllerApply[ROLL] + PIDControllerApply[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
+    ServoToFilter[SERVO4] = (PIDControllerApply[ROLL] - PIDControllerApply[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
   }
 }
 
-void Servo_Rate_Adjust()
+void AirPlaneClass::Servo_Rate_Adjust_And_Apply_LPF()
 {
   if (GetFrameStateOfMultirotor() || !SAFETYBUTTON.GetSafeStateToOutput())
   {
     return;
   }
-  //CALCULA O RATE PARA OS SERVOS
-  ServoToFilter[SERVO1] = (((int32_t)ServoRate[SERVO1] * ServoToFilter[SERVO1]) / 100) + PULSE_MIDDLE; //AJUSTA O RATE DO SERVO 1
-  ServoToFilter[SERVO2] = (((int32_t)ServoRate[SERVO2] * ServoToFilter[SERVO2]) / 100) + PULSE_MIDDLE; //AJUSTA O RATE DO SERVO 2
-  ServoToFilter[SERVO3] = (((int32_t)ServoRate[SERVO3] * ServoToFilter[SERVO3]) / 100) + PULSE_MIDDLE; //AJUSTA O RATE DO SERVO 3
-  ServoToFilter[SERVO4] = (((int32_t)ServoRate[SERVO4] * ServoToFilter[SERVO4]) / 100) + PULSE_MIDDLE; //AJUSTA O RATE DO SERVO 4
+
+  Servo_Rate_Apply();
 
   int16_t Servo_LPF_CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
 
   if (Servo_LPF_CutOff == 0)
   {
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
-    MotorControl[MOTOR2] = Constrain_16Bits(ServoToFilter[SERVO1], PULSE_MIN, PULSE_MAX); //SERVO 1
-    MotorControl[MOTOR3] = Constrain_16Bits(ServoToFilter[SERVO2], PULSE_MIN, PULSE_MAX); //SERVO 2
-    MotorControl[MOTOR4] = Constrain_16Bits(ServoToFilter[SERVO3], PULSE_MIN, PULSE_MAX); //SERVO 3
-    MotorControl[MOTOR5] = Constrain_16Bits(ServoToFilter[SERVO4], PULSE_MIN, PULSE_MAX); //SERVO 4
+    MotorControl[MOTOR2] = Constrain_16Bits(ServoToFilter[SERVO1], ServoMin[SERVO1], ServoMax[SERVO1]); //SERVO 1
+    MotorControl[MOTOR3] = Constrain_16Bits(ServoToFilter[SERVO2], ServoMin[SERVO2], ServoMax[SERVO2]); //SERVO 2
+    MotorControl[MOTOR4] = Constrain_16Bits(ServoToFilter[SERVO3], ServoMin[SERVO3], ServoMax[SERVO3]); //SERVO 3
+    MotorControl[MOTOR5] = Constrain_16Bits(ServoToFilter[SERVO4], ServoMin[SERVO4], ServoMax[SERVO4]); //SERVO 4
   }
   else
   {
     //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
-    DeviceFiltered[SERVO1] = (int16_t)LowPassFilter(&LPFDevice[SERVO1], ServoToFilter[SERVO1], Servo_LPF_CutOff, LPF_SETPOINT);
-    DeviceFiltered[SERVO2] = (int16_t)LowPassFilter(&LPFDevice[SERVO2], ServoToFilter[SERVO2], Servo_LPF_CutOff, LPF_SETPOINT);
-    DeviceFiltered[SERVO3] = (int16_t)LowPassFilter(&LPFDevice[SERVO3], ServoToFilter[SERVO3], Servo_LPF_CutOff, LPF_SETPOINT);
-    DeviceFiltered[SERVO4] = (int16_t)LowPassFilter(&LPFDevice[SERVO4], ServoToFilter[SERVO4], Servo_LPF_CutOff, LPF_SETPOINT);
+    DeviceFiltered[SERVO1] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO1], ServoToFilter[SERVO1], Servo_LPF_CutOff, LPF_SETPOINT);
+    DeviceFiltered[SERVO2] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO2], ServoToFilter[SERVO2], Servo_LPF_CutOff, LPF_SETPOINT);
+    DeviceFiltered[SERVO3] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO3], ServoToFilter[SERVO3], Servo_LPF_CutOff, LPF_SETPOINT);
+    DeviceFiltered[SERVO4] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO4], ServoToFilter[SERVO4], Servo_LPF_CutOff, LPF_SETPOINT);
+
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
-    MotorControl[MOTOR2] = Constrain_16Bits(DeviceFiltered[SERVO1], PULSE_MIN, PULSE_MAX); //SERVO 1
-    MotorControl[MOTOR3] = Constrain_16Bits(DeviceFiltered[SERVO2], PULSE_MIN, PULSE_MAX); //SERVO 2
-    MotorControl[MOTOR4] = Constrain_16Bits(DeviceFiltered[SERVO3], PULSE_MIN, PULSE_MAX); //SERVO 3
-    MotorControl[MOTOR5] = Constrain_16Bits(DeviceFiltered[SERVO4], PULSE_MIN, PULSE_MAX); //SERVO 4
+    MotorControl[MOTOR2] = Constrain_16Bits(DeviceFiltered[SERVO1], ServoMin[SERVO1], ServoMax[SERVO1]); //SERVO 1
+    MotorControl[MOTOR3] = Constrain_16Bits(DeviceFiltered[SERVO2], ServoMin[SERVO2], ServoMax[SERVO2]); //SERVO 2
+    MotorControl[MOTOR4] = Constrain_16Bits(DeviceFiltered[SERVO3], ServoMin[SERVO3], ServoMax[SERVO3]); //SERVO 3
+    MotorControl[MOTOR5] = Constrain_16Bits(DeviceFiltered[SERVO4], ServoMin[SERVO4], ServoMax[SERVO4]); //SERVO 4
   }
 }

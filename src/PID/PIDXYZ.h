@@ -20,6 +20,7 @@
 #include "Arduino.h"
 extern int16_t IntegralAccError[2];
 extern int16_t IntegralGyroError[2];
+extern int32_t IntegralGyroError_Yaw;
 extern int16_t CalcedRateTargetRoll;
 extern int16_t CalcedRateTargetPitch;
 extern int16_t CalcedRateTargetYaw;

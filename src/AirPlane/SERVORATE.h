@@ -15,8 +15,9 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SWITCHFLAG_H_
-#define SWITCHFLAG_H_
+#ifndef SERVORATE_H_
+#define SERVORATE_H_
 #include "Arduino.h"
-void Switch_Flag(void);
+void Servo_Rate_Update();
+void Servo_Rate_Apply();
 #endif

@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "GPIOANALOGREAD.h"
+#include "ESP32ADC.h"
 
 #ifdef ESP32
 #include "esp_adc_cal.h"

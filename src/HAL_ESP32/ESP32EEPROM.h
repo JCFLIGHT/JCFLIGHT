@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FLASHSTORAGE_H_
-#define FLASHSTORAGE_H_
+#ifndef FESP32EEPROM_H_
+#define ESP32EEPROM_H_
 #ifdef ESP32
 #include "Arduino.h"
 void EEPROM_Write_8Bits(int16_t Address, uint8_t Value);

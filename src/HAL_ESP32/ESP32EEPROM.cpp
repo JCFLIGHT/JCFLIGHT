@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "FLASHSTORAGE.h"
+#include "ESP32EEPROM.h"
 
 #ifdef ESP32
 

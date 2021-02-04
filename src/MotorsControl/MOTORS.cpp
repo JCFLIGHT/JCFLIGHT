@@ -27,7 +27,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "WatchDog/REBOOT.h"
 #ifdef ESP32
-#include "HAL_ESP32/GPIOPWM.h"
+#include "HAL_ESP32/ESP32PWM.h"
 #endif
 #include "Build/GCC.h"
 

@@ -17,7 +17,7 @@
 
 #include "HALADC.h"
 #include "HAL_AVR/AVRADC.h"
-#include "HAL_ESP32/GPIOANALOGREAD.h"
+#include "HAL_ESP32/ESP32ADC.h"
 #include "HAL_STM32/STM32ADC.h"
 
 HAL_ADC_Class HAL_ADC;

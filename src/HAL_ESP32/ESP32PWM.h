@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _GPIOPWM_H_
-#define _GPIOPWM_H_
+#ifndef ESP32PWM_H_
+#define ESP32PWM_H_
 #include "Arduino.h"
 void AnalogWriteSetSettings(uint8_t Pin, double Frequency, uint8_t Resolution);
 void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse);

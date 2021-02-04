@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _GPIOANALOGREAD_H_
-#define _GPIOANALOGREAD_H_
+#ifndef ESP32ADC_H_
+#define ESP32ADC_H_
 #ifdef ESP32
 #include "Arduino.h"
 int16_t GPIOAnalogRead(uint8_t AnalogPin);

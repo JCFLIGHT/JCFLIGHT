@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "GPIOPWM.h"
+#include "ESP32PWM.h"
 #include "Math/MATHSUPPORT.h"
 
 #define MIN_PULSE 205 //4095 / 20

@@ -1172,7 +1172,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendRadioControlGCSParameters.SendServo1Rate, VAR_16BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendServo2Rate, VAR_16BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendServo3Rate, VAR_16BITS);
-        GCS_Send_Data(SendRadioControlGCSParameters.SSendServo4Rate, VAR_16BITS);
+        GCS_Send_Data(SendRadioControlGCSParameters.SendServo4Rate, VAR_16BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendServosReverse, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendServo1Min, VAR_16BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendServo2Min, VAR_16BITS);

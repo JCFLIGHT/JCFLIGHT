@@ -31,9 +31,13 @@
 
 FILE_COMPILE_FOR_SPEED
 
-#define SPIN_RATE_LIMIT 20        //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
-#define MAX_ACC_SQ_NEARNESS 25    //25% (0.87G - 1.12G)
-#define NEARNESS 100.0f           //FATOR DE CORREÇÃO DO ACELEROMETRO NO AHRS
+#define SPIN_RATE_LIMIT 20    //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
+#define MAX_ACC_NEARNESS 0.33 //25% (0.87G - 1.12G)
+#ifdef __AVR_ATmega2560__
+#define NEARNESS 100.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
+#else
+#define NEARNESS 1.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
+#endif
 #define ACC_1G 512                //1G DA IMU - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GYRO_SCALE (1.0f / 16.4f) //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GRAVITY_CMSS 980.665f     //VALOR DA GRAVIDADE EM CM/S^2
@@ -309,7 +313,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
   ComputeRotationMatrix();
 }
 
-static float CalculateAccelerometerWeight(const float DeltaTime)
+static float CalculateAccelerometerWeight()
 {
   float AccelerometerMagnitudeSquare = 0;
 
@@ -318,9 +322,8 @@ static float CalculateAccelerometerWeight(const float DeltaTime)
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[PITCH] / ACC_1G);
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[YAW] / ACC_1G);
 
-  //CALCULA A MAGNITUDE DO ACELEROMETRO EM %
-  const float Nearness = ABS_FLOAT(100 - (AccelerometerMagnitudeSquare * 100));
-  const float AccWeight_Nearness = (Nearness > MAX_ACC_SQ_NEARNESS) ? 0.0f : NEARNESS;
+  //CALCULA A CURVA DE SENO DA MAGNITUDE DO ACELEROMETRO
+  const float AccWeight_Nearness = SineCurve(sqrtf(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS) * NEARNESS;
 
   return AccWeight_Nearness;
 }
@@ -425,7 +428,7 @@ void AHRS_Update()
                                                        (float)IMU.CompassRead[YAW]}};
 
   const float CalcedCompassWeight = NEARNESS;
-  const float CalcedAccelerometerWeight = CalculateAccelerometerWeight(DeltaTime);
+  const float CalcedAccelerometerWeight = CalculateAccelerometerWeight();
   const bool SafeToUseAccelerometer = (CalcedAccelerometerWeight > 0.001f);
 
   //ATUALIZA O AHRS

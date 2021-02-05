@@ -153,25 +153,35 @@ int16_t ApproximationOfAtan2ForTurnAssist(int16_t AccRoll, int16_t AccYaw)
     uint8_t CalculateABS;
     CalculateABS = ABS_16BITS(AccRoll) < ABS_16BITS(AccYaw);
     if (CalculateABS)
+    {
         Difference = Difference / AccYaw;
+    }
     else
+    {
         Difference = AccYaw / Difference;
+    }
     Ata2Result = 2046.43f * (Difference / (3.5714f + Difference * Difference));
     if (CalculateABS)
     {
         if (AccYaw < 0)
         {
             if (AccRoll < 0)
+            {
                 Ata2Result -= 1800;
+            }
             else
+            {
                 Ata2Result += 1800;
+            }
         }
     }
     else
     {
         Ata2Result = 900 - Ata2Result;
         if (AccRoll < 0)
+        {
             Ata2Result -= 1800;
+        }
     }
     return Ata2Result;
 }
@@ -297,4 +307,9 @@ float Fast_AtanCosine(float X)
     {
         return Result;
     }
+}
+
+float SineCurve(const float InputValue, const float CurveWidth)
+{
+    return pow(2.71828182845904523536f, -SquareFloat(InputValue) / (2.0f * SquareFloat(CurveWidth)));
 }

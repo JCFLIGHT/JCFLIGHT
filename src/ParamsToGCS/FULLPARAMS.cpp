@@ -60,7 +60,6 @@ typedef struct
   uint16_t Param_AutoDisarm_Throttle_Min;
   uint16_t Param_AutoDisarm_YPR_Min;
   uint16_t Param_AutoDisarm_YPR_Max;
-  uint8_t Param_AHRS_Nearness;
   uint8_t Param_AirPlane_Wheels;
   uint8_t Param_GPS_Baud_Rate;
   uint16_t Param_Navigation_Vel;
@@ -116,7 +115,6 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"AutoDisarm_Throttle_Min", AUTODISARM_THR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_Throttle_Min, 800, 1500},
     {"AutoDisarm_YPR_Min", AUTODISARM_YPR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_YPR_Min, 800, 1500},
     {"AutoDisarm_YPR_Max", AUTODISARM_YPR_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_YPR_Max, 800, 2200},
-    {"AHRS_Nearness", NEARNESS_ADDR, VAR_8BITS, &FullParamsList.Param_AHRS_Nearness, 0, 255},
     {"AirPlane_Wheels", WHEELS_ADDR, VAR_8BITS, &FullParamsList.Param_AirPlane_Wheels, 0, 255},
     {"GPS_Baud_Rate", GPS_BAUDRATE_ADDR, VAR_8BITS, &FullParamsList.Param_GPS_Baud_Rate, 0, 4},
     {"Navigation_Vel", NAV_VEL_ADDR, VAR_16BITS, &FullParamsList.Param_Navigation_Vel, 0, 400},

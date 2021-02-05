@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _MATHSUPPORT_H_
-#define _MATHSUPPORT_H_
+#ifndef MATHSUPPORT_H_
+#define MATHSUPPORT_H_
 #include "Arduino.h"
 float ABS_FLOAT(float X);
 int16_t ABS_16BITS(int16_t X);
@@ -50,4 +50,5 @@ float Fast_Sine(float X);
 float Fast_Cosine(float X);
 float Fast_Atan2(float Y, float X);
 float Fast_AtanCosine(float X);
+float SineCurve(const float InputValue, const float CurveWidth);
 #endif

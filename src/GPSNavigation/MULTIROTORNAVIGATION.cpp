@@ -31,7 +31,7 @@
 
 #define NAVTILTCOMPENSATION 20 //RETIRADO DA ARDUPILOT
 
-static void GPS_Calcule_Bearing(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, int32_t *bearing);
+static void GPS_Calcule_Bearing(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, int32_t *Bearing);
 static void GPS_Calcule_Distance_In_CM(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, uint32_t *CalculateDistance);
 static void GPS_Calcule_Distance_To_Home(uint32_t *CalculateDistance);
 static void GPS_Calcule_Velocity(void);
@@ -234,14 +234,14 @@ bool Point_Reached(void)
   return (ABS_32BITS(TargetCalculed) > 10000);
 }
 
-void GPS_Calcule_Bearing(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, int32_t *bearing)
+void GPS_Calcule_Bearing(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, int32_t *Bearing)
 {
-  int32_t off_x = *Longitude_Two - *Longitude_One;
-  int32_t off_y = (*Latitude_Two - *Latitude_One) / ScaleDownOfLongitude;
-  *bearing = 9000 + atan2(-off_y, off_x) * 5729.57795f;
-  if (*bearing < 0)
+  int32_t Adjust_OffSet_Long = *Longitude_Two - *Longitude_One;
+  int32_t Adjust_OffSet_Lat = (*Latitude_Two - *Latitude_One) / ScaleDownOfLongitude;
+  *Bearing = 9000 + atan2(-Adjust_OffSet_Lat, Adjust_OffSet_Long) * 5729.57795f;
+  if (*Bearing < 0)
   {
-    *bearing += 36000;
+    *Bearing += 36000;
   }
 }
 

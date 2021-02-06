@@ -11,7 +11,6 @@ JCFLIGHT é um software de piloto automático de código aberto.Ele está em des
 | Status | Microcontrolador | Nome | Versão | Notas |
 | :----: | :-------: | ---- | :-----: | :---- |
 | :heavy_check_mark:  | ATMEGA2560 | JCFLIGHT-CLASSIC | *0.0.0* | Em construção |
-| :x:  | STM32F103CBT6 | JCFLIGHT-ZION | *0.0.0* | Construção não iniciada |
 | :x:  | STM32F407VE | JCFLIGHT-PASCAL | *0.0.0* | Construção não iniciada |
 | :heavy_check_mark:  | ESP32 | JCFLIGHT-EXTREME | *0.0.0* | Em construção |
 

@@ -88,6 +88,7 @@ int32_t GetAltitudeForGCS()
 
   if (COMMAND_ARM_DISARM)
   {
+    InitialSamples = 0x1F4; //RECALIBRE O BARO
     return ALTITUDE.RealBaroAltitude;
   }
 

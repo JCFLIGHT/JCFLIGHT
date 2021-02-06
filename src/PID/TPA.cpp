@@ -39,7 +39,7 @@ void TPA_Initialization()
 void TPA_Update()
 {
   TPA_Parameters.TPABreakPointer = STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR);
-  //PARA AEROS E ASA-FIXA,ESSE PARAMETRO EM 90% FUNCIONA BEM
+  //PARA AEROS E ASA-FIXA,ESSE PARAMETRO ACIMA DE 50% FUNCIONA BEM
   TPA_Parameters.TPAThrottlePercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
 }
 
@@ -47,7 +47,7 @@ int16_t GetThrottleIdleValue(void)
 {
   if (!TPA_Parameters.ThrottleIdleValue)
   {
-    TPA_Parameters.ThrottleIdleValue = MotorSpeed + (((TPA_Parameters.MaxThrottle - MotorSpeed) / 100.0f) * TPA_Parameters.ThrottleIdleFactor);
+    TPA_Parameters.ThrottleIdleValue = MotorSpeed + (((AttitudeThrottleMax - MotorSpeed) / 100.0f) * TPA_Parameters.ThrottleIdleFactor);
   }
   return TPA_Parameters.ThrottleIdleValue;
 }
@@ -84,10 +84,10 @@ uint8_t CalculateMultirotorTPAFactor(int16_t Throttle)
   {
     TPAFactor = 1.0f;
   }
-  else if (Throttle < TPA_Parameters.MaxThrottle)
+  else if (Throttle < AttitudeThrottleMax)
   {
     TPAFactor = (100 - (uint16_t)TPA_Parameters.TPAThrottlePercent * (Throttle - TPA_Parameters.TPABreakPointer) /
-                           (float)(TPA_Parameters.MaxThrottle - TPA_Parameters.TPABreakPointer)) /
+                           (float)(AttitudeThrottleMax - TPA_Parameters.TPABreakPointer)) /
                 100.0f;
   }
   else

@@ -175,11 +175,11 @@ void PID_MixMotors()
     }
     for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
     {
-      if (SuportMotor > 1900)
+      if (SuportMotor > AttitudeThrottleMax)
       {
-        MotorControl[MotorsCount] -= SuportMotor - 1900;
+        MotorControl[MotorsCount] -= SuportMotor - AttitudeThrottleMax;
       }
-      MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], MotorSpeed, 1900);
+      MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], MotorSpeed, AttitudeThrottleMax);
       if (RadioControllOutput[THROTTLE] < 1100)
       {
         MotorControl[MotorsCount] = MotorSpeed;

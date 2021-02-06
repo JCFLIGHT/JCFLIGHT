@@ -85,7 +85,7 @@ void __attribute__((noinline)) WaitTransmission(uint8_t _TWCR)
     if (CheckTWCRTWINTState == 0)
     {
       TWCR = 0;
-      ErrorI2C++;
+      I2CErrors++;
       break;
     }
   }

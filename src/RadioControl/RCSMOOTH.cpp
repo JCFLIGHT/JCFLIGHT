@@ -51,7 +51,7 @@ void RCInterpolationApply()
     DevicesFiltered[ROLL] = (int16_t)LowPassFilter(&RCSmooth_LPF[ROLL], RCControllerUnFiltered[ROLL], RCFilterFrequencyEEPROM, 0);
 
     //APLICA O FILTRO
-    RCController[THROTTLE] = Constrain_16Bits(DevicesFiltered[THROTTLE], MotorSpeed, 1900);
+    RCController[THROTTLE] = Constrain_16Bits(DevicesFiltered[THROTTLE], MotorSpeed, AttitudeThrottleMax);
     RCController[YAW] = DevicesFiltered[YAW];
     RCController[PITCH] = DevicesFiltered[PITCH];
     RCController[ROLL] = DevicesFiltered[ROLL];

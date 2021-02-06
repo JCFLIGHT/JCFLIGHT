@@ -180,7 +180,7 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   int16_t VarioPIDControl = ((VariometerError * PID[PIDALTITUDE].ProportionalVector) >> 5) + VariometerErrorIPart -
                             (((int32_t)INS.AccelerationEarthFrame_Filtered[2] * PID[PIDALTITUDE].DerivativeVector) >> 6);
   RCController[THROTTLE] = HoveringThrottle + VarioPIDControl;
-  RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE], MotorSpeed + 50, 1900 - 50);
+  RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE], MotorSpeed + 50, AttitudeThrottleMax - 50);
 }
 
 void ResetIntegralOfVariometerError()

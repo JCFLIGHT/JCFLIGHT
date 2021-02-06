@@ -21,33 +21,33 @@
 //*******************************************************
 //BOOL OU BOOLEAN (0 - 1) OU (TRUE - FALSE)
 //*******************************************************
-bool COMMAND_ARM_DISARM = false;
+bool COMMAND_ARM_DISARM;
 bool SetFlightModes[SIZE_OF_FLIGHT_MODES];
-bool CalibratingCompass = false;
-bool Do_GPS_Altitude = false;
-bool GPSHold_CallBaro = false;
-bool Fail_Safe_Event = false;
-bool Home_Point = false;
-bool GPS_3DFIX = false;
-bool Do_Stabilize_Mode = false;
-bool Do_HeadingHold_Mode = false;
-bool Do_IOC_Mode = false;
-bool Do_AltitudeHold_Mode = false;
-bool Cancel_Arm_Disarm = false;
-bool ImmediatelyFailSafe = false;
-bool TurnCoordinatorMode = false;
+bool CalibratingCompass;
+bool Do_GPS_Altitude;
+bool GPSHold_CallBaro;
+bool Fail_Safe_Event;
+bool Home_Point;
+bool GPS_3DFIX;
+bool Do_Stabilize_Mode;
+bool Do_HeadingHold_Mode;
+bool Do_IOC_Mode;
+bool Do_AltitudeHold_Mode;
+bool Cancel_Arm_Disarm;
+bool ImmediatelyFailSafe;
+bool TurnCoordinatorMode;
 
 //*******************************************************
 //UNSIGNED 8 BITS (0 - 255)
 //*******************************************************
-uint8_t FrameType = 0;
-uint8_t RTH_Altitude = 0;
-uint16_t LedRGB[3] = {0, 0, 0};
-uint8_t Compass_Type = 0;
-uint8_t MagAddress = 0;
-uint8_t MagRegister = 0;
+uint8_t FrameType;
+uint8_t RTH_Altitude;
+uint16_t LedRGB[3];
+uint8_t Compass_Type;
+uint8_t MagAddress;
+uint8_t MagRegister;
 uint8_t GPS_NumberOfSatellites;
-uint8_t NavigationMode = 0;
+uint8_t NavigationMode;
 uint8_t GPS_Flight_Mode;
 uint8_t RCRate;
 uint8_t RCExpo;
@@ -59,12 +59,12 @@ uint8_t ThrottleExpo;
 //*******************************************************
 //UNSIGNED 16 BITS (0 - 65.535‬)
 //*******************************************************
-uint16_t MotorSpeed = 0;
+uint16_t MotorSpeed;
 uint16_t GPS_HDOP;
-uint16_t CalibratingAccelerometer = 0;
+uint16_t CalibratingAccelerometer;
 uint16_t CalibratingGyroscope = 512;
 uint16_t CalculeLookUpThrottle[11];
-uint16_t GPS_Ground_Course = 0;
+uint16_t GPS_Ground_Course;
 uint16_t DistanceToHome;
 uint16_t GPS_Altitude;
 uint16_t GPS_Ground_Speed;
@@ -80,11 +80,13 @@ int16_t MotorControl[8];
 int16_t HeadingHoldTarget;
 int16_t IOC_Initial_Compass;
 int16_t GPS_Navigation_Array[2];
-int16_t GPS_Angle[3] = {0, 0, 0};
+int16_t GPS_Angle[3];
 int16_t DirectionToHome;
-int16_t ErrorI2C = 0;
+int16_t I2CErrors;
 int16_t SlipAngleForAirPlane;
-volatile int16_t Fail_Safe_System = 0;
+int16_t AttitudeThrottleMin;
+int16_t AttitudeThrottleMax;
+volatile int16_t Fail_Safe_System;
 
 //*******************************************************
 //FLOAT 24 BITS COM EXPONENTE DE 8 BITS
@@ -93,7 +95,7 @@ volatile int16_t Fail_Safe_System = 0;
 //*******************************************************
 //UNSIGNED 32 BITS (0 - 4.294.967.295)
 //*******************************************************
-uint32_t Time_To_Start_The_Land = 0;
+uint32_t Time_To_Start_The_Land;
 
 //*******************************************************
 //SIGNED 32 BITS (-2.147.483.647 - 2.147.483.647)

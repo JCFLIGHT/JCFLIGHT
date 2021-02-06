@@ -44,7 +44,7 @@ void CurvesRC_CalculeValue()
     CalculeLookUpThrottle[IndexOfLookUpThrottle] = 100 * ThrottleMiddle + NewValueCalculed * ((int32_t)ThrottleExpo * (NewValueCalculed * NewValueCalculed) /
                                                                                                   ((uint16_t)ThrottleMiddlePoint * ThrottleMiddlePoint) +
                                                                                               100 - ThrottleExpo);
-    CalculeLookUpThrottle[IndexOfLookUpThrottle] = MotorSpeed + (uint32_t)((uint16_t)(1900 - MotorSpeed)) * CalculeLookUpThrottle[IndexOfLookUpThrottle] / 10000;
+    CalculeLookUpThrottle[IndexOfLookUpThrottle] = MotorSpeed + (uint32_t)((uint16_t)(AttitudeThrottleMax - MotorSpeed)) * CalculeLookUpThrottle[IndexOfLookUpThrottle] / 10000;
   }
 }
 
@@ -66,7 +66,7 @@ uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
 {
   if (CalcedDeflection > 999)
   {
-    return 1900;
+    return AttitudeThrottleMax;
   }
 
   const uint8_t CalcedLookUpStep = CalcedDeflection / 100;
@@ -86,4 +86,6 @@ void CurvesRC_SetValues()
   RollAndPitchRate[ROLL] = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
   RollAndPitchRate[PITCH] = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
   YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
+  AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
+  AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
 }

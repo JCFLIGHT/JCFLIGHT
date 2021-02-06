@@ -54,7 +54,6 @@ typedef struct
   uint16_t Param_GimbalMaxValue;
   uint8_t Param_Land_Check_Acc;
   uint8_t Param_Land_LPF;
-  uint8_t Param_Throttle_Idle_Factor;
   uint8_t Param_Throttle_Factor;
   uint8_t Param_AutoDisarm_Time;
   uint16_t Param_AutoDisarm_Throttle_Min;
@@ -109,7 +108,6 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GimbalMaxValue", GIMBAL_MAX_ADDR, VAR_16BITS, &FullParamsList.Param_GimbalMaxValue, 800, 2200},
     {"Land_CheckAcc", LAND_CHECKACC_ADDR, VAR_8BITS, &FullParamsList.Param_Land_Check_Acc, 0, 255},
     {"Land_LPF", LAND_LPF_ADDR, VAR_8BITS, &FullParamsList.Param_Land_LPF, 0, 255},
-    {"ThrottleIddleFactor", THROTTLE_IDDLE_FACTOR_ADDR, VAR_8BITS, &FullParamsList.Param_Throttle_Idle_Factor, 0, 255},
     {"ThrottleFactor", THROTTLE_FACTOR_ADDR, VAR_16BITS, &FullParamsList.Param_Throttle_Factor, 0, 255},
     {"AutoDisarm", AUTODISARM_ADDR, VAR_8BITS, &FullParamsList.Param_AutoDisarm_Time, 0, 255},
     {"AutoDisarm_Throttle_Min", AUTODISARM_THR_MIN_ADDR, VAR_16BITS, &FullParamsList.Param_AutoDisarm_Throttle_Min, 800, 1500},

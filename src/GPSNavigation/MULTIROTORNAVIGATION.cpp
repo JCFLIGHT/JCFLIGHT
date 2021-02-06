@@ -29,7 +29,7 @@
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
-#define NavTiltCompensation 20 //RETIRADO DA ARDUPILOT
+#define NAVTILTCOMPENSATION 20 //RETIRADO DA ARDUPILOT
 
 static void GPS_Calcule_Bearing(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, int32_t *bearing);
 static void GPS_Calcule_Distance_In_CM(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, uint32_t *CalculateDistance);
@@ -363,9 +363,9 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
                                  GPSGetIntegral(GPS_Rate_Error[axis], &DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID) +
                                  GPSGetDerivative(GPS_Rate_Error[axis], &DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID);
 
-    if (NavTiltCompensation != 0)
+    if (NAVTILTCOMPENSATION != 0)
     {
-      NavCompensation = Target_Speed[axis] * Target_Speed[axis] * ((float)NavTiltCompensation * 0.0001f);
+      NavCompensation = Target_Speed[axis] * Target_Speed[axis] * ((float)NAVTILTCOMPENSATION * 0.0001f);
       if (Target_Speed[axis] < 0)
       {
         NavCompensation = -NavCompensation;

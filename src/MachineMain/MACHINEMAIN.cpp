@@ -103,5 +103,6 @@ void MachineInit()
 
 void MachineRun()
 {
+    //SISTEMA DE TASK EM LOOP INFINITO
     TaskSystemRun();
 }

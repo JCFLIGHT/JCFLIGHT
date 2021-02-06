@@ -1141,8 +1141,8 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 19) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(int16_t) * 23)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 28)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleMiddle, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleExpo, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCRate, VAR_8BITS);
@@ -1194,6 +1194,15 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
 
     case 31:
         GCS_Get_Struct_Params((uint8_t *)&GetRadioControlGCSParameters, sizeof(_GetRadioControlGCSParameters));
+        break;
+
+    case 32:
+        GCS.Save_Radio_Control_Configuration();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        break;
+
+    case 33:
+        GCS_Get_Struct_Params((uint8_t *)&GetServosGCSParameters, sizeof(_GetServosGCSParameters));
         break;
     }
 

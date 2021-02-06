@@ -25,7 +25,7 @@
 
 #ifdef __AVR_ATmega2560__
 
-void AVR_PPM_Initialization()
+void _PPM_Initialization()
 {
     DDRK &= ~(1 << 7);  //DECLARA COMO ENTRADA
     PORTK |= (1 << 7);  //ATIVA O PULL-UP

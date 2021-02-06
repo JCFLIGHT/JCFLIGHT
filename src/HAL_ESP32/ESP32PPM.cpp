@@ -65,7 +65,7 @@ void IRAM_ATTR ESP32InterruptRoutine(void)
     }
 }
 
-void ESP32_PPM_Initialization()
+void _PPM_Initialization()
 {
     pinMode(GPIO_NUM_36, INPUT);
     attachInterrupt(GPIO_NUM_36, ESP32InterruptRoutine, FALLING);

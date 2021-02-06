@@ -23,9 +23,5 @@ ClassHALPPM HALPPM;
 
 void ClassHALPPM::Initialization()
 {
-#ifdef __AVR_ATmega2560__
-  AVR_PPM_Initialization();
-#elif defined ESP32
-  ESP32_PPM_Initialization();
-#endif
+  _PPM_Initialization();
 }

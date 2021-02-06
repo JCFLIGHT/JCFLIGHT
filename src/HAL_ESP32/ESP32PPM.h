@@ -17,8 +17,8 @@
 
 #ifndef ESP32PPM_H_
 #define ESP32PPM_H_
+#ifdef ESP32
 #include "Arduino.h"
-#if ESP32
-void ESP32_PPM_Initialization();
+void _PPM_Initialization();
 #endif
 #endif

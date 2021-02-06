@@ -20,10 +20,24 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "Math/MATHSUPPORT.h"
+#include "PID/TPA.h"
 
 #define THROTTLE_LOOKUP_LENGTH 11
 //lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO DE PONTO FLUTUANTE (1.5 = 2 / 2.5 = 2)
 #define LRint lrint
+
+void CurvesRC_SetValues()
+{
+  ThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
+  ThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
+  RCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
+  RCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
+  RollAndPitchRate[ROLL] = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
+  RollAndPitchRate[PITCH] = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
+  YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
+  AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
+  AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
+}
 
 void CurvesRC_CalculeValue()
 {
@@ -41,10 +55,8 @@ void CurvesRC_CalculeValue()
     {
       ThrottleMiddlePoint = 100 - ThrottleMiddlePoint;
     }
-    CalculeLookUpThrottle[IndexOfLookUpThrottle] = 100 * ThrottleMiddle + NewValueCalculed * ((int32_t)ThrottleExpo * (NewValueCalculed * NewValueCalculed) /
-                                                                                                  ((uint16_t)ThrottleMiddlePoint * ThrottleMiddlePoint) +
-                                                                                              100 - ThrottleExpo);
-    CalculeLookUpThrottle[IndexOfLookUpThrottle] = MotorSpeed + (uint32_t)((uint16_t)(AttitudeThrottleMax - MotorSpeed)) * CalculeLookUpThrottle[IndexOfLookUpThrottle] / 10000;
+    CalculeLookUpThrottle[IndexOfLookUpThrottle] = 100 * ThrottleMiddle + NewValueCalculed * ((int32_t)ThrottleExpo * (NewValueCalculed * NewValueCalculed) / ((uint16_t)ThrottleMiddlePoint * ThrottleMiddlePoint) + 100 - ThrottleExpo);
+    CalculeLookUpThrottle[IndexOfLookUpThrottle] = AttitudeThrottleMin + (uint32_t)((uint16_t)(AttitudeThrottleMax - AttitudeThrottleMin)) * CalculeLookUpThrottle[IndexOfLookUpThrottle] / 10000;
   }
 }
 
@@ -70,22 +82,5 @@ uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
   }
 
   const uint8_t CalcedLookUpStep = CalcedDeflection / 100;
-  return CalculeLookUpThrottle[CalcedLookUpStep] +
-         (CalcedDeflection - CalcedLookUpStep * 100) *
-             (CalculeLookUpThrottle[CalcedLookUpStep + 1] -
-              CalculeLookUpThrottle[CalcedLookUpStep]) /
-             100;
-}
-
-void CurvesRC_SetValues()
-{
-  ThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
-  ThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
-  RCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
-  RCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
-  RollAndPitchRate[ROLL] = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
-  RollAndPitchRate[PITCH] = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
-  YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
-  AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
-  AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
+  return CalculeLookUpThrottle[CalcedLookUpStep] + (CalcedDeflection - CalcedLookUpStep * 100) * (CalculeLookUpThrottle[CalcedLookUpStep + 1] - CalculeLookUpThrottle[CalcedLookUpStep]) / 100;
 }

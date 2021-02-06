@@ -22,6 +22,7 @@ FILE_COMPILE_FOR_SPEED
 
 void MachineInit()
 {
+    //INICIALIZA O LED RGB
     RGB.Initialization();
     //ATIVA O LED VERMELHO
     RED_LED_ON;
@@ -35,14 +36,12 @@ void MachineInit()
     FASTSERIAL.Initialization();
     //CARREGA OS RECURSOS DO BODY FRAME
     AUXFLIGHT.LoadEEPROM();
-    //CARREGA A VELOCIDADE MINIMA DOS MOTORES
-    SPEEDMOTORS.LoadEEPROM();
     //INICIALIZA A LISTA DE PARAMETROS
     FullParamsListInitialization();
     //CARREGA OS PARAMETROS DO RADIO CONTROLE
     CurvesRC_SetValues();
-    CurvesRC_CalculeValue();
     TPA_Initialization();
+    CurvesRC_CalculeValue();
     //CARREGA OS PARAMETROS DO ALTITUDE-HOLD
     AltitudeHold_Update_Params();
     //INICIALIZA AS COFIGURAÇÕES DO PPM

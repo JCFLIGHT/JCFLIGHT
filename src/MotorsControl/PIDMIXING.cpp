@@ -32,7 +32,7 @@ void MixingApplyPIDControl()
 {
 
     MixerThrottleCommand = RCController[THROTTLE];
-    MixerThrottleCommand = ((MixerThrottleCommand - MotorSpeed) * ThrottleScale) + MotorSpeed;
+    MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
     Motors_Compensation(STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR), NumberOfMotors);
 
     switch (FrameType)

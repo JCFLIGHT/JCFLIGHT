@@ -98,7 +98,7 @@ void GPS_Process_FlightModes(void)
   static uint32_t StoredCurrentTime;
   DeltaTimeGPSNavigation = (ActualCurrentTime - StoredCurrentTime) * 1e-3f;
   StoredCurrentTime = ActualCurrentTime;
-  DeltaTimeGPSNavigation = MIN_FLOAT(DeltaTimeGPSNavigation, 1.0);
+  DeltaTimeGPSNavigation = MIN_FLOAT(DeltaTimeGPSNavigation, 1.0f);
   GPS_Calcule_Bearing(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &CalculateDirection);
   DirectionToHome = CalculateDirection / 100;
   GPS_Calcule_Distance_To_Home(&CalculateDistance);
@@ -267,11 +267,11 @@ static void GPS_Calcule_Velocity(void)
   if (IgnoreFirstPeak)
   {
     float DeltaTimeStored;
-    if (DeltaTimeGPSNavigation >= (0.1f - 0.03f) && DeltaTimeGPSNavigation <= (0.1f + 0.03f))
+    if (DeltaTimeGPSNavigation >= 0.07f && DeltaTimeGPSNavigation <= 0.13f)
     {
       DeltaTimeStored = 0.1f;
     }
-    else if (DeltaTimeGPSNavigation >= (0.2f - 0.03f) && DeltaTimeGPSNavigation <= (0.2f + 0.03f))
+    else if (DeltaTimeGPSNavigation >= 0.17f && DeltaTimeGPSNavigation <= 0.23f)
     {
       DeltaTimeStored = 0.2f;
     }
@@ -280,16 +280,16 @@ static void GPS_Calcule_Velocity(void)
       DeltaTimeStored = DeltaTimeGPSNavigation;
     }
     DeltaTimeStored = 1.0 / DeltaTimeStored;
-    GPSActualSpeed[1] = (float)(GPS_Coordinates_Vector[1] - Last_CoordinatesOfGPS[1]) * ScaleDownOfLongitude * DeltaTimeStored;
     GPSActualSpeed[0] = (float)(GPS_Coordinates_Vector[0] - Last_CoordinatesOfGPS[0]) * DeltaTimeStored;
-    GPSActualSpeed[1] = (GPSActualSpeed[1] + Previous_Velocity[1]) / 2;
+    GPSActualSpeed[1] = (float)(GPS_Coordinates_Vector[1] - Last_CoordinatesOfGPS[1]) * ScaleDownOfLongitude * DeltaTimeStored;
     GPSActualSpeed[0] = (GPSActualSpeed[0] + Previous_Velocity[0]) / 2;
-    Previous_Velocity[1] = GPSActualSpeed[1];
+    GPSActualSpeed[1] = (GPSActualSpeed[1] + Previous_Velocity[1]) / 2;
     Previous_Velocity[0] = GPSActualSpeed[0];
+    Previous_Velocity[1] = GPSActualSpeed[1];
   }
   IgnoreFirstPeak = true;
-  Last_CoordinatesOfGPS[1] = GPS_Coordinates_Vector[1];
   Last_CoordinatesOfGPS[0] = GPS_Coordinates_Vector[0];
+  Last_CoordinatesOfGPS[1] = GPS_Coordinates_Vector[1];
 }
 
 void SetThisPointToPositionHold()
@@ -305,12 +305,12 @@ static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
   uint8_t axis;
   for (axis = 0; axis < 2; axis++)
   {
-    int32_t positionError = INSPositionToHold[axis] - INS.Position_EarthFrame[axis];
-    int32_t targetSpeed = GPSGetProportional(positionError, &PositionHoldPID);
-    targetSpeed = Constrain_32Bits(targetSpeed, -1000, 1000);
-    int32_t rateError = targetSpeed - INS.Velocity_EarthFrame[axis];
-    rateError = Constrain_32Bits(rateError, -1000, 1000);
-    GPS_Navigation_Array[axis] = GPSGetProportional(rateError, &PositionHoldRatePID) + GPSGetIntegral(rateError, DeltaTime, &PositionHoldRatePIDArray[axis], &PositionHoldRatePID);
+    int32_t INSPositionError = INSPositionToHold[axis] - INS.Position_EarthFrame[axis];
+    int32_t GPSTargetSpeed = GPSGetProportional(INSPositionError, &PositionHoldPID);
+    GPSTargetSpeed = Constrain_32Bits(GPSTargetSpeed, -1000, 1000);
+    int32_t RateError = GPSTargetSpeed - INS.Velocity_EarthFrame[axis];
+    RateError = Constrain_32Bits(RateError, -1000, 1000);
+    GPS_Navigation_Array[axis] = GPSGetProportional(RateError, &PositionHoldRatePID) + GPSGetIntegral(RateError, DeltaTime, &PositionHoldRatePIDArray[axis], &PositionHoldRatePID);
     GPS_Navigation_Array[axis] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[axis] * PositionHoldRatePID.kD), -2000, 2000);
     GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis], -3000, 3000);
     NavigationPIDArray[axis].Integrator = PositionHoldRatePIDArray[axis].Integrator;
@@ -326,32 +326,35 @@ void ApplyPosHoldPIDControl(float *DeltaTime)
   else
   {
     GPS_Navigation_Array[0] = 0;
-    GPSResetPID(&PositionHoldRatePIDArray[0]);
     GPS_Navigation_Array[1] = 0;
+    GPSResetPID(&PositionHoldRatePIDArray[0]);
     GPSResetPID(&PositionHoldRatePIDArray[1]);
   }
 }
 
 bool NavStateForPosHold()
 {
-  return NavigationMode == Do_Land_Init || NavigationMode == Do_Land_Settle || NavigationMode == Do_LandInProgress || NavigationMode == Do_PositionHold || NavigationMode == Do_Start_RTH;
+  return NavigationMode == Do_Land_Init || NavigationMode == Do_Land_Settle ||
+         NavigationMode == Do_LandInProgress || NavigationMode == Do_PositionHold ||
+         NavigationMode == Do_Start_RTH;
 }
 
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
 {
+#define CROSSTRACK_ERROR 0.4
   uint8_t axis;
   float Trigonometry[2];
   float NavCompensation;
   int32_t Target_Speed[2];
   GPS_Update_CrossTrackError();
-  int16_t Cross_Speed = Crosstrack_Error * ((.4 * 100) / 100.0);
+  int16_t Cross_Speed = Crosstrack_Error * CROSSTRACK_ERROR;
   Cross_Speed = Constrain_16Bits(Cross_Speed, -200, 200);
   Cross_Speed = -Cross_Speed;
   float TargetCalculed = (9000L - Target_Bearing) * 0.000174532925f;
-  Trigonometry[1] = cos(TargetCalculed);
   Trigonometry[0] = sin(TargetCalculed);
-  Target_Speed[1] = Maximum_Velocity * Trigonometry[1] - Cross_Speed * Trigonometry[0];
+  Trigonometry[1] = cos(TargetCalculed);
   Target_Speed[0] = Cross_Speed * Trigonometry[1] + Maximum_Velocity * Trigonometry[0];
+  Target_Speed[1] = Maximum_Velocity * Trigonometry[1] - Cross_Speed * Trigonometry[0];
   for (axis = 0; axis < 2; axis++)
   {
     GPS_Rate_Error[axis] = Target_Speed[axis] - GPSActualSpeed[axis];
@@ -359,6 +362,7 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
     GPS_Navigation_Array[axis] = GPSGetProportional(GPS_Rate_Error[axis], &NavigationPID) +
                                  GPSGetIntegral(GPS_Rate_Error[axis], &DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID) +
                                  GPSGetDerivative(GPS_Rate_Error[axis], &DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID);
+
     if (NavTiltCompensation != 0)
     {
       NavCompensation = Target_Speed[axis] * Target_Speed[axis] * ((float)NavTiltCompensation * 0.0001f);
@@ -426,10 +430,10 @@ void Reset_Home_Point(void)
 void GPS_Reset_Navigation(void)
 {
   GPS_Navigation_Array[0] = 0;
+  GPS_Navigation_Array[1] = 0;
   GPSResetPID(&PositionHoldPIDArray[0]);
   GPSResetPID(&PositionHoldRatePIDArray[0]);
   GPSResetPID(&NavigationPIDArray[0]);
-  GPS_Navigation_Array[1] = 0;
   GPSResetPID(&PositionHoldPIDArray[1]);
   GPSResetPID(&PositionHoldRatePIDArray[1]);
   GPSResetPID(&NavigationPIDArray[1]);

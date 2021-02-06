@@ -43,24 +43,15 @@ void TPA_Update()
   TPA_Parameters.TPAThrottlePercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
 }
 
-int16_t GetThrottleIdleValue(void)
-{
-  if (!TPA_Parameters.ThrottleIdleValue)
-  {
-    TPA_Parameters.ThrottleIdleValue = MotorSpeed + (((AttitudeThrottleMax - MotorSpeed) / 100.0f) * TPA_Parameters.ThrottleIdleFactor);
-  }
-  return TPA_Parameters.ThrottleIdleValue;
-}
-
 uint8_t CalculateFixedWingTPAFactor(int16_t Throttle)
 {
   TPA_Update();
   float TPAFactor;
-  if (TPA_Parameters.TPAThrottlePercent != 0 && GetThrottleIdleValue() < TPA_Parameters.TPABreakPointer)
+  if (TPA_Parameters.TPAThrottlePercent != 0 && AttitudeThrottleMin < TPA_Parameters.TPABreakPointer)
   {
-    if (Throttle > GetThrottleIdleValue())
+    if (Throttle > AttitudeThrottleMin)
     {
-      TPAFactor = 0.5f + ((float)(TPA_Parameters.TPABreakPointer - GetThrottleIdleValue()) / (Throttle - GetThrottleIdleValue()) / 2.0f);
+      TPAFactor = 0.5f + ((float)(TPA_Parameters.TPABreakPointer - AttitudeThrottleMin) / (Throttle - AttitudeThrottleMin) / 2.0f);
       TPAFactor = Constrain_Float(TPAFactor, 0.5f, 2.0f);
     }
     else

@@ -46,7 +46,6 @@
 #include "CrashCheck/CRASHCHECK.h"
 #include "IMU/IMUHEALTH.h"
 #include "SwitchFlag/SWITCHFLAG.h"
-#include "MotorsControl/SPEED.h"
 #include "RadioControl/RCCONFIG.h"
 #include "PAA/FLIPMODE.h"
 #include "WayPointNavigation/WAYPOINT.h"

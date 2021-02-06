@@ -17,7 +17,11 @@
 
 #include "AIRPLANE.h"
 #include "Common/VARIABLES.h"
+#ifndef __AVR_ATmega2560__
 #include "Filters/LPFSERVO.h"
+#else
+#include "Filters/PT1.h"
+#endif
 #include "Math/MATHSUPPORT.h"
 #include "SERVORATE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
@@ -32,7 +36,14 @@ FILE_COMPILE_FOR_SPEED
 
 AirPlaneClass AIR_PLANE;
 
-Struct_LowPassFilter ServosSmooth_LPF[MAX_SUPPORTED_SERVOS]; //INSTANCIA PARA APLICAR O FILTRO LPF NOS SERVOS
+#ifndef __AVR_ATmega2560__
+Struct_LowPassFilter ServosSmooth_LPF[MAX_SUPPORTED_SERVOS];
+#else
+PT1_Filter_Struct PT1_Servo1_Aileron;
+PT1_Filter_Struct PT1_Servo2_Aileron;
+PT1_Filter_Struct PT1_Servo_Rudder;
+PT1_Filter_Struct PT1_Servo_Elevator;
+#endif
 
 #define LPF_SETPOINT 1500 //PONTO MEDIO DOS SERVOS PARA O FILTRO LPF
 
@@ -202,11 +213,18 @@ void AirPlaneClass::Servo_Rate_Adjust_And_Apply_LPF()
   }
   else
   {
-    //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
+//APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
+#ifndef __AVR_ATmega2560__
     DeviceFiltered[SERVO1] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO1], ServoToFilter[SERVO1], Servo_LPF_CutOff, LPF_SETPOINT);
     DeviceFiltered[SERVO2] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO2], ServoToFilter[SERVO2], Servo_LPF_CutOff, LPF_SETPOINT);
     DeviceFiltered[SERVO3] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO3], ServoToFilter[SERVO3], Servo_LPF_CutOff, LPF_SETPOINT);
     DeviceFiltered[SERVO4] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO4], ServoToFilter[SERVO4], Servo_LPF_CutOff, LPF_SETPOINT);
+#else
+    DeviceFiltered[SERVO1] = (int16_t)PT1FilterApply(&PT1_Servo1_Aileron, ServoToFilter[SERVO1], Servo_LPF_CutOff, 1.0f / 1000);
+    DeviceFiltered[SERVO2] = (int16_t)PT1FilterApply(&PT1_Servo2_Aileron, ServoToFilter[SERVO2], Servo_LPF_CutOff, 1.0f / 1000);
+    DeviceFiltered[SERVO3] = (int16_t)PT1FilterApply(&PT1_Servo_Rudder, ServoToFilter[SERVO3], Servo_LPF_CutOff, 1.0f / 1000);
+    DeviceFiltered[SERVO4] = (int16_t)PT1FilterApply(&PT1_Servo_Elevator, ServoToFilter[SERVO4], Servo_LPF_CutOff, 1.0f / 1000);
+#endif
 
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
     MotorControl[MOTOR2] = Constrain_16Bits(DeviceFiltered[SERVO1], ServoMin[SERVO1], ServoMax[SERVO1]); //SERVO 1

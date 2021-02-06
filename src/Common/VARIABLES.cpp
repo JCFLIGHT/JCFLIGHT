@@ -59,7 +59,6 @@ uint8_t ThrottleExpo;
 //*******************************************************
 //UNSIGNED 16 BITS (0 - 65.535‬)
 //*******************************************************
-uint16_t MotorSpeed;
 uint16_t GPS_HDOP;
 uint16_t CalibratingAccelerometer;
 uint16_t CalibratingGyroscope = 512;

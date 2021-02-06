@@ -151,7 +151,11 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   LastValueOfGyro = IMU.GyroscopeRead[ROLL];
   if (Get_LPF_Derivative_Value > 0)
   {
+#ifndef __AVR_ATmega2560__
     DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6);
+#else
+    DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
+#endif
   }
   else
   {
@@ -217,7 +221,11 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   LastValueOfGyro = IMU.GyroscopeRead[PITCH];
   if (Get_LPF_Derivative_Value > 0)
   {
+#ifndef __AVR_ATmega2560__
     DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6);
+#else
+    DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
+#endif
   }
   else
   {

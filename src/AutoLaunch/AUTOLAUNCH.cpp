@@ -187,7 +187,7 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
     }
     else
     {
-      RCController[THROTTLE] = MotorSpeed; //VAMOS MANTER A VELOCIDADE MINIMA DEFINIDA PELO USUARIO
+      RCController[THROTTLE] = AttitudeThrottleMin; //VAMOS MANTER A VELOCIDADE MINIMA DEFINIDA PELO USUARIO
     }
   }
 }

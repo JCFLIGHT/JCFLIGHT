@@ -71,9 +71,7 @@ struct PID_TERMS
 
 typedef struct
 {
-  int8_t ThrottleIdleFactor = 15;
   int16_t TPABreakPointer = 1500;
-  int16_t ThrottleIdleValue = 0;
   uint16_t TPAThrottlePercent = 0;
 } TPA_Parameters_Struct;
 

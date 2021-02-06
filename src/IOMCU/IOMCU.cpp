@@ -160,7 +160,6 @@ struct _SendUserBasicGCSParameters
     uint8_t SendCompassType;
     uint8_t SendCompassRotationType;
     uint8_t SendRTHAltitudeType;
-    uint8_t SendMotorSpeedType;
     uint8_t SendAcroType;
     uint8_t SendAltitudeHoldType;
     uint8_t SendPositionHoldType;
@@ -189,7 +188,6 @@ struct _GetUserBasicGCSParameters
     uint8_t GetCompassType;
     uint8_t GetCompassRotationType;
     uint8_t GetRTHAltitudeType;
-    uint8_t GetMotorSpeedType;
     uint8_t GetAcroType;
     uint8_t GetAltitudeHoldType;
     uint8_t GetPositionHoldType;
@@ -932,7 +930,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 22) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 21) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 3)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(SendUserBasicGCSParameters.SendFrameType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendReceiverType, VAR_8BITS);
@@ -943,7 +941,6 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendUserBasicGCSParameters.SendCompassType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendCompassRotationType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendRTHAltitudeType, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendMotorSpeedType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAcroType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAltitudeHoldType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendPositionHoldType, VAR_8BITS);
@@ -1425,11 +1422,6 @@ void GCSClass::Save_Basic_Configuration()
         STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, GetUserBasicGCSParameters.GetRTHAltitudeType);
     }
 
-    if (GetUserBasicGCSParameters.GetMotorSpeedType != STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR))
-    {
-        STORAGEMANAGER.Write_8Bits(MOTORSPEED_ADDR, GetUserBasicGCSParameters.GetMotorSpeedType);
-    }
-
     if (GetUserBasicGCSParameters.GetAcroType != STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR))
     {
         STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, GetUserBasicGCSParameters.GetAcroType);
@@ -1879,7 +1871,6 @@ void GCSClass::Default_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DO CONTROLE DO GIMBAL
     STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO TIPO DE FRAME
     STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODULO RECEPTOR PPM
-    STORAGEMANAGER.Write_8Bits(MOTORSPEED_ADDR, 0);        //LIMPA A CONFIGURAÇÃO DO MOTOR SPEED
     STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA UART_NUMB_2
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, 0);  //LIMPA A CONFIGURAÇÃO DE ROTAÇÃO DO COMPASS
     STORAGEMANAGER.Write_8Bits(COMPASS_TYPE_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DO MODELO DO COMPASS
@@ -1900,19 +1891,20 @@ void GCSClass::Default_Basic_Configuration()
 
 void GCSClass::Default_RadioControl_Configuration()
 {
-    STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, 50);      //VOLTA A CONFIGURAÇÃO DE FABRICA DO THROTTLE MÉDIO
-    STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, 35);        //VOLTA A CONFIGURAÇÃO DE FABRICA DO EXPO DO THROTTLE
-    STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, 60);              //VOLTA A CONFIGURAÇÃO DE FABRICA DO EXPO DO YAW,PITCH E ROLL
-    STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, 70);              //VOLTA A CONFIGURAÇÃO DE FABRICA DO RATE DO ROLL E DO PITCH DO PID
-    STORAGEMANAGER.Write_8Bits(ROLL_RATE_ADDR, 0);             //VOLTA A CONFIGURAÇÃO DE FABRICA DO RATE DO ROLL DO PID DINAMICO
-    STORAGEMANAGER.Write_8Bits(PITCH_RATE_ADDR, 0);            //VOLTA A CONFIGURAÇÃO DE FABRICA DO RATE DO PITCH DO PID DINAMICO
-    STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 0);              //VOLTA A CONFIGURAÇÃO DE FABRICA DO RATE DO YAW DO PID DINAMICO
-    STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, 1100);      //VOLTA A CONFIGURAÇÃO DE FABRICA DO PULSO MINIMO DOS CANAIS RC
-    STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, 1900);      //VOLTA A CONFIGURAÇÃO DE FABRICA DO PULSO MAXIMO DOS CANAIS RC
-    STORAGEMANAGER.Write_16Bits(AH_THROTTLE_ROVER_ADDR, 1500); //VOLTA A CONFIGURAÇÃO DE FABRICA DO THROTTLE ROVER DO ALT-HOLD
-    STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, 70);          //VOLTA A CONFIGURAÇÃO DE FABRICA DO DEADZONE DO ALT-HOLD
-    STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, 5);           //VOLTA A CONFIGURAÇÃO DE FABRICA DO SAFE-ALT DO ALT-HOLD
-    STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, 50);      //VOLTA A CONFIGURAÇÃO DE FABRICA DA VELOCIDADE VERTICAL MINIMA DO ALT-HOLD
+    //LIMPA TODAS AS CONFIGURAÇÕES SALVAS DO RÁDIO E DOS SERVOS
+    STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, 50);
+    STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, 35);
+    STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, 60);
+    STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, 70);
+    STORAGEMANAGER.Write_8Bits(ROLL_RATE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(PITCH_RATE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, 1000);
+    STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, 1900);
+    STORAGEMANAGER.Write_16Bits(AH_THROTTLE_ROVER_ADDR, 1500);
+    STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, 70);
+    STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, 5);
+    STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, 50);
     STORAGEMANAGER.Write_16Bits(THROTTLE_MIN_ADDR, 1050);
     STORAGEMANAGER.Write_16Bits(YAW_MIN_ADDR, 1050);
     STORAGEMANAGER.Write_16Bits(PITCH_MIN_ADDR, 1050);
@@ -2001,7 +1993,6 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendCompassType = STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR);
     SendUserBasicGCSParameters.SendCompassRotationType = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
     SendUserBasicGCSParameters.SendRTHAltitudeType = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
-    SendUserBasicGCSParameters.SendMotorSpeedType = STORAGEMANAGER.Read_8Bits(MOTORSPEED_ADDR);
     SendUserBasicGCSParameters.SendAcroType = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);
     SendUserBasicGCSParameters.SendAltitudeHoldType = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR);
     SendUserBasicGCSParameters.SendPositionHoldType = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);

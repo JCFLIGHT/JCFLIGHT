@@ -64,14 +64,15 @@ void DynamicPID()
     DynamicDerivativeVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].DerivativeVector * DynamicProportional / 100;
   }
   int32_t CalcedThrottle;
-  CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], 1000, 2000);
-  CalcedThrottle = (uint32_t)(CalcedThrottle - 1000) * 1000 / 900;
+  CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], AttitudeThrottleMin, 2000);
+  CalcedThrottle = (uint32_t)(CalcedThrottle - AttitudeThrottleMin) * 1000 / (2000 - AttitudeThrottleMin);
   RCController[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
   RCController[YAW] = CalcedAttitudeRC(YAW, RCExpo);
   RCController[PITCH] = CalcedAttitudeRC(PITCH, RCExpo);
   RCController[ROLL] = CalcedAttitudeRC(ROLL, RCExpo);
+  //APLICA O FILTRO LPF NO RC DA ATTITUDE
   RCInterpolationApply();
-  //REMOVE O -1 CAUSADO PELO FILTRO
+  //FAZ UMA PEQUENA ZONA MORTA NOS CANAIS DA ATTITUDE
   if (ABS_16BITS(RCController[YAW]) < 5)
   {
     RCController[YAW] = 0;
@@ -83,31 +84,6 @@ void DynamicPID()
   if (ABS_16BITS(RCController[ROLL]) < 5)
   {
     RCController[ROLL] = 0;
-  }
-  //REMOVE OS VALORES MAIORES QUE -500 E 500 CAUSADOS PELO FILTRO
-  if (RCController[YAW] > 500)
-  {
-    RCController[YAW] = 500;
-  }
-  else if (RCController[YAW] < -500)
-  {
-    RCController[YAW] = -500;
-  }
-  if (RCController[ROLL] > 500)
-  {
-    RCController[ROLL] = 500;
-  }
-  else if (RCController[ROLL] < -500)
-  {
-    RCController[ROLL] = -500;
-  }
-  if (RCController[PITCH] > 500)
-  {
-    RCController[PITCH] = 500;
-  }
-  else if (RCController[PITCH] < -500)
-  {
-    RCController[PITCH] = -500;
   }
   IOC_Mode_Update();
 }

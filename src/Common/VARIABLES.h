@@ -61,7 +61,6 @@ extern uint8_t GPS_Flight_Mode;
 //*******************************************************
 //UNSIGNED 16 BITS (0 - 65.535‬)
 //*******************************************************
-extern uint16_t MotorSpeed;
 extern uint16_t GPS_HDOP;
 extern uint16_t GPS_Ground_Course;
 extern uint16_t GPS_Altitude;

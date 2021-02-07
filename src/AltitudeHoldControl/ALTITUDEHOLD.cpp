@@ -185,7 +185,7 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
 
 void ResetIntegralOfVariometerError()
 {
-  VariometerErrorISum = Constrain_32Bits(VariometerErrorISum, -16384000 / 2, 16384000 / 2);
+  VariometerErrorISum = Constrain_32Bits(VariometerErrorISum, -8192000, 8192000);
   VariometerErrorIPart = Constrain_16Bits(VariometerErrorIPart, -250 / 2, 250 / 2);
 }
 

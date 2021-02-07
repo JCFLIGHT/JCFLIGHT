@@ -39,6 +39,7 @@ typedef struct
   float AccelerationEarthFrame_Sum[3];
   float Velocity_EarthFrame[3];
   float Position_EarthFrame[3];
+  int32_t PositionToHold[2];
 } INS_STRUCT;
 
 typedef struct

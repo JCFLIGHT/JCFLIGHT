@@ -54,7 +54,6 @@ static int16_t Navigation_Bearing_RTH;
 uint32_t Two_Points_Distance;
 int32_t Target_Bearing;
 int32_t GPSDistanceToHome[2];
-int32_t INSPositionToHold[2];
 int32_t Original_Target_Bearing;
 int32_t Coordinates_To_Navigation[2];
 static int32_t Coordinates_From_Navigation[2];
@@ -220,8 +219,8 @@ void Set_Points_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Dest
   Cruise_Mode_Update();
   GPS_Calcule_Bearing(&Coordinates_From_Navigation[0], &Coordinates_From_Navigation[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
   GPS_Calcule_Distance_In_CM(&Coordinates_From_Navigation[0], &Coordinates_From_Navigation[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
-  INSPositionToHold[0] = (Coordinates_To_Navigation[0] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
-  INSPositionToHold[1] = (Coordinates_To_Navigation[1] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
+  INS.PositionToHold[0] = (Coordinates_To_Navigation[0] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
+  INS.PositionToHold[1] = (Coordinates_To_Navigation[1] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
   Coordinates_Navigation_Speed = 100;
   Original_Target_Bearing = Target_Bearing;
 }
@@ -294,10 +293,10 @@ static void GPS_Calcule_Velocity(void)
 
 void SetThisPointToPositionHold()
 {
-  INSPositionToHold[0] = INS.Position_EarthFrame[0] + INS.Velocity_EarthFrame[0] * PositionHoldPID.kI;
-  INSPositionToHold[1] = INS.Position_EarthFrame[1] + INS.Velocity_EarthFrame[1] * PositionHoldPID.kI;
-  GPS_CoordinatesToHold[0] = Stored_Coordinates_Home_Point[0] + INSPositionToHold[0] / 1.11318845f;
-  GPS_CoordinatesToHold[1] = Stored_Coordinates_Home_Point[1] + INSPositionToHold[1] / (1.11318845f * ScaleDownOfLongitude);
+  INS.PositionToHold[0] = INS.Position_EarthFrame[0] + INS.Velocity_EarthFrame[0] * PositionHoldPID.kI;
+  INS.PositionToHold[1] = INS.Position_EarthFrame[1] + INS.Velocity_EarthFrame[1] * PositionHoldPID.kI;
+  GPS_CoordinatesToHold[0] = Stored_Coordinates_Home_Point[0] + INS.PositionToHold[0] / 1.11318845f;
+  GPS_CoordinatesToHold[1] = Stored_Coordinates_Home_Point[1] + INS.PositionToHold[1] / (1.11318845f * ScaleDownOfLongitude);
 }
 
 static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
@@ -305,7 +304,7 @@ static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
   uint8_t axis;
   for (axis = 0; axis < 2; axis++)
   {
-    int32_t INSPositionError = INSPositionToHold[axis] - INS.Position_EarthFrame[axis];
+    int32_t INSPositionError = INS.PositionToHold[axis] - INS.Position_EarthFrame[axis];
     int32_t GPSTargetSpeed = GPSGetProportional(INSPositionError, &PositionHoldPID);
     GPSTargetSpeed = Constrain_32Bits(GPSTargetSpeed, -1000, 1000);
     int32_t RateError = GPSTargetSpeed - INS.Velocity_EarthFrame[axis];

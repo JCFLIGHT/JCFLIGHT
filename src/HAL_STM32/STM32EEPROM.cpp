@@ -19,8 +19,11 @@
 
 #ifdef __arm__
 
+#include "EEPROM.h"
+
 void EEPROM_Write_8Bits(int16_t Address, uint8_t Value)
 {
+    EEPROM.write(Address, Value);
 }
 
 void EEPROM_Write_16Bits(int16_t Address, int16_t Value)
@@ -37,7 +40,7 @@ void EEPROM_Write_Float(int16_t Address, float Value)
 
 uint8_t EEPROM_Read_8Bits(int16_t Address)
 {
-    return 0;
+    return EEPROM.read(Address);
 }
 
 int16_t EEPROM_Read_16Bits(int16_t Address)

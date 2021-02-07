@@ -27,6 +27,8 @@ LEDRGB RGB;
 #define PWM 254
 #elif defined ESP32
 #define PWM 4095
+#elif defined __arm__
+#define PWM 254
 #endif
 
 bool NotPriorit = false;
@@ -61,10 +63,8 @@ void LEDRGB::Update()
 #elif defined __arm__
 
 #endif
-  if ((CalibratingAccelerometer == 0) &&
-      (!GCS.ConfigFlight) &&
-      (!CalibratingCompass) &&
-      (!NotPriorit))
+
+  if ((CalibratingAccelerometer == 0) && (!GCS.ConfigFlight) && (!CalibratingCompass) && (!NotPriorit))
   {
     RGB.Function(GPSLED);
   }

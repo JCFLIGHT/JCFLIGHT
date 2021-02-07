@@ -87,7 +87,7 @@ void Serial_Begin(uint8_t SerialPort, uint32_t BaudRate)
         break;
 
     case UART_NUMB_2:
-        Serial2.begin(BaudRate);
+        //Serial2.begin(BaudRate);
         break;
 
     case UART_NUMB_3:
@@ -113,7 +113,7 @@ uint8_t Serial_Read(uint8_t SerialPort)
         break;
 
     case UART_NUMB_2:
-        return Serial2.read();
+        //return Serial2.read();
         break;
 
     case UART_NUMB_3:
@@ -136,7 +136,7 @@ uint8_t Serial_Available(uint8_t SerialPort)
         break;
 
     case UART_NUMB_2:
-        return Serial2.available();
+        //return Serial2.available();
         break;
 
     case UART_NUMB_3:
@@ -168,7 +168,7 @@ void Serial_Write(uint8_t SerialPort, uint8_t WriteData)
         break;
 
     case UART_NUMB_2:
-        Serial2.write(WriteData);
+        //Serial2.write(WriteData);
         break;
 
     case UART_NUMB_3:

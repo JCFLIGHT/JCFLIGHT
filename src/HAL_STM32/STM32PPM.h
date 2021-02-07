@@ -15,14 +15,10 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "HALPPM.h"
-#include "HAL_AVR/AVRPPM.h"
-#include "HAL_ESP32/ESP32PPM.h"
-#include "HAL_STM32/STM32PPM.h"
-
-ClassHALPPM HALPPM;
-
-void ClassHALPPM::Initialization()
-{
-  _PPM_Initialization();
-}
+#ifndef STM32PPM_H_
+#define STM32PPM_H_
+#ifdef __arm__
+#include "Arduino.h"
+void _PPM_Initialization();
+#endif
+#endif

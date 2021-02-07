@@ -28,9 +28,9 @@ class Filter
 {
 public:
   Filter(){};
-  virtual T Apply(T sample)
+  virtual T Apply(T Sample)
   {
-    return sample;
+    return Sample;
   };
   virtual void Reset(){};
 };

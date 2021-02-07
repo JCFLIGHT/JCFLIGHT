@@ -26,20 +26,12 @@ class FilterWithBuffer : public Filter<T>
 {
 public:
   FilterWithBuffer();
-  virtual T Apply(T sample);
+  virtual T Apply(T Sample);
   virtual void Reset();
-  virtual uint8_t get_filter_size()
-  {
-    return FILTER_SIZE;
-  };
-  virtual T get_sample(uint8_t i)
-  {
-    return samples[i];
-  }
 
 protected:
-  T samples[FILTER_SIZE];
-  uint8_t sample_index;
+  T Samples[FILTER_SIZE];
+  uint8_t Sample_Index;
 };
 
 typedef FilterWithBuffer<int16_t, 2> FilterWithBufferInt16_Size2;
@@ -68,7 +60,7 @@ typedef FilterWithBuffer<uint32_t, 6> FilterWithBufferUInt32_Size6;
 typedef FilterWithBuffer<uint32_t, 7> FilterWithBufferUInt32_Size7;
 
 template <class T, uint8_t FILTER_SIZE>
-FilterWithBuffer<T, FILTER_SIZE>::FilterWithBuffer() : Filter<T>(), sample_index(0)
+FilterWithBuffer<T, FILTER_SIZE>::FilterWithBuffer() : Filter<T>(), Sample_Index(0)
 {
   Reset();
 }
@@ -79,17 +71,19 @@ void FilterWithBuffer<T, FILTER_SIZE>::Reset()
   Filter<T>::Reset();
   for (int8_t i = 0; i < FILTER_SIZE; i++)
   {
-    samples[i] = 0;
+    Samples[i] = 0;
   }
-  sample_index = 0;
+  Sample_Index = 0;
 }
 
 template <class T, uint8_t FILTER_SIZE>
-T FilterWithBuffer<T, FILTER_SIZE>::Apply(T sample)
+T FilterWithBuffer<T, FILTER_SIZE>::Apply(T Sample)
 {
-  samples[sample_index++] = sample;
-  if (sample_index >= FILTER_SIZE)
-    sample_index = 0;
-  return sample;
+  Samples[Sample_Index++] = Sample;
+  if (Sample_Index >= FILTER_SIZE)
+  {
+    Sample_Index = 0;
+  }
+  return Sample;
 }
 #endif

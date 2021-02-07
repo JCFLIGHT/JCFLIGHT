@@ -65,6 +65,9 @@ void AirPlaneClass::UpdateServosMinAndMax()
   ServoMax[SERVO2] = GET_SERVO_MAX(SERVO2_MAX_ADDR);
   ServoMax[SERVO3] = GET_SERVO_MAX(SERVO3_MAX_ADDR);
   ServoMax[SERVO4] = GET_SERVO_MAX(SERVO4_MAX_ADDR);
+
+  //ATUALIZA A FREQUENCIA DE CORTE DO LPF DOS SERVOS
+  Servo_LPF_CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
 }
 
 void AirPlaneClass::UpdateServosMiddlePoint(void)
@@ -201,8 +204,6 @@ void AirPlaneClass::Servo_Rate_Adjust_And_Apply_LPF()
 
   Servo_Rate_Apply();
 
-  int16_t Servo_LPF_CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
-
   if (Servo_LPF_CutOff == 0)
   {
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
@@ -215,21 +216,21 @@ void AirPlaneClass::Servo_Rate_Adjust_And_Apply_LPF()
   {
 //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
 #ifndef __AVR_ATmega2560__
-    DeviceFiltered[SERVO1] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO1], ServoToFilter[SERVO1], Servo_LPF_CutOff, LPF_SETPOINT);
-    DeviceFiltered[SERVO2] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO2], ServoToFilter[SERVO2], Servo_LPF_CutOff, LPF_SETPOINT);
-    DeviceFiltered[SERVO3] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO3], ServoToFilter[SERVO3], Servo_LPF_CutOff, LPF_SETPOINT);
-    DeviceFiltered[SERVO4] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO4], ServoToFilter[SERVO4], Servo_LPF_CutOff, LPF_SETPOINT);
+    ServosFiltered[SERVO1] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO1], ServoToFilter[SERVO1], Servo_LPF_CutOff, LPF_SETPOINT);
+    ServosFiltered[SERVO2] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO2], ServoToFilter[SERVO2], Servo_LPF_CutOff, LPF_SETPOINT);
+    ServosFiltered[SERVO3] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO3], ServoToFilter[SERVO3], Servo_LPF_CutOff, LPF_SETPOINT);
+    ServosFiltered[SERVO4] = (int16_t)LowPassFilter(&ServosSmooth_LPF[SERVO4], ServoToFilter[SERVO4], Servo_LPF_CutOff, LPF_SETPOINT);
 #else
-    DeviceFiltered[SERVO1] = (int16_t)PT1FilterApply(&PT1_Servo1_Aileron, ServoToFilter[SERVO1], Servo_LPF_CutOff, 1.0f / 1000);
-    DeviceFiltered[SERVO2] = (int16_t)PT1FilterApply(&PT1_Servo2_Aileron, ServoToFilter[SERVO2], Servo_LPF_CutOff, 1.0f / 1000);
-    DeviceFiltered[SERVO3] = (int16_t)PT1FilterApply(&PT1_Servo_Rudder, ServoToFilter[SERVO3], Servo_LPF_CutOff, 1.0f / 1000);
-    DeviceFiltered[SERVO4] = (int16_t)PT1FilterApply(&PT1_Servo_Elevator, ServoToFilter[SERVO4], Servo_LPF_CutOff, 1.0f / 1000);
+    ServosFiltered[SERVO1] = (int16_t)PT1FilterApply(&PT1_Servo1_Aileron, ServoToFilter[SERVO1], Servo_LPF_CutOff, 1.0f / 1000);
+    ServosFiltered[SERVO2] = (int16_t)PT1FilterApply(&PT1_Servo2_Aileron, ServoToFilter[SERVO2], Servo_LPF_CutOff, 1.0f / 1000);
+    ServosFiltered[SERVO3] = (int16_t)PT1FilterApply(&PT1_Servo_Rudder, ServoToFilter[SERVO3], Servo_LPF_CutOff, 1.0f / 1000);
+    ServosFiltered[SERVO4] = (int16_t)PT1FilterApply(&PT1_Servo_Elevator, ServoToFilter[SERVO4], Servo_LPF_CutOff, 1.0f / 1000);
 #endif
 
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
-    MotorControl[MOTOR2] = Constrain_16Bits(DeviceFiltered[SERVO1], ServoMin[SERVO1], ServoMax[SERVO1]); //SERVO 1
-    MotorControl[MOTOR3] = Constrain_16Bits(DeviceFiltered[SERVO2], ServoMin[SERVO2], ServoMax[SERVO2]); //SERVO 2
-    MotorControl[MOTOR4] = Constrain_16Bits(DeviceFiltered[SERVO3], ServoMin[SERVO3], ServoMax[SERVO3]); //SERVO 3
-    MotorControl[MOTOR5] = Constrain_16Bits(DeviceFiltered[SERVO4], ServoMin[SERVO4], ServoMax[SERVO4]); //SERVO 4
+    MotorControl[MOTOR2] = Constrain_16Bits(ServosFiltered[SERVO1], ServoMin[SERVO1], ServoMax[SERVO1]); //SERVO 1
+    MotorControl[MOTOR3] = Constrain_16Bits(ServosFiltered[SERVO2], ServoMin[SERVO2], ServoMax[SERVO2]); //SERVO 2
+    MotorControl[MOTOR4] = Constrain_16Bits(ServosFiltered[SERVO3], ServoMin[SERVO3], ServoMax[SERVO3]); //SERVO 3
+    MotorControl[MOTOR5] = Constrain_16Bits(ServosFiltered[SERVO4], ServoMin[SERVO4], ServoMax[SERVO4]); //SERVO 4
   }
 }

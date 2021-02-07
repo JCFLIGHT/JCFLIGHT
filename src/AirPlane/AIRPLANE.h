@@ -33,8 +33,9 @@ public:
   int16_t ServoMin[MAX_SUPPORTED_SERVOS];
   int16_t ServoMiddle[MAX_SUPPORTED_SERVOS];
   int16_t ServoMax[MAX_SUPPORTED_SERVOS];
+  int16_t Servo_LPF_CutOff;
   int16_t ServoToFilter[MAX_SUPPORTED_SERVOS];
-  int16_t DeviceFiltered[MAX_SUPPORTED_SERVOS];
+  int16_t ServosFiltered[MAX_SUPPORTED_SERVOS];
   void UpdateServosMinAndMax();
   void UpdateServosMiddlePoint();
   void UpdateServosDirection(void);

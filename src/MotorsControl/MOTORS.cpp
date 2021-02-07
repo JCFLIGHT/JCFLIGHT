@@ -190,6 +190,7 @@ void PID_MixMotors()
       }
     }
   }
+  ApplyPWMInAllComponents();
 }
 
 void PulseInAllMotors(int16_t Pulse)

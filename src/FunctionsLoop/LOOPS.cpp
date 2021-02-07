@@ -21,20 +21,20 @@
 void Slow_Loop()
 {
         Pre_Arm();
+        COMPASS.Constant_Read();
         CurvesRC_SetValues();
         CHECKSUM.UpdateChannelsReverse();
         AUXFLIGHT.LoadEEPROM();
-        COMPASS.Constant_Read();
         RTH_Altitude_EEPROM();
         IMU_Filters_Update();
         PID_DerivativeLPF_Update();
-        UpdateValuesOfPID();
         AIR_PLANE.UpdateServosMinAndMax();
         AIR_PLANE.UpdateServosMiddlePoint();
         AIR_PLANE.UpdateServosDirection();
         AltitudeHold_Update_Params();
         GCS.UpdateParametersToGCS();
         PushWayPointParameters();
+        UpdateValuesOfPID();
 }
 
 void Medium_Loop()
@@ -50,11 +50,11 @@ void Medium_Loop()
         AUXFLIGHT.SelectMode();
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
-        PrintlnParameters();
         Servo_Rate_Update();
         Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDE_HOLD_MODE]);
         BATTERY.Read_Voltage();
         BATTERY.Read_Current();
+        PrintlnParameters();
 }
 
 void Fast_Medium_Loop()
@@ -99,9 +99,8 @@ void Super_Fast_Loop()
         AirSpeed_Update();
         Apply_Controll_For_Throttle();
         GPS_Orientation_Update();
-        AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
-        ApplyPWMInAllComponents();
         Switch_Flag();
+        AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         BATTERY.Calculate_Total_Mah();
 
 #ifdef __AVR_ATmega2560__
@@ -116,6 +115,5 @@ void Integral_Loop()
         Update_Loop_Time();
         ServoAutoTrimRun();
         PID_Update();
-        PID_Reset_Integral_Accumulators();
         PID_MixMotors();
 }

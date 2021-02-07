@@ -48,7 +48,7 @@ void RCInterpolationApply()
   int16_t RCFilterFrequencyEEPROM = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
 
   //GUARDA OS VALORES ANTERIOR
-  RCControllerUnFiltered[THROTTLE] = RCController[THROTTLE];
+  RCControllerUnFiltered[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
   RCControllerUnFiltered[YAW] = RCController[YAW];
   RCControllerUnFiltered[PITCH] = RCController[PITCH];
   RCControllerUnFiltered[ROLL] = RCController[ROLL];

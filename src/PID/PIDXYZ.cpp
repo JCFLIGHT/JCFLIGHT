@@ -92,6 +92,7 @@ void PID_Update()
   PID_Controll_Roll(CalcedRateTargetRoll);
   PID_Controll_Pitch(CalcedRateTargetPitch);
   PID_Controll_Yaw(CalcedRateTargetYaw);
+  PID_Reset_Integral_Accumulators();
 }
 
 void PID_Controll_Roll(int16_t RateTargetInput)

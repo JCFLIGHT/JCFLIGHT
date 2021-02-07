@@ -25,12 +25,12 @@ template <class T, class U, uint8_t FILTER_SIZE>
 class AverageFilter : public FilterWithBuffer<T, FILTER_SIZE>
 {
 public:
-  AverageFilter() : FilterWithBuffer<T, FILTER_SIZE>(), _num_samples(0){};
-  virtual T Apply(T sample);
+  AverageFilter() : FilterWithBuffer<T, FILTER_SIZE>(), Num_Samples(0){};
+  virtual T Apply(T Sample);
   virtual void Reset();
 
 private:
-  uint8_t _num_samples;
+  uint8_t Num_Samples;
 };
 
 typedef AverageFilter<int8_t, int16_t, 2> AverageFilterInt8_Size2;
@@ -62,22 +62,26 @@ typedef AverageFilter<float, float, 5> AverageFilterFloat_Size5;
 typedef AverageFilter<float, float, 20> AverageFilterFloat_Size20;
 
 template <class T, class U, uint8_t FILTER_SIZE>
-T AverageFilter<T, U, FILTER_SIZE>::Apply(T sample)
+T AverageFilter<T, U, FILTER_SIZE>::Apply(T Sample)
 {
-  U result = 0;
-  FilterWithBuffer<T, FILTER_SIZE>::Apply(sample);
-  _num_samples++;
-  if (_num_samples > FILTER_SIZE || _num_samples == 0)
-    _num_samples = FILTER_SIZE;
+  U Result = 0;
+  FilterWithBuffer<T, FILTER_SIZE>::Apply(Sample);
+  Num_Samples++;
+  if (Num_Samples > FILTER_SIZE || Num_Samples == 0)
+  {
+    Num_Samples = FILTER_SIZE;
+  }
   for (uint8_t i = 0; i < FILTER_SIZE; i++)
-    result += FilterWithBuffer<T, FILTER_SIZE>::samples[i];
-  return (T)(result / _num_samples);
+  {
+    Result += FilterWithBuffer<T, FILTER_SIZE>::Samples[i];
+  }
+  return (T)(Result / Num_Samples);
 }
 
 template <class T, class U, uint8_t FILTER_SIZE>
 void AverageFilter<T, U, FILTER_SIZE>::Reset()
 {
   FilterWithBuffer<T, FILTER_SIZE>::Reset();
-  _num_samples = 0;
+  Num_Samples = 0;
 }
 #endif

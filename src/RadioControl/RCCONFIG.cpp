@@ -97,8 +97,8 @@ void RC_Config::Set_Reverse(bool Reverse)
 void RC_Config::Set_Dead_Zone(uint8_t DeadZone)
 {
   //NÃO APLICA A ZONA MORTA NO SBUS E IBUS
-  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) ||
-      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
+      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))
   {
     _DeadZone = 0;
   }

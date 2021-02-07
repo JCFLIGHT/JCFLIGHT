@@ -31,16 +31,16 @@ void Serial_Initialization()
     Serial_Begin(UART_NUMB_1, 57600);
     GPS_SerialInit(57600);
     //IBUS & SBUS
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 0)
+    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == PPM_RECEIVER)
     {
         Serial_Begin(UART_NUMB_2, 115200);
     }
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
+    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
     {
         //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
         Serial_Begin(UART_NUMB_2, 100000);
     }
-    else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
+    else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER)
     {
         //CONFIGURAÇÃO DA UART_NUMB_2 PARA IBUS
         Serial_Begin(UART_NUMB_2, 115200);

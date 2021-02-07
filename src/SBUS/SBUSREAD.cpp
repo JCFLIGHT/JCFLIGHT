@@ -22,6 +22,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FastSerial/PRINTF.h"
 #include "BAR/BAR.h"
+#include "Common/ENUM.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -35,7 +36,7 @@ uint16_t SBUSReadChannels[12];
 
 void SBUS_Update()
 {
-  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER)
   {
     return;
   }

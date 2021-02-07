@@ -459,4 +459,11 @@ typedef enum
     SERVO_AUTOTRIM_SAVE_PENDING,
     SERVO_AUTOTRIM_DONE,
 } ServoAutoTrimState_Enum;
+
+enum Receivers_Type_Enum
+{
+    PPM_RECEIVER = 0,
+    SBUS_RECEIVER,
+    IBUS_RECEIVER
+};
 #endif

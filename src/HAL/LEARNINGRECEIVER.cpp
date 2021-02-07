@@ -21,15 +21,16 @@
 #include "BAR/BAR.h"
 #include "SBUS/SBUSREAD.h"
 #include "IBUS/IBUSREAD.h"
+#include "Common/ENUM.h"
 
 uint16_t LearningChannelsOfReceiver(uint8_t Channels)
 {
     uint16_t ReceiverData;
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
+    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
     {
         ReceiverData = SBUSReadChannels[PPMChannelMap[Channels]];
     }
-    else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2)
+    else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER)
     {
         ReceiverData = IBUSReadChannels[PPMChannelMap[Channels]];
     }

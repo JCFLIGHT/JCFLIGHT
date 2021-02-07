@@ -78,8 +78,8 @@ void AVRInterruptRoutine(void)
 extern "C" void __vector_11(void) __attribute__((signal, __INTR_ATTRS));
 void __vector_11(void)
 {
-    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) ||
-        (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
+    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
+        (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))
     {
         return;
     }

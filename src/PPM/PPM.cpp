@@ -34,7 +34,8 @@ uint8_t PPMChannelMap[12];
 
 void PPM_Initialization()
 {
-  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2))
+  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER) ||
+      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != IBUS_RECEIVER))
   {
     HALPPM.Initialization();
   }
@@ -78,7 +79,7 @@ void DecodeAllReceiverChannels()
   for (uint8_t Channels = 0; Channels < 12; Channels++)
   {
     RadioControllOutputDecoded = LearningChannelsOfReceiver(Channels);
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1)
+    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
     {
       CheckFailSafeState = SBUSRC.FailSafe || !COMMAND_ARM_DISARM;
     }
@@ -86,7 +87,8 @@ void DecodeAllReceiverChannels()
     {
       CheckFailSafeState = RadioControllOutputDecoded > CHECKSUM.GetFailSafeValue || !COMMAND_ARM_DISARM;
     }
-    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 1) || (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == 2))
+    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
+        (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))
     {
       if (CheckFailSafeState)
       {

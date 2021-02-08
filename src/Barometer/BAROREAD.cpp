@@ -52,7 +52,7 @@ void CalculateBaroAltitudeForFlight()
   }
   else
   {
-    ALTITUDE.RealBaroAltitude = Baro_Filter.Apply(Get_Altitude_Difference(BarometerGroundPressureForFlight, BaroPressureFiltered, BarometerTemperatureScale));
+    ALTITUDE.RealBaroAltitude = Baro_Filter.Apply((int32_t)Get_Altitude_Difference(BarometerGroundPressureForFlight, BaroPressureFiltered, BarometerTemperatureScale));
   }
 }
 
@@ -82,13 +82,13 @@ float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t Bar
 
 int32_t GetAltitudeForGCS()
 {
-  static uint16_t InitialSamples = 0x1F4;
+  static uint8_t InitialSamples = 0xC8;
   static int16_t BarometerTemperatureScaleForGCS;
   static int32_t BarometerGroundPressure;
 
   if (COMMAND_ARM_DISARM)
   {
-    InitialSamples = 0x1F4; //RECALIBRE O BARO
+    InitialSamples = 0xC8; //RECALIBRA A ALTITUDE DO BARO PARA O MODO DESARMADO
     return ALTITUDE.RealBaroAltitude;
   }
 
@@ -100,5 +100,5 @@ int32_t GetAltitudeForGCS()
     return 0;
   }
 
-  return Get_Altitude_Difference(BarometerGroundPressure, BaroPressureFiltered, BarometerTemperatureScaleForGCS);
+  return (int32_t)Get_Altitude_Difference(BarometerGroundPressure, BaroPressureFiltered, BarometerTemperatureScaleForGCS);
 }

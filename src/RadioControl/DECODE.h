@@ -15,11 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPM_H_
-#define PPM_H_
+#ifndef DECODE_H_
+#define DECODE_H_
 #include "Arduino.h"
 extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t PPMChannelMap[12];
+extern uint8_t RcChannelMap[12];
 void PPM_Initialization();
 void DecodeAllReceiverChannels();
 #endif

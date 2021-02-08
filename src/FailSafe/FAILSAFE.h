@@ -19,5 +19,4 @@
 #define FAILSAFE_H_
 #include "Arduino.h"
 void FailSafeCheck();
-void NormalizeFailSafe();
 #endif

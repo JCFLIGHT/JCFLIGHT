@@ -20,63 +20,115 @@
 #include "WayPointNavigation/WAYPOINT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "FlightModes/AUXFLIGHT.h"
+#include "Math/MATHSUPPORT.h"
 
 #define THIS_LOOP_RATE 50     //HZ
 #define FAILSAFE_DELAY 1      //SEGUNDO
 #define FAILSAFE_DELAY2 0.25f //MS
+#define STICK_MOTION 100
 
-void FailSafeCheck()
+bool GetValidFailSafeState(float DelayToDetect)
 {
-  if (Fail_Safe_System > (THIS_LOOP_RATE * FAILSAFE_DELAY2) && COMMAND_ARM_DISARM)
+  return (Fail_Safe_System > (THIS_LOOP_RATE * DelayToDetect)) && COMMAND_ARM_DISARM;
+}
+
+void NormalizeFundamentalChnnels()
+{
+  RadioControllOutput[THROTTLE] = 1500;
+  RadioControllOutput[YAW] = 1500;
+  RadioControllOutput[PITCH] = 1500;
+  RadioControllOutput[ROLL] = 1500;
+}
+
+void NormalizaAuxiliariesChnnels()
+{
+  RadioControllOutput[AUX1] = 1000;
+  RadioControllOutput[AUX2] = 1000;
+  RadioControllOutput[AUX3] = 1000;
+  RadioControllOutput[AUX4] = 1000;
+  RadioControllOutput[AUX5] = 1000;
+  RadioControllOutput[AUX6] = 1000;
+  RadioControllOutput[AUX7] = 1000;
+  RadioControllOutput[AUX8] = 1000;
+}
+
+void NormalizeFlightModesToFailSafe()
+{
+  //MODOS DE VOO NECESSARIOS PARA O FAIL-SAFE
+  //O ALT-HOLD É CHAMADO ATRAVÉS DE OUTRA FLAG
+  SetFlightModes[STABILIZE_MODE] = true;
+  SetFlightModes[RTH_MODE] = true;
+
+  //MODOS DE VOO NÃO NECESSARIOS PARA O FAIL-SAFE
+  SetFlightModes[ALTITUDE_HOLD_MODE] = false;
+  SetFlightModes[GPS_HOLD_MODE] = false;
+  SetFlightModes[IOC_MODE] = false;
+  SetFlightModes[ATACK_MODE] = false;
+  SetFlightModes[FLIP_MODE] = false;
+  SetFlightModes[WAYPOINT_MODE] = false;
+}
+
+bool FailSafeCheckStickMotion(void)
+{
+  uint32_t CalcedRcDelta = 0;
+  CalcedRcDelta += ABS_16BITS(RadioControllOutput[ROLL] - 1500);
+  CalcedRcDelta += ABS_16BITS(RadioControllOutput[PITCH] - 1500);
+  CalcedRcDelta += ABS_16BITS(RadioControllOutput[YAW] - 1500);
+  return CalcedRcDelta >= STICK_MOTION;
+}
+
+void AbortFailSafe()
+{
+  //SE O PILOTO MOVER OS STICKS,O FAIL-SAFE IRÁ SER ABORTADO
+  if (!FailSafeCheckStickMotion())
   {
-    ImmediatelyFailSafe = true;
+    return;
   }
-  else
+  ImmediatelyFailSafe = false;
+  Fail_Safe_Event = false;
+}
+
+void FailSafeFinished()
+{
+  if (!RTHControlAux)
   {
-    ImmediatelyFailSafe = false;
+    SetFlightModes[RTH_MODE] = false;
   }
-  if (Fail_Safe_System > (THIS_LOOP_RATE * FAILSAFE_DELAY) && COMMAND_ARM_DISARM)
-  {
-    NormalizeFailSafe();
-    Fail_Safe_Event = true;
-    RadioControllOutput[THROTTLE] = 1500;
-    RadioControllOutput[YAW] = 1500;
-    RadioControllOutput[PITCH] = 1500;
-    RadioControllOutput[ROLL] = 1500;
-    RadioControllOutput[AUX1] = 1000;
-    RadioControllOutput[AUX2] = 1000;
-    RadioControllOutput[AUX3] = 1000;
-    RadioControllOutput[AUX4] = 1000;
-    RadioControllOutput[AUX5] = 1000;
-    RadioControllOutput[AUX6] = 1000;
-    RadioControllOutput[AUX7] = 1000;
-    RadioControllOutput[AUX8] = 1000;
-  }
-  else
-  {
-    Fail_Safe_Event = false;
-  }
+  ImmediatelyFailSafe = false;
+  Fail_Safe_Event = false;
+}
+
+void UpdateFailSafeSystem()
+{
   if (COMMAND_ARM_DISARM)
   {
     Fail_Safe_System++;
   }
   else
   {
-    if (!RTHControlAux)
-    {
-      SetFlightModes[RTH_MODE] = false;
-    }
+    FailSafeFinished();
   }
 }
 
-void NormalizeFailSafe()
+void FailSafeCheck()
 {
-  SetFlightModes[STABILIZE_MODE] = true;
-  SetFlightModes[IOC_MODE] = false;
-  SetFlightModes[ALTITUDE_HOLD_MODE] = false;
-  SetFlightModes[GPS_HOLD_MODE] = false;
-  SetFlightModes[RTH_MODE] = true;
-  SetFlightModes[ATACK_MODE] = false;
-  SetFlightModes[FLIP_MODE] = false;
-  SetFlightModes[WAYPOINT_MODE] = false;
+  //FAIL-SAFE IMEDIATO CASO O USUARIO ESTIVER USANDO O ARM-DISARM POR CANAL AUX
+  if (GetValidFailSafeState(FAILSAFE_DELAY2))
+  {
+    ImmediatelyFailSafe = true;
+  }
+
+  //FAIL-SAFE LENTO PARA DIFERENCIAR SE É UMA FALHA OU REALMENTE UMA PERDA DE SINAL
+  if (GetValidFailSafeState(FAILSAFE_DELAY))
+  {
+    Fail_Safe_Event = true;
+    NormalizeFlightModesToFailSafe();
+    NormalizeFundamentalChnnels();
+    NormalizaAuxiliariesChnnels();
+  }
+  else
+  {
+    AbortFailSafe();
+  }
+  UpdateFailSafeSystem();
 }

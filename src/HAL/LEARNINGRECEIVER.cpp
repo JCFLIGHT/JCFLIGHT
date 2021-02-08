@@ -17,7 +17,7 @@
 
 #include "LEARNINGRECEIVER.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "PPM/PPM.h"
+#include "RadioControl/DECODE.h"
 #include "BAR/BAR.h"
 #include "SBUS/SBUSREAD.h"
 #include "IBUS/IBUSREAD.h"
@@ -28,11 +28,11 @@ uint16_t LearningChannelsOfReceiver(uint8_t Channels)
     uint16_t ReceiverData;
     if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
     {
-        ReceiverData = SBUSReadChannels[PPMChannelMap[Channels]];
+        ReceiverData = SBUSReadChannels[RcChannelMap[Channels]];
     }
     else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER)
     {
-        ReceiverData = IBUSReadChannels[PPMChannelMap[Channels]];
+        ReceiverData = IBUSReadChannels[RcChannelMap[Channels]];
     }
     else
     {
@@ -42,7 +42,7 @@ uint16_t LearningChannelsOfReceiver(uint8_t Channels)
         __asm__ __volatile__("cli" ::
                                  : "memory");
 #endif
-        ReceiverData = PPMReadChannels[PPMChannelMap[Channels]];
+        ReceiverData = PPMReadChannels[RcChannelMap[Channels]];
 #ifdef __AVR_ATmega2560__
         SREG = oldSREG;
 #endif

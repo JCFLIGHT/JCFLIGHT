@@ -19,7 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "MotorsControl/MOTORS.h"
 #include "LedRGB/LEDRGB.h"
-#include "PPM/PPM.h"
+#include "RadioControl/DECODE.h"
 #include "RadioControl/RCCONFIG.h"
 #include "Buzzer/BUZZER.h"
 #include "Scheduler/SCHEDULERTIME.h"

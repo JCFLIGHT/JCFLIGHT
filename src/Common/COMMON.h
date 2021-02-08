@@ -21,7 +21,7 @@
 #include "AHRS/AHRS.h"
 #include "InertialNavigation/INS.h"
 #include "MotorsControl/MOTORS.h"
-#include "PPM/PPM.h"
+#include "RadioControl/DECODE.h"
 #include "I2C/I2C.h"
 #include "FastSerial/FASTSERIAL.h"
 #include "GPSNavigation/MULTIROTORNAVIGATION.h"

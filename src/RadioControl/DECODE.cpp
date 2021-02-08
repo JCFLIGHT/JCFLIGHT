@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "PPM.h"
+#include "DECODE.h"
 #include "Common/STRUCTS.h"
 #include "FastSerial/FASTSERIAL.h"
 #include "Common/VARIABLES.h"
@@ -30,7 +30,7 @@
 #include "ParamsToGCS/CHECKSUM.h"
 
 volatile uint16_t PPMReadChannels[12];
-uint8_t PPMChannelMap[12];
+uint8_t RcChannelMap[12];
 
 void PPM_Initialization()
 {
@@ -42,26 +42,26 @@ void PPM_Initialization()
   //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
   if (ReceiverModel <= 7)
   {
-    PPMChannelMap[0] = ROLL;
-    PPMChannelMap[1] = PITCH;
-    PPMChannelMap[2] = THROTTLE;
-    PPMChannelMap[3] = YAW;
+    RcChannelMap[0] = ROLL;
+    RcChannelMap[1] = PITCH;
+    RcChannelMap[2] = THROTTLE;
+    RcChannelMap[3] = YAW;
   }
   else
   { //FUTABA OU D4R-II
-    PPMChannelMap[0] = PITCH;
-    PPMChannelMap[1] = ROLL;
-    PPMChannelMap[2] = THROTTLE;
-    PPMChannelMap[3] = YAW;
+    RcChannelMap[0] = PITCH;
+    RcChannelMap[1] = ROLL;
+    RcChannelMap[2] = THROTTLE;
+    RcChannelMap[3] = YAW;
   }
-  PPMChannelMap[4] = AUX1;
-  PPMChannelMap[5] = AUX2;
-  PPMChannelMap[6] = AUX3;
-  PPMChannelMap[7] = AUX4;
-  PPMChannelMap[8] = AUX5;
-  PPMChannelMap[9] = AUX6;
-  PPMChannelMap[10] = AUX7;
-  PPMChannelMap[11] = AUX8;
+  RcChannelMap[4] = AUX1;
+  RcChannelMap[5] = AUX2;
+  RcChannelMap[6] = AUX3;
+  RcChannelMap[7] = AUX4;
+  RcChannelMap[8] = AUX5;
+  RcChannelMap[9] = AUX6;
+  RcChannelMap[10] = AUX7;
+  RcChannelMap[11] = AUX8;
 }
 
 void DecodeAllReceiverChannels()

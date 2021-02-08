@@ -177,7 +177,9 @@ void FlightModesUpdate()
           else
           {
             if (SetFlightModes[GPS_HOLD_MODE])
+            {
               SetFlightModes[GPS_HOLD_MODE] = SticksInAutoPilotPosition(20);
+            }
           }
           if (CheckSafeStateToGPSMode())
           {

@@ -19,7 +19,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Common/VARIABLES.h"
-#include "PPM/PPM.h"
+#include "RadioControl/DECODE.h"
 #include "BAR/BAR.h"
 #include "ParamsToGCS/CHECKSUM.h"
 

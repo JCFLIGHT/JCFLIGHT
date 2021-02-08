@@ -17,7 +17,7 @@
 
 #include "RCCONFIG.h"
 #include "Common/VARIABLES.h"
-#include "PPM/PPM.h"
+#include "RadioControl/DECODE.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "PAA/FLIPMODE.h"
 #include "StorageManager/EEPROMSTORAGE.h"

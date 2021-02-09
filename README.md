@@ -40,6 +40,5 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 
 ## Fotos
 
-![JCFLIGHT](Photos/Diagram.bmp)
-![JCFLIGHT](Photos/Front.png)
-![JCFLIGHT](Photos/Back.png)
+![JCFLIGHT](Docs/Front.png)
+![JCFLIGHT](Docs/Back.png)

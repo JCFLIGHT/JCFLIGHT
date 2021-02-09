@@ -41,7 +41,7 @@
 #define NAVIGATION_DERIVATIVE 45
 
 #define MAX_PITCH_BANKANGLE 15
-#define MAX_ROLL_BANKANGLE 20
+#define MAX_ROLL_BANKANGLE 20 //PARA ASA-FIXA 35 GRAUS É MELHOR
 #define MAX_YAW_BANKANGLE 15
 
 float IntegralErrorOfNavigation;
@@ -138,7 +138,7 @@ void PlaneUpdateNavigation(void)
         GetThrottleToNavigation = AttitudeThrottleMax;
         if (CurrentAltitude < SAFE_NAV_ALT)
         {
-          HeadingDifference = 0;
+          HeadingDifference = 0; //FORÇA UMA SUBIDA ATÉ UM VALOR MAIOR OU IGUAL A SAFE_NAV_ALT
         }
       }
       if ((DistanceToHome < SAFE_DECSCEND_ZONE) && CurrentAltitude > RTH_AltitudeOfPlane)

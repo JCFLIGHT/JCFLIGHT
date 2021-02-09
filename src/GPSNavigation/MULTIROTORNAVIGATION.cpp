@@ -216,7 +216,7 @@ void Set_Points_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Dest
   Coordinates_From_Navigation[0] = *Latitude_Actual;
   Coordinates_From_Navigation[1] = *Longitude_Actual;
   GPS_Calcule_Longitude_Scaling(*Latitude_Destiny);
-  Cruise_Mode_Update();
+  Circle_Mode_Update();
   GPS_Calcule_Bearing(&Coordinates_From_Navigation[0], &Coordinates_From_Navigation[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
   GPS_Calcule_Distance_In_CM(&Coordinates_From_Navigation[0], &Coordinates_From_Navigation[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
   INS.PositionToHold[0] = (Coordinates_To_Navigation[0] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;

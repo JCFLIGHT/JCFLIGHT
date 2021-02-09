@@ -33,7 +33,6 @@ extern bool Home_Point;
 extern bool GPS_3DFIX;
 extern bool Do_Stabilize_Mode;
 extern bool Do_HeadingHold_Mode;
-extern bool Do_IOC_Mode;
 extern bool Do_AltitudeHold_Mode;
 extern bool Cancel_Arm_Disarm;
 extern bool ImmediatelyFailSafe;
@@ -43,7 +42,6 @@ extern bool TurnCoordinatorMode;
 //UNSIGNED 8 BITS (0 - 255)
 //*******************************************************
 extern uint8_t RTH_Altitude;
-extern uint16_t LedRGB[3];
 extern uint8_t Compass_Type;
 extern uint8_t MagAddress;
 extern uint8_t MagRegister;
@@ -69,6 +67,7 @@ extern uint16_t DistanceToHome;
 extern uint16_t CalculeLookUpThrottle[11];
 extern uint16_t CalibratingAccelerometer;
 extern uint16_t CalibratingGyroscope;
+extern uint16_t LedRGB[3];
 
 //*******************************************************
 //SIGNED 16 BITS (-32.767 - 32.767)

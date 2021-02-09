@@ -86,11 +86,11 @@ void AutoLaunchDetector()
 
 void Auto_Launch_Update()
 {
-  if (!SetFlightModes[ATACK_MODE] || GetFrameStateOfMultirotor())
+  if (!GetFrameStateOfAirPlane())
   {
     return;
   }
-  else
+  if (SetFlightModes[LAUNCH_MODE])
   {
     if (GetValidStateToRunLaunch() && !LaunchedDetect)
     {

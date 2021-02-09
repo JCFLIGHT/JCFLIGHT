@@ -28,7 +28,7 @@ FILE_COMPILE_FOR_SPEED
 
 void IOC_Mode_Update()
 {
-  if (Do_IOC_Mode && GetFrameStateOfMultirotor())
+  if (SetFlightModes[IOC_MODE] && GetFrameStateOfMultirotor())
   {
     const float HeadingDifference = ConvertToRadians(ConvertDeciDegreesToDegrees(ATTITUDE.CompassHeading) - ConvertDeciDegreesToDegrees(IOC_Initial_Compass));
     const float CosineDifference = Fast_Cosine(HeadingDifference);

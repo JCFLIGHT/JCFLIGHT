@@ -31,7 +31,6 @@ bool Home_Point;
 bool GPS_3DFIX;
 bool Do_Stabilize_Mode;
 bool Do_HeadingHold_Mode;
-bool Do_IOC_Mode;
 bool Do_AltitudeHold_Mode;
 bool Cancel_Arm_Disarm;
 bool ImmediatelyFailSafe;
@@ -42,7 +41,6 @@ bool TurnCoordinatorMode;
 //*******************************************************
 uint8_t FrameType;
 uint8_t RTH_Altitude;
-uint16_t LedRGB[3];
 uint8_t Compass_Type;
 uint8_t MagAddress;
 uint8_t MagRegister;
@@ -67,6 +65,7 @@ uint16_t GPS_Ground_Course;
 uint16_t DistanceToHome;
 uint16_t GPS_Altitude;
 uint16_t GPS_Ground_Speed;
+uint16_t LedRGB[3];
 
 //*******************************************************
 //SIGNED 16 BITS (-32.767 - 32.767)

@@ -66,6 +66,15 @@ void NormalizeFlightModesToFailSafe()
   SetFlightModes[ATACK_MODE] = false;
   SetFlightModes[FLIP_MODE] = false;
   SetFlightModes[WAYPOINT_MODE] = false;
+  SetFlightModes[LAND_MODE] = false;
+
+  //DESATIVA OS MODOS DE VOO NÃO NECESSARIOS NO MODO AIR-PLANE
+  SetFlightModes[AUTO_THROTTLE_MODE] = false;
+  SetFlightModes[MANUAL_MODE] = false;
+  SetFlightModes[CIRCLE_MODE] = false;
+  SetFlightModes[LAUNCH_MODE] = false;
+  SetFlightModes[TURN_MODE] = false;
+  SetFlightModes[CRUISE_MODE] = false;
 }
 
 bool FailSafeCheckStickMotion(void)

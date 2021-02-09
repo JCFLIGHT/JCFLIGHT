@@ -20,7 +20,7 @@
 #include "Arduino.h"
 extern int32_t GPS_Altitude_For_Plane;
 extern int32_t GPS_AltitudeHold_For_Plane;
-void Cruise_Mode_Update();
+void Circle_Mode_Update();
 void PlaneUpdateNavigation(void);
 void PlaneResetNavigation(void);
 #endif

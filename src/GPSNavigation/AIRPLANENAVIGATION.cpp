@@ -24,7 +24,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 
 //PARAMETROS DE NAVEGAÇÃO
-#define CRUISE_DISTANCE 500   //DISTANCIA (EM CM)
+#define CRUISE_DISTANCE 500   //DISTANCIA (EM CM) - DISTANCIA ENTRE O PRIMEIRO E O SEGUNDO PONTO A SER ATINGIDO
 #define SAFE_NAV_ALT 25       //ALTITUDE SEGURA PARA O MODO DE NAVEGAÇÃO COM GPS HEADING
 #define SAFE_DECSCEND_ZONE 50 //VOLOR SEGURO PARA MANTER A ALTITUDE DO PLANE (EM METROS)
 #define PITCH_COMP 0.5f       //COMPENSAÇÃO DE ANGULO DINAMICO
@@ -60,28 +60,29 @@ static int16_t PreviousHeadingDifference;
 static int16_t ThrottleBoost;
 static int16_t AltitudeVector[6];
 static int16_t NavigationDifferenceVector[6];
+
 int32_t GPS_Altitude_For_Plane;
 int32_t GPS_AltitudeHold_For_Plane;
 
-void Cruise_Mode_Update()
+void Circle_Mode_Update()
 {
   if (GetFrameStateOfMultirotor())
   {
     return;
   }
-  float Latitude_To_Cruise;
-  float Longitude_To_Cruise;
-  float Scale_Of_Cruise;
-  int32_t HeadingToCruise = GPS_Ground_Course / 10;
-  if (HeadingToCruise > 180)
+  float Latitude_To_Circle;
+  float Longitude_To_Circle;
+  float Scale_Of_Circle;
+  int32_t HeadingToCircle = GPS_Ground_Course / 10;
+  if (HeadingToCircle > 180)
   {
-    HeadingToCruise -= 360;
+    HeadingToCircle -= 360;
   }
-  Scale_Of_Cruise = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
-  Latitude_To_Cruise = cos(HeadingToCruise * 0.0174532925f);
-  Longitude_To_Cruise = sin(HeadingToCruise * 0.0174532925f) * ScaleDownOfLongitude;
-  Coordinates_To_Navigation[0] += Latitude_To_Cruise * Scale_Of_Cruise;
-  Coordinates_To_Navigation[1] += Longitude_To_Cruise * Scale_Of_Cruise;
+  Scale_Of_Circle = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
+  Latitude_To_Circle = cos(HeadingToCircle * 0.0174532925f);
+  Longitude_To_Circle = sin(HeadingToCircle * 0.0174532925f) * ScaleDownOfLongitude;
+  Coordinates_To_Navigation[0] += Latitude_To_Circle * Scale_Of_Circle;
+  Coordinates_To_Navigation[1] += Longitude_To_Circle * Scale_Of_Circle;
 }
 
 void PlaneUpdateNavigation(void)
@@ -240,7 +241,7 @@ void PlaneUpdateNavigation(void)
     GetThrottleToNavigation += ThrottleBoost;
     GetThrottleToNavigation = Constrain_16Bits(GetThrottleToNavigation, 1300, AttitudeThrottleMax);
   }
-  if ((!Do_Stabilize_Mode) || (Do_IOC_Mode && !Fail_Safe_Event))
+  if ((!Do_Stabilize_Mode) || (SetFlightModes[MANUAL_MODE] && !Fail_Safe_Event))
   {
     GetThrottleToNavigation = Read_Throttle;
     GPS_Angle[PITCH] = 0;

@@ -116,7 +116,7 @@ void AirPlaneClass::Mode_ConventionalPlane_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
 
-  if (Do_IOC_Mode) //MODO MANUAL
+  if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
   {
     ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[0];  //WING     (SERVO 1 DA ASA)
     ServoToFilter[SERVO2] = RCController[ROLL] * ServoDirection[1];  //WING     (SERVO 2 DA ASA)
@@ -149,7 +149,7 @@ void AirPlaneClass::Mode_FixedWing_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
 
-  if (Do_IOC_Mode) //MODO MANUAL
+  if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
   {
     ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[0]) + (RCController[PITCH] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
     ServoToFilter[SERVO2] = (RCController[ROLL] * ServoDirection[0]) - (RCController[PITCH] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
@@ -178,7 +178,7 @@ void AirPlaneClass::Mode_PlaneVTail_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
 
-  if (Do_IOC_Mode) //MODO MANUAL
+  if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
   {
     ServoToFilter[SERVO1] = RCController[PITCH] * ServoDirection[0];                      //WING     (SERVO 1 DA ASA)
     ServoToFilter[SERVO2] = RCController[PITCH] * ServoDirection[1];                      //WING     (SERVO 2 DA ASA)

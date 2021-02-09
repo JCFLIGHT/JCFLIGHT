@@ -48,7 +48,7 @@ void FlipModeRun()
 {
   if (GetFrameStateOfAirPlane())
   {
-    if (SetFlightModes[FLIP_MODE])
+    if (SetFlightModes[TURN_MODE])
     {
       TurnCoordinatorMode = true;
     }

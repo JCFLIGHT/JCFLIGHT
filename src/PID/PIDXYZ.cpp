@@ -263,7 +263,7 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
   {
     PIDError = RadioControlToPID - IMU.GyroscopeRead[YAW];
   }
-  if (!Do_IOC_Mode && GetFrameStateOfAirPlane()) //MODO MANUAL DESATIVADO E PERFIL DE AERO?SIM...
+  if (!SetFlightModes[MANUAL_MODE] && GetFrameStateOfAirPlane()) //MODO MANUAL DESATIVADO E PERFIL DE AERO?SIM...
   {
     DeltaYawSmallFilter = IMU.GyroscopeRead[YAW] - LastGyroYawValue;
     DeltaYawSmallFilterStored = (DeltaYawSmallFilterStored >> 1) + (DeltaYawSmallFilter >> 1);

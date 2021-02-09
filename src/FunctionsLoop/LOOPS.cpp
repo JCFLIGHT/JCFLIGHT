@@ -51,7 +51,7 @@ void Medium_Loop()
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
         Servo_Rate_Update();
-        Auto_Throttle_Flight_Mode(SetFlightModes[ALTITUDE_HOLD_MODE]);
+        Auto_Throttle_Flight_Mode(SetFlightModes[AUTO_THROTTLE_MODE]);
         BATTERY.Read_Voltage();
         BATTERY.Read_Current();
         PrintlnParameters();

@@ -27,7 +27,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 
 //APENAS PARA AERO E ASA-FIXA
-bool GPS_HOLD_MODE_FW = false;
+bool CIRCLE_MODE_FW = false;
 bool GPS_HOME_MODE_FW = false;
 bool CLIMBOUT_FW = false;
 bool GPSNavReset = true;
@@ -82,18 +82,6 @@ void FlightModesUpdate()
     Do_HeadingHold_Mode = false;
   }
 
-  if (SetFlightModes[IOC_MODE])
-  {
-    if (!Do_IOC_Mode)
-    {
-      Do_IOC_Mode = true;
-    }
-  }
-  else
-  {
-    Do_IOC_Mode = false;
-  }
-
   if (GetFrameStateOfAirPlane())
   {
     if (GPS_NumberOfSatellites >= 5 && COMMAND_ARM_DISARM)
@@ -107,7 +95,7 @@ void FlightModesUpdate()
         if (!GPS_HOME_MODE_FW)
         {
           GPS_HOME_MODE_FW = true;
-          GPS_HOLD_MODE_FW = false;
+          CIRCLE_MODE_FW = false;
           GPSNavReset = false;
           Set_Points_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1]);
           GPS_Flight_Mode = Do_RTH_Enroute;
@@ -118,11 +106,11 @@ void FlightModesUpdate()
       else
       {
         GPS_HOME_MODE_FW = false;
-        if (SetFlightModes[GPS_HOLD_MODE] && SticksInAutoPilotPosition(20))
+        if (SetFlightModes[CIRCLE_MODE] && SticksInAutoPilotPosition(20))
         {
-          if (!GPS_HOLD_MODE_FW)
+          if (!CIRCLE_MODE_FW)
           {
-            GPS_HOLD_MODE_FW = true;
+            CIRCLE_MODE_FW = true;
             GPSNavReset = false;
             NavigationMode = Do_PositionHold;
             GPS_Flight_Mode = GPS_MODE_HOLD;
@@ -133,7 +121,7 @@ void FlightModesUpdate()
         }
         else
         {
-          GPS_HOLD_MODE_FW = false;
+          CIRCLE_MODE_FW = false;
           GPS_HOME_MODE_FW = false;
           GPS_Flight_Mode = GPS_MODE_NONE;
           NavigationMode = Do_None;
@@ -148,7 +136,7 @@ void FlightModesUpdate()
     }
     else
     {
-      GPS_HOLD_MODE_FW = false;
+      CIRCLE_MODE_FW = false;
       GPS_HOME_MODE_FW = false;
       GPS_Flight_Mode = GPS_MODE_NONE;
       NavigationMode = Do_None;

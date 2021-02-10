@@ -17,7 +17,9 @@
 
 #include "AIRPLANE.h"
 #include "Common/VARIABLES.h"
-#include "Filters/PT1.h"
+#include "Filters/BIQUADFILTER.h"
+#include "Scheduler/SCHEDULER.h"
+#include "Build/BOARDDEFS.h"
 #include "Math/MATHSUPPORT.h"
 #include "SERVORATE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
@@ -32,12 +34,18 @@ FILE_COMPILE_FOR_SPEED
 
 AirPlaneClass AIR_PLANE;
 
-PT1_Filter_Struct PT1_Servo1_Aileron;
-PT1_Filter_Struct PT1_Servo2_Aileron;
-PT1_Filter_Struct PT1_Servo_Rudder;
-PT1_Filter_Struct PT1_Servo_Elevator;
+static BiquadFilter_Struct Smooth_Servo1_Aileron;
+static BiquadFilter_Struct Smooth_Servo2_Aileron;
+static BiquadFilter_Struct Smooth_Servo_Rudder;
+static BiquadFilter_Struct Smooth_Servo_Elevator;
 
-#define LPF_SETPOINT 1500 //PONTO MEDIO DOS SERVOS PARA O FILTRO LPF
+void AirPlaneClass::LoadBiquadLPFSettings()
+{
+  BIQUADFILTER.Settings(&Smooth_Servo1_Aileron, Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo2_Aileron, Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo_Rudder, Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo_Elevator, Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+}
 
 void AirPlaneClass::UpdateServosMinAndMax()
 {
@@ -60,6 +68,9 @@ void AirPlaneClass::UpdateServosMinAndMax()
 
   //ATUALIZA A FREQUENCIA DE CORTE DO LPF DOS SERVOS
   Servo_LPF_CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
+
+  //INICIALIZA O FILTRO LPF DO SERVOS
+  LoadBiquadLPFSettings();
 }
 
 void AirPlaneClass::UpdateServosMiddlePoint(void)
@@ -206,18 +217,11 @@ void AirPlaneClass::Servo_Rate_Adjust_And_Apply_LPF()
   }
   else
   {
-//APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
-#ifndef __AVR_ATmega2560__
-    ServosFiltered[SERVO1] = (int16_t)PT1FilterApply(&PT1_Servo1_Aileron, ServoToFilter[SERVO1], Servo_LPF_CutOff, Loop_Integral_Time * 1e-6f);
-    ServosFiltered[SERVO2] = (int16_t)PT1FilterApply(&PT1_Servo2_Aileron, ServoToFilter[SERVO2], Servo_LPF_CutOff, Loop_Integral_Time * 1e-6f);
-    ServosFiltered[SERVO3] = (int16_t)PT1FilterApply(&PT1_Servo_Rudder, ServoToFilter[SERVO3], Servo_LPF_CutOff, Loop_Integral_Time * 1e-6f);
-    ServosFiltered[SERVO4] = (int16_t)PT1FilterApply(&PT1_Servo_Elevator, ServoToFilter[SERVO4], Servo_LPF_CutOff, Loop_Integral_Time * 1e-6f);
-#else
-    ServosFiltered[SERVO1] = (int16_t)PT1FilterApply(&PT1_Servo1_Aileron, ServoToFilter[SERVO1], Servo_LPF_CutOff, 1.0f / 1000);
-    ServosFiltered[SERVO2] = (int16_t)PT1FilterApply(&PT1_Servo2_Aileron, ServoToFilter[SERVO2], Servo_LPF_CutOff, 1.0f / 1000);
-    ServosFiltered[SERVO3] = (int16_t)PT1FilterApply(&PT1_Servo_Rudder, ServoToFilter[SERVO3], Servo_LPF_CutOff, 1.0f / 1000);
-    ServosFiltered[SERVO4] = (int16_t)PT1FilterApply(&PT1_Servo_Elevator, ServoToFilter[SERVO4], Servo_LPF_CutOff, 1.0f / 1000);
-#endif
+    //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
+    ServosFiltered[SERVO1] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo1_Aileron, ServoToFilter[SERVO1]);
+    ServosFiltered[SERVO2] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo2_Aileron, ServoToFilter[SERVO2]);
+    ServosFiltered[SERVO3] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo_Rudder, ServoToFilter[SERVO3]);
+    ServosFiltered[SERVO4] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo_Elevator, ServoToFilter[SERVO4]);
 
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
     MotorControl[MOTOR2] = Constrain_16Bits(ServosFiltered[SERVO1], ServoMin[SERVO1], ServoMax[SERVO1]); //SERVO 1

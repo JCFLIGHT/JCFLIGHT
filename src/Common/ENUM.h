@@ -277,10 +277,9 @@ typedef enum
     BEEPER_FMU_SAFE_TO_ARM
 } Beeper_Mode;
 
-enum FilterTypes
+enum BiquadFilterTypes
 {
     LPF = 0,
-    HPF,
     NOTCH
 };
 

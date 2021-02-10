@@ -85,5 +85,30 @@ void PID_Dynamic()
   {
     RCController[ROLL] = 0;
   }
+  //REMOVE OS VALORES MAIORES QUE -500 E 500 CAUSADOS PELO FILTRO
+  if (RCController[YAW] > 500)
+  {
+    RCController[YAW] = 500;
+  }
+  else if (RCController[YAW] < -500)
+  {
+    RCController[YAW] = -500;
+  }
+  if (RCController[ROLL] > 500)
+  {
+    RCController[ROLL] = 500;
+  }
+  else if (RCController[ROLL] < -500)
+  {
+    RCController[ROLL] = -500;
+  }
+  if (RCController[PITCH] > 500)
+  {
+    RCController[PITCH] = 500;
+  }
+  else if (RCController[PITCH] < -500)
+  {
+    RCController[PITCH] = -500;
+  }
   IOC_Mode_Update();
 }

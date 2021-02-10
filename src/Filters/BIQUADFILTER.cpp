@@ -21,54 +21,69 @@
 
 FILE_COMPILE_FOR_SPEED
 
-void BiQuadFilter::Settings(int16_t CutOffFreq, int16_t SampleFreq, uint8_t FilterType)
+BiQuadFilter BIQUADFILTER;
+
+float FilterGetLPF_Quality()
 {
-  //CALCULA A FREQUENCIA DE CORTE
-  //A FREQUENCIA DE CORTE TEM QUE SER METADE DO RATE DA FUNÇÃO APLICADA
-  float COF = MIN_FLOAT(float(CutOffFreq), float((SampleFreq / 2) - 1));
-  //GERA OS COEFICIENTES DO FILTRO BIQUADRATICO
-  float Omega = tan(3.1415927f * COF / SampleFreq);
-  float Normal = 1.0f / (1.0f + Omega / 0.7071f + Omega * Omega);
+  return 1.0f / sqrtf(2.0f);
+}
+
+float FilterGetNotch_Quality(float CenterFrequencyHz, float CutOffFrequencyHz)
+{
+  return CenterFrequencyHz * CutOffFrequencyHz / (CenterFrequencyHz * CenterFrequencyHz - CutOffFrequencyHz * CutOffFrequencyHz);
+}
+
+void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int16_t CutOffFreq, int16_t SampleInterval, uint8_t FilterType)
+{
+
+  float Q_Quality = 0;
+
+  if (FilterType == LPF)
+  {
+    Q_Quality = FilterGetLPF_Quality();
+  }
+  else //NOTCH
+  {
+    Q_Quality = FilterGetNotch_Quality(FilterFreq, CutOffFreq);
+  }
+
+  float Beta0, Beta1, Beta2;
+  const float SampleRate = 1.0f / ((float)SampleInterval * 0.000001f);
+  const float Omega = 2.0f * 3.14159265358979323846f * ((float)FilterFreq) / SampleRate;
+  const float CalcedSine = Fast_Sine(Omega);
+  const float CalcedCosine = Fast_Cosine(Omega);
+  const float Alpha = CalcedSine / (2 * Q_Quality);
+
   switch (FilterType)
   {
-
   case LPF:
-    //CALCULO DE COEFICIENTE PARA FILTRO DO TIPO LOW PASS
-    Coeff1 = int16_t(Omega * Omega * Normal * 16384.0f);
-    Coeff2 = 2 * Coeff1;
-    Coeff3 = Coeff1;
-    Coeff4 = int16_t(2.0f * (Omega * Omega - 1.0f) * Normal * 16384.0f);
-    Coeff5 = int16_t((1.0f - Omega / 0.7071f + Omega * Omega) * Normal * 16384.0f);
-    break;
-
-  case HPF:
-    //CALCULO DE COEFICIENTE PARA FILTRO DO TIPO HIGH PASS
-    Coeff1 = 1 * Normal * 16384.0f;
-    Coeff2 = -2 * Coeff1;
-    Coeff3 = Coeff1;
-    Coeff4 = 2 * (Omega * Omega - 1) * Normal * 16384.0f;
-    Coeff5 = (1 - Omega / 0.7071f + Omega * Omega) * Normal * 16384.0f;
+    Beta0 = (1 - CalcedCosine) / 2;
+    Beta1 = 1 - CalcedCosine;
+    Beta2 = (1 - CalcedCosine) / 2;
     break;
 
   case NOTCH:
-    //CALCULO DE COEFICIENTE PARA FILTRO DO TIPO NOTCH
-    Coeff1 = (1 + Omega * Omega) * Normal * 16384.0f;
-    Coeff2 = 2 * (Omega * Omega - 1) * Normal * 16384.0f;
-    Coeff3 = Coeff1;
-    Coeff4 = Coeff2;
-    Coeff5 = (1 - Omega / 0.7071f + Omega * Omega) * Normal * 16384.0f;
+    Beta0 = 1;
+    Beta1 = -2 * CalcedCosine;
+    Beta2 = 1;
     break;
   }
+  const float Alpha0 = 1 + Alpha;
+  const float Alpha1 = -2 * CalcedCosine;
+  const float Alpha2 = 1 - Alpha;
+  Filter->Beta0 = Beta0 / Alpha0;
+  Filter->Beta1 = Beta1 / Alpha0;
+  Filter->Beta2 = Beta2 / Alpha0;
+  Filter->Alpha1 = Alpha1 / Alpha0;
+  Filter->Alpha2 = Alpha2 / Alpha0;
+  Filter->SampleX1 = Filter->SampleX2 = 0;
+  Filter->SampleY1 = Filter->SampleY2 = 0;
 }
 
-int16_t BiQuadFilter::FilterOutput(int16_t DeviveToFilter)
+float BiQuadFilter::FilterApplyAndGet(BiquadFilter_Struct *Filter, float DeviceToFilter)
 {
-  //ENTRADA DO DISPOSITIVO PARA O FILTRO
-  Result.LongValue = DeviveToFilter * Coeff1 + GuardInput1 * Coeff2 + GuardInput2 * Coeff3 - GuardOutput1 * Coeff4 - GuardOutput2 * Coeff5;
-  Result.LongValue = Result.LongValue << 2;
-  GuardInput2 = GuardInput1;
-  GuardInput1 = DeviveToFilter;
-  GuardOutput2 = GuardOutput1;
-  GuardOutput1 = Result.ShortValue[1];
-  return Result.ShortValue[1];
+  const float Result = Filter->Beta0 * DeviceToFilter + Filter->SampleX1;
+  Filter->SampleX1 = Filter->Beta1 * DeviceToFilter - Filter->Alpha1 * Result + Filter->SampleX2;
+  Filter->SampleX2 = Filter->Beta2 * DeviceToFilter - Filter->Alpha2 * Result;
+  return Result;
 }

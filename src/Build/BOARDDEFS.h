@@ -21,7 +21,8 @@
 //AVR
 #ifdef __AVR_ATmega2560__
 #define MEGA2560                                  //APENAS PARA OTIMIZAR A LISTA DE PARAMETROS
-#define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0         //ENDEREÇO INIACIAL PARA ERASE
+#define THIS_LOOP_FREQUENCY 1000                  //HZ - RATE PARA O FILTRO BIQUAD
+#define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0         //ENDEREÇO INICIAL PARA ERASE
 #define FINAL_ADDRESS_EEPROM_TO_CLEAR 2000        //ENDEREÇO FINAL PARA ERASE
 #define SIZE_OF_EEPROM 2000                       //TAMANHO TOTAL DA EEPROM
 #define ADC_BATTERY_VOLTAGE ADC_NUM_0             //PINO ANALOGICO CONECTADO O SENSOR DE TENSÃO
@@ -51,7 +52,7 @@
 #ifdef ESP32
 #include "HAL_ESP32/ESP32PWM.h"
 #define THIS_LOOP_FREQUENCY 2000                                         //HZ - RATE PARA OS FILTROS LPF E NOTCH DA IMU
-#define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0                                //ENDEREÇO INIACIAL PARA ERASE
+#define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0                                //ENDEREÇO INICIAL PARA ERASE
 #define FINAL_ADDRESS_EEPROM_TO_CLEAR 2000                               //ENDEREÇO FINAL PARA ERASE
 #define SIZE_OF_EEPROM 2000                                              //TAMANHO TOTAL DA EEPROM
 #define ADC_BATTERY_VOLTAGE ADC_NUM_0                                    //GPIO34

@@ -36,6 +36,7 @@ public:
   int16_t Servo_LPF_CutOff;
   int16_t ServoToFilter[MAX_SUPPORTED_SERVOS];
   int16_t ServosFiltered[MAX_SUPPORTED_SERVOS];
+  void LoadBiquadLPFSettings();
   void UpdateServosMinAndMax();
   void UpdateServosMiddlePoint();
   void UpdateServosDirection(void);

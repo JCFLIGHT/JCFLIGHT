@@ -20,51 +20,59 @@
 #include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "FastSerial/PRINTF.h"
-#include "Filters/PT1.h"
 #include "BAR/BAR.h"
+#include "Filters/BIQUADFILTER.h"
+#include "Scheduler/SCHEDULER.h"
+#include "Build/BOARDDEFS.h"
+#include "FastSerial/PRINTF.h"
 
 //DEBUG
 //#define PRINTLN_RC_INTERPOLATION
 
-PT1_Filter_Struct PT1_RC_Throttle;
-PT1_Filter_Struct PT1_RC_Yaw;
-PT1_Filter_Struct PT1_RC_Roll;
-PT1_Filter_Struct PT1_RC_Pitch;
+static BiquadFilter_Struct Smooth_RC_Throttle;
+static BiquadFilter_Struct Smooth_RC_Yaw;
+static BiquadFilter_Struct Smooth_RC_Roll;
+static BiquadFilter_Struct Smooth_RC_Pitch;
 
+int16_t RC_LPF_CutOff;
 int16_t RCControllerUnFiltered[4];
 int16_t RCAttitudeFiltered[4];
 
+void RCInterpolationInit()
+{
+  RC_LPF_CutOff = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
+  BIQUADFILTER.Settings(&Smooth_RC_Throttle, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_RC_Yaw, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_RC_Roll, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_RC_Pitch, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+}
+
 void RCInterpolationApply()
 {
-  int16_t RCFilterFrequencyEEPROM = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
 
-  //GUARDA OS VALORES ANTERIOR
-  RCControllerUnFiltered[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
-  RCControllerUnFiltered[YAW] = RCController[YAW];
-  RCControllerUnFiltered[PITCH] = RCController[PITCH];
-  RCControllerUnFiltered[ROLL] = RCController[ROLL];
-
-  if (RCFilterFrequencyEEPROM != 0)
+  if (RC_LPF_CutOff != 0)
   {
+    //GUARDA OS VALORES ANTERIOR
+    RCControllerUnFiltered[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
+    RCControllerUnFiltered[YAW] = RCController[YAW];
+    RCControllerUnFiltered[PITCH] = RCController[PITCH];
+    RCControllerUnFiltered[ROLL] = RCController[ROLL];
+
     //APLICA O FILTRO
-#ifndef __AVR_ATmega2560__
-    RCAttitudeFiltered[THROTTLE] = (int16_t)PT1FilterApply(&PT1_RC_Throttle, RCControllerUnFiltered[THROTTLE], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
-    RCAttitudeFiltered[YAW] = (int16_t)PT1FilterApply(&PT1_RC_Yaw, RCControllerUnFiltered[YAW], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
-    RCAttitudeFiltered[PITCH] = (int16_t)PT1FilterApply(&PT1_RC_Pitch, RCControllerUnFiltered[PITCH], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
-    RCAttitudeFiltered[ROLL] = (int16_t)PT1FilterApply(&PT1_RC_Roll, RCControllerUnFiltered[ROLL], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
-#else
-    RCAttitudeFiltered[THROTTLE] = (int16_t)PT1FilterApply(&PT1_RC_Throttle, RCControllerUnFiltered[THROTTLE], RCFilterFrequencyEEPROM, 1.0f / 1000);
-    RCAttitudeFiltered[YAW] = (int16_t)PT1FilterApply(&PT1_RC_Yaw, RCControllerUnFiltered[YAW], RCFilterFrequencyEEPROM, 1.0f / 1000);
-    RCAttitudeFiltered[PITCH] = (int16_t)PT1FilterApply(&PT1_RC_Pitch, RCControllerUnFiltered[PITCH], RCFilterFrequencyEEPROM, 1.0f / 1000);
-    RCAttitudeFiltered[ROLL] = (int16_t)PT1FilterApply(&PT1_RC_Roll, RCControllerUnFiltered[ROLL], RCFilterFrequencyEEPROM, 1.0f / 1000);
-#endif
+    RCAttitudeFiltered[THROTTLE] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Throttle, RCControllerUnFiltered[THROTTLE]);
+    RCAttitudeFiltered[YAW] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Yaw, RCControllerUnFiltered[YAW]);
+    RCAttitudeFiltered[PITCH] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Pitch, RCControllerUnFiltered[PITCH]);
+    RCAttitudeFiltered[ROLL] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Roll, RCControllerUnFiltered[ROLL]);
 
     //OBTÉM O VALOR FILTRADO
     RCController[THROTTLE] = RCAttitudeFiltered[THROTTLE];
     RCController[YAW] = RCAttitudeFiltered[YAW];
     RCController[PITCH] = RCAttitudeFiltered[PITCH];
     RCController[ROLL] = RCAttitudeFiltered[ROLL];
+  }
+  else
+  {
+    RCController[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
   }
 #if defined(PRINTLN_RC_INTERPOLATION)
   static uint32_t Refresh = 0;

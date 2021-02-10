@@ -18,5 +18,6 @@
 #ifndef RCSMOOTH_H_
 #define RCSMOOTH_H_
 #include "Arduino.h"
+void RCInterpolationInit();
 void RCInterpolationApply();
 #endif

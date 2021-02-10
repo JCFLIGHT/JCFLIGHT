@@ -24,13 +24,13 @@
 bool AutoThrottle_Mode = false;
 uint16_t PreviousValueOfAirSpeed = 0;
 
-void Auto_Throttle_Flight_Mode(int16_t InputChannelAux)
+void Auto_Throttle_Flight_Mode()
 {
     if (GetFrameStateOfMultirotor())
     {
         return;
     }
-    if (InputChannelAux)
+    if (SetFlightModes[AUTO_THROTTLE_MODE])
     {
         if (!AutoThrottle_Mode)
         {

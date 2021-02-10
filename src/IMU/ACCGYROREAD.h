@@ -19,7 +19,6 @@
 #define ACCGYROREAD_H_
 #include "Arduino.h"
 void IMU_Filters_Initialization();
-void IMU_Filters_Update();
 void Acc_Initialization();
 void Gyro_Initialization();
 void Acc_ReadBufferData();

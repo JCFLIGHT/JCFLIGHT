@@ -78,3 +78,4 @@
 #include "TaskSystem/TASKSYSTEM.h"
 #include "AirPlane/SERVOAUTOTRIM.h"
 #include "ParamsToGCS/CHECKSUM.h"
+#include "Build/GENERALSETTINGS.h"

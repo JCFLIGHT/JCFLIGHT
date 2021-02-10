@@ -18,6 +18,6 @@
 #ifndef AUTOTHROTTLE_H_
 #define AUTOTHROTTLE_H_
 #include "Arduino.h"
-void Auto_Throttle_Flight_Mode(int16_t InputChannelAux);
+void Auto_Throttle_Flight_Mode();
 void Apply_Controll_For_Throttle();
 #endif

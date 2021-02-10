@@ -15,11 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DECODE_H_
-#define DECODE_H_
-#include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t RcChannelMap[12];
-void Radio_Decode_Initialization();
-void DecodeAllReceiverChannels();
+#ifndef GENERALSETTINGS_H_
+#define GENERALSETTINGS_H_
+void GeneralSettingsInitialization();
 #endif

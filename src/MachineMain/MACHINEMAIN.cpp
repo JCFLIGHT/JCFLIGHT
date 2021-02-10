@@ -22,6 +22,8 @@ FILE_COMPILE_FOR_SPEED
 
 void MachineInit()
 {
+    //INICIALIZA A SERIAL
+    FASTSERIAL.Initialization();
     //INICIALIZA O LED RGB
     RGB.Initialization();
     //ATIVA O LED VERMELHO
@@ -30,47 +32,16 @@ void MachineInit()
     BLUE_LED_OFF;
     //CHECA SE É A PRIMEIRA VEZ QUE O FIRMWARE FOI CARREGADO
     CheckFirstLinkOrganizeEEPROM();
-    //CONFIGURA OS TRANSISTORES DA JCFLIGHT-CLASSIC
-    UART2Mode_Initialization();
-    //INICIALIZA A SERIAL
-    FASTSERIAL.Initialization();
-    //CARREGA OS RECURSOS DO BODY FRAME
-    AUXFLIGHT.LoadEEPROM();
-    //INICIALIZA A LISTA DE PARAMETROS
-    FullParamsListInitialization();
-    //CARREGA OS PARAMETROS DO RADIO CONTROLE
-    CurvesRC_SetValues();
-    TPA_Initialization();
-    CurvesRC_CalculeValue();
-    //CARREGA OS PARAMETROS DO ALTITUDE-HOLD
-    AltitudeHold_Update_Params();
-    //INICIALIZA AS COFIGURAÇÕES DO PPM
-    PPM_Initialization();
+    //INICIALIZA OS PARAMETROS GERAIS
+    GeneralSettingsInitialization();
     //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA E DO COMPASS
     CheckAndUpdateIMUCalibration();
-    //CARREGA OS VALORES DE PID
-    LoadPID();
     //INICIALIZA OS DISPOSITIVOS I2C
     All_I2C_Initialization();
-    //CARREGA OS PARAMETROS DO GPS
-    LoadGPSParameters();
-    //INICIALIZA OS FILTROS
-    KALMAN.Init();
-    IMU_Filters_Initialization();
-    //CONFIGURA OS 12 CANAIS
-    RCCONFIG.Init();
     //CALIBRAÇÃO DOS ESC'S
     ESC.Calibration();
-    //CARREGA TODOS OS PARAMETROS DO MODO WAYPOINT
-    WayPoint_Initialization();
-    //RECOLHE AS PRIMEIRAS AMOSTRAS DO AIR-SPEED PARA CALIBRAR
-    AirSpeed_Initialization();
     //INICIA O BUZZER EM OPERAÇÃO NORMAL
     ESC.BeeperMode = NORMAL_OPERATION_MODE;
-    //INICIALIZA O AHRS
-    AHRS_Initialization();
-    //INICIALIZA O BOTÃO DE SEGURANÇA
-    SAFETYBUTTON.Initialization();
     //DESATIVA TODOS OS LEDS
     RED_LED_OFF;
     GREEN_LED_OFF;

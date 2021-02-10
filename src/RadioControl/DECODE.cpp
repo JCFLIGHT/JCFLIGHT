@@ -32,7 +32,7 @@
 volatile uint16_t PPMReadChannels[12];
 uint8_t RcChannelMap[12];
 
-void PPM_Initialization()
+void Radio_Decode_Initialization()
 {
   if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER) ||
       (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != IBUS_RECEIVER))

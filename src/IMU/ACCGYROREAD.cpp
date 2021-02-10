@@ -53,26 +53,28 @@ PT1_Filter_Struct PT1_Gyro_Yaw;
 #endif
 
 bool ActiveKalman = false;
-uint8_t GyroLPF = 0;
-#ifndef __AVR_ATmega2560__
 int16_t Acc_LPF = 0;
 int16_t Gyro_LPF = 0;
+#ifndef __AVR_ATmega2560__
 int16_t Acc_Notch = 0;
 int16_t Gyro_Notch = 0;
-#endif
-int16_t Acc_LPFStoredInEEPROM = 0;
-int16_t Gyro_LPFStoredInEEPROM = 0;
-#ifndef __AVR_ATmega2560__
-int16_t Acc_NotchStoredInEEPROM = 0;
-int16_t Gyro_NotchStoredInEEPROM = 0;
 #endif
 
 void IMU_Filters_Initialization()
 {
-#ifndef __AVR_ATmega2560__
+  //ATUALIZA O ESTADO GUARDADO DO ESTADO DO KALMAN
+  if (STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == 0)
+  {
+    ActiveKalman = false;
+  }
+  else
+  {
+    ActiveKalman = true;
+  }
   //CARREGA OS VALORES GUARDADOS DO LPF
   Acc_LPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Gyro_LPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
+#ifndef __AVR_ATmega2560__
   //CARREGA OS VALORES GUARDADOS DO NOTCH
   Acc_Notch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
   Gyro_Notch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
@@ -95,59 +97,6 @@ void IMU_Filters_Initialization()
 #endif
 }
 
-void IMU_Filters_Update()
-{
-  //ATUALIZA O VALOR GUARDADO DO ESTADO DO KALMAN
-  if (STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == 0)
-  {
-    ActiveKalman = false;
-  }
-  else
-  {
-    ActiveKalman = true;
-  }
-  //ATUALIZA OS VALORES GUARDADOS DO LPF
-  Acc_LPFStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
-  Gyro_LPFStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
-#ifndef __AVR_ATmega2560__
-  //ATUALIZA OS VALORES GUARDADOS DO NOTCH
-  Acc_NotchStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
-  Gyro_NotchStoredInEEPROM = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
-  //SE NECESSARIO GERA UM NOVO COEFICIENTE PARA O LPF NO ACC
-  if (Acc_LPFStoredInEEPROM != Acc_LPF)
-  {
-    BiquadAccLPF[ROLL].Settings(Acc_LPFStoredInEEPROM, THIS_LOOP_FREQUENCY, LPF);
-    BiquadAccLPF[PITCH].Settings(Acc_LPFStoredInEEPROM, THIS_LOOP_FREQUENCY, LPF);
-    BiquadAccLPF[YAW].Settings(Acc_LPFStoredInEEPROM, THIS_LOOP_FREQUENCY, LPF);
-    Acc_LPF = Acc_LPFStoredInEEPROM;
-  }
-  //SE NECESSARIO GERA UM NOVO COEFICIENTE PARA O LPF NO GYRO
-  if (Gyro_LPFStoredInEEPROM != Gyro_LPF)
-  {
-    BiquadGyroLPF[ROLL].Settings(Gyro_LPFStoredInEEPROM, THIS_LOOP_FREQUENCY, LPF);
-    BiquadGyroLPF[PITCH].Settings(Gyro_LPFStoredInEEPROM, THIS_LOOP_FREQUENCY, LPF);
-    BiquadGyroLPF[YAW].Settings(Gyro_LPFStoredInEEPROM, THIS_LOOP_FREQUENCY, LPF);
-    Gyro_LPF = Gyro_LPFStoredInEEPROM;
-  }
-  //SE NECESSARIO GERA UM NOVO COEFICIENTE PARA O NOTCH NO ACC
-  if (Acc_NotchStoredInEEPROM != Acc_Notch)
-  {
-    BiquadAccNotch[ROLL].Settings(Acc_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
-    BiquadAccNotch[PITCH].Settings(Acc_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
-    BiquadAccNotch[YAW].Settings(Acc_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
-    Acc_Notch = Acc_NotchStoredInEEPROM;
-  }
-  //SE NECESSARIO GERA UM NOVO COEFICIENTE PARA O NOTCH NO GYRO
-  if (Gyro_NotchStoredInEEPROM != Gyro_Notch)
-  {
-    BiquadGyroNotch[ROLL].Settings(Gyro_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
-    BiquadGyroNotch[PITCH].Settings(Gyro_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
-    BiquadGyroNotch[YAW].Settings(Gyro_NotchStoredInEEPROM, THIS_LOOP_FREQUENCY, NOTCH);
-    Gyro_Notch = Gyro_NotchStoredInEEPROM;
-  }
-#endif
-}
-
 void Acc_Initialization()
 {
   I2C.WriteRegister(0x68, 0x1C, 0x10);
@@ -167,8 +116,7 @@ void Gyro_Initialization()
   I2C.WriteRegister(0x68, 0x6B, 0x80);
   SCHEDULERTIME.Sleep(50);
   I2C.WriteRegister(0x68, 0x6B, 0x03);
-  GyroLPF = STORAGEMANAGER.Read_8Bits(GYRO_LPF_ADDR);
-  switch (GyroLPF)
+  switch (STORAGEMANAGER.Read_8Bits(GYRO_LPF_ADDR)) //LPF INTERNO DA IMU
   {
 
   case 0:
@@ -245,7 +193,7 @@ void Acc_ReadBufferData()
   }
 
   //LPF
-  if (Acc_LPFStoredInEEPROM > 0)
+  if (Acc_LPF > 0)
   {
 //APLICA O FILTRO
 #ifndef __AVR_ATmega2560__
@@ -253,15 +201,15 @@ void Acc_ReadBufferData()
     IMU.AccelerometerRead[PITCH] = BiquadAccLPF[PITCH].FilterOutput(IMU.AccelerometerRead[PITCH]);
     IMU.AccelerometerRead[YAW] = BiquadAccLPF[YAW].FilterOutput(IMU.AccelerometerRead[YAW]);
 #else
-    IMU.AccelerometerRead[ROLL] = (int16_t)PT1FilterApply(&PT1_Acc_Roll, IMU.AccelerometerReadNotFiltered[ROLL], Acc_LPFStoredInEEPROM, 1.0f / 1000);
-    IMU.AccelerometerRead[PITCH] = (int16_t)PT1FilterApply(&PT1_Acc_Pitch, IMU.AccelerometerReadNotFiltered[PITCH], Acc_LPFStoredInEEPROM, 1.0f / 1000);
-    IMU.AccelerometerRead[YAW] = (int16_t)PT1FilterApply(&PT1_Acc_Yaw, IMU.AccelerometerReadNotFiltered[YAW], Acc_LPFStoredInEEPROM, 1.0f / 1000);
+    IMU.AccelerometerRead[ROLL] = (int16_t)PT1FilterApply(&PT1_Acc_Roll, IMU.AccelerometerReadNotFiltered[ROLL], Acc_LPF, 1.0f / 1000);
+    IMU.AccelerometerRead[PITCH] = (int16_t)PT1FilterApply(&PT1_Acc_Pitch, IMU.AccelerometerReadNotFiltered[PITCH], Acc_LPF, 1.0f / 1000);
+    IMU.AccelerometerRead[YAW] = (int16_t)PT1FilterApply(&PT1_Acc_Yaw, IMU.AccelerometerReadNotFiltered[YAW], Acc_LPF, 1.0f / 1000);
 #endif
   }
 
 #ifndef __AVR_ATmega2560__
   //NOTCH
-  if (Acc_NotchStoredInEEPROM > 0)
+  if (Acc_Notch > 0)
   {
     //APLICA O FILTRO
     IMU.AccelerometerRead[ROLL] = BiquadAccNotch[ROLL].FilterOutput(IMU.AccelerometerRead[ROLL]);
@@ -299,7 +247,7 @@ void Gyro_ReadBufferData()
   }
 
   //LPF
-  if (Gyro_LPFStoredInEEPROM > 0)
+  if (Gyro_LPF > 0)
   {
 //APLICA O FILTRO
 #ifndef __AVR_ATmega2560__
@@ -307,15 +255,15 @@ void Gyro_ReadBufferData()
     IMU.GyroscopeRead[PITCH] = BiquadGyroLPF[PITCH].FilterOutput(IMU.GyroscopeRead[PITCH]);
     IMU.GyroscopeRead[YAW] = BiquadGyroLPF[YAW].FilterOutput(IMU.GyroscopeRead[YAW]);
 #else
-    IMU.GyroscopeRead[ROLL] = (int16_t)PT1FilterApply(&PT1_Gyro_Roll, IMU.GyroscopeReadNotFiltered[ROLL], Gyro_LPFStoredInEEPROM, 1.0f / 1000);
-    IMU.GyroscopeRead[PITCH] = (int16_t)PT1FilterApply(&PT1_Gyro_Pitch, IMU.GyroscopeReadNotFiltered[PITCH], Gyro_LPFStoredInEEPROM, 1.0f / 1000);
-    IMU.GyroscopeRead[YAW] = (int16_t)PT1FilterApply(&PT1_Gyro_Yaw, IMU.GyroscopeReadNotFiltered[YAW], Gyro_LPFStoredInEEPROM, 1.0f / 1000);
+    IMU.GyroscopeRead[ROLL] = (int16_t)PT1FilterApply(&PT1_Gyro_Roll, IMU.GyroscopeReadNotFiltered[ROLL], Gyro_LPF, 1.0f / 1000);
+    IMU.GyroscopeRead[PITCH] = (int16_t)PT1FilterApply(&PT1_Gyro_Pitch, IMU.GyroscopeReadNotFiltered[PITCH], Gyro_LPF, 1.0f / 1000);
+    IMU.GyroscopeRead[YAW] = (int16_t)PT1FilterApply(&PT1_Gyro_Yaw, IMU.GyroscopeReadNotFiltered[YAW], Gyro_LPF, 1.0f / 1000);
 #endif
   }
 
 #ifndef __AVR_ATmega2560__
   //NOTCH
-  if (Gyro_NotchStoredInEEPROM > 0)
+  if (Gyro_Notch > 0)
   {
     //APLICA O FILTRO
     IMU.GyroscopeRead[ROLL] = BiquadGyroNotch[ROLL].FilterOutput(IMU.GyroscopeRead[ROLL]);

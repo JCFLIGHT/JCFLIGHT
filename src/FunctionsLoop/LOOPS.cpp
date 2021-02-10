@@ -22,17 +22,6 @@ void Slow_Loop()
 {
         Pre_Arm();
         COMPASS.Constant_Read();
-        CurvesRC_SetValues();
-        CHECKSUM.UpdateChannelsReverse();
-        AUXFLIGHT.LoadEEPROM();
-        RTH_Altitude_EEPROM();
-        IMU_Filters_Update();
-        PID_DerivativeLPF_Update();
-        AIR_PLANE.UpdateServosMinAndMax();
-        AIR_PLANE.UpdateServosMiddlePoint();
-        AIR_PLANE.UpdateServosDirection();
-        AltitudeHold_Update_Params();
-        GCS.UpdateParametersToGCS();
         PushWayPointParameters();
         UpdateValuesOfPID();
 }
@@ -51,7 +40,7 @@ void Medium_Loop()
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
         Servo_Rate_Update();
-        Auto_Throttle_Flight_Mode(SetFlightModes[AUTO_THROTTLE_MODE]);
+        Auto_Throttle_Flight_Mode();
         BATTERY.Read_Voltage();
         BATTERY.Read_Current();
         PrintlnParameters();

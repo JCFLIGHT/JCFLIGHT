@@ -356,7 +356,7 @@ void WayPointRun()
       if (WayPointFlightMode[MissionNumber] == WP_RTH)
       {
         Do_Mode_RTH_Now();
-        HeadingHoldTarget = ATTITUDE.CompassHeading;
+        HeadingHoldTarget = ATTITUDE.AngleOut[YAW];
       }
     }
     break;

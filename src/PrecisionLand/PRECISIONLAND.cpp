@@ -70,6 +70,8 @@ float GetAccelerationTotal()
 bool GetLandSuccess()
 {
   if (GetAccelerationTotal() >= LAND_CHECK_ACCEL_MOVING)
+  {
     return false;
+  }
   return true;
 }

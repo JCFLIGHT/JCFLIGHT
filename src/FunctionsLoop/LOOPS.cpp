@@ -80,7 +80,6 @@ void Super_Fast_Loop()
         IBUS_Update();
         GPS_Serial_Read();
         AHRS_Update();
-        DynamicPID();
         Auto_Launch_Update();
         CalculateAccelerationXYZ();
         INS_Calculate_AccelerationZ();
@@ -89,7 +88,6 @@ void Super_Fast_Loop()
         Apply_Controll_For_Throttle();
         GPS_Orientation_Update();
         Switch_Flag();
-        AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         BATTERY.Calculate_Total_Mah();
 
 #ifdef __AVR_ATmega2560__
@@ -102,7 +100,9 @@ void Integral_Loop()
         Acc_ReadBufferData();
         Gyro_ReadBufferData();
         Update_Loop_Time();
-        ServoAutoTrimRun();
+        PID_Dynamic();
         PID_Update();
+        ServoAutoTrimRun();
+        AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         PID_MixMotors();
 }

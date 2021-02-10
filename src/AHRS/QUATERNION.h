@@ -82,8 +82,7 @@ static inline Struct_Vector3x3 *QuaternionRotateVector(Struct_Vector3x3 *Result,
                                                        const Struct_Vector3x3 *Vector,
                                                        const Struct_Quaternion *Reference)
 {
-    Struct_Quaternion QuaternionVector,
-        ReferenceConjugate;
+    Struct_Quaternion QuaternionVector, ReferenceConjugate;
     QuaternionVector.q0 = 0;
     QuaternionVector.q1 = Vector->Roll;
     QuaternionVector.q2 = Vector->Pitch;
@@ -98,8 +97,8 @@ static inline Struct_Vector3x3 *QuaternionRotateVector(Struct_Vector3x3 *Result,
 }
 
 static inline Struct_Vector3x3 *QuaternionRotateVectorInverse(Struct_Vector3x3 *Result,
-                                                          const Struct_Vector3x3 *Vector,
-                                                          const Struct_Quaternion *Reference)
+                                                              const Struct_Vector3x3 *Vector,
+                                                              const Struct_Quaternion *Reference)
 {
     Struct_Quaternion QuaternionVector,
         ReferenceConjugate;

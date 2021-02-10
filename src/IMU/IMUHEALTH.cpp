@@ -35,5 +35,7 @@ void CheckAndUpdateIMUCalibration()
   if (CALIBRATION.AccelerometerZero[ROLL] == 0 &&
       CALIBRATION.AccelerometerZero[PITCH] == 0 &&
       CALIBRATION.AccelerometerZero[YAW] == 0)
+  {
     CALIBRATION.AccelerometerZero[ROLL] = 0x10FE;
+  }
 }

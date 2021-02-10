@@ -34,7 +34,7 @@ FILE_COMPILE_FOR_SPEED
 uint8_t DynamicProportionalVector[2];
 uint8_t DynamicDerivativeVector[2];
 
-void DynamicPID()
+void PID_Dynamic()
 {
   uint8_t DynamicProportional;
   uint8_t DynamicProportionalTwo;

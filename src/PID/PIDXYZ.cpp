@@ -37,12 +37,16 @@
 
 FILE_COMPILE_FOR_SPEED
 
-static PT1_Filter_Struct DerivativeRollFilter;
-static PT1_Filter_Struct DerivativePitchFilter;
+PT1_Filter_Struct DerivativeRollFilter;
+PT1_Filter_Struct DerivativePitchFilter;
 
 //STABILIZE PARA MULTIROTORES
-#define STAB_PITCH_ANGLE_MAX 45 //GRAUS
-#define STAB_ROLL_ANGLE_MAX 45  //GRAUS
+#define STAB_PITCH_ANGLE_MAX 30 //GRAUS
+#define STAB_ROLL_ANGLE_MAX 30  //GRAUS
+
+//SPORT PARA MULTIROTORES
+#define SPORT_PITCH_ANGLE_MAX 40 //GRAUS
+#define SPORT_ROLL_ANGLE_MAX 40  //GRAUS
 
 //STABILIZE PARA AEROS
 #define STAB_PLANE_PITCH_ANGLE_MAX 35 //GRAUS
@@ -50,10 +54,6 @@ static PT1_Filter_Struct DerivativePitchFilter;
 
 //RATE MAXIMO DE SAÍDA DO PID YAW PARA AEROS E ASA-FIXA
 #define YAW_RATE_MAX_FOR_PLANE 36 //GRAUS
-
-//SPORT PARA MULTIROTORES
-#define SPORT_PITCH_ANGLE_MAX 55 //GRAUS
-#define SPORT_ROLL_ANGLE_MAX 55  //GRAUS
 
 #define GYRO_SATURATION_LIMIT 1800 //DPS
 
@@ -97,6 +97,7 @@ void PID_Update()
 
 void PID_Controll_Roll(int16_t RateTargetInput)
 {
+  int16_t RadioControlToPID;
   int16_t ProportionalTerminate = 0;
   int16_t DerivativeTerminate;
   static int16_t PIDError;
@@ -105,7 +106,6 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   static int16_t ProportionalTerminateLevel;
   static int16_t IntegratorTerminateLevel;
   static int16_t LastValueOfGyro = 0;
-  int16_t RadioControlToPID;
   RadioControlToPID = RateTargetInput << 1;
   PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * Loop_Integral_Time) >> 12);
   IntegralGyroError[ROLL] = Constrain_16Bits(IntegralGyroError[ROLL] + PIDError, -16000, +16000);
@@ -153,7 +153,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   if (Get_LPF_Derivative_Value > 0)
   {
 #ifndef __AVR_ATmega2560__
-    DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6);
+    DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6f);
 #else
     DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
 #endif
@@ -167,6 +167,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
 
 void PID_Controll_Pitch(int16_t RateTargetInput)
 {
+  int16_t RadioControlToPID;
   int16_t ProportionalTerminate = 0;
   int16_t DerivativeTerminate;
   static int16_t PIDError;
@@ -174,7 +175,6 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   static int16_t IntegratorTerminate = 0;
   static int16_t ProportionalTerminateLevel;
   static int16_t IntegratorTerminateLevel;
-  static int16_t RadioControlToPID;
   static int16_t LastValueOfGyro = 0;
   RadioControlToPID = RateTargetInput << 1;
   PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * Loop_Integral_Time) >> 12);
@@ -223,7 +223,7 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   if (Get_LPF_Derivative_Value > 0)
   {
 #ifndef __AVR_ATmega2560__
-    DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6);
+    DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6f);
 #else
     DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
 #endif

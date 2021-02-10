@@ -20,5 +20,5 @@
 #include "Arduino.h"
 extern uint8_t DynamicProportionalVector[2];
 extern uint8_t DynamicDerivativeVector[2];
-void DynamicPID();
+void PID_Dynamic();
 #endif

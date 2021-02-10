@@ -21,24 +21,16 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FastSerial/PRINTF.h"
-#ifndef __AVR_ATmega2560__
-#include "Filters/LPFSERVO.h"
-#else
 #include "Filters/PT1.h"
-#endif
 #include "BAR/BAR.h"
 
 //DEBUG
 //#define PRINTLN_RC_INTERPOLATION
 
-#ifndef __AVR_ATmega2560__
-Struct_LowPassFilter RCSmooth_LPF[4];
-#else
 PT1_Filter_Struct PT1_RC_Throttle;
 PT1_Filter_Struct PT1_RC_Yaw;
 PT1_Filter_Struct PT1_RC_Roll;
 PT1_Filter_Struct PT1_RC_Pitch;
-#endif
 
 int16_t RCControllerUnFiltered[4];
 int16_t RCAttitudeFiltered[4];
@@ -57,10 +49,10 @@ void RCInterpolationApply()
   {
     //APLICA O FILTRO
 #ifndef __AVR_ATmega2560__
-    RCAttitudeFiltered[THROTTLE] = (int16_t)LowPassFilter(&RCSmooth_LPF[THROTTLE], RCControllerUnFiltered[THROTTLE], RCFilterFrequencyEEPROM, AttitudeThrottleMin);
-    RCAttitudeFiltered[YAW] = (int16_t)LowPassFilter(&RCSmooth_LPF[YAW], RCControllerUnFiltered[YAW], RCFilterFrequencyEEPROM, 0);
-    RCAttitudeFiltered[PITCH] = (int16_t)LowPassFilter(&RCSmooth_LPF[PITCH], RCControllerUnFiltered[PITCH], RCFilterFrequencyEEPROM, 0);
-    RCAttitudeFiltered[ROLL] = (int16_t)LowPassFilter(&RCSmooth_LPF[ROLL], RCControllerUnFiltered[ROLL], RCFilterFrequencyEEPROM, 0);
+    RCAttitudeFiltered[THROTTLE] = (int16_t)PT1FilterApply(&PT1_RC_Throttle, RCControllerUnFiltered[THROTTLE], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
+    RCAttitudeFiltered[YAW] = (int16_t)PT1FilterApply(&PT1_RC_Yaw, RCControllerUnFiltered[YAW], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
+    RCAttitudeFiltered[PITCH] = (int16_t)PT1FilterApply(&PT1_RC_Pitch, RCControllerUnFiltered[PITCH], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
+    RCAttitudeFiltered[ROLL] = (int16_t)PT1FilterApply(&PT1_RC_Roll, RCControllerUnFiltered[ROLL], RCFilterFrequencyEEPROM, Loop_Integral_Time * 1e-6f);
 #else
     RCAttitudeFiltered[THROTTLE] = (int16_t)PT1FilterApply(&PT1_RC_Throttle, RCControllerUnFiltered[THROTTLE], RCFilterFrequencyEEPROM, 1.0f / 1000);
     RCAttitudeFiltered[YAW] = (int16_t)PT1FilterApply(&PT1_RC_Yaw, RCControllerUnFiltered[YAW], RCFilterFrequencyEEPROM, 1.0f / 1000);

@@ -33,9 +33,9 @@
 //#define PRINTLN_PRECISIONLAND
 //#define PRINTLN_LPFINROLL
 
-LowPassFilter AccelerationEarthFrameFilteredRoll;
-LowPassFilter AccelerationEarthFrameFilteredPitch;
-LowPassFilter AccelerationEarthFrameFilteredYaw;
+LowPassFilterEarthFrame AccelerationEarthFrameFilteredRoll;
+LowPassFilterEarthFrame AccelerationEarthFrameFilteredPitch;
+LowPassFilterEarthFrame AccelerationEarthFrameFilteredYaw;
 
 void Update_PrecisionLand()
 {

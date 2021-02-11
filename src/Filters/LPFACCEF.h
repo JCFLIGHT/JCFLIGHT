@@ -15,11 +15,10 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef LPFACCEF
 #define LPFACCEF
 #include "Arduino.h"
-class LowPassFilter
+class LowPassFilterEarthFrame
 {
 public:
   void Apply(const float Sample, float CutOff_Freq, float DeltaTime);

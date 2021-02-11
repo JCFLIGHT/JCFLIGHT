@@ -24,15 +24,21 @@
 #include "BAR/BAR.h"
 
 bool TakeOffInProgress = false;
+bool GroundAltitudeSet = false;
+
+uint8_t MinVariometer = 50;
+uint8_t SafeZoneToCompleteTakeOff = 70;
+uint8_t SafeAltitude = 5;
+int16_t ThrottleMiddleValue = 1500;
 int16_t HoveringThrottle = 0;
+int16_t VariometerErrorIPart = 0;
+
+uint32_t LandDetectorStartTime;
+uint32_t TimeOnLand;
+
 int32_t AltitudeToHold = 0;
 int32_t TargetVariometer = 0;
-
-//VARIAVEIS AJUSTAVEIS PELO USUARIO
-uint8_t MinVariometer = 50;             //CM/S
-uint8_t SafeZoneToCompleteTakeOff = 70; //1700uS NO THROTTLE
-uint8_t SafeAltitude = 5;               //METROS
-int16_t ThrottleMiddleValue = 1500;     //uS
+int32_t VariometerErrorISum = 0;
 
 void AltitudeHold_Update_Params()
 {
@@ -165,8 +171,16 @@ bool GetTakeOffInProgress()
   return TakeOffInProgress;
 }
 
-int32_t VariometerErrorISum = 0;
-int16_t VariometerErrorIPart = 0;
+//#define THR_SMOOTH_TEST
+
+#ifdef THR_SMOOTH_TEST
+
+#include "FastSerial/PRINTF.h"
+#include "Filters/PT1.h"
+
+PT1_Filter_Struct Smooth_ThrottleHover;
+
+#endif
 
 void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
 {
@@ -179,8 +193,16 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   VariometerErrorIPart = Constrain_16Bits(VariometerErrorIPart, -250, 250);
   int16_t VarioPIDControl = ((VariometerError * PID[PIDALTITUDE].ProportionalVector) >> 5) + VariometerErrorIPart -
                             (((int32_t)INS.AccelerationEarthFrame_Filtered[2] * PID[PIDALTITUDE].DerivativeVector) >> 6);
-  RCController[THROTTLE] = HoveringThrottle + VarioPIDControl; //PT1 COM 4 HZ DE CORTE AQUI FUTURAMENTE
+  RCController[THROTTLE] = HoveringThrottle + VarioPIDControl;
   RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE], AttitudeThrottleMin + 50, AttitudeThrottleMax - 50);
+
+#ifdef THR_SMOOTH_TEST
+
+  FastSerialPrintln(PSTR("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
+                    RCController[THROTTLE],
+                    (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], 4, 1.0f / 1000));
+
+#endif
 }
 
 void ResetIntegralOfVariometerError()
@@ -211,10 +233,6 @@ bool GetAltitudeReached()
 {
   return ABS_32BITS(AltitudeToHold - ALTITUDE.EstimatedAltitude) < 50;
 }
-
-bool GroundAltitudeSet = false;
-uint32_t LandDetectorStartTime;
-uint32_t TimeOnLand;
 
 void RunLandDetector()
 {

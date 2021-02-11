@@ -21,14 +21,14 @@
 
 FILE_COMPILE_FOR_SPEED
 
-void LowPassFilter::Apply(const float Sample, float CutOff_Freq, float DeltaTime)
+void LowPassFilterEarthFrame::Apply(const float Sample, float CutOff_Freq, float DeltaTime)
 {
   float RecalculateCutOff = 1.0f / (6.283185307179586476925286766559f * CutOff_Freq);
   Alpha = Constrain_Float(DeltaTime / (DeltaTime + RecalculateCutOff), 0.0f, 1.0f);
   OutputFiltered += (Sample - OutputFiltered) * Alpha;
 }
 
-float LowPassFilter::GetOutputFiltered()
+float LowPassFilterEarthFrame::GetOutputFiltered()
 {
   return OutputFiltered;
 }

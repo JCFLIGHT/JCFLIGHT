@@ -24,9 +24,9 @@
 
 float Cosine_Yaw;
 float Sine_Yaw;
-float AccelerationAdjustBias[3] = {0.0f, 0.0f, 0.0f};
-float AccelerationEarthFrame_LPF[3] = {0.0f, 0.0f, 0.0f};
-float AccelerationDifference[3] = {0.0f, 0.0f, 0.0f};
+float AccelerationAdjustBias[3];
+float AccelerationEarthFrame_LPF[3];
+float AccelerationDifference[3];
 
 void CalculateAccelerationXYZ()
 {

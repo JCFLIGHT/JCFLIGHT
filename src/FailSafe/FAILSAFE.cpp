@@ -25,7 +25,10 @@
 #define THIS_LOOP_RATE 50     //HZ
 #define FAILSAFE_DELAY 1      //SEGUNDO
 #define FAILSAFE_DELAY2 0.25f //MS
-#define STICK_MOTION 100
+#define STICK_MOTION 100      //100 uS DE DEFLEXÃO
+#define RX_RECOVERY_TIME 15   //NO MINIMO 15 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE
+
+int16_t RxConsistenceCount = 0;
 
 bool GetValidFailSafeState(float DelayToDetect)
 {
@@ -40,7 +43,7 @@ void NormalizeFundamentalChnnels()
   RadioControllOutput[ROLL] = 1500;
 }
 
-void NormalizaAuxiliariesChnnels()
+void NormalizeAuxiliariesChnnels()
 {
   RadioControllOutput[AUX1] = 1000;
   RadioControllOutput[AUX2] = 1000;
@@ -77,7 +80,7 @@ void NormalizeFlightModesToFailSafe()
   SetFlightModes[CRUISE_MODE] = false;
 }
 
-bool FailSafeCheckStickMotion(void)
+bool FailSafeCheckStickMotion()
 {
   uint32_t CalcedRcDelta = 0;
   CalcedRcDelta += ABS_16BITS(RadioControllOutput[ROLL] - 1500);
@@ -86,8 +89,28 @@ bool FailSafeCheckStickMotion(void)
   return CalcedRcDelta >= STICK_MOTION;
 }
 
+bool GetRxConsistence()
+{
+  if (RxConsistenceCount >= (THIS_LOOP_RATE * RX_RECOVERY_TIME))
+  {
+    return true;
+  }
+  RxConsistenceCount++;
+  return false;
+}
+
+void ResetRxConsistence()
+{
+  RxConsistenceCount = 0;
+}
+
 void AbortFailSafe()
 {
+  //VERIFICA O TEMPO MINIMO PARA CONSIDERAR QUE O PILOTO AUTOMATICO DO FAIL-SAFE ESTÁ PRONTO PARA SER DESLIGADO
+  if (!GetRxConsistence())
+  {
+    return;
+  }
   //SE O PILOTO MOVER OS STICKS,O FAIL-SAFE IRÁ SER ABORTADO
   if (!FailSafeCheckStickMotion())
   {
@@ -119,6 +142,15 @@ void UpdateFailSafeSystem()
   }
 }
 
+void FailSafeBuzzerNotification()
+{
+  if (!Fail_Safe_Event)
+  {
+    return;
+  }
+  //NOTIFICAÇÃO DO BUZZER
+}
+
 void FailSafeCheck()
 {
   //FAIL-SAFE IMEDIATO CASO O USUARIO ESTIVER USANDO O ARM-DISARM POR CANAL AUX
@@ -133,11 +165,13 @@ void FailSafeCheck()
     Fail_Safe_Event = true;
     NormalizeFlightModesToFailSafe();
     NormalizeFundamentalChnnels();
-    NormalizaAuxiliariesChnnels();
+    NormalizeAuxiliariesChnnels();
+    ResetRxConsistence();
   }
   else
   {
     AbortFailSafe();
   }
   UpdateFailSafeSystem();
+  FailSafeBuzzerNotification();
 }

@@ -50,10 +50,10 @@ void RCInterpolationInit()
 void RCInterpolationApply()
 {
 
-  if (RC_LPF_CutOff != 0)
+  if (RC_LPF_CutOff > 0)
   {
     //GUARDA OS VALORES ANTERIOR
-    RCControllerUnFiltered[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
+    RCControllerUnFiltered[THROTTLE] = RCController[THROTTLE];
     RCControllerUnFiltered[YAW] = RCController[YAW];
     RCControllerUnFiltered[PITCH] = RCController[PITCH];
     RCControllerUnFiltered[ROLL] = RCController[ROLL];
@@ -65,7 +65,7 @@ void RCInterpolationApply()
     RCAttitudeFiltered[ROLL] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Roll, RCControllerUnFiltered[ROLL]);
 
     //OBTÉM O VALOR FILTRADO
-    RCController[THROTTLE] = RCAttitudeFiltered[THROTTLE];
+    RCController[THROTTLE] = ((RCAttitudeFiltered[THROTTLE]) >= (AttitudeThrottleMin) ? (RCAttitudeFiltered[THROTTLE]) : (AttitudeThrottleMin));
     RCController[YAW] = RCAttitudeFiltered[YAW];
     RCController[PITCH] = RCAttitudeFiltered[PITCH];
     RCController[ROLL] = RCAttitudeFiltered[ROLL];

@@ -21,6 +21,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Math/MATHSUPPORT.h"
+#include "Buzzer/BUZZER.h"
 
 #define THIS_LOOP_RATE 50     //HZ
 #define FAILSAFE_DELAY 1      //SEGUNDO
@@ -32,7 +33,7 @@ int16_t RxConsistenceCount = 0;
 
 bool GetValidFailSafeState(float DelayToDetect)
 {
-  return (Fail_Safe_System > (THIS_LOOP_RATE * DelayToDetect)) && COMMAND_ARM_DISARM;
+  return (Fail_Safe_System > (THIS_LOOP_RATE * DelayToDetect));
 }
 
 void NormalizeFundamentalChnnels()
@@ -104,6 +105,17 @@ void ResetRxConsistence()
   RxConsistenceCount = 0;
 }
 
+void ResetFailSafe()
+{
+  ImmediatelyFailSafe = false;
+  Fail_Safe_Event = false;
+  if (!RTHControlAux)
+  {
+    SetFlightModes[RTH_MODE] = false;
+  }
+  ResetRxConsistence();
+}
+
 void AbortFailSafe()
 {
   //VERIFICA O TEMPO MINIMO PARA CONSIDERAR QUE O PILOTO AUTOMATICO DO FAIL-SAFE ESTÁ PRONTO PARA SER DESLIGADO
@@ -116,30 +128,12 @@ void AbortFailSafe()
   {
     return;
   }
-  ImmediatelyFailSafe = false;
-  Fail_Safe_Event = false;
-}
-
-void FailSafeFinished()
-{
-  if (!RTHControlAux)
-  {
-    SetFlightModes[RTH_MODE] = false;
-  }
-  ImmediatelyFailSafe = false;
-  Fail_Safe_Event = false;
+  ResetFailSafe();
 }
 
 void UpdateFailSafeSystem()
 {
-  if (COMMAND_ARM_DISARM)
-  {
-    Fail_Safe_System++;
-  }
-  else
-  {
-    FailSafeFinished();
-  }
+  Fail_Safe_System++;
 }
 
 void FailSafeBuzzerNotification()
@@ -148,7 +142,7 @@ void FailSafeBuzzerNotification()
   {
     return;
   }
-  //NOTIFICAÇÃO DO BUZZER
+  BEEPER.Play(BEEPER_FAIL_SAFE);
 }
 
 void FailSafeCheck()
@@ -166,7 +160,6 @@ void FailSafeCheck()
     NormalizeFlightModesToFailSafe();
     NormalizeFundamentalChnnels();
     NormalizeAuxiliariesChnnels();
-    ResetRxConsistence();
   }
   else
   {

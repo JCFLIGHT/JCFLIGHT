@@ -73,6 +73,9 @@ static const uint8_t FMU_Init_Beep[] = {
 static const uint8_t FMU_Safe_Beep[] = {
     5, 5, 15, 5, 5, 5, 15, 30, BEEPER_COMMAND_STOP};
 
+static const uint8_t Fail_Safe_Beep[] = {
+    50, 50, BEEPER_COMMAND_STOP};
+
 static uint8_t BeeperState = 0;
 static uint16_t BeeperPositionArray = 0;
 static uint32_t BeeperNextNote = 0;
@@ -88,7 +91,8 @@ const Struct_BeeperEntry BeeperTable[] = {
     {BEEPER_AUTOLAUNCH, 7, AutoLaunch_Beep},
     {BEEPER_LAUNCHED, 8, Launched_Beep},
     {BEEPER_FMU_INIT, 9, FMU_Init_Beep},
-    {BEEPER_FMU_SAFE_TO_ARM, 10, FMU_Safe_Beep}};
+    {BEEPER_FMU_SAFE_TO_ARM, 10, FMU_Safe_Beep},
+    {BEEPER_FAIL_SAFE, 11, Fail_Safe_Beep}};
 
 static const Struct_BeeperEntry *BeeperEntry = NULL;
 

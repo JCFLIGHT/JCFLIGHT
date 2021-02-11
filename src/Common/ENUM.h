@@ -274,7 +274,8 @@ typedef enum
     BEEPER_AUTOLAUNCH,
     BEEPER_LAUNCHED,
     BEEPER_FMU_INIT,
-    BEEPER_FMU_SAFE_TO_ARM
+    BEEPER_FMU_SAFE_TO_ARM,
+    BEEPER_FAIL_SAFE
 } Beeper_Mode;
 
 enum BiquadFilterTypes

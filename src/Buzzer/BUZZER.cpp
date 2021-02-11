@@ -32,6 +32,12 @@ BEEPERCLASS BEEPER;
 
 bool BuzzerInit = false;
 bool SafeToOthersBeeps = false;
+static uint8_t BeeperState = 0;
+static uint16_t BeeperPositionArray = 0;
+static uint32_t BeeperNextNote = 0;
+
+//PRIMEIRA COLUNA = DURAÇÃO DA NOTA
+//SEGUNDA COLUNA = DURAÇÃO DA PAUSA
 
 static const uint8_t AlgorithmInit_Beep[] = {
     19, 5,
@@ -41,44 +47,91 @@ static const uint8_t AlgorithmInit_Beep[] = {
     9, 5,
     0, 39,
     19, 5,
-    19, 5, BEEPER_COMMAND_STOP};
+    19, 5,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t Arm_Beep[] = {
-    245, BEEPER_COMMAND_STOP};
+    245,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t Disarm_Beep[] = {
-    15, 5, 15, 5, BEEPER_COMMAND_STOP};
+    15, 5,
+    15, 5,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t LowBattery_Beep[] = {
-    50, 2, BEEPER_COMMAND_STOP};
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 5,
+    7, 50,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t Success_Beep[] = {
-    5, 5, 5, 5, BEEPER_COMMAND_STOP};
+    5, 5,
+    5, 5, BEEPER_COMMAND_STOP};
 
 static const uint8_t Fail_Beep[] = {
-    20, 15, 35, 5, BEEPER_COMMAND_STOP};
+    20, 15,
+    35, 5,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t Calibration_Beep[] = {
-    18, 8, 18, 8, 18, 8, BEEPER_COMMAND_STOP};
+    18, 8,
+    18, 8,
+    18, 8,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t AutoLaunch_Beep[] = {
-    5, 5, 5, 100, BEEPER_COMMAND_STOP};
+    5, 5,
+    5, 100,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t Launched_Beep[] = {
-    245, BEEPER_COMMAND_STOP};
+    245,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t FMU_Init_Beep[] = {
-    5, 5, 5, 5, BEEPER_COMMAND_STOP};
+    5, 5,
+    5, 5,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t FMU_Safe_Beep[] = {
-    5, 5, 15, 5, 5, 5, 15, 30, BEEPER_COMMAND_STOP};
+    5, 5,
+    15, 5,
+    5, 5,
+    15, 30,
+    BEEPER_COMMAND_STOP};
 
 static const uint8_t Fail_Safe_Beep[] = {
-    50, 50, BEEPER_COMMAND_STOP};
+    50, 50,
+    BEEPER_COMMAND_STOP};
 
-static uint8_t BeeperState = 0;
-static uint16_t BeeperPositionArray = 0;
-static uint32_t BeeperNextNote = 0;
+static const uint8_t Fail_Safe_Good_Beep[] = {
+    30, 8,
+    30, 8,
+    30, 8,
+    90, 50,
+    BEEPER_COMMAND_STOP};
+
+static const uint8_t Parachute_Beep[] = {
+    7, 2,
+    7, 2,
+    7, 2,
+    7, 2,
+    7, 2,
+    7, 2,
+    7, 2,
+    7, 50,
+    BEEPER_COMMAND_STOP};
 
 const Struct_BeeperEntry BeeperTable[] = {
     {BEEPER_CALIBRATION_DONE, 0, Calibration_Beep},
@@ -92,7 +145,10 @@ const Struct_BeeperEntry BeeperTable[] = {
     {BEEPER_LAUNCHED, 8, Launched_Beep},
     {BEEPER_FMU_INIT, 9, FMU_Init_Beep},
     {BEEPER_FMU_SAFE_TO_ARM, 10, FMU_Safe_Beep},
-    {BEEPER_FAIL_SAFE, 11, Fail_Safe_Beep}};
+    {BEEPER_FAIL_SAFE, 11, Fail_Safe_Beep},
+    {BEEPER_FAIL_SAFE_GOOD, 12, Fail_Safe_Good_Beep},
+    {BEEPER_PARACHUTE, 13, Parachute_Beep},
+};
 
 static const Struct_BeeperEntry *BeeperEntry = NULL;
 
@@ -110,18 +166,24 @@ void BEEPERCLASS::Play(Beeper_Mode Mode)
   {
     const Struct_BeeperEntry *SelectedSongTable = &BeeperTable[i];
     if (SelectedSongTable->Mode != Mode)
+    {
       continue;
+    }
     if (!BeeperEntry)
     {
       SelectedSong = SelectedSongTable;
       break;
     }
     if (SelectedSongTable->Priority < BeeperEntry->Priority)
+    {
       SelectedSong = SelectedSongTable;
+    }
     break;
   }
   if (!SelectedSong)
+  {
     return;
+  }
   BeeperEntry = SelectedSong;
   BeeperPositionArray = 0;
   BeeperNextNote = 0;
@@ -151,13 +213,17 @@ void BEEPERCLASS::Update()
   {
     BeeperState = 1;
     if (BeeperEntry->Sequence[BeeperPositionArray] != 0)
+    {
       BEEP_ON;
+    }
   }
   else
   {
     BeeperState = 0;
     if (BeeperEntry->Sequence[BeeperPositionArray] != 0)
+    {
       BEEP_OFF;
+    }
   }
   ProcessCommand();
 }

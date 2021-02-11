@@ -26,10 +26,12 @@
 #define THIS_LOOP_RATE 50     //HZ
 #define FAILSAFE_DELAY 1      //SEGUNDO
 #define FAILSAFE_DELAY2 0.25f //MS
-#define STICK_MOTION 100      //100 uS DE DEFLEXÃO
+#define STICK_MOTION 50       //50 uS DE DEFLEXÃO
 #define RX_RECOVERY_TIME 15   //NO MINIMO 15 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE
 
+bool FailSafeGoodRunBeep = false;
 int16_t RxConsistenceCount = 0;
+int16_t BuzzerFailSafeRunCount = 0;
 
 bool GetValidFailSafeState(float DelayToDetect)
 {
@@ -103,6 +105,8 @@ bool GetRxConsistence()
 void ResetRxConsistence()
 {
   RxConsistenceCount = 0;
+  BuzzerFailSafeRunCount = 0;
+  FailSafeGoodRunBeep = true;
 }
 
 void ResetFailSafe()
@@ -118,6 +122,11 @@ void ResetFailSafe()
 
 void AbortFailSafe()
 {
+  //EVITA COM QUE O STICK MOTION RODE COM O FAIL-SAFE DESATIVADO
+  if (!Fail_Safe_Event)
+  {
+    return;
+  }
   //VERIFICA O TEMPO MINIMO PARA CONSIDERAR QUE O PILOTO AUTOMATICO DO FAIL-SAFE ESTÁ PRONTO PARA SER DESLIGADO
   if (!GetRxConsistence())
   {
@@ -134,6 +143,19 @@ void AbortFailSafe()
 void UpdateFailSafeSystem()
 {
   Fail_Safe_System++;
+  if (RxConsistenceCount == 0 && !Fail_Safe_Event && FailSafeGoodRunBeep)
+  {
+    if (BuzzerFailSafeRunCount > 100) //2 SEGUNDOS
+    {
+      BEEPER.Play(BEEPER_FAIL_SAFE_GOOD);
+      FailSafeGoodRunBeep = false;
+      BuzzerFailSafeRunCount = 0;
+    }
+    else
+    {
+      BuzzerFailSafeRunCount++;
+    }
+  }
 }
 
 void FailSafeBuzzerNotification()
@@ -142,7 +164,17 @@ void FailSafeBuzzerNotification()
   {
     return;
   }
-  BEEPER.Play(BEEPER_FAIL_SAFE);
+  if (BEEPER.SafeToOthersBeepsCounter > 200 && CalibratingGyroscope == 0)
+  {
+    if (BuzzerFailSafeRunCount > 150) //3 SEGUNDOS
+    {
+      BEEPER.Play(BEEPER_FAIL_SAFE);
+    }
+    else
+    {
+      BuzzerFailSafeRunCount++;
+    }
+  }
 }
 
 void FailSafeCheck()

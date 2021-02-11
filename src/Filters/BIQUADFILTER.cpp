@@ -33,6 +33,15 @@ float FilterGetNotch_Quality(float CenterFrequencyHz, float CutOffFrequencyHz)
   return CenterFrequencyHz * CutOffFrequencyHz / (CenterFrequencyHz * CenterFrequencyHz - CutOffFrequencyHz * CutOffFrequencyHz);
 }
 
+void BiQuadFilterSetupPassthrough(BiquadFilter_Struct *Filter)
+{
+  Filter->Beta0 = 1.0f;
+  Filter->Beta1 = 0.0f;
+  Filter->Beta2 = 0.0f;
+  Filter->Alpha1 = 0.0f;
+  Filter->Alpha2 = 0.0f;
+}
+
 void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int16_t CutOffFreq, int16_t SampleInterval, uint8_t FilterType)
 {
 
@@ -47,35 +56,47 @@ void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int
     Q_Quality = FilterGetNotch_Quality(FilterFreq, CutOffFreq);
   }
 
-  float Beta0, Beta1, Beta2;
-  const float SampleRate = 1.0f / ((float)SampleInterval * 0.000001f);
-  const float Omega = 2.0f * 3.14159265358979323846f * ((float)FilterFreq) / SampleRate;
-  const float CalcedSine = Fast_Sine(Omega);
-  const float CalcedCosine = Fast_Cosine(Omega);
-  const float Alpha = CalcedSine / (2 * Q_Quality);
-
-  switch (FilterType)
+  if (FilterFreq < (1000000 / SampleInterval / 2))
   {
-  case LPF:
-    Beta0 = (1 - CalcedCosine) / 2;
-    Beta1 = 1 - CalcedCosine;
-    Beta2 = (1 - CalcedCosine) / 2;
-    break;
 
-  case NOTCH:
-    Beta0 = 1;
-    Beta1 = -2 * CalcedCosine;
-    Beta2 = 1;
-    break;
+    float Beta0, Beta1, Beta2;
+    const float SampleRate = 1.0f / ((float)SampleInterval * 0.000001f);
+    const float Omega = 2.0f * 3.14159265358979323846f * ((float)FilterFreq) / SampleRate;
+    const float CalcedSine = Fast_Sine(Omega);
+    const float CalcedCosine = Fast_Cosine(Omega);
+    const float Alpha = CalcedSine / (2 * Q_Quality);
+
+    switch (FilterType)
+    {
+    case LPF:
+      Beta0 = (1 - CalcedCosine) / 2;
+      Beta1 = 1 - CalcedCosine;
+      Beta2 = (1 - CalcedCosine) / 2;
+      break;
+
+    case NOTCH:
+      Beta0 = 1;
+      Beta1 = -2 * CalcedCosine;
+      Beta2 = 1;
+      break;
+
+    default:
+      BiQuadFilterSetupPassthrough(Filter);
+      return;
+    }
+    const float Alpha0 = 1 + Alpha;
+    const float Alpha1 = -2 * CalcedCosine;
+    const float Alpha2 = 1 - Alpha;
+    Filter->Beta0 = Beta0 / Alpha0;
+    Filter->Beta1 = Beta1 / Alpha0;
+    Filter->Beta2 = Beta2 / Alpha0;
+    Filter->Alpha1 = Alpha1 / Alpha0;
+    Filter->Alpha2 = Alpha2 / Alpha0;
   }
-  const float Alpha0 = 1 + Alpha;
-  const float Alpha1 = -2 * CalcedCosine;
-  const float Alpha2 = 1 - Alpha;
-  Filter->Beta0 = Beta0 / Alpha0;
-  Filter->Beta1 = Beta1 / Alpha0;
-  Filter->Beta2 = Beta2 / Alpha0;
-  Filter->Alpha1 = Alpha1 / Alpha0;
-  Filter->Alpha2 = Alpha2 / Alpha0;
+  else
+  {
+    BiQuadFilterSetupPassthrough(Filter);
+  }
   Filter->SampleX1 = Filter->SampleX2 = 0;
   Filter->SampleY1 = Filter->SampleY2 = 0;
 }

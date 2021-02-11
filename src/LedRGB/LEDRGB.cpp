@@ -240,7 +240,7 @@ void LEDRGB::GPS_Led(void)
   //SE O NÚMERO DE SATELITES FOR MENOR OU IGUAL A 4,O LED VERMELHO IRÁ FICAR PISCANDO SEM PARAR
   static bool GPS_Fail_Toggle = false;
   static uint32_t GPS_Fail = SCHEDULERTIME.GetMillis();
-  if (GPS_NumberOfSatellites <= 4)
+  if (GPS_NumberOfSatellites < 5)
   {
     if (SCHEDULERTIME.GetMillis() - GPS_Fail >= 350)
     {
@@ -276,7 +276,9 @@ void LEDRGB::GPS_Led(void)
         if (GPS_NumberOfSatellites >= 8)
         {
           if (BlinkCount++ > 16)
+          {
             BlinkCount = 0;
+          }
         }
         else
         {

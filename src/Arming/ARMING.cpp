@@ -119,7 +119,7 @@ uint8_t PreArmClass::Checking(void)
         return FLIGHT_MODES_ERROR;
     }
 
-    if (Fail_Safe_System > 5) //MODO FAIL-SAFE ATIVO
+    if (Fail_Safe_Event) //MODO FAIL-SAFE ATIVO
     {
         return FAIL_SAFE_ERROR;
     }

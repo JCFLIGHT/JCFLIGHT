@@ -19,6 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "Buzzer/BUZZER.h"
 
 ParachuteClass PARACHUTE;
 
@@ -34,15 +35,23 @@ void ParachuteClass::Auto_Do_Now(bool ActiveParachute)
   }
   ParachuteInAuto = true;
   MotorControl[PARACHUTESERVO] = 2400; //180 GRAUS
+  if (!ParachuteReleased)
+  {
+    BEEPER.Play(BEEPER_PARACHUTE);
+  }
   ParachuteReleased = true;
 }
 
 void ParachuteClass::Manual_Do_Now()
 {
   if (!ParachuteReleased)
+  {
     OverFlowTime += SCHEDULERTIME.GetMillis();
+  }
   if (ParachuteInAuto)
+  {
     return;
+  }
   if (!ManualDetectTrigger)
   {
     MotorControl[PARACHUTESERVO] = 400; //0 GRAUS
@@ -50,6 +59,10 @@ void ParachuteClass::Manual_Do_Now()
     return;
   }
   MotorControl[PARACHUTESERVO] = 2400; //180 GRAUS
+  if (!ParachuteReleased)
+  {
+    BEEPER.Play(BEEPER_PARACHUTE);
+  }
   ParachuteReleased = true;
 }
 
@@ -159,9 +172,13 @@ void ParachuteClass::Manual_Detect_Channel()
 bool ParachuteClass::GetSafeStateToDisarmMotors()
 {
   if (ParachuteDetectTrigger == 0)
+  {
     return false;
+  }
   if (PARACHUTE.Released())
+  {
     return true;
+  }
   return false;
 }
 
@@ -173,6 +190,8 @@ bool ParachuteClass::Released()
 bool ParachuteClass::ReleasedOverFlowTime()
 {
   if (SCHEDULERTIME.GetMillis() - OverFlowTime >= MOTORS_DISARM_TIME)
+  {
     return true;
+  }
   return false;
 }

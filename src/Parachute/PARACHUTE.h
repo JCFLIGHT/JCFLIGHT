@@ -31,7 +31,6 @@ private:
   bool ParachuteReleased = false;
   bool Released();
   bool ReleasedOverFlowTime();
-  uint8_t EEPROM_ManualDetectTrigger = 0;
   uint16_t ManualDetectTrigger = 0;
   uint32_t OverFlowTime = 0;
 };

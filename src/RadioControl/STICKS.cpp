@@ -61,7 +61,7 @@ void RCSticks_Update()
         }
         if (SetFlightModes[ARM_DISARM_MODE])
         {
-          if (Fail_Safe_System < 5 && !SetFlightModes[RTH_MODE] && !SetFlightModes[GPS_HOLD_MODE])
+          if (!Fail_Safe_Event && !SetFlightModes[RTH_MODE] && !SetFlightModes[GPS_HOLD_MODE])
           {
             if (!COMMAND_ARM_DISARM)
             {

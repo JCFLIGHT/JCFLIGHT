@@ -29,20 +29,23 @@
 #define YPR_VALUE_MIN 1450
 #define YPR_VALUE_MAX 1550
 
-uint8_t TimerDesarm, Counter_One_Hertz;
+uint8_t TimerDesarm;
+uint8_t Counter_One_Hertz;
 
 void Desarm_LowThrottle()
 {
+  //FAÇA UMA RAPIDA SAÍDA SE O MODO AERO OU ASA-FIXA ESTIVER ATIVADO
   if (GetFrameStateOfAirPlane())
   {
-    return; //FAÇA UMA RAPIDA SAÍDA SE O MODO AERO OU ASA-FIXA ESTIVER ATIVADO
+    return;
   }
+  //FAÇA UMA RAPIDA SAÍDA SE O COMANDO ARMDISARM FOR PELA CHAVE AUX
   if (ArmDisarmConfig != 0)
   {
-    return; //FAÇA UMA RAPIDA SAÍDA SE O COMANDO ARMDISARM FOR PELA CHAVE AUX
+    return;
   }
   //THROTTLE NO MINIMO,DRONE ARMADO,FAIL-SAFE DESATIVADO?SIM...
-  if (Check_Throttle() && Check_Others_Channels() && COMMAND_ARM_DISARM && Fail_Safe_System < 5)
+  if (Check_Throttle() && Check_Others_Channels() && COMMAND_ARM_DISARM && !ImmediatelyFailSafe)
   {
     //ROTINA DE 1HZ
     Counter_One_Hertz++;
@@ -58,7 +61,9 @@ void Desarm_LowThrottle()
         }
       }
       else if (TimerDesarm > 254)
+      {
         TimerDesarm = 254;
+      }
       Counter_One_Hertz = 0;
     }
   }
@@ -72,7 +77,9 @@ void Desarm_LowThrottle()
 bool Check_Throttle()
 {
   if (RadioControllOutput[THROTTLE] <= THROTTLE_VALUE_MAX)
+  {
     return true;
+  }
   return false;
 }
 
@@ -81,6 +88,8 @@ bool Check_Others_Channels()
   if ((RadioControllOutput[YAW] >= YPR_VALUE_MIN && RadioControllOutput[YAW] <= YPR_VALUE_MAX) &&
       (RadioControllOutput[PITCH] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX) &&
       (RadioControllOutput[ROLL] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX))
+  {
     return true;
+  }
   return false;
 }

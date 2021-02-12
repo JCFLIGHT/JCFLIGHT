@@ -34,12 +34,12 @@ void MachineInit()
     CheckFirstLinkOrganizeEEPROM();
     //INICIALIZA OS PARAMETROS GERAIS
     GeneralSettingsInitialization();
+    //CALIBRAÇÃO DOS ESCS
+    ESC.Calibration();
     //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA E DO COMPASS
     CheckAndUpdateIMUCalibration();
     //INICIALIZA OS DISPOSITIVOS I2C
     All_I2C_Initialization();
-    //CALIBRAÇÃO DOS ESC'S
-    ESC.Calibration();
     //INICIA O BUZZER EM OPERAÇÃO NORMAL
     ESC.BeeperMode = NORMAL_OPERATION_MODE;
     //DESATIVA TODOS OS LEDS
@@ -67,7 +67,7 @@ void MachineInit()
     GREEN_LED_OFF;
     BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
-    ConfigureRegisters();
+    ConfigureRegisters(false);
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
 }

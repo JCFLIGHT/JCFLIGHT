@@ -33,7 +33,7 @@ void Medium_Loop()
         RCCONFIG.Update_Channels();
         Desarm_LowThrottle();
         FailSafeCheck();
-        RCSticks_Update();
+        RC_Sticks_Update();
         Barometer_Update();
         GPS_Process_FlightModes();
         AUXFLIGHT.SelectMode();

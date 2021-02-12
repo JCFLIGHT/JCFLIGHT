@@ -21,10 +21,12 @@
 class ClassESC
 {
 public:
-  ClassESC(){};
-  bool Run_Calibrate;
   int8_t BeeperMode;
   void Calibration(void);
+
+private:
+  bool EscCal_ArmTest = false;
+  uint8_t EscCal_ArmCount = 0;
 };
 extern ClassESC ESC;
 #endif

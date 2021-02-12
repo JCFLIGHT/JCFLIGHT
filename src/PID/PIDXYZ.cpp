@@ -27,7 +27,7 @@
 #include "AHRS/AHRS.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "Yaw/YAWMANIPULATION.h"
+#include "Yaw/HEADINGHOLD.h"
 #include "RadioControl/CURVESRC.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Filters/PT1.h"

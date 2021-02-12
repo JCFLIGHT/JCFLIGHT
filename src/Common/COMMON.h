@@ -32,7 +32,7 @@
 #include "FailSafe/FAILSAFE.h"
 #include "IMU/ACCELERATION.h"
 #include "FlightModes/FLIGHTMODES.h"
-#include "Yaw/YAWMANIPULATION.h"
+#include "Yaw/HEADINGHOLD.h"
 #include "GPS/GPSORIENTATION.h"
 #include "Scheduler/SCHEDULER.h"
 #include "PID/DYNAMICPID.h"

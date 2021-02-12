@@ -107,7 +107,9 @@ void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
 void SchedulerTimeClass::MicroSecondsSleep(uint16_t MicroSeconds)
 {
   if (--MicroSeconds == 0)
+  {
     return;
+  }
   MicroSeconds <<= 2;
   MicroSeconds -= 2;
   __asm__ __volatile__("1: sbiw %0,1"
@@ -168,19 +170,21 @@ void SchedulerTimeClass::Initialization()
 
 uint32_t SchedulerTimeClass::GetMillis()
 {
-  return 0;
+  return millis();
 }
 
 uint32_t SchedulerTimeClass::GetMicros()
 {
-  return 0;
+  return micros();
 }
 
 void SchedulerTimeClass::Sleep(uint16_t MillisSeconds)
 {
+  delay(MillisSeconds);
 }
 
 void SchedulerTimeClass::MicroSecondsSleep(uint16_t MicroSeconds)
 {
+  delayMicroseconds(MicroSeconds);
 }
 #endif

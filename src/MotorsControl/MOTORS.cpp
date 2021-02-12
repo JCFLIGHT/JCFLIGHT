@@ -35,7 +35,7 @@ FILE_COMPILE_FOR_SPEED
 
 //#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
 
-void ConfigureRegisters()
+void ConfigureRegisters(bool Run_Calibrate_ESC)
 {
 #ifdef __AVR_ATmega2560__
 
@@ -149,7 +149,7 @@ void ConfigureRegisters()
 
 #endif
 
-  if (!ESC.Run_Calibrate && !SAFETYBUTTON.SafeButtonEnabled())
+  if (!Run_Calibrate_ESC && !SAFETYBUTTON.SafeButtonEnabled())
   {
     PulseInAllMotors(1000);
     SCHEDULERTIME.Sleep(300);

@@ -19,6 +19,8 @@
 #define STATES_H_
 #include "Arduino.h"
 bool CheckInclinationForArm(void);
+bool ArmDelayedState(void);
+void ResetArmDelayed(void);
 bool StickStateToArm(void);
 bool StickStateToDisarm(void);
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue);

@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "YAWMANIPULATION.h"
+#include "HEADINGHOLD.h"
 #include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"

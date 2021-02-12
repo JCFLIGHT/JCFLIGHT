@@ -27,32 +27,34 @@
 
 ClassESC ESC;
 
-#define THROTTLEFAIL RadioControllOutput[THROTTLE] < 1600   //VALOR MAXIMO TOLERADO PARA NÃO ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
-#define THROTTLESUCESS RadioControllOutput[THROTTLE] > 1700 //VALOR MINIMO TOLERADO PARA ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
-
-bool ArmTest = false;
-uint8_t ArmCount = 0;
-uint32_t EscLoopRefresh = 0;
+#define ESC_CAL_THROTTLE_FAIL RadioControllOutput[THROTTLE] < 1600   //VALOR MAXIMO TOLERADO PARA NÃO ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
+#define ESC_CAL_THROTTLE_SUCESS RadioControllOutput[THROTTLE] > 1700 //VALOR MINIMO TOLERADO PARA ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
 
 void ClassESC::Calibration(void)
 {
-  if (THROTTLEFAIL)
+  if (ESC_CAL_THROTTLE_FAIL)
   {
     return; //FAÇA UMA RAPIDA SAIDA DA FUNÇÃO CASO O USUARIO NÃO QUEIRA CALIBRAR OS ESC'S
   }
-  if (THROTTLESUCESS) //CHECA SE O VALOR DO ACELERADOR É SAFE
+  if (ESC_CAL_THROTTLE_SUCESS) //CHECA SE O VALOR DO ACELERADOR É SAFE
   {
-    Run_Calibrate = true;   //FLAG PARA CALIBRAÇÃO DOS ESC'S
-    ConfigureRegisters();   //INICIA OS REGISTRADORES DE CONFIGURAÇÃO DE SAIDA DOS PINOS PWM
-    PulseInAllMotors(2000); //ENVIA PWM MAXIMO A TODOS OS ESC'S
+    ConfigureRegisters(true); //INICIA OS REGISTRADORES DE CONFIGURAÇÃO DE SAIDA DOS PINOS PWM
+    PulseInAllMotors(2000);   //ENVIA PWM MAXIMO A TODOS OS ESC'S
     while (true)
     {
+      //ESSE PRIMEIRO WHILE DURA 10 SEGUNDOS
+      //5 SEGUNDOS ENVIANDO 2000uS PARA OS ESCS
+      //5 SEGUNDOS ENVIANDO 1000uS PARA OS ESCS
       static uint32_t CountDelay = SCHEDULERTIME.GetMillis();
       static bool IgnoreThis = false;
-      RGB.Function(CALIBRATIONESC);                   //ATIVA O LED VERMELHO
-      RGB.Update();                                   //ATUALIZA O ESTADO DOS LED'S
+      RGB.Function(CALIBRATIONESC);                       //ATIVA O LED VERMELHO
+      RGB.Update();                                       //ATUALIZA O ESTADO DOS LED'S
       if (SCHEDULERTIME.GetMillis() - CountDelay >= 5000) //ROTINA DE CONTAGEM DE 5 SEGUNDOS
       {
+        if (IgnoreThis)
+        {
+          break; //QUEBRA O WHILE
+        }
         IgnoreThis = true;
         CountDelay = SCHEDULERTIME.GetMillis();
       }
@@ -60,16 +62,12 @@ void ClassESC::Calibration(void)
       {
         PulseInAllMotors(1000); //ENVIA PWM MINIMO A TODOS OS ESC'S
       }
-      if (IgnoreThis && SCHEDULERTIME.GetMillis() - CountDelay >= 5000)
-      {
-        break; //QUEBRA O WHILE
-      }
     }
     BeeperMode = ESC_FINISH_CALIBRATION_MODE;
     while (true) //FICA TRAVADO AQUI NO WHILE ATÉ QUE A CONTROLADORA SEJA REINICIADA MANUALMENTE
     {
-      Run_Calibrate = false;
-      if (SCHEDULERTIME.GetMillis() - EscLoopRefresh >= 20) //ROTINA DE 50Hz
+      static uint32_t EscCalLoopRefresh = SCHEDULERTIME.GetMillis();
+      if (SCHEDULERTIME.GetMillis() - EscCalLoopRefresh >= 20) //ROTINA DE 50Hz
       {
         DecodeAllReceiverChannels(); //FAZ A LEITURA DE TODOS OS CANAIS DO RECEPTOR DO RADIO
         RCCONFIG.Set_Pulse();        //SETA A SAÍDA PARA CONFIGURAÇÃO PARA O RECEPTOR DO RADIO
@@ -82,22 +80,22 @@ void ClassESC::Calibration(void)
           BeeperMode--;
         }
         if (RadioControllOutput[THROTTLE] < 1100 && RadioControllOutput[YAW] > 1900 &&
-            RadioControllOutput[PITCH] < 1100 && RadioControllOutput[ROLL] < 1100 && !ArmTest)
+            RadioControllOutput[PITCH] < 1100 && RadioControllOutput[ROLL] < 1100 && !EscCal_ArmTest)
         {
-          ArmCount++; //REALIZA 50 CONTAGENS = 1 SEGUNDO
+          EscCal_ArmCount++; //REALIZA 50 CONTAGENS = 1 SEGUNDO
         }
-        if (ArmCount >= 50)
+        if (EscCal_ArmCount >= 50)
         {
-          ArmTest = true; //ARMA OS MOTORES PARA TESTE
+          EscCal_ArmTest = true; //ARMA OS MOTORES PARA TESTE
         }
         if (RadioControllOutput[THROTTLE] < 1100 && RadioControllOutput[YAW] < 1100 &&
-            RadioControllOutput[PITCH] > 1900 && RadioControllOutput[ROLL] < 1100 && ArmTest)
+            RadioControllOutput[PITCH] > 1900 && RadioControllOutput[ROLL] < 1100 && EscCal_ArmTest)
         {
-          ArmCount = ArmTest = false; //DESARMA OS MOTORES E RESETA A CONTAGEM
+          EscCal_ArmCount = EscCal_ArmTest = false; //DESARMA OS MOTORES E RESETA A CONTAGEM
         }
-        EscLoopRefresh = SCHEDULERTIME.GetMillis();
+        EscCalLoopRefresh = SCHEDULERTIME.GetMillis();
       }
-      if (ArmTest)
+      if (EscCal_ArmTest)
       {
         PulseInAllMotors(Constrain_16Bits(RadioControllOutput[THROTTLE], 1000, 2000)); //REALIZA O BY-PASS DO THROTTLE
       }

@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef YAWMANIPULATION_H_
-#define YAWMANIPULATION_H_
+#ifndef HEADINGHOLD_H_
+#define HEADINGHOLD_H_
 #include "Arduino.h"
 void UpdateStateOfHeadingHold(void);
 bool GetSafeStateOfHeadingHold();

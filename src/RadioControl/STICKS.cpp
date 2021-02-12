@@ -25,16 +25,23 @@
 #include "Buzzer/BUZZER.h"
 #include "Arming/ARMING.h"
 
-bool ArmDelay = false;
-uint8_t Arm_Delay_Count = 0;
+bool PreArm_Delay = false;
+uint8_t PreArm_Delay_Count = 0;
 
-void RCSticks_Update()
+void RC_Sticks_Update()
 {
   if (!COMMAND_ARM_DISARM)
   {
     if ((ArmDisarmConfig == 0) && (StickStateToArm()) && (!BATTERY.LowBattPreventArm))
     {
-      ArmDelay = true;
+      if (ArmDelayedState())
+      {
+        PreArm_Delay = true;
+      }
+    }
+    else
+    {
+      ResetArmDelayed();
     }
   }
   else
@@ -86,10 +93,10 @@ void Pre_Arm(void)
     return; //FAÇA UMA RAPIDA SAÍDA SE O ARMDISARM ESTIVE CONFIGURADO PELA CHAVE AUX
   }
   //ROTINA PRE-ARM
-  if (ArmDelay)
+  if (PreArm_Delay)
   {
-    Arm_Delay_Count++;
-    if (Arm_Delay_Count > 30)
+    PreArm_Delay_Count++;
+    if (PreArm_Delay_Count > 30)
     {
       if (!PREARM.CheckSafeState()) //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
       {
@@ -103,8 +110,8 @@ void Pre_Arm(void)
           IOC_Initial_Compass = ATTITUDE.AngleOut[YAW];
         }
       }
-      ArmDelay = false;
-      Arm_Delay_Count = 0;
+      PreArm_Delay = false;
+      PreArm_Delay_Count = 0;
     }
   }
 }
@@ -112,21 +119,21 @@ void Pre_Arm(void)
 void Pre_Arm_Leds(void)
 {
   //ROTINA PRE-ARM LED INDICADOR
-  if ((Arm_Delay_Count > 0 && Arm_Delay_Count <= 20))
+  if ((PreArm_Delay_Count > 0 && PreArm_Delay_Count <= 20))
   {
     RGB.Function(PREARMINIT);
     BEEPER.Play(BEEPER_ARM);
   }
   if (!PREARM.CheckSafeState()) //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
   {
-    if ((Arm_Delay_Count > 20 && Arm_Delay_Count <= 30))
+    if ((PreArm_Delay_Count > 20 && PreArm_Delay_Count <= 30))
     {
       RGB.Function(PREARMFAIL);
-      if (Arm_Delay_Count == 21)
+      if (PreArm_Delay_Count == 21)
       {
         BEEPER.Play(BEEPER_ACTION_FAIL);
       }
-      if (Arm_Delay_Count == 30)
+      if (PreArm_Delay_Count == 30)
       {
         NotPriorit = false;
       }
@@ -134,10 +141,10 @@ void Pre_Arm_Leds(void)
   }
   else //CASO CONTRARIO
   {
-    if ((Arm_Delay_Count > 20 && Arm_Delay_Count <= 30))
+    if ((PreArm_Delay_Count > 20 && PreArm_Delay_Count <= 30))
     {
       RGB.Function(PREARMSUCESS);
-      if (Arm_Delay_Count == 30)
+      if (PreArm_Delay_Count == 30)
       {
         NotPriorit = false;
       }

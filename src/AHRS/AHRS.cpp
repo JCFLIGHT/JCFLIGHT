@@ -24,7 +24,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "I2C/I2C.h"
 #include "BAR/BAR.h"
-#include "Yaw/YAWMANIPULATION.h"
+#include "Yaw/HEADINGHOLD.h"
 #include "QUATERNION.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Build/GCC.h"

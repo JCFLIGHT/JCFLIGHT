@@ -40,6 +40,7 @@
 
 void GeneralSettingsInitialization()
 {
+  FullParamsListInitialization();
   CurvesRC_SetValues();
   TPA_Initialization();
   CurvesRC_CalculeValue();
@@ -63,6 +64,5 @@ void GeneralSettingsInitialization()
   GCS.UpdateParametersToGCS();
   AHRS_Initialization();
   SAFETYBUTTON.Initialization();
-  FullParamsListInitialization();
   RCInterpolationInit();
 }

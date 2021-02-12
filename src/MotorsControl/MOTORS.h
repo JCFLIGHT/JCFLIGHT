@@ -18,7 +18,7 @@
 #ifndef MOTORS_H_
 #define MOTORS_H_
 #include "Arduino.h"
-void ConfigureRegisters();
+void ConfigureRegisters(bool Run_Calibrate_ESC);
 void PID_MixMotors();
 void PulseInAllMotors(int16_t Pulse);
 void ShutDownAllMotorsAndServos();

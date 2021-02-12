@@ -35,8 +35,19 @@ bool CheckInclinationForArm(void)
     return false; //INCLINAÇÃO NÃO DETECTADA
 }
 
+bool ArmDelayedState(void)
+{
+    return true;
+}
+
+void ResetArmDelayed(void)
+{
+}
+
 bool StickStateToArm(void)
 {
+    //FUTURAMENTE FAZER UM DELAYED NESSA FUNÇAÕ DE NO MINIMO 2 SEGUNDOS,
+    //CONSTRUIR NA FUNÇÃO "ArmDelayedState",QUE ESTÁ LOGO ACIMA
     return (Throttle.Output < 1100) &&
            (Yaw.Output > 1900) &&
            (Pitch.Output < 1100) &&
@@ -53,10 +64,12 @@ bool StickStateToDisarm(void)
 
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue)
 {
-    return ABS_16BITS(RCController[ROLL]) < AutoPilotValue && ABS_16BITS(RCController[PITCH]) < AutoPilotValue;
+    return ABS_16BITS(RCController[ROLL]) < AutoPilotValue &&
+           ABS_16BITS(RCController[PITCH]) < AutoPilotValue;
 }
 
 bool SticksDeflected(int16_t MinDeflectionValue)
 {
-    return (ABS_16BITS(RCController[ROLL]) > MinDeflectionValue) || (ABS_16BITS(RCController[PITCH]) > MinDeflectionValue);
+    return (ABS_16BITS(RCController[ROLL]) > MinDeflectionValue) ||
+           (ABS_16BITS(RCController[PITCH]) > MinDeflectionValue);
 }

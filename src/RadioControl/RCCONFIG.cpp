@@ -249,8 +249,9 @@ void RCConfigClass::Init()
   AuxiliarEight.Set_Filter(true);
   AuxiliarEight.Set_Fail_Safe(false);
   //FAZ AS PRIMEIRAS LEITURAS DOS CANAIS PARA A CALIBRAÇÃO DOS ESC'S
-  for (static uint8_t i; i < 20; i++)
-  {                              //CORRE AS FUNÇÕES 20 VEZES PARA OBTER OS VALORES ATUAIS DOS CANAIS DO RADIO
+  //CORRE AS FUNÇÕES 100 VEZES PARA OBTER OS VALORES ATUAIS DOS CANAIS DO RADIO
+  for (uint8_t i = 0; i < 100; i++)
+  {
     DecodeAllReceiverChannels(); //FAZ AS PRIMEIRA LEITURAS
     RCCONFIG.Set_Pulse();        //APLICA OS VALORES LIDOS
     RCCONFIG.Update_Channels();  //FAZ A LEITURA DOS CANAIS APÓS A CONFIGURAÇÃO

@@ -86,6 +86,7 @@ extern int16_t I2CErrors;
 extern int16_t SlipAngleForAirPlane;
 extern int16_t AttitudeThrottleMin;
 extern int16_t AttitudeThrottleMax;
+extern int16_t GPSVelNED[3];
 extern volatile int16_t Fail_Safe_System;
 
 //*******************************************************
@@ -100,7 +101,6 @@ extern uint32_t Time_To_Start_The_Land;
 //*******************************************************
 //SIGNED 32 BITS (-2.147.483.647 - 2.147.483.647)
 //*******************************************************
-extern int32_t GPS_Coordinates_Vector_temp[2];
 extern int32_t GPS_Coordinates_Vector[2];
 extern int32_t Stored_Coordinates_Home_Point[2];
 extern int32_t GPS_CoordinatesToHold[2];

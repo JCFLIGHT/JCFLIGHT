@@ -474,4 +474,11 @@ enum Receivers_Type_Enum
     SBUS_RECEIVER,
     IBUS_RECEIVER
 };
+
+enum GPS_Velocity_NED_Enum
+{
+    NORTH = 0,
+    EAST,
+    DOWN
+};
 #endif

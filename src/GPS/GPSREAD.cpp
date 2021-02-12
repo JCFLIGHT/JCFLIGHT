@@ -28,47 +28,47 @@
 
 struct Ublox_Navigation_PosLLH
 {
-  uint32_t time;
-  int32_t longitude;
-  int32_t latitude;
-  int32_t altitude_ellipsoid;
-  int32_t altitude_msl;
-  uint32_t horizontal_accuracy;
-  uint32_t vertical_accuracy;
+  uint32_t Time;
+  int32_t Longitude;
+  int32_t Latitude;
+  int32_t Altitude_Ellipsoid;
+  int32_t Altitude_MSL;
+  uint32_t Horizontal_Accuracy;
+  uint32_t Vertical_Accuracy;
 };
 
 struct Ublox_Navigation_Solution
 {
-  uint32_t time;
-  int32_t time_nsec;
-  int16_t week;
-  uint8_t fix_type;
-  uint8_t fix_status;
-  int32_t ecef_x;
-  int32_t ecef_y;
-  int32_t ecef_z;
-  uint32_t position_accuracy_3d;
-  int32_t ecef_x_velocity;
-  int32_t ecef_y_velocity;
-  int32_t ecef_z_velocity;
-  uint32_t speed_accuracy;
-  uint16_t position_DOP;
-  uint8_t res;
-  uint8_t satellites;
-  uint32_t res2;
+  uint32_t Time;
+  int32_t Time_NSec;
+  int16_t Week;
+  uint8_t Fix_Type;
+  uint8_t Fix_Status;
+  int32_t ECEF_X;
+  int32_t ECEF_Y;
+  int32_t ECEF_Z;
+  uint32_t Position_Accuracy_3D;
+  int32_t ECEF_X_Velocity;
+  int32_t ECEF_Y_Velocity;
+  int32_t ECEF_Z_Velocity;
+  uint32_t Speed_Accuracy;
+  uint16_t Position_DOP;
+  uint8_t Res;
+  uint8_t Satellites;
+  uint32_t Res2;
 };
 
 struct Ublox_Navigation_VelNED
 {
-  uint32_t time;
-  int32_t ned_north;
-  int32_t ned_east;
-  int32_t ned_down;
-  uint32_t speed_3d;
-  uint32_t speed_2d;
-  int32_t heading_2d;
-  uint32_t speed_accuracy;
-  uint32_t heading_accuracy;
+  uint32_t Time;
+  int32_t NED_North;
+  int32_t NED_East;
+  int32_t NED_Down;
+  uint32_t Speed_3D;
+  uint32_t Speed_2D;
+  int32_t Heading_2D;
+  uint32_t Speed_Accuracy;
+  uint32_t Heading_Accuracy;
 };
 
 static union
@@ -348,14 +348,14 @@ void GetAllGPSData(void)
   {
 
   case MSG_POSLLH:
-    GPS_Coordinates_Vector[1] = Buffer.PositionLLH.longitude;
-    GPS_Coordinates_Vector[0] = Buffer.PositionLLH.latitude;
-    GPS_Altitude = Buffer.PositionLLH.altitude_msl / 1000;
+    GPS_Coordinates_Vector[1] = Buffer.PositionLLH.Longitude;
+    GPS_Coordinates_Vector[0] = Buffer.PositionLLH.Latitude;
+    GPS_Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
     GPS_3DFIX = Next_GPSFix;
     break;
 
   case MSG_STATUS:
-    Next_GPSFix = ((Buffer.Solution.fix_status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.fix_type == FIX_3D));
+    Next_GPSFix = ((Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D));
     if (!Next_GPSFix)
     {
       GPS_3DFIX = false;
@@ -363,23 +363,26 @@ void GetAllGPSData(void)
     break;
 
   case MSG_SOL:
-    Next_GPSFix = (Buffer.Solution.fix_status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.fix_type == FIX_3D);
+    Next_GPSFix = (Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D);
     if (!Next_GPSFix)
     {
       GPS_3DFIX = false;
     }
-    GPS_NumberOfSatellites = Buffer.Solution.satellites;
-    GPS_HDOP = Buffer.Solution.position_DOP;
+    GPS_NumberOfSatellites = Buffer.Solution.Satellites;
+    GPS_HDOP = Buffer.Solution.Position_DOP;
     break;
 
   case MSG_VELNED:
-    GPS_Ground_Speed = Buffer.VelocityNED.speed_2d;
-    GPS_Ground_Course = (uint16_t)(Buffer.VelocityNED.heading_2d / 10000);
+    GPS_Ground_Speed = Buffer.VelocityNED.Speed_2D;
+    GPS_Ground_Course = (uint16_t)(Buffer.VelocityNED.Heading_2D / 10000);
     //APENAS PARA AERO MODE
     if (GPS_Ground_Speed > 100)
     {
       GPS_Ground_Course = WRap_180(GPS_Ground_Course * 10) / 10;
     }
+    GPSVelNED[NORTH] = Buffer.VelocityNED.NED_North;
+    GPSVelNED[EAST] = Buffer.VelocityNED.NED_East;
+    GPSVelNED[DOWN] = Buffer.VelocityNED.NED_Down;
     break;
   }
 }

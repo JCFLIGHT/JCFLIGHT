@@ -84,6 +84,7 @@ int16_t I2CErrors;
 int16_t SlipAngleForAirPlane;
 int16_t AttitudeThrottleMin;
 int16_t AttitudeThrottleMax;
+int16_t GPSVelNED[3];
 volatile int16_t Fail_Safe_System;
 
 //*******************************************************

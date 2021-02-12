@@ -36,16 +36,20 @@ FILE_COMPILE_FOR_SPEED
 //INSTANCIAS PARA O LPF
 static BiquadFilter_Struct BiquadAccLPF[3];
 static BiquadFilter_Struct BiquadGyroLPF[3];
+#ifndef __AVR_ATmega2560__
 //INSTANCIAS PARA O NOTCH
 static BiquadFilter_Struct BiquadAccNotch[3];
 static BiquadFilter_Struct BiquadGyroNotch[3];
+#endif
 
 bool ActiveKalman = false;
 
 int16_t Biquad_Acc_LPF = 0;
 int16_t Biquad_Gyro_LPF = 0;
+#ifndef __AVR_ATmega2560__
 int16_t Biquad_Acc_Notch = 0;
 int16_t Biquad_Gyro_Notch = 0;
+#endif
 
 void IMU_Filters_Initialization()
 {
@@ -61,9 +65,6 @@ void IMU_Filters_Initialization()
   //CARREGA OS VALORES GUARDADOS DO LPF
   Biquad_Acc_LPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Biquad_Gyro_LPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
-  //CARREGA OS VALORES GUARDADOS DO NOTCH
-  Biquad_Acc_Notch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
-  Biquad_Gyro_Notch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
   //GERA UM COEFICIENTE PARA O LPF DO ACELEROMETRO
   BIQUADFILTER.Settings(&BiquadAccLPF[ROLL], Biquad_Acc_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
   BIQUADFILTER.Settings(&BiquadAccLPF[PITCH], Biquad_Acc_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
@@ -73,6 +74,9 @@ void IMU_Filters_Initialization()
   BIQUADFILTER.Settings(&BiquadGyroLPF[PITCH], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
   BIQUADFILTER.Settings(&BiquadGyroLPF[YAW], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
 #ifndef __AVR_ATmega2560__
+  //CARREGA OS VALORES GUARDADOS DO NOTCH
+  Biquad_Acc_Notch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
+  Biquad_Gyro_Notch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
   //GERA UM COEFICIENTE PARA O NOTCH DO ACELEROMETRO
   BIQUADFILTER.Settings(&BiquadAccNotch[ROLL], Biquad_Acc_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);
   BIQUADFILTER.Settings(&BiquadAccNotch[PITCH], Biquad_Acc_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);

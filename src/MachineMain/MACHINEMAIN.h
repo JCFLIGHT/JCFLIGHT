@@ -21,7 +21,7 @@
 void MachineInit();
 void MachineRun();
 #ifndef __AVR_ATmega2560__
-#define MachineInit() setup() 
-#define MachineRun() loop() 
+#define MachineInit() setup()
+#define MachineRun() loop()
 #endif
 #endif

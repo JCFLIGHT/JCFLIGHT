@@ -323,7 +323,7 @@ static float CalculateAccelerometerWeight()
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[YAW] / ACC_1G);
 
   //CALCULA A CURVA DE SENO DA MAGNITUDE DO ACELEROMETRO
-  const float AccWeight_Nearness = SineCurve(sqrtf(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS) * NEARNESS;
+  const float AccWeight_Nearness = Sine_Curve(sqrtf(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS) * NEARNESS;
 
   return AccWeight_Nearness;
 }
@@ -390,10 +390,6 @@ void AHRS_Update()
 
   if (GetFrameStateOfAirPlane())
   {
-    //SLIP ANGLE PARA O MODO PLANE
-    SlipAngleForAirPlane = ApproximationOfAtan2ForTurnAssist(IMU.AccelerometerRead[ROLL], ABS_16BITS(IMU.AccelerometerRead[YAW]));
-    SlipAngleForAirPlane = Constrain_16Bits(SlipAngleForAirPlane, -900, 900); //APLICA LIMITES DE -90 Á +90 GRAUS
-
     bool canUseCOG = (GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300);
 
     if (I2C.CompassFound)

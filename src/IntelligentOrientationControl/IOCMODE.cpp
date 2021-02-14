@@ -33,15 +33,15 @@ void IOC_Mode_Update()
     const float HeadingDifference = ConvertToRadians(ConvertDeciDegreesToDegrees(ATTITUDE.CompassHeading) - ConvertDeciDegreesToDegrees(IOC_Initial_Compass));
     const float CosineDifference = Fast_Cosine(HeadingDifference);
     const float SineDifference = Fast_Sine(HeadingDifference);
-    const int16_t RCController_PITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;
+    const int16_t CalcedRCControllerPITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;
     RCController[ROLL] = RCController[ROLL] * CosineDifference - RCController[PITCH] * SineDifference;
-    RCController[PITCH] = RCController_PITCH;
+    RCController[PITCH] = CalcedRCControllerPITCH;
   }
 #ifdef DEBUG_IOC
-  FastSerialPrintln(PSTR("RCController[ROLL]:%d RCController[PITCH]:%d RCController_PITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
+  FastSerialPrintln(PSTR("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
                     RCController[ROLL],
                     RCController[PITCH],
-                    RCController_PITCH,
+                    CalcedRCControllerPITCH,
                     HeadingDifference,
                     CosineDifference,
                     SineDifference);

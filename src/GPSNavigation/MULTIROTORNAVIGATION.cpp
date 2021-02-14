@@ -29,7 +29,8 @@
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
-#define NAVTILTCOMPENSATION 20 //RETIRADO DA ARDUPILOT
+#define NAVTILTCOMPENSATION 20  //RETIRADO DA ARDUPILOT
+#define GPS_BANK_ANGLE_MAX 3000 //30 GRAUS
 
 static void GPS_Calcule_Bearing(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, int32_t *Bearing);
 static void GPS_Calcule_Distance_In_CM(int32_t *Latitude_One, int32_t *Longitude_One, int32_t *Latitude_Two, int32_t *Longitude_Two, uint32_t *CalculateDistance);
@@ -56,7 +57,6 @@ int32_t Target_Bearing;
 int32_t GPSDistanceToHome[2];
 int32_t Original_Target_Bearing;
 int32_t Coordinates_To_Navigation[2];
-static int32_t Coordinates_From_Navigation[2];
 
 void GPS_Process_FlightModes(void)
 {
@@ -137,7 +137,7 @@ void GPS_Process_FlightModes(void)
       }
       else if (GetAltitudeReached())
       {
-        Set_Points_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1]);
+        Set_Next_Point_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1]);
         NavigationMode = Do_RTH_Enroute;
       }
       break;
@@ -200,7 +200,7 @@ void GPS_Process_FlightModes(void)
 
 void GPS_Adjust_Heading()
 {
-  HeadingHoldTarget = WRap_180(Target_Bearing) / 100;
+  HeadingHoldTarget = WRap_18000(Target_Bearing) / 100;
 }
 
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput)
@@ -208,17 +208,14 @@ void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput)
   ScaleDownOfLongitude = cos(LatitudeVectorInput * 1.0e-7f * 0.01745329251f);
 }
 
-void Set_Points_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Destiny,
-                              int32_t *Latitude_Actual, int32_t *Longitude_Actual)
+void Set_Next_Point_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Destiny)
 {
   Coordinates_To_Navigation[0] = *Latitude_Destiny;
   Coordinates_To_Navigation[1] = *Longitude_Destiny;
-  Coordinates_From_Navigation[0] = *Latitude_Actual;
-  Coordinates_From_Navigation[1] = *Longitude_Actual;
   GPS_Calcule_Longitude_Scaling(*Latitude_Destiny);
   Circle_Mode_Update();
-  GPS_Calcule_Bearing(&Coordinates_From_Navigation[0], &Coordinates_From_Navigation[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
-  GPS_Calcule_Distance_In_CM(&Coordinates_From_Navigation[0], &Coordinates_From_Navigation[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
+  GPS_Calcule_Bearing(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
+  GPS_Calcule_Distance_In_CM(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1], &Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
   INS.PositionToHold[0] = (Coordinates_To_Navigation[0] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
   INS.PositionToHold[1] = (Coordinates_To_Navigation[1] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
   Coordinates_Navigation_Speed = 100;
@@ -229,7 +226,7 @@ bool Point_Reached(void)
 {
   int32_t TargetCalculed;
   TargetCalculed = Target_Bearing - Original_Target_Bearing;
-  TargetCalculed = WRap_180(TargetCalculed);
+  TargetCalculed = WRap_18000(TargetCalculed);
   return (ABS_32BITS(TargetCalculed) > 10000);
 }
 
@@ -311,7 +308,7 @@ static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
     RateError = Constrain_32Bits(RateError, -1000, 1000);
     GPS_Navigation_Array[axis] = GPSGetProportional(RateError, &PositionHoldRatePID) + GPSGetIntegral(RateError, DeltaTime, &PositionHoldRatePIDArray[axis], &PositionHoldRatePID);
     GPS_Navigation_Array[axis] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[axis] * PositionHoldRatePID.kD), -2000, 2000);
-    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis], -3000, 3000);
+    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis], -GPS_BANK_ANGLE_MAX, GPS_BANK_ANGLE_MAX);
     NavigationPIDArray[axis].Integrator = PositionHoldRatePIDArray[axis].Integrator;
   }
 }
@@ -340,7 +337,7 @@ bool NavStateForPosHold()
 
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
 {
-#define CROSSTRACK_ERROR 0.4
+#define CROSSTRACK_ERROR 0.4 //TESTAR COM 1 FUTURAMENTE
   uint8_t axis;
   float Trigonometry[2];
   float NavCompensation;
@@ -374,7 +371,7 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
     {
       NavCompensation = 0;
     }
-    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis] + NavCompensation, -3000, 3000);
+    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis] + NavCompensation, -GPS_BANK_ANGLE_MAX, GPS_BANK_ANGLE_MAX);
     PositionHoldRatePIDArray[axis].Integrator = NavigationPIDArray[axis].Integrator;
   }
 }
@@ -415,15 +412,12 @@ void Do_Mode_RTH_Now()
 
 void Reset_Home_Point(void)
 {
-  if (GPS_3DFIX && GPS_NumberOfSatellites >= 5)
-  {
-    Stored_Coordinates_Home_Point[0] = GPS_Coordinates_Vector[0];
-    Stored_Coordinates_Home_Point[1] = GPS_Coordinates_Vector[1];
-    GPS_Calcule_Longitude_Scaling(GPS_Coordinates_Vector[0]);
-    Navigation_Bearing_RTH = ATTITUDE.AngleOut[YAW];
-    GPS_Altitude_For_Plane = GPS_Altitude;
-    Home_Point = true;
-  }
+  Stored_Coordinates_Home_Point[0] = GPS_Coordinates_Vector[0];
+  Stored_Coordinates_Home_Point[1] = GPS_Coordinates_Vector[1];
+  GPS_Calcule_Longitude_Scaling(GPS_Coordinates_Vector[0]);
+  Navigation_Bearing_RTH = ATTITUDE.AngleOut[YAW];
+  GPS_Altitude_For_Plane = GPS_Altitude;
+  Home_Point = true;
 }
 
 void GPS_Reset_Navigation(void)
@@ -456,19 +450,6 @@ void LoadGPSParameters(void)
   NavigationPID.kI = (float)PID[PIDGPSNAVIGATIONRATE].IntegratorVector / 100.0;
   NavigationPID.kD = (float)PID[PIDGPSNAVIGATIONRATE].DerivativeVector / 1000.0;
   NavigationPID.IntegratorMax = 20 * 100;
-}
-
-int32_t WRap_180(int32_t AngleInput)
-{
-  if (AngleInput > 18000)
-  {
-    AngleInput -= 36000;
-  }
-  if (AngleInput < -18000)
-  {
-    AngleInput += 36000;
-  }
-  return AngleInput;
 }
 
 void RTH_Altitude_EEPROM()

@@ -145,47 +145,6 @@ float ConvertDeciDegreesToDegrees(float Inputvalue)
     return (Inputvalue / 10);
 }
 
-//ESSA FUNÇÃO GASTA 199us PARA CALCULAR O RESULTADO
-int16_t ApproximationOfAtan2ForTurnAssist(int16_t AccRoll, int16_t AccYaw)
-{
-    float Difference = AccRoll;
-    int16_t Ata2Result;
-    uint8_t CalculateABS;
-    CalculateABS = ABS_16BITS(AccRoll) < ABS_16BITS(AccYaw);
-    if (CalculateABS)
-    {
-        Difference = Difference / AccYaw;
-    }
-    else
-    {
-        Difference = AccYaw / Difference;
-    }
-    Ata2Result = 2046.43f * (Difference / (3.5714f + Difference * Difference));
-    if (CalculateABS)
-    {
-        if (AccYaw < 0)
-        {
-            if (AccRoll < 0)
-            {
-                Ata2Result -= 1800;
-            }
-            else
-            {
-                Ata2Result += 1800;
-            }
-        }
-    }
-    else
-    {
-        Ata2Result = 900 - Ata2Result;
-        if (AccRoll < 0)
-        {
-            Ata2Result -= 1800;
-        }
-    }
-    return Ata2Result;
-}
-
 uint16_t SquareRootU16Bits(uint16_t ValueInput)
 {
     uint16_t Operation = ValueInput;
@@ -309,7 +268,25 @@ float Fast_AtanCosine(float X)
     }
 }
 
-float SineCurve(const float InputValue, const float CurveWidth)
+float Sine_Curve(const float InputValue, const float CurveWidth)
 {
     return pow(2.71828182845904523536f, -SquareFloat(InputValue) / (2.0f * SquareFloat(CurveWidth)));
+}
+
+float Fast_Tangent(float InputValue)
+{
+    return Fast_Sine(InputValue) / Fast_Cosine(InputValue);
+}
+
+int32_t WRap_18000(int32_t AngleInput)
+{
+    if (AngleInput > 18000)
+    {
+        AngleInput -= 36000;
+    }
+    if (AngleInput < -18000)
+    {
+        AngleInput += 36000;
+    }
+    return AngleInput;
 }

@@ -89,9 +89,13 @@ void CompassReadClass::Initialization()
       SCHEDULERTIME.Sleep(100);
       InitialReadBufferData();
       if (!PushBias(0x011))
+      {
         BiasOk = false;
+      }
       if (!PushBias(0x012))
+      {
         BiasOk = false;
+      }
       if (BiasOk)
       {
         //CALCULA O GANHO PARA CADA EIXO DO COMPASS
@@ -121,17 +125,23 @@ bool CompassReadClass::PushBias(uint8_t InputBias)
     ABS_MagRead = ABS_16BITS(IMU.CompassRead[ROLL]);
     XYZ_CompassBias[ROLL] += ABS_MagRead;
     if (ABS_MagRead > 4096)
+    {
       return false;
+    }
     //PITCH
     ABS_MagRead = ABS_16BITS(IMU.CompassRead[PITCH]);
     XYZ_CompassBias[PITCH] += ABS_MagRead;
     if (ABS_MagRead > 4096)
+    {
       return false;
+    }
     //YAW
     ABS_MagRead = ABS_16BITS(IMU.CompassRead[YAW]);
     XYZ_CompassBias[YAW] += ABS_MagRead;
     if (ABS_MagRead > 4096)
+    {
       return false;
+    }
   }
   return true; //OK,NENHUMA LEITURA DO MAG EXCEDEU 2^12
 }

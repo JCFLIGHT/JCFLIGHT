@@ -32,11 +32,14 @@ void RC_Sticks_Update()
 {
   if (!COMMAND_ARM_DISARM)
   {
-    if ((ArmDisarmConfig == 0) && (StickStateToArm()) && (!BATTERY.LowBattPreventArm))
+    if ((ArmDisarmConfig == 0) && (StickStateToArm()))
     {
-      if (ArmDelayedState())
+      if (!BATTERY.LowBattPreventArm)
       {
-        PreArm_Delay = true;
+        if (ArmDelayedState())
+        {
+          PreArm_Delay = true;
+        }
       }
     }
     else
@@ -48,8 +51,15 @@ void RC_Sticks_Update()
   {
     if ((ArmDisarmConfig == 0) && (StickStateToDisarm()))
     {
-      COMMAND_ARM_DISARM = false;
-      BEEPER.Play(BEEPER_DISARMING);
+      if (DisarmDelayedState())
+      {
+        COMMAND_ARM_DISARM = false;
+        BEEPER.Play(BEEPER_DISARMING);
+      }
+    }
+    else
+    {
+      ResetDisarmDelayed();
     }
   }
   if (RadioControllOutput[THROTTLE] <= 1100)

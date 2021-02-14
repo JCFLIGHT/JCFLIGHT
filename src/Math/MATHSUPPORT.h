@@ -43,12 +43,13 @@ float ConvertToRadians(float InputValue);
 float ConvertRadiansToDeciDegrees(float Inputvalue);
 float ConvertDeciDegreesToRadians(float Inputvalue);
 float ConvertDeciDegreesToDegrees(float Inputvalue);
-int16_t ApproximationOfAtan2ForTurnAssist(int16_t AccRoll, int16_t AccYaw);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);
 float Fast_Sine(float X);
 float Fast_Cosine(float X);
 float Fast_Atan2(float Y, float X);
 float Fast_AtanCosine(float X);
-float SineCurve(const float InputValue, const float CurveWidth);
+float Sine_Curve(const float InputValue, const float CurveWidth);
+float Fast_Tangent(float InputValue);
+int32_t WRap_18000(int32_t AngleInput);
 #endif

@@ -23,5 +23,6 @@ extern Struct_Vector3x3 BodyFrameAcceleration;
 extern Struct_Vector3x3 BodyFrameRotation;
 void AHRS_Initialization();
 void AHRS_Update();
+float CosineAHRSTiltAngle(void);
 bool CheckAnglesInclination(int16_t Angle);
 #endif

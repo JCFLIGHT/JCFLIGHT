@@ -25,6 +25,7 @@
 //TIMER DE DESLIGAMENTO AUTOMATICO DOS MOTORES POR INATIVADADE DO THROTTLE
 //**************************************************************************
 
+#define AUTO_DISARM_TIME 5 //SEGUNDOS
 #define THROTTLE_VALUE_MAX 1100
 #define YPR_VALUE_MIN 1450
 #define YPR_VALUE_MAX 1550
@@ -51,8 +52,8 @@ void Desarm_LowThrottle()
     Counter_One_Hertz++;
     if (Counter_One_Hertz >= 50)
     {
-      TimerDesarm++;        //INICIA A CONTAGEM
-      if (TimerDesarm == 4) //4 CONTAGENS = 4 SEGUNDOS
+      TimerDesarm++; //INICIA A CONTAGEM
+      if (TimerDesarm == AUTO_DISARM_TIME)
       {
         if (COMMAND_ARM_DISARM && !Cancel_Arm_Disarm)
         {

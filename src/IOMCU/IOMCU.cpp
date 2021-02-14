@@ -216,7 +216,6 @@ struct _SendRadioControlGCSParameters
     uint8_t SendYawRate;
     int16_t SendRCPulseMin;
     int16_t SendRCPulseMax;
-    int16_t SendAHThrottleRover;
     uint8_t SendAHDeadZone;
     uint8_t SendAHSafeAltitude;
     uint8_t SendAHMinVelVertical;
@@ -264,7 +263,6 @@ struct _GetRadioControlGCSParameters
     uint8_t GetYawRate;
     int16_t GetRCPulseMin;
     int16_t GetRCPulseMax;
-    int16_t GetAHThrottleRover;
     uint8_t GetAHDeadZone;
     uint8_t GetAHSafeAltitude;
     uint8_t GetAHMinVelVertical;
@@ -1139,7 +1137,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(int16_t) * 28)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 27)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleMiddle, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleExpo, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCRate, VAR_8BITS);
@@ -1149,7 +1147,6 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendRadioControlGCSParameters.SendYawRate, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCPulseMin, VAR_16BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCPulseMax, VAR_16BITS);
-        GCS_Send_Data(SendRadioControlGCSParameters.SendAHThrottleRover, VAR_16BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendAHDeadZone, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendAHSafeAltitude, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendAHMinVelVertical, VAR_8BITS);
@@ -1545,11 +1542,6 @@ void GCSClass::Save_Radio_Control_Configuration()
         STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, GetRadioControlGCSParameters.GetRCPulseMax);
     }
 
-    if (GetRadioControlGCSParameters.GetAHThrottleRover != STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR))
-    {
-        STORAGEMANAGER.Write_16Bits(AH_THROTTLE_ROVER_ADDR, GetRadioControlGCSParameters.GetAHThrottleRover);
-    }
-
     if (GetRadioControlGCSParameters.GetAHDeadZone != STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR))
     {
         STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, GetRadioControlGCSParameters.GetAHDeadZone);
@@ -1870,7 +1862,7 @@ void GCSClass::Default_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO PARACHUTE
     STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DO CONTROLE DO GIMBAL
     STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO TIPO DE FRAME
-    STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODULO RECEPTOR PPM
+    STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODULO RECEPTOR
     STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA UART_NUMB_2
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, 0);  //LIMPA A CONFIGURAÇÃO DE ROTAÇÃO DO COMPASS
     STORAGEMANAGER.Write_8Bits(COMPASS_TYPE_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DO MODELO DO COMPASS
@@ -1901,7 +1893,6 @@ void GCSClass::Default_RadioControl_Configuration()
     STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, 1000);
     STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, 1900);
-    STORAGEMANAGER.Write_16Bits(AH_THROTTLE_ROVER_ADDR, 1500);
     STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, 70);
     STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, 5);
     STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, 50);
@@ -2019,7 +2010,6 @@ void GCSClass::UpdateParametersToGCS()
     SendRadioControlGCSParameters.SendYawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
     SendRadioControlGCSParameters.SendRCPulseMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
     SendRadioControlGCSParameters.SendRCPulseMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
-    SendRadioControlGCSParameters.SendAHThrottleRover = STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR);
     SendRadioControlGCSParameters.SendAHDeadZone = STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR);
     SendRadioControlGCSParameters.SendAHSafeAltitude = STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR);
     SendRadioControlGCSParameters.SendAHMinVelVertical = STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR);

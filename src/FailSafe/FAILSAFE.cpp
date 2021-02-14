@@ -23,11 +23,12 @@
 #include "Math/MATHSUPPORT.h"
 #include "Buzzer/BUZZER.h"
 
-#define THIS_LOOP_RATE 50     //HZ
-#define FAILSAFE_DELAY 1      //SEGUNDO
-#define FAILSAFE_DELAY2 0.25f //MS
-#define STICK_MOTION 50       //50 uS DE DEFLEXÃO
-#define RX_RECOVERY_TIME 15   //NO MINIMO 15 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE
+#define THIS_LOOP_RATE 50                //HZ
+#define IMMEDIATELY_FAILSAFE_DELAY 0.25f //MS
+#define AUTOPILOT_FAILSAFE_DELAY 1       //SEGUNDO
+#define STICK_MOTION 50                  //50 uS DE DEFLEXÃO
+#define RX_RECOVERY_TIME_ARMED 15        //NO MINIMO 15 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE EM MODO ARMADO
+#define RX_RECOVERY_TIME_DESARMED 2      //NO MINIMO 2 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE EM MODO DESARMADO
 
 bool FailSafeGoodRunBeep = false;
 int16_t RxConsistenceCount = 0;
@@ -92,9 +93,9 @@ bool FailSafeCheckStickMotion()
   return CalcedRcDelta >= STICK_MOTION;
 }
 
-bool GetRxConsistence()
+bool GetRxConsistence(uint8_t RecoveryTime)
 {
-  if (RxConsistenceCount >= (THIS_LOOP_RATE * RX_RECOVERY_TIME))
+  if (RxConsistenceCount >= (THIS_LOOP_RATE * RecoveryTime))
   {
     return true;
   }
@@ -127,15 +128,25 @@ void AbortFailSafe()
   {
     return;
   }
-  //VERIFICA O TEMPO MINIMO PARA CONSIDERAR QUE O PILOTO AUTOMATICO DO FAIL-SAFE ESTÁ PRONTO PARA SER DESLIGADO
-  if (!GetRxConsistence())
+  if (COMMAND_ARM_DISARM)
   {
-    return;
+    //VERIFICA O TEMPO MINIMO PARA CONSIDERAR QUE O PILOTO AUTOMATICO DO FAIL-SAFE ESTÁ PRONTO PARA SER DESLIGADO
+    if (!GetRxConsistence(RX_RECOVERY_TIME_ARMED))
+    {
+      return;
+    }
+    //SE O PILOTO MOVER OS STICKS,O FAIL-SAFE IRÁ SER ABORTADO
+    if (!FailSafeCheckStickMotion())
+    {
+      return;
+    }
   }
-  //SE O PILOTO MOVER OS STICKS,O FAIL-SAFE IRÁ SER ABORTADO
-  if (!FailSafeCheckStickMotion())
+  else
   {
-    return;
+    if (!GetRxConsistence(RX_RECOVERY_TIME_DESARMED))
+    {
+      return;
+    }
   }
   ResetFailSafe();
 }
@@ -180,13 +191,13 @@ void FailSafeBuzzerNotification()
 void FailSafeCheck()
 {
   //FAIL-SAFE IMEDIATO CASO O USUARIO ESTIVER USANDO O ARM-DISARM POR CANAL AUX E O DESARM-LOW-THR
-  if (GetValidFailSafeState(FAILSAFE_DELAY2))
+  if (GetValidFailSafeState(IMMEDIATELY_FAILSAFE_DELAY))
   {
     ImmediatelyFailSafe = true;
   }
 
   //FAIL-SAFE LENTO PARA DIFERENCIAR SE É UMA FALHA OU REALMENTE UMA PERDA DE SINAL
-  if (GetValidFailSafeState(FAILSAFE_DELAY))
+  if (GetValidFailSafeState(AUTOPILOT_FAILSAFE_DELAY))
   {
     Fail_Safe_Event = true;
     NormalizeFlightModesToFailSafe();

@@ -307,34 +307,23 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
 
 int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
 {
-  static bool OkToTurnCoordination = false;
   if (!TurnCoordinatorMode)
   {
     return (RadioControlToTurn - IMU.GyroscopeRead[YAW]);
   }
   else
   {
-    if (ABS_16BITS(ATTITUDE.AngleOut[ROLL]) > 100) //100 = 10 GRAUS DE INCLINAÇÃO
+    if (CosineAHRSTiltAngle() >= 0.173648f) //10 GRAUS DE INCLINAÇÃO
     {
-      if (!OkToTurnCoordination)
-      {
-        IntegralGyroError_Yaw = 0;
-        OkToTurnCoordination = true;
-      }
       //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1000CM/S = 36KM/H
       int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_State() ? AirSpeedCalcedInCM : ReferenceAirSpeed;
       //10KM/H - 216KM/H
-      AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 360, 6000);
-      SlipAngleForAirPlane *= 980.665f / AirSpeedForCoordinatedTurn;
-      return (RadioControlToTurn + SlipAngleForAirPlane);
+      AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 300, 6000);
+      CoordinatedTurnRateEarthFrame = ConvetToDegrees(980.665f * Fast_Tangent(-ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL])) / AirSpeedForCoordinatedTurn);
+      return (RadioControlToTurn + CoordinatedTurnRateEarthFrame);
     }
     else
     {
-      if (OkToTurnCoordination)
-      {
-        IntegralGyroError_Yaw = 0;
-        OkToTurnCoordination = false;
-      }
       return (RadioControlToTurn - IMU.GyroscopeRead[YAW]);
     }
   }

@@ -87,30 +87,31 @@ void Circle_Mode_Update()
 
 void PlaneUpdateNavigation(void)
 {
+  uint8_t RTH_AltitudeOfPlane = RTH_Altitude;
+  float TimePIDOfNavigationPrimary;
+  int16_t Read_Throttle = RadioControllOutput[THROTTLE];
   int16_t GPS_Heading = GPS_Ground_Course;
   int16_t Current_Heading;
   int16_t AltitudeDifference = 0;
-  uint8_t RTH_AltitudeOfPlane = RTH_Altitude;
-  int16_t Saturation[2] = {0, 0};
+  int16_t AltitudeSaturation[2] = {0, 0};
+  int16_t HeadingDifference;
+  int16_t GroundSpeed;
+  int16_t SpeedDifference;
+  int16_t CurrentAltitude = GPS_Altitude - GPS_Altitude_For_Plane;
+  int16_t TargetAltitude = GPS_AltitudeHold_For_Plane - GPS_Altitude_For_Plane;
   static int16_t NavigationDeltaSumPID;
   static int16_t AltitudeDeltaSumPID;
   static int16_t GPSTargetBearing;
   static int16_t AltitudeError;
   static int16_t GetThrottleToNavigation;
-  int16_t Read_Throttle = RadioControllOutput[THROTTLE];
-  int16_t HeadingDifference;
-  float TimePIDOfNavigationPrimary;
   static uint32_t TimePIDOfNavigation;
-  int16_t GroundSpeed;
-  int16_t SpeedDifference;
   static uint32_t NavTimer = 0;
-  int16_t CurrentAltitude = GPS_Altitude - GPS_Altitude_For_Plane;
-  int16_t TargetAltitude = GPS_AltitudeHold_For_Plane - GPS_Altitude_For_Plane;
+
   if (CLIMBOUT_FW && CurrentAltitude < RTH_AltitudeOfPlane)
   {
     GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + RTH_AltitudeOfPlane;
   }
-  GPS_Heading = WRap_180(GPS_Heading * 10) / 10;
+  GPS_Heading = WRap_18000(GPS_Heading * 10) / 10;
   Current_Heading = GPS_Heading / 10;
   GPSTargetBearing = Original_Target_Bearing / 100;
   HeadingDifference = GPSTargetBearing - Current_Heading;
@@ -156,7 +157,7 @@ void PlaneUpdateNavigation(void)
     {
       HeadingDifference *= 0.1f;
     }
-    HeadingDifference = WRap_180(HeadingDifference * 100) / 100;
+    HeadingDifference = WRap_18000(HeadingDifference * 100) / 100;
     if (ABS_16BITS(HeadingDifference) > 170)
     {
       HeadingDifference = 175;
@@ -170,18 +171,18 @@ void PlaneUpdateNavigation(void)
     AltitudeError *= 10;
     IntegralErrorOfAltitude += (AltitudeError * Alt_kI) * TimePIDOfNavigationPrimary;
     IntegralErrorOfAltitude = Constrain_Float(IntegralErrorOfAltitude, -500, 500);
-    Saturation[0] = (AltitudeError - PreviousAltitudeDifference);
+    AltitudeSaturation[0] = (AltitudeError - PreviousAltitudeDifference);
     PreviousAltitudeDifference = AltitudeError;
-    if (ABS_16BITS(Saturation[0]) > 100)
+    if (ABS_16BITS(AltitudeSaturation[0]) > 100)
     {
-      Saturation[0] = 0;
+      AltitudeSaturation[0] = 0;
     }
     AltitudeVector[0] = AltitudeVector[1];
     AltitudeVector[1] = AltitudeVector[2];
     AltitudeVector[2] = AltitudeVector[3];
     AltitudeVector[3] = AltitudeVector[4];
     AltitudeVector[4] = AltitudeVector[5];
-    AltitudeVector[4] = Saturation[0];
+    AltitudeVector[4] = AltitudeSaturation[0];
     AltitudeDeltaSumPID = 0;
     AltitudeDeltaSumPID += AltitudeVector[0];
     AltitudeDeltaSumPID += AltitudeVector[1];
@@ -198,18 +199,18 @@ void PlaneUpdateNavigation(void)
     HeadingDifference *= 10;
     IntegralErrorOfNavigation += (HeadingDifference * Nav_kI) * TimePIDOfNavigationPrimary;
     IntegralErrorOfNavigation = Constrain_Float(IntegralErrorOfNavigation, -500, 500);
-    Saturation[1] = (HeadingDifference - PreviousHeadingDifference);
+    AltitudeSaturation[1] = (HeadingDifference - PreviousHeadingDifference);
     PreviousHeadingDifference = HeadingDifference;
-    if (ABS_16BITS(Saturation[1]) > 100)
+    if (ABS_16BITS(AltitudeSaturation[1]) > 100)
     {
-      Saturation[1] = 0;
+      AltitudeSaturation[1] = 0;
     }
     NavigationDifferenceVector[0] = NavigationDifferenceVector[1];
     NavigationDifferenceVector[1] = NavigationDifferenceVector[2];
     NavigationDifferenceVector[2] = NavigationDifferenceVector[3];
     NavigationDifferenceVector[3] = NavigationDifferenceVector[4];
     NavigationDifferenceVector[4] = NavigationDifferenceVector[5];
-    NavigationDifferenceVector[4] = Saturation[1];
+    NavigationDifferenceVector[4] = AltitudeSaturation[1];
     NavigationDeltaSumPID = 0;
     NavigationDeltaSumPID += NavigationDifferenceVector[0];
     NavigationDeltaSumPID += NavigationDifferenceVector[1];

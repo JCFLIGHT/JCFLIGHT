@@ -23,4 +23,5 @@ void CurvesRC_CalculeValue();
 int16_t RCControllerToRate(int16_t StickData, uint8_t Rate);
 int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo);
 uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection);
+int16_t RCLookupThrottleMiddle(void);
 #endif

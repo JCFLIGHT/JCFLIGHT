@@ -15,9 +15,9 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "SETFLIGHTMODE.h"
+#include "SETFLIGHTMODES.h"
 #include "Common/VARIABLES.h"
-#include "AUXFLIGHT.h"
+#include "FlightModes/AUXFLIGHT.h"
 
 void SetFlightModesToGCS()
 {
@@ -28,56 +28,56 @@ void SetFlightModesToGCS()
   {
     if (NavigationMode == Do_Landed)
     {
-      FlightMode = 13;
+      FlightMode = GCS_LANDED_MODE;
     }
     else
     {
-      FlightMode = 8;
+      FlightMode = GCS_LAND_MODE;
     }
   }
   else
   {
     if (AcroControlAux)
     {
-      FlightMode = 0;
+      FlightMode = GCS_ACRO_MODE;
     }
     if (IOCControlAux)
     {
-      FlightMode = 5;
+      FlightMode = GCS_IOC_MODE;
     }
     if (AltitudeHoldControlAux)
     {
-      FlightMode = 2;
+      FlightMode = GCS_ALTITUDE_HOLD_MODE;
     }
     if (GPSHoldControlAux)
     {
-      FlightMode = 4;
+      FlightMode = GCS_GPS_HOLD_MODE;
     }
     if (RTHControlAux)
     {
-      FlightMode = 6;
+      FlightMode = GCS_RTH_MODE;
     }
-    if (SportControlAux)
+    if (AttackControlAux)
     {
-      FlightMode = 3;
+      FlightMode = GCS_ATTACK_MODE;
     }
     if (AutoFlipControlAux)
     {
-      FlightMode = 11;
+      FlightMode = GCS_FLIP_MODE;
     }
-    if (AutoPilotControlAux)
+    if (WayPointControlAux)
     {
-      FlightMode = 12;
+      FlightMode = GCS_WAYPOINT_MODE;
     }
     if (AutoLandControlAux && !COMMAND_ARM_DISARM)
     {
-      FlightMode = 8;
+      FlightMode = GCS_LAND_MODE;
     }
     if (!AcroControlAux && !IOCControlAux && !AltitudeHoldControlAux &&
-        !GPSHoldControlAux && !RTHControlAux && !SportControlAux &&
-        !AutoFlipControlAux && !AutoPilotControlAux && !AutoLandControlAux)
+        !GPSHoldControlAux && !RTHControlAux && !AttackControlAux &&
+        !AutoFlipControlAux && !WayPointControlAux && !AutoLandControlAux)
     {
-      FlightMode = 1;
+      FlightMode = GCS_STABILIZE_MODE;
     }
   }
 }

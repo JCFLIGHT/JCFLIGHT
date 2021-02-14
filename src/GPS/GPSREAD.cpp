@@ -22,6 +22,7 @@
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "ProgMem/PROGMEM.h"
+#include "Math/MATHSUPPORT.h"
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464
@@ -61,9 +62,9 @@ struct Ublox_Navigation_Solution
 struct Ublox_Navigation_VelNED
 {
   uint32_t Time;
-  int32_t NED_North;
-  int32_t NED_East;
-  int32_t NED_Down;
+  int32_t North;
+  int32_t East;
+  int32_t Down;
   uint32_t Speed_3D;
   uint32_t Speed_2D;
   int32_t Heading_2D;
@@ -348,8 +349,8 @@ void GetAllGPSData(void)
   {
 
   case MSG_POSLLH:
-    GPS_Coordinates_Vector[1] = Buffer.PositionLLH.Longitude;
     GPS_Coordinates_Vector[0] = Buffer.PositionLLH.Latitude;
+    GPS_Coordinates_Vector[1] = Buffer.PositionLLH.Longitude;
     GPS_Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
     GPS_3DFIX = Next_GPSFix;
     break;
@@ -378,11 +379,11 @@ void GetAllGPSData(void)
     //APENAS PARA AERO MODE
     if (GPS_Ground_Speed > 100)
     {
-      GPS_Ground_Course = WRap_180(GPS_Ground_Course * 10) / 10;
+      GPS_Ground_Course = WRap_18000(GPS_Ground_Course * 10) / 10;
     }
-    GPSVelNED[NORTH] = Buffer.VelocityNED.NED_North;
-    GPSVelNED[EAST] = Buffer.VelocityNED.NED_East;
-    GPSVelNED[DOWN] = Buffer.VelocityNED.NED_Down;
+    GPSVelNED[NORTH] = Buffer.VelocityNED.North;
+    GPSVelNED[EAST] = Buffer.VelocityNED.East;
+    GPSVelNED[DOWN] = Buffer.VelocityNED.Down;
     break;
   }
 }

@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SETFLIGHTMODE_H
-#define SETFLIGHTMODE_H
+#ifndef SETFLIGHTMODES_H
+#define SETFLIGHTMODES_H
 #include "Arduino.h"
 void SetFlightModesToGCS();
 #endif

@@ -50,7 +50,7 @@ void Fast_Medium_Loop()
 {
         BEEPER.Run();
         Pre_Arm_Leds();
-        GimbalControll();
+        Gimbal_Controll();
         CrashCheck();
         PARACHUTE.Manual_Detect_Channel();
         PARACHUTE.Manual_Do_Now();

@@ -26,6 +26,8 @@
 //lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO DE PONTO FLUTUANTE (1.5 = 2 / 2.5 = 2)
 #define LRint lrint
 
+int16_t ThrottleRCMiddle = 0;
+
 void CurvesRC_SetValues()
 {
   ThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
@@ -47,6 +49,7 @@ void CurvesRC_CalculeValue()
   }
   int8_t NewValueCalculed;
   uint8_t ThrottleMiddlePoint;
+  ThrottleRCMiddle = AttitudeThrottleMin + (int32_t)(AttitudeThrottleMax - AttitudeThrottleMin) * ThrottleMiddle / 100;
   for (uint8_t IndexOfLookUpThrottle = 0; IndexOfLookUpThrottle < THROTTLE_LOOKUP_LENGTH; IndexOfLookUpThrottle++)
   {
     NewValueCalculed = 10 * IndexOfLookUpThrottle - ThrottleMiddle;
@@ -83,4 +86,9 @@ uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
 
   const uint8_t CalcedLookUpStep = CalcedDeflection / 100;
   return CalculeLookUpThrottle[CalcedLookUpStep] + (CalcedDeflection - CalcedLookUpStep * 100) * (CalculeLookUpThrottle[CalcedLookUpStep + 1] - CalculeLookUpThrottle[CalcedLookUpStep]) / 100;
+}
+
+int16_t RCLookupThrottleMiddle(void)
+{
+  return ThrottleRCMiddle;
 }

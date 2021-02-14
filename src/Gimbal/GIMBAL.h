@@ -18,5 +18,5 @@
 #ifndef GIMBAL_H_
 #define GIMBAL_H_
 #include "Arduino.h"
-void GimbalControll();
+void Gimbal_Controll();
 #endif

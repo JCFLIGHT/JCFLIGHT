@@ -83,7 +83,6 @@ extern int16_t GPS_Angle[3];
 extern int16_t HeadingHoldTarget;
 extern int16_t IOC_Initial_Compass;
 extern int16_t I2CErrors;
-extern int16_t SlipAngleForAirPlane;
 extern int16_t AttitudeThrottleMin;
 extern int16_t AttitudeThrottleMax;
 extern int16_t GPSVelNED[3];
@@ -92,6 +91,7 @@ extern volatile int16_t Fail_Safe_System;
 //*******************************************************
 //FLOAT 24 BITS COM EXPONENTE DE 8 BITS
 //*******************************************************
+extern float CoordinatedTurnRateEarthFrame;
 
 //*******************************************************
 //UNSIGNED 32 BITS (0 - 4.294.967.295)

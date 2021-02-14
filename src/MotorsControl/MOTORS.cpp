@@ -35,6 +35,10 @@ FILE_COMPILE_FOR_SPEED
 
 //#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
 
+//MAXIMO = 499
+//PARA DESATIVAR:COLOQUE O VALOR EM 500
+int16_t Yaw_Jump_Prevention = 200;
+
 void ConfigureRegisters(bool Run_Calibrate_ESC)
 {
 #ifdef __AVR_ATmega2560__
@@ -162,22 +166,30 @@ void PID_MixMotors()
   {
     return;
   }
+  if (NumberOfMotors >= 4 && Yaw_Jump_Prevention < 500)
+  {
+    //PREVINE UM "PULO" NO YAW,ESSE ERRO É UM PROBLEMA PRESENTE NA NAZA V2,
+    //MAS PRA QUE ELE ACONTEÇA,DEPENDE DO TIPO DE ESC E MOTOR QUE VOCÊ ESTÁ USANDO
+    PIDControllerApply[YAW] = Constrain_16Bits(PIDControllerApply[YAW],
+                                               -Yaw_Jump_Prevention - ABS_16BITS(RCController[YAW]),
+                                               Yaw_Jump_Prevention + ABS_16BITS(RCController[YAW]));
+  }
   MixingApplyPIDControl();
   if (GetFrameStateOfMultirotor())
   {
-    int16_t SuportMotor = MotorControl[MOTOR4];
+    int16_t MaximumMotor = MotorControl[MOTOR4];
     for (uint8_t MotorsCount = 1; MotorsCount < NumberOfMotors; MotorsCount++)
     {
-      if (MotorControl[MotorsCount] > SuportMotor)
+      if (MotorControl[MotorsCount] > MaximumMotor)
       {
-        SuportMotor = MotorControl[MotorsCount];
+        MaximumMotor = MotorControl[MotorsCount];
       }
     }
     for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
     {
-      if (SuportMotor > AttitudeThrottleMax)
+      if (MaximumMotor > AttitudeThrottleMax)
       {
-        MotorControl[MotorsCount] -= SuportMotor - AttitudeThrottleMax;
+        MotorControl[MotorsCount] -= MaximumMotor - AttitudeThrottleMax;
       }
       MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], AttitudeThrottleMin, AttitudeThrottleMax);
       if (RadioControllOutput[THROTTLE] < 1100)

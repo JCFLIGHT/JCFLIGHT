@@ -21,6 +21,8 @@
 bool CheckInclinationForArm(void);
 bool ArmDelayedState(void);
 void ResetArmDelayed(void);
+bool DisarmDelayedState(void);
+void ResetDisarmDelayed(void);
 bool StickStateToArm(void);
 bool StickStateToDisarm(void);
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue);

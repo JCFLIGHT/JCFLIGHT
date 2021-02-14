@@ -81,7 +81,6 @@ int16_t GPS_Navigation_Array[2];
 int16_t GPS_Angle[3];
 int16_t DirectionToHome;
 int16_t I2CErrors;
-int16_t SlipAngleForAirPlane;
 int16_t AttitudeThrottleMin;
 int16_t AttitudeThrottleMax;
 int16_t GPSVelNED[3];
@@ -90,6 +89,7 @@ volatile int16_t Fail_Safe_System;
 //*******************************************************
 //FLOAT 24 BITS COM EXPONENTE DE 8 BITS
 //*******************************************************
+float CoordinatedTurnRateEarthFrame;
 
 //*******************************************************
 //UNSIGNED 32 BITS (0 - 4.294.967.295)

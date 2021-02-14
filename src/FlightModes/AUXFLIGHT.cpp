@@ -19,7 +19,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Common/VARIABLES.h"
 #include "WayPointNavigation/WAYPOINT.h"
-#include "SETFLIGHTMODE.h"
+#include "ParamsToGCS/SETFLIGHTMODES.h"
 #include "BAR/BAR.h"
 
 //***********************************************************
@@ -34,9 +34,9 @@ uint8_t GPSHoldConfig,
     IOCConfig,
     AltitudeHoldConfig,
     AcroConfig,
-    SportConfig,
+    AttackConfig,
     AutoFlipConfig,
-    AutoPilotConfig,
+    WayPointConfig,
     FlightMode,
     ReceiverModel,
     ArmDisarmConfig,
@@ -50,9 +50,9 @@ int16_t AltitudeHoldControlAux,
     IOCControlAux,
     GimbalControlAux,
     AcroControlAux,
-    SportControlAux,
+    AttackControlAux,
     AutoFlipControlAux,
-    AutoPilotControlAux,
+    WayPointControlAux,
     ArmDisarmControlAux,
     AutoLandControlAux;
 
@@ -63,14 +63,14 @@ void AUXFLIGHTCLASS::LoadEEPROM(void)
   GPSHoldConfig = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);           //CHAVE AUX ATRIBUIDA PARA O MODO GPS-HOLD
   RTHConfig = STORAGEMANAGER.Read_8Bits(RTH_ADDR);                    //CHAVE AUX ATRIBUIDA PARA O MODO RTH
   AcroConfig = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);              //CHAVE AUX ATRIBUIDA PARA O MODO ACRO
-  SportConfig = STORAGEMANAGER.Read_8Bits(ATACK_ADDR);                //CHAVE AUX ATRIBUIDA PARA O MODO SPORT
+  AttackConfig = STORAGEMANAGER.Read_8Bits(ATACK_ADDR);                //CHAVE AUX ATRIBUIDA PARA O MODO SPORT
   ParachuteDetectTrigger = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR); //CONFIGURAÇÃO DO PARACHUTE
   AutoFlipConfig = STORAGEMANAGER.Read_8Bits(AUTOFLIP_ADDR);          //CHAVE AUX ATRIBUIDA PARA O MODO AUTO-FLIP
   GimbalControlAux = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);          //CANAL AUX ATRIBUIDO PARA O CONTROLE DO GIMBAL
   FrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR);              //TIPO DE FRAME SELECIONADO
   ReceiverModel = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);           //MODELO DO RADIO
   ArmDisarmConfig = STORAGEMANAGER.Read_8Bits(ARMDISARM_ADDR);        //CHAVE ATRIBUIDA AO ARMDISARM VIA CHAVE AUX
-  AutoPilotConfig = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR);      //CHAVE ATRIBUIDA AO MODO WAYPOINT
+  WayPointConfig = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR);      //CHAVE ATRIBUIDA AO MODO WAYPOINT
   AutoLandConfig = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);          //CHAVE ATRIBUIDA AO AUTO LAND
 }
 
@@ -582,103 +582,103 @@ void AUXFLIGHTCLASS::SelectMode(void)
   }
 
   //SPORT
-  switch (SportConfig)
+  switch (AttackConfig)
   {
 
   case AUXONELOW:
-    SportControlAux = AUX1_LOW;
+    AttackControlAux = AUX1_LOW;
     break;
 
   case AUXONEMIDDLE:
-    SportControlAux = AUX1_MID;
+    AttackControlAux = AUX1_MID;
     break;
 
   case AUXONEHIGH:
-    SportControlAux = AUX1_HIGH;
+    AttackControlAux = AUX1_HIGH;
     break;
 
   case AUXTWOLOW:
-    SportControlAux = AUX2_LOW;
+    AttackControlAux = AUX2_LOW;
     break;
 
   case AUXTWOMIDDLE:
-    SportControlAux = AUX2_MID;
+    AttackControlAux = AUX2_MID;
     break;
 
   case AUXTWOHIGH:
-    SportControlAux = AUX2_HIGH;
+    AttackControlAux = AUX2_HIGH;
     break;
 
   case AUXTHREELOW:
-    SportControlAux = AUX3_LOW;
+    AttackControlAux = AUX3_LOW;
     break;
 
   case AUXTHREEMIDDLE:
-    SportControlAux = AUX3_MID;
+    AttackControlAux = AUX3_MID;
     break;
 
   case AUXTHREEHIGH:
-    SportControlAux = AUX3_HIGH;
+    AttackControlAux = AUX3_HIGH;
     break;
 
   case AUXFOURLOW:
-    SportControlAux = AUX4_LOW;
+    AttackControlAux = AUX4_LOW;
     break;
 
   case AUXFOURMIDDLE:
-    SportControlAux = AUX4_MID;
+    AttackControlAux = AUX4_MID;
     break;
 
   case AUXFOURHIGH:
-    SportControlAux = AUX4_HIGH;
+    AttackControlAux = AUX4_HIGH;
     break;
 
   case AUXFIVELOW:
-    SportControlAux = AUX5_LOW;
+    AttackControlAux = AUX5_LOW;
     break;
 
   case AUXFIVEMIDDLE:
-    SportControlAux = AUX5_MID;
+    AttackControlAux = AUX5_MID;
     break;
 
   case AUXFIVEHIGH:
-    SportControlAux = AUX5_HIGH;
+    AttackControlAux = AUX5_HIGH;
     break;
 
   case AUXSIXLOW:
-    SportControlAux = AUX6_LOW;
+    AttackControlAux = AUX6_LOW;
     break;
 
   case AUXSIXMIDDLE:
-    SportControlAux = AUX6_MID;
+    AttackControlAux = AUX6_MID;
     break;
 
   case AUXSIXHIGH:
-    SportControlAux = AUX6_HIGH;
+    AttackControlAux = AUX6_HIGH;
     break;
 
   case AUXSEVENLOW:
-    SportControlAux = AUX7_LOW;
+    AttackControlAux = AUX7_LOW;
     break;
 
   case AUXSEVENMIDDLE:
-    SportControlAux = AUX7_MID;
+    AttackControlAux = AUX7_MID;
     break;
 
   case AUXSEVENHIGH:
-    SportControlAux = AUX7_HIGH;
+    AttackControlAux = AUX7_HIGH;
     break;
 
   case AUXEIGHTLOW:
-    SportControlAux = AUX8_LOW;
+    AttackControlAux = AUX8_LOW;
     break;
 
   case AUXEIGHTMIDDLE:
-    SportControlAux = AUX8_MID;
+    AttackControlAux = AUX8_MID;
     break;
 
   case AUXEIGHTHIGH:
-    SportControlAux = AUX8_HIGH;
+    AttackControlAux = AUX8_HIGH;
     break;
   }
 
@@ -784,103 +784,103 @@ void AUXFLIGHTCLASS::SelectMode(void)
   }
 
   //AUTO
-  switch (AutoPilotConfig)
+  switch (WayPointConfig)
   {
 
   case AUXONELOW:
-    AutoPilotControlAux = AUX1_LOW;
+    WayPointControlAux = AUX1_LOW;
     break;
 
   case AUXONEMIDDLE:
-    AutoPilotControlAux = AUX1_MID;
+    WayPointControlAux = AUX1_MID;
     break;
 
   case AUXONEHIGH:
-    AutoPilotControlAux = AUX1_HIGH;
+    WayPointControlAux = AUX1_HIGH;
     break;
 
   case AUXTWOLOW:
-    AutoPilotControlAux = AUX2_LOW;
+    WayPointControlAux = AUX2_LOW;
     break;
 
   case AUXTWOMIDDLE:
-    AutoPilotControlAux = AUX2_MID;
+    WayPointControlAux = AUX2_MID;
     break;
 
   case AUXTWOHIGH:
-    AutoPilotControlAux = AUX2_HIGH;
+    WayPointControlAux = AUX2_HIGH;
     break;
 
   case AUXTHREELOW:
-    AutoPilotControlAux = AUX3_LOW;
+    WayPointControlAux = AUX3_LOW;
     break;
 
   case AUXTHREEMIDDLE:
-    AutoPilotControlAux = AUX3_MID;
+    WayPointControlAux = AUX3_MID;
     break;
 
   case AUXTHREEHIGH:
-    AutoPilotControlAux = AUX3_HIGH;
+    WayPointControlAux = AUX3_HIGH;
     break;
 
   case AUXFOURLOW:
-    AutoPilotControlAux = AUX4_LOW;
+    WayPointControlAux = AUX4_LOW;
     break;
 
   case AUXFOURMIDDLE:
-    AutoPilotControlAux = AUX4_MID;
+    WayPointControlAux = AUX4_MID;
     break;
 
   case AUXFOURHIGH:
-    AutoPilotControlAux = AUX4_HIGH;
+    WayPointControlAux = AUX4_HIGH;
     break;
 
   case AUXFIVELOW:
-    AutoPilotControlAux = AUX5_LOW;
+    WayPointControlAux = AUX5_LOW;
     break;
 
   case AUXFIVEMIDDLE:
-    AutoPilotControlAux = AUX5_MID;
+    WayPointControlAux = AUX5_MID;
     break;
 
   case AUXFIVEHIGH:
-    AutoPilotControlAux = AUX5_HIGH;
+    WayPointControlAux = AUX5_HIGH;
     break;
 
   case AUXSIXLOW:
-    AutoPilotControlAux = AUX6_LOW;
+    WayPointControlAux = AUX6_LOW;
     break;
 
   case AUXSIXMIDDLE:
-    AutoPilotControlAux = AUX6_MID;
+    WayPointControlAux = AUX6_MID;
     break;
 
   case AUXSIXHIGH:
-    AutoPilotControlAux = AUX6_HIGH;
+    WayPointControlAux = AUX6_HIGH;
     break;
 
   case AUXSEVENLOW:
-    AutoPilotControlAux = AUX7_LOW;
+    WayPointControlAux = AUX7_LOW;
     break;
 
   case AUXSEVENMIDDLE:
-    AutoPilotControlAux = AUX7_MID;
+    WayPointControlAux = AUX7_MID;
     break;
 
   case AUXSEVENHIGH:
-    AutoPilotControlAux = AUX7_HIGH;
+    WayPointControlAux = AUX7_HIGH;
     break;
 
   case AUXEIGHTLOW:
-    AutoPilotControlAux = AUX8_LOW;
+    WayPointControlAux = AUX8_LOW;
     break;
 
   case AUXEIGHTMIDDLE:
-    AutoPilotControlAux = AUX8_MID;
+    WayPointControlAux = AUX8_MID;
     break;
 
   case AUXEIGHTHIGH:
-    AutoPilotControlAux = AUX8_HIGH;
+    WayPointControlAux = AUX8_HIGH;
     break;
   }
 
@@ -1149,7 +1149,7 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
     SetFlightModes[RTH_MODE] = false;
   }
   //SPORT
-  if (SportControlAux)
+  if (AttackControlAux)
   {
     SetFlightModes[ATACK_MODE] = true;
   }
@@ -1167,7 +1167,7 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
     SetFlightModes[FLIP_MODE] = false;
   }
   //AUTO
-  if (AutoPilotControlAux)
+  if (WayPointControlAux)
   {
     SetFlightModes[WAYPOINT_MODE] = true;
   }

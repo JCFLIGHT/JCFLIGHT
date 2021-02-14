@@ -17,7 +17,7 @@
 
 #include "DYNAMICPID.h"
 #include "Common/VARIABLES.h"
-#include "FlightModes/IOCMODE.h"
+#include "IntelligentOrientationControl/IOCMODE.h"
 #include "TPA.h"
 #include "Math/MATHSUPPORT.h"
 #include "RadioControl/RCSMOOTH.h"

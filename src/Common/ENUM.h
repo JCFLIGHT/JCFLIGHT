@@ -481,4 +481,20 @@ enum GPS_Velocity_NED_Enum
     EAST,
     DOWN
 };
+
+enum GCS_FlightModes_Enum
+{
+    GCS_ACRO_MODE = 0,
+    GCS_STABILIZE_MODE,
+    GCS_ALTITUDE_HOLD_MODE,
+    GCS_ATTACK_MODE,
+    GCS_GPS_HOLD_MODE,
+    GCS_IOC_MODE,
+    GCS_RTH_MODE,
+    GCS_LAND_MODE = 8,
+    GCS_FLIP_MODE = 11,
+    GCS_WAYPOINT_MODE,
+    GCS_LANDED_MODE
+};
+
 #endif

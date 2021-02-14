@@ -29,7 +29,7 @@ public:
   void Init();
   void Set_Range(int16_t Min, int16_t Max);
   void Set_Filter(bool Filter);
-  void Set_Pulse(int16_t PPM);
+  void Set_Pulse(int16_t ChannelInputValue);
   void Set_Reverse(bool Reverse);
   void Set_Dead_Zone(uint8_t DeadZone);
   void Set_Fail_Safe(bool FailSafe);

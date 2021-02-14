@@ -22,6 +22,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "RadioControl/CURVESRC.h"
 
 bool TakeOffInProgress = false;
 bool GroundAltitudeSet = false;
@@ -45,7 +46,7 @@ void AltitudeHold_Update_Params()
   MinVariometer = STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR);
   SafeZoneToCompleteTakeOff = STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR);
   SafeAltitude = STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR);
-  ThrottleMiddleValue = STORAGEMANAGER.Read_16Bits(AH_THROTTLE_ROVER_ADDR);
+  ThrottleMiddleValue = RCLookupThrottleMiddle();
 }
 
 bool ApplyAltitudeHoldControl()
@@ -208,7 +209,7 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
 void ResetIntegralOfVariometerError()
 {
   VariometerErrorISum = Constrain_32Bits(VariometerErrorISum, -8192000, 8192000);
-  VariometerErrorIPart = Constrain_16Bits(VariometerErrorIPart, -250 / 2, 250 / 2);
+  VariometerErrorIPart = Constrain_16Bits(VariometerErrorIPart, -125, 125);
 }
 
 void InitializeHoveringThrottle()

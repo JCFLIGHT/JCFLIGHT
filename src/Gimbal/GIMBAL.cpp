@@ -19,7 +19,7 @@
 #include "FlightModes/AUXFLIGHT.h"
 #include "Common/VARIABLES.h"
 
-void GimbalControll()
+void Gimbal_Controll()
 {
   //CONTROLE DO GIMBAL
   if (GimbalControlAux == NONE)

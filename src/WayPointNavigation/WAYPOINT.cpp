@@ -23,6 +23,7 @@
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "Math/MATHSUPPORT.h"
 
 struct _GetWayPointGCSParameters GetWayPointGCSParameters;
 struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
@@ -31,7 +32,7 @@ struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 #define WAYPOINT_RADIUS 2               //RAIO PARA VERIFICAR SE A CONTROLADORA CHEGOU PERTO DO WP E INICIAR A IDA PARA O PROXIMO (RAIO EM METROS)
 #define THROTTLE_TAKEOFF_ASCENT 1600    //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF ATÉ CHEGAR NA ALTITUDE SETADA PELO GCS
 #define THROTTLE_TAKEOFF_NORMALIZE 1500 //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF AO CHEGAR NA ALTITUDE SETADA PELO GCS
-#define THROTTLE_CANCEL_TAKEOFF 1470    //VALOR DO THROTTLE LIDO DO RECEPTOR PPM PARA CANCELAR O AUTO-TAKEOFF E VOLTAR AO CONTROLE NORMAL
+#define THROTTLE_CANCEL_TAKEOFF 1470    //VALOR DO THROTTLE LIDO DO RECEPTOR PARA CANCELAR O AUTO-TAKEOFF E VOLTAR AO CONTROLE NORMAL
 #define THIS_LOOP_RATE 100              //TODAS AS FUNÇÕES ABAIXO ESTÃO OPERANDO A 100HZ,MENOS O void PushWayPointParameters
 #define THROTTLE_INCREMENT 100          //NÚMERO DE INCREMENTAÇÕES A CADA ESTOURO DE TEMPO DEFINIDO PELO PARAMETRO THROTTLE_INCREMENT_TIME
 #define THROTTLE_INCREMENT_TIME 10      //INCREMENTA A CADA 0.10 SEGUNDOS
@@ -261,7 +262,7 @@ void WayPointRun()
     break;
 
   case WP_START_MISSION:
-    Set_Points_To_Navigation(&WayPointLatitude[MissionNumber], &WayPointLongitude[MissionNumber], &GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1]);
+    Set_Next_Point_To_Navigation(&WayPointLatitude[MissionNumber], &WayPointLongitude[MissionNumber]);
     WPSucess = true;
     WayPointMode = WP_EN_ROUTE;
     break;
@@ -269,7 +270,7 @@ void WayPointRun()
   case WP_EN_ROUTE:
     Navigation_Speed_Result = Calculate_Navigation_Speed(WP_NAVIGATION_SPEED);
     GPSCalculateNavigationRate(Navigation_Speed_Result);
-    HeadingHoldTarget = WRap_180(Target_Bearing) / 100;
+    HeadingHoldTarget = WRap_18000(Target_Bearing) / 100;
     if ((Two_Points_Distance <= WAYPOINT_RADIUS * 100) || Point_Reached())
     {
       if (WPSucess && MissionNumber == 0 && WayPointLatitude[1] != 0 && WayPointLongitude[1] != 0)
@@ -652,7 +653,9 @@ void Store_And_Clear_WayPoints()
     }
   }
   else
+  {
     ClearEEPROM = false;
+  }
 
   if (EEPROM_Function == 2) //SALVA NA EEPROM
   {
@@ -718,5 +721,7 @@ void Store_And_Clear_WayPoints()
     }
   }
   else
+  {
     StoreEEPROM = false;
+  }
 }

@@ -22,7 +22,7 @@
 #include "AirPlane/AIRPLANE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
-#include "PIDMIXING.h"
+#include "MIXING.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "WatchDog/REBOOT.h"
@@ -174,7 +174,7 @@ void PID_MixMotors()
                                                -Yaw_Jump_Prevention - ABS_16BITS(RCController[YAW]),
                                                Yaw_Jump_Prevention + ABS_16BITS(RCController[YAW]));
   }
-  MixingApplyPIDControl();
+  MixingApplyControl();
   if (GetFrameStateOfMultirotor())
   {
     int16_t MaximumMotor = MotorControl[MOTOR4];

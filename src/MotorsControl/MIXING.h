@@ -15,10 +15,10 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PIDMIXING_H_
-#define PIDMIXING_H_
+#ifndef MIXING_H_
+#define MIXING_H_
 #include "Arduino.h"
 extern uint8_t NumberOfMotors;
 extern int16_t MixerThrottleCommand;
-void MixingApplyPIDControl();
+void MixingApplyControl();
 #endif

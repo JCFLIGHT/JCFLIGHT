@@ -20,6 +20,9 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/VARIABLES.h"
 #include "FastSerial/PRINTF.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 //DEBUG
 //#define PRINTLN_THR_BOOST

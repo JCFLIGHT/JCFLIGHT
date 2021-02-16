@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "PIDMIXING.h"
+#include "MIXING.h"
 #include "Common/VARIABLES.h"
 #include "AirPlane/AIRPLANE.h"
 #include "MOTORSCOMPENSATION.h"
@@ -28,7 +28,7 @@ uint8_t NumberOfMotors = 4;
 int16_t MixerThrottleCommand = 1000;
 float ThrottleScale = 1.0f;
 
-void MixingApplyPIDControl()
+void MixingApplyControl()
 {
 
     MixerThrottleCommand = RCController[THROTTLE];

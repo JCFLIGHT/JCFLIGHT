@@ -23,7 +23,7 @@
 #include "RadioControl/RCSMOOTH.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/CURVESRC.h"
-#include "THRBOOST.h"
+#include "MotorsControl/THRBOOST.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 

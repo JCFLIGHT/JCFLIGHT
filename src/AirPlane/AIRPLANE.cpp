@@ -121,16 +121,16 @@ void AirPlaneClass::Mode_ConventionalPlane_Run()
 
   if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
   {
-    ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[0];  //WING     (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = RCController[ROLL] * ServoDirection[1];  //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[0];  //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = RCController[ROLL] * ServoDirection[1];  //AILERON  (SERVO 2 DA ASA)
     ServoToFilter[SERVO3] = RCController[YAW] * ServoDirection[2];   //RUDDER   (LEME)
     ServoToFilter[SERVO4] = RCController[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    ServoToFilter[SERVO1] = PIDControllerApply[ROLL] * ServoDirection[0];  //WING     (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = PIDControllerApply[ROLL] * ServoDirection[1];  //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = PIDControllerApply[ROLL] * ServoDirection[0];  //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = PIDControllerApply[ROLL] * ServoDirection[1];  //AILERON  (SERVO 2 DA ASA)
     ServoToFilter[SERVO3] = PIDControllerApply[YAW] * ServoDirection[2];   //RUDDER   (LEME)
     ServoToFilter[SERVO4] = PIDControllerApply[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
   }
@@ -154,14 +154,14 @@ void AirPlaneClass::Mode_FixedWing_Run()
 
   if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
   {
-    ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[0]) + (RCController[PITCH] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = (RCController[ROLL] * ServoDirection[0]) - (RCController[PITCH] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[0]) + (RCController[PITCH] * ServoDirection[0]); //AILERON (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = (RCController[ROLL] * ServoDirection[0]) - (RCController[PITCH] * ServoDirection[1]); //AILERON (SERVO 2 DA ASA)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    ServoToFilter[SERVO1] = (PIDControllerApply[ROLL] * ServoDirection[0]) + (PIDControllerApply[PITCH] * ServoDirection[0]); //WING (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = (PIDControllerApply[ROLL] * ServoDirection[0]) - (PIDControllerApply[PITCH] * ServoDirection[1]); //WING (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = (PIDControllerApply[ROLL] * ServoDirection[0]) + (PIDControllerApply[PITCH] * ServoDirection[0]); //AILERON (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = (PIDControllerApply[ROLL] * ServoDirection[0]) - (PIDControllerApply[PITCH] * ServoDirection[1]); //AILERON (SERVO 2 DA ASA)
   }
 }
 
@@ -183,16 +183,16 @@ void AirPlaneClass::Mode_PlaneVTail_Run()
 
   if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
   {
-    ServoToFilter[SERVO1] = RCController[PITCH] * ServoDirection[0];                      //WING     (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = RCController[PITCH] * ServoDirection[1];                      //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = RCController[PITCH] * ServoDirection[0];                      //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = RCController[PITCH] * ServoDirection[1];                      //AILERON  (SERVO 2 DA ASA)
     ServoToFilter[SERVO3] = (RCController[ROLL] + RCController[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
     ServoToFilter[SERVO4] = (RCController[ROLL] - RCController[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    ServoToFilter[SERVO1] = PIDControllerApply[PITCH] * ServoDirection[0];                            //WING     (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = PIDControllerApply[PITCH] * ServoDirection[1];                            //WING     (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = PIDControllerApply[PITCH] * ServoDirection[0];                            //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = PIDControllerApply[PITCH] * ServoDirection[1];                            //AILERON  (SERVO 2 DA ASA)
     ServoToFilter[SERVO3] = (PIDControllerApply[ROLL] + PIDControllerApply[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
     ServoToFilter[SERVO4] = (PIDControllerApply[ROLL] - PIDControllerApply[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
   }

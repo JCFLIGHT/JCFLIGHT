@@ -43,7 +43,7 @@ void IRAM_ATTR ESP32InterruptRoutine(void)
     {
         if (PPMTimerDifference > 750 && PPMTimerDifference < 2250)
         {
-            PPMReadChannels[Channels] = PPMTimerDifference;
+            DECODE.PPMReadChannels[Channels] = PPMTimerDifference;
             if (Channels < 4 && PPMTimerDifference > CHECKSUM.GetFailSafeValue)
             {
                 CheckFailSafe |= (1 << Channels);

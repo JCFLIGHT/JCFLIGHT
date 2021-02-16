@@ -20,7 +20,7 @@
 
 void Slow_Loop()
 {
-        Pre_Arm();
+        STICKS.Pre_Arm();
         COMPASS.Constant_Read();
         PushWayPointParameters();
         UpdateValuesOfPID();
@@ -28,12 +28,12 @@ void Slow_Loop()
 
 void Medium_Loop()
 {
-        DecodeAllReceiverChannels();
+        DECODE.Update();
         RCCONFIG.Set_Pulse();
         RCCONFIG.Update_Channels();
-        Desarm_LowThrottle();
+        DESARMLOWTHROTTLE.Update();
         FailSafeCheck();
-        RC_Sticks_Update();
+        STICKS.Update();
         Barometer_Update();
         GPS_Serial_Read();
         GPS_Process_FlightModes();
@@ -49,7 +49,7 @@ void Medium_Loop()
 void Fast_Medium_Loop()
 {
         BEEPER.Run();
-        Pre_Arm_Leds();
+        STICKS.Pre_Arm_Leds();
         Gimbal_Controll();
         CrashCheck();
         PARACHUTE.Manual_Detect_Channel();
@@ -81,7 +81,7 @@ void Super_Fast_Loop()
         SAFETYBUTTON.UpdateRoutine();
         SBUS_Update();
         IBUS_Update();
-        AHRS_Update();
+        AHRS.Update();
         EarthFrame_Calculate_AccelerationXYZ();
         INS_Calculate_AccelerationXY();
         INS_Calculate_AccelerationZ();

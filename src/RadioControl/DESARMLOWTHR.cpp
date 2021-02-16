@@ -31,9 +31,29 @@
 #define YPR_VALUE_MIN 1450
 #define YPR_VALUE_MAX 1550
 
-uint8_t TimerDesarm;
+DesarmLowThrClass DESARMLOWTHROTTLE;
 
-void Desarm_LowThrottle()
+bool Check_Throttle()
+{
+  if (RadioControllOutput[THROTTLE] <= THROTTLE_VALUE_MAX)
+  {
+    return true;
+  }
+  return false;
+}
+
+bool Check_Others_Channels()
+{
+  if ((RadioControllOutput[YAW] >= YPR_VALUE_MIN && RadioControllOutput[YAW] <= YPR_VALUE_MAX) &&
+      (RadioControllOutput[PITCH] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX) &&
+      (RadioControllOutput[ROLL] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX))
+  {
+    return true;
+  }
+  return false;
+}
+
+void DesarmLowThrClass::Update()
 {
   //FAÇA UMA RAPIDA SAÍDA SE O MODO AERO OU ASA-FIXA ESTIVER ATIVADO
   if (GetFrameStateOfAirPlane())
@@ -62,24 +82,4 @@ void Desarm_LowThrottle()
   {
     TimerDesarm = 0; //RESETA A CONTAGEM
   }
-}
-
-bool Check_Throttle()
-{
-  if (RadioControllOutput[THROTTLE] <= THROTTLE_VALUE_MAX)
-  {
-    return true;
-  }
-  return false;
-}
-
-bool Check_Others_Channels()
-{
-  if ((RadioControllOutput[YAW] >= YPR_VALUE_MIN && RadioControllOutput[YAW] <= YPR_VALUE_MAX) &&
-      (RadioControllOutput[PITCH] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX) &&
-      (RadioControllOutput[ROLL] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX))
-  {
-    return true;
-  }
-  return false;
 }

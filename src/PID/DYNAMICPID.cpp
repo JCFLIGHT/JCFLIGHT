@@ -23,6 +23,7 @@
 #include "RadioControl/RCSMOOTH.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/CURVESRC.h"
+#include "AHRS/AHRS.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -30,39 +31,14 @@ FILE_COMPILE_FOR_SPEED
 
 //DEBUG
 //#define PRINTLN_TPA
+//#define PRINTLN_THR_BOOST
 
+uint8_t DynamicPIDCalced;
 uint8_t DynamicProportionalVector[2];
 uint8_t DynamicDerivativeVector[2];
 
-void PID_Dynamic()
+void GetRCDataConvertedAndApplyFilter()
 {
-  uint8_t DynamicProportional;
-  uint8_t DynamicProportionalTwo;
-  //THROTTLE PID ATTENUATION
-  //A ATENUAÇÃO OCORRE APENAS NO PROPORCIONAL E NO DERIVATIVO
-  //AJUSTE DINAMICO DE ACORDO COM O VALOR DO THROTTLE
-  if (GetFrameStateOfMultirotor()) //CONFIG PARA DRONES
-  {
-    DynamicProportionalTwo = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
-#if defined(PRINTLN_TPA)
-    PRINTF.SendToConsole(PSTR("TPACopter:%d\n"), DynamicProportionalTwo);
-#endif
-  }
-  else //CONFIG PARA AEROS E ASA-FIXA
-  {
-    DynamicProportionalTwo = CalculateFixedWingTPAFactor(RCController[THROTTLE]);
-#if defined(PRINTLN_TPA)
-    PRINTF.SendToConsole(PSTR("TPAPlane:%d\n"), DynamicProportionalTwo);
-#endif
-  }
-  for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)
-  {
-    uint16_t DynamicStored = MIN_U16BITS(ABS_16BITS(RadioControllOutput[RCIndexCount] - 1500), 500);
-    DynamicProportional = 100 - (uint16_t)DynamicRollAndPitchRate[RCIndexCount] * DynamicStored / 500;
-    DynamicProportional = (uint16_t)DynamicProportional * DynamicProportionalTwo / 100;
-    DynamicProportionalVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].ProportionalVector * DynamicProportional / 100;
-    DynamicDerivativeVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].DerivativeVector * DynamicProportional / 100;
-  }
   int32_t CalcedThrottle;
   CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], AttitudeThrottleMin, 2000);
   CalcedThrottle = (uint32_t)(CalcedThrottle - AttitudeThrottleMin) * 1000 / (2000 - AttitudeThrottleMin);
@@ -109,6 +85,73 @@ void PID_Dynamic()
   else if (RCController[PITCH] < -500)
   {
     RCController[PITCH] = -500;
+  }
+}
+
+int16_t Get_Angle_Boost(int16_t Throttle_Value)
+{
+  float AHRS_Angles_Cosine = AHRS.CosinePitch() * AHRS.CosineRoll();
+  AHRS_Angles_Cosine = Constrain_Float(AHRS_Angles_Cosine, 0.5f, 1.0f);
+  AHRS_Angles_Cosine = Constrain_Float(9000 - max(labs(ATTITUDE.AngleOut[ROLL]), labs(ATTITUDE.AngleOut[PITCH])), 0, 3000) / (3000 * AHRS_Angles_Cosine);
+  return Constrain_Float((float)(Throttle_Value - AttitudeThrottleMin) * AHRS_Angles_Cosine + AttitudeThrottleMin, AttitudeThrottleMin, 2000);
+}
+
+void Set_Throttle_Out(int16_t Throttle_Out, bool Apply_Angle_Boost)
+{
+  if (Apply_Angle_Boost)
+  {
+    RCController[THROTTLE] = Get_Angle_Boost(Throttle_Out);
+  }
+  else
+  {
+    RCController[THROTTLE] = Throttle_Out;
+  }
+}
+
+void ApplyThrottleBoost()
+{
+  if (!GetFrameStateOfMultirotor())
+  {
+    return;
+  }
+  Set_Throttle_Out(RCController[THROTTLE], SetFlightModes[STABILIZE_MODE]); //APLIQUE APENAS NO MODO STABILIZE
+#ifdef PRINTLN_THR_BOOST
+  PRINTF.SendToConsole(PSTR("RCController[THROTTLE]:%d\n"), RCController[THROTTLE]);
+#endif
+}
+
+void PID_Dynamic()
+{
+  //CONVERTE AS DATAS DOS RADIO E APLICA O FILTRO LPF
+  GetRCDataConvertedAndApplyFilter();
+
+  //APLICA O BOOST NO THROTTLE PARA O MODO STABILIZE
+  ApplyThrottleBoost();
+
+  //THROTTLE PID ATTENUATION
+  //A ATENUAÇÃO OCORRE APENAS NO PROPORCIONAL E NO DERIVATIVO
+  //AJUSTE DINAMICO DE ACORDO COM O VALOR DO THROTTLE
+  if (GetFrameStateOfMultirotor()) //CONFIG PARA DRONES
+  {
+    TPA_Parameters.CalcedValue = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
+#if defined(PRINTLN_TPA)
+    PRINTF.SendToConsole(PSTR("TPACopter:%d\n"), TPA_Parameters.CalcedValue);
+#endif
+  }
+  else //CONFIG PARA AEROS E ASA-FIXA
+  {
+    TPA_Parameters.CalcedValue = CalculateFixedWingTPAFactor(RCController[THROTTLE]);
+#if defined(PRINTLN_TPA)
+    PRINTF.SendToConsole(PSTR("TPAPlane:%d\n"), TPA_Parameters.CalcedValue);
+#endif
+  }
+  for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)
+  {
+    uint16_t DynamicStored = MIN_U16BITS(ABS_16BITS(RadioControllOutput[RCIndexCount] - 1500), 500);
+    DynamicPIDCalced = 100 - (uint16_t)DynamicRollAndPitchRate[RCIndexCount] * DynamicStored / 500;
+    DynamicPIDCalced = (uint16_t)DynamicPIDCalced * TPA_Parameters.CalcedValue / 100;
+    DynamicProportionalVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].ProportionalVector * DynamicPIDCalced / 100;
+    DynamicDerivativeVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].DerivativeVector * DynamicPIDCalced / 100;
   }
   IOC_Mode_Update();
 }

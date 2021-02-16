@@ -21,8 +21,21 @@
 #include "VECTOR.h"
 extern Struct_Vector3x3 BodyFrameAcceleration;
 extern Struct_Vector3x3 BodyFrameRotation;
-void AHRS_Initialization();
-void AHRS_Update();
-float CosineAHRSTiltAngle(void);
-bool CheckAnglesInclination(int16_t Angle);
+class AHRSClass
+{
+public:
+  void Initialization();
+  void Update();
+  bool CheckAnglesInclination(int16_t Angle);
+  float SineRoll();
+  float CosineRoll();
+  float SinePitch();
+  float CosinePitch();
+  float SineYaw();
+  float CosineYaw();
+
+private:
+  float CosineTiltAngle(void);
+};
+extern AHRSClass AHRS;
 #endif

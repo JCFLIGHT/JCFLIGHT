@@ -313,7 +313,7 @@ int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
   }
   else
   {
-    if (CosineAHRSTiltAngle() >= 0.173648f) //10 GRAUS DE INCLINAÇÃO
+    if (AHRS.CheckAnglesInclination(10)) //10 GRAUS DE INCLINAÇÃO
     {
       //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1000CM/S = 36KM/H
       int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_State() ? AirSpeedCalcedInCM : ReferenceAirSpeed;

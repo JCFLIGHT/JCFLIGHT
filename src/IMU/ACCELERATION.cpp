@@ -18,9 +18,10 @@
 #include "ACCELERATION.h"
 #include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
+#include "AHRS/AHRS.h"
 #include "FastSerial/PRINTF.h"
 
-//#define DEBUG_ACCELERATION
+#define DEBUG_ACCELERATION
 
 float Cosine_Yaw;
 float Sine_Yaw;
@@ -37,31 +38,35 @@ void EarthFrame_Calculate_AccelerationXYZ()
   float SinePitch_CosineYaw_Fusion;
   float SinePitch_SineYaw_Fusion;
 
-  //CALCULA O SENO E COSSENO DE CADA EIXO DA ESTIMAÇÃO DE ATTITUDE DADO PELO AHRS
-  Cosine_Roll = Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
-  Sine_Roll = Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
-  Cosine_Pitch = Fast_Cosine(ConvertDeciDegreesToRadians(-ATTITUDE.AngleOut[PITCH]));
-  Sine_Pitch = Fast_Sine(ConvertDeciDegreesToRadians(-ATTITUDE.AngleOut[PITCH]));
-  Cosine_Yaw = Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
-  Sine_Yaw = Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
+  //OBTÉM O SENO E COSSENO DE CADA EIXO DA ESTIMAÇÃO DE ATTITUDE DADO PELO AHRS
+  Cosine_Roll = AHRS.CosineRoll();
+  Sine_Roll = AHRS.SineRoll();
+  Cosine_Pitch = -AHRS.CosinePitch();
+  Sine_Pitch = -AHRS.SinePitch();
+  Cosine_Yaw = AHRS.CosineYaw();
+  Sine_Yaw = AHRS.SineYaw();
 
 #ifdef DEBUG_ACCELERATION
 
-  PRINTF.SendToConsole(PSTR("Cosine_Roll:%.4f Sine_Roll:%.4f ATTITUDE.AngleOut[ROLL]:%.4f\n"),
-                    Cosine_Roll,
-                    Sine_Roll,
-                    ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
-
 /*
-  PRINTF.SendToConsole(PSTR("Cosine_Pitch:%.4f Sine_Pitch:%.4f\n"),
-                    Cosine_Pitch,
-                    Sine_Pitch);
+  PRINTF.SendToConsole(PSTR("Cosine_Roll:%.4f Sine_Roll:%.4f ATTITUDE.AngleOut[ROLL]:%.4f\n"),
+                       Cosine_Roll,
+                       Sine_Roll,
+                       ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
 */
 
 /*
-  PRINTF.SendToConsole(PSTR("Cosine_Yaw:%.4f Sine_Yaw:%.4f\n"),
+  PRINTF.SendToConsole(PSTR("Cosine_Pitch:%.4f Sine_Pitch:%.4f ATTITUDE.AngleOut[PITCH]:%.4f\n"),
+                       Cosine_Pitch,
+                       Sine_Pitch,
+                       ConvertDeciDegreesToRadians(-ATTITUDE.AngleOut[PITCH]));
+*/
+
+/*
+  PRINTF.SendToConsole(PSTR("Cosine_Yaw:%.4f Sine_Yaw:%.4f ATTITUDE.AngleOut[YAW]:%.4f\n"),
                     Cosine_Yaw,
-                    Sine_Yaw);
+                    Sine_Yaw,
+                    ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[YAW]));
 */
 #endif
 

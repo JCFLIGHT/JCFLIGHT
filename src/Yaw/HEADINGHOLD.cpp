@@ -45,7 +45,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (CheckAnglesInclination(25)) //NÃO APLICA A CORREÇÃO DO YAW SE OS ANGULOS FOREM MAIOR QUE 25 GRAUS
+  if (AHRS.CheckAnglesInclination(25)) //NÃO APLICA A CORREÇÃO DO YAW SE OS ANGULOS FOREM MAIOR QUE 25 GRAUS
   {
     return false;
   }
@@ -101,8 +101,8 @@ float GetHeadingHoldValue()
 
 #ifdef DEBUG
   PRINTF.SendToConsole(PSTR("HHR:%.2f HHRF:%.2f\n"),
-                    HeadingHoldRateNF,
-                    HeadingHoldRate);
+                       HeadingHoldRateNF,
+                       HeadingHoldRate);
 #endif
 
   //APLICA O CONTROLE DO YAW

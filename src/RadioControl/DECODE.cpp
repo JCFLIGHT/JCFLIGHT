@@ -29,10 +29,9 @@
 #include "HAL/HALPPM.h"
 #include "ParamsToGCS/CHECKSUM.h"
 
-volatile uint16_t PPMReadChannels[12];
-uint8_t RcChannelMap[12];
+DecodeClass DECODE;
 
-void Radio_Decode_Initialization()
+void DecodeClass::Initialization()
 {
   if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER) ||
       (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != IBUS_RECEIVER))
@@ -64,7 +63,7 @@ void Radio_Decode_Initialization()
   RcChannelMap[11] = AUX8;
 }
 
-void DecodeAllReceiverChannels()
+void DecodeClass::Update()
 {
   bool CheckFailSafeState = true;
   static uint8_t TYPRIndex = 0;

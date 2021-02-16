@@ -18,8 +18,13 @@
 #ifndef DECODE_H_
 #define DECODE_H_
 #include "Arduino.h"
-extern volatile uint16_t PPMReadChannels[12];
-extern uint8_t RcChannelMap[12];
-void Radio_Decode_Initialization();
-void DecodeAllReceiverChannels();
+class DecodeClass
+{
+public:
+  volatile uint16_t PPMReadChannels[12];
+  uint8_t RcChannelMap[12];
+  void Initialization();
+  void Update();
+};
+extern DecodeClass DECODE;
 #endif

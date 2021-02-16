@@ -31,6 +31,8 @@
 
 FILE_COMPILE_FOR_SPEED
 
+AHRSClass AHRS;
+
 #define SPIN_RATE_LIMIT 20    //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
 #define MAX_ACC_NEARNESS 0.33 //25% (0.87G - 1.12G)
 #ifdef __AVR_ATmega2560__
@@ -75,7 +77,7 @@ static void ComputeRotationMatrix(void)
   RotationMath[2][2] = 1.0f - 2.0f * q1q1 - 2.0f * q2q2;
 }
 
-void AHRS_Initialization(void)
+void AHRSClass::Initialization(void)
 {
   //CALCULA A DECLINAÇÃO MAGNETICA
   const int16_t Degrees = ((int16_t)(STORAGEMANAGER.Read_Float(DECLINATION_ADDR) * 100)) / 100;
@@ -224,12 +226,12 @@ static void MahonyAHRSUpdate(float DeltaTime,
       //USE O COG DO GPS PARA CALCULAR O HEADING
       while (CourseOverGround > 3.14159265358979323846f)
       {
-        CourseOverGround -= (2.0f * 3.14159265358979323846f);
+        CourseOverGround -= (6.283185482f);
       }
 
       while (CourseOverGround < -3.14159265358979323846f)
       {
-        CourseOverGround += (2.0f * 3.14159265358979323846f);
+        CourseOverGround += (6.283185482f);
       }
 
       //CALCULA O VALOR DE HEADING COM BASE NO COG
@@ -376,7 +378,7 @@ void GetMeasuredRotationRate(Struct_Vector3x3 *MeasureRotation)
   MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.GyroscopeRead[YAW] * GYRO_SCALE));
 }
 
-void AHRS_Update()
+void AHRSClass::Update()
 {
   bool SafeToUseCompass = false;
   bool GPS_HeadingState = false;
@@ -450,16 +452,46 @@ void AHRS_Update()
   ATTITUDE.AngleOut[YAW] = ConvertDeciDegreesToDegrees(ATTITUDE.CompassHeading);
 }
 
-float CosineAHRSTiltAngle(void)
+float AHRSClass::CosineTiltAngle(void)
 {
   return 1.0f - 2.0f * SquareFloat(Orientation.q1) - 2.0f * SquareFloat(Orientation.q2);
 }
 
-bool CheckAnglesInclination(int16_t Angle)
+bool AHRSClass::CheckAnglesInclination(int16_t Angle)
 {
-  if (CosineAHRSTiltAngle() < Fast_Cosine(ConvertToRadians(Angle)))
+  if (CosineTiltAngle() < Fast_Cosine(ConvertToRadians(Angle)))
   {
     return true;
   }
   return false;
+}
+
+float AHRSClass::SineRoll()
+{
+  return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
+}
+
+float AHRSClass::CosineRoll()
+{
+  return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
+}
+
+float AHRSClass::SinePitch()
+{
+  return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[PITCH]));
+}
+
+float AHRSClass::CosinePitch()
+{
+  return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[PITCH]));
+}
+
+float AHRSClass::SineYaw()
+{
+  return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
+}
+
+float AHRSClass::CosineYaw()
+{
+  return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
 }

@@ -24,10 +24,9 @@
 #include "Buzzer/BUZZER.h"
 #include "Arming/ARMING.h"
 
-bool PreArm_Delay = false;
-uint8_t PreArm_Delay_Count = 0;
+SticksClass STICKS;
 
-void RC_Sticks_Update()
+void SticksClass::Update()
 {
   if (!COMMAND_ARM_DISARM)
   {
@@ -95,7 +94,7 @@ void RC_Sticks_Update()
   }
 }
 
-void Pre_Arm(void)
+void SticksClass::Pre_Arm(void)
 {
   if (ArmDisarmConfig != 0)
   {
@@ -122,7 +121,7 @@ void Pre_Arm(void)
   }
 }
 
-void Pre_Arm_Leds(void)
+void SticksClass::Pre_Arm_Leds(void)
 {
   //ROTINA PRE-ARM LED INDICADOR
   if ((PreArm_Delay_Count > 0 && PreArm_Delay_Count <= 20))

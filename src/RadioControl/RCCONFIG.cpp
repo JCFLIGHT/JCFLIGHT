@@ -251,11 +251,11 @@ void RCConfigClass::Init()
   //CORRE AS FUNÇÕES 100 VEZES PARA OBTER OS VALORES ATUAIS DOS CANAIS DO RADIO
   for (uint8_t i = 0; i < 100; i++)
   {
-    DecodeAllReceiverChannels(); //FAZ AS PRIMEIRA LEITURAS
-    RCCONFIG.Set_Pulse();        //APLICA OS VALORES LIDOS
-    RCCONFIG.Update_Channels();  //FAZ A LEITURA DOS CANAIS APÓS A CONFIGURAÇÃO
-    SBUS_Update();               //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO SBUS
-    IBUS_Update();               //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO IBUS
+    DECODE.Update();            //FAZ AS PRIMEIRA LEITURAS
+    RCCONFIG.Set_Pulse();       //APLICA OS VALORES LIDOS
+    RCCONFIG.Update_Channels(); //FAZ A LEITURA DOS CANAIS APÓS A CONFIGURAÇÃO
+    SBUS_Update();              //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO SBUS
+    IBUS_Update();              //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO IBUS
   }
 }
 

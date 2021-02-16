@@ -68,7 +68,7 @@ const bool GetSwingVelocityState()
 
 void AutoLaunchDetector()
 {
-  if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), CheckAnglesInclination(AHRS_BANKED_ANGLE)) || GetSwingVelocityState())
+  if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), AHRS.CheckAnglesInclination(AHRS_BANKED_ANGLE)) || GetSwingVelocityState())
   {
     AutoLaunchDetectorSum += (SCHEDULERTIME.GetMillis() - AutoLaunchDetectorPreviousTime);
     AutoLaunchDetectorPreviousTime = SCHEDULERTIME.GetMillis();

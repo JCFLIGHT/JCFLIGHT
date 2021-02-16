@@ -45,7 +45,7 @@ void GeneralSettingsInitialization()
   CurvesRC_SetValues();
   TPA_Initialization();
   CurvesRC_CalculeValue();
-  Radio_Decode_Initialization();
+  DECODE.Initialization();
   UART2Mode_Initialization();
   AUXFLIGHT.LoadEEPROM();
   CHECKSUM.UpdateChannelsReverse();
@@ -63,7 +63,7 @@ void GeneralSettingsInitialization()
   WayPoint_Initialization();
   AirSpeed_Initialization();
   GCS.UpdateParametersToGCS();
-  AHRS_Initialization();
+  AHRS.Initialization();
   SAFETYBUTTON.Initialization();
   RCInterpolationInit();
   Servo_Rate_Update();

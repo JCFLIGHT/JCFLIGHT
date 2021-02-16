@@ -22,7 +22,7 @@
 #include "AHRS/AHRS.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
-#define THIS_LOOP_RATE 50 //RC_Sticks_Update()
+#define THIS_LOOP_RATE 50 //Update()
 #define ARM_TIME_MAX 2    //SEGUNDOS
 #define DISARM_TIME_MAX 2 //SEGUNDOS
 
@@ -35,7 +35,7 @@ bool CheckInclinationForArm(void)
     {
         return false; //PULA A CHECAGEM DE INCLINAÇÃO NO MODO PLANE
     }
-    if (GetFrameStateOfMultirotor() && CheckAnglesInclination(25))
+    if (GetFrameStateOfMultirotor() && AHRS.CheckAnglesInclination(25))
     {
         return true; //INVALIDA O ARMAMENTO DO SISTEMA SE HOUVER INCLINAÇÃO NOS EIXOS
     }

@@ -18,7 +18,13 @@
 #ifndef DESARMLOWTHR_H_
 #define DESARMLOWTHR_H_
 #include "Arduino.h"
-void Desarm_LowThrottle();
-bool Check_Throttle();
-bool Check_Others_Channels();
+class DesarmLowThrClass
+{
+public:
+  void Update();
+
+private:
+  uint8_t TimerDesarm;
+};
+extern DesarmLowThrClass DESARMLOWTHROTTLE;
 #endif

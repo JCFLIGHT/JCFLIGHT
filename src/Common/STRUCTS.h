@@ -72,6 +72,7 @@ struct PID_TERMS
 
 typedef struct
 {
+  uint8_t CalcedValue = 0;
   int16_t BreakPointer = 1500;
   uint16_t ThrottlePercent = 0;
   float Factor = 0;

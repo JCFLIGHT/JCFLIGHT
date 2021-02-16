@@ -18,8 +18,16 @@
 #ifndef STICKS_H_
 #define STICKS_H_
 #include "Arduino.h"
-extern bool PreArm_Delay;
-void RC_Sticks_Update();
-void Pre_Arm(void);
-void Pre_Arm_Leds(void);
+class SticksClass
+{
+public:
+  bool PreArm_Delay;
+  void Update();
+  void Pre_Arm(void);
+  void Pre_Arm_Leds(void);
+
+private:
+  uint8_t PreArm_Delay_Count = 0;
+};
+extern SticksClass STICKS;
 #endif

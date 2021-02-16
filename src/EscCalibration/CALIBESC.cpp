@@ -69,9 +69,9 @@ void ClassESC::Calibration(void)
       static uint32_t EscCalLoopRefresh = SCHEDULERTIME.GetMillis();
       if (SCHEDULERTIME.GetMillis() - EscCalLoopRefresh >= 20) //ROTINA DE 50Hz
       {
-        DecodeAllReceiverChannels(); //FAZ A LEITURA DE TODOS OS CANAIS DO RECEPTOR DO RADIO
-        RCCONFIG.Set_Pulse();        //SETA A SAÍDA PARA CONFIGURAÇÃO PARA O RECEPTOR DO RADIO
-        RCCONFIG.Update_Channels();  //FAZ A LEITURA DOS CANAIS DO RECEPTOR DO RADIO APÓS A CONFIGURAÇÃO
+        DECODE.Update();            //FAZ A LEITURA DE TODOS OS CANAIS DO RECEPTOR DO RADIO
+        RCCONFIG.Set_Pulse();       //SETA A SAÍDA PARA CONFIGURAÇÃO PARA O RECEPTOR DO RADIO
+        RCCONFIG.Update_Channels(); //FAZ A LEITURA DOS CANAIS DO RECEPTOR DO RADIO APÓS A CONFIGURAÇÃO
         BEEPER.Run();
         RGB.Function(CALIBRATIONESCFINISH); //ATIVA O LED VERDE
         RGB.Update();                       //ATUALIZA O ESTADO DOS LED'S

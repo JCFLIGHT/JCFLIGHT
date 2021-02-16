@@ -100,7 +100,7 @@ float GetHeadingHoldValue()
 #endif
 
 #ifdef DEBUG
-  FastSerialPrintln(PSTR("HHR:%.2f HHRF:%.2f\n"),
+  PRINTF.SendToConsole(PSTR("HHR:%.2f HHRF:%.2f\n"),
                     HeadingHoldRateNF,
                     HeadingHoldRate);
 #endif

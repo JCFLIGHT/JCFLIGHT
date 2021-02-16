@@ -27,13 +27,13 @@ void Operator_Check_Values_In_Address(uint16_t Size)
 {
     while (true)
     {
-        FastSerialPrintln(PSTR("Address:%d ValorGuardado:%d\n"),
-                          EPPROM_Address,
-                          STORAGEMANAGER.Read_8Bits(EPPROM_Address));
+        PRINTF.SendToConsole(PSTR("Address:%d ValorGuardado:%d\n"),
+                             EPPROM_Address,
+                             STORAGEMANAGER.Read_8Bits(EPPROM_Address));
         EPPROM_Address++;
         if (EPPROM_Address == Size)
         {
-            FastSerialPrintln(PSTR("Completo!\n"));
+            PRINTF.SendToConsole(PSTR("Completo!\n"));
             while (true)
                 ;
         }

@@ -47,19 +47,19 @@ void EarthFrame_Calculate_AccelerationXYZ()
 
 #ifdef DEBUG_ACCELERATION
 
-  FastSerialPrintln(PSTR("Cosine_Roll:%.4f Sine_Roll:%.4f ATTITUDE.AngleOut[ROLL]:%.4f\n"),
+  PRINTF.SendToConsole(PSTR("Cosine_Roll:%.4f Sine_Roll:%.4f ATTITUDE.AngleOut[ROLL]:%.4f\n"),
                     Cosine_Roll,
                     Sine_Roll,
                     ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
 
 /*
-  FastSerialPrintln(PSTR("Cosine_Pitch:%.4f Sine_Pitch:%.4f\n"),
+  PRINTF.SendToConsole(PSTR("Cosine_Pitch:%.4f Sine_Pitch:%.4f\n"),
                     Cosine_Pitch,
                     Sine_Pitch);
 */
 
 /*
-  FastSerialPrintln(PSTR("Cosine_Yaw:%.4f Sine_Yaw:%.4f\n"),
+  PRINTF.SendToConsole(PSTR("Cosine_Yaw:%.4f Sine_Yaw:%.4f\n"),
                     Cosine_Yaw,
                     Sine_Yaw);
 */

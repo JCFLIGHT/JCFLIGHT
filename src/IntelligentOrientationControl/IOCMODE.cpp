@@ -38,7 +38,7 @@ void IOC_Mode_Update()
     RCController[PITCH] = CalcedRCControllerPITCH;
   }
 #ifdef DEBUG_IOC
-  FastSerialPrintln(PSTR("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
+  PRINTF.SendToConsole(PSTR("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
                     RCController[ROLL],
                     RCController[PITCH],
                     CalcedRCControllerPITCH,

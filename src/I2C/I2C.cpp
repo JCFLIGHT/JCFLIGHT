@@ -155,8 +155,8 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
   static uint8_t Status;
   uint8_t Devices = 0;
 #ifdef DEBUG_I2C
-  FastSerialPrintln(PSTR("ESCANEANDO O BARRAMENTO I2C,AGUARDE...\n"));
-  FastSerialPrintln(PSTR("\n"));
+  PRINTF.SendToConsole(PSTR("ESCANEANDO O BARRAMENTO I2C,AGUARDE...\n"));
+  PRINTF.SendToConsole(PSTR("\n"));
 #endif
   for (uint8_t NumbGenerator = 0; NumbGenerator <= 0x7F; NumbGenerator++)
   {
@@ -169,7 +169,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
       if (Status == 1)
       {
 #ifdef DEBUG_I2C
-        FastSerialPrintln(PSTR("OCORREU ALGUM ERRO,NÃO FOI POSSIVEL COMPLETAR\n"));
+        PRINTF.SendToConsole(PSTR("OCORREU ALGUM ERRO,NÃO FOI POSSIVEL COMPLETAR\n"));
 #endif
         return;
       }
@@ -177,32 +177,32 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
     else
     {
 #ifdef DEBUG_I2C
-      FastSerialPrintln(PSTR("DISPOSITIVO ENCONTRADO - "));
+      PRINTF.SendToConsole(PSTR("DISPOSITIVO ENCONTRADO - "));
       if (NumbGenerator == 0x68)
-        FastSerialPrintln(PSTR("0x68"));
+        PRINTF.SendToConsole(PSTR("0x68"));
       if (NumbGenerator == 0x68)
-        FastSerialPrintln(PSTR(" << MPU6050"));
+        PRINTF.SendToConsole(PSTR(" << MPU6050"));
       if (NumbGenerator == 0x77)
       {
-        FastSerialPrintln(PSTR("0x77"));
-        FastSerialPrintln(PSTR(" << MS5611"));
+        PRINTF.SendToConsole(PSTR("0x77"));
+        PRINTF.SendToConsole(PSTR(" << MS5611"));
       }
       if (NumbGenerator == 0x76)
       {
-        FastSerialPrintln(PSTR("0x76"));
-        FastSerialPrintln(PSTR(" << BMP280"));
+        PRINTF.SendToConsole(PSTR("0x76"));
+        PRINTF.SendToConsole(PSTR(" << BMP280"));
       }
       if (NumbGenerator == 0x0C)
-        FastSerialPrintln(PSTR("0x0C"));
+        PRINTF.SendToConsole(PSTR("0x0C"));
       if (NumbGenerator == 0x0C)
-        FastSerialPrintln(PSTR(" << AK8975"));
+        PRINTF.SendToConsole(PSTR(" << AK8975"));
       if (NumbGenerator == 0x1E)
-        FastSerialPrintln(PSTR("0x1E"));
+        PRINTF.SendToConsole(PSTR("0x1E"));
       if (NumbGenerator == 0x0D)
-        FastSerialPrintln(PSTR("0x0D"));
+        PRINTF.SendToConsole(PSTR("0x0D"));
       if ((NumbGenerator == 0x1E) || (NumbGenerator == 0x0D))
-        FastSerialPrintln(PSTR(" << HMC5843 OU HMC5883"));
-      FastSerialPrintln(PSTR("\n"));
+        PRINTF.SendToConsole(PSTR(" << HMC5843 OU HMC5883"));
+      PRINTF.SendToConsole(PSTR("\n"));
 #endif
       if (NumbGenerator == 0x0D)
         COMPASS.FakeHMC5883Address = 0x0D;
@@ -228,15 +228,15 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
   }
 #ifdef DEBUG_I2C
   if (!Devices)
-    FastSerialPrintln(PSTR("NENHUM DISPOSITVO ENCONTRADO\n"));
+    PRINTF.SendToConsole(PSTR("NENHUM DISPOSITVO ENCONTRADO\n"));
   if (CompassFound)
-    FastSerialPrintln(PSTR("COMPASS CONECTADO AO I2C?SIM\n"));
+    PRINTF.SendToConsole(PSTR("COMPASS CONECTADO AO I2C?SIM\n"));
   else
-    FastSerialPrintln(PSTR("COMPASS CONECTADO AO I2C?NÃO\n"));
+    PRINTF.SendToConsole(PSTR("COMPASS CONECTADO AO I2C?NÃO\n"));
   if (BarometerFound)
-    FastSerialPrintln(PSTR("BAROMETRO CONECTADO AO I2C?SIM\n"));
+    PRINTF.SendToConsole(PSTR("BAROMETRO CONECTADO AO I2C?SIM\n"));
   else
-    FastSerialPrintln(PSTR("BAROMETRO CONECTADO AO I2C?NÃO\n"));
+    PRINTF.SendToConsole(PSTR("BAROMETRO CONECTADO AO I2C?NÃO\n"));
 #endif
 }
 

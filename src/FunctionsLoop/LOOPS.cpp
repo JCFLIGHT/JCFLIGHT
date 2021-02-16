@@ -43,7 +43,7 @@ void Medium_Loop()
         AirPlane_Update_Auto_Throttle();
         BATTERY.Read_Voltage();
         BATTERY.Read_Current();
-        PrintlnParameters();
+        PRINTF.ParamsToConsole();
 }
 
 void Fast_Medium_Loop()

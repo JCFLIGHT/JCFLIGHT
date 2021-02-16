@@ -45,14 +45,14 @@ void Update_PrecisionLand()
 
 #ifdef PRINTLN_PRECISIONLAND
 
-  FastSerialPrintln(PSTR("GetAccelerationTotal:%f GetLandSuccess:%d\n"),
+  PRINTF.SendToConsole(PSTR("GetAccelerationTotal:%f GetLandSuccess:%d\n"),
                     GetAccelerationTotal(), GetLandSuccess());
 
 #endif
 
 #ifdef PRINTLN_LPFINROLL
 
-  FastSerialPrintln(PSTR("INS.AccelerationEarthFrame[ROLL]:%f AccelerationEarthFrameFilteredRoll.GetOutputFiltered():%f\n"),
+  PRINTF.SendToConsole(PSTR("INS.AccelerationEarthFrame[ROLL]:%f AccelerationEarthFrameFilteredRoll.GetOutputFiltered():%f\n"),
                     INS.AccelerationEarthFrame[ROLL], AccelerationEarthFrameFilteredRoll.GetOutputFiltered());
 
 #endif

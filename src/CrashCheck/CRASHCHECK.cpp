@@ -40,7 +40,7 @@ void CrashCheck()
 #ifdef DEBUG_CRASHCHECK
 
   if (GetLandSuccess())
-    FastSerialPrintln(PSTR("!!!Solo Detectado!!!\n"));
+    PRINTF.SendToConsole(PSTR("!!!Solo Detectado!!!\n"));
 
 #endif
 
@@ -98,7 +98,7 @@ void CrashCheck()
 
 #ifdef DEBUG_CRASHCHECK
 
-    FastSerialPrintln(PSTR("!!!Crash Detectado!!!\n"));
+    PRINTF.SendToConsole(PSTR("!!!Crash Detectado!!!\n"));
 
 #endif
 

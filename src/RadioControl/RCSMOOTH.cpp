@@ -78,7 +78,7 @@ void RCInterpolationApply()
   static uint32_t Refresh = 0;
   if (SCHEDULERTIME.GetMillis() - Refresh >= 20)
   {
-    FastSerialPrintln(PSTR("NotFiltered:%d Filtered:%d\n"),
+    PRINTF.SendToConsole(PSTR("NotFiltered:%d Filtered:%d\n"),
                       RCControllerUnFiltered[ROLL],
                       RCController[ROLL]);
     Refresh = SCHEDULERTIME.GetMillis();

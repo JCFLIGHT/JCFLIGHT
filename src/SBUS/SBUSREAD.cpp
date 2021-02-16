@@ -45,7 +45,7 @@ void SBUS_Update()
   static uint32_t SBUS_Serial_Refresh;
   if (SCHEDULERTIME.GetMillis() - SBUS_Serial_Refresh >= 20)
   {
-    FastSerialPrintln(PSTR("Thr:%d Yaw:%d Pitch:%d Roll:%d Aux1:%d Aux2:%d Aux3:%d Aux4:%d Aux5:%d Aux6:%d Aux7:%d Aux8:%d FailSafe:%d\n"),
+    PRINTF.SendToConsole(PSTR("Thr:%d Yaw:%d Pitch:%d Roll:%d Aux1:%d Aux2:%d Aux3:%d Aux4:%d Aux5:%d Aux6:%d Aux7:%d Aux8:%d FailSafe:%d\n"),
                       SBUSReadChannels[0], SBUSReadChannels[1], SBUSReadChannels[2], SBUSReadChannels[3], SBUSReadChannels[4],
                       SBUSReadChannels[5], SBUSReadChannels[6], SBUSReadChannels[7], SBUSRC.FailSafe);
     SBUS_Serial_Refresh = SCHEDULERTIME.GetMillis();

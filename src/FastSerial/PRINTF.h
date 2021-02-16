@@ -24,13 +24,23 @@ extern "C"
   int __ftoa_engine(double val, char *buf, unsigned char prec, unsigned char maxdgs);
   char *__ultoa_invert(unsigned long val, char *s, int base);
 }
-void PrintlnParameters();
-void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
-void FastSerialPrintln(const char *fmt, ...);
 #endif
-#if defined (__arm__) || defined (ESP32)
-void FastSerialPrintln();
-void SerialPrintF();
-void PrintlnParameters();
+class SerialPrint
+{
+public:
+  void ParamsToConsole();
+#if defined(__arm__) || defined(ESP32)
+  void SendToConsole();
+#else
+  void SendToConsole(const char *fmt, ...);
 #endif
+
+private:
+#if defined(__arm__) || defined(ESP32)
+  void SerialPrintF();
+#else
+  void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
+#endif
+};
+extern SerialPrint PRINTF;
 #endif

@@ -29,6 +29,8 @@
 #include "BAR/BAR.h"
 #include "ProgMem/PROGMEM.h"
 
+SerialPrint PRINTF;
+
 #ifdef __AVR_ATmega2560__
 
 #define FTOA_MINUS 1
@@ -86,7 +88,7 @@
   __c;                              \
 })
 
-void FastSerialPrintln(const char *fmt, ...)
+void SerialPrint::SendToConsole(const char *fmt, ...)
 {
   __gnuc_va_list ap;
   __builtin_va_start(ap, fmt);
@@ -114,70 +116,70 @@ void FastSerialPrintln(const char *fmt, ...)
    %ld  >> int32_t
 */
 
-void PrintlnParameters()
+void SerialPrint::ParamsToConsole()
 {
 #if defined(PRINTLN_RADIO)
-  FastSerialPrintln(PSTR("Throttle:%u Yaw:%u Pitch:%u Roll:%u Aux1:%u Aux2:%u Aux3:%u Aux4:%u Aux5:%u Aux6:%u Aux7:%u Aux8:%u\n"),
-                    Throttle.Output, Yaw.Output, Pitch.Output, Roll.Output,
-                    AuxiliarOne.Output, AuxiliarTwo.Output, AuxiliarThree.Output, AuxiliarFour.Output,
-                    AuxiliarFive.Output, AuxiliarSix.Output, AuxiliarSeven.Output, AuxiliarEight.Output);
+  PRINTF.SendToConsole(PSTR("Throttle:%u Yaw:%u Pitch:%u Roll:%u Aux1:%u Aux2:%u Aux3:%u Aux4:%u Aux5:%u Aux6:%u Aux7:%u Aux8:%u\n"),
+                       Throttle.Output, Yaw.Output, Pitch.Output, Roll.Output,
+                       AuxiliarOne.Output, AuxiliarTwo.Output, AuxiliarThree.Output, AuxiliarFour.Output,
+                       AuxiliarFive.Output, AuxiliarSix.Output, AuxiliarSeven.Output, AuxiliarEight.Output);
 #endif
 
 #if defined(PRINTLN_GPS)
-  FastSerialPrintln(PSTR("NúmSat:%u Latitude:%ld Longitude:%ld 3DFix:%u Declinação:%.2f EEPROM:%.2f HDOP:%.2f\n"),
-                    GPS_NumberOfSatellites, GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1],
-                    GPS_3DFIX, Declination(), STORAGEMANAGER.Read_Float(DECLINATION_ADDR),
-                    (float)GPS_HDOP / 100);
+  PRINTF.SendToConsole(PSTR("NúmSat:%u Latitude:%ld Longitude:%ld 3DFix:%u Declinação:%.2f EEPROM:%.2f HDOP:%.2f\n"),
+                       GPS_NumberOfSatellites, GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1],
+                       GPS_3DFIX, Declination(), STORAGEMANAGER.Read_Float(DECLINATION_ADDR),
+                       (float)GPS_HDOP / 100);
 #endif
 
 #if defined(PRINTLN_ATTITUDE)
-  FastSerialPrintln(PSTR("Pitch:%d Roll:%d Yaw:%d\n"),
-                    ATTITUDE.AngleOut[PITCH], ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[YAW]);
+  PRINTF.SendToConsole(PSTR("Pitch:%d Roll:%d Yaw:%d\n"),
+                       ATTITUDE.AngleOut[PITCH], ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[YAW]);
 #endif
 
 #if defined(PRINTLN_BATTERY)
-  FastSerialPrintln(PSTR("Tensão:%.2f Porcentagem:%u Corrente:%.2f TotalCurrentInMah:%.2f Watts:%u\n"),
-                    BATTERY.Voltage, BATTERY.GetPercentage(), BATTERY.Total_Current, BATTERY.Get_Current_In_Mah(), BATTERY.GetWatts());
+  PRINTF.SendToConsole(PSTR("Tensão:%.2f Porcentagem:%u Corrente:%.2f TotalCurrentInMah:%.2f Watts:%u\n"),
+                       BATTERY.Voltage, BATTERY.GetPercentage(), BATTERY.Total_Current, BATTERY.Get_Current_In_Mah(), BATTERY.GetWatts());
 #endif
 
 #if defined(PRINTLN_ALLSENSORS)
-  FastSerialPrintln(PSTR("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d Mx:%d My:%d Mz:%d Baro:%ld\n"),
-                    IMU.AccelerometerRead[ROLL], IMU.AccelerometerRead[PITCH], IMU.AccelerometerRead[YAW], IMU.GyroscopeRead[ROLL], IMU.GyroscopeRead[PITCH], IMU.GyroscopeRead[YAW],
-                    IMU.CompassRead[ROLL], IMU.CompassRead[PITCH], IMU.CompassRead[YAW], ALTITUDE.RealBaroAltitude);
+  PRINTF.SendToConsole(PSTR("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d Mx:%d My:%d Mz:%d Baro:%ld\n"),
+                       IMU.AccelerometerRead[ROLL], IMU.AccelerometerRead[PITCH], IMU.AccelerometerRead[YAW], IMU.GyroscopeRead[ROLL], IMU.GyroscopeRead[PITCH], IMU.GyroscopeRead[YAW],
+                       IMU.CompassRead[ROLL], IMU.CompassRead[PITCH], IMU.CompassRead[YAW], ALTITUDE.RealBaroAltitude);
 #endif
 
 #if defined(PRINTLN_IMU)
-  FastSerialPrintln(PSTR("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d\n"),
-                    IMU.AccelerometerRead[ROLL], IMU.AccelerometerRead[PITCH], IMU.AccelerometerRead[YAW],
-                    IMU.GyroscopeRead[ROLL], IMU.GyroscopeRead[PITCH], IMU.GyroscopeRead[YAW]);
+  PRINTF.SendToConsole(PSTR("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d\n"),
+                       IMU.AccelerometerRead[ROLL], IMU.AccelerometerRead[PITCH], IMU.AccelerometerRead[YAW],
+                       IMU.GyroscopeRead[ROLL], IMU.GyroscopeRead[PITCH], IMU.GyroscopeRead[YAW]);
 #endif
 
 #if defined(PRINTLN_COMPASS)
-  FastSerialPrintln(PSTR("Pitch:%d Roll:%d Yaw:%d Rotation:%d Orientation:%d\n"),
-                    IMU.CompassRead[PITCH], IMU.CompassRead[ROLL], IMU.CompassRead[YAW], STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR), STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR));
+  PRINTF.SendToConsole(PSTR("Pitch:%d Roll:%d Yaw:%d Rotation:%d Orientation:%d\n"),
+                       IMU.CompassRead[PITCH], IMU.CompassRead[ROLL], IMU.CompassRead[YAW], STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR), STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR));
 #endif
 
 #if defined(PRINTLN_BARO)
-  FastSerialPrintln(PSTR("BaroFiltered:%ld INSBaro:%ld\n"),
-                    ALTITUDE.RealBaroAltitude, ALTITUDE.EstimatedAltitude);
+  PRINTF.SendToConsole(PSTR("BaroFiltered:%ld INSBaro:%ld\n"),
+                       ALTITUDE.RealBaroAltitude, ALTITUDE.EstimatedAltitude);
 #endif
 
 #if defined(PRINTLN_MEMORY)
-  FastSerialPrintln(PSTR("Memoria RAM Livre:%ld Memoria RAM Usada em Porcentagem:%d\n"),
-                    MEMORY.Check(), MEMORY.GetPercentageRAMUsed());
+  PRINTF.SendToConsole(PSTR("Memoria RAM Livre:%ld Memoria RAM Usada em Porcentagem:%d\n"),
+                       MEMORY.Check(), MEMORY.GetPercentageRAMUsed());
 #endif
 
 #if defined(PRINTLN_ATTITUDERC)
-  FastSerialPrintln(PSTR("Thr:%d Yaw:%d Pitch:%d Roll:%d FrameType:%d\n"),
-                    RCController[THROTTLE],
-                    RCController[YAW],
-                    RCController[PITCH],
-                    RCController[ROLL],
-                    FrameType);
+  PRINTF.SendToConsole(PSTR("Thr:%d Yaw:%d Pitch:%d Roll:%d FrameType:%d\n"),
+                       RCController[THROTTLE],
+                       RCController[YAW],
+                       RCController[PITCH],
+                       RCController[ROLL],
+                       FrameType);
 #endif
 }
 
-void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
+void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
 {
   unsigned char c;
   unsigned char flags;
@@ -198,7 +200,9 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
           break;
       }
       if (c == '\n')
+      {
         FASTSERIAL.Write(UART_NUMB_0, '\r');
+      }
       FASTSERIAL.Write(UART_NUMB_0, c);
     }
     flags = 0;
@@ -610,7 +614,7 @@ void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
 
 #if defined(__arm__) || defined(ESP32)
 
-void FastSerialPrintln()
+void PRINTF.SendToConsole()
 {
 }
 
@@ -618,7 +622,7 @@ void SerialPrintF()
 {
 }
 
-void PrintlnParameters()
+void ParamsToConsole()
 {
   /*
   if (Serial.read() == 'c')

@@ -80,7 +80,7 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
     BATTERY.Percentage = 1;
   }
 #ifdef DEBUG
-  FastSerialPrintln(PSTR("volt:%0.2f min:%0.2f max:%0.2f mincount:%d maxcount:%d\n"),
+  PRINTF.SendToConsole(PSTR("volt:%0.2f min:%0.2f max:%0.2f mincount:%d maxcount:%d\n"),
                     BattVoltage,
                     BattMinVolt,
                     BattMaxVolt,

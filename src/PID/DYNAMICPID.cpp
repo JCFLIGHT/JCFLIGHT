@@ -45,14 +45,14 @@ void PID_Dynamic()
   {
     DynamicProportionalTwo = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
 #if defined(PRINTLN_TPA)
-    FastSerialPrintln(PSTR("TPACopter:%d\n"), DynamicProportionalTwo);
+    PRINTF.SendToConsole(PSTR("TPACopter:%d\n"), DynamicProportionalTwo);
 #endif
   }
   else //CONFIG PARA AEROS E ASA-FIXA
   {
     DynamicProportionalTwo = CalculateFixedWingTPAFactor(RCController[THROTTLE]);
 #if defined(PRINTLN_TPA)
-    FastSerialPrintln(PSTR("TPAPlane:%d\n"), DynamicProportionalTwo);
+    PRINTF.SendToConsole(PSTR("TPAPlane:%d\n"), DynamicProportionalTwo);
 #endif
   }
   for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)

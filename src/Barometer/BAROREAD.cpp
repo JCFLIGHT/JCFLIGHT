@@ -34,17 +34,17 @@ AverageFilterInt32_Size5 Altitude_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A AL
 
 void RecalculateBaroTotalPressure()
 {
-  static int32_t BaroVector[BARO_SPIKES_SIZE];
-  static uint8_t BaroIndex;
-  uint8_t IndexFilter = (BaroIndex + 1);
-  if (IndexFilter >= BARO_SPIKES_SIZE)
+  static int32_t PressureVector[BARO_SPIKES_SIZE];
+  static uint8_t PressureIndex;
+  uint8_t PressureIndexCount = (PressureIndex + 1);
+  if (PressureIndexCount >= BARO_SPIKES_SIZE)
   {
-    IndexFilter = 0;
+    PressureIndexCount = 0;
   }
-  BaroVector[BaroIndex] = Pressure_Filter.Apply(BaroPressureRaw);
-  BaroPressureFiltered += BaroVector[BaroIndex];
-  BaroPressureFiltered -= BaroVector[IndexFilter];
-  BaroIndex = IndexFilter;
+  PressureVector[PressureIndex] = Pressure_Filter.Apply(BaroPressureRaw);
+  BaroPressureFiltered += PressureVector[PressureIndex];
+  BaroPressureFiltered -= PressureVector[PressureIndexCount];
+  PressureIndex = PressureIndexCount;
 }
 
 float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t BaroTemperature)

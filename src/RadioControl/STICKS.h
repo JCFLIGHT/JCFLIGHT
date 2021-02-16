@@ -18,6 +18,7 @@
 #ifndef STICKS_H_
 #define STICKS_H_
 #include "Arduino.h"
+extern bool PreArm_Delay;
 void RC_Sticks_Update();
 void Pre_Arm(void);
 void Pre_Arm_Leds(void);

@@ -58,7 +58,7 @@ void PID_Dynamic()
   for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)
   {
     uint16_t DynamicStored = MIN_U16BITS(ABS_16BITS(RadioControllOutput[RCIndexCount] - 1500), 500);
-    DynamicProportional = 100 - (uint16_t)RollAndPitchRate[RCIndexCount] * DynamicStored / 500;
+    DynamicProportional = 100 - (uint16_t)DynamicRollAndPitchRate[RCIndexCount] * DynamicStored / 500;
     DynamicProportional = (uint16_t)DynamicProportional * DynamicProportionalTwo / 100;
     DynamicProportionalVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].ProportionalVector * DynamicProportional / 100;
     DynamicDerivativeVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].DerivativeVector * DynamicProportional / 100;

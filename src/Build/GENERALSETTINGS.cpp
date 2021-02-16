@@ -37,6 +37,7 @@
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "ParamsToGCS/FULLPARAMS.h"
 #include "RadioControl/RCSMOOTH.h"
+#include "AirPlane/SERVORATE.h"
 
 void GeneralSettingsInitialization()
 {
@@ -65,4 +66,5 @@ void GeneralSettingsInitialization()
   AHRS_Initialization();
   SAFETYBUTTON.Initialization();
   RCInterpolationInit();
+  Servo_Rate_Update();
 }

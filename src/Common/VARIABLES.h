@@ -34,7 +34,6 @@ extern bool GPS_3DFIX;
 extern bool Do_Stabilize_Mode;
 extern bool Do_HeadingHold_Mode;
 extern bool Do_AltitudeHold_Mode;
-extern bool Cancel_Arm_Disarm;
 extern bool ImmediatelyFailSafe;
 extern bool TurnCoordinatorMode;
 
@@ -47,7 +46,7 @@ extern uint8_t MagAddress;
 extern uint8_t MagRegister;
 extern uint8_t RCRate;
 extern uint8_t RCExpo;
-extern uint8_t RollAndPitchRate[2];
+extern uint8_t DynamicRollAndPitchRate[2];
 extern uint8_t YawRate;
 extern uint8_t ThrottleMiddle;
 extern uint8_t ThrottleExpo;

@@ -20,5 +20,5 @@
 #include "Arduino.h"
 extern float Cosine_Yaw;
 extern float Sine_Yaw;
-void CalculateAccelerationXYZ();
+void EarthFrame_Calculate_AccelerationXYZ();
 #endif

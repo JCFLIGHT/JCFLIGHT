@@ -103,7 +103,7 @@ struct _GCSParameters
     uint16_t SendHomePointDistance;
     uint16_t SendCurrentInMah;
     uint16_t SendCourseOverGround;
-    int16_t SendCrosstrack;
+    int16_t SendBearing;
     int16_t SendAccGForce;
     uint8_t SendAccImageBitMap;
     int16_t SendCompassRoll;
@@ -913,7 +913,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(GCSParameters.SendHomePointDistance, VAR_16BITS);
         GCS_Send_Data(GCSParameters.SendCurrentInMah, VAR_16BITS);
         GCS_Send_Data(GCSParameters.SendCourseOverGround, VAR_16BITS);
-        GCS_Send_Data(GCSParameters.SendCrosstrack, VAR_16BITS);
+        GCS_Send_Data(GCSParameters.SendBearing, VAR_16BITS);
         GCS_Send_Data(GCSParameters.SendAccGForce, VAR_16BITS);
         GCS_Send_Data(GCSParameters.SendAccImageBitMap, VAR_8BITS);
         GCS_Send_Data(GCSParameters.SendCompassRoll, VAR_16BITS);
@@ -1268,7 +1268,7 @@ void GCSClass::GCS_Request_Parameters()
 #else
     GCSParameters.SendCourseOverGround = Loop_Integral_Time;
 #endif
-    GCSParameters.SendCrosstrack = Target_Bearing;
+    GCSParameters.SendBearing = Target_Bearing;
     GCSParameters.SendAccGForce = GetGForce() * 100;
     GCSParameters.SendAccImageBitMap = GetImageToGCS();
     GCSParameters.SendCompassRoll = IMU.CompassRead[ROLL];
@@ -1885,9 +1885,9 @@ void GCSClass::Default_RadioControl_Configuration()
 {
     //LIMPA TODAS AS CONFIGURAÇÕES SALVAS DO RÁDIO E DOS SERVOS
     STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, 50);
-    STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, 35);
-    STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, 60);
-    STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, 70);
+    STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, 65);
+    STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, 90);
     STORAGEMANAGER.Write_8Bits(ROLL_RATE_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(PITCH_RATE_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 0);

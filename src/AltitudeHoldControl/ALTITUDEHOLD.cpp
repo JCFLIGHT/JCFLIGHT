@@ -23,6 +23,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "RadioControl/CURVESRC.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 bool TakeOffInProgress = false;
 bool GroundAltitudeSet = false;
@@ -194,14 +195,30 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   VariometerErrorIPart = Constrain_16Bits(VariometerErrorIPart, -250, 250);
   int16_t VarioPIDControl = ((VariometerError * PID[PIDALTITUDE].ProportionalVector) >> 5) + VariometerErrorIPart -
                             (((int32_t)INS.AccelerationEarthFrame_Filtered[2] * PID[PIDALTITUDE].DerivativeVector) >> 6);
-  RCController[THROTTLE] = HoveringThrottle + VarioPIDControl;
-  RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE], AttitudeThrottleMin + 50, AttitudeThrottleMax - 50);
+
+  if (GetFrameStateOfMultirotor())
+  {
+    RCController[THROTTLE] = Constrain_16Bits(HoveringThrottle + VarioPIDControl, AttitudeThrottleMin + 50, AttitudeThrottleMax - 50);
+  }
+  else if (GetFrameStateOfAirPlane())
+  {
+    RCController[PITCH] = Constrain_16Bits(VarioPIDControl, -RCRate * 10, +RCRate * 10);
+  }
 
 #ifdef THR_SMOOTH_TEST
 
-  FastSerialPrintln(PSTR("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
-                    RCController[THROTTLE],
-                    (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], 4, 1.0f / 1000));
+  if (GetFrameStateOfMultirotor())
+  {
+    FastSerialPrintln(PSTR("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
+                      RCController[THROTTLE],
+                      (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], 4, 1.0f / 1000));
+  }
+  else if (GetFrameStateOfAirPlane())
+  {
+    FastSerialPrintln(PSTR("RCController[PITCH]:%d PT1RCController[PITCH]:%d\n"),
+                      RCController[PITCH],
+                      (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], 4, 1.0f / 1000));
+  }
 
 #endif
 }

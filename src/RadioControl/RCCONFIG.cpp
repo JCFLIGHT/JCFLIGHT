@@ -18,7 +18,6 @@
 #include "RCCONFIG.h"
 #include "Common/VARIABLES.h"
 #include "RadioControl/DECODE.h"
-#include "WayPointNavigation/WAYPOINT.h"
 #include "PAA/FLIPMODE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "SBUS/SBUSREAD.h"
@@ -278,20 +277,13 @@ void RCConfigClass::Set_Pulse()
 
 void RCConfigClass::Update_Channels()
 {
-  if (!Auto_TakeOff)
+  if (!Lock_UP)
   {
-    if (!Lock_UP)
-    {
-      RadioControllOutput[THROTTLE] = StoredValueOfThrottle = Throttle.Output;
-    }
-    else
-    {
-      RadioControllOutput[THROTTLE] = StoredValueOfThrottle;
-    }
+    RadioControllOutput[THROTTLE] = StoredValueOfThrottle = Throttle.Output;
   }
   else
   {
-    RadioControllOutput[THROTTLE] = ThrottleIncrement;
+    RadioControllOutput[THROTTLE] = StoredValueOfThrottle;
   }
   if (!LockPitchAndRollRC)
   {

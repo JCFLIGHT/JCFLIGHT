@@ -18,6 +18,6 @@
 #ifndef AUTOTHROTTLE_H_
 #define AUTOTHROTTLE_H_
 #include "Arduino.h"
-void Auto_Throttle_Flight_Mode();
-void Apply_Controll_For_Throttle();
+void AirPlane_Update_Auto_Throttle();
+void AirPlane_Apply_Auto_Throttle_Control();
 #endif

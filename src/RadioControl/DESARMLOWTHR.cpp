@@ -25,13 +25,13 @@
 //TIMER DE DESLIGAMENTO AUTOMATICO DOS MOTORES POR INATIVADADE DO THROTTLE
 //**************************************************************************
 
+#define THIS_LOOP_RATE 50  //HZ
 #define AUTO_DISARM_TIME 5 //SEGUNDOS
 #define THROTTLE_VALUE_MAX 1100
 #define YPR_VALUE_MIN 1450
 #define YPR_VALUE_MAX 1550
 
 uint8_t TimerDesarm;
-uint8_t Counter_One_Hertz;
 
 void Desarm_LowThrottle()
 {
@@ -40,38 +40,27 @@ void Desarm_LowThrottle()
   {
     return;
   }
-  //FAÇA UMA RAPIDA SAÍDA SE O COMANDO ARMDISARM FOR PELA CHAVE AUX
-  if (ArmDisarmConfig != 0)
-  {
-    return;
-  }
   //THROTTLE NO MINIMO,DRONE ARMADO,FAIL-SAFE DESATIVADO?SIM...
-  if (Check_Throttle() && Check_Others_Channels() && COMMAND_ARM_DISARM && !ImmediatelyFailSafe)
+  if (Check_Throttle() && Check_Others_Channels() && COMMAND_ARM_DISARM &&
+      !ImmediatelyFailSafe && !SetFlightModes[WAYPOINT_MODE] && ArmDisarmConfig == 0)
   {
-    //ROTINA DE 1HZ
-    Counter_One_Hertz++;
-    if (Counter_One_Hertz >= 50)
+    if (TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
+    {
+      COMMAND_ARM_DISARM = false;    //DESARMA OS MOTORES
+      BEEPER.Play(BEEPER_DISARMING); //TOCA A MÚSICA INDICANDO O DESARM
+    }
+    else if (TimerDesarm > 254)
+    {
+      TimerDesarm = 254;
+    }
+    else
     {
       TimerDesarm++; //INICIA A CONTAGEM
-      if (TimerDesarm == AUTO_DISARM_TIME)
-      {
-        if (COMMAND_ARM_DISARM && !Cancel_Arm_Disarm)
-        {
-          COMMAND_ARM_DISARM = false;    //DESARMA OS MOTORES
-          BEEPER.Play(BEEPER_DISARMING); //TOCA A MÚSICA INDICANDO O DESARM
-        }
-      }
-      else if (TimerDesarm > 254)
-      {
-        TimerDesarm = 254;
-      }
-      Counter_One_Hertz = 0;
     }
   }
   else
   {
-    TimerDesarm = 0;       //RESETA A CONTAGEM
-    Counter_One_Hertz = 0; //RESETA A CONTAGEM
+    TimerDesarm = 0; //RESETA A CONTAGEM
   }
 }
 

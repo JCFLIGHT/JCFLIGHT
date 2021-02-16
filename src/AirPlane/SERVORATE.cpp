@@ -43,10 +43,10 @@ void Servo_Rate_Update()
 void Servo_Rate_Apply()
 {
   //CALCULA O RATE PARA OS SERVOS
-  AIR_PLANE.ServoToFilter[SERVO1] = (((int32_t)AIR_PLANE.ServoRate[SERVO1] * AIR_PLANE.ServoToFilter[SERVO1]) / 100); //AJUSTA O RATE DO SERVO 1
-  AIR_PLANE.ServoToFilter[SERVO2] = (((int32_t)AIR_PLANE.ServoRate[SERVO2] * AIR_PLANE.ServoToFilter[SERVO2]) / 100); //AJUSTA O RATE DO SERVO 2
-  AIR_PLANE.ServoToFilter[SERVO3] = (((int32_t)AIR_PLANE.ServoRate[SERVO3] * AIR_PLANE.ServoToFilter[SERVO3]) / 100); //AJUSTA O RATE DO SERVO 3
-  AIR_PLANE.ServoToFilter[SERVO4] = (((int32_t)AIR_PLANE.ServoRate[SERVO4] * AIR_PLANE.ServoToFilter[SERVO4]) / 100); //AJUSTA O RATE DO SERVO 4
+  AIR_PLANE.ServoToFilter[SERVO1] = (((int32_t)AIR_PLANE.ServoRate[SERVO1] * AIR_PLANE.ServoToFilter[SERVO1]) / 100L); //AJUSTA O RATE DO SERVO 1
+  AIR_PLANE.ServoToFilter[SERVO2] = (((int32_t)AIR_PLANE.ServoRate[SERVO2] * AIR_PLANE.ServoToFilter[SERVO2]) / 100L); //AJUSTA O RATE DO SERVO 2
+  AIR_PLANE.ServoToFilter[SERVO3] = (((int32_t)AIR_PLANE.ServoRate[SERVO3] * AIR_PLANE.ServoToFilter[SERVO3]) / 100L); //AJUSTA O RATE DO SERVO 3
+  AIR_PLANE.ServoToFilter[SERVO4] = (((int32_t)AIR_PLANE.ServoRate[SERVO4] * AIR_PLANE.ServoToFilter[SERVO4]) / 100L); //AJUSTA O RATE DO SERVO 4
 
   //AJUSTA O PONTO MÉDIO DOS SERVOS
   AIR_PLANE.ServoToFilter[SERVO1] += AIR_PLANE.ServoMiddle[SERVO1];

@@ -28,8 +28,6 @@
 #define SERVO_AUTOTRIM_OVERFLOW 2000
 #define SAVE_OVERFLOW 2500
 
-ServoAutoTrimState_Enum ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
-
 bool ServoAutoTrimEnabled;
 
 int16_t ServoActualPulse[MAX_SUPPORTED_SERVOS];
@@ -59,6 +57,8 @@ void Reset_Gyro_PID_Accum()
 
 void ServoAutoTrimRun(void)
 {
+    static ServoAutoTrimState_Enum ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
+
     ServoActualPulse[SERVO1] = MotorControl[MOTOR2];
     ServoActualPulse[SERVO2] = MotorControl[MOTOR3];
     ServoActualPulse[SERVO3] = MotorControl[MOTOR4];

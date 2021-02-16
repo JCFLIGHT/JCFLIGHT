@@ -69,7 +69,7 @@ void SetFlightModesToGCS()
     {
       FlightMode = GCS_WAYPOINT_MODE;
     }
-    if (AutoLandControlAux && !COMMAND_ARM_DISARM)
+    if (AutoLandControlAux)
     {
       FlightMode = GCS_LAND_MODE;
     }

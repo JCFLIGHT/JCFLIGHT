@@ -19,47 +19,32 @@
 #include "Common/VARIABLES.h"
 #include "Filters/AVERAGEFILTER.h"
 
+#define BARO_SPIKES_SIZE 0x15
+
 float BarometerGroundPressureForFlight;
 float BarometerTemperatureScale;
 
 int16_t BaroTemperatureRaw;
+
 int32_t BaroPressureRaw;
 int32_t BaroPressureFiltered;
 
-AverageFilterInt32_Size5 Baro_Filter; //ISTANCIA DO FILTRO AVERAGE PARA O BARO,TAMANHO = 5 ITERAÇÕES
+AverageFilterInt32_Size5 Pressure_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A PRESSÃO BARO,TAMANHO = 5 ITERAÇÕES
+AverageFilterInt32_Size5 Altitude_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A ALTITUDE,TAMANHO = 5 ITERAÇÕES
 
-void Baro_AverageFilter()
+void RecalculateBaroTotalPressure()
 {
-  static int32_t BaroVector[0x15];
+  static int32_t BaroVector[BARO_SPIKES_SIZE];
   static uint8_t BaroIndex;
   uint8_t IndexFilter = (BaroIndex + 1);
-  if (IndexFilter == 0x15)
+  if (IndexFilter >= BARO_SPIKES_SIZE)
   {
     IndexFilter = 0;
   }
-  BaroVector[BaroIndex] = BaroPressureRaw;
+  BaroVector[BaroIndex] = Pressure_Filter.Apply(BaroPressureRaw);
   BaroPressureFiltered += BaroVector[BaroIndex];
   BaroPressureFiltered -= BaroVector[IndexFilter];
   BaroIndex = IndexFilter;
-}
-
-void CalculateBaroAltitudeForFlight()
-{
-  if (!COMMAND_ARM_DISARM)
-  {
-    DoBaroCalibrationForFlight();
-    Baro_Filter.Reset(); //RESETA O FILTRO AVERAGE PARA EVITAR ALTOS DROPS DE VALORES
-  }
-  else
-  {
-    ALTITUDE.RealBaroAltitude = Baro_Filter.Apply((int32_t)Get_Altitude_Difference(BarometerGroundPressureForFlight, BaroPressureFiltered, BarometerTemperatureScale));
-  }
-}
-
-void DoBaroCalibrationForFlight()
-{
-  BarometerGroundPressureForFlight = BaroPressureFiltered;
-  BarometerTemperatureScale = BaroTemperatureRaw;
 }
 
 float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t BaroTemperature)
@@ -78,6 +63,25 @@ float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t Bar
   Result = 153.8462f * CalcedTemperature * (1.0f - expf(0.190259f * logf(Scaling)));
 #endif
   return Result;
+}
+
+void DoBaroCalibrationForFlight()
+{
+  BarometerGroundPressureForFlight = BaroPressureFiltered;
+  BarometerTemperatureScale = BaroTemperatureRaw;
+}
+
+void CalculateBaroAltitudeForFlight()
+{
+  if (!COMMAND_ARM_DISARM)
+  {
+    DoBaroCalibrationForFlight();
+    Altitude_Filter.Reset();
+  }
+  else
+  {
+    ALTITUDE.RealBaroAltitude = Altitude_Filter.Apply((int32_t)Get_Altitude_Difference(BarometerGroundPressureForFlight, BaroPressureFiltered, BarometerTemperatureScale));
+  }
 }
 
 int32_t GetAltitudeForGCS()

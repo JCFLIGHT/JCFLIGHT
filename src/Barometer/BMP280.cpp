@@ -106,6 +106,6 @@ void BMP280_Initialization()
 
 void BMP280_Update()
 {
-  Baro_AverageFilter();
+  RecalculateBaroTotalPressure();
   CalculatePressure();
 }

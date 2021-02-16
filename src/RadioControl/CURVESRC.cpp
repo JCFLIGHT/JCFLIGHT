@@ -23,8 +23,6 @@
 #include "PID/TPA.h"
 
 #define THROTTLE_LOOKUP_LENGTH 11
-//lrint RETORNA UM VALOR ARREDONDADO DE UM NÚMERO DE PONTO FLUTUANTE (1.5 = 2 / 2.5 = 2)
-#define LRint lrint
 
 int16_t ThrottleRCMiddle = 0;
 
@@ -34,8 +32,8 @@ void CurvesRC_SetValues()
   ThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
   RCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
   RCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
-  RollAndPitchRate[ROLL] = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
-  RollAndPitchRate[PITCH] = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
+  DynamicRollAndPitchRate[ROLL] = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
+  DynamicRollAndPitchRate[PITCH] = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
   YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
   AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
   AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
@@ -74,7 +72,7 @@ int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo)
   int16_t RCValueDeflection;
   RCValueDeflection = Constrain_16Bits(RadioControllOutput[Data] - 1500, -500, 500);
   float ConvertValueToFloat = RCValueDeflection / 100.0f;
-  return LRint((2500.0f + (float)RcExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
+  return lrint((2500.0f + (float)RcExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
 }
 
 uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)

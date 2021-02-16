@@ -28,7 +28,7 @@ float AccelerationAdjustBias[3];
 float AccelerationEarthFrame_LPF[3];
 float AccelerationDifference[3];
 
-void CalculateAccelerationXYZ()
+void EarthFrame_Calculate_AccelerationXYZ()
 {
   float Cosine_Roll;
   float Sine_Roll;
@@ -47,9 +47,10 @@ void CalculateAccelerationXYZ()
 
 #ifdef DEBUG_ACCELERATION
 
-  FastSerialPrintln(PSTR("Cosine_Roll:%.4f Sine_Roll:%.4f\n"),
+  FastSerialPrintln(PSTR("Cosine_Roll:%.4f Sine_Roll:%.4f ATTITUDE.AngleOut[ROLL]:%.4f\n"),
                     Cosine_Roll,
-                    Sine_Roll);
+                    Sine_Roll,
+                    ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
 
 /*
   FastSerialPrintln(PSTR("Cosine_Pitch:%.4f Sine_Pitch:%.4f\n"),

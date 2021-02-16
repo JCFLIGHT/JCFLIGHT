@@ -155,6 +155,18 @@ void ProcessFlightModesToAirPlane()
     return;
   }
 
+  if (SetFlightModes[CRUISE_MODE])
+  {
+    if (!Do_AltitudeHold_Mode)
+    {
+      Do_AltitudeHold_Mode = true;
+    }
+  }
+  else
+  {
+    Do_AltitudeHold_Mode = false;
+  }
+
   if (GPS_NumberOfSatellites >= 5 && COMMAND_ARM_DISARM)
   {
     if (GPS_Flight_Mode != GPS_MODE_NONE && !Do_Stabilize_Mode)

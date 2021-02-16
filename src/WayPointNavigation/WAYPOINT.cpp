@@ -24,6 +24,8 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
+#include "RadioControl/STICKS.h"
+#include "Scheduler/SCHEDULER.h"
 
 struct _GetWayPointGCSParameters GetWayPointGCSParameters;
 struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
@@ -32,13 +34,11 @@ struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 #define WAYPOINT_RADIUS 2               //RAIO PARA VERIFICAR SE A CONTROLADORA CHEGOU PERTO DO WP E INICIAR A IDA PARA O PROXIMO (RAIO EM METROS)
 #define THROTTLE_TAKEOFF_ASCENT 1600    //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF ATÉ CHEGAR NA ALTITUDE SETADA PELO GCS
 #define THROTTLE_TAKEOFF_NORMALIZE 1500 //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF AO CHEGAR NA ALTITUDE SETADA PELO GCS
-#define THROTTLE_CANCEL_TAKEOFF 1470    //VALOR DO THROTTLE LIDO DO RECEPTOR PARA CANCELAR O AUTO-TAKEOFF E VOLTAR AO CONTROLE NORMAL
-#define THIS_LOOP_RATE 100              //TODAS AS FUNÇÕES ABAIXO ESTÃO OPERANDO A 100HZ,MENOS O void PushWayPointParameters
+#define THROTTLE_CANCEL_TAKEOFF 1450    //VALOR DO THROTTLE LIDO DO RECEPTOR PARA CANCELAR O AUTO-TAKEOFF E VOLTAR AO CONTROLE NORMAL
 #define THROTTLE_INCREMENT 100          //NÚMERO DE INCREMENTAÇÕES A CADA ESTOURO DE TEMPO DEFINIDO PELO PARAMETRO THROTTLE_INCREMENT_TIME
-#define THROTTLE_INCREMENT_TIME 10      //INCREMENTA A CADA 0.10 SEGUNDOS
+#define THROTTLE_INCREMENT_TIME 1       //INCREMENTA A CADA 0.10 SEGUNDOS
 
-bool Auto_TakeOff = false;
-bool Normalize_Throttle_TakeOff = false;
+bool WPTakeOffNomalized = false;
 bool Mission_BaroMode = false;
 bool WPSucess = false;
 bool ClearEEPROM = false;
@@ -183,6 +183,16 @@ void PushWayPointParameters()
   WayPointTimed[9] = GetWayPointGCSParametersTwo.GPSHoldTimedTen;
 }
 
+bool WayPointSync10Hz()
+{
+  static Scheduler_Struct WayPointSyncTimer;
+  if (Scheduler(&WayPointSyncTimer, SCHEDULER_SET_FREQUENCY(10, "Hz")))
+  {
+    return true;
+  }
+  return false;
+}
+
 void WayPointRun()
 {
   int16_t Navigation_Speed_Result = 0;
@@ -198,9 +208,8 @@ void WayPointRun()
     Mission_Timed_Count = 0;
     ThrottleIncrement = 1000;
     ThrottleIncrementCount = 0;
-    Auto_TakeOff = false;
-    Cancel_Arm_Disarm = false;
     Mission_BaroMode = false;
+    WPTakeOffNomalized = false;
     return;
   }
 
@@ -235,17 +244,24 @@ void WayPointRun()
     GPS_Flight_Mode = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
     NavigationMode = Do_PositionHold;
-    if (GetAltitudeReached())
+    if (GetAltitudeReached() && COMMAND_ARM_DISARM)
     {
-      Normalize_Throttle_TakeOff = true;
-      WayPointMode = WP_START_MISSION;
+      if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
+      {
+        PreArm_Delay = false;
+        WayPointMode = WP_START_MISSION;
+      }
     }
     else
     {
-      //CORRIGIR O AUTO-TAKEOFF QUE NÃO ESTÁ FUNCIONANDO
-      Normalize_Throttle_TakeOff = false;
-      COMMAND_ARM_DISARM = true;
-      AutoTakeOff(true);
+      if (COMMAND_ARM_DISARM)
+      {
+        AutoTakeOff(true);
+      }
+      else
+      {
+        PreArm_Delay = true;
+      }
     }
     break;
 
@@ -332,14 +348,17 @@ void WayPointRun()
       //GPS-HOLD TIMERIZADO
       if (WayPointFlightMode[MissionNumber] == WP_TIMED)
       {
-        Mission_Timed_Count++; //100 ITERAÇÕES = 1 SEGUNDO
+        if (WayPointSync10Hz())
+        {
+          Mission_Timed_Count++; //10 ITERAÇÕES = 1 SEGUNDO
+        }
         Do_GPS_Altitude = false;
         GPS_Flight_Mode = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
         NavigationMode = Do_PositionHold;
         GPS_Flight_Mode = WAYPOINT;
         NavigationMode = Do_PositionHold;
-        if (Mission_Timed_Count >= WayPointTimed[MissionNumber] * THIS_LOOP_RATE)
+        if (Mission_Timed_Count >= WayPointTimed[MissionNumber] * 10)
         {
           WayPointMode = GET_ALTITUDE;
         }
@@ -364,138 +383,145 @@ void WayPointRun()
   }
 }
 
-void AutoTakeOff(bool _TAKEOFF)
+void AutoTakeOff(bool AutoTakeOff)
 {
-  Auto_TakeOff = _TAKEOFF;
-  Cancel_Arm_Disarm = _TAKEOFF;
-  if (!_TAKEOFF)
+  if (!AutoTakeOff)
   {
     return;
   }
-  ThrottleIncrementCount++;
-  if (ThrottleIncrementCount >= THROTTLE_INCREMENT_TIME)
+  if (WayPointSync10Hz())
   {
-    if (Normalize_Throttle_TakeOff)
+    if (ThrottleIncrement < THROTTLE_TAKEOFF_ASCENT && !WPTakeOffNomalized)
     {
+      if (ThrottleIncrementCount >= THROTTLE_INCREMENT_TIME)
+      {
+        ThrottleIncrement += THROTTLE_INCREMENT;
+        ThrottleIncrementCount = 0;
+      }
+      else
+      {
+        ThrottleIncrementCount++;
+      }
+    }
+    else
+    {
+      WPTakeOffNomalized = true;
       ThrottleIncrement = THROTTLE_TAKEOFF_NORMALIZE;
     }
-    if (ThrottleIncrement < THROTTLE_TAKEOFF_ASCENT && !Normalize_Throttle_TakeOff)
-    {
-      ThrottleIncrement += THROTTLE_INCREMENT;
-    }
-    ThrottleIncrementCount = 0;
   }
+  RadioControllOutput[THROTTLE] = ThrottleIncrement;
+  RCController[THROTTLE] = Constrain_16Bits(ThrottleIncrement, AttitudeThrottleMin, AttitudeThrottleMax);
 }
 
 void Get_Altitude()
 {
   if (WayPointAltitude[MissionNumber] == 0)
   {
-    SetAltitudeHold(10);
+    SetAltitudeHold(10 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 1)
   {
-    SetAltitudeHold(15);
+    SetAltitudeHold(15 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 2)
   {
-    SetAltitudeHold(20);
+    SetAltitudeHold(20 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 3)
   {
-    SetAltitudeHold(25);
+    SetAltitudeHold(25 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 4)
   {
-    SetAltitudeHold(30);
+    SetAltitudeHold(30 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 5)
   {
-    SetAltitudeHold(35);
+    SetAltitudeHold(35 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 6)
   {
-    SetAltitudeHold(40);
+    SetAltitudeHold(40 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 7)
   {
-    SetAltitudeHold(45);
+    SetAltitudeHold(45 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 8)
   {
-    SetAltitudeHold(50);
+    SetAltitudeHold(50 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 9)
   {
-    SetAltitudeHold(55);
+    SetAltitudeHold(55 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 10)
   {
-    SetAltitudeHold(60);
+    SetAltitudeHold(60 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 11)
   {
-    SetAltitudeHold(65);
+    SetAltitudeHold(65 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 12)
   {
-    SetAltitudeHold(70);
+    SetAltitudeHold(70 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 13)
   {
-    SetAltitudeHold(75);
+    SetAltitudeHold(75 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 14)
   {
-    SetAltitudeHold(80);
+    SetAltitudeHold(80 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 15)
   {
-    SetAltitudeHold(85);
+    SetAltitudeHold(85 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 16)
   {
-    SetAltitudeHold(90);
+    SetAltitudeHold(90 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 17)
   {
-    SetAltitudeHold(95);
+    SetAltitudeHold(95 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 18)
   {
-    SetAltitudeHold(100);
+    SetAltitudeHold(100 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 19)
   {
-    SetAltitudeHold(105);
+    SetAltitudeHold(105 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 20)
   {
-    SetAltitudeHold(110);
+    SetAltitudeHold(110 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 21)
   {
-    SetAltitudeHold(115);
+    SetAltitudeHold(115 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 22)
   {
-    SetAltitudeHold(120);
+    SetAltitudeHold(120 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 23)
   {
-    SetAltitudeHold(125);
+    SetAltitudeHold(125 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 24)
   {
-    SetAltitudeHold(130);
+    SetAltitudeHold(130 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 25)
   {
-    SetAltitudeHold(135);
+    SetAltitudeHold(135 * 100);
   }
   else if (WayPointAltitude[MissionNumber] == 26)
   {
-    SetAltitudeHold(140);
+    SetAltitudeHold(140 * 100);
   }
 }
 

@@ -34,4 +34,17 @@
   }
 JCFLIGHT_INITIALIZE_ALGORITHM();
 
+#else
+
+void setup()
+{
+  SCHEDULERTIME.Initialization();
+  MachineInit();
+}
+
+void loop()
+{
+  MachineRun();
+}
+
 #endif

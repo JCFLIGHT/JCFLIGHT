@@ -31,6 +31,7 @@
 #define RX_RECOVERY_TIME_DESARMED 2      //NO MINIMO 2 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE EM MODO DESARMADO
 
 bool FailSafeGoodRunBeep = false;
+bool FailSafeDesarmedRecovered = false;
 int16_t RxConsistenceCount = 0;
 int16_t BuzzerFailSafeRunCount = 0;
 
@@ -108,6 +109,7 @@ void ResetRxConsistence()
   RxConsistenceCount = 0;
   BuzzerFailSafeRunCount = 0;
   FailSafeGoodRunBeep = true;
+  FailSafeDesarmedRecovered = false;
 }
 
 void ResetFailSafe()
@@ -143,9 +145,18 @@ void AbortFailSafe()
   }
   else
   {
-    if (!GetRxConsistence(RX_RECOVERY_TIME_DESARMED))
+    if (FailSafeDesarmedRecovered)
     {
       return;
+    }
+    if (!GetRxConsistence(RX_RECOVERY_TIME_DESARMED))
+    {
+      FailSafeDesarmedRecovered = false;
+      return;
+    }
+    else
+    {
+      FailSafeDesarmedRecovered = true;
     }
   }
   ResetFailSafe();
@@ -159,8 +170,8 @@ void UpdateFailSafeSystem()
     if (BuzzerFailSafeRunCount > 100) //2 SEGUNDOS
     {
       BEEPER.Play(BEEPER_FAIL_SAFE_GOOD);
-      FailSafeGoodRunBeep = false;
       BuzzerFailSafeRunCount = 0;
+      FailSafeGoodRunBeep = false;
     }
     else
     {

@@ -20,7 +20,6 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "BatteryMonitor/BATTERY.h"
-#include "RadioControl/RCCONFIG.h"
 #include "STATES.h"
 #include "Buzzer/BUZZER.h"
 #include "Arming/ARMING.h"
@@ -114,11 +113,8 @@ void Pre_Arm(void)
       }
       else //IMU CALIBRADA?SIM...ARMA OS MOTORES
       {
-        if (!COMMAND_ARM_DISARM)
-        {
-          COMMAND_ARM_DISARM = true;
-          IOC_Initial_Compass = ATTITUDE.AngleOut[YAW];
-        }
+        COMMAND_ARM_DISARM = true;
+        IOC_Initial_Compass = ATTITUDE.AngleOut[YAW];
       }
       PreArm_Delay = false;
       PreArm_Delay_Count = 0;

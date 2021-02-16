@@ -72,8 +72,9 @@ struct PID_TERMS
 
 typedef struct
 {
-  int16_t TPABreakPointer = 1500;
-  uint16_t TPAThrottlePercent = 0;
+  int16_t BreakPointer = 1500;
+  uint16_t ThrottlePercent = 0;
+  float Factor = 0;
 } TPA_Parameters_Struct;
 
 typedef struct
@@ -138,7 +139,7 @@ typedef struct
   float Matrix3x3[3][3];
 } Matrix3x3_Struct;
 
-//VETOR EM INT,PARA EVITAR AVISO DE COPILAÇÃO DO GCC
+//VETOR EM INT,PARA EVITAR AVISO DE COMPILAÇÃO DO GCC
 typedef union
 {
   int16_t Vector[3];

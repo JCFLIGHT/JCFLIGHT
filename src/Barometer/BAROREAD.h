@@ -20,9 +20,7 @@
 #include "Arduino.h"
 extern int16_t BaroTemperatureRaw;
 extern int32_t BaroPressureRaw;
-void Baro_AverageFilter();
+void RecalculateBaroTotalPressure();
 void CalculateBaroAltitudeForFlight();
-void DoBaroCalibrationForFlight();
-float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t BaroTemperature);
 int32_t GetAltitudeForGCS();
 #endif

@@ -52,6 +52,7 @@ void GPS_Orientation_Update()
   }
   else
   {
+    //ApplyAltitudeHoldControl(); //ALTITUDE-HOLD PARA AEROS???ISSO REALMENTE SERVE???
     if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != Do_None))
     {
       PlaneUpdateNavigation();

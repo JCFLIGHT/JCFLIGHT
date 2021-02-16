@@ -32,7 +32,6 @@ bool GPS_3DFIX;
 bool Do_Stabilize_Mode;
 bool Do_HeadingHold_Mode;
 bool Do_AltitudeHold_Mode;
-bool Cancel_Arm_Disarm;
 bool ImmediatelyFailSafe;
 bool TurnCoordinatorMode;
 
@@ -49,7 +48,7 @@ uint8_t NavigationMode;
 uint8_t GPS_Flight_Mode;
 uint8_t RCRate;
 uint8_t RCExpo;
-uint8_t RollAndPitchRate[2];
+uint8_t DynamicRollAndPitchRate[2];
 uint8_t YawRate;
 uint8_t ThrottleMiddle;
 uint8_t ThrottleExpo;

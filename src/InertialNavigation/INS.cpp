@@ -99,10 +99,10 @@ void ResetZState()
 uint8_t HistoryXYCount;
 int32_t HistoryXYPosition[2][10];
 
-void CalculateXY_INS()
+void INS_Calculate_AccelerationXY()
 {
-  static Scheduler_Struct CalculateXY_INSTimer;
-  if (Scheduler(&CalculateXY_INSTimer, 20000))
+  static Scheduler_Struct INS_Calculate_AccelerationXYTimer;
+  if (Scheduler(&INS_Calculate_AccelerationXYTimer, 20000))
   {
     static bool Activated = false;
     UpdateAccelerationEarthFrame_Filtered(0);
@@ -114,7 +114,7 @@ void CalculateXY_INS()
         Activated = true;
         ResetXYState();
       }
-      float DeltaTime = CalculateXY_INSTimer.ActualTime * 1e-6f;
+      float DeltaTime = INS_Calculate_AccelerationXYTimer.ActualTime * 1e-6f;
       CorrectXYStateWithGPS(&DeltaTime);
       UpdateXYState(&DeltaTime);
       SaveXYPositionToHistory();

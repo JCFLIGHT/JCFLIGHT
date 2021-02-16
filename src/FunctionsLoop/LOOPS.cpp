@@ -35,12 +35,12 @@ void Medium_Loop()
         FailSafeCheck();
         RC_Sticks_Update();
         Barometer_Update();
+        GPS_Serial_Read();
         GPS_Process_FlightModes();
         AUXFLIGHT.SelectMode();
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
-        Servo_Rate_Update();
-        Auto_Throttle_Flight_Mode();
+        AirPlane_Update_Auto_Throttle();
         BATTERY.Read_Voltage();
         BATTERY.Read_Current();
         PrintlnParameters();
@@ -54,8 +54,11 @@ void Fast_Medium_Loop()
         CrashCheck();
         PARACHUTE.Manual_Detect_Channel();
         PARACHUTE.Manual_Do_Now();
+        ///---INTEGRAL LOOP---///
+        //DEPOIS DO GPS_Orientation_Update()
         FlipModeRun();
-        WayPointRun();
+        //WayPointRun();
+        ///------------------///
         GCS.Serial_Parse_Protocol();
 
 #ifdef __AVR_ATmega2560__
@@ -78,15 +81,11 @@ void Super_Fast_Loop()
         SAFETYBUTTON.UpdateRoutine();
         SBUS_Update();
         IBUS_Update();
-        GPS_Serial_Read();
         AHRS_Update();
-        Auto_Launch_Update();
-        CalculateAccelerationXYZ();
+        EarthFrame_Calculate_AccelerationXYZ();
+        INS_Calculate_AccelerationXY();
         INS_Calculate_AccelerationZ();
-        CalculateXY_INS();
         AirSpeed_Update();
-        Apply_Controll_For_Throttle();
-        GPS_Orientation_Update();
         Switch_Flag();
         BATTERY.Calculate_Total_Mah();
 
@@ -101,8 +100,12 @@ void Integral_Loop()
         Gyro_ReadBufferData();
         Update_Loop_Time();
         PID_Dynamic();
+        GPS_Orientation_Update();
+        WayPointRun();
+        Auto_Launch_Update();
+        AirPlane_Apply_Auto_Throttle_Control();
         PID_Update();
-        ServoAutoTrimRun();
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
+        ServoAutoTrimRun();
         PID_MixMotors();
 }

@@ -32,7 +32,9 @@ void GPS_Serial_Read()
     {
         CheckGPSTXBuffer = FASTSERIAL.UsedTXBuffer(UART_NUMB_1);
         if (CheckGPSTXBuffer > 78)
+        {
             return;
+        }
         SerialReadGPS = FASTSERIAL.Read(UART_NUMB_1);
         GPS_SerialRead(SerialReadGPS);
     }

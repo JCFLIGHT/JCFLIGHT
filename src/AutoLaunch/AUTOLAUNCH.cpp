@@ -62,7 +62,7 @@ const float GetRollAccelerationInMSS()
 
 const bool GetSwingVelocityState()
 {
-  const float SwingVelocity = (ABS_FLOAT(BodyFrameRotation.Yaw) * 10 > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / BodyFrameRotation.Yaw) : 0;
+  const float SwingVelocity = (ABS(BodyFrameRotation.Yaw) * 10 > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / BodyFrameRotation.Yaw) : 0;
   return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (GetPitchAccelerationInMSS() > 0);
 }
 

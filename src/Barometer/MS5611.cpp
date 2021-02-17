@@ -30,46 +30,46 @@ static struct
 
 void MS5611_Initialization()
 {
-  I2C.WriteRegister(0x77, 0x1E, 0);
+  I2C.WriteRegister(ADDRESS_BAROMETER_MS5611, ADDRESS_COMPASS_HMC5843_OR_HMC5883, 0);
   SCHEDULERTIME.Sleep(100);
   union
   {
     uint16_t Value;
     uint8_t UT_UP_Raw[2];
   } BaroData;
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(0xA2);
-  I2C.Restart((0x77 << 1) | 1);
+  I2C.Restart((ADDRESS_BAROMETER_MS5611 << 1) | 1);
   BaroData.UT_UP_Raw[1] = I2C.ReadACK();
   BaroData.UT_UP_Raw[0] = I2C.ReadNAK();
   StructBarometer.CountVector[1] = BaroData.Value;
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(0xA4);
-  I2C.Restart((0x77 << 1) | 1);
+  I2C.Restart((ADDRESS_BAROMETER_MS5611 << 1) | 1);
   BaroData.UT_UP_Raw[1] = I2C.ReadACK();
   BaroData.UT_UP_Raw[0] = I2C.ReadNAK();
   StructBarometer.CountVector[2] = BaroData.Value;
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(0xA6);
-  I2C.Restart((0x77 << 1) | 1);
+  I2C.Restart((ADDRESS_BAROMETER_MS5611 << 1) | 1);
   BaroData.UT_UP_Raw[1] = I2C.ReadACK();
   BaroData.UT_UP_Raw[0] = I2C.ReadNAK();
   StructBarometer.CountVector[3] = BaroData.Value;
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(0xA8);
-  I2C.Restart((0x77 << 1) | 1);
+  I2C.Restart((ADDRESS_BAROMETER_MS5611 << 1) | 1);
   BaroData.UT_UP_Raw[1] = I2C.ReadACK();
   BaroData.UT_UP_Raw[0] = I2C.ReadNAK();
   StructBarometer.CountVector[4] = BaroData.Value;
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(0xAA);
-  I2C.Restart((0x77 << 1) | 1);
+  I2C.Restart((ADDRESS_BAROMETER_MS5611 << 1) | 1);
   BaroData.UT_UP_Raw[1] = I2C.ReadACK();
   BaroData.UT_UP_Raw[0] = I2C.ReadNAK();
   StructBarometer.CountVector[5] = BaroData.Value;
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(0xAC);
-  I2C.Restart((0x77 << 1) | 1);
+  I2C.Restart((ADDRESS_BAROMETER_MS5611 << 1) | 1);
   BaroData.UT_UP_Raw[1] = I2C.ReadACK();
   BaroData.UT_UP_Raw[0] = I2C.ReadNAK();
   StructBarometer.CountVector[6] = BaroData.Value;
@@ -77,7 +77,7 @@ void MS5611_Initialization()
 
 static void UT_UP_Start(uint8_t Register)
 {
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(Register);
   I2C.Stop();
 }
@@ -89,9 +89,9 @@ static void UT_UP_Read(uint32_t *Value)
     uint32_t Value;
     uint8_t UT_UP_Raw[4];
   } BaroData;
-  I2C.Restart(0x77 << 1);
+  I2C.Restart(ADDRESS_BAROMETER_MS5611 << 1);
   I2C.Write(0);
-  I2C.Restart((0x77 << 1) | 1);
+  I2C.Restart((ADDRESS_BAROMETER_MS5611 << 1) | 1);
   BaroData.UT_UP_Raw[2] = I2C.ReadACK();
   BaroData.UT_UP_Raw[1] = I2C.ReadACK();
   BaroData.UT_UP_Raw[0] = I2C.ReadNAK();

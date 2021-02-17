@@ -62,69 +62,52 @@ void ProcessFlightModesToMultirotor()
 
   if (COMMAND_ARM_DISARM)
   {
-    if (GPS_3DFIX)
+    if (GPS_NumberOfSatellites >= 5)
     {
-      if (GPS_NumberOfSatellites >= 5)
+      if (SetFlightModes[RTH_MODE])
       {
-        if (SetFlightModes[RTH_MODE])
-        {
-          SetFlightModes[GPS_HOLD_MODE] = false;
-        }
-        else
-        {
-          if (SetFlightModes[GPS_HOLD_MODE])
-          {
-            SetFlightModes[GPS_HOLD_MODE] = SticksInAutoPilotPosition(20);
-          }
-        }
-        if (CheckSafeStateToGPSMode())
-        {
-          if (SetFlightModes[RTH_MODE])
-          {
-            GPSHold_CallBaro = true;
-            SetFlightModes[HEADING_HOLD_MODE] = true;
-            Do_Mode_RTH_Now();
-          }
-          else if (SetFlightModes[GPS_HOLD_MODE])
-          {
-            GPS_Flight_Mode = GPS_MODE_HOLD;
-            Do_GPS_Altitude = false;
-            GPSHold_CallBaro = true;
-            SetFlightModes[HEADING_HOLD_MODE] = true;
-            SetThisPointToPositionHold();
-            NavigationMode = Do_PositionHold;
-          }
-          else if (SetFlightModes[LAND_MODE])
-          {
-            GPS_Flight_Mode = GPS_MODE_HOLD;
-            Do_GPS_Altitude = true;
-            SetThisPointToPositionHold();
-            SetFlightModes[HEADING_HOLD_MODE] = true;
-            NavigationMode = Do_Land_Init;
-          }
-          else
-          {
-            GPS_Flight_Mode = GPS_MODE_NONE;
-            GPSHold_CallBaro = false;
-            Do_GPS_Altitude = false;
-            SetFlightModes[HEADING_HOLD_MODE] = false;
-            GPS_Reset_Navigation();
-          }
-        }
+        SetFlightModes[GPS_HOLD_MODE] = false;
       }
       else
       {
-        if (GPS_Flight_Mode != GPS_MODE_NONE)
+        if (SetFlightModes[GPS_HOLD_MODE])
         {
-          if (Do_GPS_Altitude)
-          {
-            SetAltitudeHold(ALTITUDE.EstimatedAltitude);
-          }
-          GPS_Flight_Mode = GPS_MODE_NONE;
-          NavigationMode = Do_None;
+          SetFlightModes[GPS_HOLD_MODE] = SticksInAutoPilotPosition(20);
         }
-        GPS_Navigation_Array[0] = 0;
-        GPS_Navigation_Array[1] = 0;
+      }
+      if (CheckSafeStateToGPSMode())
+      {
+        if (SetFlightModes[RTH_MODE])
+        {
+          GPSHold_CallBaro = true;
+          SetFlightModes[HEADING_HOLD_MODE] = true;
+          Do_Mode_RTH_Now();
+        }
+        else if (SetFlightModes[GPS_HOLD_MODE])
+        {
+          GPS_Flight_Mode = GPS_MODE_HOLD;
+          Do_GPS_Altitude = false;
+          GPSHold_CallBaro = true;
+          SetFlightModes[HEADING_HOLD_MODE] = true;
+          SetThisPointToPositionHold();
+          NavigationMode = Do_PositionHold;
+        }
+        else if (SetFlightModes[LAND_MODE])
+        {
+          GPS_Flight_Mode = GPS_MODE_HOLD;
+          Do_GPS_Altitude = true;
+          SetThisPointToPositionHold();
+          SetFlightModes[HEADING_HOLD_MODE] = true;
+          NavigationMode = Do_Land_Init;
+        }
+        else
+        {
+          GPS_Flight_Mode = GPS_MODE_NONE;
+          GPSHold_CallBaro = false;
+          Do_GPS_Altitude = false;
+          SetFlightModes[HEADING_HOLD_MODE] = false;
+          GPS_Reset_Navigation();
+        }
       }
     }
     else
@@ -232,8 +215,8 @@ void FlightModesUpdate()
   {
     if (!Do_Stabilize_Mode)
     {
-      IntegralAccError[ROLL] = 0;
-      IntegralAccError[PITCH] = 0;
+      PIDXYZ.IntegralAccError[ROLL] = 0;
+      PIDXYZ.IntegralAccError[PITCH] = 0;
       Do_Stabilize_Mode = true;
     }
   }
@@ -241,8 +224,8 @@ void FlightModesUpdate()
   {
     if (Do_Stabilize_Mode)
     {
-      IntegralGyroError[ROLL] = 0;
-      IntegralGyroError[PITCH] = 0;
+      PIDXYZ.IntegralGyroError[ROLL] = 0;
+      PIDXYZ.IntegralGyroError[PITCH] = 0;
     }
     Do_Stabilize_Mode = false;
   }

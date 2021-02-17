@@ -44,24 +44,24 @@ int64_t BMP280_Pressure;
 
 static void BMP280_Get_Calibration(void)
 {
-  I2C.RegisterBuffer(0x76, 0x88, BMP280_Calculation.BMP280_CalculationArray, 0x1A);
+  I2C.RegisterBuffer(ADDRESS_BAROMETER_BMP280, 0x88, BMP280_Calculation.BMP280_CalculationArray, 0x1A);
 }
 
 void BMP280_Set_Control_Mode(uint8_t OverSamplingSet_Temperature, uint8_t OverSamplingSet_Pressure, uint8_t PowerMode)
 {
-  I2C.WriteRegister(0x76, 0xF4, ((OverSamplingSet_Temperature & 0x7) << 5) | ((OverSamplingSet_Pressure & 0x7) << 2) | (PowerMode & 0x3));
+  I2C.WriteRegister(ADDRESS_BAROMETER_BMP280, 0xF4, ((OverSamplingSet_Temperature & 0x7) << 5) | ((OverSamplingSet_Pressure & 0x7) << 2) | (PowerMode & 0x3));
 }
 
 void BMP280_Set_Operation_Mode(uint8_t StandByTime, uint8_t FilterCoefficient, uint8_t SPIModeEnabled)
 {
-  I2C.WriteRegister(0x76, 0xF5, ((StandByTime & 0x7) << 5) | ((FilterCoefficient & 0x7) << 2) | (SPIModeEnabled & 1));
+  I2C.WriteRegister(ADDRESS_BAROMETER_BMP280, 0xF5, ((StandByTime & 0x7) << 5) | ((FilterCoefficient & 0x7) << 2) | (SPIModeEnabled & 1));
 }
 
 void CalculatePressure(void)
 {
   uint8_t BMP280_RawData[6];
   int32_t BMP280_Temperature_Raw, BMP280_Pressure_Raw, BMP280_VariationOne, BMP280_VariationTwo, BMP280_VariationOffSet;
-  I2C.RegisterBuffer(0x76, 0xF7, BMP280_RawData, 6);
+  I2C.RegisterBuffer(ADDRESS_BAROMETER_BMP280, 0xF7, BMP280_RawData, 6);
   BMP280_Pressure_Raw = ((int32_t)(BMP280_RawData[0]) << 16) | ((int32_t)(BMP280_RawData[1]) << 8) | ((int32_t)(BMP280_RawData[2]));
   BMP280_Temperature_Raw = ((int32_t)(BMP280_RawData[3]) << 16) | ((int32_t)(BMP280_RawData[4]) << 8) | ((int32_t)(BMP280_RawData[5]));
   BMP280_Temperature_Raw >>= 4;

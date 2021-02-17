@@ -88,9 +88,9 @@ void NormalizeFlightModesToFailSafe()
 bool FailSafeCheckStickMotion()
 {
   uint32_t CalcedRcDelta = 0;
-  CalcedRcDelta += ABS_16BITS(RadioControllOutput[ROLL] - 1500);
-  CalcedRcDelta += ABS_16BITS(RadioControllOutput[PITCH] - 1500);
-  CalcedRcDelta += ABS_16BITS(RadioControllOutput[YAW] - 1500);
+  CalcedRcDelta += ABS(RadioControllOutput[ROLL] - 1500);
+  CalcedRcDelta += ABS(RadioControllOutput[PITCH] - 1500);
+  CalcedRcDelta += ABS(RadioControllOutput[YAW] - 1500);
   return CalcedRcDelta >= STICK_MOTION;
 }
 

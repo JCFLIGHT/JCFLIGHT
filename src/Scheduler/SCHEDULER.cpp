@@ -17,9 +17,6 @@
 
 #include "SCHEDULER.h"
 #include "SCHEDULERTIME.h"
-#include "TaskSystem/TASKSYSTEM.h"
-
-uint16_t Loop_Integral_Time = 0;
 
 bool Scheduler(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime)
 {
@@ -32,13 +29,4 @@ bool Scheduler(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime)
     return true;
   }
   return false;
-}
-
-void Update_Loop_Time()
-{
-#ifndef __AVR_ATmega2560__
-  Loop_Integral_Time = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
-#else
-  Loop_Integral_Time = GetTaskDeltaTime(TASK_FAST_MEDIUM_LOOP);
-#endif
 }

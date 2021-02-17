@@ -90,7 +90,7 @@ void EarthFrame_Calculate_AccelerationXYZ()
   {
     AccelerationAdjustBias[ROLL] = AccelerationAdjustBias[ROLL] * 0.985f + INS.AccelerationEarthFrame[ROLL] * 0.015f;
   }
-  else if (ABS_FLOAT(AccelerationDifference[ROLL]) <= 80.0f)
+  else if (ABS(AccelerationDifference[ROLL]) <= 80.0f)
   {
     AccelerationAdjustBias[ROLL] = AccelerationAdjustBias[ROLL] * 0.9987f + INS.AccelerationEarthFrame[ROLL] * 0.0013f;
   }
@@ -106,7 +106,7 @@ void EarthFrame_Calculate_AccelerationXYZ()
   {
     AccelerationAdjustBias[PITCH] = AccelerationAdjustBias[PITCH] * 0.985f + INS.AccelerationEarthFrame[PITCH] * 0.015f;
   }
-  else if (ABS_FLOAT(AccelerationDifference[PITCH]) <= 80.0f)
+  else if (ABS(AccelerationDifference[PITCH]) <= 80.0f)
   {
     AccelerationAdjustBias[PITCH] = AccelerationAdjustBias[PITCH] * 0.9987f + INS.AccelerationEarthFrame[PITCH] * 0.0013f;
   }
@@ -122,7 +122,7 @@ void EarthFrame_Calculate_AccelerationXYZ()
   {
     AccelerationAdjustBias[YAW] = AccelerationAdjustBias[YAW] * 0.985f + INS.AccelerationEarthFrame[YAW] * 0.015f;
   }
-  else if (ABS_FLOAT(AccelerationDifference[YAW]) <= 80.0f)
+  else if (ABS(AccelerationDifference[YAW]) <= 80.0f)
   {
     AccelerationAdjustBias[YAW] = AccelerationAdjustBias[YAW] * 0.9987f + INS.AccelerationEarthFrame[YAW] * 0.0013f;
   }

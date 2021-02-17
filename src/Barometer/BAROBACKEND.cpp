@@ -25,12 +25,12 @@ uint8_t BaroType = 0; //DETECTA O BARÔMETRO AUTOMATICAMENTE
 
 void SetBaroType(uint8_t _BaroType)
 {
-    if (_BaroType == 0x77)
+    if (_BaroType == ADDRESS_BAROMETER_MS5611)
     {
         BaroType = BAROMETER_MS5611;
         return;
     }
-    if (_BaroType == 0x76)
+    if (_BaroType == ADDRESS_BAROMETER_BMP280)
     {
         BaroType = BAROMETER_BMP280;
         return;

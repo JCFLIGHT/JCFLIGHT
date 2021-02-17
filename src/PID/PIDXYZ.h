@@ -18,17 +18,25 @@
 #ifndef PIDXYZ_H_
 #define PIDXYZ_H_
 #include "Arduino.h"
-extern int16_t IntegralAccError[2];
-extern int16_t IntegralGyroError[2];
-extern int32_t IntegralGyroError_Yaw;
-extern int16_t CalcedRateTargetRoll;
-extern int16_t CalcedRateTargetPitch;
-extern int16_t CalcedRateTargetYaw;
-void PID_DerivativeLPF_Update();
-void PID_Update();
-void PID_Controll_Pitch(int16_t RateTargetInput);
-void PID_Controll_Roll(int16_t RateTargetInput);
-void PID_Controll_Yaw(int16_t RateTargetInput);
-int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn);
-void PID_Reset_Integral_Accumulators();
+class PIDXYZClass
+{
+public:
+  int16_t IntegralAccError[2];
+  int16_t IntegralGyroError[2];
+  int32_t IntegralGyroError_Yaw;
+  int16_t CalcedRateTargetRoll;
+  int16_t CalcedRateTargetPitch;
+  int16_t CalcedRateTargetYaw;
+  void DerivativeLPF_Update();
+  void Update(int32_t DeltaTimeUs);
+
+private:
+  int16_t Get_LPF_Derivative_Value = 0;
+  void Controll_Pitch(int16_t RateTargetInput, int32_t DeltaTimeUs);
+  void Controll_Roll(int16_t RateTargetInput, int32_t DeltaTimeUs);
+  void Controll_Yaw(int16_t RateTargetInput, int32_t DeltaTimeUs);
+  int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn);
+  void Reset_Integral_Accumulators();
+};
+extern PIDXYZClass PIDXYZ;
 #endif

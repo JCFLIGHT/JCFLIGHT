@@ -22,7 +22,6 @@
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "ProgMem/PROGMEM.h"
-#include "Math/MATHSUPPORT.h"
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464
@@ -79,9 +78,6 @@ static union
   Ublox_Navigation_VelNED VelocityNED;
   uint8_t Bytes_Array[464];
 } Buffer;
-
-//CHECAGEM DE STATUS DO 3D FIX
-static bool Next_GPSFix;
 
 //VERIFICAÇÃO DOS PACOTES DE DADOS
 static uint8_t Check_Packet_A;
@@ -352,23 +348,14 @@ void GetAllGPSData(void)
     GPS_Coordinates_Vector[0] = Buffer.PositionLLH.Latitude;
     GPS_Coordinates_Vector[1] = Buffer.PositionLLH.Longitude;
     GPS_Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
-    GPS_3DFIX = Next_GPSFix;
     break;
 
   case MSG_STATUS:
-    Next_GPSFix = ((Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D));
-    if (!Next_GPSFix)
-    {
-      GPS_3DFIX = false;
-    }
+    GPS_3DFIX = (Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D);
     break;
 
   case MSG_SOL:
-    Next_GPSFix = (Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D);
-    if (!Next_GPSFix)
-    {
-      GPS_3DFIX = false;
-    }
+    GPS_3DFIX = (Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D);
     GPS_NumberOfSatellites = Buffer.Solution.Satellites;
     GPS_HDOP = Buffer.Solution.Position_DOP;
     break;
@@ -376,11 +363,6 @@ void GetAllGPSData(void)
   case MSG_VELNED:
     GPS_Ground_Speed = Buffer.VelocityNED.Speed_2D;
     GPS_Ground_Course = (uint16_t)(Buffer.VelocityNED.Heading_2D / 10000);
-    //APENAS PARA AERO MODE
-    if (GPS_Ground_Speed > 100)
-    {
-      GPS_Ground_Course = WRap_18000(GPS_Ground_Course * 10) / 10;
-    }
     GPSVelNED[NORTH] = Buffer.VelocityNED.North;
     GPSVelNED[EAST] = Buffer.VelocityNED.East;
     GPSVelNED[DOWN] = Buffer.VelocityNED.Down;

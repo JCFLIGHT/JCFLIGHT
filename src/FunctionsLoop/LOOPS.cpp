@@ -40,7 +40,7 @@ void Medium_Loop()
         AUXFLIGHT.SelectMode();
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
-        AirPlane_Update_Auto_Throttle();
+        AirSpeed_Update_Auto_Throttle();
         BATTERY.Read_Voltage();
         BATTERY.Read_Current();
         PRINTF.ParamsToConsole();
@@ -54,25 +54,12 @@ void Fast_Medium_Loop()
         CrashCheck();
         PARACHUTE.Manual_Detect_Channel();
         PARACHUTE.Manual_Do_Now();
-        ///---INTEGRAL LOOP---///
-        //DEPOIS DO GPS_Orientation_Update()
-        FlipModeRun();
-        //WayPointRun();
-        ///------------------///
         GCS.Serial_Parse_Protocol();
-
-#ifdef __AVR_ATmega2560__
-        Fast_Loop();
-#endif
 }
 
 void Fast_Loop()
 {
         Update_PrecisionLand();
-
-#ifdef __AVR_ATmega2560__
-        Super_Fast_Loop();
-#endif
 }
 
 void Super_Fast_Loop()
@@ -81,31 +68,37 @@ void Super_Fast_Loop()
         SAFETYBUTTON.UpdateRoutine();
         SBUS_Update();
         IBUS_Update();
-        AHRS.Update();
         EarthFrame_Calculate_AccelerationXYZ();
-        INS_Calculate_AccelerationXY();
-        INS_Calculate_AccelerationZ();
+        INERTIALNAVIGATION.Calculate_AccelerationXY();
+        INERTIALNAVIGATION.Calculate_AccelerationZ();
         AirSpeed_Update();
         Switch_Flag();
         BATTERY.Calculate_Total_Mah();
-
-#ifdef __AVR_ATmega2560__
-        Integral_Loop();
-#endif
 }
 
 void Integral_Loop()
 {
+        int32_t CycleTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
+        const float DeltaTime = (float)CycleTimeUs * 0.000001f;
+
+#ifdef __AVR_ATmega2560__
+        Fast_Medium_Loop();
+        Fast_Loop();
+        Super_Fast_Loop();
+#endif
+
         Acc_ReadBufferData();
         Gyro_ReadBufferData();
-        Update_Loop_Time();
+        AHRS.Update(DeltaTime);
         PID_Dynamic();
         GPS_Orientation_Update();
+        FlipModeRun();
         WayPointRun();
         Auto_Launch_Update();
-        AirPlane_Apply_Auto_Throttle_Control();
-        PID_Update();
+        AirSpeed_Apply_Auto_Throttle_Control();
+        PIDXYZ.Update(CycleTimeUs);
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         ServoAutoTrimRun();
-        PID_MixMotors();
+        ApplyMixingForMotorsAndServos();
+        ApplyPWMControlForMotorsAndServos();
 }

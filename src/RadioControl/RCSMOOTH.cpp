@@ -75,12 +75,12 @@ void RCInterpolationApply()
     RCController[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
   }
 #if defined(PRINTLN_RC_INTERPOLATION)
-  static uint32_t Refresh = 0;
+  static uint32_t Refresh = SCHEDULERTIME.GetMillis();
   if (SCHEDULERTIME.GetMillis() - Refresh >= 20)
   {
     PRINTF.SendToConsole(PSTR("NotFiltered:%d Filtered:%d\n"),
-                      RCControllerUnFiltered[ROLL],
-                      RCController[ROLL]);
+                         RCControllerUnFiltered[ROLL],
+                         RCController[ROLL]);
     Refresh = SCHEDULERTIME.GetMillis();
   }
 #endif

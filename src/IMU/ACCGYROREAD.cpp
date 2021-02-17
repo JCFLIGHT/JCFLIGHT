@@ -90,50 +90,50 @@ void IMU_Filters_Initialization()
 
 void Acc_Initialization()
 {
-  I2C.WriteRegister(0x68, 0x1C, 0x10);
-  if (Compass_Type == COMPASS_HMC5883 && COMPASS.FakeHMC5883Address != 0x0D && I2C.CompassFound)
+  I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1C, 0x10);
+  if (Compass_Type == COMPASS_HMC5883 && COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883 && I2C.CompassFound)
   {
-    I2C.WriteRegister(0x68, 0x6A, 0b00100000);
-    I2C.WriteRegister(0x68, 0x37, 0x00);
-    I2C.WriteRegister(0x68, 0x24, 0x0D);
-    I2C.WriteRegister(0x68, 0x25, 0x80 | MagAddress);
-    I2C.WriteRegister(0x68, 0x26, MagRegister);
-    I2C.WriteRegister(0x68, 0x27, 0x86);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x6A, 0b00100000);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x37, 0x00);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x24, 0x0D);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x25, 0x80 | MagAddress);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x26, MagRegister);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x27, 0x86);
   }
 }
 
 void Gyro_Initialization()
 {
-  I2C.WriteRegister(0x68, 0x6B, 0x80);
+  I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x6B, 0x80);
   SCHEDULERTIME.Sleep(50);
-  I2C.WriteRegister(0x68, 0x6B, 0x03);
+  I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x6B, 0x03);
   switch (STORAGEMANAGER.Read_8Bits(GYRO_LPF_ADDR)) //LPF INTERNO DA IMU
   {
 
   case 0:
-    I2C.WriteRegister(0x68, 0x1A, 4); //20HZ
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1A, 4); //20HZ
     break;
 
   case 1:
-    I2C.WriteRegister(0x68, 0x1A, 3); //42HZ
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1A, 3); //42HZ
     break;
 
   case 2:
-    I2C.WriteRegister(0x68, 0x1A, 2); //98HZ
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1A, 2); //98HZ
     break;
 
   case 3:
-    I2C.WriteRegister(0x68, 0x1A, 1); //188HZ
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1A, 1); //188HZ
     break;
 
   case 4:
-    I2C.WriteRegister(0x68, 0x1A, 0); //256HZ
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1A, 0); //256HZ
     break;
   }
-  I2C.WriteRegister(0x68, 0x1B, 0x18);
+  I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1B, 0x18);
   if (I2C.CompassFound)
   {
-    I2C.WriteRegister(0x68, 0x37, 0x02);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x37, 0x02);
   }
 }
 
@@ -141,7 +141,7 @@ void Gyro_Initialization()
 void IMU_Get_Data()
 {
   uint8_t Data_Read[14];
-  I2C.RegisterBuffer(0x68, 0x3B, &Data_Read[0], 14);
+  I2C.RegisterBuffer(ADDRESS_IMU_MPU6050, 0x3B, &Data_Read[0], 14);
   IMU.AccelerometerRead[PITCH] = -(Data_Read[0] << 8 | Data_Read[1]);
   IMU.AccelerometerRead[ROLL] = -(Data_Read[2] << 8 | Data_Read[3]);
   IMU.AccelerometerRead[YAW] = Data_Read[4] << 8 | Data_Read[5];
@@ -154,7 +154,7 @@ void IMU_Get_Data()
 void Acc_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
-  I2C.SensorsRead(0x68, 0x3B);
+  I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x3B);
   IMU.AccelerometerRead[PITCH] = -((BufferData[0] << 8) | BufferData[1]) >> 3;
   IMU.AccelerometerRead[ROLL] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
   IMU.AccelerometerRead[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
@@ -207,7 +207,7 @@ void Acc_ReadBufferData()
 void Gyro_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
-  I2C.SensorsRead(0x68, 0x43);
+  I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x43);
   IMU.GyroscopeRead[PITCH] = -(((BufferData[0] << 8) | BufferData[1]) >> 2);
   IMU.GyroscopeRead[ROLL] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
   IMU.GyroscopeRead[YAW] = -((BufferData[4] << 8) | BufferData[5]) >> 2;

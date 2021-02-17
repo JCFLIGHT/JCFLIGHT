@@ -160,7 +160,7 @@ void ConfigureRegisters(bool Run_Calibrate_ESC)
   }
 }
 
-void PID_MixMotors()
+void ApplyMixingForMotorsAndServos()
 {
   if (!SAFETYBUTTON.GetSafeStateToOutput() || WATCHDOG.InShutDown)
   {
@@ -171,8 +171,8 @@ void PID_MixMotors()
     //PREVINE UM "PULO" NO YAW,ESSE ERRO É UM PROBLEMA PRESENTE NA NAZA V2,
     //MAS PRA QUE ELE ACONTEÇA,DEPENDE DO TIPO DE ESC E MOTOR QUE VOCÊ ESTÁ USANDO
     PIDControllerApply[YAW] = Constrain_16Bits(PIDControllerApply[YAW],
-                                               -Yaw_Jump_Prevention - ABS_16BITS(RCController[YAW]),
-                                               Yaw_Jump_Prevention + ABS_16BITS(RCController[YAW]));
+                                               -Yaw_Jump_Prevention - ABS(RCController[YAW]),
+                                               Yaw_Jump_Prevention + ABS(RCController[YAW]));
   }
   MixingApplyControl();
   if (GetFrameStateOfMultirotor())
@@ -202,7 +202,6 @@ void PID_MixMotors()
       }
     }
   }
-  ApplyPWMInAllComponents();
 }
 
 void PulseInAllMotors(int16_t Pulse)
@@ -213,7 +212,7 @@ void PulseInAllMotors(int16_t Pulse)
   MotorControl[MOTOR1] = Pulse;
   MotorControl[MOTOR6] = Pulse;
   MotorControl[MOTOR5] = Pulse;
-  ApplyPWMInAllComponents();
+  ApplyPWMControlForMotorsAndServos();
 }
 
 void ShutDownAllMotorsAndServos()
@@ -241,7 +240,7 @@ void ShutDownAllMotorsAndServos()
 #endif
 }
 
-void ApplyPWMInAllComponents()
+void ApplyPWMControlForMotorsAndServos()
 {
   if (WATCHDOG.InShutDown)
   {

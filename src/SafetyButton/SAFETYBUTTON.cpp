@@ -87,7 +87,7 @@ void SAFETYBUTTONCLASS::FlashButton()
                 MotorControl[MOTOR4] = 1500;
                 MotorControl[MOTOR5] = 1500;
                 MotorControl[MOTOR6] = 1500;
-                ApplyPWMInAllComponents();
+                ApplyPWMControlForMotorsAndServos();
             }
         }
         else
@@ -143,7 +143,7 @@ void SAFETYBUTTONCLASS::FlashButton()
                     MotorControl[MOTOR4] = 1500;
                     MotorControl[MOTOR5] = 1500;
                     MotorControl[MOTOR6] = 1500;
-                    ApplyPWMInAllComponents();
+                    ApplyPWMControlForMotorsAndServos();
                 }
                 SafeStateToApplyPulse = false;
             }

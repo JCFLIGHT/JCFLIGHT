@@ -47,7 +47,7 @@ void ClassCompassOrientation::SetOrientation(uint8_t Orientation, uint8_t _Compa
         }
         else if (_CompassType == COMPASS_HMC5883)
         {
-            if (COMPASS.FakeHMC5883Address != 0x0D)
+            if (COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883)
             {
                 //ORIENTAÇÃO PARA O COMPASS HMC5883
                 IMU.CompassRead[ROLL] = -((BufferData[0] << 8) | BufferData[1]);
@@ -85,7 +85,7 @@ void ClassCompassOrientation::SetOrientation(uint8_t Orientation, uint8_t _Compa
         }
         else if (_CompassType == COMPASS_HMC5883)
         {
-            if (COMPASS.FakeHMC5883Address != 0x0D)
+            if (COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883)
             {
                 //ORIENTAÇÃO PARA O COMPASS HMC5883
                 IMU.CompassRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]);

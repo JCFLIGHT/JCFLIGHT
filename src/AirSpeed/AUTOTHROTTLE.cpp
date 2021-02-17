@@ -24,7 +24,7 @@
 bool AutoThrottle_Mode = false;
 uint16_t PreviousValueOfAirSpeed = 0;
 
-void AirPlane_Update_Auto_Throttle()
+void AirSpeed_Update_Auto_Throttle()
 {
     if (GetFrameStateOfMultirotor())
     {
@@ -44,7 +44,7 @@ void AirPlane_Update_Auto_Throttle()
     }
 }
 
-void AirPlane_Apply_Auto_Throttle_Control()
+void AirSpeed_Apply_Auto_Throttle_Control()
 {
     if (GetFrameStateOfMultirotor())
     {

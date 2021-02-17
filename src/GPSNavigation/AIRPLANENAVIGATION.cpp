@@ -20,8 +20,10 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/FLIGHTMODES.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "Scheduler/SCHEDULER.h"
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "I2C/I2C.h"
 
 //PARAMETROS DE NAVEGAÇÃO
 #define CRUISE_DISTANCE 500   //DISTANCIA (EM CM) - DISTANCIA ENTRE O PRIMEIRO E O SEGUNDO PONTO A SER ATINGIDO
@@ -44,9 +46,6 @@
 #define MAX_ROLL_BANKANGLE 20 //PARA ASA-FIXA 35 GRAUS É MELHOR
 #define MAX_YAW_BANKANGLE 15
 
-float IntegralErrorOfNavigation;
-float IntegralErrorOfAltitude;
-
 float Alt_kP = (float)ALTITUDE_PROPORTIONAL / 10.0f;
 float Alt_kI = (float)ALTITUDE_INTEGRAL / 100.0f;
 float Alt_kD = (float)ALTITUDE_DERIVATIVE / 1000.0f;
@@ -55,14 +54,42 @@ float Nav_kP = (float)NAVIGATION_PROPORTIONAL / 10.0f;
 float Nav_kI = (float)NAVIGATION_INTEGRAL / 100.0f;
 float Nav_kD = (float)NAVIGATION_DERIVATIVE / 1000.0f;
 
+float Latitude_To_Circle;
+float Longitude_To_Circle;
+float Scale_Of_Circle;
+float IntegralErrorOfNavigation;
+float IntegralErrorOfAltitude;
+float TimePIDOfNavigationPrimary;
+
+uint8_t RTH_AltitudeOfPlane;
+
+int16_t GPS_Heading;
+int16_t AttitudeHeading;
+int16_t Current_Heading;
+int16_t AltitudeDifference = 0;
+int16_t AltitudeSaturation[2] = {0, 0};
+int16_t HeadingDifference;
+int16_t SpeedDifference;
+int16_t CurrentAltitude;
+int16_t TargetAltitude;
+int16_t Read_Throttle;
+
 static int16_t PreviousAltitudeDifference;
 static int16_t PreviousHeadingDifference;
 static int16_t ThrottleBoost;
 static int16_t AltitudeVector[6];
 static int16_t NavigationDifferenceVector[6];
+static int16_t NavigationDeltaSumPID;
+static int16_t AltitudeDeltaSumPID;
+static int16_t GPSTargetBearing;
+static int16_t AltitudeError;
+static int16_t GetThrottleToNavigation;
 
 int32_t GPS_Altitude_For_Plane;
 int32_t GPS_AltitudeHold_For_Plane;
+int32_t HeadingToCircle;
+
+static uint32_t PreviousTimePIDOfNavigation;
 
 void Circle_Mode_Update()
 {
@@ -70,56 +97,77 @@ void Circle_Mode_Update()
   {
     return;
   }
-  float Latitude_To_Circle;
-  float Longitude_To_Circle;
-  float Scale_Of_Circle;
-  int32_t HeadingToCircle = GPS_Ground_Course / 10;
+
+  if (!I2C.CompassFound)
+  {
+    HeadingToCircle = WRap_18000(GPS_Ground_Course * 10) / 100;
+  }
+  else
+  {
+    HeadingToCircle = GPS_Ground_Course;
+  }
+
   if (HeadingToCircle > 180)
   {
     HeadingToCircle -= 360;
   }
+
   Scale_Of_Circle = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
-  Latitude_To_Circle = cos(HeadingToCircle * 0.0174532925f);
-  Longitude_To_Circle = sin(HeadingToCircle * 0.0174532925f) * ScaleDownOfLongitude;
+  Latitude_To_Circle = cos(ConvertToRadians(HeadingToCircle));
+  Longitude_To_Circle = sin(ConvertToRadians(HeadingToCircle)) * ScaleDownOfLongitude;
   Coordinates_To_Navigation[0] += Latitude_To_Circle * Scale_Of_Circle;
   Coordinates_To_Navigation[1] += Longitude_To_Circle * Scale_Of_Circle;
 }
 
 void PlaneUpdateNavigation(void)
 {
-  uint8_t RTH_AltitudeOfPlane = RTH_Altitude;
-  float TimePIDOfNavigationPrimary;
-  int16_t Read_Throttle = RadioControllOutput[THROTTLE];
-  int16_t GPS_Heading = GPS_Ground_Course;
-  int16_t Current_Heading;
-  int16_t AltitudeDifference = 0;
-  int16_t AltitudeSaturation[2] = {0, 0};
-  int16_t HeadingDifference;
-  int16_t GroundSpeed;
-  int16_t SpeedDifference;
-  int16_t CurrentAltitude = GPS_Altitude - GPS_Altitude_For_Plane;
-  int16_t TargetAltitude = GPS_AltitudeHold_For_Plane - GPS_Altitude_For_Plane;
-  static int16_t NavigationDeltaSumPID;
-  static int16_t AltitudeDeltaSumPID;
-  static int16_t GPSTargetBearing;
-  static int16_t AltitudeError;
-  static int16_t GetThrottleToNavigation;
-  static uint32_t TimePIDOfNavigation;
-  static uint32_t NavTimer = 0;
+  RTH_AltitudeOfPlane = RTH_Altitude;
+  Read_Throttle = RadioControllOutput[THROTTLE];
+  CurrentAltitude = GPS_Altitude - GPS_Altitude_For_Plane;
+  TargetAltitude = GPS_AltitudeHold_For_Plane - GPS_Altitude_For_Plane;
 
   if (CLIMBOUT_FW && CurrentAltitude < RTH_AltitudeOfPlane)
   {
     GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + RTH_AltitudeOfPlane;
   }
+
+  if (!I2C.CompassFound)
+  {
+    GPS_Heading = WRap_18000(GPS_Ground_Course * 10) / 10;
+    AttitudeHeading = GPS_Heading / 10;
+  }
+  else
+  {
+    GPS_Heading = GPS_Ground_Course;
+    AttitudeHeading = ATTITUDE.AngleOut[YAW];
+  }
+
   GPS_Heading = WRap_18000(GPS_Heading * 10) / 10;
-  Current_Heading = GPS_Heading / 10;
+
+  if (I2C.CompassFound)
+  {
+    if (ABS(AttitudeHeading - (GPS_Heading / 10)) > 10 && GPS_Ground_Speed > 200)
+    {
+      Current_Heading = GPS_Heading / 10;
+    }
+    else
+    {
+      Current_Heading = AttitudeHeading;
+    }
+  }
+  else
+  {
+    Current_Heading = GPS_Heading / 10;
+  }
+
   GPSTargetBearing = Original_Target_Bearing / 100;
   HeadingDifference = GPSTargetBearing - Current_Heading;
   AltitudeError = CurrentAltitude - TargetAltitude;
-  if (SCHEDULERTIME.GetMillis() - NavTimer >= 200)
+
+  static Scheduler_Struct AirPlaneNavigationTimer;
+  if (Scheduler(&AirPlaneNavigationTimer, SCHEDULER_SET_FREQUENCY(5, "Hz")))
   {
-    NavTimer = SCHEDULERTIME.GetMillis();
-    if (ABS_16BITS(AltitudeError) < 1)
+    if (ABS(AltitudeError) < 1)
     {
       GetThrottleToNavigation = 1500;
     }
@@ -158,13 +206,13 @@ void PlaneUpdateNavigation(void)
       HeadingDifference *= 0.1f;
     }
     HeadingDifference = WRap_18000(HeadingDifference * 100) / 100;
-    if (ABS_16BITS(HeadingDifference) > 170)
+    if (ABS(HeadingDifference) > 170)
     {
       HeadingDifference = 175;
     }
-    TimePIDOfNavigationPrimary = (float)(SCHEDULERTIME.GetMillis() - TimePIDOfNavigation) / 1000;
-    TimePIDOfNavigation = SCHEDULERTIME.GetMillis();
-    if (ABS_16BITS(AltitudeError) <= 3)
+    TimePIDOfNavigationPrimary = (float)(SCHEDULERTIME.GetMillis() - PreviousTimePIDOfNavigation) / 1000;
+    PreviousTimePIDOfNavigation = SCHEDULERTIME.GetMillis();
+    if (ABS(AltitudeError) <= 3)
     {
       IntegralErrorOfAltitude *= TimePIDOfNavigationPrimary;
     }
@@ -173,7 +221,7 @@ void PlaneUpdateNavigation(void)
     IntegralErrorOfAltitude = Constrain_Float(IntegralErrorOfAltitude, -500, 500);
     AltitudeSaturation[0] = (AltitudeError - PreviousAltitudeDifference);
     PreviousAltitudeDifference = AltitudeError;
-    if (ABS_16BITS(AltitudeSaturation[0]) > 100)
+    if (ABS(AltitudeSaturation[0]) > 100)
     {
       AltitudeSaturation[0] = 0;
     }
@@ -191,8 +239,8 @@ void PlaneUpdateNavigation(void)
     AltitudeDeltaSumPID += AltitudeVector[4];
     AltitudeDeltaSumPID = (AltitudeDeltaSumPID * Alt_kD) / TimePIDOfNavigationPrimary;
     AltitudeDifference = AltitudeError * Alt_kP;
-    AltitudeDifference += (IntegralErrorOfAltitude);
-    if (ABS_16BITS(HeadingDifference) <= 3)
+    AltitudeDifference += IntegralErrorOfAltitude;
+    if (ABS(HeadingDifference) <= 3)
     {
       IntegralErrorOfNavigation *= TimePIDOfNavigationPrimary;
     }
@@ -201,7 +249,7 @@ void PlaneUpdateNavigation(void)
     IntegralErrorOfNavigation = Constrain_Float(IntegralErrorOfNavigation, -500, 500);
     AltitudeSaturation[1] = (HeadingDifference - PreviousHeadingDifference);
     PreviousHeadingDifference = HeadingDifference;
-    if (ABS_16BITS(AltitudeSaturation[1]) > 100)
+    if (ABS(AltitudeSaturation[1]) > 100)
     {
       AltitudeSaturation[1] = 0;
     }
@@ -229,11 +277,10 @@ void PlaneUpdateNavigation(void)
     }
     if (!CLIMBOUT_FW)
     {
-      GPS_Angle[PITCH] -= (ABS_16BITS(ATTITUDE.AngleOut[ROLL]));
+      GPS_Angle[PITCH] -= (ABS(ATTITUDE.AngleOut[ROLL]));
     }
     GetThrottleToNavigation -= Constrain_16Bits(ATTITUDE.AngleOut[PITCH] * PITCH_COMP, 0, 450);
-    GroundSpeed = GPS_Ground_Speed;
-    SpeedDifference = (GPS_MINSPEED - GroundSpeed) * I_TERM;
+    SpeedDifference = (GPS_MINSPEED - GPS_Ground_Speed) * I_TERM;
     if (GPS_Ground_Speed < GPS_MINSPEED - 50 || GPS_Ground_Speed > GPS_MINSPEED + 50)
     {
       ThrottleBoost += SpeedDifference;

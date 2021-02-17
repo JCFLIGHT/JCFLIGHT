@@ -24,20 +24,20 @@ bool AccCalibratedPosition[6];
 
 int8_t GetAxisInclinedToCalibration(int16_t AccSample[3])
 {
-  if ((ABS_16BITS(AccSample[ROLL]) / 1.5f) > ABS_16BITS(AccSample[PITCH]) &&
-      (ABS_16BITS(AccSample[ROLL]) / 1.5f) > ABS_16BITS(AccSample[YAW]))
+  if ((ABS(AccSample[ROLL]) / 1.5f) > ABS(AccSample[PITCH]) &&
+      (ABS(AccSample[ROLL]) / 1.5f) > ABS(AccSample[YAW]))
   {
     //ROLL
     return (AccSample[ROLL] > 0) ? 2 : 3;
   }
-  else if ((ABS_16BITS(AccSample[PITCH]) / 1.5f) > ABS_16BITS(AccSample[ROLL]) &&
-           (ABS_16BITS(AccSample[PITCH]) / 1.5f) > ABS_16BITS(AccSample[YAW]))
+  else if ((ABS(AccSample[PITCH]) / 1.5f) > ABS(AccSample[ROLL]) &&
+           (ABS(AccSample[PITCH]) / 1.5f) > ABS(AccSample[YAW]))
   {
     //PITCH
     return (AccSample[PITCH] > 0) ? 4 : 5;
   }
-  else if ((ABS_16BITS(AccSample[YAW]) / 1.5f) > ABS_16BITS(AccSample[ROLL]) &&
-           (ABS_16BITS(AccSample[YAW]) / 1.5f) > ABS_16BITS(AccSample[PITCH]))
+  else if ((ABS(AccSample[YAW]) / 1.5f) > ABS(AccSample[ROLL]) &&
+           (ABS(AccSample[YAW]) / 1.5f) > ABS(AccSample[PITCH]))
   {
     //YAW
     return (AccSample[YAW] > 0) ? 0 : 1;

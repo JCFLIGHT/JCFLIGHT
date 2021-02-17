@@ -50,9 +50,9 @@ void ServosSaveAndUpdateMiddlePoint(void)
 
 void Reset_Gyro_PID_Accum()
 {
-    IntegralGyroError[ROLL] = 0;
-    IntegralGyroError[PITCH] = 0;
-    IntegralGyroError_Yaw = 0;
+    PIDXYZ.IntegralGyroError[ROLL] = 0;
+    PIDXYZ.IntegralGyroError[PITCH] = 0;
+    PIDXYZ.IntegralGyroError_Yaw = 0;
 }
 
 void ServoAutoTrimRun(void)

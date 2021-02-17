@@ -20,5 +20,5 @@
 #include "Arduino.h"
 void UpdateStateOfHeadingHold(void);
 bool GetSafeStateOfHeadingHold();
-float GetHeadingHoldValue();
+float GetHeadingHoldValue(int32_t DeltaTimeUs);
 #endif

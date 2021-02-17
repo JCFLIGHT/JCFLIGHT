@@ -37,6 +37,8 @@
 
 FILE_COMPILE_FOR_SPEED
 
+PIDXYZClass PIDXYZ;
+
 PT1_Filter_Struct DerivativeRollFilter;
 PT1_Filter_Struct DerivativePitchFilter;
 
@@ -55,47 +57,34 @@ PT1_Filter_Struct DerivativePitchFilter;
 //RATE MAXIMO DE SAÍDA DO PID YAW PARA AEROS E ASA-FIXA
 #define YAW_RATE_MAX_FOR_PLANE 36 //GRAUS
 
-#define GYRO_SATURATION_LIMIT 1800 //DPS
-
 //MIGRAR ESSE PARAMETRO PARA A LISTA COMPLETA DE PARAMETROS
 int16_t ReferenceAirSpeed = 1000; //VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 
-int16_t IntegralAccError[2] = {0, 0};
-int16_t IntegralGyroError[2] = {0, 0};
-int16_t Get_LPF_Derivative_Value = 0;
-int16_t CalcedRateTargetRoll = 0;
-int16_t CalcedRateTargetPitch = 0;
-int16_t CalcedRateTargetYaw = 0;
-int32_t IntegralGyroError_Yaw = 0;
-
-void PID_DerivativeLPF_Update()
+void PIDXYZClass::DerivativeLPF_Update()
 {
   Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
 }
 
-void PID_Update()
+void PIDXYZClass::Update(int32_t DeltaTimeUs)
 {
   CalcedRateTargetRoll = RCControllerToRate(RCController[ROLL], RCRate);
   CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
   if (GetSafeStateOfHeadingHold())
   {
-    CalcedRateTargetYaw = GetHeadingHoldValue();
+    CalcedRateTargetYaw = GetHeadingHoldValue(DeltaTimeUs);
   }
   else
   {
     CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], RCRate);
     UpdateStateOfHeadingHold();
   }
-  CalcedRateTargetRoll = Constrain_16Bits(CalcedRateTargetRoll, -GYRO_SATURATION_LIMIT, +GYRO_SATURATION_LIMIT);
-  CalcedRateTargetPitch = Constrain_16Bits(CalcedRateTargetPitch, -GYRO_SATURATION_LIMIT, +GYRO_SATURATION_LIMIT);
-  CalcedRateTargetYaw = Constrain_16Bits(CalcedRateTargetYaw, -GYRO_SATURATION_LIMIT, +GYRO_SATURATION_LIMIT);
-  PID_Controll_Roll(CalcedRateTargetRoll);
-  PID_Controll_Pitch(CalcedRateTargetPitch);
-  PID_Controll_Yaw(CalcedRateTargetYaw);
-  PID_Reset_Integral_Accumulators();
+  Controll_Roll(CalcedRateTargetRoll, DeltaTimeUs);
+  Controll_Pitch(CalcedRateTargetPitch, DeltaTimeUs);
+  Controll_Yaw(CalcedRateTargetYaw, DeltaTimeUs);
+  Reset_Integral_Accumulators();
 }
 
-void PID_Controll_Roll(int16_t RateTargetInput)
+void PIDXYZClass::Controll_Roll(int16_t RateTargetInput, int32_t DeltaTimeUs)
 {
   int16_t RadioControlToPID;
   int16_t ProportionalTerminate = 0;
@@ -107,9 +96,9 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   static int16_t IntegratorTerminateLevel;
   static int16_t LastValueOfGyro = 0;
   RadioControlToPID = RateTargetInput << 1;
-  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * Loop_Integral_Time) >> 12);
+  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * DeltaTimeUs) >> 12);
   IntegralGyroError[ROLL] = Constrain_16Bits(IntegralGyroError[ROLL] + PIDError, -16000, +16000);
-  if (ABS_16BITS(IMU.GyroscopeRead[ROLL]) > 640)
+  if (ABS(IMU.GyroscopeRead[ROLL]) > 640)
   {
     IntegralGyroError[ROLL] = 0;
   }
@@ -139,7 +128,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
     {
       MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_PLANE_ROLL_ANGLE_MAX * 10, +STAB_PLANE_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
     }
-    IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
+    IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * DeltaTimeUs) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_X = PID[PIDAUTOLEVEL].DerivativeVector * 5;
     ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_X, +Limit_Proportional_X);
@@ -153,7 +142,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   if (Get_LPF_Derivative_Value > 0)
   {
 #ifndef __AVR_ATmega2560__
-    DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6f);
+    DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, DeltaTimeUs * 1e-6f);
 #else
     DerivativeTerminate = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[ROLL]) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
 #endif
@@ -165,7 +154,7 @@ void PID_Controll_Roll(int16_t RateTargetInput)
   PIDControllerApply[ROLL] = ProportionalTerminate + IntegratorTerminate - DerivativeTerminate;
 }
 
-void PID_Controll_Pitch(int16_t RateTargetInput)
+void PIDXYZClass::Controll_Pitch(int16_t RateTargetInput, int32_t DeltaTimeUs)
 {
   int16_t RadioControlToPID;
   int16_t ProportionalTerminate = 0;
@@ -177,9 +166,9 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   static int16_t IntegratorTerminateLevel;
   static int16_t LastValueOfGyro = 0;
   RadioControlToPID = RateTargetInput << 1;
-  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * Loop_Integral_Time) >> 12);
+  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * DeltaTimeUs) >> 12);
   IntegralGyroError[PITCH] = Constrain_16Bits(IntegralGyroError[PITCH] + PIDError, -16000, +16000);
-  if (ABS_16BITS(IMU.GyroscopeRead[PITCH]) > 640)
+  if (ABS(IMU.GyroscopeRead[PITCH]) > 640)
   {
     IntegralGyroError[PITCH] = 0;
   }
@@ -209,7 +198,7 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
     {
       MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PLANE_PITCH_ANGLE_MAX * 10, +STAB_PLANE_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
     }
-    IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * Loop_Integral_Time) >> 12)), -10000, +10000);
+    IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * DeltaTimeUs) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_Y = PID[PIDAUTOLEVEL].DerivativeVector * 5;
     ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_Y, +Limit_Proportional_Y);
@@ -223,7 +212,7 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   if (Get_LPF_Derivative_Value > 0)
   {
 #ifndef __AVR_ATmega2560__
-    DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, Loop_Integral_Time * 1e-6f);
+    DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, DeltaTimeUs * 1e-6f);
 #else
     DerivativeTerminate = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(DerivativeTerminate, DynamicDerivativeVector[PITCH]) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
 #endif
@@ -235,7 +224,7 @@ void PID_Controll_Pitch(int16_t RateTargetInput)
   PIDControllerApply[PITCH] = ProportionalTerminate + IntegratorTerminate - DerivativeTerminate;
 }
 
-void PID_Controll_Yaw(int16_t RateTargetInput)
+void PIDXYZClass::Controll_Yaw(int16_t RateTargetInput, int32_t DeltaTimeUs)
 {
   static uint8_t IntegralGyroMax = 250;
   int16_t RadioControlToPID;
@@ -271,7 +260,7 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
     DerivativeTerminate = Multiplication32Bits(DeltaYawSmallFilterStored, PID[YAW].DerivativeVector) >> 6;
     DerivativeTerminate = Constrain_16Bits(DerivativeTerminate, -150, 150);
   }
-  IntegralGyroError_Yaw += Multiplication32Bits((int16_t)(((int32_t)PIDError * Loop_Integral_Time) >> 12), PID[YAW].IntegratorVector);
+  IntegralGyroError_Yaw += Multiplication32Bits((int16_t)(((int32_t)PIDError * DeltaTimeUs) >> 12), PID[YAW].IntegratorVector);
   if (GetFrameStateOfAirPlane())
   {
     IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, -(((int32_t)IntegralGyroMax) << 13), (((int32_t)IntegralGyroMax) << 13));
@@ -280,7 +269,7 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
   {
     IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, 2 - ((int32_t)1 << 28), -2 + ((int32_t)1 << 28));
   }
-  if (ABS_16BITS(RadioControlToPID) > 50)
+  if (ABS(RadioControlToPID) > 50)
   {
     IntegralGyroError_Yaw = 0;
   }
@@ -305,7 +294,7 @@ void PID_Controll_Yaw(int16_t RateTargetInput)
   }
 }
 
-int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
+int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
 {
   if (!TurnCoordinatorMode)
   {
@@ -329,7 +318,7 @@ int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn)
   }
 }
 
-void PID_Reset_Integral_Accumulators()
+void PIDXYZClass::Reset_Integral_Accumulators()
 {
   if (RadioControllOutput[THROTTLE] <= 1100 && GetFrameStateOfMultirotor())
   {

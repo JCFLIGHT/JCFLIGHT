@@ -126,9 +126,9 @@ void SerialPrint::ParamsToConsole()
 #endif
 
 #if defined(PRINTLN_GPS)
-  PRINTF.SendToConsole(PSTR("NúmSat:%u Latitude:%ld Longitude:%ld 3DFix:%u Declinação:%.2f EEPROM:%.2f HDOP:%.2f\n"),
+  PRINTF.SendToConsole(PSTR("NúmSat:%u Latitude:%ld Longitude:%ld Declinação:%.2f EEPROM:%.2f HDOP:%.2f\n"),
                        GPS_NumberOfSatellites, GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1],
-                       GPS_3DFIX, Declination(), STORAGEMANAGER.Read_Float(DECLINATION_ADDR),
+                       Declination(), STORAGEMANAGER.Read_Float(DECLINATION_ADDR),
                        (float)GPS_HDOP / 100);
 #endif
 

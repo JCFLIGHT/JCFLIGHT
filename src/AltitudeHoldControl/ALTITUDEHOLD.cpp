@@ -125,13 +125,13 @@ bool ApplyAltitudeHoldControl()
             TakeOffInProgress = false;
           }
         }
-        if (TakeOffInProgress || (ABS_16BITS(ThrottleDifference) > SafeZoneToCompleteTakeOff))
+        if (TakeOffInProgress || (ABS(ThrottleDifference) > SafeZoneToCompleteTakeOff))
         {
           if (HoveringState)
           {
             HoveringState = false;
           }
-          if (ABS_16BITS(ThrottleDifference) <= SafeZoneToCompleteTakeOff)
+          if (ABS(ThrottleDifference) <= SafeZoneToCompleteTakeOff)
           {
             TargetVariometer = 0;
           }
@@ -189,7 +189,7 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   TargetVariometer = Constrain_32Bits(TargetVariometer, -350, 350);
   int32_t VariometerError = TargetVariometer - ALTITUDE.EstimatedVariometer;
   VariometerError = Constrain_32Bits(VariometerError, -600, 600);
-  VariometerErrorISum += ((VariometerError * PID[PIDALTITUDE].IntegratorVector * DeltaTime) >> 7) / ((HoveringState && ABS_32BITS(TargetVariometer) < 100) ? 2 : 1);
+  VariometerErrorISum += ((VariometerError * PID[PIDALTITUDE].IntegratorVector * DeltaTime) >> 7) / ((HoveringState && ABS(TargetVariometer) < 100) ? 2 : 1);
   VariometerErrorISum = Constrain_32Bits(VariometerErrorISum, -16384000, 16384000);
   VariometerErrorIPart = (VariometerErrorISum >> 16);
   VariometerErrorIPart = Constrain_16Bits(VariometerErrorIPart, -250, 250);
@@ -249,7 +249,7 @@ void SetAltitudeHold(int32_t ValueOfNewAltitudeHold)
 
 bool GetAltitudeReached()
 {
-  return ABS_32BITS(AltitudeToHold - ALTITUDE.EstimatedAltitude) < 50;
+  return ABS(AltitudeToHold - ALTITUDE.EstimatedAltitude) < 50;
 }
 
 void RunLandDetector()
@@ -278,7 +278,7 @@ void ResetLandDetector()
 
 bool GetGroundDetected()
 {
-  return (ABS_16BITS(ALTITUDE.EstimatedVariometer) < 15) && (VariometerErrorIPart <= -185) && (ALTITUDE.EstimatedAltitude < (SafeAltitude * 100));
+  return (ABS(ALTITUDE.EstimatedVariometer) < 15) && (VariometerErrorIPart <= -185) && (ALTITUDE.EstimatedAltitude < (SafeAltitude * 100));
 }
 
 bool GetGroundDetectedFor100ms()

@@ -159,11 +159,11 @@ void Accelerometer_Calibration()
         {
           int8_t AccCalibIndexTwo = (AccCalibIndex + 1) % 3;
           int8_t AccCalibIndexThree = (AccCalibIndex + 2) % 3;
-          if (ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
-                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexTwo] -
+          if (ABS(IMU.AccelerometerRead[AccCalibIndex] -
+                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexTwo] -
                                                                                     CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
-              ABS_16BITS(IMU.AccelerometerRead[AccCalibIndex] -
-                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS_16BITS(IMU.AccelerometerRead[AccCalibIndexThree] -
+              ABS(IMU.AccelerometerRead[AccCalibIndex] -
+                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexThree] -
                                                                                     CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
           {
             AxisToCalibration = AccCalibIndex;

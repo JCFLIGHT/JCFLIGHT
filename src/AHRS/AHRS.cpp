@@ -93,10 +93,10 @@ void AHRSClass::Initialization(void)
 
 static bool ValidateQuaternion(const Struct_Quaternion *Quaternion)
 {
-  const float CheckAbsoluteValue = ABS_FLOAT(Quaternion->q0) +
-                                   ABS_FLOAT(Quaternion->q1) +
-                                   ABS_FLOAT(Quaternion->q2) +
-                                   ABS_FLOAT(Quaternion->q3);
+  const float CheckAbsoluteValue = ABS(Quaternion->q0) +
+                                   ABS(Quaternion->q1) +
+                                   ABS(Quaternion->q2) +
+                                   ABS(Quaternion->q3);
   if (!isnan(CheckAbsoluteValue) && !isinf(CheckAbsoluteValue))
   {
     return true;
@@ -235,7 +235,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
       }
 
       //CALCULA O VALOR DE HEADING COM BASE NO COG
-      Struct_Vector3x3 vCoG = {.Vector = {-Fast_Cosine(CourseOverGround), Fast_Sine(CourseOverGround), 0.0f}};
+      Struct_Vector3x3 CourseOverGroundVector = {.Vector = {-Fast_Cosine(CourseOverGround), Fast_Sine(CourseOverGround), 0.0f}};
 
       //ROTACIONA O VETOR DO BODY FRAME PARA EARTH FRAME
       QuaternionRotateVectorInverse(&HeadingEarthFrame, &Forward, &Orientation);
@@ -248,7 +248,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
         VectorNormalize(&HeadingEarthFrame, &HeadingEarthFrame);
 
         //CALCULA O ERRO
-        VectorCrossProduct(&VectorError, &vCoG, &HeadingEarthFrame);
+        VectorCrossProduct(&VectorError, &CourseOverGroundVector, &HeadingEarthFrame);
 
         //ROTACIONA O ERRO NO BODY FRAME
         QuaternionRotateVector(&VectorError, &VectorError, &Orientation);
@@ -378,28 +378,29 @@ void GetMeasuredRotationRate(Struct_Vector3x3 *MeasureRotation)
   MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.GyroscopeRead[YAW] * GYRO_SCALE));
 }
 
-void AHRSClass::Update()
+#include "FastSerial/PRINTF.h"
+#include "Scheduler/SCHEDULER.h"
+#include "TaskSystem/TASKSYSTEM.h"
+
+void AHRSClass::Update(float DeltaTime)
 {
   bool SafeToUseCompass = false;
   bool GPS_HeadingState = false;
   float CourseOverGround = 0;
-  static uint32_t previousIMUUpdateTimeUs;
-  const float DeltaTime = (SCHEDULERTIME.GetMicros() - previousIMUUpdateTimeUs) * 1e-6;
-  previousIMUUpdateTimeUs = SCHEDULERTIME.GetMicros();
 
   GetMeasuredRotationRate(&BodyFrameRotation);     //CALCULA A ROTAÇÃO DA IMU EM RADIANOS/S
   GetMeasuredAcceleration(&BodyFrameAcceleration); //CALCULA A ACELERAÇÃO DA IMU EM CM/S^2
 
   if (GetFrameStateOfAirPlane())
   {
-    bool canUseCOG = (GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300);
+    const bool SafeToUseCOG = (GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300);
 
     if (I2C.CompassFound)
     {
       SafeToUseCompass = true;
       GPSHeadingInitialized = true;
     }
-    else if (canUseCOG)
+    else if (SafeToUseCOG)
     {
       if (GPSHeadingInitialized)
       {

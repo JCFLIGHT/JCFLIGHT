@@ -18,15 +18,22 @@
 #ifndef INS_H_
 #define INS_H_
 #include "Arduino.h"
-void ResetXYState();
-void CorrectXYStateWithGPS(float *DeltaTime);
-void UpdateXYState(float *DeltaTime);
-void SaveXYPositionToHistory();
-void ResetZState();
-void CorrectZStateWithBaro(float *DeltaTime);
-void UpdateZState(float *DeltaTime);
-void SaveZPositionToHistory();
-void INS_Calculate_AccelerationXY();
-void INS_Calculate_AccelerationZ();
-void UpdateAccelerationEarthFrame_Filtered(uint8_t ArrayCount);
+class InertialNavigationClass
+{
+public:
+  void Calculate_AccelerationXY();
+  void Calculate_AccelerationZ();
+
+private:
+  void ResetXYState();
+  void CorrectXYStateWithGPS(float *DeltaTime);
+  void UpdateXYState(float *DeltaTime);
+  void SaveXYPositionToHistory();
+  void ResetZState();
+  void CorrectZStateWithBaro(float *DeltaTime);
+  void UpdateZState(float *DeltaTime);
+  void SaveZPositionToHistory();
+  void UpdateAccelerationEarthFrame_Filtered(uint8_t ArrayCount);
+};
+extern InertialNavigationClass INERTIALNAVIGATION;
 #endif

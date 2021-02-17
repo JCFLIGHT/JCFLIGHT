@@ -44,18 +44,14 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
         .StaticPriority = TASK_PRIORITY_HIGH,
     },
 
+#ifndef __AVR_ATmega2560__
+
     [TASK_FAST_MEDIUM_LOOP] = {
         .TaskName = "FAST_MEDIUM_LOOP",
         .TaskFunction = Fast_Medium_Loop,
         .DesiredPeriod = SCHEDULER_SET_FREQUENCY(100, "Hz"),
-#ifndef __AVR_ATmega2560__
         .StaticPriority = TASK_PRIORITY_MEDIUM,
-#else
-        .StaticPriority = TASK_PRIORITY_HIGH,
-#endif
     },
-
-#ifndef __AVR_ATmega2560__
 
     [TASK_FAST_LOOP] = {
         .TaskName = "FAST_LOOP",
@@ -71,14 +67,24 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
         .StaticPriority = TASK_PRIORITY_HIGH,
     },
 
+#endif
+
     [TASK_INTEGRAL_LOOP] = {
         .TaskName = "INTEGRAL_LOOP",
         .TaskFunction = Integral_Loop,
-        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"),
-        .StaticPriority = TASK_PRIORITY_REALTIME,
-    },
 
+#ifndef __AVR_ATmega2560__
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"),
+#else
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(100, "Hz"),
 #endif
+
+#ifndef __AVR_ATmega2560__
+        .StaticPriority = TASK_PRIORITY_REALTIME,
+#else
+        .StaticPriority = TASK_PRIORITY_HIGH,
+#endif
+    },
 
     [TASK_SYSTEM_LOAD] = {
         .TaskName = "SYSTEM_LOAD",

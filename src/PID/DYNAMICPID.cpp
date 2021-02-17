@@ -48,15 +48,15 @@ void GetRCDataConvertedAndApplyFilter()
   //APLICA O FILTRO LPF NO RC DA ATTITUDE
   RCInterpolationApply();
   //FAZ UMA PEQUENA ZONA MORTA NOS CANAIS DA ATTITUDE
-  if (ABS_16BITS(RCController[YAW]) < 5)
+  if (ABS(RCController[YAW]) < 5)
   {
     RCController[YAW] = 0;
   }
-  if (ABS_16BITS(RCController[PITCH]) < 5)
+  if (ABS(RCController[PITCH]) < 5)
   {
     RCController[PITCH] = 0;
   }
-  if (ABS_16BITS(RCController[ROLL]) < 5)
+  if (ABS(RCController[ROLL]) < 5)
   {
     RCController[ROLL] = 0;
   }
@@ -114,7 +114,7 @@ void PID_Dynamic()
   }
   for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)
   {
-    uint16_t DynamicStored = MIN_U16BITS(ABS_16BITS(RadioControllOutput[RCIndexCount] - 1500), 500);
+    uint16_t DynamicStored = MIN(ABS(RadioControllOutput[RCIndexCount] - 1500), 500);
     DynamicPIDCalced = 100 - (uint16_t)DynamicRollAndPitchRate[RCIndexCount] * DynamicStored / 500;
     DynamicPIDCalced = (uint16_t)DynamicPIDCalced * TPA_Parameters.CalcedValue / 100;
     DynamicProportionalVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].ProportionalVector * DynamicPIDCalced / 100;

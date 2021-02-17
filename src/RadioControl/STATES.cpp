@@ -96,12 +96,12 @@ bool StickStateToDisarm(void)
 
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue)
 {
-    return ABS_16BITS(RCController[ROLL]) < AutoPilotValue &&
-           ABS_16BITS(RCController[PITCH]) < AutoPilotValue;
+    return ABS(RCController[ROLL]) < AutoPilotValue &&
+           ABS(RCController[PITCH]) < AutoPilotValue;
 }
 
 bool SticksDeflected(int16_t MinDeflectionValue)
 {
-    return (ABS_16BITS(RCController[ROLL]) > MinDeflectionValue) ||
-           (ABS_16BITS(RCController[PITCH]) > MinDeflectionValue);
+    return (ABS(RCController[ROLL]) > MinDeflectionValue) ||
+           (ABS(RCController[PITCH]) > MinDeflectionValue);
 }

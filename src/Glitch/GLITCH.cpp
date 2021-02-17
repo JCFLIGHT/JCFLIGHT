@@ -23,7 +23,7 @@ GlitchClass GLITCH;
 
 bool GlitchClass::CheckGPS(void)
 {
-    if (!GPS_3DFIX && GPS_NumberOfSatellites < 5)
+    if (GPS_NumberOfSatellites < 5)
     {
         return false;
     }

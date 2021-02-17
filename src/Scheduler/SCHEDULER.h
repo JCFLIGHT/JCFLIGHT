@@ -20,7 +20,5 @@
 #include "Arduino.h"
 #include "Common/STRUCTS.h"
 #define SCHEDULER_SET_FREQUENCY(Frequecy, Unidad) (1000000 / (Frequecy))
-extern uint16_t Loop_Integral_Time;
 bool Scheduler(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime);
-void Update_Loop_Time();
 #endif

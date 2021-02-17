@@ -1221,7 +1221,7 @@ void GCSClass::GCS_Request_Parameters()
     }
     else
     {
-        GCSParameters.SendAttitudeYaw = GPS_Ground_Course / 10;
+        GCSParameters.SendAttitudeYaw = WRap_18000(GPS_Ground_Course * 10) / 10;
     }
     GCSParameters.DevicesOnBoard = CHECKSUM.GetDevicesActived();
     GCSParameters.SendThrottleValue = Throttle.Output;
@@ -1266,7 +1266,7 @@ void GCSClass::GCS_Request_Parameters()
 #ifndef MACHINE_CYCLE
     GCSParameters.SendCourseOverGround = GPS_Ground_Course;
 #else
-    GCSParameters.SendCourseOverGround = Loop_Integral_Time;
+    GCSParameters.SendCourseOverGround = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
 #endif
     GCSParameters.SendBearing = Target_Bearing;
     GCSParameters.SendAccGForce = GetGForce() * 100;
@@ -1291,9 +1291,9 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendActualAuxSevenValue = DirectRadioControllRead[AUX7];
     GCSParameters_Two.SendActualAuxEightValue = DirectRadioControllRead[AUX8];
     GCSParameters_Two.SendAttitudeThrottleValue = RCController[THROTTLE];
-    GCSParameters_Two.SendAttitudeYawValue = CalcedRateTargetYaw;
-    GCSParameters_Two.SendAttitudePitchValue = CalcedRateTargetPitch;
-    GCSParameters_Two.SendAttitudeRollValue = CalcedRateTargetRoll;
+    GCSParameters_Two.SendAttitudeYawValue = PIDXYZ.CalcedRateTargetYaw;
+    GCSParameters_Two.SendAttitudePitchValue = PIDXYZ.CalcedRateTargetPitch;
+    GCSParameters_Two.SendAttitudeRollValue = PIDXYZ.CalcedRateTargetRoll;
     GCSParameters_Two.SendMemoryRamUsed = MEMORY.Check();
     GCSParameters_Two.SendMemoryRamUsedPercent = MEMORY.GetPercentageRAMUsed();
     GCSParameters_Two.SendAccXNotFiltered = IMU.AccelerometerReadNotFiltered[ROLL];

@@ -25,7 +25,7 @@ class AHRSClass
 {
 public:
   void Initialization();
-  void Update();
+  void Update(float DeltaTime);
   bool CheckAnglesInclination(int16_t Angle);
   float SineRoll();
   float CosineRoll();

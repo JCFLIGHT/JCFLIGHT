@@ -55,7 +55,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (ABS_16BITS(RCController[YAW]) != 0) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
+  if (ABS(RCController[YAW]) != 0) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
   {
     return false;
   }
@@ -63,7 +63,7 @@ bool GetSafeStateOfHeadingHold()
   return true; //TUDO ESTÁ OK
 }
 
-float GetHeadingHoldValue()
+float GetHeadingHoldValue(int32_t DeltaTimeUs)
 {
   uint8_t Heading_Hold_Rate_Limit = 90;
   float HeadingHoldRate;
@@ -92,7 +92,7 @@ float GetHeadingHoldValue()
 
 //REALIZA FILTRAGEM DO RATE COM O PT1
 #ifndef __AVR_ATmega2560__
-  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, Loop_Integral_Time * 1e-6f);
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, DeltaTimeUs * 1e-6f);
 #else
   //DEVIDO O CICLO DE MAQUINA EM 100HZ,NÃO É POSSIVEL FILTRAR A 2HZ USANDO O VALOR MEDIDO DO PROPRIO CICLO DE MAQUINA
   //É NECESSARIO "ENGANAR" O ALGORITIMO,E FINGIR QUE ELE ESTÁ TRABALHANDO A 1KHZ PARA FREQUENCIA DE CORTE DE 2HZ SER APLICADA CORRETAMENTE

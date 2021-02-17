@@ -18,15 +18,17 @@
 #ifndef MATHSUPPORT_H_
 #define MATHSUPPORT_H_
 #include "Arduino.h"
-float ABS_FLOAT(float X);
-int16_t ABS_16BITS(int16_t X);
-int32_t ABS_32BITS(int32_t X);
-float MIN_FLOAT(float X, float Y);
-float MAX_FLOAT(float X, float Y);
-int8_t MIN_8BITS(int8_t X, int8_t Y);
-uint16_t MIN_U16BITS(uint16_t X, uint16_t Y);
-uint32_t MIN_U32BITS(uint32_t X, uint32_t Y);
-uint16_t MAX_U16BITS(uint16_t X, uint16_t Y);
+#define MIN(a, b) \
+  __extension__({ __typeof__ (a) _a = (a); \
+  __typeof__ (b) _b = (b); \
+  _a < _b ? _a : _b; })
+#define MAX(a, b) \
+  __extension__({ __typeof__ (a) _a = (a); \
+  __typeof__ (b) _b = (b); \
+  _a > _b ? _a : _b; })
+#define ABS(x) \
+  __extension__({ __typeof__ (x) _x = (x); \
+  _x > 0 ? _x : -_x; })
 float Constrain_Float(float ValueInput, float ValueInputMin, float ValueInputMax);
 int8_t Constrain_8Bits(int8_t ValueInput, int8_t ValueInputMin, int8_t ValueInputMax);
 uint8_t Constrain_U8Bits(uint8_t ValueInput, uint8_t ValueInputMin, uint8_t ValueInputMax);
@@ -43,6 +45,7 @@ float ConvertToRadians(float InputValue);
 float ConvertRadiansToDeciDegrees(float Inputvalue);
 float ConvertDeciDegreesToRadians(float Inputvalue);
 float ConvertDeciDegreesToDegrees(float Inputvalue);
+float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);
 float Fast_Sine(float X);
@@ -52,4 +55,5 @@ float Fast_AtanCosine(float X);
 float Sine_Curve(const float InputValue, const float CurveWidth);
 float Fast_Tangent(float InputValue);
 int32_t WRap_18000(int32_t AngleInput);
+float Fast_Pow(float ValueA, float ValueB);
 #endif

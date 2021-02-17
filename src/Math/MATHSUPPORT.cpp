@@ -20,51 +20,6 @@
 
 FILE_COMPILE_FOR_SPEED
 
-float ABS_FLOAT(float X)
-{
-    return ((X) > 0 ? (X) : -(X));
-}
-
-int16_t ABS_16BITS(int16_t X)
-{
-    return ((X) > 0 ? (X) : -(X));
-}
-
-int32_t ABS_32BITS(int32_t X)
-{
-    return ((X) > 0 ? (X) : -(X));
-}
-
-float MIN_FLOAT(float X, float Y)
-{
-    return ((X) < (Y) ? (X) : (Y));
-}
-
-float MAX_FLOAT(float X, float Y)
-{
-    return ((X) > (Y) ? (X) : (Y));
-}
-
-int8_t MIN_8BITS(int8_t X, int8_t Y)
-{
-    return ((X) < (Y) ? (X) : (Y));
-}
-
-uint16_t MIN_U16BITS(uint16_t X, uint16_t Y)
-{
-    return ((X) < (Y) ? (X) : (Y));
-}
-
-uint32_t MIN_U32BITS(uint32_t X, uint32_t Y)
-{
-    return ((X) < (Y) ? (X) : (Y));
-}
-
-uint16_t MAX_U16BITS(uint16_t X, uint16_t Y)
-{
-    return ((X) > (Y) ? (X) : (Y));
-}
-
 float Constrain_Float(float ValueInput, float ValueInputMin, float ValueInputMax)
 {
     return ((ValueInput) < (ValueInputMin) ? (ValueInputMin) : ((ValueInput) > (ValueInputMax) ? (ValueInputMax) : (ValueInput)));
@@ -143,6 +98,11 @@ float ConvertDeciDegreesToRadians(float Inputvalue)
 float ConvertDeciDegreesToDegrees(float Inputvalue)
 {
     return (Inputvalue / 10);
+}
+
+float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput)
+{
+    return CoordinateInput * 1.0e-7f;
 }
 
 uint16_t SquareRootU16Bits(uint16_t ValueInput)
@@ -224,12 +184,12 @@ float Fast_Cosine(float X)
 float Fast_Atan2(float Y, float X)
 {
     float Result, ABSOfX, ABSOfY;
-    ABSOfX = ABS_FLOAT(X);
-    ABSOfY = ABS_FLOAT(Y);
-    Result = MAX_FLOAT(ABSOfX, ABSOfY);
+    ABSOfX = ABS(X);
+    ABSOfY = ABS(Y);
+    Result = MAX(ABSOfX, ABSOfY);
     if (Result)
     {
-        Result = MIN_FLOAT(ABSOfX, ABSOfY) / Result;
+        Result = MIN(ABSOfX, ABSOfY) / Result;
     }
     else
     {
@@ -256,7 +216,7 @@ float Fast_Atan2(float Y, float X)
 
 float Fast_AtanCosine(float X)
 {
-    float ABSFloatOfX = ABS_FLOAT(X);
+    float ABSFloatOfX = ABS(X);
     float Result = sqrtf(1.0f - ABSFloatOfX) * (1.5707288f + ABSFloatOfX * (-0.2121144f + ABSFloatOfX * (0.0742610f + (-0.0187293f * ABSFloatOfX))));
     if (X < 0.0f)
     {
@@ -270,7 +230,7 @@ float Fast_AtanCosine(float X)
 
 float Sine_Curve(const float InputValue, const float CurveWidth)
 {
-    return pow(2.71828182845904523536f, -SquareFloat(InputValue) / (2.0f * SquareFloat(CurveWidth)));
+    return Fast_Pow(2.71828182845904523536f, -SquareFloat(InputValue) / (2.0f * SquareFloat(CurveWidth)));
 }
 
 float Fast_Tangent(float InputValue)
@@ -289,4 +249,56 @@ int32_t WRap_18000(int32_t AngleInput)
         AngleInput += 36000;
     }
     return AngleInput;
+}
+
+float Fast_Exponential(float InputValue)
+{
+    union
+    {
+        int32_t i;
+        float f;
+    } xu, xu2;
+
+    float val2, val3, val4, b;
+    int32_t val4i;
+    val2 = 12102203.1615614f * InputValue + 1065353216.f;
+    val3 = val2 < 2139095040.f ? val2 : 2139095040.f;
+    val4 = val3 > 0.f ? val3 : 0.f;
+    val4i = (int32_t)val4;
+    xu.i = val4i & 0x7F800000;
+    xu2.i = (val4i & 0x7FFFFF) | 0x3F800000;
+    b = xu2.f;
+    return xu.f * (0.509871020343597804469416f + b * (0.312146713032169896138863f + b * (0.166617139319965966118107f + b * (-2.19061993049215080032874e-3f + b * 1.3555747234758484073940937e-2f))));
+}
+
+float Fast_Logarithm(float InputValue)
+{
+    union
+    {
+        float f;
+        int32_t i;
+    } valu;
+
+    float exp, addcst, x;
+    valu.f = InputValue;
+    exp = valu.i >> 23;
+    addcst = InputValue > 0 ? -89.970756366f : -(float)__builtin_inf();
+    valu.i = (valu.i & 0x7FFFFF) | 0x3F800000;
+    x = valu.f;
+    return x * (3.529304993f + x * (-2.461222105f + x * (1.130626167f + x * (-0.288739945f + x * 3.110401639e-2f)))) + (addcst + 0.69314718055995f * exp);
+}
+
+float Fast_Pow(float ValueA, float ValueB)
+{
+    return Fast_Exponential(ValueB * Fast_Logarithm(ValueA));
+}
+
+float Power_Float(float Base, int16_t Exponential) //X^Y
+{
+    float Result = Base;
+    for (int16_t Count = 1; Count < Exponential; Count++)
+    {
+        Result *= Base;
+    }
+    return Result;
 }

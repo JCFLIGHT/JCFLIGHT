@@ -23,7 +23,7 @@ bool CrashCheck2D(int16_t AngleRoll, int16_t AnglePitch, float CrashAngle)
   CrashAngle = ConvertToRadians(CrashAngle) * 1000.0f;
   AngleRoll = Constrain_16Bits(AngleRoll, -1000, 1000);   //ANGULO MAXIMO DE -1000 A +1000
   AnglePitch = Constrain_16Bits(AnglePitch, -1000, 1000); //ANGULO MAXIMO DE -1000 A +1000
-  if ((ABS_16BITS(AngleRoll) > CrashAngle) || (ABS_16BITS(AnglePitch) > CrashAngle))
+  if ((ABS(AngleRoll) > CrashAngle) || (ABS(AnglePitch) > CrashAngle))
   {
     return true;
   }

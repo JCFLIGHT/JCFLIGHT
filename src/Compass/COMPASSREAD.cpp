@@ -52,7 +52,7 @@ void CompassReadClass::Initialization()
   if (Compass_Type == COMPASS_AK8975)
   {
     SCHEDULERTIME.Sleep(100);
-    I2C.WriteRegister(0x0C, 0x0A, 0x01);
+    I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
     SCHEDULERTIME.Sleep(100);
   }
 
@@ -66,9 +66,9 @@ void CompassReadClass::Initialization()
     SCHEDULERTIME.Sleep(100);
     InitialReadBufferData();
     SCHEDULERTIME.Sleep(10);
-    MagnetometerGain[ROLL] = 1000.0 / ABS_16BITS(IMU.CompassRead[ROLL]);
-    MagnetometerGain[PITCH] = 1000.0 / ABS_16BITS(IMU.CompassRead[PITCH]);
-    MagnetometerGain[YAW] = 1000.0 / ABS_16BITS(IMU.CompassRead[YAW]);
+    MagnetometerGain[ROLL] = 1000.0 / ABS(IMU.CompassRead[ROLL]);
+    MagnetometerGain[PITCH] = 1000.0 / ABS(IMU.CompassRead[PITCH]);
+    MagnetometerGain[YAW] = 1000.0 / ABS(IMU.CompassRead[YAW]);
     I2C.WriteRegister(MagAddress, 0x00, 0x70);
     I2C.WriteRegister(MagAddress, 0x01, 0x20);
     I2C.WriteRegister(MagAddress, 0x02, 0x00);
@@ -76,7 +76,7 @@ void CompassReadClass::Initialization()
 
   if (Compass_Type == COMPASS_HMC5883)
   {
-    if (FakeHMC5883Address == 0x0D)
+    if (FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
     {
       I2C.WriteRegister(MagAddress, 0x0B, 0x01);
       I2C.WriteRegister(MagAddress, 0x09, 0xC1);
@@ -122,21 +122,21 @@ bool CompassReadClass::PushBias(uint8_t InputBias)
     InitialReadBufferData();
     //VERIFICA SE NENHUMA LEITURA DO MAG IRÁ EXCEDER O LIMITE DE 2^12
     //ROLL
-    ABS_MagRead = ABS_16BITS(IMU.CompassRead[ROLL]);
+    ABS_MagRead = ABS(IMU.CompassRead[ROLL]);
     XYZ_CompassBias[ROLL] += ABS_MagRead;
     if (ABS_MagRead > 4096)
     {
       return false;
     }
     //PITCH
-    ABS_MagRead = ABS_16BITS(IMU.CompassRead[PITCH]);
+    ABS_MagRead = ABS(IMU.CompassRead[PITCH]);
     XYZ_CompassBias[PITCH] += ABS_MagRead;
     if (ABS_MagRead > 4096)
     {
       return false;
     }
     //YAW
-    ABS_MagRead = ABS_16BITS(IMU.CompassRead[YAW]);
+    ABS_MagRead = ABS(IMU.CompassRead[YAW]);
     XYZ_CompassBias[YAW] += ABS_MagRead;
     if (ABS_MagRead > 4096)
     {
@@ -159,15 +159,15 @@ void CompassReadClass::ReadBufferData()
 {
   if (Compass_Type == COMPASS_AK8975)
   {
-    I2C.SensorsRead(0x0C, 0x03);
+    I2C.SensorsRead(ADDRESS_COMPASS_AK8975, 0x03);
     COMPASSORIENTATION.SetOrientation(MagOrientation, Compass_Type);
-    I2C.WriteRegister(0x0C, 0x0A, 0x01);
+    I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
   }
   else if ((Compass_Type == COMPASS_HMC5843) || (Compass_Type == COMPASS_HMC5883))
   {
-    if ((COMPASS.FakeHMC5883Address != 0x0D) && (Compass_Type == COMPASS_HMC5883))
+    if ((COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883) && (Compass_Type == COMPASS_HMC5883))
     {
-      I2C.SensorsRead(0x68, 0x49);
+      I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x49);
     }
     else
     {

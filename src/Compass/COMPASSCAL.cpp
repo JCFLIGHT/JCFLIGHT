@@ -56,7 +56,7 @@ void CompassCalClass::RunningCalibration()
     else
     {
         CalibrationCount++;
-        if (CalibrationCount < (CALIBRATION_COUNT * 10) - 30)
+        if (CalibrationCount < ((CALIBRATION_COUNT * 10) - 30))
         {
             RGB.Function(MAGLED);
             if (CalibrationCount == 1)

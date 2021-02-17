@@ -63,7 +63,7 @@ void GPS_Process_FlightModes(void)
   uint32_t CalculateDistance;
   int32_t CalculateDirection;
   //SAIA DA FUNÇÃO SE O NÚMERO DE SATELITES FOR MENOR QUE 5
-  if (GPS_NumberOfSatellites < 5 && !GPS_3DFIX)
+  if (GPS_NumberOfSatellites < 5)
   {
     return;
   }
@@ -97,7 +97,7 @@ void GPS_Process_FlightModes(void)
   static uint32_t StoredCurrentTime;
   DeltaTimeGPSNavigation = (ActualCurrentTime - StoredCurrentTime) * 1e-3f;
   StoredCurrentTime = ActualCurrentTime;
-  DeltaTimeGPSNavigation = MIN_FLOAT(DeltaTimeGPSNavigation, 1.0f);
+  DeltaTimeGPSNavigation = MIN(DeltaTimeGPSNavigation, 1.0f);
   GPS_Calcule_Bearing(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &CalculateDirection);
   DirectionToHome = CalculateDirection / 100;
   GPS_Calcule_Distance_To_Home(&CalculateDistance);
@@ -205,7 +205,7 @@ void GPS_Adjust_Heading()
 
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput)
 {
-  ScaleDownOfLongitude = cos(LatitudeVectorInput * 1.0e-7f * 0.01745329251f);
+  ScaleDownOfLongitude = cos(ConvertToRadians((ConvertCoordinateToFloatingPoint(LatitudeVectorInput))));
 }
 
 void Set_Next_Point_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Destiny)
@@ -227,7 +227,7 @@ bool Point_Reached(void)
   int32_t TargetCalculed;
   TargetCalculed = Target_Bearing - Original_Target_Bearing;
   TargetCalculed = WRap_18000(TargetCalculed);
-  return (ABS_32BITS(TargetCalculed) > 10000);
+  return (ABS(TargetCalculed) > 10000);
 }
 
 void GPS_Calcule_Bearing(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *Bearing)
@@ -384,8 +384,8 @@ static void GPS_Update_CrossTrackError(void)
 
 uint16_t Calculate_Navigation_Speed(uint16_t Maximum_Velocity)
 {
-  Maximum_Velocity = MIN_U16BITS(Maximum_Velocity, Two_Points_Distance);
-  Maximum_Velocity = MAX_U16BITS(Maximum_Velocity, 100);
+  Maximum_Velocity = MIN(Maximum_Velocity, Two_Points_Distance);
+  Maximum_Velocity = MAX(Maximum_Velocity, 100);
   if (Maximum_Velocity > Coordinates_Navigation_Speed)
   {
     Coordinates_Navigation_Speed += (int16_t)(100.0 * DeltaTimeGPSNavigation);
@@ -422,6 +422,7 @@ void Reset_Home_Point(void)
 
 void GPS_Reset_Navigation(void)
 {
+  NavigationMode = Do_None;
   GPS_Navigation_Array[0] = 0;
   GPS_Navigation_Array[1] = 0;
   GPSResetPID(&PositionHoldPIDArray[0]);
@@ -430,7 +431,6 @@ void GPS_Reset_Navigation(void)
   GPSResetPID(&PositionHoldPIDArray[1]);
   GPSResetPID(&PositionHoldRatePIDArray[1]);
   GPSResetPID(&NavigationPIDArray[1]);
-  NavigationMode = Do_None;
   if (GetFrameStateOfAirPlane())
   {
     PlaneResetNavigation();

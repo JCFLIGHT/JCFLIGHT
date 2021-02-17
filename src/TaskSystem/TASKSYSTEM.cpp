@@ -118,12 +118,12 @@ void TaskSystemInitialization(void)
   TaskQueueAdd(&Task_Resources[TASK_SLOW_LOOP]);
   SetTaskEnabled(TASK_SLOW_LOOP, true);
   SetTaskEnabled(TASK_MEDIUM_LOOP, true);
-  SetTaskEnabled(TASK_FAST_MEDIUM_LOOP, true);
 #ifndef __AVR_ATmega2560__
+  SetTaskEnabled(TASK_FAST_MEDIUM_LOOP, true);
   SetTaskEnabled(TASK_FAST_LOOP, true);
   SetTaskEnabled(TASK_SUPER_FAST_LOOP, true);
-  SetTaskEnabled(TASK_INTEGRAL_LOOP, true);
 #endif
+  SetTaskEnabled(TASK_INTEGRAL_LOOP, true);
   SetTaskEnabled(TASK_SYSTEM_LOAD, true);
 }
 
@@ -141,7 +141,7 @@ void TaskSystemRun(void)
     else
     {
       const uint32_t NewTimeInterval = NextExecuteTask - ActualCurrentTime;
-      TimeToNextRealTimeTask = MIN_U32BITS(TimeToNextRealTimeTask, NewTimeInterval);
+      TimeToNextRealTimeTask = MIN(TimeToNextRealTimeTask, NewTimeInterval);
     }
   }
   const bool OutsideRealtimeGuardInterval = (TimeToNextRealTimeTask > 0);

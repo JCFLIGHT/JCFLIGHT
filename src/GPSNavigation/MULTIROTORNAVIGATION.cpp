@@ -59,7 +59,7 @@ int32_t GPSDistanceToHome[2];
 int32_t Original_Target_Bearing;
 int32_t Coordinates_To_Navigation[2];
 
-void GPS_Process_FlightModes(void)
+void GPS_Process_FlightModes(float DeltaTime)
 {
   uint32_t CalculateDistance;
   int32_t CalculateDirection;
@@ -94,10 +94,7 @@ void GPS_Process_FlightModes(void)
     STORAGEMANAGER.Write_Float(DECLINATION_ADDR, Declination());
     DeclinationPushed = true;
   }
-  uint32_t ActualCurrentTime = SCHEDULERTIME.GetMillis();
-  static uint32_t StoredCurrentTime;
-  DeltaTimeGPSNavigation = (ActualCurrentTime - StoredCurrentTime) * 1e-3f;
-  StoredCurrentTime = ActualCurrentTime;
+  DeltaTimeGPSNavigation = DeltaTime;
   DeltaTimeGPSNavigation = MIN(DeltaTimeGPSNavigation, 1.0f);
   GPS_Calcule_Bearing(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &CalculateDirection);
   DirectionToHome = CalculateDirection / 100;

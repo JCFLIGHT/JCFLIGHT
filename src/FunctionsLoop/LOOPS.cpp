@@ -28,6 +28,9 @@ void Slow_Loop()
 
 void Medium_Loop()
 {
+        int32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_MEDIUM_LOOP);
+        const float ThisDeltaTime = (float)ThisTaskTimeUs * 1e-6f;
+
         DECODE.Update();
         RCCONFIG.Set_Pulse();
         RCCONFIG.Update_Channels();
@@ -36,7 +39,7 @@ void Medium_Loop()
         STICKS.Update();
         Barometer_Update();
         GPS_Serial_Read();
-        GPS_Process_FlightModes();
+        GPS_Process_FlightModes(ThisDeltaTime);
         AUXFLIGHT.SelectMode();
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
@@ -78,8 +81,8 @@ void Super_Fast_Loop()
 
 void Integral_Loop()
 {
-        int32_t ThisCycleTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
-        const float ThisDeltaTime = (float)ThisCycleTimeUs * 1e-6f;
+        int32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
+        const float ThisDeltaTime = (float)ThisTaskTimeUs * 1e-6f;
 
 #ifdef __AVR_ATmega2560__
         Fast_Medium_Loop();
@@ -96,7 +99,7 @@ void Integral_Loop()
         WayPointRun();
         Auto_Launch_Update();
         AirSpeed_Apply_Auto_Throttle_Control();
-        PIDXYZ.Update(ThisCycleTimeUs);
+        PIDXYZ.Update(ThisTaskTimeUs);
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         ServoAutoTrimRun();
         ApplyMixingForMotorsAndServos();

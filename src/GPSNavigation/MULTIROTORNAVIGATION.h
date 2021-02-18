@@ -26,7 +26,7 @@ extern int32_t GPSDistanceToHome[2];
 extern int32_t Original_Target_Bearing;
 extern int32_t Coordinates_To_Navigation[2];
 void LoadGPSParameters(void);
-void GPS_Process_FlightModes(void);
+void GPS_Process_FlightModes(float DeltaTime);
 void Reset_Home_Point(void);
 void Set_Next_Point_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Destiny);
 void GPS_Reset_Navigation(void);

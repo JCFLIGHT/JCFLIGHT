@@ -120,23 +120,27 @@ void MS5611_Update()
 {
   uint8_t Command_UT_UP;
   uint32_t *RawValue_UT_UP;
-  if (StructBarometer.CountState == 2)
+
+  switch (StructBarometer.CountState)
   {
-    CalculatePressure();
-    StructBarometer.CountState = 0;
-    return;
-  }
-  if (StructBarometer.CountState == 0)
-  {
+  case 0:
     RecalculateBaroTotalPressure();
     RawValue_UT_UP = &StructBarometer.UT;
     Command_UT_UP = 0x48;
-  }
-  else
-  {
+    break;
+
+  case 2:
+
+    CalculatePressure();
+    StructBarometer.CountState = 0;
+    return;
+
+  default:
     RawValue_UT_UP = &StructBarometer.UP;
     Command_UT_UP = 0x58;
+    break;
   }
+
   StructBarometer.CountState++;
   UT_UP_Read(RawValue_UT_UP);
   UT_UP_Start(Command_UT_UP);

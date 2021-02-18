@@ -378,10 +378,6 @@ void GetMeasuredRotationRate(Struct_Vector3x3 *MeasureRotation)
   MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.GyroscopeRead[YAW] * GYRO_SCALE));
 }
 
-#include "FastSerial/PRINTF.h"
-#include "Scheduler/SCHEDULER.h"
-#include "TaskSystem/TASKSYSTEM.h"
-
 void AHRSClass::Update(float DeltaTime)
 {
   bool SafeToUseCompass = false;

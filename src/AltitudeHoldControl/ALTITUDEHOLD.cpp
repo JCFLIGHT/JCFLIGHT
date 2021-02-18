@@ -202,7 +202,8 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   }
   else if (GetFrameStateOfAirPlane())
   {
-    RCController[PITCH] = Constrain_16Bits(VarioPIDControl, -RCRate * 10, +RCRate * 10);
+    const float AltHoldPitchGain = 1.4f; //EEPROM
+    RCController[PITCH] = Constrain_16Bits(VarioPIDControl * AltHoldPitchGain, -RCRate * 10, +RCRate * 10);
   }
 
 #ifdef THR_SMOOTH_TEST
@@ -210,14 +211,14 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   if (GetFrameStateOfMultirotor())
   {
     PRINTF.SendToConsole(PSTR("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
-                      RCController[THROTTLE],
-                      (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], 4, 1.0f / 1000));
+                         RCController[THROTTLE],
+                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], 4, 1.0f / 1000));
   }
   else if (GetFrameStateOfAirPlane())
   {
     PRINTF.SendToConsole(PSTR("RCController[PITCH]:%d PT1RCController[PITCH]:%d\n"),
-                      RCController[PITCH],
-                      (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], 4, 1.0f / 1000));
+                         RCController[PITCH],
+                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], 4, 1.0f / 1000));
   }
 
 #endif

@@ -42,11 +42,13 @@ void GetRCDataConvertedAndApplyFilter()
   CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], AttitudeThrottleMin, 2000);
   CalcedThrottle = (uint32_t)(CalcedThrottle - AttitudeThrottleMin) * 1000 / (2000 - AttitudeThrottleMin);
   RCController[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
-  RCController[YAW] = CalcedAttitudeRC(YAW, RCExpo);
+  RCController[YAW] = -CalcedAttitudeRC(YAW, RCExpo);
   RCController[PITCH] = CalcedAttitudeRC(PITCH, RCExpo);
-  RCController[ROLL] = CalcedAttitudeRC(ROLL, RCExpo);
+  RCController[ROLL] = -CalcedAttitudeRC(ROLL, RCExpo);
+
   //APLICA O FILTRO LPF NO RC DA ATTITUDE
   RCInterpolationApply();
+
   //FAZ UMA PEQUENA ZONA MORTA NOS CANAIS DA ATTITUDE
   if (ABS(RCController[YAW]) < 5)
   {
@@ -60,6 +62,7 @@ void GetRCDataConvertedAndApplyFilter()
   {
     RCController[ROLL] = 0;
   }
+
   //REMOVE OS VALORES MAIORES QUE -500 E 500 CAUSADOS PELO FILTRO
   if (RCController[YAW] > 500)
   {

@@ -21,6 +21,6 @@
 extern int32_t GPS_Altitude_For_Plane;
 extern int32_t GPS_AltitudeHold_For_Plane;
 void Circle_Mode_Update();
-void PlaneUpdateNavigation(void);
+void AirPlaneUpdateNavigation(void);
 void PlaneResetNavigation(void);
 #endif

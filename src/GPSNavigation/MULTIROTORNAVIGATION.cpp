@@ -33,7 +33,7 @@
 #define GPS_BANK_ANGLE_MAX 3000 //30 GRAUS
 
 static void GPS_Calcule_Bearing(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *Bearing);
-static void GPS_Calcule_Distance_In_CM(int32_t *InputLatitude, int32_t *InputLongitude, uint32_t *CalculateDistance);
+static void GPS_Calcule_Distance_In_CM(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *CalculateDistance);
 static void GPS_Calcule_Distance_To_Home(uint32_t *CalculateDistance);
 static void GPS_Calcule_Velocity(void);
 static void GPS_Update_CrossTrackError(void);
@@ -46,13 +46,14 @@ uint8_t DeclinationPushedCount = 0;
 static float DeltaTimeGPSNavigation;
 float ScaleDownOfLongitude = 1.0f;
 
-static uint16_t Coordinates_Navigation_Speed;
 int16_t GPSActualSpeed[2] = {0, 0};
+
+static int16_t Coordinates_Navigation_Speed;
 static int16_t Crosstrack_Error;
 static int16_t GPS_Rate_Error[2];
 static int16_t Navigation_Bearing_RTH;
 
-uint32_t Two_Points_Distance;
+int32_t Two_Points_Distance;
 int32_t Target_Bearing;
 int32_t GPSDistanceToHome[2];
 int32_t Original_Target_Bearing;
@@ -241,7 +242,7 @@ void GPS_Calcule_Bearing(int32_t *InputLatitude, int32_t *InputLongitude, int32_
   }
 }
 
-void GPS_Calcule_Distance_In_CM(int32_t *InputLatitude, int32_t *InputLongitude, uint32_t *CalculateDistance)
+void GPS_Calcule_Distance_In_CM(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *CalculateDistance)
 {
   float DistanceOfLatitude = (float)(GPS_Coordinates_Vector[0] - *InputLatitude);
   float DistanceOfLongitude = (float)(GPS_Coordinates_Vector[1] - *InputLongitude) * ScaleDownOfLongitude;
@@ -382,13 +383,13 @@ static void GPS_Update_CrossTrackError(void)
   Crosstrack_Error = sin(TargetCalculed) * Two_Points_Distance;
 }
 
-uint16_t Calculate_Navigation_Speed(uint16_t Maximum_Velocity)
+int16_t Calculate_Navigation_Speed(int16_t Maximum_Velocity)
 {
   Maximum_Velocity = MIN(Maximum_Velocity, Two_Points_Distance);
   Maximum_Velocity = MAX(Maximum_Velocity, 100);
   if (Maximum_Velocity > Coordinates_Navigation_Speed)
   {
-    Coordinates_Navigation_Speed += (int16_t)(100.0 * DeltaTimeGPSNavigation);
+    Coordinates_Navigation_Speed += (int16_t)(100.0f * DeltaTimeGPSNavigation);
     Maximum_Velocity = Coordinates_Navigation_Speed;
   }
   return Maximum_Velocity;

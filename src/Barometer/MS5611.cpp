@@ -18,6 +18,7 @@
 #include "MS5611.h"
 #include "BAROREAD.h"
 #include "I2C/I2C.h"
+#include "Common/ENUM.h"
 #include "Scheduler/SCHEDULERTIME.h"
 
 static struct
@@ -30,7 +31,7 @@ static struct
 
 void MS5611_Initialization()
 {
-  I2C.WriteRegister(ADDRESS_BAROMETER_MS5611, ADDRESS_COMPASS_HMC5843_OR_HMC5883, 0);
+  I2C.WriteRegister(ADDRESS_BAROMETER_MS5611, 0x1E, 0);
   SCHEDULERTIME.Sleep(100);
   union
   {

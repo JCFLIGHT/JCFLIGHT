@@ -59,7 +59,6 @@ float Longitude_To_Circle;
 float Scale_Of_Circle;
 float IntegralErrorOfNavigation;
 float IntegralErrorOfAltitude;
-float TimePIDOfNavigationPrimary;
 
 uint8_t RTH_AltitudeOfPlane;
 
@@ -89,8 +88,6 @@ int32_t GPS_Altitude_For_Plane;
 int32_t GPS_AltitudeHold_For_Plane;
 int32_t HeadingToCircle;
 
-static uint32_t PreviousTimePIDOfNavigation;
-
 void Circle_Mode_Update()
 {
   if (GetFrameStateOfMultirotor())
@@ -119,7 +116,7 @@ void Circle_Mode_Update()
   Coordinates_To_Navigation[1] += Longitude_To_Circle * Scale_Of_Circle;
 }
 
-void PlaneUpdateNavigation(void)
+void AirPlaneUpdateNavigation(void)
 {
   RTH_AltitudeOfPlane = RTH_Altitude;
   Read_Throttle = RadioControllOutput[THROTTLE];
@@ -167,6 +164,9 @@ void PlaneUpdateNavigation(void)
   static Scheduler_Struct AirPlaneNavigationTimer;
   if (Scheduler(&AirPlaneNavigationTimer, SCHEDULER_SET_FREQUENCY(5, "Hz")))
   {
+
+    const float DeltaTime_Navigation_PID = AirPlaneNavigationTimer.ActualTime * 1e-6f;
+
     if (ABS(AltitudeError) < 1)
     {
       GetThrottleToNavigation = 1500;
@@ -175,10 +175,12 @@ void PlaneUpdateNavigation(void)
     {
       GetThrottleToNavigation = Constrain_16Bits(1500 - (AltitudeError * 8), 1300, AttitudeThrottleMax);
     }
+
     if (CLIMBOUT_FW && AltitudeError >= 0)
     {
       CLIMBOUT_FW = false;
     }
+
     if (GPS_HOME_MODE_FW)
     {
       if (CLIMBOUT_FW)
@@ -195,36 +197,42 @@ void PlaneUpdateNavigation(void)
         GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + RTH_AltitudeOfPlane;
       }
     }
+
     if (Fail_Safe_Event && (DistanceToHome < 10))
     {
       COMMAND_ARM_DISARM = false;
       CLIMBOUT_FW = false;
       GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + 5;
     }
+
     if (DistanceToHome < 10)
     {
       HeadingDifference *= 0.1f;
     }
+
     HeadingDifference = WRap_18000(HeadingDifference * 100) / 100;
+
     if (ABS(HeadingDifference) > 170)
     {
       HeadingDifference = 175;
     }
-    TimePIDOfNavigationPrimary = (float)(SCHEDULERTIME.GetMillis() - PreviousTimePIDOfNavigation) / 1000;
-    PreviousTimePIDOfNavigation = SCHEDULERTIME.GetMillis();
+
     if (ABS(AltitudeError) <= 3)
     {
-      IntegralErrorOfAltitude *= TimePIDOfNavigationPrimary;
+      IntegralErrorOfAltitude *= DeltaTime_Navigation_PID;
     }
+
     AltitudeError *= 10;
-    IntegralErrorOfAltitude += (AltitudeError * Alt_kI) * TimePIDOfNavigationPrimary;
+    IntegralErrorOfAltitude += (AltitudeError * Alt_kI) * DeltaTime_Navigation_PID;
     IntegralErrorOfAltitude = Constrain_Float(IntegralErrorOfAltitude, -500, 500);
     AltitudeSaturation[0] = (AltitudeError - PreviousAltitudeDifference);
     PreviousAltitudeDifference = AltitudeError;
+
     if (ABS(AltitudeSaturation[0]) > 100)
     {
       AltitudeSaturation[0] = 0;
     }
+
     AltitudeVector[0] = AltitudeVector[1];
     AltitudeVector[1] = AltitudeVector[2];
     AltitudeVector[2] = AltitudeVector[3];
@@ -237,22 +245,26 @@ void PlaneUpdateNavigation(void)
     AltitudeDeltaSumPID += AltitudeVector[2];
     AltitudeDeltaSumPID += AltitudeVector[3];
     AltitudeDeltaSumPID += AltitudeVector[4];
-    AltitudeDeltaSumPID = (AltitudeDeltaSumPID * Alt_kD) / TimePIDOfNavigationPrimary;
+    AltitudeDeltaSumPID = (AltitudeDeltaSumPID * Alt_kD) / DeltaTime_Navigation_PID;
     AltitudeDifference = AltitudeError * Alt_kP;
     AltitudeDifference += IntegralErrorOfAltitude;
+
     if (ABS(HeadingDifference) <= 3)
     {
-      IntegralErrorOfNavigation *= TimePIDOfNavigationPrimary;
+      IntegralErrorOfNavigation *= DeltaTime_Navigation_PID;
     }
+
     HeadingDifference *= 10;
-    IntegralErrorOfNavigation += (HeadingDifference * Nav_kI) * TimePIDOfNavigationPrimary;
+    IntegralErrorOfNavigation += (HeadingDifference * Nav_kI) * DeltaTime_Navigation_PID;
     IntegralErrorOfNavigation = Constrain_Float(IntegralErrorOfNavigation, -500, 500);
     AltitudeSaturation[1] = (HeadingDifference - PreviousHeadingDifference);
     PreviousHeadingDifference = HeadingDifference;
+
     if (ABS(AltitudeSaturation[1]) > 100)
     {
       AltitudeSaturation[1] = 0;
     }
+
     NavigationDifferenceVector[0] = NavigationDifferenceVector[1];
     NavigationDifferenceVector[1] = NavigationDifferenceVector[2];
     NavigationDifferenceVector[2] = NavigationDifferenceVector[3];
@@ -265,30 +277,36 @@ void PlaneUpdateNavigation(void)
     NavigationDeltaSumPID += NavigationDifferenceVector[2];
     NavigationDeltaSumPID += NavigationDifferenceVector[3];
     NavigationDeltaSumPID += NavigationDifferenceVector[4];
-    NavigationDeltaSumPID = (NavigationDeltaSumPID * Nav_kD) / TimePIDOfNavigationPrimary;
+    NavigationDeltaSumPID = (NavigationDeltaSumPID * Nav_kD) / DeltaTime_Navigation_PID;
     HeadingDifference *= Nav_kP;
     HeadingDifference += IntegralErrorOfNavigation;
     GPS_Angle[PITCH] = Constrain_16Bits(AltitudeDifference / 10, -MAX_PITCH_BANKANGLE * 10, MAX_PITCH_BANKANGLE * 10) + AltitudeDeltaSumPID;
     GPS_Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -MAX_ROLL_BANKANGLE * 10, MAX_ROLL_BANKANGLE * 10) + NavigationDeltaSumPID;
     GPS_Angle[YAW] = Constrain_16Bits(HeadingDifference / 10, -MAX_YAW_BANKANGLE * 10, MAX_YAW_BANKANGLE * 10) + NavigationDeltaSumPID;
+
     if (!COMMAND_ARM_DISARM)
     {
       GPS_Angle[PITCH] = Constrain_16Bits(GPS_Angle[PITCH], 0, MAX_PITCH_BANKANGLE * 10);
     }
+
     if (!CLIMBOUT_FW)
     {
       GPS_Angle[PITCH] -= (ABS(ATTITUDE.AngleOut[ROLL]));
     }
+
     GetThrottleToNavigation -= Constrain_16Bits(ATTITUDE.AngleOut[PITCH] * PITCH_COMP, 0, 450);
     SpeedDifference = (GPS_MINSPEED - GPS_Ground_Speed) * I_TERM;
+
     if (GPS_Ground_Speed < GPS_MINSPEED - 50 || GPS_Ground_Speed > GPS_MINSPEED + 50)
     {
       ThrottleBoost += SpeedDifference;
     }
+
     ThrottleBoost = Constrain_16Bits(ThrottleBoost, 0, 500);
     GetThrottleToNavigation += ThrottleBoost;
     GetThrottleToNavigation = Constrain_16Bits(GetThrottleToNavigation, 1300, AttitudeThrottleMax);
   }
+
   if ((!Do_Stabilize_Mode) || (SetFlightModes[MANUAL_MODE] && !Fail_Safe_Event))
   {
     GetThrottleToNavigation = Read_Throttle;
@@ -296,6 +314,7 @@ void PlaneUpdateNavigation(void)
     GPS_Angle[ROLL] = 0;
     GPS_Angle[YAW] = 0;
   }
+
   RCController[THROTTLE] = GetThrottleToNavigation;
   RCController[YAW] += GPS_Angle[YAW];
 }

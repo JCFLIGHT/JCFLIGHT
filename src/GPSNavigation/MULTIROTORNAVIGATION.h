@@ -19,13 +19,12 @@
 #define MULTIROTORNAVIGATION_H_
 #include "Arduino.h"
 extern float ScaleDownOfLongitude;
-extern int32_t GPSDistanceToHome[2];
 extern int16_t GPSActualSpeed[2];
+extern int32_t Two_Points_Distance;
 extern int32_t Target_Bearing;
-extern int32_t Coordinates_To_Navigation[2];
+extern int32_t GPSDistanceToHome[2];
 extern int32_t Original_Target_Bearing;
-extern int32_t Target_Bearing;
-extern uint32_t Two_Points_Distance;
+extern int32_t Coordinates_To_Navigation[2];
 void LoadGPSParameters(void);
 void GPS_Process_FlightModes(void);
 void Reset_Home_Point(void);
@@ -37,7 +36,7 @@ void SetThisPointToPositionHold();
 void check_altitude();
 void GPS_Adjust_Heading();
 void Do_Mode_RTH_Now(void);
-uint16_t Calculate_Navigation_Speed(uint16_t Maximum_Velocity);
+int16_t Calculate_Navigation_Speed(int16_t Maximum_Velocity);
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity);
 bool Point_Reached(void);
 void RTH_Altitude_EEPROM();

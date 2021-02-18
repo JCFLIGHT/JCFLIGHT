@@ -78,8 +78,8 @@ void Super_Fast_Loop()
 
 void Integral_Loop()
 {
-        int32_t CycleTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
-        const float DeltaTime = (float)CycleTimeUs * 0.000001f;
+        int32_t ThisCycleTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
+        const float ThisDeltaTime = (float)ThisCycleTimeUs * 1e-6f;
 
 #ifdef __AVR_ATmega2560__
         Fast_Medium_Loop();
@@ -89,14 +89,14 @@ void Integral_Loop()
 
         Acc_ReadBufferData();
         Gyro_ReadBufferData();
-        AHRS.Update(DeltaTime);
+        AHRS.Update(ThisDeltaTime);
         PID_Dynamic();
         GPS_Orientation_Update();
         FlipModeRun();
         WayPointRun();
         Auto_Launch_Update();
         AirSpeed_Apply_Auto_Throttle_Control();
-        PIDXYZ.Update(CycleTimeUs);
+        PIDXYZ.Update(ThisCycleTimeUs);
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         ServoAutoTrimRun();
         ApplyMixingForMotorsAndServos();

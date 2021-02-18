@@ -16,8 +16,9 @@
 */
 
 #include "BMP280.h"
-#include "I2C/I2C.h"
 #include "BAROREAD.h"
+#include "I2C/I2C.h"
+#include "Common/ENUM.h"
 
 static union
 {

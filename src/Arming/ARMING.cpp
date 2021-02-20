@@ -17,7 +17,7 @@
 
 #include "ARMING.h"
 #include "Common/VARIABLES.h"
-#include "RadioControl/STATES.h"
+#include "RadioControl/RCSTATES.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "ProgMem/PROGMEM.h"

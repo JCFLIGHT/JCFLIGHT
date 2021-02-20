@@ -20,6 +20,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "IOMCU/IOMCU.h"
 #include "Build/BOARDDEFS.h"
+#include "GPS/GPSSTATES.h"
 
 LEDRGB RGB;
 
@@ -240,7 +241,7 @@ void LEDRGB::GPS_Led(void)
   //SE O NÚMERO DE SATELITES FOR MENOR OU IGUAL A 4,O LED VERMELHO IRÁ FICAR PISCANDO SEM PARAR
   static bool GPS_Fail_Toggle = false;
   static uint32_t GPS_Fail = SCHEDULERTIME.GetMillis();
-  if (GPS_NumberOfSatellites < 5)
+  if (Get_GPS_In_Bad_Condition())
   {
     if (SCHEDULERTIME.GetMillis() - GPS_Fail >= 350)
     {
@@ -271,9 +272,9 @@ void LEDRGB::GPS_Led(void)
   {
     if (SCHEDULERTIME.GetMillis() - BlinkTime >= 150)
     {
-      if (GPS_NumberOfSatellites >= 5)
+      if (Get_GPS_In_Good_Condition())
       {
-        if (GPS_NumberOfSatellites >= 8)
+        if (Get_GPS_In_Eight_Or_Plus_Satellites())
         {
           if (BlinkCount++ > 16)
           {

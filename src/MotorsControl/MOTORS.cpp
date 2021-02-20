@@ -26,6 +26,7 @@
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "WatchDog/REBOOT.h"
+#include "RadioControl/RCSTATES.h"
 #ifdef ESP32
 #include "HAL_ESP32/ESP32PWM.h"
 #endif
@@ -192,11 +193,11 @@ void ApplyMixingForMotorsAndServos()
         MotorControl[MotorsCount] -= MaximumMotor - AttitudeThrottleMax;
       }
       MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], AttitudeThrottleMin, AttitudeThrottleMax);
-      if (RadioControllOutput[THROTTLE] < 1100)
+      if (GetThrottleInLowPosition())
       {
         MotorControl[MotorsCount] = AttitudeThrottleMin;
       }
-      if (!COMMAND_ARM_DISARM)
+      if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
       {
         MotorControl[MotorsCount] = 1000;
       }

@@ -21,9 +21,10 @@
 class CompassCalClass : CompassReadClass
 {
 public:
-    void ApplyGain();
-    void ApplyCalibration();
-    void RunningCalibration();
+  void ApplyGain();
+  void ApplyCalibration();
+  void RunningCalibration();
+  void UpdateCompassCalibration();
 };
 extern CompassCalClass COMPASSCAL;
 #endif

@@ -28,6 +28,7 @@
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "SwitchFlag/SWITCHFLAG.h"
 #include "ParamsToGCS/CHECKSUM.h"
+#include "Common/RCDEFINES.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -80,12 +81,12 @@ void AirPlaneClass::UpdateServosMiddlePoint(void)
     return;
   }
 
-  if (GET_SERVO_MIDDLE(SERVO1_MID_ADDR) == 0)
+  if (GET_SERVO_MIDDLE(SERVO1_MID_ADDR) == NONE)
   {
-    SAVE_SERVO_MIDDLE(SERVO1_MID_ADDR, 1500);
-    SAVE_SERVO_MIDDLE(SERVO2_MID_ADDR, 1500);
-    SAVE_SERVO_MIDDLE(SERVO3_MID_ADDR, 1500);
-    SAVE_SERVO_MIDDLE(SERVO4_MID_ADDR, 1500);
+    SAVE_SERVO_MIDDLE(SERVO1_MID_ADDR, MIDDLE_STICKS_PULSE);
+    SAVE_SERVO_MIDDLE(SERVO2_MID_ADDR, MIDDLE_STICKS_PULSE);
+    SAVE_SERVO_MIDDLE(SERVO3_MID_ADDR, MIDDLE_STICKS_PULSE);
+    SAVE_SERVO_MIDDLE(SERVO4_MID_ADDR, MIDDLE_STICKS_PULSE);
   }
   ServoMiddle[SERVO1] = GET_SERVO_MIDDLE(SERVO1_MID_ADDR);
   ServoMiddle[SERVO2] = GET_SERVO_MIDDLE(SERVO2_MID_ADDR);
@@ -110,7 +111,7 @@ void AirPlaneClass::Mode_ConventionalPlane_Run()
     return;
   }
 
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     MotorControl[MOTOR1] = 1000;
   }
@@ -119,20 +120,20 @@ void AirPlaneClass::Mode_ConventionalPlane_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
 
-  if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
+  if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
-    ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[0];  //AILERON  (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = RCController[ROLL] * ServoDirection[1];  //AILERON  (SERVO 2 DA ASA)
-    ServoToFilter[SERVO3] = RCController[YAW] * ServoDirection[2];   //RUDDER   (LEME)
-    ServoToFilter[SERVO4] = RCController[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
+    ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[SERVO1];  //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = RCController[ROLL] * ServoDirection[SERVO2];  //AILERON  (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = RCController[YAW] * ServoDirection[SERVO3];   //RUDDER   (LEME)
+    ServoToFilter[SERVO4] = RCController[PITCH] * ServoDirection[SERVO4]; //ELEVATOR (PROFUNDOR)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    ServoToFilter[SERVO1] = PIDControllerApply[ROLL] * ServoDirection[0];  //AILERON  (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = PIDControllerApply[ROLL] * ServoDirection[1];  //AILERON  (SERVO 2 DA ASA)
-    ServoToFilter[SERVO3] = PIDControllerApply[YAW] * ServoDirection[2];   //RUDDER   (LEME)
-    ServoToFilter[SERVO4] = PIDControllerApply[PITCH] * ServoDirection[3]; //ELEVATOR (PROFUNDOR)
+    ServoToFilter[SERVO1] = PIDControllerApply[ROLL] * ServoDirection[SERVO1];  //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = PIDControllerApply[ROLL] * ServoDirection[SERVO2];  //AILERON  (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = PIDControllerApply[YAW] * ServoDirection[SERVO3];   //RUDDER   (LEME)
+    ServoToFilter[SERVO4] = PIDControllerApply[PITCH] * ServoDirection[SERVO4]; //ELEVATOR (PROFUNDOR)
   }
 }
 
@@ -143,7 +144,7 @@ void AirPlaneClass::Mode_FixedWing_Run()
     return;
   }
 
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     MotorControl[MOTOR1] = 1000;
   }
@@ -152,16 +153,16 @@ void AirPlaneClass::Mode_FixedWing_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
 
-  if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
+  if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
-    ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[0]) + (RCController[PITCH] * ServoDirection[0]); //AILERON (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = (RCController[ROLL] * ServoDirection[0]) - (RCController[PITCH] * ServoDirection[1]); //AILERON (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[SERVO1]) + (RCController[PITCH] * ServoDirection[SERVO1]); //AILERON (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = (RCController[ROLL] * ServoDirection[SERVO1]) - (RCController[PITCH] * ServoDirection[SERVO2]); //AILERON (SERVO 2 DA ASA)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    ServoToFilter[SERVO1] = (PIDControllerApply[ROLL] * ServoDirection[0]) + (PIDControllerApply[PITCH] * ServoDirection[0]); //AILERON (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = (PIDControllerApply[ROLL] * ServoDirection[0]) - (PIDControllerApply[PITCH] * ServoDirection[1]); //AILERON (SERVO 2 DA ASA)
+    ServoToFilter[SERVO1] = (PIDControllerApply[ROLL] * ServoDirection[SERVO1]) + (PIDControllerApply[PITCH] * ServoDirection[SERVO1]); //AILERON (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = (PIDControllerApply[ROLL] * ServoDirection[SERVO1]) - (PIDControllerApply[PITCH] * ServoDirection[SERVO2]); //AILERON (SERVO 2 DA ASA)
   }
 }
 
@@ -172,7 +173,7 @@ void AirPlaneClass::Mode_PlaneVTail_Run()
     return;
   }
 
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     MotorControl[MOTOR1] = 1000;
   }
@@ -181,20 +182,20 @@ void AirPlaneClass::Mode_PlaneVTail_Run()
     MotorControl[MOTOR1] = RCController[THROTTLE];
   }
 
-  if (SetFlightModes[MANUAL_MODE]) //MODO MANUAL
+  if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
-    ServoToFilter[SERVO1] = RCController[PITCH] * ServoDirection[0];                      //AILERON  (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = RCController[PITCH] * ServoDirection[1];                      //AILERON  (SERVO 2 DA ASA)
-    ServoToFilter[SERVO3] = (RCController[ROLL] + RCController[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
-    ServoToFilter[SERVO4] = (RCController[ROLL] - RCController[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
+    ServoToFilter[SERVO1] = RCController[PITCH] * ServoDirection[SERVO1];                      //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = RCController[PITCH] * ServoDirection[SERVO2];                      //AILERON  (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = (RCController[ROLL] + RCController[YAW]) * ServoDirection[SERVO3]; //V-TAIL   (CAUDA)
+    ServoToFilter[SERVO4] = (RCController[ROLL] - RCController[YAW]) * ServoDirection[SERVO4]; //V-TAIL   (CAUDA)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    ServoToFilter[SERVO1] = PIDControllerApply[PITCH] * ServoDirection[0];                            //AILERON  (SERVO 1 DA ASA)
-    ServoToFilter[SERVO2] = PIDControllerApply[PITCH] * ServoDirection[1];                            //AILERON  (SERVO 2 DA ASA)
-    ServoToFilter[SERVO3] = (PIDControllerApply[ROLL] + PIDControllerApply[YAW]) * ServoDirection[2]; //V-TAIL   (CAUDA)
-    ServoToFilter[SERVO4] = (PIDControllerApply[ROLL] - PIDControllerApply[YAW]) * ServoDirection[3]; //V-TAIL   (CAUDA)
+    ServoToFilter[SERVO1] = PIDControllerApply[PITCH] * ServoDirection[SERVO1];                            //AILERON  (SERVO 1 DA ASA)
+    ServoToFilter[SERVO2] = PIDControllerApply[PITCH] * ServoDirection[SERVO2];                            //AILERON  (SERVO 2 DA ASA)
+    ServoToFilter[SERVO3] = (PIDControllerApply[ROLL] + PIDControllerApply[YAW]) * ServoDirection[SERVO3]; //V-TAIL   (CAUDA)
+    ServoToFilter[SERVO4] = (PIDControllerApply[ROLL] - PIDControllerApply[YAW]) * ServoDirection[SERVO4]; //V-TAIL   (CAUDA)
   }
 }
 

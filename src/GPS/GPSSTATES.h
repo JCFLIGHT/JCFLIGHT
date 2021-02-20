@@ -15,39 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "FRAMESTATUS.h"
-#include "Common/VARIABLES.h"
-#include "StorageManager/EEPROMSTORAGE.h"
-
-bool GetFrameStateOfMultirotor()
-{
-    if (FrameType == QUAD_X ||
-        FrameType == HEXA_X ||
-        FrameType == HEXA_I ||
-        FrameType == ZMR250 ||
-        FrameType == TBS)
-    {
-        return true;
-    }
-    return false;
-}
-
-bool GetFrameStateOfAirPlane()
-{
-    if (FrameType == AIRPLANE ||
-        FrameType == FIXED_WING ||
-        FrameType == PLANE_VTAIL)
-    {
-        return true;
-    }
-    return false;
-}
-
-bool GetActualFrameState(uint8_t FrameName)
-{
-    if (FrameType == FrameName)
-    {
-        return true;
-    }
-    return false;
-}
+#ifndef GPSSTATES_H_
+#define GPSSTATES_H_
+#include "Arduino.h"
+bool Get_State_Armed_With_GPS();
+bool Get_GPS_In_Good_Condition();
+bool Get_GPS_In_Bad_Condition();
+bool Get_GPS_In_Eight_Or_Plus_Satellites();
+#endif

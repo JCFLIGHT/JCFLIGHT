@@ -22,6 +22,8 @@ FILE_COMPILE_FOR_SPEED
 
 void MachineInit()
 {
+    //OBTÉM O VALOR INICIAL DE MILLIS PARA CALCULAR O TEMPO DE INCIALIZAÇÃO
+    SetInitialTimeToInitTheMachine(&MachineInitTimeNow);
     //INICIALIZA A SERIAL
     FASTSERIAL.Initialization();
     //INICIALIZA O LED RGB
@@ -36,8 +38,10 @@ void MachineInit()
     GeneralSettingsInitialization();
     //CALIBRAÇÃO DOS ESCS
     ESC.Calibration();
-    //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA E DO COMPASS
+    //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA
     CheckAndUpdateIMUCalibration();
+    //CARREGA OS VALORES DE CALIBRAÇÃO DO COMPASS
+    COMPASS.UpdateCompassCalibration();
     //INICIALIZA OS DISPOSITIVOS I2C
     All_I2C_Initialization();
     //INICIA O BUZZER EM OPERAÇÃO NORMAL
@@ -70,6 +74,9 @@ void MachineInit()
     ConfigureRegisters(false);
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
+    //CALCULA E IMPRIME NO TERMINAL O TEMPO GASTO PELA INICIALIZAÇÃO
+    CalculeTheFinalTimeToInitTheMachine(&MachineInitTimeNow);
+    DEBUG("Sistema Inicializado! Tempo Gasto:%ld Segundos", GetTheFinalTimeToInitTheMachine(&MachineInitTimeNow));
 }
 
 void MachineRun()

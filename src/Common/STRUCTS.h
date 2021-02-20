@@ -194,6 +194,13 @@ typedef struct PT1Filter
 
 typedef struct
 {
+  uint32_t ActualTime;
+  uint32_t PreviousTime;
+  uint32_t TotalTime;
+} MachineInitTime;
+
+typedef struct
+{
   const char *TaskName;
   void (*TaskFunction)();
   int32_t DesiredPeriod;

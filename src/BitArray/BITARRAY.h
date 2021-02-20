@@ -15,39 +15,15 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "FRAMESTATUS.h"
-#include "Common/VARIABLES.h"
-#include "StorageManager/EEPROMSTORAGE.h"
-
-bool GetFrameStateOfMultirotor()
-{
-    if (FrameType == QUAD_X ||
-        FrameType == HEXA_X ||
-        FrameType == HEXA_I ||
-        FrameType == ZMR250 ||
-        FrameType == TBS)
-    {
-        return true;
-    }
-    return false;
-}
-
-bool GetFrameStateOfAirPlane()
-{
-    if (FrameType == AIRPLANE ||
-        FrameType == FIXED_WING ||
-        FrameType == PLANE_VTAIL)
-    {
-        return true;
-    }
-    return false;
-}
-
-bool GetActualFrameState(uint8_t FrameName)
-{
-    if (FrameType == FrameName)
-    {
-        return true;
-    }
-    return false;
-}
+#ifndef BITARRAY_H_
+#define BITARRAY_H_
+#include "inttypes.h"
+bool IS_FLIGHT_MODE_ACTIVE(uint8_t FlightModeName);
+void ENABLE_THIS_FLIGHT_MODE(uint8_t FlightModeName);
+void DISABLE_THIS_FLIGHT_MODE(uint8_t FlightModeName);
+void ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(uint8_t FlightModeName, bool Dependency);
+bool IS_STATE_ACTIVE(uint8_t FlightModeName);
+void ENABLE_STATE(uint8_t FlightModeName);
+void DISABLE_STATE(uint8_t FlightModeName);
+void ENABLE_DISABLE_STATE_WITH_DEPENDENCY(uint8_t FlightModeName, bool Dependency);
+#endif

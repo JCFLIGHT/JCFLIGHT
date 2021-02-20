@@ -29,18 +29,36 @@ class SerialPrint
 {
 public:
   void ParamsToConsole();
-#if defined(__arm__) || defined(ESP32)
+#ifndef __AVR_ATmega2560__
   void SendToConsole();
 #else
   void SendToConsole(const char *fmt, ...);
 #endif
+  void CallSchedulerSleep();
 
 private:
-#if defined(__arm__) || defined(ESP32)
+#ifndef __AVR_ATmega2560__
   void SerialPrintF();
 #else
   void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
 #endif
 };
 extern SerialPrint PRINTF;
+#ifdef __AVR_ATmega2560__
+#define DEBUG(fmt, args...)                       \
+  do                                              \
+  {                                               \
+    PRINTF.SendToConsole(PSTR(fmt "\n"), ##args); \
+    PRINTF.CallSchedulerSleep();                  \
+  } while (0)
+#define LOG(fmt)                                                                        \
+  do                                                                                    \
+  {                                                                                     \
+    PRINTF.SendToConsole(PSTR("Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__); \
+    PRINTF.CallSchedulerSleep();                                                        \
+  } while (0)
+#else
+#define DEBUG(x, y) (void)(x), (void)(y)
+#define LOG(x) (void)(x)
+#endif
 #endif

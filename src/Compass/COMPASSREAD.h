@@ -29,6 +29,7 @@ public:
   int16_t CalibrationCount = 0;
   void Initialization();
   void Constant_Read();
+  void UpdateCompassCalibration();
 
 private:
   bool PushBias(uint8_t InputBias);

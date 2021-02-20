@@ -200,3 +200,8 @@ void CompassReadClass::Constant_Read()
   //APLICA A ROTAÇÃO DO COMPASS
   COMPASSROTATION.Rotate();
 }
+
+void CompassReadClass::UpdateCompassCalibration()
+{
+  COMPASSCAL.UpdateCompassCalibration();
+}

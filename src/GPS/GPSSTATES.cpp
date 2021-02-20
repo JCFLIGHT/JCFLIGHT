@@ -15,17 +15,41 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FLIPMODE_H_
-#define FLIPMODE_H_
-#include "Arduino.h"
-extern bool LockPitchAndRollRC;
-extern bool ApplyFlipRoll;
-extern bool ApplyFlipPitch;
-extern int16_t SampleRoll;
-extern int16_t SamplePitch;
-extern int16_t FlipAngleValue;
-extern uint16_t ValueOfFlipToRoll;
-extern uint16_t ValueOfFlipToPitch;
-void FlipModeRun();
-void FlipRollPitchAxis(bool _Do_Flip, uint8_t Axis);
-#endif
+#include "GPSSTATES.h"
+#include "Common/VARIABLES.h"
+
+bool Get_State_Armed_With_GPS()
+{
+    if (GPS_NumberOfSatellites >= 5 && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && Home_Point)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Get_GPS_In_Good_Condition()
+{
+    if (GPS_NumberOfSatellites >= 5)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Get_GPS_In_Bad_Condition()
+{
+    if (GPS_NumberOfSatellites < 5)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Get_GPS_In_Eight_Or_Plus_Satellites()
+{
+    if (GPS_NumberOfSatellites >= 8)
+    {
+        return true;
+    }
+    return false;
+}

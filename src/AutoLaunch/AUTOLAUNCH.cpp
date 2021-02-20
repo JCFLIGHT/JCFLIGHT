@@ -21,10 +21,12 @@
 #include "AHRS/AHRS.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Math/MATHSUPPORT.h"
-#include "RadioControl/STATES.h"
+#include "RadioControl/RCSTATES.h"
 #include "AHRS/VECTOR.h"
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
+
+AutoLaunchClass AUTOLAUNCH;
 
 #define AHRS_BANKED_ANGLE 25                                 //25 GRAUS MAXIMO DE BANK ANGLE (CONSIDERANDO EM RADIANOS = 436)
 #define IMU_BANKED_ANGLE -450.0f                             //-45 GRAUS DE INCLINAÇÃO NA IMU
@@ -38,12 +40,12 @@
 #define AUTO_LAUNCH_THROTTLE_MAX 1700                        //VALOR MAXIMO DE ACELERAÇÃO
 #define AUTO_LAUCH_MAX_ALTITUDE 0                            //ALTITUDE MAXIMA PARA VALIDAR O AUTO-LAUNCH (VALOR EM METROS)
 
-bool PlaneType = 0;
 bool AutoLaunchState = false;
 bool StateLaunched = false;
 bool LaunchedDetect = false;
 bool IgnoreFirstPeak = false;
 bool IgnoreFirstPeakOverFlow = false;
+uint8_t PlaneType = 0;
 uint16_t ThrottleIteration = 1000;
 uint32_t ThrottleStart = 0;
 uint32_t AutoLaunchDetectorPreviousTime = 0;
@@ -60,15 +62,21 @@ const float GetRollAccelerationInMSS()
   return BodyFrameAcceleration.Pitch;
 }
 
-const bool GetSwingVelocityState()
+const float GetYawRotationInRadians()
 {
-  const float SwingVelocity = (ABS(BodyFrameRotation.Yaw) * 10 > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / BodyFrameRotation.Yaw) : 0;
+  return BodyFrameRotation.Yaw * 10;
+}
+
+const bool AutoLaunchClass::GetSwingVelocityState()
+{
+  const float SwingVelocity = (ABS(GetYawRotationInRadians()) > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / GetYawRotationInRadians()) : 0;
   return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (GetPitchAccelerationInMSS() > 0);
 }
 
-void AutoLaunchDetector()
+void AutoLaunchClass::AutoLaunchDetector()
 {
-  if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), AHRS.CheckAnglesInclination(AHRS_BANKED_ANGLE)) || GetSwingVelocityState())
+  if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), AHRS.CheckAnglesInclination(AHRS_BANKED_ANGLE)) ||
+      GetSwingVelocityState())
   {
     AutoLaunchDetectorSum += (SCHEDULERTIME.GetMillis() - AutoLaunchDetectorPreviousTime);
     AutoLaunchDetectorPreviousTime = SCHEDULERTIME.GetMillis();
@@ -84,13 +92,14 @@ void AutoLaunchDetector()
   }
 }
 
-void Auto_Launch_Update()
+void AutoLaunchClass::Update()
 {
   if (!GetFrameStateOfAirPlane())
   {
     return;
   }
-  if (SetFlightModes[LAUNCH_MODE])
+  SetPlaneType();
+  if (IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE))
   {
     if (GetValidStateToRunLaunch() && !LaunchedDetect)
     {
@@ -105,9 +114,9 @@ void Auto_Launch_Update()
       if (PlaneType == WITH_WHEELS)
       {
         AutoLaunchState = true;
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-          COMMAND_ARM_DISARM = true;
+          ENABLE_STATE(PRIMARY_ARM_DISARM);
         }
         RCControllerThrottle_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
       }
@@ -121,9 +130,9 @@ void Auto_Launch_Update()
         {
           RCControllerYawPitchRoll_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
         }
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-          COMMAND_ARM_DISARM = true;
+          ENABLE_STATE(PRIMARY_ARM_DISARM);
         }
         if (AutoLaunchCompleted())
         {
@@ -142,13 +151,13 @@ void Auto_Launch_Update()
       }
     }
   }
-  if (!COMMAND_ARM_DISARM && !GetValidStateToRunLaunch())
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !GetValidStateToRunLaunch())
   {
     ResetParameters();
   }
 }
 
-void RCControllerThrottle_Apply_Logic(bool SlowThr)
+void AutoLaunchClass::RCControllerThrottle_Apply_Logic(bool SlowThr)
 {
   if (SlowThr)
   {
@@ -192,7 +201,7 @@ void RCControllerThrottle_Apply_Logic(bool SlowThr)
   }
 }
 
-int16_t CalculeControllToPitch(float AngleInDegrees, int16_t InclinationMaxOfStabilize)
+int16_t AutoLaunchClass::CalculeControllToPitch(float AngleInDegrees, int16_t InclinationMaxOfStabilize)
 {
   AngleInDegrees *= 10;
   AngleInDegrees = Constrain_Float(AngleInDegrees, (float)-InclinationMaxOfStabilize, (float)InclinationMaxOfStabilize);
@@ -201,7 +210,7 @@ int16_t CalculeControllToPitch(float AngleInDegrees, int16_t InclinationMaxOfSta
   return ((CalcValueA / CalcValueB) + (-500.0f));
 }
 
-void RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
+void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
 {
   if (SlowControll)
   {
@@ -222,22 +231,22 @@ void RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
   }
 }
 
-bool GetStateOfThrottle()
+bool AutoLaunchClass::GetStateOfThrottle()
 {
   return (RCController[THROTTLE] >= 1400) && AutoLaunchState;
 }
 
-bool GetValidStateToRunLaunch()
+bool AutoLaunchClass::GetValidStateToRunLaunch()
 {
   return (RadioControllOutput[THROTTLE] >= 1400);
 }
 
-bool GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination)
+bool AutoLaunchClass::GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination)
 {
-  return (VectorPitch < (IMU_BANKED_ANGLE) && CheckIMUInclination);
+  return ((VectorPitch < (IMU_BANKED_ANGLE)) && CheckIMUInclination);
 }
 
-bool AutoLaunchTimerOverFlow()
+bool AutoLaunchClass::AutoLaunchTimerOverFlow()
 {
   if (SCHEDULERTIME.GetMillis() - AbortAutoLaunch >= AUTO_LAUCH_EXIT_FUNCTION)
   {
@@ -254,12 +263,12 @@ bool AutoLaunchTimerOverFlow()
   return false;
 }
 
-bool AutoLaunchMaxAltitudeReached(void)
+bool AutoLaunchClass::AutoLaunchMaxAltitudeReached(void)
 {
   return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (ALTITUDE.EstimatedAltitude >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
 }
 
-bool AutoLaunchCompleted()
+bool AutoLaunchClass::AutoLaunchCompleted()
 {
   //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
   if (AUTO_LAUCH_EXIT_FUNCTION == 0)
@@ -270,7 +279,23 @@ bool AutoLaunchCompleted()
   return (AutoLaunchTimerOverFlow()) || (SticksDeflected(15)) || (AutoLaunchMaxAltitudeReached());
 }
 
-void ResetParameters()
+void AutoLaunchClass::SetPlaneType()
+{
+  if (GetActualFrameState(FIXED_WING))
+  {
+    PlaneType = WITHOUT_WHEELS;
+  }
+  else if (GetActualFrameState(PLANE_VTAIL))
+  {
+    PlaneType = WITHOUT_WHEELS;
+  }
+  else if (GetActualFrameState(AIRPLANE))
+  {
+    PlaneType = WITH_WHEELS;
+  }
+}
+
+void AutoLaunchClass::ResetParameters()
 {
   //RESETA OS PARAMETROS QUANDO ESTIVER DESARMADO
   StateLaunched = false;

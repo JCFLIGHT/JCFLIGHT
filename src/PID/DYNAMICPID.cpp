@@ -39,8 +39,8 @@ uint8_t DynamicDerivativeVector[2];
 void GetRCDataConvertedAndApplyFilter()
 {
   int32_t CalcedThrottle;
-  CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], AttitudeThrottleMin, 2000);
-  CalcedThrottle = (uint32_t)(CalcedThrottle - AttitudeThrottleMin) * 1000 / (2000 - AttitudeThrottleMin);
+  CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], AttitudeThrottleMin, MAX_STICKS_PULSE);
+  CalcedThrottle = (uint32_t)(CalcedThrottle - AttitudeThrottleMin) * MIN_STICKS_PULSE / (MAX_STICKS_PULSE - AttitudeThrottleMin);
   RCController[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
   RCController[YAW] = -CalcedAttitudeRC(YAW, RCExpo);
   RCController[PITCH] = CalcedAttitudeRC(PITCH, RCExpo);
@@ -117,7 +117,7 @@ void PID_Dynamic()
   }
   for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)
   {
-    uint16_t DynamicStored = MIN(ABS(RadioControllOutput[RCIndexCount] - 1500), 500);
+    uint16_t DynamicStored = MIN(ABS(RadioControllOutput[RCIndexCount] - MIDDLE_STICKS_PULSE), 500);
     DynamicPIDCalced = 100 - (uint16_t)DynamicRollAndPitchRate[RCIndexCount] * DynamicStored / 500;
     DynamicPIDCalced = (uint16_t)DynamicPIDCalced * TPA_Parameters.CalcedValue / 100;
     DynamicProportionalVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].ProportionalVector * DynamicPIDCalced / 100;

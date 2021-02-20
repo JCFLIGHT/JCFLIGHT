@@ -23,10 +23,7 @@
 //*******************************************************
 //BOOL OU BOOLEAN (0 - 1) OU (TRUE - FALSE)
 //*******************************************************
-extern bool COMMAND_ARM_DISARM;
-extern bool SetFlightModes[SIZE_OF_FLIGHT_MODES];
 extern bool CalibratingCompass;
-extern bool Do_GPS_Altitude;
 extern bool GPSHold_CallBaro;
 extern bool Fail_Safe_Event;
 extern bool Home_Point;
@@ -34,8 +31,9 @@ extern bool GPS_3DFIX;
 extern bool Do_Stabilize_Mode;
 extern bool Do_HeadingHold_Mode;
 extern bool Do_AltitudeHold_Mode;
+extern bool Do_GPS_Altitude;
+extern bool Do_AutoThrottle_Mode;
 extern bool ImmediatelyFailSafe;
-extern bool TurnCoordinatorMode;
 
 //*******************************************************
 //UNSIGNED 8 BITS (0 - 255)
@@ -54,6 +52,7 @@ extern uint8_t NavigationMode;
 extern uint8_t GPS_NumberOfSatellites;
 extern uint8_t FrameType;
 extern uint8_t GPS_Flight_Mode;
+extern uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
 
 //*******************************************************
 //UNSIGNED 16 BITS (0 - 65.535‬)

@@ -24,6 +24,8 @@
 #include "Buzzer/BUZZER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
+#include "RadioControl/RCSTATES.h"
+#include "FastSerial/PRINTF.h"
 
 ClassESC ESC;
 
@@ -34,12 +36,14 @@ void ClassESC::Calibration(void)
 {
   if (ESC_CAL_THROTTLE_FAIL)
   {
+    LOG("O usuario pulou a etapa de calib dos escs.");
     return; //FAÇA UMA RAPIDA SAIDA DA FUNÇÃO CASO O USUARIO NÃO QUEIRA CALIBRAR OS ESC'S
   }
   if (ESC_CAL_THROTTLE_SUCESS) //CHECA SE O VALOR DO ACELERADOR É SAFE
   {
-    ConfigureRegisters(true); //INICIA OS REGISTRADORES DE CONFIGURAÇÃO DE SAIDA DOS PINOS PWM
-    PulseInAllMotors(2000);   //ENVIA PWM MAXIMO A TODOS OS ESC'S
+    LOG("Etapa de calib dos escs inicializada!");
+    ConfigureRegisters(true);           //INICIA OS REGISTRADORES DE CONFIGURAÇÃO DE SAIDA DOS PINOS PWM
+    PulseInAllMotors(MAX_STICKS_PULSE); //ENVIA PWM MAXIMO A TODOS OS ESC'S
     while (true)
     {
       //ESSE PRIMEIRO WHILE DURA 10 SEGUNDOS
@@ -60,10 +64,11 @@ void ClassESC::Calibration(void)
       }
       if (IgnoreThis)
       {
-        PulseInAllMotors(1000); //ENVIA PWM MINIMO A TODOS OS ESC'S
+        PulseInAllMotors(MIN_STICKS_PULSE); //ENVIA PWM MINIMO A TODOS OS ESC'S
       }
     }
     BeeperMode = ESC_FINISH_CALIBRATION_MODE;
+    LOG("Etapa de calib dos escs finalizada!");
     while (true) //FICA TRAVADO AQUI NO WHILE ATÉ QUE A CONTROLADORA SEJA REINICIADA MANUALMENTE
     {
       static uint32_t EscCalLoopRefresh = SCHEDULERTIME.GetMillis();
@@ -79,29 +84,29 @@ void ClassESC::Calibration(void)
         {
           BeeperMode--;
         }
-        if (RadioControllOutput[THROTTLE] < 1100 && RadioControllOutput[YAW] > 1900 &&
-            RadioControllOutput[PITCH] < 1100 && RadioControllOutput[ROLL] < 1100 && !EscCal_ArmTest)
+        if (SticksStateToArm() && !EscCal_ArmTest)
         {
           EscCal_ArmCount++; //REALIZA 50 CONTAGENS = 1 SEGUNDO
+          if (EscCal_ArmCount >= 50)
+          {
+            EscCal_ArmTest = true; //ARMA OS MOTORES PARA TESTE
+            LOG("Sistema armado para teste dos motores!");
+          }
         }
-        if (EscCal_ArmCount >= 50)
-        {
-          EscCal_ArmTest = true; //ARMA OS MOTORES PARA TESTE
-        }
-        if (RadioControllOutput[THROTTLE] < 1100 && RadioControllOutput[YAW] < 1100 &&
-            RadioControllOutput[PITCH] > 1900 && RadioControllOutput[ROLL] < 1100 && EscCal_ArmTest)
+        if (SticksStateToDisarm() && EscCal_ArmTest)
         {
           EscCal_ArmCount = EscCal_ArmTest = false; //DESARMA OS MOTORES E RESETA A CONTAGEM
+          LOG("Sistema desarmado!");
         }
         EscCalLoopRefresh = SCHEDULERTIME.GetMillis();
       }
       if (EscCal_ArmTest)
       {
-        PulseInAllMotors(Constrain_16Bits(RadioControllOutput[THROTTLE], 1000, 2000)); //REALIZA O BY-PASS DO THROTTLE
+        PulseInAllMotors(Constrain_16Bits(RadioControllOutput[THROTTLE], MIN_STICKS_PULSE, MAX_STICKS_PULSE)); //REALIZA O BY-PASS DO THROTTLE
       }
       else
       {
-        PulseInAllMotors(1000); //DESLIGA OS MOTORES
+        PulseInAllMotors(MIN_STICKS_PULSE); //DESLIGA OS MOTORES
       }
     }
   }

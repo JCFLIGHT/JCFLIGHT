@@ -55,7 +55,7 @@ const int8_t TableSelectDrop6SLipo[] = {0, 1, 3, 4, 5, 7, 8, 9, 11, 12, 14, 15, 
 
 void Motors_Compensation(uint8_t State, uint8_t _NumbOfMotors)
 {
-  if (!State || _NumbOfMotors == 0)
+  if (!State || _NumbOfMotors < 4)
   {
     return;
   }

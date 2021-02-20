@@ -19,7 +19,7 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 
-void SetFlightModesToGCS()
+void SetFlightModeToGCS()
 {
   if ((NavigationMode == Do_Land_Settle) ||
       (NavigationMode == Do_LandInProgress) ||
@@ -51,7 +51,7 @@ void SetFlightModesToGCS()
     }
     if (GPSHoldControlAux)
     {
-      FlightMode = GCS_GPS_HOLD_MODE;
+      FlightMode = GCS_POS_HOLD_MODE;
     }
     if (RTHControlAux)
     {

@@ -103,8 +103,15 @@ void CompassCalClass::RunningCalibration()
             STORAGEMANAGER.Write_16Bits(MAG_ROLL_ADDR, CALIBRATION.Magnetometer[ROLL]);
             STORAGEMANAGER.Write_16Bits(MAG_PITCH_ADDR, CALIBRATION.Magnetometer[PITCH]);
             STORAGEMANAGER.Write_16Bits(MAG_YAW_ADDR, CALIBRATION.Magnetometer[YAW]);
-            CheckAndUpdateIMUCalibration();
+            UpdateCompassCalibration();
             BEEPER.Play(BEEPER_CALIBRATION_DONE);
         }
     }
+}
+
+void CompassCalClass::UpdateCompassCalibration()
+{
+    CALIBRATION.Magnetometer[ROLL] = STORAGEMANAGER.Read_16Bits(MAG_ROLL_ADDR);
+    CALIBRATION.Magnetometer[PITCH] = STORAGEMANAGER.Read_16Bits(MAG_PITCH_ADDR);
+    CALIBRATION.Magnetometer[YAW] = STORAGEMANAGER.Read_16Bits(MAG_YAW_ADDR);
 }

@@ -25,6 +25,7 @@
 #include "Build/BOARDDEFS.h"
 #include "AnalogDigitalConverter/ADC.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "Common/RCDEFINES.h"
 
 SAFETYBUTTONCLASS SAFETYBUTTON;
 
@@ -77,16 +78,16 @@ void SAFETYBUTTONCLASS::FlashButton()
             WaitToNextProcess = true;
             if (GetFrameStateOfMultirotor())
             {
-                PulseInAllMotors(1000);
+                PulseInAllMotors(MIN_STICKS_PULSE);
             }
             else if (GetFrameStateOfAirPlane())
             {
-                MotorControl[MOTOR1] = 1000;
-                MotorControl[MOTOR2] = 1500;
-                MotorControl[MOTOR3] = 1500;
-                MotorControl[MOTOR4] = 1500;
-                MotorControl[MOTOR5] = 1500;
-                MotorControl[MOTOR6] = 1500;
+                MotorControl[MOTOR1] = MIN_STICKS_PULSE;
+                MotorControl[MOTOR2] = MIDDLE_STICKS_PULSE;
+                MotorControl[MOTOR3] = MIDDLE_STICKS_PULSE;
+                MotorControl[MOTOR4] = MIDDLE_STICKS_PULSE;
+                MotorControl[MOTOR5] = MIDDLE_STICKS_PULSE;
+                MotorControl[MOTOR6] = MIDDLE_STICKS_PULSE;
                 ApplyPWMControlForMotorsAndServos();
             }
         }
@@ -133,16 +134,16 @@ void SAFETYBUTTONCLASS::FlashButton()
                 DetectRise = 0;
                 if (GetFrameStateOfMultirotor())
                 {
-                    PulseInAllMotors(0);
+                    PulseInAllMotors(DISABLE_IO_PIN);
                 }
                 else if (GetFrameStateOfAirPlane())
                 {
-                    MotorControl[MOTOR1] = 0;
-                    MotorControl[MOTOR2] = 1500;
-                    MotorControl[MOTOR3] = 1500;
-                    MotorControl[MOTOR4] = 1500;
-                    MotorControl[MOTOR5] = 1500;
-                    MotorControl[MOTOR6] = 1500;
+                    MotorControl[MOTOR1] = DISABLE_IO_PIN;
+                    MotorControl[MOTOR2] = MIDDLE_STICKS_PULSE;
+                    MotorControl[MOTOR3] = MIDDLE_STICKS_PULSE;
+                    MotorControl[MOTOR4] = MIDDLE_STICKS_PULSE;
+                    MotorControl[MOTOR5] = MIDDLE_STICKS_PULSE;
+                    MotorControl[MOTOR6] = MIDDLE_STICKS_PULSE;
                     ApplyPWMControlForMotorsAndServos();
                 }
                 SafeStateToApplyPulse = false;
@@ -201,7 +202,7 @@ bool SAFETYBUTTONCLASS::SafeButtonEnabled()
 
 void SAFETYBUTTONCLASS::UpdateRoutine(void)
 {
-    if (!SafeButtonEnabled() || !GetButtonInterval() || COMMAND_ARM_DISARM)
+    if (!SafeButtonEnabled() || !GetButtonInterval() || IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
         return;
     }

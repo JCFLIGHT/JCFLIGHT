@@ -80,11 +80,11 @@ void DecodeClass::Update()
     RadioControllOutputDecoded = LearningChannelsOfReceiver(Channels);
     if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
     {
-      CheckFailSafeState = SBUSRC.FailSafe || !COMMAND_ARM_DISARM;
+      CheckFailSafeState = SBUSRC.FailSafe || !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
     }
     else
     {
-      CheckFailSafeState = RadioControllOutputDecoded > CHECKSUM.GetFailSafeValue || !COMMAND_ARM_DISARM;
+      CheckFailSafeState = RadioControllOutputDecoded > CHECKSUM.GetFailSafeValue || !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
     }
     if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
         (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))

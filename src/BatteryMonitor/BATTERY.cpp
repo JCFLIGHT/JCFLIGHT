@@ -34,7 +34,7 @@ AverageFilterFloat_Size20 Current_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A CO
 #define THIS_LOOP_RATE 50            //HZ
 #define TIMER_TO_AUTO_DETECT_BATT 15 //SEGUNDOS
 #define PREVENT_ARM_LOW_BATT 20      //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
-//#define DEBUG
+//#define DEBUG_BATT
 
 //VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
 float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
@@ -80,7 +80,7 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
     BATTERY.Percentage = 1;
   }
 
-#ifdef DEBUG
+#ifdef DEBUG_BATT
   PRINTF.SendToConsole(PSTR("volt:%0.2f min:%0.2f max:%0.2f mincount:%d maxcount:%d\n"),
                        BattVoltage,
                        BattMinVolt,
@@ -224,7 +224,7 @@ void BATT::Do_RTH_With_Low_Batt(bool FailSafeBatt)
     //A FIM DE NÃO INTERFERIR NO FUNCIONAMENTO DESSA FUNÇÃO
     FailSafeBattDetect = true;
   }
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     FailSafeBattDetect = false;
     return;

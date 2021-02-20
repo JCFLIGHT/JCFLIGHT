@@ -29,6 +29,7 @@ public:
   int16_t CalcedRateTargetYaw;
   void DerivativeLPF_Update();
   void Update(int32_t DeltaTimeUs);
+  int16_t AngleTarget(int16_t RcControllerInput, uint8_t AttitudeAngle, int16_t MaxInclination);
 
 private:
   int16_t Get_LPF_Derivative_Value = 0;

@@ -73,7 +73,7 @@ void DoBaroCalibrationForFlight()
 
 void CalculateBaroAltitudeForFlight()
 {
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     DoBaroCalibrationForFlight();
     Altitude_Filter.Reset();
@@ -90,7 +90,7 @@ int32_t GetAltitudeForGCS()
   static int16_t BarometerTemperatureScaleForGCS;
   static int32_t BarometerGroundPressure;
 
-  if (COMMAND_ARM_DISARM)
+  if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     InitialSamples = 0xC8; //RECALIBRA A ALTITUDE DO BARO PARA O MODO DESARMADO
     return ALTITUDE.RealBaroAltitude;

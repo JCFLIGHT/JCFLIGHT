@@ -1089,7 +1089,7 @@ void AUXFLIGHTCLASS::SelectMode(void)
 
 void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
 {
-  SetFlightModesToGCS();
+  SetFlightModeToGCS();
   if (Fail_Safe_Event)
   {
     return;
@@ -1097,83 +1097,95 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
   //ACRO
   if (AcroControlAux)
   {
-    SetFlightModes[STABILIZE_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(STABILIZE_MODE);
   }
   else
   {
-    SetFlightModes[STABILIZE_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE);
   }
   //IOC
   if (IOCControlAux)
   {
-    SetFlightModes[IOC_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(IOC_MODE);
+    ENABLE_THIS_FLIGHT_MODE(MANUAL_MODE);
   }
   else
   {
-    SetFlightModes[IOC_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(IOC_MODE);
+    DISABLE_THIS_FLIGHT_MODE(MANUAL_MODE);
   }
   //ALTITUDE-HOLD
   if (AltitudeHoldControlAux)
   {
-    SetFlightModes[ALTITUDE_HOLD_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(ALTITUDE_HOLD_MODE);
+    ENABLE_THIS_FLIGHT_MODE(AUTO_THROTTLE_MODE);
   }
   else
   {
-    SetFlightModes[ALTITUDE_HOLD_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(ALTITUDE_HOLD_MODE);
+    DISABLE_THIS_FLIGHT_MODE(AUTO_THROTTLE_MODE);
   }
   //GPS-HOLD
   if (GPSHoldControlAux)
   {
-    SetFlightModes[GPS_HOLD_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(POS_HOLD_MODE);
+    ENABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);
   }
   else
   {
-    SetFlightModes[GPS_HOLD_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(POS_HOLD_MODE);
+    DISABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);
   }
   //AUTO LAND
   if (AutoLandControlAux)
   {
-    SetFlightModes[LAND_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(LAND_MODE);
+    ENABLE_THIS_FLIGHT_MODE(CRUISE_MODE);
   }
   else
   {
-    SetFlightModes[LAND_MODE] = false;
-  }
-  //RTH
-  if (RTHControlAux)
-  {
-    SetFlightModes[RTH_MODE] = true;
-  }
-  else
-  {
-    SetFlightModes[RTH_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(LAND_MODE);
+    DISABLE_THIS_FLIGHT_MODE(CRUISE_MODE);
   }
   //SPORT
   if (AttackControlAux)
   {
-    SetFlightModes[ATACK_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(ATTACK_MODE);
+    ENABLE_THIS_FLIGHT_MODE(LAUNCH_MODE);
   }
   else
   {
-    SetFlightModes[ATACK_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(ATTACK_MODE);
+    DISABLE_THIS_FLIGHT_MODE(LAUNCH_MODE);
   }
   //AUTO-FLIP
   if (AutoFlipControlAux)
   {
-    SetFlightModes[FLIP_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(FLIP_MODE);
+    ENABLE_THIS_FLIGHT_MODE(TURN_MODE);
   }
   else
   {
-    SetFlightModes[FLIP_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(FLIP_MODE);
+    DISABLE_THIS_FLIGHT_MODE(TURN_MODE);
+  }
+  //RTH
+  if (RTHControlAux)
+  {
+    ENABLE_THIS_FLIGHT_MODE(RTH_MODE);
+  }
+  else
+  {
+    DISABLE_THIS_FLIGHT_MODE(RTH_MODE);
   }
   //AUTO
   if (WayPointControlAux)
   {
-    SetFlightModes[WAYPOINT_MODE] = true;
+    ENABLE_THIS_FLIGHT_MODE(WAYPOINT_MODE);
   }
   else
   {
-    SetFlightModes[WAYPOINT_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(WAYPOINT_MODE);
   }
 
   //Throttle_LockUp(true); //TRAVA DO ACELERADOR PARA TER FACILIDADE DE MOVER NO YAW

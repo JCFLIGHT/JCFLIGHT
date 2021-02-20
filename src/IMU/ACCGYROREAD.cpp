@@ -145,8 +145,8 @@ void IMU_Get_Data()
   IMU.AccelerometerRead[PITCH] = -(Data_Read[0] << 8 | Data_Read[1]);
   IMU.AccelerometerRead[ROLL] = -(Data_Read[2] << 8 | Data_Read[3]);
   IMU.AccelerometerRead[YAW] = Data_Read[4] << 8 | Data_Read[5];
-  IMU.GyroscopeRead[ROLL] = -(Data_Read[8] << 8 | Data_Read[9]);
-  IMU.GyroscopeRead[PITCH] = Data_Read[10] << 8 | Data_Read[11];
+  IMU.GyroscopeRead[ROLL] = Data_Read[8] << 8 | Data_Read[9];
+  IMU.GyroscopeRead[PITCH] = -(Data_Read[10] << 8 | Data_Read[11]);
   IMU.GyroscopeRead[YAW] = -(Data_Read[12] << 8 | Data_Read[13]);
 }
 #endif
@@ -164,18 +164,13 @@ void Acc_ReadBufferData()
 
   Accelerometer_Calibration();
 
-  if (CalibratingAccelerometer > 0)
-  {
-    return;
-  }
+  //APLICA O AJUSTE DO ACELEROMETRO
+  ApplySensorAlignment(IMU.AccelerometerRead);
 
   //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS
   IMU.AccelerometerReadNotFiltered[ROLL] = IMU.AccelerometerRead[ROLL];
   IMU.AccelerometerReadNotFiltered[PITCH] = IMU.AccelerometerRead[PITCH];
   IMU.AccelerometerReadNotFiltered[YAW] = IMU.AccelerometerRead[YAW];
-
-  //APLICA O AJUSTE DO ACELEROMETRO
-  ApplySensorAlignment(IMU.AccelerometerRead);
 
   //KALMAN
   if (ActiveKalman)
@@ -208,17 +203,12 @@ void Gyro_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x43);
-  IMU.GyroscopeRead[ROLL] = -(((BufferData[0] << 8) | BufferData[1]) >> 2);
-  IMU.GyroscopeRead[PITCH] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
+  IMU.GyroscopeRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]) >> 2;
+  IMU.GyroscopeRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 2);
   IMU.GyroscopeRead[YAW] = -((BufferData[4] << 8) | BufferData[5]) >> 2;
 #endif
 
   Gyroscope_Calibration();
-
-  if (CalibratingGyroscope > 0)
-  {
-    return;
-  }
 
   //OBTÉM OS VALORES DO GYROSCOPIO ANTES DOS FILTROS
   IMU.GyroscopeReadNotFiltered[ROLL] = IMU.GyroscopeRead[ROLL];

@@ -24,14 +24,16 @@
 #include "Scheduler/SCHEDULER.h"
 #include "FastSerial/PRINTF.h"
 
-//#define DEBUG
+//DEBUG
+//#define PRINTLN_HEADING_HOLD
+
 #define HEADING_HOLD_ERROR_LPF_FREQ 2
 
 PT1_Filter_Struct HeadingHoldRateFilter;
 
 void UpdateStateOfHeadingHold(void)
 {
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     HeadingHoldRateFilter.State = 0.0f;         //RESETA O FILTRO
     HeadingHoldTarget = ATTITUDE.AngleOut[YAW]; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
@@ -86,7 +88,7 @@ float GetHeadingHoldValue(int32_t DeltaTimeUs)
   //APLICA LIMITES MIN E MAX NO RATE
   HeadingHoldRate = Constrain_Float(HeadingHoldRate, -Heading_Hold_Rate_Limit, Heading_Hold_Rate_Limit);
 
-#ifdef DEBUG
+#ifdef PRINTLN_HEADING_HOLD
   float HeadingHoldRateNF = HeadingHoldRate;
 #endif
 
@@ -99,7 +101,7 @@ float GetHeadingHoldValue(int32_t DeltaTimeUs)
   HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, 1.0f / 1000);
 #endif
 
-#ifdef DEBUG
+#ifdef PRINTLN_HEADING_HOLD
   PRINTF.SendToConsole(PSTR("HHR:%.2f HHRF:%.2f\n"),
                        HeadingHoldRateNF,
                        HeadingHoldRate);

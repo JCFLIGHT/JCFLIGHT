@@ -61,13 +61,14 @@ void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int
 
     float Beta0, Beta1, Beta2;
     const float SampleRate = 1.0f / ((float)SampleInterval * 0.000001f);
-    const float Omega = 2.0f * 3.14159265358979323846f * ((float)FilterFreq) / SampleRate;
+    const float Omega = 6.283185482f * ((float)FilterFreq) / SampleRate;
     const float CalcedSine = Fast_Sine(Omega);
     const float CalcedCosine = Fast_Cosine(Omega);
     const float Alpha = CalcedSine / (2 * Q_Quality);
 
     switch (FilterType)
     {
+
     case LPF:
       Beta0 = (1 - CalcedCosine) / 2;
       Beta1 = 1 - CalcedCosine;
@@ -80,7 +81,7 @@ void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int
       Beta2 = 1;
       break;
 
-    default:
+    default: //FALHA
       BiQuadFilterSetupPassthrough(Filter);
       return;
     }
@@ -93,7 +94,7 @@ void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int
     Filter->Alpha1 = Alpha1 / Alpha0;
     Filter->Alpha2 = Alpha2 / Alpha0;
   }
-  else
+  else //FALHA
   {
     BiQuadFilterSetupPassthrough(Filter);
   }

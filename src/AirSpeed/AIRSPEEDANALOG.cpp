@@ -20,6 +20,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "AnalogDigitalConverter/ADC.h"
 #include "Build/BOARDDEFS.h"
+#include "FastSerial/PRINTF.h"
 
 //AIR-SPEED MODELO MPXV7002DP (CONEXÃO DO TIPO ANALOGICA)
 
@@ -27,12 +28,14 @@
 
 float AirSpeed_Analog_Get_Calibration(void)
 {
+    LOG("AirSpeed Analogico em calib.Aguarde...");
     static float AirSpeedAnalogReturnValue = 0;
     for (uint8_t CountSamples = 0; CountSamples < INITIAL_SAMPLES; CountSamples++)
     {
         AirSpeedAnalogReturnValue = ADCPIN.Read(ADC_ANALOG_AIRSPEED);
         SCHEDULERTIME.Sleep(20);
     }
+    LOG("Calib do AirSpeed Analogico finalizada!");
     return AirSpeedAnalogReturnValue;
 }
 

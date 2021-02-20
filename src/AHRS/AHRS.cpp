@@ -27,6 +27,7 @@
 #include "Yaw/HEADINGHOLD.h"
 #include "QUATERNION.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "GPS/GPSSTATES.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -389,7 +390,7 @@ void AHRSClass::Update(float DeltaTime)
 
   if (GetFrameStateOfAirPlane())
   {
-    const bool SafeToUseCOG = (GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300);
+    const bool SafeToUseCOG = (Get_GPS_In_Good_Condition() && GPS_Ground_Speed >= 300);
 
     if (I2C.CompassFound)
     {

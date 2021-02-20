@@ -15,16 +15,17 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef STATES_H_
-#define STATES_H_
+#ifndef RCSTATES_H_
+#define RCSTATES_H_
 #include "Arduino.h"
 bool CheckInclinationForArm(void);
 bool ArmDelayedState(void);
 void ResetArmDelayed(void);
 bool DisarmDelayedState(void);
 void ResetDisarmDelayed(void);
-bool StickStateToArm(void);
-bool StickStateToDisarm(void);
+bool SticksStateToArm(void);
+bool SticksStateToDisarm(void);
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue);
 bool SticksDeflected(int16_t MinDeflectionValue);
+bool GetThrottleInLowPosition(void);
 #endif

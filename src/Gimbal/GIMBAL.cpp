@@ -24,7 +24,7 @@ void Gimbal_Controll()
   //CONTROLE DO GIMBAL
   if (GimbalControlAux == NONE)
   {
-    MotorControl[GIMBAL] = 1500;
+    MotorControl[GIMBAL] = MIDDLE_STICKS_PULSE;
   }
   else if (GimbalControlAux == RCAUX1)
   {

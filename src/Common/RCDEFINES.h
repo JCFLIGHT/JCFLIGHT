@@ -17,6 +17,14 @@
 
 #ifndef RCDEFINES_H_
 #define RCDEFINES_H_
+#include "BitArray/BITARRAY.h"
+#define RANGE_MIN 900
+#define MIN_PULSE 1100
+#define MAX_PULSE 1900
+#define MIN_STICKS_PULSE 1000
+#define MAX_STICKS_PULSE 2000
+#define MIDDLE_STICKS_PULSE (MIN_STICKS_PULSE + MAX_STICKS_PULSE) / 2
+#define DISABLE_IO_PIN 0
 //AUX1
 #define AUX1_LOW RadioControllOutput[AUX1] < 1100
 #define AUX1_MID RadioControllOutput[AUX1] > 1400 && RadioControllOutput[AUX1] < 1600

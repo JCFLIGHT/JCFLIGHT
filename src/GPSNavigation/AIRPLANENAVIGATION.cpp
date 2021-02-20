@@ -110,8 +110,8 @@ void Circle_Mode_Update()
   }
 
   Scale_Of_Circle = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
-  Latitude_To_Circle = cos(ConvertToRadians(HeadingToCircle));
-  Longitude_To_Circle = sin(ConvertToRadians(HeadingToCircle)) * ScaleDownOfLongitude;
+  Latitude_To_Circle = Fast_Cosine(ConvertToRadians(HeadingToCircle));
+  Longitude_To_Circle = Fast_Sine(ConvertToRadians(HeadingToCircle)) * ScaleDownOfLongitude;
   Coordinates_To_Navigation[0] += Latitude_To_Circle * Scale_Of_Circle;
   Coordinates_To_Navigation[1] += Longitude_To_Circle * Scale_Of_Circle;
 }
@@ -123,7 +123,7 @@ void AirPlaneUpdateNavigation(void)
   CurrentAltitude = GPS_Altitude - GPS_Altitude_For_Plane;
   TargetAltitude = GPS_AltitudeHold_For_Plane - GPS_Altitude_For_Plane;
 
-  if (CLIMBOUT_FW && CurrentAltitude < RTH_AltitudeOfPlane)
+  if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE) && CurrentAltitude < RTH_AltitudeOfPlane)
   {
     GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + RTH_AltitudeOfPlane;
   }
@@ -169,21 +169,21 @@ void AirPlaneUpdateNavigation(void)
 
     if (ABS(AltitudeError) < 1)
     {
-      GetThrottleToNavigation = 1500;
+      GetThrottleToNavigation = MIDDLE_STICKS_PULSE;
     }
     else
     {
-      GetThrottleToNavigation = Constrain_16Bits(1500 - (AltitudeError * 8), 1300, AttitudeThrottleMax);
+      GetThrottleToNavigation = Constrain_16Bits(MIDDLE_STICKS_PULSE - (AltitudeError * 8), 1300, AttitudeThrottleMax);
     }
 
-    if (CLIMBOUT_FW && AltitudeError >= 0)
+    if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE) && AltitudeError >= 0)
     {
-      CLIMBOUT_FW = false;
+      DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
     }
 
-    if (GPS_HOME_MODE_FW)
+    if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
     {
-      if (CLIMBOUT_FW)
+      if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
       {
         AltitudeError = -(MAX_PITCH_BANKANGLE * 10);
         GetThrottleToNavigation = AttitudeThrottleMax;
@@ -200,8 +200,8 @@ void AirPlaneUpdateNavigation(void)
 
     if (Fail_Safe_Event && (DistanceToHome < 10))
     {
-      COMMAND_ARM_DISARM = false;
-      CLIMBOUT_FW = false;
+      DISABLE_STATE(PRIMARY_ARM_DISARM);
+      DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
       GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + 5;
     }
 
@@ -284,12 +284,12 @@ void AirPlaneUpdateNavigation(void)
     GPS_Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -MAX_ROLL_BANKANGLE * 10, MAX_ROLL_BANKANGLE * 10) + NavigationDeltaSumPID;
     GPS_Angle[YAW] = Constrain_16Bits(HeadingDifference / 10, -MAX_YAW_BANKANGLE * 10, MAX_YAW_BANKANGLE * 10) + NavigationDeltaSumPID;
 
-    if (!COMMAND_ARM_DISARM)
+    if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       GPS_Angle[PITCH] = Constrain_16Bits(GPS_Angle[PITCH], 0, MAX_PITCH_BANKANGLE * 10);
     }
 
-    if (!CLIMBOUT_FW)
+    if (!IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
     {
       GPS_Angle[PITCH] -= (ABS(ATTITUDE.AngleOut[ROLL]));
     }
@@ -307,7 +307,7 @@ void AirPlaneUpdateNavigation(void)
     GetThrottleToNavigation = Constrain_16Bits(GetThrottleToNavigation, 1300, AttitudeThrottleMax);
   }
 
-  if ((!Do_Stabilize_Mode) || (SetFlightModes[MANUAL_MODE] && !Fail_Safe_Event))
+  if ((!Do_Stabilize_Mode) || (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && !Fail_Safe_Event))
   {
     GetThrottleToNavigation = Read_Throttle;
     GPS_Angle[PITCH] = 0;

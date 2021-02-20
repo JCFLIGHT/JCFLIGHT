@@ -22,6 +22,7 @@
 #include "FlightModes/AUXFLIGHT.h"
 #include "Math/MATHSUPPORT.h"
 #include "Buzzer/BUZZER.h"
+#include "Common/RCDEFINES.h"
 
 #define THIS_LOOP_RATE 50                //HZ
 #define IMMEDIATELY_FAILSAFE_DELAY 0.25f //MS
@@ -40,57 +41,57 @@ bool GetValidFailSafeState(float DelayToDetect)
   return (Fail_Safe_System > (THIS_LOOP_RATE * DelayToDetect));
 }
 
-void NormalizeFundamentalChnnels()
+void NormalizeFundamentalChannels()
 {
-  RadioControllOutput[THROTTLE] = 1500;
-  RadioControllOutput[YAW] = 1500;
-  RadioControllOutput[PITCH] = 1500;
-  RadioControllOutput[ROLL] = 1500;
+  RadioControllOutput[THROTTLE] = MIDDLE_STICKS_PULSE;
+  RadioControllOutput[YAW] = MIDDLE_STICKS_PULSE;
+  RadioControllOutput[PITCH] = MIDDLE_STICKS_PULSE;
+  RadioControllOutput[ROLL] = MIDDLE_STICKS_PULSE;
 }
 
 void NormalizeAuxiliariesChnnels()
 {
-  RadioControllOutput[AUX1] = 1000;
-  RadioControllOutput[AUX2] = 1000;
-  RadioControllOutput[AUX3] = 1000;
-  RadioControllOutput[AUX4] = 1000;
-  RadioControllOutput[AUX5] = 1000;
-  RadioControllOutput[AUX6] = 1000;
-  RadioControllOutput[AUX7] = 1000;
-  RadioControllOutput[AUX8] = 1000;
+  RadioControllOutput[AUX1] = MIN_STICKS_PULSE;
+  RadioControllOutput[AUX2] = MIN_STICKS_PULSE;
+  RadioControllOutput[AUX3] = MIN_STICKS_PULSE;
+  RadioControllOutput[AUX4] = MIN_STICKS_PULSE;
+  RadioControllOutput[AUX5] = MIN_STICKS_PULSE;
+  RadioControllOutput[AUX6] = MIN_STICKS_PULSE;
+  RadioControllOutput[AUX7] = MIN_STICKS_PULSE;
+  RadioControllOutput[AUX8] = MIN_STICKS_PULSE;
 }
 
 void NormalizeFlightModesToFailSafe()
 {
   //MODOS DE VOO NECESSARIOS PARA O FAIL-SAFE
   //O ALT-HOLD É CHAMADO ATRAVÉS DE OUTRA FLAG
-  SetFlightModes[STABILIZE_MODE] = true;
-  SetFlightModes[RTH_MODE] = true;
+  ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE);
+  ENABLE_THIS_FLIGHT_MODE(RTH_MODE);
 
   //MODOS DE VOO NÃO NECESSARIOS PARA O FAIL-SAFE
-  SetFlightModes[ALTITUDE_HOLD_MODE] = false;
-  SetFlightModes[GPS_HOLD_MODE] = false;
-  SetFlightModes[IOC_MODE] = false;
-  SetFlightModes[ATACK_MODE] = false;
-  SetFlightModes[FLIP_MODE] = false;
-  SetFlightModes[WAYPOINT_MODE] = false;
-  SetFlightModes[LAND_MODE] = false;
+  DISABLE_THIS_FLIGHT_MODE(ALTITUDE_HOLD_MODE);
+  DISABLE_THIS_FLIGHT_MODE(POS_HOLD_MODE);
+  DISABLE_THIS_FLIGHT_MODE(IOC_MODE);
+  DISABLE_THIS_FLIGHT_MODE(ATTACK_MODE);
+  DISABLE_THIS_FLIGHT_MODE(FLIP_MODE);
+  DISABLE_THIS_FLIGHT_MODE(WAYPOINT_MODE);
+  DISABLE_THIS_FLIGHT_MODE(LAND_MODE);
 
-  //DESATIVA OS MODOS DE VOO NÃO NECESSARIOS NO MODO AIR-PLANE
-  SetFlightModes[AUTO_THROTTLE_MODE] = false;
-  SetFlightModes[MANUAL_MODE] = false;
-  SetFlightModes[CIRCLE_MODE] = false;
-  SetFlightModes[LAUNCH_MODE] = false;
-  SetFlightModes[TURN_MODE] = false;
-  SetFlightModes[CRUISE_MODE] = false;
+  //DESATIVA OS MODOS DE VOO NÃO NECESSARIOS NO MODO AIRPLANE
+  DISABLE_THIS_FLIGHT_MODE(AUTO_THROTTLE_MODE);
+  DISABLE_THIS_FLIGHT_MODE(MANUAL_MODE);
+  DISABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);
+  DISABLE_THIS_FLIGHT_MODE(LAUNCH_MODE);
+  DISABLE_THIS_FLIGHT_MODE(TURN_MODE);
+  DISABLE_THIS_FLIGHT_MODE(CRUISE_MODE);
 }
 
 bool FailSafeCheckStickMotion()
 {
   uint32_t CalcedRcDelta = 0;
-  CalcedRcDelta += ABS(RadioControllOutput[ROLL] - 1500);
-  CalcedRcDelta += ABS(RadioControllOutput[PITCH] - 1500);
-  CalcedRcDelta += ABS(RadioControllOutput[YAW] - 1500);
+  CalcedRcDelta += ABS(RadioControllOutput[ROLL] - MIDDLE_STICKS_PULSE);
+  CalcedRcDelta += ABS(RadioControllOutput[PITCH] - MIDDLE_STICKS_PULSE);
+  CalcedRcDelta += ABS(RadioControllOutput[YAW] - MIDDLE_STICKS_PULSE);
   return CalcedRcDelta >= STICK_MOTION;
 }
 
@@ -118,7 +119,7 @@ void ResetFailSafe()
   Fail_Safe_Event = false;
   if (!RTHControlAux)
   {
-    SetFlightModes[RTH_MODE] = false;
+    DISABLE_THIS_FLIGHT_MODE(RTH_MODE);
   }
   ResetRxConsistence();
 }
@@ -130,7 +131,7 @@ void AbortFailSafe()
   {
     return;
   }
-  if (COMMAND_ARM_DISARM)
+  if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     //VERIFICA O TEMPO MINIMO PARA CONSIDERAR QUE O PILOTO AUTOMATICO DO FAIL-SAFE ESTÁ PRONTO PARA SER DESLIGADO
     if (!GetRxConsistence(RX_RECOVERY_TIME_ARMED))
@@ -167,7 +168,7 @@ void UpdateFailSafeSystem()
   Fail_Safe_System++;
   if (RxConsistenceCount == 0 && !Fail_Safe_Event && FailSafeGoodRunBeep)
   {
-    if (BuzzerFailSafeRunCount > 100) //2 SEGUNDOS
+    if (BuzzerFailSafeRunCount >= 100) //2 SEGUNDOS
     {
       BEEPER.Play(BEEPER_FAIL_SAFE_GOOD);
       BuzzerFailSafeRunCount = 0;
@@ -188,7 +189,7 @@ void FailSafeBuzzerNotification()
   }
   if (BEEPER.SafeToOthersBeepsCounter > 200 && CalibratingGyroscope == 0)
   {
-    if (BuzzerFailSafeRunCount > 150) //3 SEGUNDOS
+    if (BuzzerFailSafeRunCount >= 150) //3 SEGUNDOS
     {
       BEEPER.Play(BEEPER_FAIL_SAFE);
     }
@@ -212,7 +213,7 @@ void FailSafeCheck()
   {
     Fail_Safe_Event = true;
     NormalizeFlightModesToFailSafe();
-    NormalizeFundamentalChnnels();
+    NormalizeFundamentalChannels();
     NormalizeAuxiliariesChnnels();
   }
   else

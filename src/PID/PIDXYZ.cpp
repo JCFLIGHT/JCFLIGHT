@@ -19,7 +19,6 @@
 #include "Common/VARIABLES.h"
 #include "DYNAMICPID.h"
 #include "FlightModes/AUXFLIGHT.h"
-#include "PAA/FLIPMODE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Math/AVRLOWER.h"
 #include "Scheduler/SCHEDULERTIME.h"
@@ -33,6 +32,7 @@
 #include "Filters/PT1.h"
 #include "AirSpeed/AIRSPEED.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
+#include "RadioControl/RCSTATES.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -43,8 +43,8 @@ PT1_Filter_Struct DerivativeRollFilter;
 PT1_Filter_Struct DerivativePitchFilter;
 
 //STABILIZE PARA MULTIROTORES
-#define STAB_PITCH_ANGLE_MAX 30 //GRAUS
-#define STAB_ROLL_ANGLE_MAX 30  //GRAUS
+#define STAB_COPTER_PITCH_ANGLE_MAX 30 //GRAUS
+#define STAB_COPTER_ROLL_ANGLE_MAX 30  //GRAUS
 
 //SPORT PARA MULTIROTORES
 #define SPORT_PITCH_ANGLE_MAX 40 //GRAUS
@@ -84,6 +84,11 @@ void PIDXYZClass::Update(int32_t DeltaTimeUs)
   Reset_Integral_Accumulators();
 }
 
+int16_t PIDXYZClass::AngleTarget(int16_t RcControllerInput, uint8_t AttitudeAngle, int16_t MaxInclination)
+{
+  return Constrain_16Bits(RcControllerInput + GPS_Angle[AttitudeAngle], -ConvertDegreesToDecidegrees(MaxInclination), ConvertDegreesToDecidegrees(MaxInclination)) - ATTITUDE.AngleOut[AttitudeAngle];
+}
+
 void PIDXYZClass::Controll_Roll(int16_t RateTargetInput, int32_t DeltaTimeUs)
 {
   int16_t RadioControlToPID;
@@ -108,33 +113,26 @@ void PIDXYZClass::Controll_Roll(int16_t RateTargetInput, int32_t DeltaTimeUs)
   {
     if (GetFrameStateOfMultirotor())
     {
-      if (!SetFlightModes[ATACK_MODE])
+      if (!IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
       {
-        if (!ApplyFlipRoll)
-        {
-          MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_ROLL_ANGLE_MAX * 10, +STAB_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
-        }
-        else
-        {
-          MaxMinAngle = FlipAngleValue;
-        }
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, STAB_COPTER_ROLL_ANGLE_MAX);
       }
       else
       {
-        MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -SPORT_ROLL_ANGLE_MAX * 10, +SPORT_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, SPORT_ROLL_ANGLE_MAX);
       }
     }
     else
     {
-      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[ROLL], -STAB_PLANE_ROLL_ANGLE_MAX * 10, +STAB_PLANE_ROLL_ANGLE_MAX * 10) - ATTITUDE.AngleOut[ROLL];
+      MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, STAB_PLANE_ROLL_ANGLE_MAX);
     }
     IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * DeltaTimeUs) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_X = PID[PIDAUTOLEVEL].DerivativeVector * 5;
     ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_X, +Limit_Proportional_X);
     IntegratorTerminateLevel = Multiplication32Bits(IntegralAccError[ROLL], PID[PIDAUTOLEVEL].IntegratorVector) >> 12;
-    IntegratorTerminate = IntegratorTerminateLevel + ((IntegratorTerminate - IntegratorTerminateLevel) * ValueOfFlipToRoll >> 9);
-    ProportionalTerminate = ProportionalTerminateLevel + ((ProportionalTerminate - ProportionalTerminateLevel) * ValueOfFlipToRoll >> 9);
+    IntegratorTerminate = IntegratorTerminateLevel + ((IntegratorTerminate - IntegratorTerminateLevel) * 0 >> 9);
+    ProportionalTerminate = ProportionalTerminateLevel + ((ProportionalTerminate - ProportionalTerminateLevel) * 0 >> 9);
   }
   ProportionalTerminate -= Multiplication32Bits(IMU.GyroscopeRead[ROLL], DynamicProportionalVector[ROLL]) >> 6;
   DerivativeTerminate = IMU.GyroscopeRead[ROLL] - LastValueOfGyro;
@@ -178,33 +176,26 @@ void PIDXYZClass::Controll_Pitch(int16_t RateTargetInput, int32_t DeltaTimeUs)
   {
     if (GetFrameStateOfMultirotor())
     {
-      if (!SetFlightModes[ATACK_MODE])
+      if (!IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
       {
-        if (!ApplyFlipPitch)
-        {
-          MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PITCH_ANGLE_MAX * 10, +STAB_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
-        }
-        else
-        {
-          MaxMinAngle = FlipAngleValue;
-        }
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, PITCH, STAB_COPTER_PITCH_ANGLE_MAX);
       }
       else
       {
-        MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -SPORT_PITCH_ANGLE_MAX * 10, +SPORT_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, PITCH, SPORT_PITCH_ANGLE_MAX);
       }
     }
     else
     {
-      MaxMinAngle = Constrain_16Bits(RadioControlToPID + GPS_Angle[PITCH], -STAB_PLANE_PITCH_ANGLE_MAX * 10, +STAB_PLANE_PITCH_ANGLE_MAX * 10) - ATTITUDE.AngleOut[PITCH];
+      MaxMinAngle = AngleTarget(CalcedRateTargetRoll, PITCH, STAB_PLANE_PITCH_ANGLE_MAX);
     }
     IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * DeltaTimeUs) >> 12)), -10000, +10000);
     ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
     int16_t Limit_Proportional_Y = PID[PIDAUTOLEVEL].DerivativeVector * 5;
     ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_Y, +Limit_Proportional_Y);
     IntegratorTerminateLevel = Multiplication32Bits(IntegralAccError[PITCH], PID[PIDAUTOLEVEL].IntegratorVector) >> 12;
-    IntegratorTerminate = IntegratorTerminateLevel + ((IntegratorTerminate - IntegratorTerminateLevel) * ValueOfFlipToPitch >> 9);
-    ProportionalTerminate = ProportionalTerminateLevel + ((ProportionalTerminate - ProportionalTerminateLevel) * ValueOfFlipToPitch >> 9);
+    IntegratorTerminate = IntegratorTerminateLevel + ((IntegratorTerminate - IntegratorTerminateLevel) * 0 >> 9);
+    ProportionalTerminate = ProportionalTerminateLevel + ((ProportionalTerminate - ProportionalTerminateLevel) * 0 >> 9);
   }
   ProportionalTerminate -= Multiplication32Bits(IMU.GyroscopeRead[PITCH], DynamicProportionalVector[PITCH]) >> 6;
   DerivativeTerminate = IMU.GyroscopeRead[PITCH] - LastValueOfGyro;
@@ -252,7 +243,7 @@ void PIDXYZClass::Controll_Yaw(int16_t RateTargetInput, int32_t DeltaTimeUs)
   {
     PIDError = RadioControlToPID - IMU.GyroscopeRead[YAW];
   }
-  if (!SetFlightModes[MANUAL_MODE] && GetFrameStateOfAirPlane()) //MODO MANUAL DESATIVADO E PERFIL DE AERO?SIM...
+  if (!IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && GetFrameStateOfAirPlane()) //MODO MANUAL DESATIVADO E PERFIL DE AERO?SIM...
   {
     DeltaYawSmallFilter = IMU.GyroscopeRead[YAW] - LastGyroYawValue;
     DeltaYawSmallFilterStored = (DeltaYawSmallFilterStored >> 1) + (DeltaYawSmallFilter >> 1);
@@ -267,7 +258,7 @@ void PIDXYZClass::Controll_Yaw(int16_t RateTargetInput, int32_t DeltaTimeUs)
   }
   else
   {
-    IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, 2 - ((int32_t)1 << 28), -2 + ((int32_t)1 << 28));
+    IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, -268435454, 268435454);
   }
   if (ABS(RadioControlToPID) > 50)
   {
@@ -296,7 +287,7 @@ void PIDXYZClass::Controll_Yaw(int16_t RateTargetInput, int32_t DeltaTimeUs)
 
 int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
 {
-  if (!TurnCoordinatorMode)
+  if (!IS_FLIGHT_MODE_ACTIVE(TURN_MODE))
   {
     return (RadioControlToTurn - IMU.GyroscopeRead[YAW]);
   }
@@ -320,7 +311,7 @@ int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
 
 void PIDXYZClass::Reset_Integral_Accumulators()
 {
-  if (RadioControllOutput[THROTTLE] <= 1100 && GetFrameStateOfMultirotor())
+  if (GetThrottleInLowPosition() && GetFrameStateOfMultirotor())
   {
     IntegralAccError[ROLL] = 0;
     IntegralAccError[PITCH] = 0;

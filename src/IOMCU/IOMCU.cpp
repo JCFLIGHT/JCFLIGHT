@@ -687,7 +687,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 11:
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
             CalibratingAccelerometer = 512;
         }
@@ -697,7 +697,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 12:
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
             CalibratingCompass = true;
         }
@@ -791,14 +791,14 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 27:
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
             PREARM.UpdateGCSErrorText(PREARM.Checking());
         }
         break;
 
     case 28:
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
             WATCHDOG.Reboot();
         }
@@ -1041,14 +1041,14 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 11:
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
             CalibratingAccelerometer = 512;
         }
         break;
 
     case 12:
-        if (!COMMAND_ARM_DISARM && I2C.CompassFound)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2C.CompassFound)
         {
             CalibratingCompass = true;
         }
@@ -1115,14 +1115,14 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 27:
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
             PREARM.UpdateGCSErrorText(PREARM.Checking());
         }
         break;
 
     case 28:
-        if (!COMMAND_ARM_DISARM)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
             WATCHDOG.Reboot();
         }
@@ -1252,7 +1252,7 @@ void GCSClass::GCS_Request_Parameters()
     GCSParameters.SendFailSafeState = Fail_Safe_Event;
     GCSParameters.SendBatteryVoltageValue = BATTERY.Voltage * 100;
     GCSParameters.SendBatteryPercentageValue = BATTERY.GetPercentage();
-    GCSParameters.SendArmDisarmState = COMMAND_ARM_DISARM;
+    GCSParameters.SendArmDisarmState = IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
     GCSParameters.SendHDOPValue = GPS_HDOP;
     GCSParameters.SendCurrentValue = BATTERY.Total_Current;
     GCSParameters.SendWattsValue = BATTERY.GetWatts();

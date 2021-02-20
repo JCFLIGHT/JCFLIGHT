@@ -61,12 +61,12 @@ void DesarmLowThrClass::Update()
     return;
   }
   //THROTTLE NO MINIMO,DRONE ARMADO,FAIL-SAFE DESATIVADO?SIM...
-  if (Check_Throttle() && Check_Others_Channels() && COMMAND_ARM_DISARM &&
-      !ImmediatelyFailSafe && !SetFlightModes[WAYPOINT_MODE] && ArmDisarmConfig == 0)
+  if (Check_Throttle() && Check_Others_Channels() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&
+      !ImmediatelyFailSafe && !IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && ArmDisarmConfig == 0)
   {
     if (TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
     {
-      COMMAND_ARM_DISARM = false;    //DESARMA OS MOTORES
+      DISABLE_STATE(PRIMARY_ARM_DISARM);    //DESARMA OS MOTORES
       BEEPER.Play(BEEPER_DISARMING); //TOCA A MÚSICA INDICANDO O DESARM
     }
     else if (TimerDesarm > 254)

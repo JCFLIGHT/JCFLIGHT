@@ -24,9 +24,10 @@
 #include "CHECK2D.h"
 #include "FastSerial/PRINTF.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "Common/RCDEFINES.h"
 
+#define THIS_LOOP_RATE 100                  //100HZ
 #define CRASH_CHECK_TIMER 2                 //TEMPO MAXIMO DE CRASH EM SEGUNDOS
-#define MAIN_LOOP_RATE 100                  //100HZ
 #define ATTITUDE_CHECK_THRESH_ROLL_PITCH 30 //VALOR CONVERTIDO PARA RADIANOS E FATORADO POR 1000
 
 //#define DEBUG_CRASHCHECK
@@ -40,14 +41,16 @@ void CrashCheck()
 #ifdef DEBUG_CRASHCHECK
 
   if (GetLandSuccess())
-    PRINTF.SendToConsole(PSTR("!!!Solo Detectado!!!\n"));
+  {
+    LOG("!!!Solo Detectado!!!");
+  }
 
 #endif
 
 #ifndef DEBUG_CRASHCHECK
 
   //VERIFICA SE OS MOTORES ESTÃO DESARMADOS
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     Crash_Counter = 0;
     return;
@@ -62,7 +65,7 @@ void CrashCheck()
 
   //VERIFICA SE ESTÁ EM QUALQUER MODO DE VOO,MENOS NO MODO ACRO E FLIP
   //SE ESTIVER NO MODO ACRO OU FLIP O DETECTOR DE CRASH NÃO IRÁ FUNCIOANAR
-  if (!SetFlightModes[STABILIZE_MODE] || (SetFlightModes[FLIP_MODE] && GetFrameStateOfMultirotor()))
+  if (!IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) || (IS_FLIGHT_MODE_ACTIVE(FLIP_MODE) && GetFrameStateOfMultirotor()))
   {
     Crash_Counter = 0;
     return;
@@ -93,19 +96,19 @@ void CrashCheck()
 
   Crash_Counter++; //CONTROLADOR DE ATTITUDE DETECTOU CRASH
 
-  if (Crash_Counter >= CRASH_CHECK_TIMER * MAIN_LOOP_RATE)
+  if (Crash_Counter >= CRASH_CHECK_TIMER * THIS_LOOP_RATE)
   {
 
 #ifdef DEBUG_CRASHCHECK
 
-    PRINTF.SendToConsole(PSTR("!!!Crash Detectado!!!\n"));
+    LOG("!!!Crash Detectado!!!");
 
 #endif
 
     //DESARMA OS MOTORES
     if (PARACHUTE.GetSafeStateToDisarmMotors())
     {
-      COMMAND_ARM_DISARM = false;
+      DISABLE_STATE(PRIMARY_ARM_DISARM);
     }
     //CHAMA O PARACHUTE SE ESTIVER EQUIPADO
     if (ParachuteDetectTrigger > 0)

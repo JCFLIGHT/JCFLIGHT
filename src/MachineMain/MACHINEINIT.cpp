@@ -15,39 +15,23 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "FRAMESTATUS.h"
-#include "Common/VARIABLES.h"
-#include "StorageManager/EEPROMSTORAGE.h"
+#include "MACHINEINIT.h"
+#include "Scheduler/SCHEDULERTIME.h"
 
-bool GetFrameStateOfMultirotor()
+MachineInitTime MachineInitTimeNow;
+
+void SetInitialTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer)
 {
-    if (FrameType == QUAD_X ||
-        FrameType == HEXA_X ||
-        FrameType == HEXA_I ||
-        FrameType == ZMR250 ||
-        FrameType == TBS)
-    {
-        return true;
-    }
-    return false;
+    MachineInitTimePointer->PreviousTime = SCHEDULERTIME.GetMillis();
 }
 
-bool GetFrameStateOfAirPlane()
+void CalculeTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer)
 {
-    if (FrameType == AIRPLANE ||
-        FrameType == FIXED_WING ||
-        FrameType == PLANE_VTAIL)
-    {
-        return true;
-    }
-    return false;
+    MachineInitTimePointer->ActualTime = SCHEDULERTIME.GetMillis();
+    MachineInitTimePointer->TotalTime = MachineInitTimePointer->ActualTime - MachineInitTimePointer->PreviousTime;
 }
 
-bool GetActualFrameState(uint8_t FrameName)
+uint32_t GetTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer)
 {
-    if (FrameType == FrameName)
-    {
-        return true;
-    }
-    return false;
+    return MachineInitTimePointer->TotalTime / 1000;
 }

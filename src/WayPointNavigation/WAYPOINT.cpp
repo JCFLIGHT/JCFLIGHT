@@ -199,7 +199,7 @@ void WayPointRun()
 
   Store_And_Clear_WayPoints();
 
-  if (!SetFlightModes[WAYPOINT_MODE])
+  if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE))
   {
     WayPointMode = WP_MISSION_INIT;
     WPSucess = false;
@@ -244,7 +244,7 @@ void WayPointRun()
     GPS_Flight_Mode = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
     NavigationMode = Do_PositionHold;
-    if (GetAltitudeReached() && COMMAND_ARM_DISARM)
+    if (GetAltitudeReached() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
       {
@@ -254,7 +254,7 @@ void WayPointRun()
     }
     else
     {
-      if (COMMAND_ARM_DISARM)
+      if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
       {
         AutoTakeOff(true);
       }

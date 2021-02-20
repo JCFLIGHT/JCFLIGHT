@@ -28,6 +28,7 @@
 #include "RadioControl/STICKS.h"
 #include "BAR/BAR.h"
 #include "ProgMem/PROGMEM.h"
+#include "Scheduler/SCHEDULERTIME.h"
 
 SerialPrint PRINTF;
 
@@ -610,19 +611,24 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
   }
 }
 
+void SerialPrint::CallSchedulerSleep()
+{
+  SCHEDULERTIME.Sleep(1);
+}
+
 #endif
 
 #if defined(__arm__) || defined(ESP32)
 
-void PRINTF.SendToConsole()
+void SerialPrint::SendToConsole()
 {
 }
 
-void SerialPrintF()
+void SerialPrint::SerialPrintF()
 {
 }
 
-void ParamsToConsole()
+void SerialPrint::ParamsToConsole()
 {
   /*
   if (Serial.read() == 'c')
@@ -651,6 +657,11 @@ void ParamsToConsole()
   */
 
   //Serial.println(STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR));
+}
+
+void SerialPrint::CallSchedulerSleep()
+{
+  SCHEDULERTIME.Sleep(1);
 }
 
 #endif

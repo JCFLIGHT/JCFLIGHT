@@ -23,14 +23,36 @@
 #include "WayPointNavigation/WAYPOINT.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Math/MATHSUPPORT.h"
-#include "RadioControl/STATES.h"
+#include "RadioControl/RCSTATES.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "GPS/GPSSTATES.h"
 
-//APENAS PARA AERO E ASA-FIXA
-bool CIRCLE_MODE_FW = false;
-bool GPS_HOME_MODE_FW = false;
-bool CLIMBOUT_FW = false;
-bool GPSNavReset = true;
+bool Multirotor_GPS_FlightModes_Once()
+{
+  static uint8_t Previous_Mode = 0;
+  uint8_t Check_Actual_State = ((IS_FLIGHT_MODE_ACTIVE(LAND_MODE) << 2) +
+                                (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE) << 1) +
+                                (IS_FLIGHT_MODE_ACTIVE(RTH_MODE)));
+  if (Previous_Mode != Check_Actual_State)
+  {
+    Previous_Mode = Check_Actual_State;
+    return true;
+  }
+  return false;
+}
+
+bool AirPlane_GPS_FlightModes_Once()
+{
+  static uint8_t Previous_Mode = 0;
+  uint8_t Check_Actual_State = ((IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) << 1) +
+                                (IS_FLIGHT_MODE_ACTIVE(RTH_MODE)));
+  if (Previous_Mode != Check_Actual_State)
+  {
+    Previous_Mode = Check_Actual_State;
+    return true;
+  }
+  return false;
+}
 
 void ProcessFlightModesToMultirotor()
 {
@@ -39,8 +61,7 @@ void ProcessFlightModesToMultirotor()
     return;
   }
 
-  SetFlightModes[ALTITUDE_HOLD_MODE] = (SetFlightModes[ALTITUDE_HOLD_MODE] || Do_GPS_Altitude);
-  if (SetFlightModes[ALTITUDE_HOLD_MODE] || GPSHold_CallBaro || Mission_BaroMode)
+  if (IS_FLIGHT_MODE_ACTIVE(ALTITUDE_HOLD_MODE) || GPSHold_CallBaro || Mission_BaroMode || Do_GPS_Altitude)
   {
     if (!Do_AltitudeHold_Mode)
     {
@@ -52,52 +73,49 @@ void ProcessFlightModesToMultirotor()
     Do_AltitudeHold_Mode = false;
   }
 
-  if (!SetFlightModes[RTH_MODE] && !SetFlightModes[LAND_MODE])
+  if (!IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && !IS_FLIGHT_MODE_ACTIVE(LAND_MODE))
   {
-    if (Do_GPS_Altitude)
-    {
-      Do_GPS_Altitude = false;
-    }
+    Do_GPS_Altitude = false;
   }
 
-  if (COMMAND_ARM_DISARM)
+  if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    if (GPS_NumberOfSatellites >= 5)
+    if (Get_GPS_In_Good_Condition())
     {
-      if (SetFlightModes[RTH_MODE])
+      if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
       {
-        SetFlightModes[GPS_HOLD_MODE] = false;
+        DISABLE_THIS_FLIGHT_MODE(POS_HOLD_MODE);
       }
       else
       {
-        if (SetFlightModes[GPS_HOLD_MODE])
+        if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
         {
-          SetFlightModes[GPS_HOLD_MODE] = SticksInAutoPilotPosition(20);
+          ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, SticksInAutoPilotPosition(20));
         }
       }
-      if (CheckSafeStateToGPSMode())
+      if (Multirotor_GPS_FlightModes_Once())
       {
-        if (SetFlightModes[RTH_MODE])
+        if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
         {
           GPSHold_CallBaro = true;
-          SetFlightModes[HEADING_HOLD_MODE] = true;
+          ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
           Do_Mode_RTH_Now();
         }
-        else if (SetFlightModes[GPS_HOLD_MODE])
+        else if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
         {
           GPS_Flight_Mode = GPS_MODE_HOLD;
           Do_GPS_Altitude = false;
           GPSHold_CallBaro = true;
-          SetFlightModes[HEADING_HOLD_MODE] = true;
+          ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
           SetThisPointToPositionHold();
           NavigationMode = Do_PositionHold;
         }
-        else if (SetFlightModes[LAND_MODE])
+        else if (IS_FLIGHT_MODE_ACTIVE(LAND_MODE))
         {
           GPS_Flight_Mode = GPS_MODE_HOLD;
           Do_GPS_Altitude = true;
           SetThisPointToPositionHold();
-          SetFlightModes[HEADING_HOLD_MODE] = true;
+          ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
           NavigationMode = Do_Land_Init;
         }
         else
@@ -105,7 +123,7 @@ void ProcessFlightModesToMultirotor()
           GPS_Flight_Mode = GPS_MODE_NONE;
           GPSHold_CallBaro = false;
           Do_GPS_Altitude = false;
-          SetFlightModes[HEADING_HOLD_MODE] = false;
+          DISABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
           GPS_Reset_Navigation();
         }
       }
@@ -138,7 +156,7 @@ void ProcessFlightModesToAirPlane()
     return;
   }
 
-  if (SetFlightModes[CRUISE_MODE])
+  if (IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
   {
     if (!Do_AltitudeHold_Mode)
     {
@@ -150,60 +168,47 @@ void ProcessFlightModesToAirPlane()
     Do_AltitudeHold_Mode = false;
   }
 
-  if (GPS_NumberOfSatellites >= 5 && COMMAND_ARM_DISARM)
+  if (Get_State_Armed_With_GPS())
   {
     if (GPS_Flight_Mode != GPS_MODE_NONE && !Do_Stabilize_Mode)
     {
       Do_Stabilize_Mode = true;
     }
-    if (SetFlightModes[RTH_MODE] || Fail_Safe_Event)
+    if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
     {
-      if (!GPS_HOME_MODE_FW)
+      ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(CIRCLE_MODE, SticksInAutoPilotPosition(20));
+    }
+    if (AirPlane_GPS_FlightModes_Once())
+    {
+      if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
       {
-        GPS_HOME_MODE_FW = true;
-        CIRCLE_MODE_FW = false;
-        GPSNavReset = false;
         Set_Next_Point_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1]);
         GPS_Flight_Mode = Do_RTH_Enroute;
         GPS_AltitudeHold_For_Plane = GPS_Altitude;
-        CLIMBOUT_FW = true;
+        ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
       }
-    }
-    else
-    {
-      GPS_HOME_MODE_FW = false;
-      if (SetFlightModes[CIRCLE_MODE] && SticksInAutoPilotPosition(20))
+      else
       {
-        if (!CIRCLE_MODE_FW)
+        if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
         {
-          CIRCLE_MODE_FW = true;
-          GPSNavReset = false;
           NavigationMode = Do_PositionHold;
           GPS_Flight_Mode = GPS_MODE_HOLD;
           GPS_AltitudeHold_For_Plane = GPS_Altitude;
           Set_Next_Point_To_Navigation(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1]);
-          CLIMBOUT_FW = false;
+          DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
         }
-      }
-      else
-      {
-        CIRCLE_MODE_FW = false;
-        GPS_HOME_MODE_FW = false;
-        GPS_Flight_Mode = GPS_MODE_NONE;
-        NavigationMode = Do_None;
-        if (!GPSNavReset)
+        else
         {
+          GPS_Flight_Mode = GPS_MODE_NONE;
+          NavigationMode = Do_None;
           GPS_Reset_Navigation();
-          CLIMBOUT_FW = false;
-          GPSNavReset = true;
+          DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
         }
       }
     }
   }
   else
   {
-    CIRCLE_MODE_FW = false;
-    GPS_HOME_MODE_FW = false;
     GPS_Flight_Mode = GPS_MODE_NONE;
     NavigationMode = Do_None;
   }
@@ -211,7 +216,7 @@ void ProcessFlightModesToAirPlane()
 
 void FlightModesUpdate()
 {
-  if (SetFlightModes[STABILIZE_MODE] || (Fail_Safe_Event))
+  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) || Fail_Safe_Event)
   {
     if (!Do_Stabilize_Mode)
     {
@@ -230,7 +235,7 @@ void FlightModesUpdate()
     Do_Stabilize_Mode = false;
   }
 
-  if (SetFlightModes[HEADING_HOLD_MODE])
+  if (IS_FLIGHT_MODE_ACTIVE(HEADING_HOLD_MODE))
   {
     if (!Do_HeadingHold_Mode)
     {
@@ -245,21 +250,4 @@ void FlightModesUpdate()
 
   ProcessFlightModesToMultirotor();
   ProcessFlightModesToAirPlane();
-}
-
-bool CheckSafeStateToGPSMode()
-{
-  static uint8_t Previous_Mode = 0;
-  uint8_t Check_Actual_State = ((SetFlightModes[LAND_MODE] << 2) +
-                                (SetFlightModes[GPS_HOLD_MODE] << 1) +
-                                (SetFlightModes[RTH_MODE]));
-  if (Previous_Mode != Check_Actual_State)
-  {
-    Previous_Mode = Check_Actual_State;
-    return true;
-  }
-  else
-  {
-    return false;
-  }
 }

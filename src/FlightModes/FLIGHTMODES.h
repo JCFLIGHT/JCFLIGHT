@@ -18,8 +18,5 @@
 #ifndef FLIGHTMODES_H_
 #define FLIGHTMODES_H_
 #include "Arduino.h"
-extern bool GPS_HOME_MODE_FW;
-extern bool CLIMBOUT_FW;
 void FlightModesUpdate();
-bool CheckSafeStateToGPSMode();
 #endif

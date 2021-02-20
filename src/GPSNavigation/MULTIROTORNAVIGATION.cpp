@@ -28,6 +28,7 @@
 #include "BAR/BAR.h"
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "GPS/GPSSTATES.h"
 
 #define NAVTILTCOMPENSATION 20  //RETIRADO DA ARDUPILOT
 #define GPS_BANK_ANGLE_MAX 3000 //30 GRAUS
@@ -63,30 +64,30 @@ void GPS_Process_FlightModes(float DeltaTime)
 {
   uint32_t CalculateDistance;
   int32_t CalculateDirection;
-  //SAIA DA FUNÇÃO SE O NÚMERO DE SATELITES FOR MENOR QUE 5
-  if (GPS_NumberOfSatellites < 5)
+  //SAIA DA FUNÇÃO SE O GPS ESTIVER RUIM
+  if (Get_GPS_In_Bad_Condition())
   {
     return;
   }
   //SAFE PARA RESETAR O HOME-POINT
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     Home_Point = false;
   }
   //RESETA O HOME-POINT AO ARMAR
-  if (!Home_Point && COMMAND_ARM_DISARM)
+  if (!Home_Point && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     Reset_Home_Point();
   }
   //OBTÉM A DECLINAÇÃO MAGNETICA AUTOMATICAMENTE
-  if (!COMMAND_ARM_DISARM && !DeclinationPushed)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !DeclinationPushed)
   {
     Set_Initial_Location(GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1]);
     DeclinationPushedCount++;
   }
   //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
   if (Declination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) && //VERIFICA SE O VALOR É DIFERENTE
-      !COMMAND_ARM_DISARM &&                                          //CHECA SE ESTÁ DESARMADO
+      !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&                                          //CHECA SE ESTÁ DESARMADO
       Declination() != 0 &&                                           //CHECA SE O VALOR É DIFERENTE DE ZERO
       !DeclinationPushed &&                                           //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
       DeclinationPushedCount > 250)                                   //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
@@ -187,7 +188,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       break;
 
     case Do_Landed:
-      COMMAND_ARM_DISARM = false;
+      DISABLE_STATE(PRIMARY_ARM_DISARM);
       Do_GPS_Altitude = false;
       BEEPER.Play(BEEPER_ACTION_SUCCESS);
       GPS_Reset_Navigation();
@@ -203,7 +204,7 @@ void GPS_Adjust_Heading()
 
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput)
 {
-  ScaleDownOfLongitude = cos(ConvertToRadians((ConvertCoordinateToFloatingPoint(LatitudeVectorInput))));
+  ScaleDownOfLongitude = Fast_Cosine(ConvertToRadians((ConvertCoordinateToFloatingPoint(LatitudeVectorInput))));
 }
 
 void Set_Next_Point_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Destiny)
@@ -230,8 +231,8 @@ bool Point_Reached(void)
 
 void GPS_Calcule_Bearing(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *Bearing)
 {
-  int32_t Adjust_OffSet_Long = *InputLongitude - GPS_Coordinates_Vector[1];
   int32_t Adjust_OffSet_Lat = (*InputLatitude - GPS_Coordinates_Vector[0]) / ScaleDownOfLongitude;
+  int32_t Adjust_OffSet_Long = *InputLongitude - GPS_Coordinates_Vector[1];
   *Bearing = 9000 + atan2(-Adjust_OffSet_Lat, Adjust_OffSet_Long) * 5729.57795f;
   if (*Bearing < 0)
   {
@@ -345,8 +346,8 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
   Cross_Speed = Constrain_16Bits(Cross_Speed, -200, 200);
   Cross_Speed = -Cross_Speed;
   float TargetCalculed = (9000L - Target_Bearing) * 0.000174532925f;
-  Trigonometry[0] = sin(TargetCalculed);
-  Trigonometry[1] = cos(TargetCalculed);
+  Trigonometry[0] = Fast_Sine(TargetCalculed);
+  Trigonometry[1] = Fast_Cosine(TargetCalculed);
   Target_Speed[0] = Cross_Speed * Trigonometry[1] + Maximum_Velocity * Trigonometry[0];
   Target_Speed[1] = Maximum_Velocity * Trigonometry[1] - Cross_Speed * Trigonometry[0];
   for (axis = 0; axis < 2; axis++)
@@ -377,13 +378,13 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
 static void GPS_Update_CrossTrackError(void)
 {
   float TargetCalculed = (Target_Bearing - Original_Target_Bearing) * 0.000174532925f;
-  Crosstrack_Error = sin(TargetCalculed) * Two_Points_Distance;
+  Crosstrack_Error = Fast_Sine(TargetCalculed) * Two_Points_Distance;
 }
 
 int16_t Calculate_Navigation_Speed(int16_t Maximum_Velocity)
 {
   Maximum_Velocity = MIN(Maximum_Velocity, Two_Points_Distance);
-  Maximum_Velocity = MAX(Maximum_Velocity, 100);
+  Maximum_Velocity = MAX(Maximum_Velocity, 100); //100CM/S ~ 3.6KM/M -> VELOCIDADE MINIMA SUPORTADA
   if (Maximum_Velocity > Coordinates_Navigation_Speed)
   {
     Coordinates_Navigation_Speed += (int16_t)(100.0f * DeltaTimeGPSNavigation);

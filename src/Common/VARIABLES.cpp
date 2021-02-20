@@ -21,10 +21,7 @@
 //*******************************************************
 //BOOL OU BOOLEAN (0 - 1) OU (TRUE - FALSE)
 //*******************************************************
-bool COMMAND_ARM_DISARM;
-bool SetFlightModes[SIZE_OF_FLIGHT_MODES];
 bool CalibratingCompass;
-bool Do_GPS_Altitude;
 bool GPSHold_CallBaro;
 bool Fail_Safe_Event;
 bool Home_Point;
@@ -32,8 +29,9 @@ bool GPS_3DFIX;
 bool Do_Stabilize_Mode;
 bool Do_HeadingHold_Mode;
 bool Do_AltitudeHold_Mode;
+bool Do_GPS_Altitude;
+bool Do_AutoThrottle_Mode;
 bool ImmediatelyFailSafe;
-bool TurnCoordinatorMode;
 
 //*******************************************************
 //UNSIGNED 8 BITS (0 - 255)
@@ -52,6 +50,7 @@ uint8_t DynamicRollAndPitchRate[2];
 uint8_t YawRate;
 uint8_t ThrottleMiddle;
 uint8_t ThrottleExpo;
+uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
 
 //*******************************************************
 //UNSIGNED 16 BITS (0 - 65.535‬)
@@ -69,8 +68,8 @@ uint16_t LedRGB[3];
 //*******************************************************
 //SIGNED 16 BITS (-32.767 - 32.767)
 //*******************************************************
-int16_t RadioControllOutput[12];
 int16_t DirectRadioControllRead[12];
+int16_t RadioControllOutput[12];
 int16_t RCController[4];
 int16_t PIDControllerApply[3];
 int16_t MotorControl[8];

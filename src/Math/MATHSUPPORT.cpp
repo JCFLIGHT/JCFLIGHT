@@ -100,9 +100,19 @@ float ConvertDeciDegreesToDegrees(float Inputvalue)
     return (Inputvalue / 10);
 }
 
+float ConvertDegreesToDecidegrees(float Inputvalue)
+{
+    return (Inputvalue * 10);
+}
+
 float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput)
 {
     return CoordinateInput * 1.0e-7f;
+}
+
+float ConvertAccelerationEarthFrameToCMSS(float InputAccEF)
+{
+    return InputAccEF * (980.665f / 512);
 }
 
 uint16_t SquareRootU16Bits(uint16_t ValueInput)

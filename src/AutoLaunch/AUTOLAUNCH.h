@@ -18,13 +18,25 @@
 #ifndef AUTOLAUNCH_H_
 #define AUTOLAUNCH_H_
 #include "Arduino.h"
-bool GetStateOfThrottle();
-bool GetValidStateToRunLaunch();
-bool GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination);
-bool AutoLaunchTimerOverFlow();
-bool AutoLaunchCompleted();
-void Auto_Launch_Update();
-void RCControllerThrottle_Apply_Logic(bool SlowThr);
-void RCControllerYawPitchRoll_Apply_Logic(bool SlowControll);
-void ResetParameters();
+class AutoLaunchClass
+{
+public:
+  void Update();
+
+private:
+  const bool GetSwingVelocityState();
+  void AutoLaunchDetector();
+  void RCControllerThrottle_Apply_Logic(bool SlowThr);
+  int16_t CalculeControllToPitch(float AngleInDegrees, int16_t InclinationMaxOfStabilize);
+  void RCControllerYawPitchRoll_Apply_Logic(bool SlowControll);
+  bool GetStateOfThrottle();
+  bool GetValidStateToRunLaunch();
+  bool GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination);
+  bool AutoLaunchTimerOverFlow();
+  bool AutoLaunchMaxAltitudeReached(void);
+  bool AutoLaunchCompleted();
+  void SetPlaneType();
+  void ResetParameters();
+};
+extern AutoLaunchClass AUTOLAUNCH;
 #endif

@@ -69,7 +69,7 @@ void ServoAutoTrimRun(void)
         switch (ServoAutoTrimState)
         {
         case SERVO_AUTOTRIM_IDLE:
-            if (COMMAND_ARM_DISARM)
+            if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
                 for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
                 {
@@ -87,7 +87,7 @@ void ServoAutoTrimRun(void)
             }
 
         case SERVO_AUTOTRIM_COLLECTING:
-            if (COMMAND_ARM_DISARM)
+            if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
                 ServoMiddleAccumCount++;
 
@@ -113,7 +113,7 @@ void ServoAutoTrimRun(void)
             break;
 
         case SERVO_AUTOTRIM_SAVE_PENDING:
-            if (!COMMAND_ARM_DISARM)
+            if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
                 if ((SCHEDULERTIME.GetMillis() - SavePreviuosTime) > SAVE_OVERFLOW)
                 {

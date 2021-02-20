@@ -15,14 +15,15 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "STATES.h"
+#include "RCSTATES.h"
 #include "RCCONFIG.h"
 #include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "Common/RCDEFINES.h"
 
-#define THIS_LOOP_RATE 50 //Update()
+#define THIS_LOOP_RATE 50 //STICKS.Update()
 #define ARM_TIME_MAX 2    //SEGUNDOS
 #define DISARM_TIME_MAX 2 //SEGUNDOS
 
@@ -78,30 +79,33 @@ void ResetDisarmDelayed(void)
     DisarmDelayedCount = 0;
 }
 
-bool StickStateToArm(void)
+bool SticksStateToArm(void)
 {
-    return (Throttle.Output < 1100) &&
-           (Yaw.Output > 1900) &&
-           (Pitch.Output < 1100) &&
-           (Roll.Output) < 1100;
+    return (Throttle.Output < MIN_PULSE) && (Yaw.Output > MAX_PULSE) &&
+           (Pitch.Output < MIN_PULSE) && (Roll.Output) < MIN_PULSE;
 }
 
-bool StickStateToDisarm(void)
+bool SticksStateToDisarm(void)
 {
-    return (Throttle.Output) < 1100 &&
-           (Yaw.Output < 1100) &&
-           (Pitch.Output < 1100) &&
-           (Roll.Output > 1900);
+    return (Throttle.Output) < MIN_PULSE && (Yaw.Output < MIN_PULSE) &&
+           (Pitch.Output < MIN_PULSE) && (Roll.Output > MAX_PULSE);
 }
 
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue)
 {
-    return ABS(RCController[ROLL]) < AutoPilotValue &&
-           ABS(RCController[PITCH]) < AutoPilotValue;
+    return ABS(RCController[ROLL]) < AutoPilotValue && ABS(RCController[PITCH]) < AutoPilotValue;
 }
 
 bool SticksDeflected(int16_t MinDeflectionValue)
 {
-    return (ABS(RCController[ROLL]) > MinDeflectionValue) ||
-           (ABS(RCController[PITCH]) > MinDeflectionValue);
+    return (ABS(RCController[ROLL]) > MinDeflectionValue) || (ABS(RCController[PITCH]) > MinDeflectionValue);
+}
+
+bool GetThrottleInLowPosition(void)
+{
+    if (RadioControllOutput[THROTTLE] <= MIN_PULSE)
+    {
+        return true;
+    }
+    return false;
 }

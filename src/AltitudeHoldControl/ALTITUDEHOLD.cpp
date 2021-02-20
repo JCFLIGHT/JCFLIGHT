@@ -24,6 +24,7 @@
 #include "BAR/BAR.h"
 #include "RadioControl/CURVESRC.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "RadioControl/RCSTATES.h"
 
 bool TakeOffInProgress = false;
 bool GroundAltitudeSet = false;
@@ -53,11 +54,11 @@ void AltitudeHold_Update_Params()
 bool ApplyAltitudeHoldControl()
 {
   static Scheduler_Struct AltitudeHoldControlTimer;
-  if (Scheduler(&AltitudeHoldControlTimer, 20000))
+  if (Scheduler(&AltitudeHoldControlTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
   {
     static bool BaroModeActivated = false;
     static bool HoveringState = false;
-    if ((Do_AltitudeHold_Mode || Do_GPS_Altitude) && COMMAND_ARM_DISARM)
+    if ((Do_AltitudeHold_Mode || Do_GPS_Altitude) && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (!BaroModeActivated)
       {
@@ -110,7 +111,7 @@ bool ApplyAltitudeHoldControl()
         int16_t ThrottleDifference = RadioControllOutput[THROTTLE] - ThrottleMiddleValue;
         if (!TakeOffInProgress)
         {
-          if ((RadioControllOutput[THROTTLE] < 1100))
+          if (GetThrottleInLowPosition())
           {
             if (GetGroundDetectedFor100ms())
             {

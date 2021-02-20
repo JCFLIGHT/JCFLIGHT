@@ -36,7 +36,9 @@ uint16_t AirSpeedCalcedInKM = 0;
 void AirSpeed_Initialization()
 {
   if (GetFrameStateOfMultirotor())
+  {
     return;
+  }
   if (Get_AirSpeed_Type() == NONE_AIRSPEED)
   {
     return;
@@ -54,7 +56,9 @@ void AirSpeed_Initialization()
 void AirSpeed_Update()
 {
   if (GetFrameStateOfMultirotor())
+  {
     return;
+  }
   if (Get_AirSpeed_Type() == NONE_AIRSPEED)
   {
     return;

@@ -21,8 +21,8 @@
 #include "Common/VARIABLES.h"
 #include "GPSNavigation/MULTIROTORNAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
-#include "IMU/ACCELERATION.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "InertialNavigation/INS.h"
 
 void GPS_Orientation_Update()
 {
@@ -30,7 +30,7 @@ void GPS_Orientation_Update()
   {
     bool AltHoldControlApplied = ApplyAltitudeHoldControl();
     static Scheduler_Struct GPSControlTimer;
-    if (!AltHoldControlApplied && Scheduler(&GPSControlTimer, 20000))
+    if (!AltHoldControlApplied && Scheduler(&GPSControlTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
     {
       if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != Do_None))
       {
@@ -39,8 +39,8 @@ void GPS_Orientation_Update()
           float DeltaTime = GPSControlTimer.ActualTime * 1e-6f;
           ApplyPosHoldPIDControl(&DeltaTime);
         }
-        GPS_Angle[ROLL] = (GPS_Navigation_Array[1] * Cosine_Yaw - GPS_Navigation_Array[0] * Sine_Yaw) / 10;
-        GPS_Angle[PITCH] = (GPS_Navigation_Array[1] * Sine_Yaw + GPS_Navigation_Array[0] * Cosine_Yaw) / 10;
+        GPS_Angle[ROLL] = (GPS_Navigation_Array[1] * INERTIALNAVIGATION.Cosine_Yaw - GPS_Navigation_Array[0] * INERTIALNAVIGATION.Sine_Yaw) / 10;
+        GPS_Angle[PITCH] = (GPS_Navigation_Array[1] * INERTIALNAVIGATION.Sine_Yaw + GPS_Navigation_Array[0] * INERTIALNAVIGATION.Cosine_Yaw) / 10;
       }
       else
       {
@@ -52,10 +52,10 @@ void GPS_Orientation_Update()
   }
   else
   {
-    //ApplyAltitudeHoldControl(); //É REALMENTE CORRETO USAR ESSA FUNÇÃO PARA O ALT-HOLD EM AEROS???
     if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != Do_None))
     {
       AirPlaneUpdateNavigation();
+      //ApplyAltitudeHoldControl(); //É REALMENTE CORRETO USAR ESSA FUNÇÃO PARA O ALT-HOLD EM AEROS???
     }
     else
     {

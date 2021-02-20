@@ -71,7 +71,7 @@ void Super_Fast_Loop()
         SAFETYBUTTON.UpdateRoutine();
         SBUS_Update();
         IBUS_Update();
-        EarthFrame_Calculate_AccelerationXYZ();
+        INERTIALNAVIGATION.Calculate_AccelerationXYZ_To_EarthFrame();
         INERTIALNAVIGATION.Calculate_AccelerationXY();
         INERTIALNAVIGATION.Calculate_AccelerationZ();
         AirSpeed_Update();
@@ -95,9 +95,8 @@ void Integral_Loop()
         AHRS.Update(ThisDeltaTime);
         PID_Dynamic();
         GPS_Orientation_Update();
-        FlipModeRun();
         WayPointRun();
-        Auto_Launch_Update();
+        AUTOLAUNCH.Update();
         AirSpeed_Apply_Auto_Throttle_Control();
         PIDXYZ.Update(ThisTaskTimeUs);
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();

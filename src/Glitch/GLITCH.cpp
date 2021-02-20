@@ -18,12 +18,13 @@
 #include "GLITCH.h"
 #include "Common/VARIABLES.h"
 #include "I2C/I2C.h"
+#include "GPS/GPSSTATES.h"
 
 GlitchClass GLITCH;
 
 bool GlitchClass::CheckGPS(void)
 {
-    if (GPS_NumberOfSatellites < 5)
+    if (Get_GPS_In_Bad_Condition())
     {
         return false;
     }

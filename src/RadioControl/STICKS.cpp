@@ -20,17 +20,19 @@
 #include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "BatteryMonitor/BATTERY.h"
-#include "STATES.h"
+#include "RCSTATES.h"
 #include "Buzzer/BUZZER.h"
 #include "Arming/ARMING.h"
+#include "Common/RCDEFINES.h"
+#include "RCSTATES.h"
 
 SticksClass STICKS;
 
 void SticksClass::Update()
 {
-  if (!COMMAND_ARM_DISARM)
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    if ((ArmDisarmConfig == 0) && (StickStateToArm()))
+    if ((ArmDisarmConfig == 0) && (SticksStateToArm()))
     {
       if (!BATTERY.LowBattPreventArm)
       {
@@ -47,11 +49,11 @@ void SticksClass::Update()
   }
   else
   {
-    if ((ArmDisarmConfig == 0) && (StickStateToDisarm()))
+    if ((ArmDisarmConfig == 0) && (SticksStateToDisarm()))
     {
       if (DisarmDelayedState())
       {
-        COMMAND_ARM_DISARM = false;
+        DISABLE_STATE(PRIMARY_ARM_DISARM);
         BEEPER.Play(BEEPER_DISARMING);
       }
     }
@@ -60,34 +62,27 @@ void SticksClass::Update()
       ResetDisarmDelayed();
     }
   }
-  if (RadioControllOutput[THROTTLE] <= 1100)
+  if (GetThrottleInLowPosition())
   {
     if (!ImmediatelyFailSafe)
     {
       if (ArmDisarmConfig > 0)
       {
-        if (ArmDisarmControlAux)
+        ENABLE_DISABLE_STATE_WITH_DEPENDENCY(SECONDARY_ARM_DISARM, ArmDisarmControlAux);
+        if (IS_STATE_ACTIVE(SECONDARY_ARM_DISARM))
         {
-          SetFlightModes[ARM_DISARM_MODE] = true;
-        }
-        else
-        {
-          SetFlightModes[ARM_DISARM_MODE] = false;
-        }
-        if (SetFlightModes[ARM_DISARM_MODE])
-        {
-          if (!Fail_Safe_Event && !SetFlightModes[RTH_MODE] && !SetFlightModes[GPS_HOLD_MODE])
+          if (!Fail_Safe_Event && !IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && !IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
           {
-            if (!COMMAND_ARM_DISARM)
+            if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
-              COMMAND_ARM_DISARM = true;
+              ENABLE_STATE(PRIMARY_ARM_DISARM);
               IOC_Initial_Compass = ATTITUDE.AngleOut[YAW];
             }
           }
         }
         else
         {
-          COMMAND_ARM_DISARM = false;
+          DISABLE_STATE(PRIMARY_ARM_DISARM);
         }
       }
     }
@@ -108,11 +103,11 @@ void SticksClass::Pre_Arm(void)
     {
       if (!PREARM.CheckSafeState()) //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
       {
-        COMMAND_ARM_DISARM = false;
+        DISABLE_STATE(PRIMARY_ARM_DISARM);
       }
       else //IMU CALIBRADA?SIM...ARMA OS MOTORES
       {
-        COMMAND_ARM_DISARM = true;
+        ENABLE_STATE(PRIMARY_ARM_DISARM);
         IOC_Initial_Compass = ATTITUDE.AngleOut[YAW];
       }
       PreArm_Delay = false;

@@ -18,19 +18,16 @@
 #include "RCCONFIG.h"
 #include "Common/VARIABLES.h"
 #include "RadioControl/DECODE.h"
-#include "PAA/FLIPMODE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "SBUS/SBUSREAD.h"
 #include "IBUS/IBUSREAD.h"
 #include "Math/MATHSUPPORT.h"
 #include "BAR/BAR.h"
 #include "ParamsToGCS/CHECKSUM.h"
+#include "Common/RCDEFINES.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
-
-#define MIN_PULSE 1100
-#define MAX_PULSE 1900
 
 //INSTANCIAS
 RC_Config Throttle;
@@ -120,7 +117,7 @@ int16_t RC_Config::Get_Channel_Range()
   }
   else
   {
-    RcConstrain = Constrain_16Bits(Input, 900, Max_Pulse);
+    RcConstrain = Constrain_16Bits(Input, RANGE_MIN, Max_Pulse);
   }
   if (_Reverse)
   {
@@ -130,7 +127,7 @@ int16_t RC_Config::Get_Channel_Range()
   {
     if ((Input > 1450 + _DeadZone) && (Input < 1550 - _DeadZone) && (_DeadZone > 0))
     {
-      return 1500;
+      return MIDDLE_STICKS_PULSE;
     }
   }
   if (RcConstrain > Min_Pulse)
@@ -176,73 +173,73 @@ void RCConfigClass::Init()
   AuxiliarEight.Max_Pulse = MAX_PULSE;
   //CONFIGURAÇÃO DE TODOS OS CANAIS DO RÁDIO
   //THROTTLE
-  Throttle.Set_Range(1000, 2000);
+  Throttle.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Throttle.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(THROTTLE_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ALTITUDE-HOLD)
   Throttle.Set_Reverse(false);
   Throttle.Set_Filter(true);
   Throttle.Set_Fail_Safe(true);
   //YAW
-  Yaw.Set_Range(1000, 2000);
+  Yaw.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Yaw.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(YAW_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
   Yaw.Set_Reverse(false);
   Yaw.Set_Filter(true);
   Yaw.Set_Fail_Safe(false);
   //PITCH
-  Pitch.Set_Range(1000, 2000);
+  Pitch.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Pitch.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(PITCH_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
   Pitch.Set_Reverse(false);
   Pitch.Set_Filter(true);
   Pitch.Set_Fail_Safe(false);
   //ROLL
-  Roll.Set_Range(1000, 2000);
+  Roll.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Roll.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(ROLL_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
   Roll.Set_Reverse(false);
   Roll.Set_Filter(true);
   Roll.Set_Fail_Safe(false);
   //AUX1
-  AuxiliarOne.Set_Range(1000, 2000);
+  AuxiliarOne.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarOne.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarOne.Set_Reverse(false);
   AuxiliarOne.Set_Filter(true);
   AuxiliarOne.Set_Fail_Safe(false);
   //AUX2
-  AuxiliarTwo.Set_Range(1000, 2000);
+  AuxiliarTwo.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarTwo.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarTwo.Set_Reverse(false);
   AuxiliarTwo.Set_Filter(true);
   AuxiliarTwo.Set_Fail_Safe(false);
   //AUX3
-  AuxiliarThree.Set_Range(1000, 2000);
+  AuxiliarThree.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarThree.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarThree.Set_Reverse(false);
   AuxiliarThree.Set_Filter(true);
   AuxiliarThree.Set_Fail_Safe(false);
   //AUX4
-  AuxiliarFour.Set_Range(1000, 2000);
+  AuxiliarFour.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarFour.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarFour.Set_Reverse(false);
   AuxiliarFour.Set_Filter(true);
   AuxiliarFour.Set_Fail_Safe(false);
   //AUX5
-  AuxiliarFive.Set_Range(1000, 2000);
+  AuxiliarFive.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarFive.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarFive.Set_Reverse(false);
   AuxiliarFive.Set_Filter(true);
   AuxiliarFive.Set_Fail_Safe(false);
   //AUX6
-  AuxiliarSix.Set_Range(1000, 2000);
+  AuxiliarSix.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarSix.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarSix.Set_Reverse(false);
   AuxiliarSix.Set_Filter(true);
   AuxiliarSix.Set_Fail_Safe(false);
   //AUX7
-  AuxiliarSeven.Set_Range(1000, 2000);
+  AuxiliarSeven.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarSeven.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarSeven.Set_Reverse(false);
   AuxiliarSeven.Set_Filter(true);
   AuxiliarSeven.Set_Fail_Safe(false);
   //AUX8
-  AuxiliarEight.Set_Range(1000, 2000);
+  AuxiliarEight.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarEight.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
   AuxiliarEight.Set_Reverse(false);
   AuxiliarEight.Set_Filter(true);
@@ -285,22 +282,9 @@ void RCConfigClass::Update_Channels()
   {
     RadioControllOutput[THROTTLE] = StoredValueOfThrottle;
   }
-  if (!LockPitchAndRollRC)
-  {
-    RadioControllOutput[YAW] = Yaw.Output;
-    RadioControllOutput[PITCH] = Pitch.Output;
-    RadioControllOutput[ROLL] = Roll.Output;
-    SampleRoll = 1500;
-    SamplePitch = 1500;
-  }
-  else
-  {
-    SampleRoll = Roll.Output;
-    SamplePitch = Pitch.Output;
-    RadioControllOutput[YAW] = 1500;
-    RadioControllOutput[PITCH] = 1500;
-    RadioControllOutput[ROLL] = 1500;
-  }
+  RadioControllOutput[YAW] = Yaw.Output;
+  RadioControllOutput[PITCH] = Pitch.Output;
+  RadioControllOutput[ROLL] = Roll.Output;
   RadioControllOutput[AUX1] = AuxiliarOne.Output;
   RadioControllOutput[AUX2] = AuxiliarTwo.Output;
   RadioControllOutput[AUX3] = AuxiliarThree.Output;

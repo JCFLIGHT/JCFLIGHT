@@ -93,7 +93,7 @@ void Switch_Flag(void)
   {
     GuardValue = FlagParameterFunction;
   }
-  if (COMMAND_ARM_DISARM) //CONTROLADORA ARMADA?SIM...
+  if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM)) //CONTROLADORA ARMADA?SIM...
   {
     //O VALOR GUARDADO É IGUAL A 4?E A DECREMENTAÇÃO ACABOU?SIM...INICIA O SERVO AUTO-TRIM
     if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane())

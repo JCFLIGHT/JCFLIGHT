@@ -28,9 +28,9 @@ FILE_COMPILE_FOR_SPEED
 
 void IOC_Mode_Update()
 {
-  if (SetFlightModes[IOC_MODE] && GetFrameStateOfMultirotor())
+  if (IS_FLIGHT_MODE_ACTIVE(IOC_MODE) && GetFrameStateOfMultirotor())
   {
-    const float HeadingDifference = ConvertToRadians(ConvertDeciDegreesToDegrees(ATTITUDE.CompassHeading) - ConvertDeciDegreesToDegrees(IOC_Initial_Compass));
+    const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - IOC_Initial_Compass);
     const float CosineDifference = Fast_Cosine(HeadingDifference);
     const float SineDifference = Fast_Sine(HeadingDifference);
     const int16_t CalcedRCControllerPITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;
@@ -39,11 +39,11 @@ void IOC_Mode_Update()
   }
 #ifdef DEBUG_IOC
   PRINTF.SendToConsole(PSTR("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
-                    RCController[ROLL],
-                    RCController[PITCH],
-                    CalcedRCControllerPITCH,
-                    HeadingDifference,
-                    CosineDifference,
-                    SineDifference);
+                       RCController[ROLL],
+                       RCController[PITCH],
+                       CalcedRCControllerPITCH,
+                       HeadingDifference,
+                       CosineDifference,
+                       SineDifference);
 #endif
 }

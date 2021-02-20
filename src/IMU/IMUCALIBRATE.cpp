@@ -146,7 +146,7 @@ void Accelerometer_Calibration()
 
 #ifndef __AVR_ATmega2560__
   static Scheduler_Struct ACC_Calibration_Timer;
-  if (Scheduler(&ACC_Calibration_Timer, 5000))
+  if (Scheduler(&ACC_Calibration_Timer, SCHEDULER_SET_FREQUENCY(200, "Hz")))
   {
 #endif
 
@@ -160,11 +160,11 @@ void Accelerometer_Calibration()
           int8_t AccCalibIndexTwo = (AccCalibIndex + 1) % 3;
           int8_t AccCalibIndexThree = (AccCalibIndex + 2) % 3;
           if (ABS(IMU.AccelerometerRead[AccCalibIndex] -
-                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexTwo] -
-                                                                                    CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
+                  CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexTwo] -
+                                                                      CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
               ABS(IMU.AccelerometerRead[AccCalibIndex] -
-                         CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexThree] -
-                                                                                    CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
+                  CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexThree] -
+                                                                      CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
           {
             AxisToCalibration = AccCalibIndex;
             CALIBRATION.AccelerometerZero[AxisToCalibration] = 0;

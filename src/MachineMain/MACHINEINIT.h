@@ -15,10 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ACCELERATION_H_
-#define ACCELERATION_H_
-#include "Arduino.h"
-extern float Cosine_Yaw;
-extern float Sine_Yaw;
-void EarthFrame_Calculate_AccelerationXYZ();
+#ifndef MACHINEINIT_H_
+#define MACHINEINIT_H_
+#include "Common/STRUCTS.h"
+extern MachineInitTime MachineInitTimeNow;
+void SetInitialTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer);
+void CalculeTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer);
+uint32_t GetTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer);
 #endif

@@ -296,7 +296,7 @@ int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
     if (AHRS.CheckAnglesInclination(10)) //10 GRAUS DE INCLINAÇÃO
     {
       //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1000CM/S = 36KM/H
-      int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_State() ? AirSpeedCalcedInCM : ReferenceAirSpeed;
+      int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_State() ? AIRSPEED.CalcedInCM : ReferenceAirSpeed;
       //10KM/H - 216KM/H
       AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 300, 6000);
       CoordinatedTurnRateEarthFrame = ConvetToDegrees(980.665f * Fast_Tangent(-ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL])) / AirSpeedForCoordinatedTurn);

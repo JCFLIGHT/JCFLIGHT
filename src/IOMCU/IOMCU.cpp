@@ -1310,7 +1310,7 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendGyroZFiltered = IMU.GyroscopeRead[YAW];
     GCSParameters_Two.SendGPSGroundSpeed = GPS_Ground_Speed;
     GCSParameters_Two.SendI2CError = I2CErrors;
-    GCSParameters_Two.SendAirSpeedValue = AirSpeedCalcedInCM;
+    GCSParameters_Two.SendAirSpeedValue = AIRSPEED.CalcedInCM;
     GCSParameters_Two.SendCPULoad = SystemLoadPercent;
 }
 

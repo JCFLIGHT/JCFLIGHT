@@ -61,7 +61,7 @@ void GeneralSettingsInitialization()
   AIR_PLANE.UpdateServosDirection();
   AltitudeHold_Update_Params();
   WayPoint_Initialization();
-  AirSpeed_Initialization();
+  AIRSPEED.Initialization();
   GCS.UpdateParametersToGCS();
   AHRS.Initialization();
   SAFETYBUTTON.Initialization();

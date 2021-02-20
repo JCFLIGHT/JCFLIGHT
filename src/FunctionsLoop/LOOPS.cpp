@@ -74,7 +74,7 @@ void Super_Fast_Loop()
         INERTIALNAVIGATION.Calculate_AccelerationXYZ_To_EarthFrame();
         INERTIALNAVIGATION.Calculate_AccelerationXY();
         INERTIALNAVIGATION.Calculate_AccelerationZ();
-        AirSpeed_Update();
+        AIRSPEED.Update();
         Switch_Flag();
         BATTERY.Calculate_Total_Mah();
 }

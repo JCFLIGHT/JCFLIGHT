@@ -35,7 +35,7 @@ void AirSpeed_Update_Auto_Throttle()
         if (!Do_AutoThrottle_Mode)
         {
             Do_AutoThrottle_Mode = true;
-            PreviousValueOfAirSpeed = AirSpeedCalcedInKM;
+            PreviousValueOfAirSpeed = AIRSPEED.CalcedInKM;
         }
     }
     else
@@ -52,7 +52,7 @@ void AirSpeed_Apply_Auto_Throttle_Control()
     }
     if (Do_AutoThrottle_Mode && (RCController[THROTTLE] > 1200))
     {
-        int16_t CalculateError = PreviousValueOfAirSpeed - AirSpeedCalcedInKM;
+        int16_t CalculateError = PreviousValueOfAirSpeed - AIRSPEED.CalcedInKM;
         int16_t CalculateProportional = (CalculateError * PID[PIDALTITUDE].ProportionalVector >> 3);
         CalculateIntegrator += (CalculateError * PID[PIDALTITUDE].IntegratorVector >> 5);
         CalculateIntegrator = Constrain_16Bits(CalculateIntegrator, -24000, 24000);

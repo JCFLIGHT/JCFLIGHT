@@ -18,8 +18,13 @@
 #ifndef AIRSPEED_H_
 #define AIRSPEED_H_
 #include "Arduino.h"
-extern uint16_t AirSpeedCalcedInKM;
-extern uint16_t AirSpeedCalcedInCM;
-void AirSpeed_Initialization();
-void AirSpeed_Update();
+class AirSpeedClass
+{
+public:
+  uint16_t CalcedInCM;
+  uint16_t CalcedInKM;
+  void Initialization();
+  void Update();
+};
+extern AirSpeedClass AIRSPEED;
 #endif

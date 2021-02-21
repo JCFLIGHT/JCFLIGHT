@@ -44,8 +44,8 @@ void Medium_Loop()
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
         AirSpeed_Update_Auto_Throttle();
-        BATTERY.Read_Voltage();
-        BATTERY.Read_Current();
+        BATTERY.Update_Voltage();
+        BATTERY.Update_Current();
         PRINTF.ParamsToConsole();
 }
 

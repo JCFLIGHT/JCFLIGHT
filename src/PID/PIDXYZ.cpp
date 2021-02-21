@@ -113,13 +113,13 @@ void PIDXYZClass::Controll_Roll(int16_t RateTargetInput, int32_t DeltaTimeUs)
   {
     if (GetFrameStateOfMultirotor())
     {
-      if (!IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
+      if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
       {
-        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, STAB_COPTER_ROLL_ANGLE_MAX);
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, SPORT_ROLL_ANGLE_MAX);
       }
       else
       {
-        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, SPORT_ROLL_ANGLE_MAX);
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, STAB_COPTER_ROLL_ANGLE_MAX);
       }
     }
     else
@@ -176,13 +176,13 @@ void PIDXYZClass::Controll_Pitch(int16_t RateTargetInput, int32_t DeltaTimeUs)
   {
     if (GetFrameStateOfMultirotor())
     {
-      if (!IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
+      if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
       {
-        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, PITCH, STAB_COPTER_PITCH_ANGLE_MAX);
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, PITCH, SPORT_PITCH_ANGLE_MAX);
       }
       else
       {
-        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, PITCH, SPORT_PITCH_ANGLE_MAX);
+        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, PITCH, STAB_COPTER_PITCH_ANGLE_MAX);
       }
     }
     else
@@ -311,7 +311,7 @@ int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
 
 void PIDXYZClass::Reset_Integral_Accumulators()
 {
-  if (GetThrottleInLowPosition() && GetFrameStateOfMultirotor())
+  if (GetActualThrottleStatus(THROTTLE_LOW))
   {
     IntegralAccError[ROLL] = 0;
     IntegralAccError[PITCH] = 0;

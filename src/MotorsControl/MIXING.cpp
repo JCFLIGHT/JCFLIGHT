@@ -23,6 +23,7 @@
 #include "BAR/BAR.h"
 #include "MIXTABLE.h"
 #include "ProgMem/PROGMEM.h"
+#include "Math/MATHSUPPORT.h"
 
 uint8_t NumberOfMotors = 4;
 int16_t MixerThrottleCommand = 1000;
@@ -30,10 +31,13 @@ float ThrottleScale = 1.0f;
 
 void MixingApplyControl()
 {
-
     MixerThrottleCommand = RCController[THROTTLE];
     MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
-    Motors_Compensation(STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR), NumberOfMotors);
+
+    if (STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR) > 0)
+    {
+        MixerThrottleCommand = MIN(AttitudeThrottleMin + (MixerThrottleCommand - AttitudeThrottleMin) * CalculateThrottleCompensationFactor(), AttitudeThrottleMax);
+    }
 
     switch (FrameType)
     {

@@ -274,14 +274,7 @@ void RCConfigClass::Set_Pulse()
 
 void RCConfigClass::Update_Channels()
 {
-  if (!Lock_UP)
-  {
-    RadioControllOutput[THROTTLE] = StoredValueOfThrottle = Throttle.Output;
-  }
-  else
-  {
-    RadioControllOutput[THROTTLE] = StoredValueOfThrottle;
-  }
+  RadioControllOutput[THROTTLE] = Throttle.Output;
   RadioControllOutput[YAW] = Yaw.Output;
   RadioControllOutput[PITCH] = Pitch.Output;
   RadioControllOutput[ROLL] = Roll.Output;

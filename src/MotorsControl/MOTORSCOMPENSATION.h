@@ -18,5 +18,5 @@
 #ifndef MOTORSCOMPENSATION_H_
 #define MOTORSCOMPENSATION_H_
 #include "Arduino.h"
-void Motors_Compensation(uint8_t State, uint8_t _NumbOfMotors);
+float CalculateThrottleCompensationFactor(void);
 #endif

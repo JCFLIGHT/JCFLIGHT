@@ -111,7 +111,7 @@ bool ApplyAltitudeHoldControl()
         int16_t ThrottleDifference = RadioControllOutput[THROTTLE] - ThrottleMiddleValue;
         if (!TakeOffInProgress)
         {
-          if (GetThrottleInLowPosition())
+          if (GetActualThrottleStatus(THROTTLE_LOW))
           {
             if (GetGroundDetectedFor100ms())
             {

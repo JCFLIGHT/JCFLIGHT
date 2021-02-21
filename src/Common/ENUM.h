@@ -505,4 +505,11 @@ enum GCS_FlightModes_Enum
     GCS_LANDED_MODE
 };
 
+enum Throttle_Status_Enum
+{
+    THROTTLE_LOW = 0,
+    THROTTLE_MIDDLE,
+    THROTTLE_HIGH
+};
+
 #endif

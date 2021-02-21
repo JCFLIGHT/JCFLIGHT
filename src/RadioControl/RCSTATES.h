@@ -27,5 +27,5 @@ bool SticksStateToArm(void);
 bool SticksStateToDisarm(void);
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue);
 bool SticksDeflected(int16_t MinDeflectionValue);
-bool GetThrottleInLowPosition(void);
+bool GetActualThrottleStatus(uint8_t ThrottleStatus);
 #endif

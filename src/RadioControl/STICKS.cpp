@@ -62,7 +62,7 @@ void SticksClass::Update()
       ResetDisarmDelayed();
     }
   }
-  if (GetThrottleInLowPosition())
+  if (GetActualThrottleStatus(THROTTLE_LOW))
   {
     if (!ImmediatelyFailSafe)
     {

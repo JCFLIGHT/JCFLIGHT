@@ -238,7 +238,7 @@ bool AutoLaunchClass::GetStateOfThrottle()
 
 bool AutoLaunchClass::GetValidStateToRunLaunch()
 {
-  return (RadioControllOutput[THROTTLE] >= 1400);
+  return GetActualThrottleStatus(THROTTLE_MIDDLE);
 }
 
 bool AutoLaunchClass::GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination)

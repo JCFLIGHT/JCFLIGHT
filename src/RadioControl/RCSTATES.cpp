@@ -101,9 +101,18 @@ bool SticksDeflected(int16_t MinDeflectionValue)
     return (ABS(RCController[ROLL]) > MinDeflectionValue) || (ABS(RCController[PITCH]) > MinDeflectionValue);
 }
 
-bool GetThrottleInLowPosition(void)
+bool GetActualThrottleStatus(uint8_t ThrottleStatus)
 {
-    if (RadioControllOutput[THROTTLE] <= MIN_PULSE)
+    if (RadioControllOutput[THROTTLE] <= MIN_PULSE && ThrottleStatus == THROTTLE_LOW)
+    {
+        return true;
+    }
+    else if (RadioControllOutput[THROTTLE] >= MAX_PULSE && ThrottleStatus == THROTTLE_HIGH)
+    {
+        return true;
+    }
+    else if (RadioControllOutput[THROTTLE] >= (MIDDLE_STICKS_PULSE - 100) &&
+             RadioControllOutput[THROTTLE] <= (MIDDLE_STICKS_PULSE + 100) && ThrottleStatus == THROTTLE_MIDDLE)
     {
         return true;
     }

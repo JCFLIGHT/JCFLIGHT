@@ -27,8 +27,9 @@ public:
   float Voltage;
   float Total_Current;
   float TotalCurrentInMah;
-  void Read_Voltage(void);
-  void Read_Current(void);
+  float Get_Max_Voltage_Calced();
+  void Update_Voltage(void);
+  void Update_Current(void);
   void Calculate_Total_Mah(void);
   uint32_t GetWatts();
 

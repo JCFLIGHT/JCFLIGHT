@@ -193,7 +193,7 @@ void ApplyMixingForMotorsAndServos()
         MotorControl[MotorsCount] -= MaximumMotor - AttitudeThrottleMax;
       }
       MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], AttitudeThrottleMin, AttitudeThrottleMax);
-      if (GetThrottleInLowPosition())
+      if (GetActualThrottleStatus(THROTTLE_LOW))
       {
         MotorControl[MotorsCount] = AttitudeThrottleMin;
       }

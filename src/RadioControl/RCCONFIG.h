@@ -47,14 +47,10 @@ private:
 class RCConfigClass
 {
 public:
-  bool Lock_UP;
   bool CancelDeadZone;
   void Init();
   void Set_Pulse();
   void Update_Channels();
-
-private:
-  int16_t StoredValueOfThrottle;
 };
 extern RCConfigClass RCCONFIG;
 extern RC_Config Throttle;

@@ -41,7 +41,7 @@ float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESIS
 float Amps_Per_Volt = 62.0f;        //FATOR DE MULTIPLICAÇÃO DA TENSÃO DO PINO ANALOGICO PARA CONVERTER EM CORRENTE (AMPERES)
 float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE)
 
-void BATT::Read_Voltage(void)
+void BATT::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
   Voltage = Voltage_Filter.Apply(Voltage * 0.92f + (float)(ADCPIN.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
@@ -208,6 +208,11 @@ float BATT::AutoBatteryMax(float BattVoltage)
   return NONE_BATTERY;
 }
 
+float BATT::Get_Max_Voltage_Calced()
+{
+  return BATTERY.AutoBatteryMax(Voltage);
+}
+
 uint8_t BATT::GetPercentage()
 {
   return BATTERY.CalculatePercentage(Voltage, BATTERY.AutoBatteryMin(Voltage), BATTERY.AutoBatteryMax(Voltage));
@@ -235,7 +240,7 @@ void BATT::Do_RTH_With_Low_Batt(bool FailSafeBatt)
   }
 }
 
-void BATT::Read_Current(void)
+void BATT::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
   Total_Current = Current_Filter.Apply(((ADCPIN.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);

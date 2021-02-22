@@ -15,10 +15,9 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PT1_H_
-#define PT1_H_
-#include "Arduino.h"
-#include "Common/STRUCTS.h"
-float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequency, float DeltaTime);
-float PT1FilterApply2(PT1_Filter_Struct *Filter, float Input, float DeltaTime);
+#ifndef THRCLIPPING_H_
+#define THRCLIPPING_H_
+#include "inttypes.h"
+void Throttle_Clipping_Update(uint8_t MotorCount, int16_t MixerThrottleCommand);
+bool MixerIsOutputSaturated(void);
 #endif

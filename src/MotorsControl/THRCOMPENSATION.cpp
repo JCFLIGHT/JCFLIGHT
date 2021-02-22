@@ -15,12 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "MOTORSCOMPENSATION.h"
+#include "THRCOMPENSATION.h"
 #include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "Math/MATHSUPPORT.h"
-#include "Scheduler/SCHEDULERTIME.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Filters/PT1.h"
 #include "FastSerial/PRINTF.h"
@@ -33,28 +32,21 @@
 uint8_t ImpedanceSampleCount = 0;
 
 float Throttle_Compensation_Weight = 1.0f; //GANHO DA COMPENSAÇÃO DEFINIDA PELO USUARIO
-float ActualBatteryVoltage = 12.60f;       //SIMULANDO O VALOR ATUAL DA BATERIA
-float ActualBatteryCurrent = 0.0f;         //SIMULANDO O CONSUMO DA BATERIA
-float BatteryFullVoltage = 12.60f;         //SIMULANDO 3S
+float BatteryFullVoltage;
+float ActualBatteryVoltage;
+float ActualBatteryCurrent;
 float PreviousBatteryVoltage;
 float PreviousAmperage;
 
-static uint16_t SAGCompensatedVBat = 0;   //TENSÃO DA BATERIA SEM CARGA CALCULADA
-static uint16_t PowerSupplyImpedance = 0; //IMPEDANCIA DA BATERIA CALCULADA EM MILLIOHM
+static uint16_t SaggingCompensatedVBat = 0; //TENSÃO DA BATERIA SEM CARGA CALCULADA
+static uint16_t PowerSupplyImpedance = 0;   //IMPEDANCIA DA BATERIA CALCULADA EM MILLIOHM
 
-uint32_t PreviousTime = 0;
-
-float PT1FilterApply2(PT1_Filter_Struct *Filter, float Input, float DeltaTime)
-{
-  Filter->DeltaTime = DeltaTime;
-  Filter->State = Filter->State + DeltaTime / (Filter->RC + DeltaTime) * (Input - Filter->State);
-  return Filter->State;
-}
-
-void SaggingCompensatedUpdate()
+void SaggingCompensatedUpdate(float DeltaTime)
 {
 
-  float DeltaTime = 1000 * 1e-6f;
+#ifdef __AVR_ATmega2560__
+  DeltaTime = 1000 * 1e-6f;
+#endif
 
   static PT1_Filter_Struct ImpedanceFilterState;
   static PT1_Filter_Struct SaggingCompVBatFilterState;
@@ -66,27 +58,22 @@ void SaggingCompensatedUpdate()
   if (BatteryFullVoltage == 0)
   {
     SaggingCompVBatFilterState.State = ActualBatteryVoltage * 100;
+    SaggingCompensatedVBat = ActualBatteryVoltage * 100;
     ImpedanceFilterState.State = 0;
-    SAGCompensatedVBat = ActualBatteryVoltage * 100;
     return;
   }
 
-  if ((SCHEDULERTIME.GetMicros() - PreviousTime) > SCHEDULER_SET_FREQUENCY(2, "Hz"))
-  {
-    PreviousTime = 0;
-  }
-
-  if (!PreviousTime)
+  static Scheduler_Struct SaggingCompensatedTimer;
+  if (Scheduler(&SaggingCompensatedTimer, SCHEDULER_SET_FREQUENCY(2, "Hz"))) //OBTÉM NOVAS AMOSTRAS A CADA MEIO SEGUNDO
   {
     PreviousAmperage = ActualBatteryCurrent;
     PreviousBatteryVoltage = ActualBatteryVoltage;
-    PreviousTime = SCHEDULERTIME.GetMicros();
   }
   else if ((ActualBatteryCurrent - PreviousAmperage >= 2) &&
            (PreviousBatteryVoltage - ActualBatteryVoltage >= 0.4f)) //2A DE DIF & 0.4V DE DIF
   {
 
-    uint16_t impedanceSample = (int32_t)((PreviousBatteryVoltage - ActualBatteryVoltage) * 100) * 1000 / ((ActualBatteryCurrent - PreviousAmperage) * 100);
+    uint16_t ImpedanceSample = (int32_t)((PreviousBatteryVoltage - ActualBatteryVoltage) * 100) * 1000 / ((ActualBatteryCurrent - PreviousAmperage) * 100);
 
     if (ImpedanceSampleCount <= IMPEDANCE_STABLE_SAMPLE_COUNT_THRESH)
     {
@@ -96,11 +83,11 @@ void SaggingCompensatedUpdate()
     if (ImpedanceFilterState.State)
     {
       ImpedanceFilterState.RC = ImpedanceSampleCount > IMPEDANCE_STABLE_SAMPLE_COUNT_THRESH ? 1.2 : 0.5;
-      PT1FilterApply2(&ImpedanceFilterState, impedanceSample, DeltaTime);
+      PT1FilterApply2(&ImpedanceFilterState, ImpedanceSample, DeltaTime);
     }
     else
     {
-      ImpedanceFilterState.State = impedanceSample;
+      ImpedanceFilterState.State = ImpedanceSample;
     }
 
     if (ImpedanceSampleCount > IMPEDANCE_STABLE_SAMPLE_COUNT_THRESH)
@@ -111,21 +98,21 @@ void SaggingCompensatedUpdate()
 
   uint16_t SaggingCompensatedSample = MIN(BatteryFullVoltage * 100, (ActualBatteryVoltage * 100) + (int32_t)PowerSupplyImpedance * (ActualBatteryCurrent * 100) / 1000);
   SaggingCompVBatFilterState.RC = SaggingCompensatedSample < SaggingCompVBatFilterState.State ? 40 : 500;
-  SAGCompensatedVBat = lrintf(PT1FilterApply2(&SaggingCompVBatFilterState, SaggingCompensatedSample, DeltaTime));
+  SaggingCompensatedVBat = lrintf(PT1FilterApply2(&SaggingCompVBatFilterState, SaggingCompensatedSample, DeltaTime));
 
 #ifdef PRINTLN_SAGGING
 
-  DEBUG("PowerSupplyImpedance:%u SAGCompensatedVBat:%u ActualBatteryVoltage:%.2f ActualBatteryCurrent:%.2f",
+  DEBUG("PowerSupplyImpedance:%u SaggingCompensatedVBat:%u ActualBatteryVoltage:%.2f ActualBatteryCurrent:%.2f",
         PowerSupplyImpedance,
-        SAGCompensatedVBat,
+        SaggingCompensatedVBat,
         ActualBatteryVoltage,
         ActualBatteryCurrent);
 
 #endif
 }
 
-float CalculateThrottleCompensationFactor(void)
+float CalculateThrottleCompensationFactor(float DeltaTime)
 {
-  SaggingCompensatedUpdate();
-  return 1.0f + ((float)(BatteryFullVoltage * 100) / SAGCompensatedVBat - 1.0f) * Throttle_Compensation_Weight;
+  SaggingCompensatedUpdate(DeltaTime);
+  return 1.0f + ((float)(BatteryFullVoltage * 100) / SaggingCompensatedVBat - 1.0f) * Throttle_Compensation_Weight;
 }

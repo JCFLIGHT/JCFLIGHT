@@ -155,8 +155,8 @@ void Acc_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x3B);
-  IMU.AccelerometerRead[PITCH] = -((BufferData[0] << 8) | BufferData[1]) >> 3;
-  IMU.AccelerometerRead[ROLL] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
+  IMU.AccelerometerRead[ROLL] = -((BufferData[0] << 8) | BufferData[1]) >> 3;
+  IMU.AccelerometerRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
   IMU.AccelerometerRead[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
 #elif defined ESP32
   IMU_Get_Data();
@@ -203,8 +203,8 @@ void Gyro_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x43);
-  IMU.GyroscopeRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]) >> 2;
-  IMU.GyroscopeRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 2);
+  IMU.GyroscopeRead[PITCH] = -((BufferData[0] << 8) | BufferData[1]) >> 2;
+  IMU.GyroscopeRead[ROLL] = (((BufferData[2] << 8) | BufferData[3]) >> 2);
   IMU.GyroscopeRead[YAW] = -((BufferData[4] << 8) | BufferData[5]) >> 2;
 #endif
 

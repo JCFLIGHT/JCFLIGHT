@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MOTORSCOMPENSATION_H_
-#define MOTORSCOMPENSATION_H_
+#ifndef THRCOMPENSATION_H_
+#define THRCOMPENSATION_H_
 #include "Arduino.h"
-float CalculateThrottleCompensationFactor(void);
+float CalculateThrottleCompensationFactor(float DeltaTime);
 #endif

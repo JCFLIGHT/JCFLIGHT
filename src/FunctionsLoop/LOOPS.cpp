@@ -101,6 +101,6 @@ void Integral_Loop()
         PIDXYZ.Update(ThisTaskTimeUs);
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         ServoAutoTrimRun();
-        ApplyMixingForMotorsAndServos();
+        ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();
 }

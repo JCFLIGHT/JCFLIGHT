@@ -37,3 +37,13 @@ float PT1FilterApply(PT1_Filter_Struct *Filter, float Input, float CutOffFrequen
   //RETORNA O VALOR FILTRADO
   return Filter->State;
 }
+
+float PT1FilterApply2(PT1_Filter_Struct *Filter, float Input, float DeltaTime)
+{
+  //OBTÉM O DELTA TIME
+  Filter->DeltaTime = DeltaTime;
+  //CALCULA O VALOR DO FITLRO
+  Filter->State = Filter->State + DeltaTime / (Filter->RC + DeltaTime) * (Input - Filter->State);
+  //RETORNA O VALOR FILTRADO
+  return Filter->State;
+}

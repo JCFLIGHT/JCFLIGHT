@@ -19,6 +19,5 @@
 #define MIXING_H_
 #include "Arduino.h"
 extern uint8_t NumberOfMotors;
-extern int16_t MixerThrottleCommand;
 void MixingApplyControl();
 #endif

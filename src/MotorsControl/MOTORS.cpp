@@ -30,15 +30,28 @@
 #ifdef ESP32
 #include "HAL_ESP32/ESP32PWM.h"
 #endif
+#include "THRCLIPPING.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
+#include "Math/MATHSUPPORT.h"
+#include "THRCOMPENSATION.h"
+#include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
 
+//DEBUG
+//#define PRINTLN_MOTORS
+
 //#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
+
+float ThrottleScale = 1.0f;
 
 //MAXIMO = 499
 //PARA DESATIVAR:COLOQUE O VALOR EM 500
 int16_t Yaw_Jump_Prevention = 200;
+
+int16_t MixerThrottleCommand = 1000;
 
 void ConfigureRegisters(bool Run_Calibrate_ESC)
 {
@@ -161,48 +174,72 @@ void ConfigureRegisters(bool Run_Calibrate_ESC)
   }
 }
 
-void ApplyMixingForMotorsAndServos()
+void ApplyMixingForMotorsAndServos(float DeltaTime)
 {
   if (!SAFETYBUTTON.GetSafeStateToOutput() || WATCHDOG.InShutDown)
   {
     return;
   }
+
+  MixerThrottleCommand = RCController[THROTTLE];
+  MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
+
+  if (STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR) > 0)
+  {
+    MixerThrottleCommand = MIN(AttitudeThrottleMin + (MixerThrottleCommand - AttitudeThrottleMin) * CalculateThrottleCompensationFactor(DeltaTime), AttitudeThrottleMax);
+  }
+
   if (NumberOfMotors >= 4 && Yaw_Jump_Prevention < 500)
   {
     //PREVINE UM "PULO" NO YAW,ESSE ERRO É UM PROBLEMA PRESENTE NA NAZA V2,
-    //MAS PRA QUE ELE ACONTEÇA,DEPENDE DO TIPO DE ESC E MOTOR QUE VOCÊ ESTÁ USANDO
+    //MAS PRA QUE ELE ACONTEÇA,DEPENDE DO TIPO DE ESC,MOTOR & FRAME QUE VOCÊ ESTÁ USANDO
     PIDControllerApply[YAW] = Constrain_16Bits(PIDControllerApply[YAW],
                                                -Yaw_Jump_Prevention - ABS(RCController[YAW]),
                                                Yaw_Jump_Prevention + ABS(RCController[YAW]));
   }
+
   MixingApplyControl();
-  if (GetFrameStateOfMultirotor())
+  Throttle_Clipping_Update(NumberOfMotors, MixerThrottleCommand);
+
+  if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    int16_t MaximumMotor = MotorControl[MOTOR4];
-    for (uint8_t MotorsCount = 1; MotorsCount < NumberOfMotors; MotorsCount++)
+    if (GetFrameStateOfMultirotor())
     {
-      if (MotorControl[MotorsCount] > MaximumMotor)
+      for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
       {
-        MaximumMotor = MotorControl[MotorsCount];
+        MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], AttitudeThrottleMin, AttitudeThrottleMax);
+        if (GetActualThrottleStatus(THROTTLE_LOW))
+        {
+          MotorControl[MotorsCount] = AttitudeThrottleMin;
+        }
       }
     }
-    for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
+  }
+  else
+  {
+    if (GetFrameStateOfMultirotor())
     {
-      if (MaximumMotor > AttitudeThrottleMax)
-      {
-        MotorControl[MotorsCount] -= MaximumMotor - AttitudeThrottleMax;
-      }
-      MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], AttitudeThrottleMin, AttitudeThrottleMax);
-      if (GetActualThrottleStatus(THROTTLE_LOW))
-      {
-        MotorControl[MotorsCount] = AttitudeThrottleMin;
-      }
-      if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
+      for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
       {
         MotorControl[MotorsCount] = 1000;
       }
     }
+    else if (GetFrameStateOfAirPlane())
+    {
+      MotorControl[MOTOR1] = 1000;
+    }
   }
+
+#ifdef PRINTLN_MOTORS
+
+  DEBUG("Motor1:%d Motor2:%d Motor3:%d Motor4:%d MixerIsOutputSaturated:%d",
+        MotorControl[MOTOR1],
+        MotorControl[MOTOR2],
+        MotorControl[MOTOR3],
+        MotorControl[MOTOR4],
+        MixerIsOutputSaturated());
+
+#endif
 }
 
 void PulseInAllMotors(int16_t Pulse)

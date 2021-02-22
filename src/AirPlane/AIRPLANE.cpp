@@ -111,15 +111,6 @@ void AirPlaneClass::Mode_ConventionalPlane_Run()
     return;
   }
 
-  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-  {
-    MotorControl[MOTOR1] = 1000;
-  }
-  else
-  {
-    MotorControl[MOTOR1] = RCController[THROTTLE];
-  }
-
   if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
     ServoToFilter[SERVO1] = RCController[ROLL] * ServoDirection[SERVO1];  //AILERON  (SERVO 1 DA ASA)
@@ -144,15 +135,6 @@ void AirPlaneClass::Mode_FixedWing_Run()
     return;
   }
 
-  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-  {
-    MotorControl[MOTOR1] = 1000;
-  }
-  else
-  {
-    MotorControl[MOTOR1] = RCController[THROTTLE];
-  }
-
   if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
     ServoToFilter[SERVO1] = (RCController[ROLL] * ServoDirection[SERVO1]) + (RCController[PITCH] * ServoDirection[SERVO1]); //AILERON (SERVO 1 DA ASA)
@@ -171,15 +153,6 @@ void AirPlaneClass::Mode_PlaneVTail_Run()
   if (FrameType != PLANE_VTAIL)
   {
     return;
-  }
-
-  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-  {
-    MotorControl[MOTOR1] = 1000;
-  }
-  else
-  {
-    MotorControl[MOTOR1] = RCController[THROTTLE];
   }
 
   if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL

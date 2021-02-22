@@ -54,17 +54,17 @@ uint32_t AbortAutoLaunch = 0;
 
 const float GetPitchAccelerationInMSS()
 {
-  return BodyFrameAcceleration.Roll;
+  return BodyFrameAcceleration.Pitch;
 }
 
 const float GetRollAccelerationInMSS()
 {
-  return BodyFrameAcceleration.Pitch;
+  return BodyFrameAcceleration.Roll;
 }
 
 const float GetYawRotationInRadians()
 {
-  return BodyFrameRotation.Yaw * 10;
+  return BodyFrameRotation.Yaw;
 }
 
 const bool AutoLaunchClass::GetSwingVelocityState()

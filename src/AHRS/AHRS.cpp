@@ -436,10 +436,10 @@ void AHRSClass::Update(float DeltaTime)
                    CalcedCompassWeight);
 
   //SAÍDA DOS EIXOS DO APÓS O AHRS
-  //ROLL
-  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees(Fast_Atan2(RotationMath[2][1], RotationMath[2][2]));
   //PITCH
-  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-RotationMath[2][0]));
+  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMath[2][1], RotationMath[2][2]));
+  //ROLL
+  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-RotationMath[2][0]));
   //YAW
   ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMath[1][0], RotationMath[0][0]));
   //CONVERTE O VALOR DE COMPASS HEADING PARA O VALOR ACEITAVEL

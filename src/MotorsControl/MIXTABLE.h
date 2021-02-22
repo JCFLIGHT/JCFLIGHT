@@ -120,9 +120,9 @@ static const Motors_Count_Struct Motors_Count[] = {
     {4}, //QUAD X
     {6}, //HEXA X
     {6}, //HEXA I
-    {0}, //AEROMODELO
-    {0}, //ASA-FIXA
-    {0}, //AEROMODELO DO TIPO V-TAIL
+    {1}, //AEROMODELO
+    {1}, //ASA-FIXA
+    {1}, //AEROMODELO DO TIPO V-TAIL
     {4}, //ZMR250
     {4}, //TBS
 };

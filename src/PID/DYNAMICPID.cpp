@@ -44,7 +44,7 @@ void GetRCDataConvertedAndApplyFilter()
   RCController[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
   RCController[YAW] = -CalcedAttitudeRC(YAW, RCExpo);
   RCController[PITCH] = CalcedAttitudeRC(PITCH, RCExpo);
-  RCController[ROLL] = -CalcedAttitudeRC(ROLL, RCExpo);
+  RCController[ROLL] = CalcedAttitudeRC(ROLL, RCExpo);
 
   //APLICA O FILTRO LPF NO RC DA ATTITUDE
   RCInterpolationApply();

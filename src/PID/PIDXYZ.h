@@ -36,6 +36,11 @@ private:
   void Controll_Pitch(int16_t RateTargetInput, int32_t DeltaTimeUs);
   void Controll_Roll(int16_t RateTargetInput, int32_t DeltaTimeUs);
   void Controll_Yaw(int16_t RateTargetInput, int32_t DeltaTimeUs);
+  int32_t ProportionalTermProcess(int16_t RcRateError, uint8_t kP);
+  int32_t DerivativeTermProcessRoll(int16_t ActualGyro, int16_t LastGyro, int16_t DynamicDerivative, int32_t DeltaTimeUs);
+  int32_t DerivativeTermProcessPitch(int16_t ActualGyro, int16_t LastGyro, int16_t DynamicDerivative, int32_t DeltaTimeUs);
+  int16_t ApplyIntegralTermLimiting(int16_t IntegratorTerminate);
+  bool GetGyroSaturation(uint8_t GyroAxis, int16_t SaturationValue);
   int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn);
   void Reset_Integral_Accumulators();
 };

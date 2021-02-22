@@ -20,10 +20,6 @@
 #include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 
-#define NEW_THR_CLIPPING
-
-#ifdef NEW_THR_CLIPPING
-
 #define THROTTLE_CLIPPING_FACTOR 0.33f
 
 static float MotorMixRange;
@@ -90,5 +86,3 @@ bool MixerIsOutputSaturated(void)
 {
     return MotorMixRange >= 1.0f;
 }
-
-#endif

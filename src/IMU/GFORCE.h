@@ -18,5 +18,5 @@
 #ifndef GFORCE_H_
 #define GFORCE_H_
 #include "Arduino.h"
-float GetGForce();
+void IMU_GForce_Update();
 #endif

@@ -29,6 +29,7 @@ typedef struct
   int16_t GyroscopeRead[3];
   int16_t GyroscopeReadNotFiltered[3];
   int16_t CompassRead[3];
+  float CalcedGForce;
 } IMU_STRUCT;
 
 typedef struct
@@ -68,14 +69,18 @@ struct PID_TERMS
   uint8_t ProportionalVector;
   uint8_t IntegratorVector;
   uint8_t DerivativeVector;
+  uint8_t FeedForward;
 };
 
 typedef struct
 {
-  uint8_t CalcedValue = 0;
+  bool UpdateRequired = false;
+  float Factor = 0;
+  float CalcedValue = 0;
+  int16_t PreviousThrottle;
   int16_t BreakPointer = 1500;
   uint16_t ThrottlePercent = 0;
-  float Factor = 0;
+  uint16_t FixedWingTauMS;
 } TPA_Parameters_Struct;
 
 typedef struct
@@ -174,9 +179,9 @@ typedef struct _PID_PARAM
 typedef struct _GPS_PID
 {
   float Integrator;
-  int32_t Last_Input;
   float Last_Derivative;
   float Derivative;
+  int32_t Last_Input;
 } GPS_PID;
 
 typedef struct

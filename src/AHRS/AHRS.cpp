@@ -16,7 +16,6 @@
 */
 
 #include "AHRS.h"
-#include "Math/AVRLOWER.h"
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Common/VARIABLES.h"
@@ -437,9 +436,9 @@ void AHRSClass::Update(float DeltaTime)
 
   //SAÍDA DOS EIXOS DO APÓS O AHRS
   //PITCH
-  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMath[2][1], RotationMath[2][2]));
+  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(Fast_Atan2(RotationMath[2][1], RotationMath[2][2]));
   //ROLL
-  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-RotationMath[2][0]));
+  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(RotationMath[2][0]));
   //YAW
   ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMath[1][0], RotationMath[0][0]));
   //CONVERTE O VALOR DE COMPASS HEADING PARA O VALOR ACEITAVEL

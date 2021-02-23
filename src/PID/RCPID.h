@@ -18,7 +18,5 @@
 #ifndef DYNAMICPID_H_
 #define DYNAMICPID_H_
 #include "Arduino.h"
-extern uint8_t DynamicProportionalVector[2];
-extern uint8_t DynamicDerivativeVector[2];
-void PID_Dynamic();
+void RC_PID_Update();
 #endif

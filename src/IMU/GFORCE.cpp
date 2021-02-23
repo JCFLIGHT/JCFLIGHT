@@ -18,10 +18,40 @@
 #include "GFORCE.h"
 #include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
+#include "AHRS/AHRS.h"
+#include "Filters/PT1.h"
+#include "Scheduler/SCHEDULERTIME.h"
+#include "FastSerial/PRINTF.h"
 
-float GetGForce()
+PT1_Filter_Struct GForce_Smooth;
+
+#define GRAVITY_MSS 9.80665f //M/S^2
+
+void IMU_GForce_Update()
 {
-  return sqrtf(SquareFloat(IMU.AccelerometerRead[ROLL] / 512) +
-               SquareFloat(IMU.AccelerometerRead[PITCH] / 512) +
-               SquareFloat(IMU.AccelerometerRead[YAW] / 512));
+  static uint32_t PreviousDeltaTime = 0;
+
+#ifndef __AVR_ATmega2560__
+  float CalcedDeltaTime = (SCHEDULERTIME.GetMicros() - PreviousDeltaTime) * 1e-6;
+#endif
+
+  IMU.CalcedGForce = sqrtf(VectorNormSquared(&BodyFrameAcceleration)) / GRAVITY_MSS;
+
+  if (PreviousDeltaTime)
+  {
+#ifndef __AVR_ATmega2560__
+    IMU.CalcedGForce = PT1FilterApply2(&GForce_Smooth, IMU.CalcedGForce, CalcedDeltaTime);
+#else
+    IMU.CalcedGForce = PT1FilterApply2(&GForce_Smooth, IMU.CalcedGForce, 1.0f / 1000.0f);
+#endif
+  }
+  else
+  {
+    GForce_Smooth.RC = 0.2f;
+    GForce_Smooth.State = IMU.CalcedGForce;
+  }
+
+  PreviousDeltaTime = SCHEDULERTIME.GetMicros();
+
+  //DEBUG("IMU.CalcedGForce:%.4f", IMU.CalcedGForce);
 }

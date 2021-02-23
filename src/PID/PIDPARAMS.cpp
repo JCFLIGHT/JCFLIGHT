@@ -20,25 +20,54 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "IOMCU/IOMCU.h"
 #include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 void LoadPID()
 {
-    //PID ROLL
-    PID[PIDROLL].ProportionalVector = 35;
-    PID[PIDROLL].IntegratorVector = 25;
-    PID[PIDROLL].DerivativeVector = 26;
-    //PID PITCH
-    PID[PIDPITCH].ProportionalVector = 35;
-    PID[PIDPITCH].IntegratorVector = 25;
-    PID[PIDPITCH].DerivativeVector = 26;
-    //PID YAW
-    PID[PIDYAW].ProportionalVector = 69;
-    PID[PIDYAW].IntegratorVector = 50;
-    PID[PIDYAW].DerivativeVector = 0;
-    //PID DO MODO AUTO-NIVEL
-    PID[PIDAUTOLEVEL].ProportionalVector = 80;
-    PID[PIDAUTOLEVEL].IntegratorVector = 3;
-    PID[PIDAUTOLEVEL].DerivativeVector = 100;
+    if (GetFrameStateOfMultirotor())
+    {
+        //MULTIROTORES
+        //PID ROLL
+        PID[PIDROLL].ProportionalVector = 40;
+        PID[PIDROLL].IntegratorVector = 30;
+        PID[PIDROLL].DerivativeVector = 23;
+        PID[PIDROLL].FeedForward = 60;
+        //PID PITCH
+        PID[PIDPITCH].ProportionalVector = 40;
+        PID[PIDPITCH].IntegratorVector = 30;
+        PID[PIDPITCH].DerivativeVector = 23;
+        PID[PIDPITCH].FeedForward = 60;
+        //PID YAW
+        PID[PIDYAW].ProportionalVector = 85;
+        PID[PIDYAW].IntegratorVector = 45;
+        PID[PIDYAW].DerivativeVector = 0;
+        PID[PIDYAW].FeedForward = 60;
+        //PID DO MODO AUTO-NIVEL
+        PID[PIDAUTOLEVEL].ProportionalVector = 20;
+        PID[PIDAUTOLEVEL].IntegratorVector = 15;
+    }
+    else if (GetFrameStateOfAirPlane())
+    {
+        //AEROS
+        //PID ROLL
+        PID[PIDROLL].ProportionalVector = 5;
+        PID[PIDROLL].IntegratorVector = 7;
+        PID[PIDROLL].DerivativeVector = 0;
+        PID[PIDROLL].FeedForward = 50;
+        //PID PITCH
+        PID[PIDPITCH].ProportionalVector = 5;
+        PID[PIDPITCH].IntegratorVector = 7;
+        PID[PIDPITCH].DerivativeVector = 0;
+        PID[PIDPITCH].FeedForward = 50;
+        //PID YAW
+        PID[PIDYAW].ProportionalVector = 6;
+        PID[PIDYAW].IntegratorVector = 10;
+        PID[PIDYAW].DerivativeVector = 0;
+        PID[PIDYAW].FeedForward = 60;
+        //PID DO MODO AUTO-NIVEL
+        PID[PIDAUTOLEVEL].ProportionalVector = 20;
+        PID[PIDAUTOLEVEL].IntegratorVector = 5;
+    }
     //PID PARA A RETENÇÃO DE ALTITUDE (ALTITUDE-HOLD)
     PID[PIDALTITUDE].ProportionalVector = 50;
     PID[PIDALTITUDE].IntegratorVector = 20;
@@ -68,8 +97,7 @@ void UpdateValuesOfPID()
         return;
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KP_ROLL_ADDR) != PID[PIDROLL].ProportionalVector) &&
-        (STORAGEMANAGER.Read_8Bits(KP_ROLL_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KP_ROLL_ADDR) != PID[PIDROLL].ProportionalVector)
     {
         PID[PIDROLL].ProportionalVector = STORAGEMANAGER.Read_8Bits(KP_ROLL_ADDR);
     }
@@ -79,8 +107,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, PID[PIDROLL].ProportionalVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KI_ROLL_ADDR) != PID[PIDROLL].IntegratorVector) &&
-        (STORAGEMANAGER.Read_8Bits(KI_ROLL_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KI_ROLL_ADDR) != PID[PIDROLL].IntegratorVector)
     {
         PID[PIDROLL].IntegratorVector = STORAGEMANAGER.Read_8Bits(KI_ROLL_ADDR);
     }
@@ -90,8 +117,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, PID[PIDROLL].IntegratorVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KD_ROLL_ADDR) != PID[PIDROLL].DerivativeVector) &&
-        (STORAGEMANAGER.Read_8Bits(KD_ROLL_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KD_ROLL_ADDR) != PID[PIDROLL].DerivativeVector)
     {
         PID[PIDROLL].DerivativeVector = STORAGEMANAGER.Read_8Bits(KD_ROLL_ADDR);
     }
@@ -101,8 +127,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, PID[PIDROLL].DerivativeVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR) != PID[PIDPITCH].ProportionalVector) &&
-        (STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR) != PID[PIDPITCH].ProportionalVector)
     {
         PID[PIDPITCH].ProportionalVector = STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR);
     }
@@ -112,8 +137,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, PID[PIDPITCH].ProportionalVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR) != PID[PIDPITCH].IntegratorVector) &&
-        (STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR) != PID[PIDPITCH].IntegratorVector)
     {
         PID[PIDPITCH].IntegratorVector = STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR);
     }
@@ -123,8 +147,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, PID[PIDPITCH].IntegratorVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KD_PITCH_ADDR) != PID[PIDPITCH].DerivativeVector) &&
-        (STORAGEMANAGER.Read_8Bits(KD_PITCH_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KD_PITCH_ADDR) != PID[PIDPITCH].DerivativeVector)
     {
         PID[PIDPITCH].DerivativeVector = STORAGEMANAGER.Read_8Bits(KD_PITCH_ADDR);
     }
@@ -134,8 +157,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, PID[PIDPITCH].DerivativeVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KP_YAW_ADDR) != PID[PIDYAW].ProportionalVector) &&
-        (STORAGEMANAGER.Read_8Bits(KP_YAW_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KP_YAW_ADDR) != PID[PIDYAW].ProportionalVector)
     {
         PID[PIDYAW].ProportionalVector = STORAGEMANAGER.Read_8Bits(KP_YAW_ADDR);
     }
@@ -145,8 +167,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, PID[PIDYAW].ProportionalVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KI_YAW_ADDR) != PID[PIDYAW].IntegratorVector) &&
-        (STORAGEMANAGER.Read_8Bits(KI_YAW_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KI_YAW_ADDR) != PID[PIDYAW].IntegratorVector)
     {
         PID[PIDYAW].IntegratorVector = STORAGEMANAGER.Read_8Bits(KI_YAW_ADDR);
     }
@@ -156,8 +177,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, PID[PIDYAW].IntegratorVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KD_YAW_ADDR) != PID[PIDYAW].DerivativeVector) &&
-        (STORAGEMANAGER.Read_8Bits(KD_YAW_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KD_YAW_ADDR) != PID[PIDYAW].DerivativeVector)
     {
         PID[PIDYAW].DerivativeVector = STORAGEMANAGER.Read_8Bits(KD_YAW_ADDR);
     }
@@ -167,8 +187,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, PID[PIDYAW].DerivativeVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR) != PID[PIDALTITUDE].ProportionalVector) &&
-        (STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR) != PID[PIDALTITUDE].ProportionalVector)
     {
         PID[PIDALTITUDE].ProportionalVector = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
     }
@@ -178,8 +197,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, PID[PIDALTITUDE].ProportionalVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR) != PID[PIDGPSPOSITION].ProportionalVector) &&
-        (STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR) != PID[PIDGPSPOSITION].ProportionalVector)
     {
         PID[PIDGPSPOSITION].ProportionalVector = STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR);
     }
@@ -189,8 +207,7 @@ void UpdateValuesOfPID()
         STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, PID[PIDGPSPOSITION].ProportionalVector);
     }
 
-    if ((STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR) != PID[PIDGPSPOSITION].IntegratorVector) &&
-        (STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR) != 0))
+    if (STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR) != PID[PIDGPSPOSITION].IntegratorVector)
     {
         PID[PIDGPSPOSITION].IntegratorVector = STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR);
     }

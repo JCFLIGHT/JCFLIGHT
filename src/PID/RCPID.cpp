@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "DYNAMICPID.h"
+#include "RCPID.h"
 #include "Common/VARIABLES.h"
 #include "IntelligentOrientationControl/IOCMODE.h"
 #include "TPA.h"
@@ -24,17 +24,20 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/CURVESRC.h"
 #include "MotorsControl/THRBOOST.h"
+#include "Filters/PT1.h"
+#include "Scheduler/SCHEDULER.h"
+#include "Build/BOARDDEFS.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
 
+PT1_Filter_Struct FixedWingTPAFilter;
+
 //DEBUG
 //#define PRINTLN_TPA
 
-uint8_t DynamicPIDCalced;
-uint8_t DynamicProportionalVector[2];
-uint8_t DynamicDerivativeVector[2];
+bool FixedWingTPAFilterInitalized = false;
 
 void GetRCDataConvertedAndApplyFilter()
 {
@@ -90,7 +93,7 @@ void GetRCDataConvertedAndApplyFilter()
   }
 }
 
-void PID_Dynamic()
+void RC_PID_Update()
 {
   //CONVERTE AS DATAS DOS RADIO E APLICA O FILTRO LPF
   GetRCDataConvertedAndApplyFilter();
@@ -98,30 +101,46 @@ void PID_Dynamic()
   //APLICA O BOOST NO THROTTLE PARA O MODO STABILIZE
   ApplyThrottleBoost();
 
+  if (GetFrameStateOfAirPlane() && (TPA_Parameters.FixedWingTauMS > 0))
+  {
+    if (!FixedWingTPAFilterInitalized)
+    {
+      FixedWingTPAFilter.RC = TPA_Parameters.FixedWingTauMS * 1e-3f;
+      FixedWingTPAFilter.State = AttitudeThrottleMin;
+      FixedWingTPAFilterInitalized = true;
+    }
+    int16_t FilteredThrottle = PT1FilterApply2(&FixedWingTPAFilter, RCController[THROTTLE], SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
+    if (FilteredThrottle != TPA_Parameters.PreviousThrottle)
+    {
+      TPA_Parameters.PreviousThrottle = FilteredThrottle;
+      TPA_Parameters.UpdateRequired = true;
+    }
+  }
+  else
+  {
+    if (RCController[THROTTLE] != TPA_Parameters.PreviousThrottle)
+    {
+      TPA_Parameters.PreviousThrottle = RCController[THROTTLE];
+      TPA_Parameters.UpdateRequired = true;
+    }
+  }
+
   //THROTTLE PID ATTENUATION
-  //A ATENUAÇÃO OCORRE APENAS NO PROPORCIONAL E NO DERIVATIVO
   //AJUSTE DINAMICO DE ACORDO COM O VALOR DO THROTTLE
-  if (GetFrameStateOfMultirotor()) //CONFIG PARA DRONES
+  if (TPA_Parameters.UpdateRequired)
   {
-    TPA_Parameters.CalcedValue = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
+    if (GetFrameStateOfMultirotor()) //CONFIG PARA DRONES
+    {
+      TPA_Parameters.CalcedValue = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
+    }
+    else if (GetFrameStateOfAirPlane()) //CONFIG PARA AEROS E ASA-FIXA
+    {
+      TPA_Parameters.CalcedValue = CalculateFixedWingTPAFactor(RCController[THROTTLE]);
+    }
+    TPA_Parameters.UpdateRequired = false;
+  }
 #if defined(PRINTLN_TPA)
-    PRINTF.SendToConsole(PSTR("TPACopter:%d\n"), TPA_Parameters.CalcedValue);
+  PRINTF.SendToConsole(PSTR("TPA:%d\n"), TPA_Parameters.CalcedValue);
 #endif
-  }
-  else //CONFIG PARA AEROS E ASA-FIXA
-  {
-    TPA_Parameters.CalcedValue = CalculateFixedWingTPAFactor(RCController[THROTTLE]);
-#if defined(PRINTLN_TPA)
-    PRINTF.SendToConsole(PSTR("TPAPlane:%d\n"), TPA_Parameters.CalcedValue);
-#endif
-  }
-  for (uint8_t RCIndexCount = 0; RCIndexCount < 2; RCIndexCount++)
-  {
-    uint16_t DynamicStored = MIN(ABS(RadioControllOutput[RCIndexCount] - MIDDLE_STICKS_PULSE), 500);
-    DynamicPIDCalced = 100 - (uint16_t)DynamicRollAndPitchRate[RCIndexCount] * DynamicStored / 500;
-    DynamicPIDCalced = (uint16_t)DynamicPIDCalced * TPA_Parameters.CalcedValue / 100;
-    DynamicProportionalVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].ProportionalVector * DynamicPIDCalced / 100;
-    DynamicDerivativeVector[RCIndexCount] = (uint16_t)PID[RCIndexCount].DerivativeVector * DynamicPIDCalced / 100;
-  }
   IOC_Mode_Update();
 }

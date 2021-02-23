@@ -33,7 +33,6 @@
 #include "Buzzer/BUZZER.h"
 #include "GPSNavigation/MULTIROTORNAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
-#include "IMU/GFORCE.h"
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "MemoryCheck/FREERAM.h"
@@ -46,6 +45,7 @@
 #include "Scheduler/SCHEDULER.h"
 #include "TaskSystem/TASKSYSTEM.h"
 #include "ParamsToGCS/CHECKSUM.h"
+#include "FrameStatus/FRAMESTATUS.h"
 
 GCSClass GCS;
 
@@ -1269,7 +1269,7 @@ void GCSClass::GCS_Request_Parameters()
     GCSParameters.SendCourseOverGround = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
 #endif
     GCSParameters.SendBearing = Target_Bearing;
-    GCSParameters.SendAccGForce = GetGForce() * 100;
+    GCSParameters.SendAccGForce = IMU.CalcedGForce;
     GCSParameters.SendAccImageBitMap = GetImageToGCS();
     GCSParameters.SendCompassRoll = IMU.CompassRead[ROLL];
     GCSParameters.SendCompassPitch = IMU.CompassRead[PITCH];
@@ -1943,19 +1943,37 @@ void GCSClass::Default_Medium_Configuration()
     STORAGEMANAGER.Write_16Bits(BI_GYRO_NOTCH_ADDR, 0);   //VOLTA O GYRONOTCH AO PADRÃO DE FABRICA
     STORAGEMANAGER.Write_8Bits(MOTCOMP_STATE_ADDR, 0);    //VOLTA O COMPENSATION SPEED AO PADRÃO DE FABRICA
     STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, 50);     //VOLTA O FILTRO LPF DOS SERVOS AO PADRÃO DE FABRICA
-    //VOLTA TODO O PID PARA O PADRÃO DE FABRICA
-    //PITCH
-    STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 35);
-    STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, 25);
-    STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 26);
-    //ROLL
-    STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 35);
-    STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 25);
-    STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 26);
-    //YAW
-    STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 69);
-    STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 50);
-    STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, 0);
+
+    if (GetFrameStateOfMultirotor())
+    {
+        //PITCH
+        STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 40);
+        STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, 30);
+        STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 23);
+        //ROLL
+        STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 40);
+        STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 30);
+        STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 23);
+        //YAW
+        STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 85);
+        STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 45);
+        STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, 0);
+    }
+    else if (GetFrameStateOfAirPlane())
+    {
+        //PITCH
+        STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 5);
+        STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, 7);
+        STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 0);
+        //ROLL
+        STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 5);
+        STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 7);
+        STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 0);
+        //YAW
+        STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 6);
+        STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 10);
+        STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, 0);
+    }
     //ALTITUDE-HOLD
     STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 50);
     //GPS-HOLD

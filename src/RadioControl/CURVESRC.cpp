@@ -76,6 +76,12 @@ int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo)
   return lrint((2500.0f + (float)RcExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
 }
 
+float RcControllerToAngle(int16_t RcControllerInput, int16_t MaxInclination)
+{
+  RcControllerInput = Constrain_Float(RcControllerInput, -500, 500);
+  return Map_Float((float)RcControllerInput, -500.0f, 500.0f, (float)-MaxInclination, (float)MaxInclination);
+}
+
 uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
 {
   if (CalcedDeflection > 999)

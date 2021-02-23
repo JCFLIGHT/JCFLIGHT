@@ -131,7 +131,7 @@ void InertialNavigationClass::Calculate_AccelerationXY()
       }
       float DeltaTime = Calculate_AccelerationXYTimer.ActualTime * 1e-6f;
       CorrectXYStateWithGPS(&DeltaTime);
-      UpdateXYState(&DeltaTime);
+      EstimationPredictXY(&DeltaTime);
       SaveXYPositionToHistory();
       return;
     }
@@ -158,15 +158,15 @@ void InertialNavigationClass::CorrectXYStateWithGPS(float *DeltaTime)
   INS.Position_EarthFrame[1] += PositionError[1] * StoredDeltaTime;
 }
 
-void InertialNavigationClass::UpdateXYState(float *DeltaTime)
+void InertialNavigationClass::EstimationPredictXY(float *DeltaTime)
 {
   float VelocityIncrease[2];
   VelocityIncrease[0] = INS.AccelerationEarthFrame_Filtered[0] * *DeltaTime;
   VelocityIncrease[1] = INS.AccelerationEarthFrame_Filtered[1] * *DeltaTime;
-  INS.Position_EarthFrame[0] += (INS.Velocity_EarthFrame[0] + VelocityIncrease[0] * 0.5f) * *DeltaTime;
-  INS.Position_EarthFrame[1] += (INS.Velocity_EarthFrame[1] + VelocityIncrease[1] * 0.5f) * *DeltaTime;
-  INS.Velocity_EarthFrame[0] += VelocityIncrease[0];
-  INS.Velocity_EarthFrame[1] += VelocityIncrease[1];
+  INS.Position_EarthFrame[0] += (INS.Velocity_EarthFrame[0] + VelocityIncrease[0] * 0.5f) * *DeltaTime; //POSIÇÃO FINAL X ESTIMADA PELO INS
+  INS.Position_EarthFrame[1] += (INS.Velocity_EarthFrame[1] + VelocityIncrease[1] * 0.5f) * *DeltaTime; //POSIÇÃO FINAL Y ESTIMADA PELO INS
+  INS.Velocity_EarthFrame[0] += VelocityIncrease[0];                                                    //VALOCIDADE FINAL X ESTIMADA PELO INS
+  INS.Velocity_EarthFrame[1] += VelocityIncrease[1];                                                    //VELOCIDADE FINAL Y ESTIMADA PELO INS
 }
 
 void InertialNavigationClass::SaveXYPositionToHistory()
@@ -211,7 +211,7 @@ void InertialNavigationClass::Calculate_AccelerationZ()
       }
       float DeltaTime = Calculate_AccelerationZTimer.ActualTime * 1e-6f;
       CorrectZStateWithBaro(&DeltaTime);
-      UpdateZState(&DeltaTime);
+      EstimationPredictZ(&DeltaTime);
       SaveZPositionToHistory();
       return;
     }
@@ -230,13 +230,13 @@ void InertialNavigationClass::CorrectZStateWithBaro(float *DeltaTime)
   INS.Position_EarthFrame[2] += PositionError * (0.66666666666666666666666666666667f * *DeltaTime);
 }
 
-void InertialNavigationClass::UpdateZState(float *DeltaTime)
+void InertialNavigationClass::EstimationPredictZ(float *DeltaTime)
 {
   float VelocityIncrease = INS.AccelerationEarthFrame_Filtered[2] * *DeltaTime;
   INS.Position_EarthFrame[2] += (INS.Velocity_EarthFrame[2] + VelocityIncrease * 0.5f) * *DeltaTime;
-  ALTITUDE.EstimatedAltitude = INS.Position_EarthFrame[2];
   INS.Velocity_EarthFrame[2] += VelocityIncrease;
-  ALTITUDE.EstimatedVariometer = INS.Velocity_EarthFrame[2];
+  ALTITUDE.EstimatedAltitude = INS.Position_EarthFrame[2];   //ALTITUDE FINAL ESTIMADA APÓS O INS
+  ALTITUDE.EstimatedVariometer = INS.Velocity_EarthFrame[2]; //VELOCIDADE VERTICAL(Z) FINAL ESTIMADA APÓS O INS
 }
 
 void InertialNavigationClass::SaveZPositionToHistory()

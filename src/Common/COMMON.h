@@ -34,7 +34,7 @@
 #include "Yaw/HEADINGHOLD.h"
 #include "GPS/GPSORIENTATION.h"
 #include "Scheduler/SCHEDULER.h"
-#include "PID/DYNAMICPID.h"
+#include "PID/RCPID.h"
 #include "Gimbal/GIMBAL.h"
 #include "PID/PIDXYZ.h"
 #include "LedRGB/LEDRGB.h"
@@ -78,3 +78,4 @@
 #include "ParamsToGCS/CHECKSUM.h"
 #include "Build/GENERALSETTINGS.h"
 #include "MachineMain/MACHINEINIT.h"
+#include "IMU/GFORCE.h"

@@ -37,7 +37,7 @@ void TPA_Initialization()
   TPA_Parameters.ThrottlePercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
 }
 
-uint8_t CalculateFixedWingTPAFactor(int16_t Throttle)
+float CalculateFixedWingTPAFactor(int16_t Throttle)
 {
   if (TPA_Parameters.ThrottlePercent != 0 && AttitudeThrottleMin < TPA_Parameters.BreakPointer)
   {
@@ -56,10 +56,10 @@ uint8_t CalculateFixedWingTPAFactor(int16_t Throttle)
   {
     TPA_Parameters.Factor = 1.0f;
   }
-  return TPA_Parameters.Factor * 100;
+  return TPA_Parameters.Factor;
 }
 
-uint8_t CalculateMultirotorTPAFactor(int16_t Throttle)
+float CalculateMultirotorTPAFactor(int16_t Throttle)
 {
   if (TPA_Parameters.ThrottlePercent == 0 || Throttle < TPA_Parameters.BreakPointer)
   {
@@ -75,5 +75,5 @@ uint8_t CalculateMultirotorTPAFactor(int16_t Throttle)
   {
     TPA_Parameters.Factor = (100 - TPA_Parameters.ThrottlePercent) / 100.0f;
   }
-  return TPA_Parameters.Factor * 100;
+  return TPA_Parameters.Factor;
 }

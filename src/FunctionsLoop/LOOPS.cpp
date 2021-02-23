@@ -57,6 +57,7 @@ void Fast_Medium_Loop()
         CrashCheck();
         PARACHUTE.Manual_Detect_Channel();
         PARACHUTE.Manual_Do_Now();
+        IMU_GForce_Update();
         GCS.Serial_Parse_Protocol();
 }
 
@@ -93,12 +94,12 @@ void Integral_Loop()
         Acc_ReadBufferData();
         Gyro_ReadBufferData();
         AHRS.Update(ThisDeltaTime);
-        PID_Dynamic();
+        RC_PID_Update();
         GPS_Orientation_Update();
         WayPointRun();
         AUTOLAUNCH.Update();
         AirSpeed_Apply_Auto_Throttle_Control();
-        PIDXYZ.Update(ThisTaskTimeUs);
+        PIDXYZ.Update(ThisDeltaTime);
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         ServoAutoTrimRun();
         ApplyMixingForMotorsAndServos(ThisDeltaTime);

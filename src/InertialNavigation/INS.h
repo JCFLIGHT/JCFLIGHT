@@ -37,11 +37,11 @@ private:
   int32_t HistoryZPosition[10];
   void UpdateAccelerationEarthFrame_Filtered(uint8_t ArrayCount);
   void CorrectXYStateWithGPS(float *DeltaTime);
-  void UpdateXYState(float *DeltaTime);
+  void EstimationPredictXY(float *DeltaTime);
   void SaveXYPositionToHistory();
   void ResetXYState();
   void CorrectZStateWithBaro(float *DeltaTime);
-  void UpdateZState(float *DeltaTime);
+  void EstimationPredictZ(float *DeltaTime);
   void SaveZPositionToHistory();
   void ResetZState();
 };

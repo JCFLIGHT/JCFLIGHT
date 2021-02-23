@@ -17,10 +17,9 @@
 
 #include "PIDXYZ.h"
 #include "Common/VARIABLES.h"
-#include "DYNAMICPID.h"
+#include "RCPID.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Math/AVRLOWER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
@@ -29,27 +28,36 @@
 #include "Yaw/HEADINGHOLD.h"
 #include "RadioControl/CURVESRC.h"
 #include "Scheduler/SCHEDULER.h"
+#include "Filters/BIQUADFILTER.h"
 #include "Filters/PT1.h"
 #include "AirSpeed/AIRSPEED.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "RadioControl/RCSTATES.h"
 #include "MotorsControl/THRCLIPPING.h"
+#include "TPA.h"
+#include "Scheduler/SCHEDULER.h"
+#include "Build/BOARDDEFS.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
 
 PIDXYZClass PIDXYZ;
 
-PT1_Filter_Struct DerivativeRollFilter;
-PT1_Filter_Struct DerivativePitchFilter;
+static BiquadFilter_Struct Derivative_Roll_Smooth;
+static BiquadFilter_Struct Derivative_Pitch_Smooth;
+static BiquadFilter_Struct ControlDerivative_Roll_Smooth;
+static BiquadFilter_Struct ControlDerivative_Pitch_Smooth;
+static BiquadFilter_Struct ControlDerivative_Yaw_Smooth;
+PT1_Filter_Struct Angle_Smooth_Roll;
+PT1_Filter_Struct Angle_Smooth_Pitch;
 
 //STABILIZE PARA MULTIROTORES
 #define STAB_COPTER_PITCH_ANGLE_MAX 30 //GRAUS
 #define STAB_COPTER_ROLL_ANGLE_MAX 30  //GRAUS
 
 //SPORT PARA MULTIROTORES
-#define SPORT_PITCH_ANGLE_MAX 40 //GRAUS
-#define SPORT_ROLL_ANGLE_MAX 40  //GRAUS
+#define ATTACK_COPTER_PITCH_ANGLE_MAX 40 //GRAUS
+#define ATTACK_COPTER_ROLL_ANGLE_MAX 40  //GRAUS
 
 //STABILIZE PARA AEROS
 #define STAB_PLANE_PITCH_ANGLE_MAX 35 //GRAUS
@@ -58,286 +66,457 @@ PT1_Filter_Struct DerivativePitchFilter;
 //RATE MAXIMO DE SAÍDA DO PID YAW PARA AEROS E ASA-FIXA
 #define YAW_RATE_MAX_FOR_PLANE 36 //GRAUS
 
-//DPS MAXIMO NO GYRO (PITCH E ROLL)
-#define MAX_GYRO_SATURATION 640
+//SAÍDA MAXIMA DE PITCH E ROLL
+#define MAX_PID_SUM_LIMIT 500
+
+//SAÍDA MAXIMA DO YAW
+#define MAX_YAW_PID_SUM_LIMIT 350
+
+//FREQUENCIA DE CORTE DO LPF DO kCD
+#define CONTROL_DERIVATIVE_CUTOFF 30 //Hz
 
 //MIGRAR ESSE PARAMETRO PARA A LISTA COMPLETA DE PARAMETROS
 int16_t ReferenceAirSpeed = 1000; //VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 
+int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO
+
+float FixedWingIntegralTermLimitOnStickPosition = 0.5f; //AJUSTAVEL PELO USUARIO
+
+float ErrorGyroIntegral[3];
+float ErrorGyroIntegralLimit[3];
+
 void PIDXYZClass::DerivativeLPF_Update()
 {
   Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
+  BIQUADFILTER.Settings(&Derivative_Roll_Smooth, Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
 }
 
-void PIDXYZClass::Update(int32_t DeltaTimeUs)
+void PIDXYZClass::Update(float DeltaTime)
 {
   CalcedRateTargetRoll = RCControllerToRate(RCController[ROLL], RCRate);
   CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
+  CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], RCRate);
+
   if (GetSafeStateOfHeadingHold())
   {
-    CalcedRateTargetYaw = GetHeadingHoldValue(DeltaTimeUs);
+    CalcedRateTargetYaw = GetHeadingHoldValue(DeltaTime);
   }
   else
   {
-    CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], RCRate);
     UpdateStateOfHeadingHold();
   }
-  Controll_Roll(CalcedRateTargetRoll, DeltaTimeUs);
-  Controll_Pitch(CalcedRateTargetPitch, DeltaTimeUs);
-  Controll_Yaw(CalcedRateTargetYaw, DeltaTimeUs);
-  Reset_Integral_Accumulators();
+
+  if (Do_Stabilize_Mode)
+  {
+    CalcedRateTargetRoll = PIDLevelRoll(DeltaTime);
+    CalcedRateTargetPitch = PIDLevelPitch(DeltaTime);
+  }
+
+  CalcedRateTargetYaw = PIDXYZ.GetNewYawControllerForPlane(CalcedRateTargetYaw);
+
+  if (GetFrameStateOfMultirotor())
+  {
+    PIDApplyMulticopterRateControllerRoll(DeltaTime);
+    PIDApplyMulticopterRateControllerPitch(DeltaTime);
+    PIDApplyMulticopterRateControllerYaw(DeltaTime);
+  }
+  else if (GetFrameStateOfAirPlane())
+  {
+    PIDApplyFixedWingRateControllerRoll(DeltaTime);
+    PIDApplyFixedWingRateControllerPitch(DeltaTime);
+    PIDApplyFixedWingRateControllerYaw(DeltaTime);
+  }
+
+  if (GetActualThrottleStatus(THROTTLE_LOW) ||
+      !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) /*|| !IS_FLIGHT_MODE_ACTIVE(PRIMARY_ARM_DISARM)*/)
+  {
+    Reset_Integral_Accumulators();
+  }
 }
 
-int16_t PIDXYZClass::AngleTarget(int16_t RcControllerInput, uint8_t AttitudeAngle, int16_t MaxInclination)
+float PIDXYZClass::ProportionalTermProcess(uint8_t kP, float RateError)
 {
-  return Constrain_16Bits(RcControllerInput + GPS_Angle[AttitudeAngle], -ConvertDegreesToDecidegrees(MaxInclination), ConvertDegreesToDecidegrees(MaxInclination)) - ATTITUDE.AngleOut[AttitudeAngle];
-}
-
-int32_t PIDXYZClass::ProportionalTermProcess(int16_t RcRateError, uint8_t kP)
-{
-  int32_t NewPTermCalced = Multiplication32Bits(RcRateError, kP);
+  const float NewPTermCalced = (kP / 31.0f * TPA_Parameters.CalcedValue) * RateError;
   return NewPTermCalced;
 }
 
-int32_t PIDXYZClass::DerivativeTermProcessRoll(int16_t ActualGyro, int16_t LastGyro, int16_t DynamicDerivative, int32_t DeltaTimeUs)
+float PIDXYZClass::DerivativeTermProcessRoll(float GyroDiffInput)
 {
-  int32_t NewDTermCalced = ActualGyro - LastGyro;
+  float NewDTermCalced;
 
   if (PIDXYZ.Get_LPF_Derivative_Value > 0)
   {
-#ifndef __AVR_ATmega2560__
-    NewDTermCalced = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(NewDTermCalced, DynamicDerivative) >> 5, Get_LPF_Derivative_Value, DeltaTimeUs * 1e-6f);
-#else
-    NewDTermCalced = PT1FilterApply(&DerivativeRollFilter, Multiplication32Bits(NewDTermCalced, DynamicDerivative) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
-#endif
+    NewDTermCalced = BIQUADFILTER.FilterApplyAndGet(&Derivative_Roll_Smooth, GyroDiffInput);
   }
   else
   {
-    NewDTermCalced = Multiplication32Bits(NewDTermCalced, DynamicDerivative) >> 5;
+    NewDTermCalced = GyroDiffInput;
   }
-
   return NewDTermCalced;
 }
 
-int32_t PIDXYZClass::DerivativeTermProcessPitch(int16_t ActualGyro, int16_t LastGyro, int16_t DynamicDerivative, int32_t DeltaTimeUs)
+float PIDXYZClass::DerivativeTermProcessPitch(float GyroDiffInput)
 {
-  int32_t NewDTermCalced = ActualGyro - LastGyro;
+  float NewDTermCalced;
 
   if (PIDXYZ.Get_LPF_Derivative_Value > 0)
   {
-#ifndef __AVR_ATmega2560__
-    NewDTermCalced = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(NewDTermCalced, DynamicDerivative) >> 5, Get_LPF_Derivative_Value, DeltaTimeUs * 1e-6f);
-#else
-    NewDTermCalced = PT1FilterApply(&DerivativePitchFilter, Multiplication32Bits(NewDTermCalced, DynamicDerivative) >> 5, Get_LPF_Derivative_Value, 1.0f / 1000);
-#endif
+    NewDTermCalced = BIQUADFILTER.FilterApplyAndGet(&Derivative_Pitch_Smooth, GyroDiffInput);
   }
   else
   {
-    NewDTermCalced = Multiplication32Bits(NewDTermCalced, DynamicDerivative) >> 5;
+    NewDTermCalced = GyroDiffInput;
   }
-
   return NewDTermCalced;
 }
 
-int16_t PIDXYZClass::ApplyIntegralTermLimiting(int16_t IntegratorTerminate)
+float PIDXYZClass::ApplyIntegralTermRelax(float CurrentPIDSetpoint, float IntegralTermErrorRate)
 {
-  static int16_t IntegratorTerminateLimit = 0;
-  if (MixerIsOutputSaturated())
+  float NewIntegralCalced = IntegralTermErrorRate;
+  //CODIGO
+  return NewIntegralCalced;
+}
+
+float PIDXYZClass::ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral)
+{
+  if ((MixerIsOutputSaturated() && GetFrameStateOfMultirotor()) ||
+      (GetFrameStateOfAirPlane() && FixedWingIntegralTermLimitActive(Axis)))
   {
-    IntegratorTerminate = Constrain_16Bits(IntegratorTerminate, -IntegratorTerminateLimit, IntegratorTerminateLimit);
+    ErrorGyroIntegral = Constrain_Float(ErrorGyroIntegral, -ErrorGyroIntegralLimit[Axis], ErrorGyroIntegralLimit[Axis]);
   }
   else
   {
-    IntegratorTerminateLimit = ABS(IntegratorTerminate);
+    ErrorGyroIntegralLimit[Axis] = ABS(ErrorGyroIntegral);
   }
-  return IntegratorTerminate;
+  return ErrorGyroIntegral;
 }
 
-bool PIDXYZClass::GetGyroSaturation(uint8_t GyroAxis, int16_t SaturationValue)
+float PIDXYZClass::PIDLevelRoll(float DeltaTime)
 {
-  return (ABS(IMU.GyroscopeRead[GyroAxis]) > SaturationValue);
-}
+  float RcControllerAngle = 0;
 
-void PIDXYZClass::Controll_Roll(int16_t RateTargetInput, int32_t DeltaTimeUs)
-{
-  int16_t RadioControlToPID;
-  int16_t ProportionalTerminate = 0;
-  int16_t DerivativeTerminate;
-  static int16_t PIDError;
-  static int16_t MaxMinAngle;
-  static int16_t IntegratorTerminate = 0;
-  static int16_t ProportionalTerminateLevel;
-  static int16_t IntegratorTerminateLevel;
-  static int16_t LastValueOfGyro = 0;
-  RadioControlToPID = RateTargetInput << 1;
-  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[ROLL]) * DeltaTimeUs) >> 12);
-  ProportionalTerminate = ProportionalTermProcess(RadioControlToPID, PID[PIDROLL].ProportionalVector) >> 6;
-  IntegralGyroError[ROLL] = Constrain_16Bits(IntegralGyroError[ROLL] + PIDError, -16000, +16000);
-
-  if (GetGyroSaturation(ROLL, MAX_GYRO_SATURATION))
+  if (GetFrameStateOfMultirotor())
   {
-    IntegralGyroError[ROLL] = 0;
-  }
-
-  IntegratorTerminate = (IntegralGyroError[ROLL] >> 7) * PID[PIDROLL].IntegratorVector >> 6;
-  IntegratorTerminate = ApplyIntegralTermLimiting(IntegratorTerminate);
-
-  if (Do_Stabilize_Mode)
-  {
-    if (GetFrameStateOfMultirotor())
+    if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
     {
-      if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
-      {
-        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, SPORT_ROLL_ANGLE_MAX);
-      }
-      else
-      {
-        MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, STAB_COPTER_ROLL_ANGLE_MAX);
-      }
+      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(ATTACK_COPTER_ROLL_ANGLE_MAX));
     }
     else
     {
-      MaxMinAngle = AngleTarget(CalcedRateTargetRoll, ROLL, STAB_PLANE_ROLL_ANGLE_MAX);
+      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(STAB_COPTER_ROLL_ANGLE_MAX));
     }
-    IntegralAccError[ROLL] = Constrain_16Bits(IntegralAccError[ROLL] + ((int16_t)(((int32_t)MaxMinAngle * DeltaTimeUs) >> 12)), -10000, +10000);
-    ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
-    int16_t Limit_Proportional_X = PID[PIDAUTOLEVEL].DerivativeVector * 5;
-    ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_X, +Limit_Proportional_X);
-    IntegratorTerminateLevel = Multiplication32Bits(IntegralAccError[ROLL], PID[PIDAUTOLEVEL].IntegratorVector) >> 12;
-    IntegratorTerminate = IntegratorTerminateLevel;
-    ProportionalTerminate = ProportionalTerminateLevel;
+  }
+  else
+  {
+    RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(STAB_PLANE_ROLL_ANGLE_MAX));
   }
 
-  ProportionalTerminate -= Multiplication32Bits(IMU.GyroscopeRead[ROLL], DynamicProportionalVector[ROLL]) >> 6;
-  DerivativeTerminate = DerivativeTermProcessRoll(IMU.GyroscopeRead[ROLL], LastValueOfGyro, DynamicDerivativeVector[ROLL], DeltaTimeUs);
-  LastValueOfGyro = IMU.GyroscopeRead[ROLL];
-  PIDControllerApply[ROLL] = ProportionalTerminate + IntegratorTerminate - DerivativeTerminate;
+  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
+
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (PID[PIDAUTOLEVEL].ProportionalVector / 6.56f), -500, 500);
+
+  if (PID[PIDAUTOLEVEL].IntegratorVector > 0)
+  {
+#ifndef __AVR_ATmega2560__
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, PID[PIDAUTOLEVEL].IntegratorVector, DeltaTime);
+#else
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, PID[PIDAUTOLEVEL].IntegratorVector, 1.0f / 1000.0f);
+#endif
+  }
+  return AngleRateTarget;
 }
 
-void PIDXYZClass::Controll_Pitch(int16_t RateTargetInput, int32_t DeltaTimeUs)
+float PIDXYZClass::PIDLevelPitch(float DeltaTime)
 {
-  int16_t RadioControlToPID;
-  int16_t ProportionalTerminate = 0;
-  int16_t DerivativeTerminate;
-  static int16_t PIDError;
-  static int16_t MaxMinAngle;
-  static int16_t IntegratorTerminate = 0;
-  static int16_t ProportionalTerminateLevel;
-  static int16_t IntegratorTerminateLevel;
-  static int16_t LastValueOfGyro = 0;
-  RadioControlToPID = RateTargetInput << 1;
-  PIDError = (int16_t)(((int32_t)(RadioControlToPID - IMU.GyroscopeRead[PITCH]) * DeltaTimeUs) >> 12);
-  ProportionalTerminate = ProportionalTermProcess(RadioControlToPID, PID[PIDPITCH].ProportionalVector) >> 6;
-  IntegralGyroError[PITCH] = Constrain_16Bits(IntegralGyroError[PITCH] + PIDError, -16000, +16000);
+  float RcControllerAngle = 0;
 
-  if (GetGyroSaturation(PITCH, MAX_GYRO_SATURATION))
+  if (GetFrameStateOfMultirotor())
   {
-    IntegralGyroError[PITCH] = 0;
-  }
-
-  IntegratorTerminate = (IntegralGyroError[PITCH] >> 7) * PID[PIDPITCH].IntegratorVector >> 6;
-  IntegratorTerminate = ApplyIntegralTermLimiting(IntegratorTerminate);
-
-  if (Do_Stabilize_Mode)
-  {
-    if (GetFrameStateOfMultirotor())
+    if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
     {
-      if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
-      {
-        MaxMinAngle = AngleTarget(CalcedRateTargetPitch, PITCH, SPORT_PITCH_ANGLE_MAX);
-      }
-      else
-      {
-        MaxMinAngle = AngleTarget(CalcedRateTargetPitch, PITCH, STAB_COPTER_PITCH_ANGLE_MAX);
-      }
+      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(ATTACK_COPTER_PITCH_ANGLE_MAX));
     }
     else
     {
-      MaxMinAngle = AngleTarget(CalcedRateTargetPitch, PITCH, STAB_PLANE_PITCH_ANGLE_MAX);
+      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(STAB_COPTER_PITCH_ANGLE_MAX));
     }
-    IntegralAccError[PITCH] = Constrain_16Bits(IntegralAccError[PITCH] + ((int16_t)(((int32_t)MaxMinAngle * DeltaTimeUs) >> 12)), -10000, +10000);
-    ProportionalTerminateLevel = Multiplication32Bits(MaxMinAngle, PID[PIDAUTOLEVEL].ProportionalVector) >> 7;
-    int16_t Limit_Proportional_Y = PID[PIDAUTOLEVEL].DerivativeVector * 5;
-    ProportionalTerminateLevel = Constrain_16Bits(ProportionalTerminateLevel, -Limit_Proportional_Y, +Limit_Proportional_Y);
-    IntegratorTerminateLevel = Multiplication32Bits(IntegralAccError[PITCH], PID[PIDAUTOLEVEL].IntegratorVector) >> 12;
-    IntegratorTerminate = IntegratorTerminateLevel;
-    ProportionalTerminate = ProportionalTerminateLevel;
+  }
+  else
+  {
+    RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(STAB_PLANE_PITCH_ANGLE_MAX));
   }
 
-  ProportionalTerminate -= Multiplication32Bits(IMU.GyroscopeRead[PITCH], DynamicProportionalVector[PITCH]) >> 6;
-  DerivativeTerminate = DerivativeTermProcessPitch(IMU.GyroscopeRead[PITCH], LastValueOfGyro, DynamicDerivativeVector[PITCH], DeltaTimeUs);
-  LastValueOfGyro = IMU.GyroscopeRead[PITCH];
-  PIDControllerApply[PITCH] = ProportionalTerminate + IntegratorTerminate - DerivativeTerminate;
+  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
+
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (PID[PIDAUTOLEVEL].ProportionalVector / 6.56f), -500, 500);
+
+  if (PID[PIDAUTOLEVEL].IntegratorVector > 0)
+  {
+#ifndef __AVR_ATmega2560__
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, PID[PIDAUTOLEVEL].IntegratorVector, DeltaTime);
+#else
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, PID[PIDAUTOLEVEL].IntegratorVector, 1.0f / 1000.0f);
+#endif
+  }
+  return AngleRateTarget;
 }
 
-void PIDXYZClass::Controll_Yaw(int16_t RateTargetInput, int32_t DeltaTimeUs)
+void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
 {
-  static uint8_t IntegralGyroMax = 250;
-  int16_t RadioControlToPID;
-  int16_t PIDError;
-  int16_t DeltaYawSmallFilter;
-  int16_t ProportionalTerminate = 0;
-  int16_t IntegratorTerminate = 0;
-  int16_t DerivativeTerminate = 0;
-  static int16_t LastGyroYawValue = 0;
-  static int16_t DeltaYawSmallFilterStored = 0;
-  if (GetFrameStateOfAirPlane())
+  static float PreviousRateTarget;
+  static float PreviousRateGyro;
+
+  const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[ROLL];
+  const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(PID[PIDROLL].ProportionalVector, RateError);
+
+  const float RateTargetDelta = PIDXYZ.CalcedRateTargetRoll - PreviousRateTarget;
+  const float RateTargetDeltaFiltered = BIQUADFILTER.FilterApplyAndGet(&ControlDerivative_Roll_Smooth, RateTargetDelta);
+
+  float NewControlDerivativeTerm;
+  float NewDerivativeTerm;
+  float NewControlTracking;
+
+  if (Do_Stabilize_Mode)
   {
-    IntegralGyroMax = 200;
+    NewControlDerivativeTerm = 0.0f;
   }
   else
   {
-    IntegralGyroMax = 250;
+    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((PID[PIDROLL].FeedForward / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
   }
-  RadioControlToPID = Multiplication32Bits(RateTargetInput, (2 * YawRate + 30)) >> 5;
-  if (GetFrameStateOfAirPlane())
+
+  float GyroDifference = PreviousRateGyro - IMU.GyroscopeRead[ROLL];
+
+  GyroDifference = PIDXYZ.DerivativeTermProcessRoll(GyroDifference);
+
+  NewDerivativeTerm = GyroDifference * ((PID[PIDROLL].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * 1;
+
+  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[ROLL] + NewControlDerivativeTerm;
+  const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+
+  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelax(PIDXYZ.CalcedRateTargetRoll, RateError);
+  float AntiWindUpScaler = 1;
+
+  if ((PID[PIDROLL].ProportionalVector != 0) && (PID[PIDROLL].IntegratorVector != 0))
   {
-    PIDError = TurnControllerForAirPlane(RadioControlToPID);
+    NewControlTracking = 2.0f / (((PID[PIDROLL].ProportionalVector / 31.0f * TPA_Parameters.CalcedValue) /
+                                  (PID[PIDROLL].IntegratorVector / 4.0f * TPA_Parameters.CalcedValue)) +
+                                 ((PID[PIDROLL].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) /
+                                  (PID[PIDROLL].ProportionalVector / 31.0f * TPA_Parameters.CalcedValue)));
   }
   else
   {
-    PIDError = RadioControlToPID - IMU.GyroscopeRead[YAW];
+    NewControlTracking = 0;
   }
-  if (!IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && GetFrameStateOfAirPlane()) //MODO MANUAL DESATIVADO E PERFIL DE AERO?SIM...
+
+  ErrorGyroIntegral[ROLL] += (IntegralTermErrorRate * (PID[PIDROLL].IntegratorVector / 4.0f * TPA_Parameters.CalcedValue) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
+
+  ErrorGyroIntegral[ROLL] = PIDXYZ.ApplyIntegralTermLimiting(ROLL, ErrorGyroIntegral[ROLL]);
+
+  PIDControllerApply[ROLL] = NewOutputLimited;
+
+  PreviousRateTarget = PIDXYZ.CalcedRateTargetRoll;
+  PreviousRateGyro = IMU.GyroscopeRead[ROLL];
+}
+
+void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
+{
+  static float PreviousRateTarget;
+  static float PreviousRateGyro;
+
+  const float RateError = PIDXYZ.CalcedRateTargetPitch - IMU.GyroscopeRead[PITCH];
+  const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(PID[PIDPITCH].ProportionalVector, RateError);
+
+  const float RateTargetDelta = PIDXYZ.CalcedRateTargetPitch - PreviousRateTarget;
+  const float RateTargetDeltaFiltered = BIQUADFILTER.FilterApplyAndGet(&ControlDerivative_Pitch_Smooth, RateTargetDelta);
+
+  float NewControlDerivativeTerm;
+  float NewDerivativeTerm;
+  float NewControlTracking;
+
+  if (Do_Stabilize_Mode)
   {
-    DeltaYawSmallFilter = IMU.GyroscopeRead[YAW] - LastGyroYawValue;
-    DeltaYawSmallFilterStored = (DeltaYawSmallFilterStored >> 1) + (DeltaYawSmallFilter >> 1);
-    LastGyroYawValue = IMU.GyroscopeRead[YAW];
-    DerivativeTerminate = Multiplication32Bits(DeltaYawSmallFilterStored, PID[PIDYAW].DerivativeVector) >> 6;
-    DerivativeTerminate = Constrain_16Bits(DerivativeTerminate, -150, 150);
-  }
-  IntegralGyroError_Yaw += Multiplication32Bits((int16_t)(((int32_t)PIDError * DeltaTimeUs) >> 12), PID[PIDYAW].IntegratorVector);
-  if (GetFrameStateOfAirPlane())
-  {
-    IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, -(((int32_t)IntegralGyroMax) << 13), (((int32_t)IntegralGyroMax) << 13));
+    NewControlDerivativeTerm = 0.0f;
   }
   else
   {
-    IntegralGyroError_Yaw = Constrain_32Bits(IntegralGyroError_Yaw, -268435454, 268435454);
+    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((PID[PIDPITCH].FeedForward / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
   }
-  if (ABS(RadioControlToPID) > 50)
+
+  float GyroDifference = PreviousRateGyro - IMU.GyroscopeRead[PITCH];
+
+  GyroDifference = PIDXYZ.DerivativeTermProcessPitch(GyroDifference);
+
+  NewDerivativeTerm = GyroDifference * ((PID[PIDPITCH].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * 1;
+
+  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[PITCH] + NewControlDerivativeTerm;
+  const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+
+  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelax(PIDXYZ.CalcedRateTargetPitch, RateError);
+  float AntiWindUpScaler = 1;
+
+  if ((PID[PIDPITCH].ProportionalVector != 0) && (PID[PIDPITCH].IntegratorVector != 0))
   {
-    IntegralGyroError_Yaw = 0;
-  }
-  ProportionalTerminate = Multiplication32Bits(PIDError, PID[PIDYAW].ProportionalVector) >> 6;
-  int16_t Limit_Proportional_Z = 300 - PID[PIDYAW].DerivativeVector;
-  ProportionalTerminate = Constrain_16Bits(ProportionalTerminate, -Limit_Proportional_Z, +Limit_Proportional_Z);
-  if (GetFrameStateOfAirPlane())
-  {
-    IntegratorTerminate = constrain((int16_t)(IntegralGyroError_Yaw >> 13), -IntegralGyroMax, +IntegralGyroMax);
+    NewControlTracking = 2.0f / (((PID[PIDPITCH].ProportionalVector / 31.0f * TPA_Parameters.CalcedValue) /
+                                  (PID[PIDPITCH].IntegratorVector / 4.0f * TPA_Parameters.CalcedValue)) +
+                                 ((PID[PIDPITCH].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) /
+                                  (PID[PIDPITCH].ProportionalVector / 31.0f * TPA_Parameters.CalcedValue)));
   }
   else
   {
-    IntegratorTerminate = (IntegralGyroError_Yaw >> 13);
+    NewControlTracking = 0;
   }
-  if (GetFrameStateOfAirPlane())
+
+  ErrorGyroIntegral[PITCH] += (IntegralTermErrorRate * (PID[PIDPITCH].IntegratorVector / 4.0f * TPA_Parameters.CalcedValue) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
+
+  ErrorGyroIntegral[PITCH] = PIDXYZ.ApplyIntegralTermLimiting(PITCH, ErrorGyroIntegral[PITCH]);
+
+  PIDControllerApply[PITCH] = NewOutputLimited;
+
+  PreviousRateTarget = PIDXYZ.CalcedRateTargetPitch;
+  PreviousRateGyro = IMU.GyroscopeRead[PITCH];
+}
+
+void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
+{
+  static float PreviousRateTarget;
+  static float PreviousRateGyro;
+
+  const float RateError = PIDXYZ.CalcedRateTargetYaw - IMU.GyroscopeRead[YAW];
+  const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(PID[YAW].ProportionalVector, RateError);
+
+  const float RateTargetDelta = PIDXYZ.CalcedRateTargetYaw - PreviousRateTarget;
+  const float RateTargetDeltaFiltered = BIQUADFILTER.FilterApplyAndGet(&ControlDerivative_Yaw_Smooth, RateTargetDelta);
+
+  float NewControlDerivativeTerm;
+  float NewDerivativeTerm;
+  float NewControlTracking;
+
+  if (Do_Stabilize_Mode)
   {
-    PIDControllerApply[YAW] = Constrain_16Bits(ProportionalTerminate + IntegratorTerminate - DerivativeTerminate, -YAW_RATE_MAX_FOR_PLANE * 10, +YAW_RATE_MAX_FOR_PLANE * 10);
+    NewControlDerivativeTerm = 0.0f;
   }
   else
   {
-    PIDControllerApply[YAW] = ProportionalTerminate + IntegratorTerminate;
+    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((PID[PIDYAW].FeedForward / 7270.0f * 1.0f) / DeltaTime);
   }
+
+  if (PID[PIDYAW].DerivativeVector == 0)
+  {
+    NewDerivativeTerm = 0;
+  }
+  else
+  {
+    float GyroDifference = PreviousRateGyro - IMU.GyroscopeRead[YAW];
+
+    //GyroDifference = PIDXYZ.DerivativeTermProcessYaw(GyroDifference, DeltaTime);
+
+    NewDerivativeTerm = GyroDifference * ((PID[PIDYAW].DerivativeVector / 1905.0f * 1.0f) / DeltaTime) * 1;
+  }
+
+  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[YAW] + NewControlDerivativeTerm;
+  const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_YAW_PID_SUM_LIMIT, +MAX_YAW_PID_SUM_LIMIT);
+
+  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelax(PIDXYZ.CalcedRateTargetYaw, RateError);
+  float AntiWindUpScaler = 1;
+
+  if ((PID[PIDYAW].ProportionalVector != 0) && (PID[PIDYAW].IntegratorVector != 0))
+  {
+    NewControlTracking = 2.0f / (((PID[PIDYAW].ProportionalVector / 31.0f * 1.0f) /
+                                  (PID[PIDYAW].IntegratorVector / 4.0f * 1.0f)) +
+                                 ((PID[PIDYAW].DerivativeVector / 1905.0f * 1.0f) /
+                                  (PID[PIDYAW].ProportionalVector / 31.0f * 1.0f)));
+  }
+  else
+  {
+    NewControlTracking = 0;
+  }
+
+  ErrorGyroIntegral[YAW] += (IntegralTermErrorRate * (PID[PIDYAW].IntegratorVector / 4.0f * 1.0f) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
+
+  ErrorGyroIntegral[YAW] = PIDXYZ.ApplyIntegralTermLimiting(YAW, ErrorGyroIntegral[YAW]);
+
+  PIDControllerApply[YAW] = NewOutputLimited;
+
+  PreviousRateTarget = PIDXYZ.CalcedRateTargetYaw;
+  PreviousRateGyro = IMU.GyroscopeRead[YAW];
+}
+
+void PIDXYZClass::PIDApplyFixedWingRateControllerRoll(float DeltaTime)
+{
+  const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[ROLL];
+  const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(PID[PIDROLL].ProportionalVector, RateError);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (PID[PIDROLL].FeedForward / 31.0f * TPA_Parameters.CalcedValue);
+
+  ErrorGyroIntegral[ROLL] += RateError * (PID[PIDROLL].IntegratorVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
+
+  ErrorGyroIntegral[ROLL] = PIDXYZ.ApplyIntegralTermLimiting(ROLL, ErrorGyroIntegral[ROLL]);
+
+  if (FixedWingIntegralTermThrowLimit != 0)
+  {
+    ErrorGyroIntegral[ROLL] = Constrain_Float(ErrorGyroIntegral[ROLL], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
+  }
+
+  PIDControllerApply[ROLL] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[ROLL], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+}
+
+void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
+{
+  const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[PITCH];
+  const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(PID[PIDPITCH].ProportionalVector, RateError);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (PID[PIDPITCH].FeedForward / 31.0f * TPA_Parameters.CalcedValue);
+
+  ErrorGyroIntegral[PITCH] += RateError * (PID[PIDPITCH].IntegratorVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
+
+  ErrorGyroIntegral[PITCH] = PIDXYZ.ApplyIntegralTermLimiting(PITCH, ErrorGyroIntegral[PITCH]);
+
+  if (FixedWingIntegralTermThrowLimit != 0)
+  {
+    ErrorGyroIntegral[PITCH] = Constrain_Float(ErrorGyroIntegral[PITCH], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
+  }
+
+  PIDControllerApply[PITCH] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[PITCH], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+}
+
+void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
+{
+  const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[YAW];
+  const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(PID[PIDYAW].ProportionalVector, RateError);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (PID[PIDYAW].FeedForward / 31.0f * TPA_Parameters.CalcedValue);
+
+  ErrorGyroIntegral[YAW] += RateError * (PID[PIDYAW].IntegratorVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
+
+  ErrorGyroIntegral[YAW] = PIDXYZ.ApplyIntegralTermLimiting(YAW, ErrorGyroIntegral[YAW]);
+
+  if (FixedWingIntegralTermThrowLimit != 0)
+  {
+    ErrorGyroIntegral[YAW] = Constrain_Float(ErrorGyroIntegral[YAW], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
+  }
+
+  PIDControllerApply[YAW] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[YAW], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+}
+
+bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
+{
+  float StickPosition = (float)Constrain_16Bits(RadioControllOutput[Axis] - MIDDLE_STICKS_PULSE, -500, 500) / 500.0f;
+  if (Do_Stabilize_Mode)
+  {
+    return false;
+  }
+  return fabsf(StickPosition) > FixedWingIntegralTermLimitOnStickPosition;
+}
+
+int16_t PIDXYZClass::GetNewYawControllerForPlane(int16_t RateTargetInput)
+{
+  if (GetFrameStateOfAirPlane())
+  {
+    return TurnControllerForAirPlane(RateTargetInput);
+  }
+  return RateTargetInput;
 }
 
 int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
@@ -366,12 +545,10 @@ int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
 
 void PIDXYZClass::Reset_Integral_Accumulators()
 {
-  if (GetActualThrottleStatus(THROTTLE_LOW))
-  {
-    IntegralAccError[ROLL] = 0;
-    IntegralAccError[PITCH] = 0;
-    IntegralGyroError[ROLL] = 0;
-    IntegralGyroError[PITCH] = 0;
-    IntegralGyroError_Yaw = 0;
-  }
+  ErrorGyroIntegral[ROLL] = 0;
+  ErrorGyroIntegral[PITCH] = 0;
+  ErrorGyroIntegral[YAW] = 0;
+  ErrorGyroIntegralLimit[ROLL] = 0;
+  ErrorGyroIntegralLimit[PITCH] = 0;
+  ErrorGyroIntegralLimit[YAW] = 0;
 }

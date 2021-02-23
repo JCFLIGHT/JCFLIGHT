@@ -21,6 +21,6 @@
 #include "Common/STRUCTS.h"
 extern TPA_Parameters_Struct TPA_Parameters;
 void TPA_Initialization();
-uint8_t CalculateFixedWingTPAFactor(int16_t Throttle);
-uint8_t CalculateMultirotorTPAFactor(int16_t Throttle);
+float CalculateFixedWingTPAFactor(int16_t Throttle);
+float CalculateMultirotorTPAFactor(int16_t Throttle);
 #endif

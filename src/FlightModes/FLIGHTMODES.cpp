@@ -220,18 +220,11 @@ void FlightModesUpdate()
   {
     if (!Do_Stabilize_Mode)
     {
-      PIDXYZ.IntegralAccError[ROLL] = 0;
-      PIDXYZ.IntegralAccError[PITCH] = 0;
       Do_Stabilize_Mode = true;
     }
   }
   else
   {
-    if (Do_Stabilize_Mode)
-    {
-      PIDXYZ.IntegralGyroError[ROLL] = 0;
-      PIDXYZ.IntegralGyroError[PITCH] = 0;
-    }
     Do_Stabilize_Mode = false;
   }
 

@@ -34,21 +34,22 @@ FILE_COMPILE_FOR_SPEED
 AHRSClass AHRS;
 
 #define SPIN_RATE_LIMIT 20    //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
-#define MAX_ACC_NEARNESS 0.33 //25% (0.87G - 1.12G)
+#define MAX_ACC_NEARNESS 0.33 //33% (0.67G - 1.33G)
 #ifdef __AVR_ATmega2560__
 #define NEARNESS 100.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #else
 #define NEARNESS 1.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #endif
-#define ACC_1G 512                //1G DA IMU - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
+#define ACC_1G 512.0f             //1G DA IMU - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GYRO_SCALE (1.0f / 16.4f) //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
 #define GRAVITY_CMSS 980.665f     //VALOR DA GRAVIDADE EM CM/S^2
 
 Struct_Vector3x3 BodyFrameAcceleration;
 Struct_Vector3x3 BodyFrameRotation;
+static Struct_Vector3x3 CorrectedMagneticFieldNorth;
+
 Struct_Quaternion Orientation;
 
-static Struct_Vector3x3 CorrectedMagneticFieldNorth;
 static Struct_IMURuntimeConfiguration IMURuntimeConfiguration;
 
 static bool GPSHeadingInitialized = false;

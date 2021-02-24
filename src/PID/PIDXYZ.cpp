@@ -101,6 +101,10 @@ void PIDXYZClass::Update(float DeltaTime)
   CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
   CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], RCRate);
 
+  CalcedRateTargetRollToGCS = CalcedRateTargetRoll;
+  CalcedRateTargetPitchToGCS = CalcedRateTargetPitch;
+  CalcedRateTargetYawToGCS = CalcedRateTargetYaw;
+
   if (GetSafeStateOfHeadingHold())
   {
     CalcedRateTargetYaw = GetHeadingHoldValue(DeltaTime);
@@ -466,9 +470,9 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerRoll(float DeltaTime)
 
 void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
 {
-  const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[PITCH];
+  const float RateError = PIDXYZ.CalcedRateTargetPitch - IMU.GyroscopeRead[PITCH];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_PITCH].ProportionalVector, RateError);
-  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_PITCH].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetPitch * (GET_SET[PID_PITCH].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[PITCH] += RateError * (GET_SET[PID_PITCH].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 
@@ -484,9 +488,9 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
 
 void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
 {
-  const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[YAW];
+  const float RateError = PIDXYZ.CalcedRateTargetYaw - IMU.GyroscopeRead[YAW];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_YAW].ProportionalVector, RateError);
-  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_YAW].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetYaw * (GET_SET[PID_YAW].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[YAW] += RateError * (GET_SET[PID_YAW].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 

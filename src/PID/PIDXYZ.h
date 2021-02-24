@@ -21,15 +21,18 @@
 class PIDXYZClass
 {
 public:
-  int16_t CalcedRateTargetRoll;
-  int16_t CalcedRateTargetPitch;
-  int16_t CalcedRateTargetYaw;
+  int16_t CalcedRateTargetRollToGCS;
+  int16_t CalcedRateTargetPitchToGCS;
+  int16_t CalcedRateTargetYawToGCS;
   void DerivativeLPF_Update();
   void Update(float DeltaTime);
   void Reset_Integral_Accumulators();
 
 private:
   int16_t Get_LPF_Derivative_Value = 0;
+  int16_t CalcedRateTargetRoll;
+  int16_t CalcedRateTargetPitch;
+  int16_t CalcedRateTargetYaw;
   float ProportionalTermProcess(uint8_t kP, float RateError);
   float DerivativeTermProcessRoll(float GyroDiffInpu);
   float DerivativeTermProcessPitch(float GyroDiffInput);

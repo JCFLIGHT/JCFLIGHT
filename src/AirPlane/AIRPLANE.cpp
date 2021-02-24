@@ -106,7 +106,7 @@ void AirPlaneClass::UpdateServosDirection(void)
 
 void AirPlaneClass::Mode_ConventionalPlane_Run()
 {
-  if (FrameType != AIRPLANE)
+  if (!GetActualFrameState(AIRPLANE))
   {
     return;
   }
@@ -130,7 +130,7 @@ void AirPlaneClass::Mode_ConventionalPlane_Run()
 
 void AirPlaneClass::Mode_FixedWing_Run()
 {
-  if (FrameType != FIXED_WING)
+  if (!GetActualFrameState(FIXED_WING))
   {
     return;
   }
@@ -150,7 +150,7 @@ void AirPlaneClass::Mode_FixedWing_Run()
 
 void AirPlaneClass::Mode_PlaneVTail_Run()
 {
-  if (FrameType != PLANE_VTAIL)
+  if (!GetActualFrameState(PLANE_VTAIL))
   {
     return;
   }

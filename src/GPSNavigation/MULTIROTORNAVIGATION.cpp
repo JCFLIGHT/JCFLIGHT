@@ -308,7 +308,7 @@ static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
     GPS_Navigation_Array[axis] = GPSGetProportional(RateError, &PositionHoldRatePID) + GPSGetIntegral(RateError, DeltaTime, &PositionHoldRatePIDArray[axis], &PositionHoldRatePID);
     GPS_Navigation_Array[axis] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[axis] * PositionHoldRatePID.kD), -2000, 2000);
     GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis], -GPS_BANK_ANGLE_MAX, GPS_BANK_ANGLE_MAX);
-    NavigationPIDArray[axis].Integrator = PositionHoldRatePIDArray[axis].Integrator;
+    NavigationPIDArray[axis].Integral = PositionHoldRatePIDArray[axis].Integral;
   }
 }
 
@@ -371,7 +371,7 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
       NavCompensation = 0;
     }
     GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis] + NavCompensation, -GPS_BANK_ANGLE_MAX, GPS_BANK_ANGLE_MAX);
-    PositionHoldRatePIDArray[axis].Integrator = NavigationPIDArray[axis].Integrator;
+    PositionHoldRatePIDArray[axis].Integral = NavigationPIDArray[axis].Integral;
   }
 }
 
@@ -438,17 +438,17 @@ void GPS_Reset_Navigation(void)
 
 void LoadGPSParameters(void)
 {
-  PositionHoldPID.kP = (float)PID[PIDGPSPOSITION].ProportionalVector / 100.0;
-  PositionHoldPID.kI = (float)PID[PIDGPSPOSITION].IntegratorVector / 100.0;
-  PositionHoldPID.IntegratorMax = 20 * 100;
-  PositionHoldRatePID.kP = (float)PID[PIDGPSPOSITIONRATE].ProportionalVector / 10.0;
-  PositionHoldRatePID.kI = (float)PID[PIDGPSPOSITIONRATE].IntegratorVector / 100.0;
-  PositionHoldRatePID.kD = (float)PID[PIDGPSPOSITIONRATE].DerivativeVector / 100.0;
-  PositionHoldRatePID.IntegratorMax = 20 * 100;
-  NavigationPID.kP = (float)PID[PIDGPSNAVIGATIONRATE].ProportionalVector / 10.0;
-  NavigationPID.kI = (float)PID[PIDGPSNAVIGATIONRATE].IntegratorVector / 100.0;
-  NavigationPID.kD = (float)PID[PIDGPSNAVIGATIONRATE].DerivativeVector / 1000.0;
-  NavigationPID.IntegratorMax = 20 * 100;
+  PositionHoldPID.kP = (float)GET_SET[PID_GPSPOSITION].ProportionalVector / 100.0;
+  PositionHoldPID.kI = (float)GET_SET[PID_GPSPOSITION].IntegralVector / 100.0;
+  PositionHoldPID.IntegralMax = 20 * 100;
+  PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].ProportionalVector / 10.0;
+  PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].IntegralVector / 100.0;
+  PositionHoldRatePID.kD = (float)GET_SET[PID_GPS_POSITION_RATE].DerivativeVector / 100.0;
+  PositionHoldRatePID.IntegralMax = 20 * 100;
+  NavigationPID.kP = (float)GET_SET[PID_GPS_NAVIGATION_RATE].ProportionalVector / 10.0;
+  NavigationPID.kI = (float)GET_SET[PID_GPS_NAVIGATION_RATE].IntegralVector / 100.0;
+  NavigationPID.kD = (float)GET_SET[PID_GPS_NAVIGATION_RATE].DerivativeVector / 1000.0;
+  NavigationPID.IntegralMax = 20 * 100;
 }
 
 void RTH_Altitude_EEPROM()

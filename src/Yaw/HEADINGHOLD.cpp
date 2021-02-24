@@ -84,7 +84,7 @@ float GetHeadingHoldValue(int32_t DeltaTimeUs)
   }
 
   //CALCULA O VALOR DO RATE
-  HeadingHoldRate = YawError * PID[PIDYAWVELOCITY].ProportionalVector / 30.0f;
+  HeadingHoldRate = YawError * GET_SET[PID_YAW_VELOCITY].ProportionalVector / 30.0f;
   //APLICA LIMITES MIN E MAX NO RATE
   HeadingHoldRate = Constrain_Float(HeadingHoldRate, -Heading_Hold_Rate_Limit, Heading_Hold_Rate_Limit);
 

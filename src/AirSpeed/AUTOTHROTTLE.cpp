@@ -21,7 +21,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 
-int16_t CalculateIntegrator = 0;
+int16_t CalculateIntegral = 0;
 uint16_t PreviousValueOfAirSpeed = 0;
 
 void AirSpeed_Update_Auto_Throttle()
@@ -53,13 +53,13 @@ void AirSpeed_Apply_Auto_Throttle_Control()
     if (Do_AutoThrottle_Mode && (RCController[THROTTLE] > 1200))
     {
         int16_t CalculateError = PreviousValueOfAirSpeed - AIRSPEED.CalcedInKM;
-        int16_t CalculateProportional = (CalculateError * PID[PIDALTITUDE].ProportionalVector >> 3);
-        CalculateIntegrator += (CalculateError * PID[PIDALTITUDE].IntegratorVector >> 5);
-        CalculateIntegrator = Constrain_16Bits(CalculateIntegrator, -24000, 24000);
-        RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE] + CalculateProportional + (CalculateIntegrator >> 7), 1100, 1900);
+        int16_t CalculateProportional = (CalculateError * GET_SET[PID_ALTITUDE].ProportionalVector >> 3);
+        CalculateIntegral += (CalculateError * GET_SET[PID_ALTITUDE].IntegralVector >> 5);
+        CalculateIntegral = Constrain_16Bits(CalculateIntegral, -24000, 24000);
+        RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE] + CalculateProportional + (CalculateIntegral >> 7), 1100, 1900);
     }
     else
     {
-        CalculateIntegrator = 0;
+        CalculateIntegral = 0;
     }
 }

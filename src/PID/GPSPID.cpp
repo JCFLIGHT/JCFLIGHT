@@ -35,9 +35,9 @@ int32_t GPSGetProportional(int32_t Error, struct _PID_PARAM *PID)
 
 int32_t GPSGetIntegral(int32_t Error, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param)
 {
-    PID->Integrator += ((float)Error * GPS_PID_Param->kI) * *DeltaTime;
-    PID->Integrator = Constrain_Float(PID->Integrator, -GPS_PID_Param->IntegratorMax, GPS_PID_Param->IntegratorMax);
-    return PID->Integrator;
+    PID->Integral += ((float)Error * GPS_PID_Param->kI) * *DeltaTime;
+    PID->Integral = Constrain_Float(PID->Integral, -GPS_PID_Param->IntegralMax, GPS_PID_Param->IntegralMax);
+    return PID->Integral;
 }
 
 float Get_Derivative_LPF_Coefficient(float CutOff)
@@ -56,7 +56,7 @@ int32_t GPSGetDerivative(int32_t Input, float *DeltaTime, struct _GPS_PID *PID, 
 
 void GPSResetPID(struct _GPS_PID *PID)
 {
-    PID->Integrator = 0;
+    PID->Integral = 0;
     PID->Last_Input = 0;
     PID->Last_Derivative = 0;
 }

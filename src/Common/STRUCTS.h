@@ -67,7 +67,7 @@ typedef struct
 struct PID_TERMS
 {
   uint8_t ProportionalVector;
-  uint8_t IntegratorVector;
+  uint8_t IntegralVector;
   uint8_t DerivativeVector;
   uint8_t FeedForward;
 };
@@ -173,12 +173,12 @@ typedef struct _PID_PARAM
   float kP;
   float kI;
   float kD;
-  float IntegratorMax;
+  float IntegralMax;
 } PID_PARAM;
 
 typedef struct _GPS_PID
 {
-  float Integrator;
+  float Integral;
   float Last_Derivative;
   float Derivative;
   int32_t Last_Input;

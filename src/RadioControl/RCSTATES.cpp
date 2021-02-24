@@ -22,6 +22,7 @@
 #include "AHRS/AHRS.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/RCDEFINES.h"
+#include "RadioControl/DECODE.h"
 
 #define THIS_LOOP_RATE 50 //STICKS.Update()
 #define ARM_TIME_MAX 2    //SEGUNDOS
@@ -103,16 +104,16 @@ bool SticksDeflected(int16_t MinDeflectionValue)
 
 bool GetActualThrottleStatus(uint8_t ThrottleStatus)
 {
-    if (RadioControllOutput[THROTTLE] <= MIN_PULSE && ThrottleStatus == THROTTLE_LOW)
+    if (DECODE.GetRxChannelOutput(THROTTLE) <= MIN_PULSE && ThrottleStatus == THROTTLE_LOW)
     {
         return true;
     }
-    else if (RadioControllOutput[THROTTLE] >= MAX_PULSE && ThrottleStatus == THROTTLE_HIGH)
+    else if (DECODE.GetRxChannelOutput(THROTTLE) >= MAX_PULSE && ThrottleStatus == THROTTLE_HIGH)
     {
         return true;
     }
-    else if (RadioControllOutput[THROTTLE] >= (MIDDLE_STICKS_PULSE - 100) &&
-             RadioControllOutput[THROTTLE] <= (MIDDLE_STICKS_PULSE + 100) &&
+    else if (DECODE.GetRxChannelOutput(THROTTLE) >= (MIDDLE_STICKS_PULSE - 100) &&
+             DECODE.GetRxChannelOutput(THROTTLE) <= (MIDDLE_STICKS_PULSE + 100) &&
              ThrottleStatus == THROTTLE_MIDDLE)
     {
         return true;

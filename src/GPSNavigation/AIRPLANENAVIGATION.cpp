@@ -24,6 +24,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "I2C/I2C.h"
+#include "RadioControl/DECODE.h"
 
 //PARAMETROS DE NAVEGAÇÃO
 #define CRUISE_DISTANCE 500   //DISTANCIA (EM CM) - DISTANCIA ENTRE O PRIMEIRO E O SEGUNDO PONTO A SER ATINGIDO
@@ -119,7 +120,7 @@ void Circle_Mode_Update()
 void AirPlaneUpdateNavigation(void)
 {
   RTH_AltitudeOfPlane = RTH_Altitude;
-  Read_Throttle = RadioControllOutput[THROTTLE];
+  Read_Throttle = DECODE.GetRxChannelOutput(THROTTLE);
   CurrentAltitude = GPS_Altitude - GPS_Altitude_For_Plane;
   TargetAltitude = GPS_AltitudeHold_For_Plane - GPS_Altitude_For_Plane;
 

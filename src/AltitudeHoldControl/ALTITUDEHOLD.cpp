@@ -25,6 +25,7 @@
 #include "RadioControl/CURVESRC.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/RCSTATES.h"
+#include "RadioControl/DECODE.h"
 
 bool TakeOffInProgress = false;
 bool GroundAltitudeSet = false;
@@ -108,7 +109,7 @@ bool ApplyAltitudeHoldControl()
       }
       else
       {
-        int16_t ThrottleDifference = RadioControllOutput[THROTTLE] - ThrottleMiddleValue;
+        int16_t ThrottleDifference = DECODE.GetRxChannelOutput(THROTTLE) - ThrottleMiddleValue;
         if (!TakeOffInProgress)
         {
           if (GetActualThrottleStatus(THROTTLE_LOW))

@@ -20,6 +20,7 @@
 #include "FlightModes/AUXFLIGHT.h"
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "RadioControl/DECODE.h"
 
 //**************************************************************************
 //TIMER DE DESLIGAMENTO AUTOMATICO DOS MOTORES POR INATIVADADE DO THROTTLE
@@ -35,7 +36,7 @@ DesarmLowThrClass DESARMLOWTHROTTLE;
 
 bool Check_Throttle()
 {
-  if (RadioControllOutput[THROTTLE] <= THROTTLE_VALUE_MAX)
+  if (DECODE.GetRxChannelOutput(THROTTLE) <= THROTTLE_VALUE_MAX)
   {
     return true;
   }
@@ -44,9 +45,9 @@ bool Check_Throttle()
 
 bool Check_Others_Channels()
 {
-  if ((RadioControllOutput[YAW] >= YPR_VALUE_MIN && RadioControllOutput[YAW] <= YPR_VALUE_MAX) &&
-      (RadioControllOutput[PITCH] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX) &&
-      (RadioControllOutput[ROLL] >= YPR_VALUE_MIN && RadioControllOutput[PITCH] <= YPR_VALUE_MAX))
+  if ((DECODE.GetRxChannelOutput(YAW) >= YPR_VALUE_MIN && DECODE.GetRxChannelOutput(YAW) <= YPR_VALUE_MAX) &&
+      (DECODE.GetRxChannelOutput(PITCH) >= YPR_VALUE_MIN && DECODE.GetRxChannelOutput(PITCH) <= YPR_VALUE_MAX) &&
+      (DECODE.GetRxChannelOutput(ROLL) >= YPR_VALUE_MIN && DECODE.GetRxChannelOutput(PITCH) <= YPR_VALUE_MAX))
   {
     return true;
   }
@@ -66,8 +67,8 @@ void DesarmLowThrClass::Update()
   {
     if (TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
     {
-      DISABLE_STATE(PRIMARY_ARM_DISARM);    //DESARMA OS MOTORES
-      BEEPER.Play(BEEPER_DISARMING); //TOCA A MÚSICA INDICANDO O DESARM
+      DISABLE_STATE(PRIMARY_ARM_DISARM); //DESARMA OS MOTORES
+      BEEPER.Play(BEEPER_DISARMING);     //TOCA A MÚSICA INDICANDO O DESARM
     }
     else if (TimerDesarm > 254)
     {

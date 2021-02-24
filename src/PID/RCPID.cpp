@@ -27,6 +27,7 @@
 #include "Filters/PT1.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Build/BOARDDEFS.h"
+#include "RadioControl/DECODE.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -42,7 +43,7 @@ bool FixedWingTPAFilterInitalized = false;
 void GetRCDataConvertedAndApplyFilter()
 {
   int32_t CalcedThrottle;
-  CalcedThrottle = Constrain_16Bits(RadioControllOutput[THROTTLE], AttitudeThrottleMin, MAX_STICKS_PULSE);
+  CalcedThrottle = Constrain_16Bits(DECODE.GetRxChannelOutput(THROTTLE), AttitudeThrottleMin, MAX_STICKS_PULSE);
   CalcedThrottle = (uint32_t)(CalcedThrottle - AttitudeThrottleMin) * MIN_STICKS_PULSE / (MAX_STICKS_PULSE - AttitudeThrottleMin);
   RCController[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
   RCController[YAW] = -CalcedAttitudeRC(YAW, RCExpo);

@@ -274,16 +274,16 @@ void RCConfigClass::Set_Pulse()
 
 void RCConfigClass::Update_Channels()
 {
-  RadioControllOutput[THROTTLE] = Throttle.Output;
-  RadioControllOutput[YAW] = Yaw.Output;
-  RadioControllOutput[PITCH] = Pitch.Output;
-  RadioControllOutput[ROLL] = Roll.Output;
-  RadioControllOutput[AUX1] = AuxiliarOne.Output;
-  RadioControllOutput[AUX2] = AuxiliarTwo.Output;
-  RadioControllOutput[AUX3] = AuxiliarThree.Output;
-  RadioControllOutput[AUX4] = AuxiliarFour.Output;
-  RadioControllOutput[AUX5] = AuxiliarFive.Output;
-  RadioControllOutput[AUX6] = AuxiliarSix.Output;
-  RadioControllOutput[AUX7] = AuxiliarSeven.Output;
-  RadioControllOutput[AUX8] = AuxiliarEight.Output;
+  DECODE.SetRxChannelInput(THROTTLE, Throttle.Output);
+  DECODE.SetRxChannelInput(YAW, Yaw.Output);
+  DECODE.SetRxChannelInput(PITCH, Pitch.Output);
+  DECODE.SetRxChannelInput(ROLL, Roll.Output);
+  DECODE.SetRxChannelInput(AUX1, AuxiliarOne.Output);
+  DECODE.SetRxChannelInput(AUX2, AuxiliarTwo.Output);
+  DECODE.SetRxChannelInput(AUX3, AuxiliarThree.Output);
+  DECODE.SetRxChannelInput(AUX4, AuxiliarFour.Output);
+  DECODE.SetRxChannelInput(AUX5, AuxiliarFive.Output);
+  DECODE.SetRxChannelInput(AUX6, AuxiliarSix.Output);
+  DECODE.SetRxChannelInput(AUX7, AuxiliarSeven.Output);
+  DECODE.SetRxChannelInput(AUX8, AuxiliarEight.Output);
 }

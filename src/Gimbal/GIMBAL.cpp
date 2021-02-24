@@ -18,6 +18,7 @@
 #include "GIMBAL.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Common/VARIABLES.h"
+#include "RadioControl/DECODE.h"
 
 void Gimbal_Controll()
 {
@@ -28,34 +29,34 @@ void Gimbal_Controll()
   }
   else if (GimbalControlAux == RCAUX1)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX1];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX1);
   }
   else if (GimbalControlAux == RCAUX2)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX2];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX2);
   }
   else if (GimbalControlAux == RCAUX3)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX3];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX3);
   }
   else if (GimbalControlAux == RCAUX4)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX4];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX4);
   }
   else if (GimbalControlAux == RCAUX5)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX5];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX5);
   }
   else if (GimbalControlAux == RCAUX6)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX6];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX6);
   }
   else if (GimbalControlAux == RCAUX7)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX7];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX7);
   }
   else if (GimbalControlAux == RCAUX8)
   {
-    MotorControl[GIMBAL] = RadioControllOutput[AUX8];
+    MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX8);
   }
 }

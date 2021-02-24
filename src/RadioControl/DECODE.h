@@ -25,6 +25,8 @@ public:
   uint8_t RcChannelMap[12];
   void Initialization();
   void Update();
+  int16_t GetRxChannelOutput(uint8_t Channel);
+  void SetRxChannelInput(uint8_t Channel, int16_t Value);
 };
 extern DecodeClass DECODE;
 #endif

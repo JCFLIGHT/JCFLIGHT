@@ -23,6 +23,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "Buzzer/BUZZER.h"
 #include "Common/RCDEFINES.h"
+#include "RadioControl/DECODE.h"
 
 #define THIS_LOOP_RATE 50                //HZ
 #define IMMEDIATELY_FAILSAFE_DELAY 0.25f //MS
@@ -43,22 +44,22 @@ bool GetValidFailSafeState(float DelayToDetect)
 
 void NormalizeFundamentalChannels()
 {
-  RadioControllOutput[THROTTLE] = MIDDLE_STICKS_PULSE;
-  RadioControllOutput[YAW] = MIDDLE_STICKS_PULSE;
-  RadioControllOutput[PITCH] = MIDDLE_STICKS_PULSE;
-  RadioControllOutput[ROLL] = MIDDLE_STICKS_PULSE;
+  DECODE.SetRxChannelInput(THROTTLE, MIDDLE_STICKS_PULSE);
+  DECODE.SetRxChannelInput(YAW, MIDDLE_STICKS_PULSE);
+  DECODE.SetRxChannelInput(PITCH, MIDDLE_STICKS_PULSE);
+  DECODE.SetRxChannelInput(ROLL, MIDDLE_STICKS_PULSE);
 }
 
 void NormalizeAuxiliariesChnnels()
 {
-  RadioControllOutput[AUX1] = MIN_STICKS_PULSE;
-  RadioControllOutput[AUX2] = MIN_STICKS_PULSE;
-  RadioControllOutput[AUX3] = MIN_STICKS_PULSE;
-  RadioControllOutput[AUX4] = MIN_STICKS_PULSE;
-  RadioControllOutput[AUX5] = MIN_STICKS_PULSE;
-  RadioControllOutput[AUX6] = MIN_STICKS_PULSE;
-  RadioControllOutput[AUX7] = MIN_STICKS_PULSE;
-  RadioControllOutput[AUX8] = MIN_STICKS_PULSE;
+  DECODE.SetRxChannelInput(AUX1, MIN_STICKS_PULSE);
+  DECODE.SetRxChannelInput(AUX2, MIN_STICKS_PULSE);
+  DECODE.SetRxChannelInput(AUX3, MIN_STICKS_PULSE);
+  DECODE.SetRxChannelInput(AUX4, MIN_STICKS_PULSE);
+  DECODE.SetRxChannelInput(AUX5, MIN_STICKS_PULSE);
+  DECODE.SetRxChannelInput(AUX6, MIN_STICKS_PULSE);
+  DECODE.SetRxChannelInput(AUX7, MIN_STICKS_PULSE);
+  DECODE.SetRxChannelInput(AUX8, MIN_STICKS_PULSE);
 }
 
 void NormalizeFlightModesToFailSafe()
@@ -89,9 +90,9 @@ void NormalizeFlightModesToFailSafe()
 bool FailSafeCheckStickMotion()
 {
   uint32_t CalcedRcDelta = 0;
-  CalcedRcDelta += ABS(RadioControllOutput[ROLL] - MIDDLE_STICKS_PULSE);
-  CalcedRcDelta += ABS(RadioControllOutput[PITCH] - MIDDLE_STICKS_PULSE);
-  CalcedRcDelta += ABS(RadioControllOutput[YAW] - MIDDLE_STICKS_PULSE);
+  CalcedRcDelta += ABS(DECODE.GetRxChannelOutput(ROLL) - MIDDLE_STICKS_PULSE);
+  CalcedRcDelta += ABS(DECODE.GetRxChannelOutput(PITCH) - MIDDLE_STICKS_PULSE);
+  CalcedRcDelta += ABS(DECODE.GetRxChannelOutput(YAW) - MIDDLE_STICKS_PULSE);
   return CalcedRcDelta >= STICK_MOTION;
 }
 
@@ -163,10 +164,15 @@ void AbortFailSafe()
   ResetFailSafe();
 }
 
+bool RxConsistenceOK()
+{
+  return RxConsistenceCount == 0;
+}
+
 void UpdateFailSafeSystem()
 {
   Fail_Safe_System++;
-  if (RxConsistenceCount == 0 && !Fail_Safe_Event && FailSafeGoodRunBeep)
+  if (RxConsistenceOK() && !Fail_Safe_Event && FailSafeGoodRunBeep)
   {
     if (BuzzerFailSafeRunCount >= 100) //2 SEGUNDOS
     {

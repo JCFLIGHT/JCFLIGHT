@@ -25,12 +25,13 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
 #include "RadioControl/RCSTATES.h"
+#include "RadioControl/DECODE.h"
 #include "FastSerial/PRINTF.h"
 
 ClassESC ESC;
 
-#define ESC_CAL_THROTTLE_FAIL RadioControllOutput[THROTTLE] < 1600   //VALOR MAXIMO TOLERADO PARA NÃO ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
-#define ESC_CAL_THROTTLE_SUCESS RadioControllOutput[THROTTLE] > 1700 //VALOR MINIMO TOLERADO PARA ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
+#define ESC_CAL_THROTTLE_FAIL DECODE.GetRxChannelOutput(THROTTLE) < 1600   //VALOR MAXIMO TOLERADO PARA NÃO ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
+#define ESC_CAL_THROTTLE_SUCESS DECODE.GetRxChannelOutput(THROTTLE) > 1700 //VALOR MINIMO TOLERADO PARA ENTRAR NO MODO CALIBRAÇÃO DOS ESC'S
 
 void ClassESC::Calibration(void)
 {
@@ -102,7 +103,7 @@ void ClassESC::Calibration(void)
       }
       if (EscCal_ArmTest)
       {
-        PulseInAllMotors(Constrain_16Bits(RadioControllOutput[THROTTLE], MIN_STICKS_PULSE, MAX_STICKS_PULSE)); //REALIZA O BY-PASS DO THROTTLE
+        PulseInAllMotors(Constrain_16Bits(DECODE.GetRxChannelOutput(THROTTLE), MIN_STICKS_PULSE, MAX_STICKS_PULSE)); //REALIZA O BY-PASS DO THROTTLE
       }
       else
       {

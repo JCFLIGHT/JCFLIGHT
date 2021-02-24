@@ -117,3 +117,13 @@ void DecodeClass::Update()
     }
   }
 }
+
+int16_t DecodeClass::GetRxChannelOutput(uint8_t Channel)
+{
+  return RadioControllOutput[Channel];
+}
+
+void DecodeClass::SetRxChannelInput(uint8_t Channel, int16_t Value)
+{
+  RadioControllOutput[Channel] = Value;
+}

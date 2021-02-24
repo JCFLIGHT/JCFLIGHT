@@ -409,7 +409,7 @@ void AutoTakeOff(bool AutoTakeOff)
       ThrottleIncrement = THROTTLE_TAKEOFF_NORMALIZE;
     }
   }
-  RadioControllOutput[THROTTLE] = ThrottleIncrement;
+  DECODE.SetRxChannelInput(THROTTLE, ThrottleIncrement);
   RCController[THROTTLE] = Constrain_16Bits(ThrottleIncrement, AttitudeThrottleMin, AttitudeThrottleMax);
 }
 

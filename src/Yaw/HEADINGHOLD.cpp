@@ -67,7 +67,6 @@ bool GetSafeStateOfHeadingHold()
 
 float GetHeadingHoldValue(int32_t DeltaTimeUs)
 {
-  uint8_t Heading_Hold_Rate_Limit = 90;
   float HeadingHoldRate;
 
   int16_t YawError = ATTITUDE.AngleOut[YAW] - HeadingHoldTarget; //CALCULA O ERRO / DIFERENÇA
@@ -84,9 +83,9 @@ float GetHeadingHoldValue(int32_t DeltaTimeUs)
   }
 
   //CALCULA O VALOR DO RATE
-  HeadingHoldRate = YawError * GET_SET[PID_YAW_VELOCITY].ProportionalVector / 30.0f;
+  HeadingHoldRate = YawError * GET_SET[P_YAW_RATE].ProportionalVector / 30.0f;
   //APLICA LIMITES MIN E MAX NO RATE
-  HeadingHoldRate = Constrain_Float(HeadingHoldRate, -Heading_Hold_Rate_Limit, Heading_Hold_Rate_Limit);
+  HeadingHoldRate = Constrain_Float(HeadingHoldRate, -GET_SET[P_YAW_RATE_LIMIT].MinMaxValueVector, GET_SET[P_YAW_RATE_LIMIT].MinMaxValueVector);
 
 #ifdef PRINTLN_HEADING_HOLD
   float HeadingHoldRateNF = HeadingHoldRate;

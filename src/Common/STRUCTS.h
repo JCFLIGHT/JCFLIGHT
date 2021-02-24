@@ -66,10 +66,12 @@ typedef struct
 
 struct PID_TERMS
 {
+  bool State;
   uint8_t ProportionalVector;
   uint8_t IntegralVector;
   uint8_t DerivativeVector;
-  uint8_t FeedForward;
+  uint8_t FeedForwardVector;
+  uint8_t MinMaxValueVector;
 };
 
 typedef struct

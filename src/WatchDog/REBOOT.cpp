@@ -81,11 +81,14 @@ void WatchDogClass::Reboot(void)
 {
     ShutDownAllMotorsAndServos();
     SCHEDULERTIME.Sleep(1000); //ESPERA O MICROCONTROLADOR DOS ESCS REAGIREM AO PULSO EM LOW
+
 #ifdef __AVR_ATmega2560__
 
     __asm__ __volatile__("cli" ::
                              : "memory");
+
     WatchDogReset(0); //WATCHDOG 15MS
+
     for (;;)
         ;
 

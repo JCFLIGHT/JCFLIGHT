@@ -22,7 +22,6 @@ class GCSClass
 {
 public:
   bool ConfigFlight = false;
-  bool UpdatePID = false;
   void Serial_Parse_Protocol();
   void UpdateParametersToGCS();
   void SendStringToGCS(const char *String);

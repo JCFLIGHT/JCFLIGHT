@@ -217,14 +217,14 @@ float PIDXYZClass::PIDLevelRoll(float DeltaTime)
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
 
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PID_AUTO_LEVEL].ProportionalVector / 6.56f), -500, 500);
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -500, 500);
 
-  if (GET_SET[PID_AUTO_LEVEL].IntegralVector > 0)
+  if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {
 #ifndef __AVR_ATmega2560__
-    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, GET_SET[PID_AUTO_LEVEL].IntegralVector, DeltaTime);
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, DeltaTime);
 #else
-    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, GET_SET[PID_AUTO_LEVEL].IntegralVector, 1.0f / 1000.0f);
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, 1.0f / 1000.0f);
 #endif
   }
   return AngleRateTarget;
@@ -252,14 +252,14 @@ float PIDXYZClass::PIDLevelPitch(float DeltaTime)
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
 
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PID_AUTO_LEVEL].ProportionalVector / 6.56f), -500, 500);
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -500, 500);
 
-  if (GET_SET[PID_AUTO_LEVEL].IntegralVector > 0)
+  if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {
 #ifndef __AVR_ATmega2560__
-    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, GET_SET[PID_AUTO_LEVEL].IntegralVector, DeltaTime);
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, DeltaTime);
 #else
-    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, GET_SET[PID_AUTO_LEVEL].IntegralVector, 1.0f / 1000.0f);
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, 1.0f / 1000.0f);
 #endif
   }
   return AngleRateTarget;
@@ -286,7 +286,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
   }
   else
   {
-    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_ROLL].FeedForward / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
+    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_ROLL].FeedForwardVector / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
   }
 
   float GyroDifference = PreviousRateGyro - IMU.GyroscopeRead[ROLL];
@@ -344,7 +344,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
   }
   else
   {
-    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_PITCH].FeedForward / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
+    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_PITCH].FeedForwardVector / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
   }
 
   float GyroDifference = PreviousRateGyro - IMU.GyroscopeRead[PITCH];
@@ -402,7 +402,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
   }
   else
   {
-    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_YAW].FeedForward / 7270.0f * 1.0f) / DeltaTime);
+    NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_YAW].FeedForwardVector / 7270.0f * 1.0f) / DeltaTime);
   }
 
   if (GET_SET[PID_YAW].DerivativeVector == 0)
@@ -450,7 +450,7 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerRoll(float DeltaTime)
 {
   const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[ROLL];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_ROLL].ProportionalVector, RateError);
-  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_ROLL].FeedForward / 31.0f * TPA_Parameters.CalcedValue);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_ROLL].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[ROLL] += RateError * (GET_SET[PID_ROLL].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 
@@ -468,7 +468,7 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
 {
   const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[PITCH];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_PITCH].ProportionalVector, RateError);
-  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_PITCH].FeedForward / 31.0f * TPA_Parameters.CalcedValue);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_PITCH].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[PITCH] += RateError * (GET_SET[PID_PITCH].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 
@@ -486,7 +486,7 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
 {
   const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.GyroscopeRead[YAW];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_YAW].ProportionalVector, RateError);
-  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_YAW].FeedForward / 31.0f * TPA_Parameters.CalcedValue);
+  const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_YAW].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[YAW] += RateError * (GET_SET[PID_YAW].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 

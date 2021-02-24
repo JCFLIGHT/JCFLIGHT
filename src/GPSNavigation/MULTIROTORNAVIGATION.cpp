@@ -438,8 +438,8 @@ void GPS_Reset_Navigation(void)
 
 void LoadGPSParameters(void)
 {
-  PositionHoldPID.kP = (float)GET_SET[PID_GPSPOSITION].ProportionalVector / 100.0;
-  PositionHoldPID.kI = (float)GET_SET[PID_GPSPOSITION].IntegralVector / 100.0;
+  PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].ProportionalVector / 100.0;
+  PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].IntegralVector / 100.0;
   PositionHoldPID.IntegralMax = 20 * 100;
   PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].ProportionalVector / 10.0;
   PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].IntegralVector / 100.0;

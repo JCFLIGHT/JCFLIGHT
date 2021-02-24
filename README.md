@@ -6,7 +6,7 @@
 
 Travis-CI Dashboard: [travis-ci.com/JCFLIGHT/JCFLIGHT](https://travis-ci.com/JCFLIGHT/JCFLIGHT)
 
-JCFLIGHT é um software de piloto automático de código aberto.Ele está em desenvolvimento desde 2018 por um único desenvolvedor.Este software de piloto automático é capaz de controlar alguns sistemas de veículos,tais como,Multirotores,Aeromodelos Convencionais,Aeromodelo do tipo V-Tail e Asa-Fixa.
+JCFLIGHT é um software de piloto automático de código aberto,ele está em desenvolvimento desde 2018.Este software de piloto automático é capaz de controlar alguns sistemas de veículos,tais como:Multirotores,Aeromodelos Convencionais,Aeromodelos do tipo V-Tail e Asa-Fixa.
 
 | Status | Microcontrolador | Nome | Versão | Notas |
 | :----: | :-------: | ---- | :-----: | :---- |

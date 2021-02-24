@@ -71,8 +71,6 @@ static __inline__ __attribute__((__always_inline__)) void WatchDogReset(const ui
     }
 }
 
-#elif defined ESP32
-
 #elif defined __arm__
 
 #endif

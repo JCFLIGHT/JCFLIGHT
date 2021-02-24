@@ -112,7 +112,8 @@ bool GetActualThrottleStatus(uint8_t ThrottleStatus)
         return true;
     }
     else if (RadioControllOutput[THROTTLE] >= (MIDDLE_STICKS_PULSE - 100) &&
-             RadioControllOutput[THROTTLE] <= (MIDDLE_STICKS_PULSE + 100) && ThrottleStatus == THROTTLE_MIDDLE)
+             RadioControllOutput[THROTTLE] <= (MIDDLE_STICKS_PULSE + 100) &&
+             ThrottleStatus == THROTTLE_MIDDLE)
     {
         return true;
     }

@@ -62,7 +62,7 @@ static float DeviceVariance(Device_Struct *Device)
 
 static float DeviceStandardDeviation(Device_Struct *Device)
 {
-  return sqrtf(DeviceVariance(Device));
+  return Fast_SquareRoot(DeviceVariance(Device));
 }
 
 void Gyroscope_Calibration()

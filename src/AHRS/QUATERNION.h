@@ -37,7 +37,7 @@ static inline float QuaternionNormalizedSquared(const Struct_Quaternion *Quatern
 static inline Struct_Quaternion *QuaternionNormalize(Struct_Quaternion *Result,
                                                      const Struct_Quaternion *Quaternion)
 {
-    float CheckSquare = sqrtf(QuaternionNormalizedSquared(Quaternion));
+    float CheckSquare = Fast_SquareRoot(QuaternionNormalizedSquared(Quaternion));
     if (CheckSquare < 1e-6f)
     {
         Result->q0 = 1;

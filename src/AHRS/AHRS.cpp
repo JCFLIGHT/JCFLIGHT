@@ -112,7 +112,7 @@ static bool ValidateQuaternion(const Struct_Quaternion *Quaternion)
 
 static void ResetOrientationQuaternion(const Struct_Vector3x3 *AccelerationBodyFrame)
 {
-  const float AccVectorSquared = sqrtf(VectorNormSquared(AccelerationBodyFrame));
+  const float AccVectorSquared = Fast_SquareRoot(VectorNormSquared(AccelerationBodyFrame));
   Orientation.q0 = AccelerationBodyFrame->Yaw + AccVectorSquared;
   Orientation.q1 = AccelerationBodyFrame->Pitch;
   Orientation.q2 = -AccelerationBodyFrame->Roll;
@@ -292,14 +292,14 @@ static void MahonyAHRSUpdate(float DeltaTime,
     //PARA CONTORNAR ISSO,USAMOS A SÉRIE DE TAYLOR,VERIFICAMOS SE O SQUARE DE THETA É MENOR QUE A PRECISÃO
     //FLOAT DO MICROCONTROLADOR (FLOAT = 24 BITS COM EXPONENTE DE 8 BITS),SENDO ASSIM SER POSSIVEL CALCULAR
     //COM SEGURANÇA O VALOR DE UM ÂNGULO PEQUENO SEM PERDER A PRECISÃO NUMÉRICA.
-    if (ThetaSquared < sqrtf(24.0f * 1e-6f))
+    if (ThetaSquared < Fast_SquareRoot(24.0f * 1e-6f))
     {
       QuaternionScale(&QuaternionDelta, &QuaternionDelta, 1.0f - ThetaSquared / 6.0f);
       QuaternionDelta.q0 = 1.0f - ThetaSquared / 2.0f;
     }
     else
     {
-      const float ThetaMagnitude = sqrtf(ThetaSquared);
+      const float ThetaMagnitude = Fast_SquareRoot(ThetaSquared);
       QuaternionScale(&QuaternionDelta, &QuaternionDelta, Fast_Sine(ThetaMagnitude) / ThetaMagnitude);
       QuaternionDelta.q0 = Fast_Cosine(ThetaMagnitude);
     }
@@ -326,7 +326,7 @@ static float CalculateAccelerometerWeight()
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[YAW] / ACC_1G);
 
   //CALCULA A CURVA DE SENO DA MAGNITUDE DO ACELEROMETRO
-  const float AccWeight_Nearness = Sine_Curve(sqrtf(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS) * NEARNESS;
+  const float AccWeight_Nearness = Sine_Curve(Fast_SquareRoot(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS) * NEARNESS;
 
   return AccWeight_Nearness;
 }

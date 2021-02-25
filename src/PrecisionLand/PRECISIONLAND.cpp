@@ -61,7 +61,7 @@ void Update_PrecisionLand()
 //CALCULA A RAIZ QUADRADA DE TODAS AS ACELERAÇÕES PRESENTES NO EARTH FRAME COM 1G SUBTRAIDO NO EIXO Z
 float GetAccelerationTotal()
 {
-  return sqrtf(SquareFloat(AccelerationEarthFrameFilteredRoll.GetOutputFiltered()) +
+  return Fast_SquareRoot(SquareFloat(AccelerationEarthFrameFilteredRoll.GetOutputFiltered()) +
                SquareFloat(AccelerationEarthFrameFilteredPitch.GetOutputFiltered()) +
                SquareFloat(AccelerationEarthFrameFilteredYaw.GetOutputFiltered()));
 }

@@ -25,7 +25,7 @@ BiQuadFilter BIQUADFILTER;
 
 float FilterGetLPF_Quality()
 {
-  return 1.0f / sqrtf(2.0f);
+  return 1.0f / Fast_SquareRoot(2.0f);
 }
 
 float FilterGetNotch_Quality(float CenterFrequencyHz, float CutOffFrequencyHz)

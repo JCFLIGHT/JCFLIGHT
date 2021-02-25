@@ -34,7 +34,7 @@ void IMU_GForce_Update()
   float CalcedDeltaTime = (SCHEDULERTIME.GetMicros() - PreviousDeltaTime) * 1e-6;
 #endif
 
-  IMU.CalcedGForce = sqrtf(VectorNormSquared(&BodyFrameAcceleration)) / GRAVITY_MSS;
+  IMU.CalcedGForce = Fast_SquareRoot(VectorNormSquared(&BodyFrameAcceleration)) / GRAVITY_MSS;
 
   if (PreviousDeltaTime)
   {

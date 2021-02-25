@@ -30,7 +30,7 @@ static inline float VectorNormSquared(const Struct_Vector3x3 *Vector)
 static inline Struct_Vector3x3 *VectorNormalize(Struct_Vector3x3 *Result,
                                                 const Struct_Vector3x3 *Vector)
 {
-    float Length = sqrtf(VectorNormSquared(Vector));
+    float Length = Fast_SquareRoot(VectorNormSquared(Vector));
     if (Length != 0)
     {
         Result->Roll = Vector->Roll / Length;

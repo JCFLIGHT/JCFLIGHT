@@ -63,7 +63,7 @@ void CurvesRC_CalculeValue()
 
 int16_t RCControllerToRate(int16_t StickData, uint8_t Rate)
 {
-  const int16_t MaximumRateDPS = Rate * 10;
+  const int16_t MaximumRateDPS = ConvertDegreesToDecidegrees(Rate);
   return Map_32Bits((int16_t)StickData, -500, 500, -MaximumRateDPS, MaximumRateDPS);
 }
 

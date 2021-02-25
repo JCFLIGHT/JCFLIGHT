@@ -49,8 +49,7 @@ private:
   void PIDApplyFixedWingRateControllerPitch(float DeltaTime);
   void PIDApplyFixedWingRateControllerYaw(float DeltaTime);
   bool FixedWingIntegralTermLimitActive(uint8_t Axis);
-  int16_t GetNewYawControllerForPlane(int16_t RateTargetInput);
-  int16_t TurnControllerForAirPlane(int16_t RadioControlToTurn);
+  void GetNewControllerForPlaneWithTurn();
 };
 extern PIDXYZClass PIDXYZ;
 #endif

@@ -21,6 +21,7 @@
 #include "VECTOR.h"
 extern Struct_Vector3x3 BodyFrameAcceleration;
 extern Struct_Vector3x3 BodyFrameRotation;
+extern Struct_Quaternion Orientation;
 class AHRSClass
 {
 public:

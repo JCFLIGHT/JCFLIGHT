@@ -207,7 +207,7 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   else if (GetFrameStateOfAirPlane())
   {
     const float AltHoldPitchGain = 1.4f; //EEPROM
-    RCController[PITCH] = Constrain_16Bits(VarioPIDControl * AltHoldPitchGain, -RCRate * 10, +RCRate * 10);
+    RCController[PITCH] = Constrain_16Bits(VarioPIDControl * AltHoldPitchGain, -ConvertDegreesToDecidegrees(RCRate), +ConvertDegreesToDecidegrees(RCRate));
   }
 
 #ifdef THR_SMOOTH_TEST

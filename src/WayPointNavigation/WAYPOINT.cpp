@@ -360,7 +360,7 @@ void WayPointRun()
         NavigationMode = Do_PositionHold;
         GPS_Flight_Mode = WAYPOINT;
         NavigationMode = Do_PositionHold;
-        if (Mission_Timed_Count >= WayPointTimed[MissionNumber] * 10)
+        if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber]))
         {
           WayPointMode = GET_ALTITUDE;
         }

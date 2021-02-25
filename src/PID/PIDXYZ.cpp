@@ -38,6 +38,8 @@
 #include "Build/BOARDDEFS.h"
 #include "GPS/GPSORIENTATION.h"
 #include "FlightModes/FLIGHTMODES.h"
+#include "AHRS/AHRS.h"
+#include "AHRS/QUATERNION.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -134,8 +136,6 @@ void PIDXYZClass::Update(float DeltaTime)
     CalcedRateTargetPitch = PIDLevelPitch(DeltaTime);
   }
 
-  CalcedRateTargetYaw = PIDXYZ.GetNewYawControllerForPlane(CalcedRateTargetYaw);
-
   if (GetFrameStateOfMultirotor())
   {
     AntiWindUpScaler = Constrain_Float((1.0f - GetMotorMixRange()) / MotorIntegralTermWindUpPoint, 0.0f, 1.0f);
@@ -145,6 +145,7 @@ void PIDXYZClass::Update(float DeltaTime)
   }
   else if (GetFrameStateOfAirPlane())
   {
+    GetNewControllerForPlaneWithTurn();
     PIDApplyFixedWingRateControllerRoll(DeltaTime);
     PIDApplyFixedWingRateControllerPitch(DeltaTime);
     PIDApplyFixedWingRateControllerYaw(DeltaTime);
@@ -536,20 +537,21 @@ bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
   return fabsf(StickPosition) > FixedWingIntegralTermLimitOnStickPosition;
 }
 
-int16_t PIDXYZClass::GetNewYawControllerForPlane(int16_t RateTargetInput)
+void IMUTransformVectorEarthToBody(Struct_Vector3x3 *Vector)
 {
-  if (GetFrameStateOfAirPlane())
-  {
-    return TurnControllerForAirPlane(RateTargetInput);
-  }
-  return RateTargetInput;
+  Vector->Pitch = -Vector->Pitch;
+  QuaternionRotateVector(Vector, Vector, &Orientation);
 }
 
-int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
+void PIDXYZClass::GetNewControllerForPlaneWithTurn()
 {
+  Struct_Vector3x3 TurnControllerRates;
+  TurnControllerRates.Roll = 0;
+  TurnControllerRates.Pitch = 0;
+
   if (!IS_FLIGHT_MODE_ACTIVE(TURN_MODE))
   {
-    return (RadioControlToTurn - IMU.GyroscopeRead[YAW]);
+    return;
   }
   else
   {
@@ -560,13 +562,21 @@ int16_t PIDXYZClass::TurnControllerForAirPlane(int16_t RadioControlToTurn)
       //10KM/H - 216KM/H
       AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 300, 6000);
       CoordinatedTurnRateEarthFrame = ConvetToDegrees(980.665f * Fast_Tangent(-ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL])) / AirSpeedForCoordinatedTurn);
-      return (RadioControlToTurn + CoordinatedTurnRateEarthFrame);
+      TurnControllerRates.Yaw = CoordinatedTurnRateEarthFrame;
     }
     else
     {
-      return (RadioControlToTurn - IMU.GyroscopeRead[YAW]);
+      return;
     }
   }
+
+  //CONVERTE DE EARTH FRAME PARA BODY-FRAME
+  IMUTransformVectorEarthToBody(&TurnControllerRates);
+
+  //LIMITA O VALOR MINIMO E MAXIMO DE SAÍDA A PARTIR DOS VALOR DE RATE DEFINIDO PELO USUARIO NO GCS
+  CalcedRateTargetRoll = Constrain_16Bits(CalcedRateTargetRoll + TurnControllerRates.Roll, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
+  CalcedRateTargetPitch = Constrain_16Bits(CalcedRateTargetPitch + TurnControllerRates.Pitch, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
+  CalcedRateTargetYaw = Constrain_16Bits(CalcedRateTargetYaw + TurnControllerRates.Yaw, -ConvertDegreesToDecidegrees(YawRate), ConvertDegreesToDecidegrees(YawRate));
 }
 
 void PIDXYZClass::Reset_Integral_Accumulators()

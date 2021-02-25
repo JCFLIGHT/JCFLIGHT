@@ -16,9 +16,8 @@
 */
 
 #include "WAYPOINT.h"
-#include "Common/VARIABLES.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "RadioControl/RCCONFIG.h"
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
@@ -26,6 +25,9 @@
 #include "Math/MATHSUPPORT.h"
 #include "RadioControl/STICKS.h"
 #include "Scheduler/SCHEDULER.h"
+#include "Yaw/HEADINGHOLD.h"
+#include "PID/RCPID.h"
+#include "FlightModes/FLIGHTMODES.h"
 
 struct _GetWayPointGCSParameters GetWayPointGCSParameters;
 struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;

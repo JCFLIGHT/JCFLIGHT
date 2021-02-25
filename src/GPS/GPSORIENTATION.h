@@ -18,5 +18,6 @@
 #ifndef GPSORIENTATION_H_
 #define GPSORIENTATION_H_
 #include "Arduino.h"
+extern int16_t GPS_Angle[3];
 void GPS_Orientation_Update();
 #endif

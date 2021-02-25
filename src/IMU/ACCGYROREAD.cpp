@@ -17,7 +17,6 @@
 
 #include "ACCGYROREAD.h"
 #include "I2C/I2C.h"
-#include "Common/VARIABLES.h"
 #include "Filters/KALMANFILTER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "StorageManager/EEPROMSTORAGE.h"
@@ -91,13 +90,13 @@ void IMU_Filters_Initialization()
 void Acc_Initialization()
 {
   I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1C, 0x10);
-  if (Compass_Type == COMPASS_HMC5883 && COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883 && I2C.CompassFound)
+  if (COMPASS.Type == COMPASS_HMC5883 && COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883 && I2C.CompassFound)
   {
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x6A, 0b00100000);
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x37, 0x00);
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x24, 0x0D);
-    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x25, 0x80 | MagAddress);
-    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x26, MagRegister);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x25, 0x80 | COMPASS.Address);
+    I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x26, COMPASS.Register);
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x27, 0x86);
   }
 }

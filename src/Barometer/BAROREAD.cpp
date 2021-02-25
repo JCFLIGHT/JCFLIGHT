@@ -16,8 +16,10 @@
 */
 
 #include "BAROREAD.h"
-#include "Common/VARIABLES.h"
 #include "Filters/AVERAGEFILTER.h"
+#include "Common/ENUM.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/STRUCTS.h"
 
 #define BARO_SPIKES_SIZE 0x15
 

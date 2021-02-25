@@ -16,8 +16,7 @@
 */
 
 #include "FLIGHTMODES.h"
-#include "Common/VARIABLES.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "PID/PIDXYZ.h"
 #include "WayPointNavigation/WAYPOINT.h"
@@ -26,6 +25,18 @@
 #include "RadioControl/RCSTATES.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "GPS/GPSSTATES.h"
+#include "FailSafe/FAILSAFE.h"
+#include "Yaw/HEADINGHOLD.h"
+#include "GPS/GPSREAD.h"
+#include "Common/ENUM.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/STRUCTS.h"
+
+bool Do_Stabilize_Mode;
+bool Do_HeadingHold_Mode;
+bool Do_AltitudeHold_Mode;
+bool Do_GPS_Altitude;
+bool Do_AutoThrottle_Mode;
 
 bool Multirotor_GPS_FlightModes_Once()
 {
@@ -216,7 +227,7 @@ void ProcessFlightModesToAirPlane()
 
 void FlightModesUpdate()
 {
-  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) || Fail_Safe_Event)
+  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) || SystemInFailSafe())
   {
     if (!Do_Stabilize_Mode)
     {

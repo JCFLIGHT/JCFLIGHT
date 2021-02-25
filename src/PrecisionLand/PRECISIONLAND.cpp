@@ -17,8 +17,8 @@
 
 #include "PRECISIONLAND.h"
 #include "Filters/LPFACCEF.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
+#include "Common/STRUCTS.h"
 #include "FastSerial/PRINTF.h"
 
 #ifndef __AVR_ATmega2560__

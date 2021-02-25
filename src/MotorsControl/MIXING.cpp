@@ -16,10 +16,12 @@
 */
 
 #include "MIXING.h"
-#include "Common/VARIABLES.h"
 #include "AirPlane/AIRPLANE.h"
 #include "MIXTABLE.h"
 #include "ProgMem/PROGMEM.h"
+#include "FrameStatus/FRAMESTATUS.h"
+#include "PID/PIDXYZ.h"
+#include "MotorsControl/MOTORS.h"
 
 uint8_t NumberOfMotors = 4;
 
@@ -31,14 +33,14 @@ void MixingApplyControl()
     case QUAD_X:
     {
         //QUAD-X
-        MotorControl[MOTOR1] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[0].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[0].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[0].Yaw);
-        MotorControl[MOTOR2] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[1].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[1].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[1].Yaw);
-        MotorControl[MOTOR3] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[2].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[2].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[2].Yaw);
-        MotorControl[MOTOR4] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Yaw);
+        MotorControl[MOTOR1] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[0].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[0].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[0].Yaw);
+        MotorControl[MOTOR2] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[1].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[1].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[1].Yaw);
+        MotorControl[MOTOR3] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[2].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[2].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[2].Yaw);
+        MotorControl[MOTOR4] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Yaw);
         NumberOfMotors = ProgMemReadByte(&Motors_Count[QUAD_X].FrameMotorsCount);
         return;
     }
@@ -46,18 +48,18 @@ void MixingApplyControl()
     case HEXA_X:
     {
         //HEXA-X
-        MotorControl[MOTOR1] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[0].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[0].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[0].Yaw);
-        MotorControl[MOTOR2] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[1].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[1].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[1].Yaw);
-        MotorControl[MOTOR3] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[2].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[2].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[2].Yaw);
-        MotorControl[MOTOR4] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[3].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[3].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[3].Yaw);
-        MotorControl[MOTOR5] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[4].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[4].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[4].Yaw);
-        MotorControl[MOTOR6] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Yaw);
+        MotorControl[MOTOR1] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[0].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[0].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[0].Yaw);
+        MotorControl[MOTOR2] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[1].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[1].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[1].Yaw);
+        MotorControl[MOTOR3] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[2].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[2].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[2].Yaw);
+        MotorControl[MOTOR4] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[3].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[3].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[3].Yaw);
+        MotorControl[MOTOR5] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[4].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[4].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[4].Yaw);
+        MotorControl[MOTOR6] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Yaw);
         NumberOfMotors = ProgMemReadByte(&Motors_Count[HEXA_X].FrameMotorsCount);
         return;
     }
@@ -65,18 +67,18 @@ void MixingApplyControl()
     case HEXA_I:
     {
         //HEXA+
-        MotorControl[MOTOR1] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[0].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[0].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[0].Yaw);
-        MotorControl[MOTOR2] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[1].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[1].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[1].Yaw);
-        MotorControl[MOTOR3] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[2].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[2].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[2].Yaw);
-        MotorControl[MOTOR4] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[3].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[3].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[3].Yaw);
-        MotorControl[MOTOR5] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[4].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[4].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[4].Yaw);
-        MotorControl[MOTOR6] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Yaw);
+        MotorControl[MOTOR1] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[0].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[0].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[0].Yaw);
+        MotorControl[MOTOR2] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[1].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[1].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[1].Yaw);
+        MotorControl[MOTOR3] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[2].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[2].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[2].Yaw);
+        MotorControl[MOTOR4] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[3].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[3].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[3].Yaw);
+        MotorControl[MOTOR5] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[4].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[4].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[4].Yaw);
+        MotorControl[MOTOR6] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Yaw);
         NumberOfMotors = ProgMemReadByte(&Motors_Count[HEXA_I].FrameMotorsCount);
         return;
     }
@@ -113,14 +115,14 @@ void MixingApplyControl()
     case ZMR250:
     {
         //ZMR250
-        MotorControl[MOTOR1] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[0].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[0].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[0].Yaw);
-        MotorControl[MOTOR2] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[1].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[1].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[1].Yaw);
-        MotorControl[MOTOR3] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[2].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[2].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[2].Yaw);
-        MotorControl[MOTOR4] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Yaw);
+        MotorControl[MOTOR1] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[0].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[0].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[0].Yaw);
+        MotorControl[MOTOR2] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[1].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[1].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[1].Yaw);
+        MotorControl[MOTOR3] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[2].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[2].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[2].Yaw);
+        MotorControl[MOTOR4] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Yaw);
         NumberOfMotors = ProgMemReadByte(&Motors_Count[ZMR250].FrameMotorsCount);
         return;
     }
@@ -128,14 +130,14 @@ void MixingApplyControl()
     case TBS:
     {
         //TEAM BLACK SHEEP
-        MotorControl[MOTOR1] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[0].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[0].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[0].Yaw);
-        MotorControl[MOTOR2] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[1].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[1].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[1].Yaw);
-        MotorControl[MOTOR3] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[2].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[2].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[2].Yaw);
-        MotorControl[MOTOR4] = PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Roll) +
-                               PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Pitch) + 1 * PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Yaw);
+        MotorControl[MOTOR1] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[0].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[0].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[0].Yaw);
+        MotorControl[MOTOR2] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[1].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[1].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[1].Yaw);
+        MotorControl[MOTOR3] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[2].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[2].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[2].Yaw);
+        MotorControl[MOTOR4] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Roll) +
+                               PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Pitch) + 1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Yaw);
         NumberOfMotors = ProgMemReadByte(&Motors_Count[TBS].FrameMotorsCount);
         return;
     }

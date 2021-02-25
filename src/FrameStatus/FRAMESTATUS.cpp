@@ -16,8 +16,10 @@
 */
 
 #include "FRAMESTATUS.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
+#include "Common/ENUM.h"
+
+uint8_t FrameType;
 
 bool GetFrameStateOfMultirotor()
 {

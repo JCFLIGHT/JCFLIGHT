@@ -18,7 +18,6 @@
 #include "DECODE.h"
 #include "Common/STRUCTS.h"
 #include "FastSerial/FASTSERIAL.h"
-#include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "SBUS/SBUSREAD.h"

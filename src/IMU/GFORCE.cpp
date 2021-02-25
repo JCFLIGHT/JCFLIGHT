@@ -16,7 +16,6 @@
 */
 
 #include "GFORCE.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
 #include "Filters/PT1.h"

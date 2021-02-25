@@ -16,7 +16,6 @@
 */
 
 #include "AUTOLAUNCH.h"
-#include "Common/VARIABLES.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "AHRS/AHRS.h"
 #include "FlightModes/AUXFLIGHT.h"
@@ -25,6 +24,7 @@
 #include "AHRS/VECTOR.h"
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "PID/RCPID.h"
 
 AutoLaunchClass AUTOLAUNCH;
 

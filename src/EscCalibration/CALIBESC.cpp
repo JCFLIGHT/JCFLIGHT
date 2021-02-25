@@ -16,7 +16,6 @@
 */
 
 #include "CALIBESC.h"
-#include "Common/VARIABLES.h"
 #include "MotorsControl/MOTORS.h"
 #include "LedRGB/LEDRGB.h"
 #include "RadioControl/DECODE.h"
@@ -26,6 +25,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "RadioControl/RCSTATES.h"
 #include "RadioControl/DECODE.h"
+#include "Common/RCDEFINES.h"
 #include "FastSerial/PRINTF.h"
 
 ClassESC ESC;

@@ -17,12 +17,12 @@
 
 #include "SBUSREAD.h"
 #include "FastSerial/FASTSERIAL.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FastSerial/PRINTF.h"
 #include "BAR/BAR.h"
 #include "Common/ENUM.h"
+#include "FailSafe/FAILSAFE.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -96,13 +96,13 @@ void SBUS::Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame)
       else
       {
         *FailSafe = false;
-        if (Fail_Safe_System > 20)
+        if (Fail_Safe_System_Count > 20)
         {
-          Fail_Safe_System -= 20;
+          Fail_Safe_System_Count -= 20;
         }
         else
         {
-          Fail_Safe_System = 0;
+          Fail_Safe_System_Count = 0;
         }
       }
     }

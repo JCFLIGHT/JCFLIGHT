@@ -17,13 +17,13 @@
 
 #include "BATTERY.h"
 #include "AnalogDigitalConverter/ADC.h"
-#include "Common/VARIABLES.h"
 #include "Filters/AVERAGEFILTER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Buzzer/BUZZER.h"
 #include "BATTLEVELS.h"
 #include "Build/BOARDDEFS.h"
 #include "Math/MATHSUPPORT.h"
+#include "BitArray/BITARRAY.h"
 #include "FastSerial/PRINTF.h"
 
 BATT BATTERY;

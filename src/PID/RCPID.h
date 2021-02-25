@@ -18,5 +18,13 @@
 #ifndef DYNAMICPID_H_
 #define DYNAMICPID_H_
 #include "Arduino.h"
+extern uint8_t RCRate;
+extern uint8_t RCExpo;
+extern uint8_t YawRate;
+extern uint8_t ThrottleMiddle;
+extern uint8_t ThrottleExpo;
+extern int16_t RCController[4];
+extern int16_t AttitudeThrottleMin;
+extern int16_t AttitudeThrottleMax;
 void RC_PID_Update();
 #endif

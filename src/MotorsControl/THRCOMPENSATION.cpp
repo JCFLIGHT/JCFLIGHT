@@ -16,7 +16,6 @@
 */
 
 #include "THRCOMPENSATION.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "Math/MATHSUPPORT.h"

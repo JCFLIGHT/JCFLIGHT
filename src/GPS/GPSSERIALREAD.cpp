@@ -17,10 +17,9 @@
 
 #include "GPSSERIALREAD.h"
 #include "FastSerial/FASTSERIAL.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "GPS/GPSREAD.h"
-#include "Scheduler/SCHEDULERTIME.h"
-#include "Common/VARIABLES.h"
+#include "Common/ENUM.h"
 
 void GPS_Serial_Read()
 {

@@ -17,11 +17,12 @@
 
 #include "SWITCHFLAG.h"
 #include "FlightModes/AUXFLIGHT.h"
-#include "Common/VARIABLES.h"
 #include "AirPlane/SERVORATE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "AirPlane/SERVOAUTOTRIM.h"
+#include "Compass/COMPASSREAD.h"
+#include "BitArray/BITARRAY.h"
 
 //***********************************************************************************************
 //ATIVAÇÃO PARA O CALIBRÇÃO DO MAG,SERVO AUTO-TRIM & TRIMAGEM MANUAL DOS SERVOS VIA CHAVE AUX
@@ -84,7 +85,7 @@ void Switch_Flag(void)
     FlagParameterFunction = 0;
   }
   //FLAG PRINCIPAL IGUAL A 4?CHAVE AUX ATIVADA?CAL DO MAG ACABOU?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
-  if (FlagParameterFunction == 4 && IOCControlAux && !CalibratingCompass)
+  if (FlagParameterFunction == 4 && IOCControlAux && !COMPASS.Calibrating)
   {
     GuardValue = FlagParameterFunction;
   }
@@ -111,7 +112,7 @@ void Switch_Flag(void)
   {
     if (GuardValue == 8 && CloseReset > 2 && CloseReset < 4)
     {
-      CalibratingCompass = true; //O VALOR GUARDADO É IGUAL A 8?E A DECREMENTAÇÃO ACABOU?SIM...INICIA A CALIBRAÇÃO DO COMPASS
+      COMPASS.Calibrating = true; //O VALOR GUARDADO É IGUAL A 8?E A DECREMENTAÇÃO ACABOU?SIM...INICIA A CALIBRAÇÃO DO COMPASS
     }
     if (GuardValue == 8 && CloseReset == 2)
     {

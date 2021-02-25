@@ -18,10 +18,10 @@
 #include "COMPASSCAL.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
-#include "Common/VARIABLES.h"
 #include "LedRGB/LEDRGB.h"
 #include "IMU/IMUHEALTH.h"
 #include "Buzzer/BUZZER.h"
+#include "Common/STRUCTS.h"
 
 CompassCalClass COMPASSCAL;
 
@@ -39,7 +39,7 @@ void CompassCalClass::ApplyGain()
 void CompassCalClass::ApplyCalibration()
 {
     //AJUSTA O VALOR DO COMPASS COM A CALIBRAÇÃO GUARDADA NA EEPROM
-    if (!CalibratingCompass)
+    if (!Calibrating)
     {
         IMU.CompassRead[ROLL] -= CALIBRATION.Magnetometer[ROLL];
         IMU.CompassRead[PITCH] -= CALIBRATION.Magnetometer[PITCH];
@@ -49,7 +49,7 @@ void CompassCalClass::ApplyCalibration()
 
 void CompassCalClass::RunningCalibration()
 {
-    if (!CalibratingCompass)
+    if (!Calibrating)
     {
         return;
     }
@@ -98,7 +98,7 @@ void CompassCalClass::RunningCalibration()
         }
         else
         {
-            CalibratingCompass = false;
+            Calibrating = false;
             CalibrationCount = 0;
             STORAGEMANAGER.Write_16Bits(MAG_ROLL_ADDR, CALIBRATION.Magnetometer[ROLL]);
             STORAGEMANAGER.Write_16Bits(MAG_PITCH_ADDR, CALIBRATION.Magnetometer[PITCH]);

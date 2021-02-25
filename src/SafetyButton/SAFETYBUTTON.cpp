@@ -16,7 +16,6 @@
 */
 
 #include "SAFETYBUTTON.h"
-#include "Common/VARIABLES.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Buzzer/BUZZER.h"
 #include "MotorsControl/MOTORS.h"

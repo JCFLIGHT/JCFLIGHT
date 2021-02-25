@@ -16,12 +16,14 @@
 */
 
 #include "HEADINGHOLD.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Filters/PT1.h"
 #include "Scheduler/SCHEDULER.h"
+#include "GPSNavigation/NAVIGATION.h"
+#include "PID/RCPID.h"
+#include "FlightModes/FLIGHTMODES.h"
 #include "FastSerial/PRINTF.h"
 
 //DEBUG
@@ -30,6 +32,8 @@
 #define HEADING_HOLD_ERROR_LPF_FREQ 2
 
 PT1_Filter_Struct HeadingHoldRateFilter;
+
+int16_t HeadingHoldTarget;
 
 void UpdateStateOfHeadingHold(void)
 {

@@ -16,13 +16,16 @@
 */
 
 #include "ARMING.h"
-#include "Common/VARIABLES.h"
 #include "RadioControl/RCSTATES.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "ProgMem/PROGMEM.h"
 #include "Glitch/GLITCH.h"
 #include "IOMCU/IOMCU.h"
+#include "FailSafe/FAILSAFE.h"
+#include "GPSNavigation/NAVIGATION.h"
+#include "IMU/IMUCALIBRATE.h"
+#include "Common/STRUCTS.h"
 
 PreArmClass PREARM;
 
@@ -119,7 +122,7 @@ uint8_t PreArmClass::Checking(void)
         return FLIGHT_MODES_ERROR;
     }
 
-    if (Fail_Safe_Event) //MODO FAIL-SAFE ATIVO
+    if (SystemInFailSafe()) //MODO FAIL-SAFE ATIVO
     {
         return FAIL_SAFE_ERROR;
     }

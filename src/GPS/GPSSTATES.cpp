@@ -16,7 +16,10 @@
 */
 
 #include "GPSSTATES.h"
-#include "Common/VARIABLES.h"
+#include "GPSNavigation/NAVIGATION.h"
+#include "GPS/GPSREAD.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/ENUM.h"
 
 bool Get_State_Armed_With_GPS()
 {

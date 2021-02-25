@@ -18,6 +18,12 @@
 #ifndef GPSREAD_H_
 #define GPSREAD_H_
 #include "Arduino.h"
+extern uint8_t GPS_NumberOfSatellites;
+extern int16_t GPSVelNED[3];
+extern uint16_t GPS_Ground_Course;
+extern uint16_t GPS_Altitude;
+extern uint16_t GPS_Ground_Speed;
+extern uint16_t GPS_HDOP;
 void GPS_SerialInit(uint32_t Get_BaudRate);
 void GPS_SerialRead(uint8_t ReadData);
 void GetAllGPSData(void);

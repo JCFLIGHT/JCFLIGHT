@@ -16,10 +16,11 @@
 */
 
 #include "PARACHUTE.h"
-#include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Buzzer/BUZZER.h"
+#include "MotorsControl/MOTORS.h"
+#include "Common/RCDEFINES.h"
 
 ParachuteClass PARACHUTE;
 

@@ -16,7 +16,6 @@
 */
 
 #include "GLITCH.h"
-#include "Common/VARIABLES.h"
 #include "I2C/I2C.h"
 #include "GPS/GPSSTATES.h"
 

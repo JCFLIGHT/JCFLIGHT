@@ -17,8 +17,9 @@
 
 #include "GIMBAL.h"
 #include "FlightModes/AUXFLIGHT.h"
-#include "Common/VARIABLES.h"
 #include "RadioControl/DECODE.h"
+#include "MotorsControl/MOTORS.h"
+#include "Common/RCDEFINES.h"
 
 void Gimbal_Controll()
 {

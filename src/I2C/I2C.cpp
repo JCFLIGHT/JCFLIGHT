@@ -17,7 +17,6 @@
 
 #include "I2C.h"
 #include "Common/STRUCTS.h"
-#include "Common/VARIABLES.h"
 #include "Barometer/BAROBACKEND.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Compass/COMPASSREAD.h"
@@ -43,37 +42,37 @@ void I2CPROTOCOL::Initialization(void)
   if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 ||
       STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
   {
-    Compass_Type = COMPASS_AK8975;
+    COMPASS.Type = COMPASS_AK8975;
   }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 ||
            STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
   {
-    Compass_Type = COMPASS_HMC5843;
+    COMPASS.Type = COMPASS_HMC5843;
   }
   else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 ||
            STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
   {
-    Compass_Type = COMPASS_HMC5883;
+    COMPASS.Type = COMPASS_HMC5883;
   }
   I2C.SearchDevicesInBarrament();
   //AK8975 ENDEREÇO:0x0C
   //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
-  if (Compass_Type == COMPASS_AK8975)
+  if (COMPASS.Type == COMPASS_AK8975)
   {
-    MagAddress = ADDRESS_COMPASS_AK8975;
-    MagRegister = 0x03;
+    COMPASS.Address = ADDRESS_COMPASS_AK8975;
+    COMPASS.Register = 0x03;
   }
-  else if ((Compass_Type == COMPASS_HMC5843) || (Compass_Type == COMPASS_HMC5883))
+  else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
   {
     if (COMPASS.FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
     {
-      MagAddress = ADDRESS_COMPASS_QMC5883;
-      MagRegister = 0x00;
+      COMPASS.Address = ADDRESS_COMPASS_QMC5883;
+      COMPASS.Register = 0x00;
     }
     else
     {
-      MagAddress = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-      MagRegister = 0x03;
+      COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
+      COMPASS.Register = 0x03;
     }
   }
 }
@@ -88,7 +87,7 @@ void __attribute__((noinline)) WaitTransmission(uint8_t _TWCR)
     if (CheckTWCRTWINTState == 0)
     {
       TWCR = 0;
-      I2CErrors++;
+      I2C.Errors++;
       break;
     }
   }
@@ -363,20 +362,20 @@ void I2CPROTOCOL::Initialization(void)
   //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
   if (Compass_Type == COMPASS_AK8975)
   {
-    MagAddress = ADDRESS_COMPASS_AK8975;
-    MagRegister = 0x03;
+    COMPASS.Address = ADDRESS_COMPASS_AK8975;
+    COMPASS.Register = 0x03;
   }
   else if ((Compass_Type == COMPASS_HMC5843) || (Compass_Type == COMPASS_HMC5883))
   {
     if (COMPASS.FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
     {
-      MagAddress = ADDRESS_COMPASS_QMC5883;
-      MagRegister = 0x00;
+      COMPASS.Address = ADDRESS_COMPASS_QMC5883;
+      COMPASS.Register = 0x00;
     }
     else
     {
-      MagAddress = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-      MagRegister = 0x03;
+      COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
+      COMPASS.Register = 0x03;
     }
   }
 }
@@ -516,20 +515,20 @@ void I2CPROTOCOL::Initialization(void)
   //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
   if (Compass_Type == COMPASS_AK8975)
   {
-    MagAddress = ADDRESS_COMPASS_AK8975;
-    MagRegister = 0x03;
+    COMPASS.Address = ADDRESS_COMPASS_AK8975;
+    COMPASS.Register = 0x03;
   }
   else if ((Compass_Type == COMPASS_HMC5843) || (Compass_Type == COMPASS_HMC5883))
   {
     if (COMPASS.FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
     {
-      MagAddress = ADDRESS_COMPASS_QMC5883;
-      MagRegister = 0x00;
+      COMPASS.Address = ADDRESS_COMPASS_QMC5883;
+      COMPASS.Register = 0x00;
     }
     else
     {
-      MagAddress = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-      MagRegister = 0x03;
+      COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
+      COMPASS.Register = 0x03;
     }
   }
 }
@@ -570,7 +569,7 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
 
 #endif
 
-void All_I2C_Initialization()
+void I2CPROTOCOL::All_Initialization()
 {
   uint8_t ForceInitialization = 5;
   SCHEDULERTIME.Sleep(200);

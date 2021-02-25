@@ -17,11 +17,11 @@
 
 #include "GPSREAD.h"
 #include "FastSerial/FASTSERIAL.h"
-#include "Common/VARIABLES.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "ProgMem/PROGMEM.h"
+#include "Common/ENUM.h"
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464
@@ -79,15 +79,26 @@ static union
   uint8_t Bytes_Array[464];
 } Buffer;
 
+bool GPS_3DFIX;
+
 //VERIFICAÇÃO DOS PACOTES DE DADOS
 static uint8_t Check_Packet_A;
 static uint8_t Check_Packet_B;
+
+uint8_t GPS_NumberOfSatellites;
 
 //ESTADO DE MAQUINA
 static uint8_t Step_Counter;
 static uint8_t Get_GPS_Message_ID;
 static uint16_t Payload_Length;
 static uint16_t Payload_Counter;
+
+int16_t GPSVelNED[3];
+
+uint16_t GPS_Ground_Course;
+uint16_t GPS_Altitude;
+uint16_t GPS_Ground_Speed;
+uint16_t GPS_HDOP;
 
 #ifdef __AVR_ATmega2560__
 const uint8_t Ublox_Set_Configuration[] __attribute__((__progmem__)) = {
@@ -322,19 +333,25 @@ void GPS_SerialRead(uint8_t ReadData)
       Buffer.Bytes_Array[Payload_Counter] = ReadData;
     }
     if (++Payload_Counter == Payload_Length)
+    {
       Step_Counter++;
+    }
     break;
 
   case 7:
     Step_Counter++;
     if (Check_Packet_A != ReadData)
+    {
       Step_Counter = 0;
+    }
     break;
 
   case 8:
     Step_Counter = 0;
     if (Check_Packet_B != ReadData)
+    {
       break;
+    }
     GetAllGPSData();
   }
 }

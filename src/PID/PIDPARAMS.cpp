@@ -16,11 +16,12 @@
 */
 
 #include "PIDPARAMS.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "IOMCU/IOMCU.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "Common/ENUM.h"
+#include "Common/STRUCTS.h"
 
 void LoadPID()
 {

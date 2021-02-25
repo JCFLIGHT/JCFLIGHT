@@ -23,6 +23,8 @@ class DecodeClass
 public:
   volatile uint16_t PPMReadChannels[12];
   uint8_t RcChannelMap[12];
+  int16_t DirectRadioControllRead[12];
+  int16_t RadioControllOutput[12];
   void Initialization();
   void Update();
   int16_t GetRxChannelOutput(uint8_t Channel);

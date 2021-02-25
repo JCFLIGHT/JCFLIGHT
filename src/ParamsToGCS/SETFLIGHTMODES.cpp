@@ -16,8 +16,8 @@
 */
 
 #include "SETFLIGHTMODES.h"
-#include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
+#include "GPSNavigation/NAVIGATION.h"
 
 void SetFlightModeToGCS()
 {

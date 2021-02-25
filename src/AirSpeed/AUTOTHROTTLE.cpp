@@ -17,9 +17,13 @@
 
 #include "AUTOTHROTTLE.h"
 #include "AIRSPEED.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "PID/RCPID.h"
+#include "FlightModes/FLIGHTMODES.h"
+#include "Common/ENUM.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/STRUCTS.h"
 
 int16_t CalculateIntegral = 0;
 uint16_t PreviousValueOfAirSpeed = 0;

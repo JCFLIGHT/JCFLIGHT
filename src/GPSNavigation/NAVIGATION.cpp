@@ -15,8 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "MULTIROTORNAVIGATION.h"
-#include "Common/VARIABLES.h"
+#include "NAVIGATION.h"
 #include "PID/PIDPARAMS.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Declination/AUTODECLINATION.h"
@@ -29,6 +28,9 @@
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "GPS/GPSSTATES.h"
+#include "Yaw/HEADINGHOLD.h"
+#include "GPS/GPSREAD.h"
+#include "FlightModes/FLIGHTMODES.h"
 
 #define NAVTILTCOMPENSATION 20  //RETIRADO DA ARDUPILOT
 #define GPS_BANK_ANGLE_MAX 3000 //30 GRAUS
@@ -41,24 +43,38 @@ static void GPS_Update_CrossTrackError(void);
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput);
 
 bool DeclinationPushed = false;
+bool GPSHold_CallBaro = false;
+bool Home_Point;
 
 uint8_t DeclinationPushedCount = 0;
+uint8_t GPS_Flight_Mode;
+uint8_t NavigationMode;
+uint8_t RTH_Altitude;
 
 static float DeltaTimeGPSNavigation;
 float ScaleDownOfLongitude = 1.0f;
 
 int16_t GPSActualSpeed[2] = {0, 0};
+int16_t GPS_Navigation_Array[2];
+int16_t DirectionToHome;
 
 static int16_t Coordinates_Navigation_Speed;
 static int16_t Crosstrack_Error;
 static int16_t GPS_Rate_Error[2];
 static int16_t Navigation_Bearing_RTH;
 
+uint16_t DistanceToHome;
+
+int32_t GPS_Coordinates_Vector[2];
+int32_t Stored_Coordinates_Home_Point[2];
+int32_t GPS_CoordinatesToHold[2];
 int32_t Two_Points_Distance;
 int32_t Target_Bearing;
 int32_t GPSDistanceToHome[2];
 int32_t Original_Target_Bearing;
 int32_t Coordinates_To_Navigation[2];
+
+uint32_t Time_To_Start_The_Land;
 
 void GPS_Process_FlightModes(float DeltaTime)
 {
@@ -87,7 +103,7 @@ void GPS_Process_FlightModes(float DeltaTime)
   }
   //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
   if (Declination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) && //VERIFICA SE O VALOR É DIFERENTE
-      !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&                                          //CHECA SE ESTÁ DESARMADO
+      !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&                         //CHECA SE ESTÁ DESARMADO
       Declination() != 0 &&                                           //CHECA SE O VALOR É DIFERENTE DE ZERO
       !DeclinationPushed &&                                           //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
       DeclinationPushedCount > 250)                                   //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
@@ -98,7 +114,7 @@ void GPS_Process_FlightModes(float DeltaTime)
   DeltaTimeGPSNavigation = DeltaTime;
   DeltaTimeGPSNavigation = MIN(DeltaTimeGPSNavigation, 1.0f);
   GPS_Calcule_Bearing(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &CalculateDirection);
-  DirectionToHome = CalculateDirection / 100;
+  DirectionToHome = CalculateDirection / 100; //FUTURAMENTE PARA O GCS
   GPS_Calcule_Distance_To_Home(&CalculateDistance);
   DistanceToHome = CalculateDistance / 100;
   if (!Home_Point)

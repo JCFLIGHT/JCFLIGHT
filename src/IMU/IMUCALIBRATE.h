@@ -18,6 +18,8 @@
 #ifndef IMUCALIBRATE_H_
 #define IMUCALIBRATE_H_
 #include "Arduino.h"
+extern uint16_t CalibratingAccelerometer;
+extern uint16_t CalibratingGyroscope;
 void Accelerometer_Calibration();
 void Gyroscope_Calibration();
 #endif

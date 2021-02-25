@@ -17,13 +17,13 @@
 
 #include "RCSMOOTH.h"
 #include "Math/MATHSUPPORT.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "BAR/BAR.h"
 #include "Filters/BIQUADFILTER.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Build/BOARDDEFS.h"
+#include "PID/RCPID.h"
 #include "FastSerial/PRINTF.h"
 
 //DEBUG

@@ -16,7 +16,6 @@
 */
 
 #include "BUZZER.h"
-#include "Common/VARIABLES.h"
 #include "RadioControl/STICKS.h"
 #include "EscCalibration/CALIBESC.h"
 #include "BatteryMonitor/BATTERY.h"

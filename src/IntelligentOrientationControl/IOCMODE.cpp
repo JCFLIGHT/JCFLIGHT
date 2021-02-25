@@ -16,9 +16,13 @@
 */
 
 #include "IOCMODE.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "Compass/COMPASSREAD.h"
+#include "PID/RCPID.h"
+#include "Common/ENUM.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/STRUCTS.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -30,7 +34,7 @@ void IOC_Mode_Update()
 {
   if (IS_FLIGHT_MODE_ACTIVE(IOC_MODE) && GetFrameStateOfMultirotor())
   {
-    const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - IOC_Initial_Compass);
+    const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - COMPASS.IOC_Initial);
     const float CosineDifference = Fast_Cosine(HeadingDifference);
     const float SineDifference = Fast_Sine(HeadingDifference);
     const int16_t CalcedRCControllerPITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;

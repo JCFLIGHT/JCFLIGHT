@@ -16,7 +16,6 @@
 */
 
 #include "ALTITUDEHOLD.h"
-#include "Common/VARIABLES.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
@@ -26,6 +25,9 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/RCSTATES.h"
 #include "RadioControl/DECODE.h"
+#include "GPSNavigation/NAVIGATION.h"
+#include "PID/RCPID.h"
+#include "FlightModes/FLIGHTMODES.h"
 
 bool TakeOffInProgress = false;
 bool GroundAltitudeSet = false;

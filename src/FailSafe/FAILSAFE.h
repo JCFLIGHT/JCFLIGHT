@@ -18,5 +18,8 @@
 #ifndef FAILSAFE_H_
 #define FAILSAFE_H_
 #include "Arduino.h"
+extern volatile int16_t Fail_Safe_System_Count;
+bool FastSystemFailSafe();
+bool SystemInFailSafe();
 void FailSafeCheck();
 #endif

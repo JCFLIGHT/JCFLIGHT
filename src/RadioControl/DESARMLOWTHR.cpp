@@ -16,11 +16,13 @@
 */
 
 #include "DESARMLOWTHR.h"
-#include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/DECODE.h"
+#include "FailSafe/FAILSAFE.h"
+#include "Common/ENUM.h"
+#include "BitArray/BITARRAY.h"
 
 //**************************************************************************
 //TIMER DE DESLIGAMENTO AUTOMATICO DOS MOTORES POR INATIVADADE DO THROTTLE
@@ -63,7 +65,7 @@ void DesarmLowThrClass::Update()
   }
   //THROTTLE NO MINIMO,DRONE ARMADO,FAIL-SAFE DESATIVADO?SIM...
   if (Check_Throttle() && Check_Others_Channels() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&
-      !ImmediatelyFailSafe && !IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && ArmDisarmConfig == 0)
+      !FastSystemFailSafe() && !IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && ArmDisarmConfig == 0)
   {
     if (TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
     {

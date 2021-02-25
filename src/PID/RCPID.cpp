@@ -16,7 +16,6 @@
 */
 
 #include "RCPID.h"
-#include "Common/VARIABLES.h"
 #include "IntelligentOrientationControl/IOCMODE.h"
 #include "TPA.h"
 #include "Math/MATHSUPPORT.h"
@@ -39,6 +38,16 @@ PT1_Filter_Struct FixedWingTPAFilter;
 //#define PRINTLN_TPA
 
 bool FixedWingTPAFilterInitalized = false;
+
+uint8_t RCRate;
+uint8_t RCExpo;
+uint8_t YawRate;
+uint8_t ThrottleMiddle;
+uint8_t ThrottleExpo;
+
+int16_t RCController[4];
+int16_t AttitudeThrottleMin;
+int16_t AttitudeThrottleMax;
 
 void GetRCDataConvertedAndApplyFilter()
 {

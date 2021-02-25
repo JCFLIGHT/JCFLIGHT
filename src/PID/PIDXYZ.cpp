@@ -16,7 +16,6 @@
 */
 
 #include "PIDXYZ.h"
-#include "Common/VARIABLES.h"
 #include "RCPID.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
@@ -37,6 +36,8 @@
 #include "TPA.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Build/BOARDDEFS.h"
+#include "GPS/GPSORIENTATION.h"
+#include "FlightModes/FLIGHTMODES.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -84,6 +85,7 @@ float FixedWingIntegralTermLimitOnStickPosition = 0.5f; //AJUSTAVEL PELO USUARIO
 
 float ErrorGyroIntegral[3];
 float ErrorGyroIntegralLimit[3];
+float CoordinatedTurnRateEarthFrame;
 
 void PIDXYZClass::DerivativeLPF_Update()
 {
@@ -99,7 +101,7 @@ void PIDXYZClass::Update(float DeltaTime)
 {
   CalcedRateTargetRoll = RCControllerToRate(RCController[ROLL], RCRate);
   CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
-  CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], RCRate);
+  CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], YawRate);
 
   CalcedRateTargetRollToGCS = CalcedRateTargetRoll;
   CalcedRateTargetPitchToGCS = CalcedRateTargetPitch;
@@ -321,7 +323,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
 
   ErrorGyroIntegral[ROLL] = PIDXYZ.ApplyIntegralTermLimiting(ROLL, ErrorGyroIntegral[ROLL]);
 
-  PIDControllerApply[ROLL] = NewOutputLimited;
+  PIDXYZ.PIDControllerApply[ROLL] = NewOutputLimited;
 
   PreviousRateTarget = PIDXYZ.CalcedRateTargetRoll;
   PreviousRateGyro = IMU.GyroscopeRead[ROLL];
@@ -379,7 +381,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
 
   ErrorGyroIntegral[PITCH] = PIDXYZ.ApplyIntegralTermLimiting(PITCH, ErrorGyroIntegral[PITCH]);
 
-  PIDControllerApply[PITCH] = NewOutputLimited;
+  PIDXYZ.PIDControllerApply[PITCH] = NewOutputLimited;
 
   PreviousRateTarget = PIDXYZ.CalcedRateTargetPitch;
   PreviousRateGyro = IMU.GyroscopeRead[PITCH];
@@ -444,7 +446,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
 
   ErrorGyroIntegral[YAW] = PIDXYZ.ApplyIntegralTermLimiting(YAW, ErrorGyroIntegral[YAW]);
 
-  PIDControllerApply[YAW] = NewOutputLimited;
+  PIDXYZ.PIDControllerApply[YAW] = NewOutputLimited;
 
   PreviousRateTarget = PIDXYZ.CalcedRateTargetYaw;
   PreviousRateGyro = IMU.GyroscopeRead[YAW];
@@ -465,7 +467,7 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerRoll(float DeltaTime)
     ErrorGyroIntegral[ROLL] = Constrain_Float(ErrorGyroIntegral[ROLL], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PIDControllerApply[ROLL] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[ROLL], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PIDXYZ.PIDControllerApply[ROLL] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[ROLL], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 }
 
 void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
@@ -483,7 +485,7 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
     ErrorGyroIntegral[PITCH] = Constrain_Float(ErrorGyroIntegral[PITCH], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PIDControllerApply[PITCH] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[PITCH], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PIDXYZ.PIDControllerApply[PITCH] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[PITCH], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 }
 
 void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
@@ -501,12 +503,12 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
     ErrorGyroIntegral[YAW] = Constrain_Float(ErrorGyroIntegral[YAW], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PIDControllerApply[YAW] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[YAW], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PIDXYZ.PIDControllerApply[YAW] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[YAW], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 }
 
 bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
 {
-  float StickPosition = (float)Constrain_16Bits(RadioControllOutput[Axis] - MIDDLE_STICKS_PULSE, -500, 500) / 500.0f;
+  float StickPosition = (float)Constrain_16Bits(DECODE.GetRxChannelOutput(Axis) - MIDDLE_STICKS_PULSE, -500, 500) / 500.0f;
   if (Do_Stabilize_Mode)
   {
     return false;

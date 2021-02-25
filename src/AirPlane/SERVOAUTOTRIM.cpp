@@ -16,7 +16,6 @@
 */
 
 #include "SERVOAUTOTRIM.h"
-#include "Common/VARIABLES.h"
 #include "PID/PIDXYZ.h"
 #include "SwitchFlag/SWITCHFLAG.h"
 #include "Scheduler/SCHEDULERTIME.h"
@@ -24,6 +23,8 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "Buzzer/BUZZER.h"
+#include "MotorsControl/MOTORS.h"
+#include "BitArray/BITARRAY.h"
 
 #define SERVO_AUTOTRIM_OVERFLOW 2000
 #define SAVE_OVERFLOW 2500

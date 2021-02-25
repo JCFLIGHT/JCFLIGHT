@@ -17,16 +17,22 @@
 
 #include "AUXFLIGHT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Common/VARIABLES.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "ParamsToGCS/SETFLIGHTMODES.h"
 #include "BAR/BAR.h"
+#include "FailSafe/FAILSAFE.h"
+#include "FrameStatus/FRAMESTATUS.h"
+#include "Common/ENUM.h"
+#include "Common/RCDEFINES.h"
 
 //***********************************************************
 //CONFIGURAÇÃO DAS CHAVES AUXILIARES PARA OS MODOS DE VOO
 //***********************************************************
 
 AUXFLIGHTCLASS AUXFLIGHT;
+
+//ATIVAÇÃO E DASATIVAÇÃO DOS MODOS DE VOO
+uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
 
 //VARIAVEIS DE CARREGAMENTO DA EEPROM
 uint8_t GPSHoldConfig,
@@ -1090,7 +1096,7 @@ void AUXFLIGHTCLASS::SelectMode(void)
 void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
 {
   SetFlightModeToGCS();
-  if (Fail_Safe_Event)
+  if (SystemInFailSafe())
   {
     return;
   }

@@ -18,6 +18,7 @@
 #ifndef HEADINGHOLD_H_
 #define HEADINGHOLD_H_
 #include "Arduino.h"
+extern int16_t HeadingHoldTarget;
 void UpdateStateOfHeadingHold(void);
 bool GetSafeStateOfHeadingHold();
 float GetHeadingHoldValue(int32_t DeltaTimeUs);

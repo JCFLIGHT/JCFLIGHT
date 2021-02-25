@@ -18,11 +18,11 @@
 #ifndef LEDRGB_H_
 #define LEDRGB_H_
 #include "Arduino.h"
-extern bool NotPriorit;
 class LEDRGB
 {
 public:
-  LEDRGB(){};
+  bool NotPriorit;
+  uint16_t SetColorValue[3];
   void Initialization();
   void Update();
   void Function(uint8_t Mode);

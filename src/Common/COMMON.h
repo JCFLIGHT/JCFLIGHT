@@ -15,7 +15,6 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "VARIABLES.h"
 #include "STRUCTS.h"
 #include "PID/PIDPARAMS.h"
 #include "AHRS/AHRS.h"
@@ -24,7 +23,7 @@
 #include "RadioControl/DECODE.h"
 #include "I2C/I2C.h"
 #include "FastSerial/FASTSERIAL.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "FastSerial/PRINTF.h"

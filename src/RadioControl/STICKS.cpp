@@ -17,7 +17,6 @@
 
 #include "STICKS.h"
 #include "LedRGB/LEDRGB.h"
-#include "Common/VARIABLES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "RCSTATES.h"
@@ -25,6 +24,9 @@
 #include "Arming/ARMING.h"
 #include "Common/RCDEFINES.h"
 #include "RCSTATES.h"
+#include "Compass/COMPASSREAD.h"
+#include "FailSafe/FAILSAFE.h"
+#include "Common/STRUCTS.h"
 
 SticksClass STICKS;
 
@@ -64,19 +66,19 @@ void SticksClass::Update()
   }
   if (GetActualThrottleStatus(THROTTLE_LOW))
   {
-    if (!ImmediatelyFailSafe)
+    if (!FastSystemFailSafe())
     {
       if (ArmDisarmConfig > 0)
       {
         ENABLE_DISABLE_STATE_WITH_DEPENDENCY(SECONDARY_ARM_DISARM, ArmDisarmControlAux);
         if (IS_STATE_ACTIVE(SECONDARY_ARM_DISARM))
         {
-          if (!Fail_Safe_Event && !IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && !IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
+          if (!SystemInFailSafe() && !IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && !IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
           {
             if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
               ENABLE_STATE(PRIMARY_ARM_DISARM);
-              IOC_Initial_Compass = ATTITUDE.AngleOut[YAW];
+              COMPASS.IOC_Initial = ATTITUDE.AngleOut[YAW];
             }
           }
         }
@@ -108,7 +110,7 @@ void SticksClass::Pre_Arm(void)
       else //IMU CALIBRADA?SIM...ARMA OS MOTORES
       {
         ENABLE_STATE(PRIMARY_ARM_DISARM);
-        IOC_Initial_Compass = ATTITUDE.AngleOut[YAW];
+        COMPASS.IOC_Initial = ATTITUDE.AngleOut[YAW];
       }
       PreArm_Delay = false;
       PreArm_Delay_Count = 0;
@@ -135,7 +137,7 @@ void SticksClass::Pre_Arm_Leds(void)
       }
       if (PreArm_Delay_Count == 30)
       {
-        NotPriorit = false;
+        RGB.NotPriorit = false;
       }
     }
   }
@@ -146,7 +148,7 @@ void SticksClass::Pre_Arm_Leds(void)
       RGB.Function(PREARMSUCESS);
       if (PreArm_Delay_Count == 30)
       {
-        NotPriorit = false;
+        RGB.NotPriorit = false;
       }
     }
   }

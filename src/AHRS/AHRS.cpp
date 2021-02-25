@@ -18,7 +18,6 @@
 #include "AHRS.h"
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "I2C/I2C.h"
@@ -27,6 +26,7 @@
 #include "QUATERNION.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "GPS/GPSSTATES.h"
+#include "GPS/GPSREAD.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

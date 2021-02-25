@@ -18,7 +18,8 @@
 #include "ROTATION.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
-#include "Common/VARIABLES.h"
+#include "Common/ENUM.h"
+#include "Common/STRUCTS.h"
 
 ClassCompassRotation COMPASSROTATION;
 

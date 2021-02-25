@@ -24,6 +24,7 @@ public:
   int16_t CalcedRateTargetRollToGCS;
   int16_t CalcedRateTargetPitchToGCS;
   int16_t CalcedRateTargetYawToGCS;
+  int16_t PIDControllerApply[3];
   void DerivativeLPF_Update();
   void Update(float DeltaTime);
   void Reset_Integral_Accumulators();

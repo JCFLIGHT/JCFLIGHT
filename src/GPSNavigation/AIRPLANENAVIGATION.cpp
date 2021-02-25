@@ -16,8 +16,7 @@
 */
 
 #include "AIRPLANENAVIGATION.h"
-#include "MULTIROTORNAVIGATION.h"
-#include "Common/VARIABLES.h"
+#include "NAVIGATION.h"
 #include "FlightModes/FLIGHTMODES.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Scheduler/SCHEDULER.h"
@@ -25,6 +24,10 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "I2C/I2C.h"
 #include "RadioControl/DECODE.h"
+#include "FailSafe/FAILSAFE.h"
+#include "GPS/GPSREAD.h"
+#include "GPS/GPSORIENTATION.h"
+#include "PID/RCPID.h"
 
 //PARAMETROS DE NAVEGAÇÃO
 #define CRUISE_DISTANCE 500   //DISTANCIA (EM CM) - DISTANCIA ENTRE O PRIMEIRO E O SEGUNDO PONTO A SER ATINGIDO
@@ -199,7 +202,7 @@ void AirPlaneUpdateNavigation(void)
       }
     }
 
-    if (Fail_Safe_Event && (DistanceToHome < 10))
+    if (SystemInFailSafe() && (DistanceToHome < 10))
     {
       DISABLE_STATE(PRIMARY_ARM_DISARM);
       DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
@@ -308,7 +311,7 @@ void AirPlaneUpdateNavigation(void)
     GetThrottleToNavigation = Constrain_16Bits(GetThrottleToNavigation, 1300, AttitudeThrottleMax);
   }
 
-  if ((!Do_Stabilize_Mode) || (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && !Fail_Safe_Event))
+  if ((!Do_Stabilize_Mode) || (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && !SystemInFailSafe()))
   {
     GetThrottleToNavigation = Read_Throttle;
     GPS_Angle[PITCH] = 0;

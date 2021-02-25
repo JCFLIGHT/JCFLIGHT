@@ -18,6 +18,8 @@
 #ifndef AUXFLIGHT_H_
 #define AUXFLIGHT_H_
 #include "Arduino.h"
+#include "Common/ENUM.h"
+extern uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
 extern uint8_t GPSHoldConfig,
     RTHConfig,
     IOCConfig,

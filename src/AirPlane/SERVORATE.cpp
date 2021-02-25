@@ -18,10 +18,10 @@
 #include "SERVORATE.h"
 #include "AIRPLANE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Common/VARIABLES.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "BAR/BAR.h"
 #include "Math/MATHSUPPORT.h"
+#include "Common/ENUM.h"
 
 int16_t ServoScaleMin[MAX_SUPPORTED_SERVOS];
 int16_t ServoScaleMax[MAX_SUPPORTED_SERVOS];

@@ -16,7 +16,6 @@
 */
 
 #include "ESP32SERIAL.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "GPS/GPSREAD.h"
 #include "BAR/BAR.h"

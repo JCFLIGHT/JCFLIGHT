@@ -16,7 +16,6 @@
 */
 
 #include "IMUCALIBRATE.h"
-#include "Common/VARIABLES.h"
 #include "PID/PIDPARAMS.h"
 #include "LedRGB/LEDRGB.h"
 #include "StorageManager/EEPROMSTORAGE.h"
@@ -28,6 +27,10 @@
 #include "Scheduler/SCHEDULER.h"
 
 int16_t StoredValueOfGyro[3] = {0, 0, 0};
+
+uint16_t CalibratingAccelerometer;
+uint16_t CalibratingGyroscope = 512;
+
 int32_t StoredGyroZero[3] = {0, 0, 0};
 
 static void DeviceClear(Device_Struct *Device)

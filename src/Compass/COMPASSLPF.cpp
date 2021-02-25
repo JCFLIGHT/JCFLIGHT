@@ -16,7 +16,9 @@
 */
 
 #include "COMPASSLPF.h"
-#include "Common/VARIABLES.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/ENUM.h"
+#include "Common/STRUCTS.h"
 
 CompassLPFClass COMPASSLPF;
 

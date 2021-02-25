@@ -16,7 +16,6 @@
 */
 
 #include "FAILSAFE.h"
-#include "Common/VARIABLES.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "FlightModes/AUXFLIGHT.h"
@@ -24,6 +23,7 @@
 #include "Buzzer/BUZZER.h"
 #include "Common/RCDEFINES.h"
 #include "RadioControl/DECODE.h"
+#include "IMU/IMUCALIBRATE.h"
 
 #define THIS_LOOP_RATE 50                //HZ
 #define IMMEDIATELY_FAILSAFE_DELAY 0.25f //MS
@@ -32,14 +32,29 @@
 #define RX_RECOVERY_TIME_ARMED 15        //NO MINIMO 15 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE EM MODO ARMADO
 #define RX_RECOVERY_TIME_DESARMED 2      //NO MINIMO 2 SEGUNDOS DE CONSISTENCIA ACIMA DO VALOR CONSIDERADO FAIL-SAFE EM MODO DESARMADO
 
+bool Fail_Safe_Event;
+bool ImmediatelyFailSafe;
 bool FailSafeGoodRunBeep = false;
 bool FailSafeDesarmedRecovered = false;
+
 int16_t RxConsistenceCount = 0;
 int16_t BuzzerFailSafeRunCount = 0;
 
+volatile int16_t Fail_Safe_System_Count;
+
+bool FastSystemFailSafe()
+{
+  return ImmediatelyFailSafe;
+}
+
+bool SystemInFailSafe()
+{
+  return Fail_Safe_Event;
+}
+
 bool GetValidFailSafeState(float DelayToDetect)
 {
-  return (Fail_Safe_System > (THIS_LOOP_RATE * DelayToDetect));
+  return (Fail_Safe_System_Count > (THIS_LOOP_RATE * DelayToDetect));
 }
 
 void NormalizeFundamentalChannels()
@@ -171,7 +186,7 @@ bool RxConsistenceOK()
 
 void UpdateFailSafeSystem()
 {
-  Fail_Safe_System++;
+  Fail_Safe_System_Count++;
   if (RxConsistenceOK() && !Fail_Safe_Event && FailSafeGoodRunBeep)
   {
     if (BuzzerFailSafeRunCount >= 100) //2 SEGUNDOS

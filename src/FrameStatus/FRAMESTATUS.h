@@ -18,6 +18,7 @@
 #ifndef FRAMESTATUS_H_
 #define FRAMESTATUS_H_
 #include "inttypes.h"
+extern uint8_t FrameType;
 bool GetFrameStateOfMultirotor();
 bool GetFrameStateOfAirPlane();
 bool GetActualFrameState(uint8_t FrameName);

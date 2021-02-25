@@ -16,7 +16,6 @@
 */
 
 #include "CRASHCHECK.h"
-#include "Common/VARIABLES.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Parachute/PARACHUTE.h"
 #include "FlightModes/AUXFLIGHT.h"
@@ -25,6 +24,7 @@
 #include "FastSerial/PRINTF.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/RCDEFINES.h"
+#include "Common/STRUCTS.h"
 
 #define THIS_LOOP_RATE 100                  //100HZ
 #define CRASH_CHECK_TIMER 2                 //TEMPO MAXIMO DE CRASH EM SEGUNDOS

@@ -217,4 +217,11 @@ typedef struct
   uint32_t LastExecuted;
   int32_t TaskLatestDeltaTime;
 } Task_Resources_Struct;
+
+extern CALIBRATION_STRUCT CALIBRATION;
+extern IMU_STRUCT IMU;
+extern INS_STRUCT INS;
+extern ALTITUDE_STRUCT ALTITUDE;
+extern ATTITUDE_STRUCT ATTITUDE;
+extern PID_TERMS GET_SET[SIZE_OF_PID_PARAMS];
 #endif

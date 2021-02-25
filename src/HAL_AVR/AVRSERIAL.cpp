@@ -16,10 +16,10 @@
 */
 
 #include "AVRSERIAL.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "GPS/GPSREAD.h"
 #include "BAR/BAR.h"
+#include "Common/ENUM.h"
 
 #ifdef __AVR_ATmega2560__
 

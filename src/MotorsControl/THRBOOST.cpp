@@ -18,8 +18,8 @@
 #include "THRBOOST.h"
 #include "AHRS/AHRS.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
+#include "PID/RCPID.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 

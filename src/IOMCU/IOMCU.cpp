@@ -17,7 +17,6 @@
 
 #include "IOMCU.h"
 #include "FastSerial/FASTSERIAL.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "I2C/I2C.h"
 #include "AHRS/AHRS.h"
@@ -31,7 +30,7 @@
 #include "BAR/BAR.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "Buzzer/BUZZER.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
@@ -46,6 +45,11 @@
 #include "TaskSystem/TASKSYSTEM.h"
 #include "ParamsToGCS/CHECKSUM.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "Compass/COMPASSREAD.h"
+#include "FailSafe/FAILSAFE.h"
+#include "GPS/GPSREAD.h"
+#include "PID/RCPID.h"
+#include "IMU/IMUCALIBRATE.h"
 
 GCSClass GCS;
 
@@ -211,8 +215,6 @@ struct _SendRadioControlGCSParameters
     uint8_t SendThrottleExpo;
     uint8_t SendRCRate;
     uint8_t SendRCExpo;
-    uint8_t SendRollRate;
-    uint8_t SendPitchRate;
     uint8_t SendYawRate;
     int16_t SendRCPulseMin;
     int16_t SendRCPulseMax;
@@ -258,8 +260,6 @@ struct _GetRadioControlGCSParameters
     uint8_t GetThrottleExpo;
     uint8_t GetRCRate;
     uint8_t GetRCExpo;
-    uint8_t GetRollRate;
-    uint8_t GetPitchRate;
     uint8_t GetYawRate;
     int16_t GetRCPulseMin;
     int16_t GetRCPulseMax;
@@ -713,7 +713,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 12:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-            CalibratingCompass = true;
+            COMPASS.Calibrating = true;
         }
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
@@ -1157,14 +1157,12 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 14) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 27)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleMiddle, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendThrottleExpo, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCRate, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCExpo, VAR_8BITS);
-        GCS_Send_Data(SendRadioControlGCSParameters.SendRollRate, VAR_8BITS);
-        GCS_Send_Data(SendRadioControlGCSParameters.SendPitchRate, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendYawRate, VAR_8BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCPulseMin, VAR_16BITS);
         GCS_Send_Data(SendRadioControlGCSParameters.SendRCPulseMax, VAR_16BITS);
@@ -1270,7 +1268,7 @@ void GCSClass::GCS_Request_Parameters()
     {
         GCSParameters.SendBarometerValue = (GPS_Altitude - GPS_Altitude_For_Plane) * 100;
     }
-    GCSParameters.SendFailSafeState = Fail_Safe_Event;
+    GCSParameters.SendFailSafeState = SystemInFailSafe();
     GCSParameters.SendBatteryVoltageValue = BATTERY.Voltage * 100;
     GCSParameters.SendBatteryPercentageValue = BATTERY.GetPercentage();
     GCSParameters.SendArmDisarmState = IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
@@ -1299,18 +1297,18 @@ void GCSClass::GCS_Request_Parameters()
 
 void GCSClass::GCS_Request_Parameters_Two()
 {
-    GCSParameters_Two.SendActualThrottleValue = DirectRadioControllRead[THROTTLE];
-    GCSParameters_Two.SendActualYawValue = DirectRadioControllRead[YAW];
-    GCSParameters_Two.SendActualPitchValue = DirectRadioControllRead[PITCH];
-    GCSParameters_Two.SendActualRollValue = DirectRadioControllRead[ROLL];
-    GCSParameters_Two.SendActualAuxOneValue = DirectRadioControllRead[AUX1];
-    GCSParameters_Two.SendActualAuxTwoValue = DirectRadioControllRead[AUX2];
-    GCSParameters_Two.SendActualAuxThreeValue = DirectRadioControllRead[AUX3];
-    GCSParameters_Two.SendActualAuxFourValue = DirectRadioControllRead[AUX4];
-    GCSParameters_Two.SendActualAuxFiveValue = DirectRadioControllRead[AUX5];
-    GCSParameters_Two.SendActualAuxSixValue = DirectRadioControllRead[AUX6];
-    GCSParameters_Two.SendActualAuxSevenValue = DirectRadioControllRead[AUX7];
-    GCSParameters_Two.SendActualAuxEightValue = DirectRadioControllRead[AUX8];
+    GCSParameters_Two.SendActualThrottleValue = DECODE.DirectRadioControllRead[THROTTLE];
+    GCSParameters_Two.SendActualYawValue = DECODE.DirectRadioControllRead[YAW];
+    GCSParameters_Two.SendActualPitchValue = DECODE.DirectRadioControllRead[PITCH];
+    GCSParameters_Two.SendActualRollValue = DECODE.DirectRadioControllRead[ROLL];
+    GCSParameters_Two.SendActualAuxOneValue = DECODE.DirectRadioControllRead[AUX1];
+    GCSParameters_Two.SendActualAuxTwoValue = DECODE.DirectRadioControllRead[AUX2];
+    GCSParameters_Two.SendActualAuxThreeValue = DECODE.DirectRadioControllRead[AUX3];
+    GCSParameters_Two.SendActualAuxFourValue = DECODE.DirectRadioControllRead[AUX4];
+    GCSParameters_Two.SendActualAuxFiveValue = DECODE.DirectRadioControllRead[AUX5];
+    GCSParameters_Two.SendActualAuxSixValue = DECODE.DirectRadioControllRead[AUX6];
+    GCSParameters_Two.SendActualAuxSevenValue = DECODE.DirectRadioControllRead[AUX7];
+    GCSParameters_Two.SendActualAuxEightValue = DECODE.DirectRadioControllRead[AUX8];
     GCSParameters_Two.SendAttitudeThrottleValue = RCController[THROTTLE];
     GCSParameters_Two.SendAttitudeYawValue = PIDXYZ.CalcedRateTargetYawToGCS;
     GCSParameters_Two.SendAttitudePitchValue = PIDXYZ.CalcedRateTargetPitchToGCS;
@@ -1330,7 +1328,7 @@ void GCSClass::GCS_Request_Parameters_Two()
     GCSParameters_Two.SendGyroYFiltered = IMU.GyroscopeRead[PITCH];
     GCSParameters_Two.SendGyroZFiltered = IMU.GyroscopeRead[YAW];
     GCSParameters_Two.SendGPSGroundSpeed = GPS_Ground_Speed;
-    GCSParameters_Two.SendI2CError = I2CErrors;
+    GCSParameters_Two.SendI2CError = I2C.Errors;
     GCSParameters_Two.SendAirSpeedValue = AIRSPEED.CalcedInCM;
     GCSParameters_Two.SendCPULoad = SystemLoadPercent;
 }
@@ -1427,8 +1425,6 @@ void GCSClass::Save_Radio_Control_Configuration()
     STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, GetRadioControlGCSParameters.GetThrottleExpo);
     STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, GetRadioControlGCSParameters.GetRCRate);
     STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, GetRadioControlGCSParameters.GetRCExpo);
-    STORAGEMANAGER.Write_8Bits(ROLL_RATE_ADDR, GetRadioControlGCSParameters.GetRollRate);
-    STORAGEMANAGER.Write_8Bits(PITCH_RATE_ADDR, GetRadioControlGCSParameters.GetPitchRate);
     STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, GetRadioControlGCSParameters.GetYawRate);
     STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, GetRadioControlGCSParameters.GetRCPulseMin);
     STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, GetRadioControlGCSParameters.GetRCPulseMax);
@@ -1542,9 +1538,7 @@ void GCSClass::Default_RadioControl_Configuration()
     STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, 65);
     STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, 90);
-    STORAGEMANAGER.Write_8Bits(ROLL_RATE_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(PITCH_RATE_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 20);
     STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, 1000);
     STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, 1900);
     STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, 70);
@@ -1702,8 +1696,6 @@ void GCSClass::UpdateParametersToGCS()
     SendRadioControlGCSParameters.SendThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
     SendRadioControlGCSParameters.SendRCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
     SendRadioControlGCSParameters.SendRCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
-    SendRadioControlGCSParameters.SendRollRate = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
-    SendRadioControlGCSParameters.SendPitchRate = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
     SendRadioControlGCSParameters.SendYawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
     SendRadioControlGCSParameters.SendRCPulseMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
     SendRadioControlGCSParameters.SendRCPulseMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);

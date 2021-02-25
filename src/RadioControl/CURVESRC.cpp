@@ -16,16 +16,17 @@
 */
 
 #include "CURVESRC.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "Math/MATHSUPPORT.h"
 #include "PID/TPA.h"
 #include "Common/RCDEFINES.h"
+#include "PID/RCPID.h"
 
 #define THROTTLE_LOOKUP_LENGTH 11
 
 int16_t ThrottleRCMiddle = 0;
+uint16_t CalculeLookUpThrottle[11];
 
 void CurvesRC_SetValues()
 {
@@ -33,8 +34,6 @@ void CurvesRC_SetValues()
   ThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
   RCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
   RCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
-  DynamicRollAndPitchRate[ROLL] = STORAGEMANAGER.Read_8Bits(ROLL_RATE_ADDR);
-  DynamicRollAndPitchRate[PITCH] = STORAGEMANAGER.Read_8Bits(PITCH_RATE_ADDR);
   YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
   AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
   AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
@@ -71,7 +70,7 @@ int16_t RCControllerToRate(int16_t StickData, uint8_t Rate)
 int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo)
 {
   int16_t RCValueDeflection;
-  RCValueDeflection = Constrain_16Bits(RadioControllOutput[Data] - MIDDLE_STICKS_PULSE, -500, 500);
+  RCValueDeflection = Constrain_16Bits(DECODE.GetRxChannelOutput(Data) - MIDDLE_STICKS_PULSE, -500, 500);
   float ConvertValueToFloat = RCValueDeflection / 100.0f;
   return lrint((2500.0f + (float)RcExpo * (ConvertValueToFloat * ConvertValueToFloat - 25.0f)) * ConvertValueToFloat / 25.0f);
 }

@@ -17,12 +17,12 @@
 
 #include "RCSTATES.h"
 #include "RCCONFIG.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/RCDEFINES.h"
 #include "RadioControl/DECODE.h"
+#include "PID/RCPID.h"
 
 #define THIS_LOOP_RATE 50 //STICKS.Update()
 #define ARM_TIME_MAX 2    //SEGUNDOS

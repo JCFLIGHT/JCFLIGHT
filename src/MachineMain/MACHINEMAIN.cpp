@@ -43,7 +43,7 @@ void MachineInit()
     //CARREGA OS VALORES DE CALIBRAÇÃO DO COMPASS
     COMPASS.UpdateCompassCalibration();
     //INICIALIZA OS DISPOSITIVOS I2C
-    All_I2C_Initialization();
+    I2C.All_Initialization();
     //INICIA O BUZZER EM OPERAÇÃO NORMAL
     ESC.BeeperMode = NORMAL_OPERATION_MODE;
     //DESATIVA TODOS OS LEDS

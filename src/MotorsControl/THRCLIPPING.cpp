@@ -17,8 +17,10 @@
 
 #include "THRCLIPPING.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
+#include "MotorsControl/MOTORS.h"
+#include "PID/RCPID.h"
+#include "Common/ENUM.h"
 
 #define THROTTLE_CLIPPING_FACTOR 0.33f
 

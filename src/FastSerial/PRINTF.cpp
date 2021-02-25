@@ -17,7 +17,6 @@
 
 #include "PRINTF.h"
 #include "FASTSERIAL.h"
-#include "Common/VARIABLES.h"
 #include "Declination/AUTODECLINATION.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "InertialNavigation/INS.h"
@@ -28,6 +27,7 @@
 #include "RadioControl/STICKS.h"
 #include "BAR/BAR.h"
 #include "ProgMem/PROGMEM.h"
+#include "Common/ENUM.h"
 #include "Scheduler/SCHEDULERTIME.h"
 
 SerialPrint PRINTF;

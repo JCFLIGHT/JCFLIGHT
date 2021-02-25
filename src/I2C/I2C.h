@@ -18,7 +18,6 @@
 #ifndef I2C_H_
 #define I2C_H_
 #include "Arduino.h"
-void All_I2C_Initialization();
 class I2CPROTOCOL
 {
 public:
@@ -26,7 +25,9 @@ public:
   bool BarometerFound = false;
   uint8_t ReadACK();
   uint8_t ReadNAK();
+  int16_t Errors;
   void Initialization(void);
+  void All_Initialization();
   void Restart(uint8_t Address);
   void Write(uint8_t SendData);
   void Stop(void);

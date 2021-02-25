@@ -15,13 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FLIGHTMODES_H_
-#define FLIGHTMODES_H_
-#include "Arduino.h"
-extern bool Do_Stabilize_Mode;
-extern bool Do_HeadingHold_Mode;
-extern bool Do_AltitudeHold_Mode;
-extern bool Do_GPS_Altitude;
-extern bool Do_AutoThrottle_Mode;
-void FlightModesUpdate();
-#endif
+#include "STRUCTS.h"
+
+IMU_STRUCT IMU;
+INS_STRUCT INS;
+ALTITUDE_STRUCT ALTITUDE;
+ATTITUDE_STRUCT ATTITUDE;
+CALIBRATION_STRUCT CALIBRATION;
+PID_TERMS GET_SET[SIZE_OF_PID_PARAMS];

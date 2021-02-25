@@ -16,7 +16,6 @@
 */
 
 #include "MOTORS.h"
-#include "Common/VARIABLES.h"
 #include "EscCalibration/CALIBESC.h"
 #include "Common/STRUCTS.h"
 #include "AirPlane/AIRPLANE.h"
@@ -35,6 +34,8 @@
 #include "BAR/BAR.h"
 #include "Math/MATHSUPPORT.h"
 #include "THRCOMPENSATION.h"
+#include "PID/RCPID.h"
+#include "PID/PIDXYZ.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -47,11 +48,13 @@ FILE_COMPILE_FOR_SPEED
 
 float ThrottleScale = 1.0f;
 
+int16_t MotorControl[8];
+
+int16_t MixerThrottleCommand = 1000;
+
 //MAXIMO = 499
 //PARA DESATIVAR:COLOQUE O VALOR EM 500
 int16_t Yaw_Jump_Prevention = 200;
-
-int16_t MixerThrottleCommand = 1000;
 
 void ConfigureRegisters(bool Run_Calibrate_ESC)
 {
@@ -193,9 +196,9 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
   {
     //PREVINE UM "PULO" NO YAW,ESSE ERRO É UM PROBLEMA PRESENTE NA NAZA V2,
     //MAS PRA QUE ELE ACONTEÇA,DEPENDE DO TIPO DE ESC,MOTOR & FRAME QUE VOCÊ ESTÁ USANDO
-    PIDControllerApply[YAW] = Constrain_16Bits(PIDControllerApply[YAW],
-                                               -Yaw_Jump_Prevention - ABS(RCController[YAW]),
-                                               Yaw_Jump_Prevention + ABS(RCController[YAW]));
+    PIDXYZ.PIDControllerApply[YAW] = Constrain_16Bits(PIDXYZ.PIDControllerApply[YAW],
+                                                      -Yaw_Jump_Prevention - ABS(RCController[YAW]),
+                                                      Yaw_Jump_Prevention + ABS(RCController[YAW]));
   }
 
   MixingApplyControl();

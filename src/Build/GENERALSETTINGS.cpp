@@ -17,7 +17,7 @@
 
 #include "GENERALSETTINGS.h"
 #include "ParamsToGCS/CHECKSUM.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDXYZ.h"
 #include "AirPlane/AIRPLANE.h"

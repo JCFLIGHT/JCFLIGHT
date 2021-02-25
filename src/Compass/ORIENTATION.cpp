@@ -18,6 +18,8 @@
 #include "ORIENTATION.h"
 #include "COMPASSREAD.h"
 #include "I2C/I2C.h"
+#include "Common/STRUCTS.h"
+#include "Common/ENUM.h"
 
 ClassCompassOrientation COMPASSORIENTATION;
 

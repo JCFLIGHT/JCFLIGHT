@@ -18,11 +18,12 @@
 #include "GPSORIENTATION.h"
 #include "Scheduler/SCHEDULER.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
-#include "Common/VARIABLES.h"
-#include "GPSNavigation/MULTIROTORNAVIGATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "InertialNavigation/INS.h"
+
+int16_t GPS_Angle[3];
 
 void GPS_Orientation_Update()
 {

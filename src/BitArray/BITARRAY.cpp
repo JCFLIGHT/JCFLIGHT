@@ -16,7 +16,7 @@
 */
 
 #include "BITARRAY.h"
-#include "Common/VARIABLES.h"
+#include "FlightModes/AUXFLIGHT.h"
 
 //ESSE BIT ARRAY ESTÁ EM UINT8_T (BYTE -> 0 - 255)
 

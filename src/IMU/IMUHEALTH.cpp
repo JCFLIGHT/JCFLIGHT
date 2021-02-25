@@ -16,9 +16,10 @@
 */
 
 #include "IMUHEALTH.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "Common/ENUM.h"
+#include "Common/STRUCTS.h"
 
 void CheckAndUpdateIMUCalibration()
 {

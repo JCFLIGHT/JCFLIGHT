@@ -18,10 +18,11 @@
 #include "AVRPPM.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "Common/VARIABLES.h"
 #include "RadioControl/DECODE.h"
 #include "BAR/BAR.h"
 #include "ParamsToGCS/CHECKSUM.h"
+#include "FailSafe/FAILSAFE.h"
+#include "Common/ENUM.h"
 
 #ifdef __AVR_ATmega2560__
 
@@ -61,13 +62,13 @@ void AVRInterruptRoutine(void)
             if (CheckFailSafe == 0x0F)
             {
                 CheckFailSafe = 0;
-                if (Fail_Safe_System > 20)
+                if (Fail_Safe_System_Count > 20)
                 {
-                    Fail_Safe_System -= 20;
+                    Fail_Safe_System_Count -= 20;
                 }
                 else
                 {
-                    Fail_Safe_System = 0;
+                    Fail_Safe_System_Count = 0;
                 }
             }
         }

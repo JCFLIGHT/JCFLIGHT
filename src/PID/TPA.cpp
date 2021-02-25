@@ -16,10 +16,10 @@
 */
 
 #include "TPA.h"
-#include "Common/VARIABLES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Math/MATHSUPPORT.h"
 #include "BAR/BAR.h"
+#include "PID/RCPID.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

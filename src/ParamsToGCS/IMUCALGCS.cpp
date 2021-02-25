@@ -17,7 +17,6 @@
 
 #include "IMUCALGCS.h"
 #include "Common/STRUCTS.h"
-#include "Common/VARIABLES.h"
 #include "Math/MATHSUPPORT.h"
 
 bool AccCalibratedPosition[6];

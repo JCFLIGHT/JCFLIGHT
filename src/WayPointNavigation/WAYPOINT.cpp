@@ -360,7 +360,7 @@ void WayPointRun()
         NavigationMode = Do_PositionHold;
         GPS_Flight_Mode = WAYPOINT;
         NavigationMode = Do_PositionHold;
-        if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber]))
+        if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber])) //MULT POR 10 PARA OBTÉR O VALOR EM SEGUNDOS PARA TRABALHAR EM CONJUNTO COM A FUNÇÃO WayPointSync10Hz()
         {
           WayPointMode = GET_ALTITUDE;
         }

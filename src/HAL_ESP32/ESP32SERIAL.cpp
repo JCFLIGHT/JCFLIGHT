@@ -19,6 +19,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "GPS/GPSREAD.h"
 #include "BAR/BAR.h"
+#include "Common/ENUM.h"
 
 #if ESP32
 

@@ -22,6 +22,7 @@
 #include "BAR/BAR.h"
 #include "ParamsToGCS/CHECKSUM.h"
 #include "FailSafe/FAILSAFE.h"
+#include "Common/ENUM.h"
 
 #if ESP32
 

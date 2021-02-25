@@ -1071,7 +1071,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 12:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2C.CompassFound)
         {
-            CalibratingCompass = true;
+            COMPASS.Calibrating = true;
         }
         break;
 

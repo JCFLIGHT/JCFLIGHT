@@ -25,7 +25,7 @@ public:
   int16_t CalcedRateTargetPitchToGCS;
   int16_t CalcedRateTargetYawToGCS;
   int16_t PIDControllerApply[3];
-  void DerivativeLPF_Update();
+  void Initialization();
   void Update(float DeltaTime);
   void Reset_Integral_Accumulators();
 
@@ -35,9 +35,10 @@ private:
   int16_t CalcedRateTargetPitch;
   int16_t CalcedRateTargetYaw;
   float ProportionalTermProcess(uint8_t kP, float RateError);
-  float DerivativeTermProcessRoll(float GyroDiffInpu);
+  float DerivativeTermProcessRoll(float GyroDiffInput);
   float DerivativeTermProcessPitch(float GyroDiffInput);
-  float ApplyIntegralTermRelax(float CurrentPIDSetpoint, float IntegralTermErrorRate);
+  float ApplyIntegralTermRelaxRoll(float CurrentPIDSetpoint, float IntegralTermErrorRate);
+  float ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float IntegralTermErrorRate);
   float ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral);
   float PIDLevelRoll(float DeltaTime);
   float PIDLevelPitch(float DeltaTime);

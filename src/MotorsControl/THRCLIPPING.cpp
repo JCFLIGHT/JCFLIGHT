@@ -88,3 +88,8 @@ bool MixerIsOutputSaturated(void)
 {
     return MotorMixRange >= 1.0f;
 }
+
+float GetMotorMixRange(void)
+{
+    return MotorMixRange;
+}

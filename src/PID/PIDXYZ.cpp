@@ -49,8 +49,11 @@ static BiquadFilter_Struct Derivative_Pitch_Smooth;
 static BiquadFilter_Struct ControlDerivative_Roll_Smooth;
 static BiquadFilter_Struct ControlDerivative_Pitch_Smooth;
 static BiquadFilter_Struct ControlDerivative_Yaw_Smooth;
+
 PT1_Filter_Struct Angle_Smooth_Roll;
 PT1_Filter_Struct Angle_Smooth_Pitch;
+PT1_Filter_Struct WindUpRollLPF;
+PT1_Filter_Struct WindUpPitchLPF;
 
 //STABILIZE PARA MULTIROTORES
 #define STAB_COPTER_PITCH_ANGLE_MAX 30 //GRAUS
@@ -76,18 +79,24 @@ PT1_Filter_Struct Angle_Smooth_Pitch;
 //FREQUENCIA DE CORTE DO LPF DO kCD
 #define CONTROL_DERIVATIVE_CUTOFF 30 //Hz
 
-//MIGRAR ESSE PARAMETRO PARA A LISTA COMPLETA DE PARAMETROS
-int16_t ReferenceAirSpeed = 1000; //VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
+//FREQUENCIA DE CORTE DO RELAXAMENTO DO TERMO INTEGRAL
+#define INTEGRAL_TERM_RELAX 15
 
-int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO
-
+//MIGRAR ESSES PARAMETROS PARA A LISTA COMPLETA DE PARAMETROS
+/////////////////////////////////////////////////////////////////
+uint8_t IntegralTermWindUpPercent = 50;                 //AJUSTAVEL PELO USUARIO
+int16_t ReferenceAirSpeed = 1000;                       //VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
+int16_t FixedWingIntegralTermThrowLimit = 165;          //AJUSTAVEL PELO USUARIO
 float FixedWingIntegralTermLimitOnStickPosition = 0.5f; //AJUSTAVEL PELO USUARIO
+///////////////////////////////////////////////////////////////
 
+float MotorIntegralTermWindUpPoint;
+float AntiWindUpScaler;
+float CoordinatedTurnRateEarthFrame;
 float ErrorGyroIntegral[3];
 float ErrorGyroIntegralLimit[3];
-float CoordinatedTurnRateEarthFrame;
 
-void PIDXYZClass::DerivativeLPF_Update()
+void PIDXYZClass::Initialization()
 {
   Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
   BIQUADFILTER.Settings(&Derivative_Roll_Smooth, Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
@@ -95,6 +104,9 @@ void PIDXYZClass::DerivativeLPF_Update()
   BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  PT1FilterInit(&WindUpRollLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
+  PT1FilterInit(&WindUpPitchLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
+  MotorIntegralTermWindUpPoint = 1.0f - (IntegralTermWindUpPercent / 100.0f);
 }
 
 void PIDXYZClass::Update(float DeltaTime)
@@ -126,6 +138,7 @@ void PIDXYZClass::Update(float DeltaTime)
 
   if (GetFrameStateOfMultirotor())
   {
+    AntiWindUpScaler = Constrain_Float((1.0f - GetMotorMixRange()) / MotorIntegralTermWindUpPoint, 0.0f, 1.0f);
     PIDApplyMulticopterRateControllerRoll(DeltaTime);
     PIDApplyMulticopterRateControllerPitch(DeltaTime);
     PIDApplyMulticopterRateControllerYaw(DeltaTime);
@@ -180,11 +193,20 @@ float PIDXYZClass::DerivativeTermProcessPitch(float GyroDiffInput)
   return NewDTermCalced;
 }
 
-float PIDXYZClass::ApplyIntegralTermRelax(float CurrentPIDSetpoint, float IntegralTermErrorRate)
+float PIDXYZClass::ApplyIntegralTermRelaxRoll(float CurrentPIDSetpoint, float IntegralTermErrorRate)
 {
-  float NewIntegralCalced = IntegralTermErrorRate;
-  //CODIGO
-  return NewIntegralCalced;
+  const float SetPointLPF = PT1FilterApply3(&WindUpRollLPF, CurrentPIDSetpoint);
+  const float SetPointHPF = fabsf(CurrentPIDSetpoint - SetPointLPF);
+  const float IntegralTermRelaxFactor = MAX(0, 1 - SetPointHPF / 40.0f);
+  return IntegralTermErrorRate * IntegralTermRelaxFactor;
+}
+
+float PIDXYZClass::ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float IntegralTermErrorRate)
+{
+  const float SetPointLPF = PT1FilterApply3(&WindUpPitchLPF, CurrentPIDSetpoint);
+  const float SetPointHPF = fabsf(CurrentPIDSetpoint - SetPointLPF);
+  const float IntegralTermRelaxFactor = MAX(0, 1 - SetPointHPF / 40.0f);
+  return IntegralTermErrorRate * IntegralTermRelaxFactor;
 }
 
 float PIDXYZClass::ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral)
@@ -304,8 +326,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[ROLL] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 
-  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelax(PIDXYZ.CalcedRateTargetRoll, RateError);
-  float AntiWindUpScaler = 1;
+  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelaxRoll(PIDXYZ.CalcedRateTargetRoll, RateError);
 
   if ((GET_SET[PID_ROLL].ProportionalVector != 0) && (GET_SET[PID_ROLL].IntegralVector != 0))
   {
@@ -362,8 +383,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[PITCH] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 
-  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelax(PIDXYZ.CalcedRateTargetPitch, RateError);
-  float AntiWindUpScaler = 1;
+  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelaxPitch(PIDXYZ.CalcedRateTargetPitch, RateError);
 
   if ((GET_SET[PID_PITCH].ProportionalVector != 0) && (GET_SET[PID_PITCH].IntegralVector != 0))
   {
@@ -427,8 +447,8 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[YAW] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_YAW_PID_SUM_LIMIT, +MAX_YAW_PID_SUM_LIMIT);
 
-  float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelax(PIDXYZ.CalcedRateTargetYaw, RateError);
-  float AntiWindUpScaler = 1;
+  //float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelaxYaw(PIDXYZ.CalcedRateTargetYaw, RateError);
+  float IntegralTermErrorRate = RateError;
 
   if ((GET_SET[PID_YAW].ProportionalVector != 0) && (GET_SET[PID_YAW].IntegralVector != 0))
   {

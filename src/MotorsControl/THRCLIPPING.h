@@ -20,4 +20,5 @@
 #include "inttypes.h"
 void Throttle_Clipping_Update(uint8_t MotorCount, int16_t MixerThrottleCommand);
 bool MixerIsOutputSaturated(void);
+float GetMotorMixRange(void);
 #endif

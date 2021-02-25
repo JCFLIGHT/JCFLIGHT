@@ -52,7 +52,7 @@ void GeneralSettingsInitialization()
   RTH_Altitude_EEPROM();
   LoadPID();
   LoadGPSParameters();
-  PIDXYZ.DerivativeLPF_Update();
+  PIDXYZ.Initialization();
   KALMAN.Init();
   IMU_Filters_Initialization();
   RCCONFIG.Init();

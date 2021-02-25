@@ -22,7 +22,7 @@ FILE_COMPILE_FOR_SPEED
 
 void MachineInit()
 {
-    //OBTÉM O VALOR INICIAL DE MILLIS PARA CALCULAR O TEMPO DE INCIALIZAÇÃO
+    //OBTÉM O VALOR INICIAL DE MILLIS PARA CALCULAR O TEMPO DE INICIALIZAÇÃO
     SetInitialTimeToInitTheMachine(&MachineInitTimeNow);
     //INICIALIZA A SERIAL
     FASTSERIAL.Initialization();
@@ -74,9 +74,9 @@ void MachineInit()
     ConfigureRegisters(false);
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
-    //CALCULA E IMPRIME NO TERMINAL O TEMPO GASTO PELA INICIALIZAÇÃO
+    //CALCULA E IMPRIME O TEMPO GASTO PELA INICIALIZAÇÃO
     CalculeTheFinalTimeToInitTheMachine(&MachineInitTimeNow);
-    DEBUG("Sistema Inicializado! Tempo Gasto:%ld Segundos", GetTheFinalTimeToInitTheMachine(&MachineInitTimeNow));
+    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos", GetTheFinalTimeToInitTheMachine(&MachineInitTimeNow));
 }
 
 void MachineRun()

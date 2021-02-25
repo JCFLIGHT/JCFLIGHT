@@ -54,7 +54,7 @@ extern SerialPrint PRINTF;
 #define LOG(fmt)                                                                        \
   do                                                                                    \
   {                                                                                     \
-    PRINTF.SendToConsole(PSTR("Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__); \
+    PRINTF.SendToConsole(PSTR("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__); \
     PRINTF.CallSchedulerSleep();                                                        \
   } while (0)
 #else

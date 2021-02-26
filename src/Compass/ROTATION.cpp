@@ -1,5 +1,5 @@
 /*
-   Este arquivo faIMU.CompassRead[YAW] parte da JCFLIGHT.
+   Este arquivo faz parte da JCFLIGHT.
 
    JCFLIGHT é um software livre: você pode redistribuí-lo e/ou modificar
    sob os termos da GNU General Public License conforme publicada por

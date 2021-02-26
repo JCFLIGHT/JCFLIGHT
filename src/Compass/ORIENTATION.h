@@ -21,7 +21,7 @@
 class ClassCompassOrientation
 {
 public:
-    void SetOrientation(uint8_t Orientation, uint8_t _CompassType);
+  void SetOrientation(uint8_t _CompassType);
 };
 extern ClassCompassOrientation COMPASSORIENTATION;
 #endif

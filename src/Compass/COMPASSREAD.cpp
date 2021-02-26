@@ -30,7 +30,6 @@
 
 CompassReadClass COMPASS;
 
-uint8_t MagOrientation = 0;
 static int32_t XYZ_CompassBias[3] = {0, 0, 0};
 
 void CompassReadClass::Initialization()
@@ -39,15 +38,6 @@ void CompassReadClass::Initialization()
   if (!I2C.CompassFound)
   {
     return;
-  }
-
-  if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) <= 3)
-  {
-    MagOrientation = GPS_ONBOARD_COMPASS; //COMPASS ONBOARD NO GPS
-  }
-  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) >= 4)
-  {
-    MagOrientation = EXTERNAL_COMPASS; //COMPASS EXTERNO
   }
 
   if (COMPASS.Type == COMPASS_AK8975)
@@ -77,38 +67,36 @@ void CompassReadClass::Initialization()
 
   if (COMPASS.Type == COMPASS_HMC5883)
   {
-    if (FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
+    bool BiasOk = true;
+    I2C.WriteRegister(COMPASS.Address, 1, 40);
+    I2C.WriteRegister(COMPASS.Address, 2, 1);
+    SCHEDULERTIME.Sleep(100);
+    InitialReadBufferData();
+    if (!PushBias(0x011))
     {
-      I2C.WriteRegister(COMPASS.Address, 0x0B, 0x01);
-      I2C.WriteRegister(COMPASS.Address, 0x09, 0xC1);
+      BiasOk = false;
     }
-    else
+    if (!PushBias(0x012))
     {
-      bool BiasOk = true;
-      I2C.WriteRegister(COMPASS.Address, 1, 40);
-      I2C.WriteRegister(COMPASS.Address, 2, 1);
-      SCHEDULERTIME.Sleep(100);
-      InitialReadBufferData();
-      if (!PushBias(0x011))
-      {
-        BiasOk = false;
-      }
-      if (!PushBias(0x012))
-      {
-        BiasOk = false;
-      }
-      if (BiasOk)
-      {
-        //CALCULA O GANHO PARA CADA EIXO DO COMPASS
-        MagnetometerGain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
-        MagnetometerGain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
-        MagnetometerGain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
-      }
-      I2C.WriteRegister(COMPASS.Address, 0, 0x70);
-      I2C.WriteRegister(COMPASS.Address, 1, 0x20);
-      I2C.WriteRegister(COMPASS.Address, 2, 0x00);
-      SCHEDULERTIME.Sleep(100);
+      BiasOk = false;
     }
+    if (BiasOk)
+    {
+      //CALCULA O GANHO PARA CADA EIXO DO COMPASS
+      MagnetometerGain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
+      MagnetometerGain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
+      MagnetometerGain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
+    }
+    I2C.WriteRegister(COMPASS.Address, 0, 0x70);
+    I2C.WriteRegister(COMPASS.Address, 1, 0x20);
+    I2C.WriteRegister(COMPASS.Address, 2, 0x00);
+    SCHEDULERTIME.Sleep(100);
+  }
+
+  if (COMPASS.Type == COMPASS_QMC5883)
+  {
+    I2C.WriteRegister(COMPASS.Address, 0x0B, 0x01);
+    I2C.WriteRegister(COMPASS.Address, 0x09, 0xC1);
   }
 }
 
@@ -152,7 +140,8 @@ void CompassReadClass::InitialReadBufferData()
   if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
   {
     I2C.SensorsRead(COMPASS.Address, 0x03);
-    COMPASSORIENTATION.SetOrientation(MagOrientation, COMPASS.Type);
+    COMPASSORIENTATION.SetOrientation(COMPASS.Type);
+    COMPASSROTATION.Rotate();
   }
 }
 
@@ -161,21 +150,17 @@ void CompassReadClass::ReadBufferData()
   if (COMPASS.Type == COMPASS_AK8975)
   {
     I2C.SensorsRead(ADDRESS_COMPASS_AK8975, 0x03);
-    COMPASSORIENTATION.SetOrientation(MagOrientation, COMPASS.Type);
     I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
   }
   else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
   {
-    if ((COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883) && (COMPASS.Type == COMPASS_HMC5883))
-    {
-      I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x49);
-    }
-    else
-    {
-      I2C.SensorsRead(COMPASS.Address, COMPASS.Register);
-    }
-    COMPASSORIENTATION.SetOrientation(MagOrientation, COMPASS.Type);
+    I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x49);
   }
+  else if (COMPASS.Type == COMPASS_QMC5883)
+  {
+    I2C.SensorsRead(COMPASS.Address, COMPASS.Register);
+  }
+  COMPASSORIENTATION.SetOrientation(COMPASS.Type);
 }
 
 void CompassReadClass::Constant_Read()
@@ -187,7 +172,7 @@ void CompassReadClass::Constant_Read()
   }
 
   //REALIZA A LEITURA I2C DO COMPASS
-  ReadBufferData();
+  COMPASS.ReadBufferData();
 
   //APLICA OS AJUSTES DE BIAS CALCULADOS
   COMPASSCAL.ApplyGain();

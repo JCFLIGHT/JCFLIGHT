@@ -1,5 +1,5 @@
 /*
-   Este arquivo faz parte da JCFLIGHT.
+   Este arquivo faIMU.CompassRead[YAW] parte da JCFLIGHT.
 
    JCFLIGHT é um software livre: você pode redistribuí-lo e/ou modificar
    sob os termos da GNU General Public License conforme publicada por
@@ -24,6 +24,7 @@
 ClassCompassRotation COMPASSROTATION;
 
 #define HALF_SQRT_2 0.70710678118654757f
+
 void ClassCompassRotation::Rotate()
 {
     uint8_t Rotation = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
@@ -31,46 +32,364 @@ void ClassCompassRotation::Rotate()
 
     switch (Rotation)
     {
+    case ROTATION_NONE:
+    case ROTATION_MAX:
+        return;
 
-    case NONE_ROTATION:
+    case ROTATION_YAW_45:
     {
-        //SEM ROTAÇÃO PARA O COMPASS
+        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
         return;
     }
 
-    case COMPASS_ROTATION_YAW_45_DEGREES:
+    case ROTATION_YAW_90:
     {
-        //YAW DESLOCADO 45 GRAUS
-        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[PITCH] + IMU.CompassRead[ROLL]);
-        IMU.CompassRead[ROLL] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[PITCH];
         IMU.CompassRead[PITCH] = AngleCorretion;
         return;
     }
 
-    case COMPASS_ROTATION_YAW_315_DEGREES:
+    case ROTATION_YAW_135:
     {
-        //YAW DESLOCADO 315 GRAUS
+        AngleCorretion = -HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_YAW_180:
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[PITCH] = -IMU.CompassRead[PITCH];
+        return;
+
+    case ROTATION_YAW_225:
+    {
         AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[PITCH] - IMU.CompassRead[ROLL]);
-        IMU.CompassRead[ROLL] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
-        IMU.CompassRead[PITCH] = AngleCorretion;
+        IMU.CompassRead[PITCH] = -HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
         return;
     }
 
-    case COMPASS_ROTATION_ROLL_180_YAW_45_DEGREES:
+    case ROTATION_YAW_270:
     {
-        //ROTAÇÃO PARA OS GPS M7 E M8 COM COMPASS ONBOARD QUE FICA POR BAIXO DA PCB
-        //ROLL DESLOCADO 180 GRAUS + YAW DESLOCADO 45 GRAUS
-        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[PITCH] + IMU.CompassRead[ROLL]);
-        IMU.CompassRead[ROLL] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_YAW_315:
+    {
+        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[PITCH] - IMU.CompassRead[ROLL]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_180:
+    {
+        IMU.CompassRead[PITCH] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_180_YAW_45:
+    {
+        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_180_YAW_90:
+    {
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = IMU.CompassRead[PITCH];
         IMU.CompassRead[PITCH] = AngleCorretion;
         IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
         return;
     }
 
-    case COMPASS_ROTATION_PITCH_180_DEGREES:
+    case ROTATION_ROLL_180_YAW_135:
+    {
+        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[PITCH] - IMU.CompassRead[ROLL]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[PITCH] + IMU.CompassRead[ROLL]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_PITCH_180:
     {
         IMU.CompassRead[ROLL] = -IMU.CompassRead[ROLL];
         IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_180_YAW_225:
+    {
+        AngleCorretion = -HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[PITCH] - IMU.CompassRead[ROLL]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_180_YAW_270:
+    {
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_180_YAW_315:
+    {
+        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = -HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_90:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_90_YAW_45:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_90_YAW_90:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_90_YAW_135:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        AngleCorretion = -HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_270:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_270_YAW_45:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        AngleCorretion = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_270_YAW_90:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_270_YAW_135:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        AngleCorretion = -HALF_SQRT_2 * (IMU.CompassRead[ROLL] + IMU.CompassRead[PITCH]);
+        IMU.CompassRead[PITCH] = HALF_SQRT_2 * (IMU.CompassRead[ROLL] - IMU.CompassRead[PITCH]);
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_PITCH_90:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_PITCH_270:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_PITCH_180_YAW_90:
+    {
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        AngleCorretion = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_PITCH_180_YAW_270:
+    {
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_90_PITCH_90:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_180_PITCH_90:
+    {
+        IMU.CompassRead[PITCH] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_270_PITCH_90:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_90_PITCH_180:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_270_PITCH_180:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        return;
+    }
+
+    case ROTATION_ROLL_90_PITCH_270:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_180_PITCH_270:
+    {
+        IMU.CompassRead[PITCH] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_270_PITCH_270:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_90_PITCH_180_YAW_90:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[ROLL];
+        IMU.CompassRead[YAW] = -IMU.CompassRead[YAW];
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = -IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = AngleCorretion;
+        return;
+    }
+
+    case ROTATION_ROLL_90_YAW_270:
+    {
+        AngleCorretion = IMU.CompassRead[YAW];
+        IMU.CompassRead[YAW] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        AngleCorretion = IMU.CompassRead[ROLL];
+        IMU.CompassRead[ROLL] = IMU.CompassRead[PITCH];
+        IMU.CompassRead[PITCH] = -AngleCorretion;
+        return;
+    }
+
+    case ROTATION_YAW_293_PITCH_68_ROLL_90:
+    {
+        float AngleCorretionX = IMU.CompassRead[ROLL];
+        float AngleCorretionY = IMU.CompassRead[PITCH];
+        float AngleCorretionZ = IMU.CompassRead[YAW];
+        IMU.CompassRead[ROLL] = 0.143039f * AngleCorretionX + 0.368776f * AngleCorretionY + -0.918446f * AngleCorretionZ;
+        IMU.CompassRead[PITCH] = -0.332133f * AngleCorretionX + -0.856289f * AngleCorretionY + -0.395546f * AngleCorretionZ;
+        IMU.CompassRead[YAW] = -0.932324f * AngleCorretionX + 0.361625f * AngleCorretionY + 0.000000f * AngleCorretionZ;
         return;
     }
     }

@@ -23,86 +23,41 @@
 
 ClassCompassOrientation COMPASSORIENTATION;
 
-void ClassCompassOrientation::SetOrientation(uint8_t Orientation, uint8_t _CompassType)
+void ClassCompassOrientation::SetOrientation(uint8_t _CompassType)
 {
 
-    switch (Orientation)
+    switch (_CompassType)
     {
 
-    case GPS_ONBOARD_COMPASS:
-        //ORIENTAÇÃO PARA COMPASS ONBOARD DOS GPS M7 E M8
-        if (_CompassType == COMPASS_AK8975)
-        {
-            //ORIENTAÇÃO PARA O COMPASS AK8975
-            IMU.CompassRead[ROLL] = -((BufferData[1] << 8) | BufferData[0]);
-            IMU.CompassRead[PITCH] = -((BufferData[3] << 8) | BufferData[2]);
-            IMU.CompassRead[YAW] = ((BufferData[5] << 8) | BufferData[4]);
-            return;
-        }
-        else if (_CompassType == COMPASS_HMC5843)
-        {
-            //ORIENTAÇÃO PARA O COMPASS HMC5843
-            IMU.CompassRead[ROLL] = -((BufferData[0] << 8) | BufferData[1]);
-            IMU.CompassRead[PITCH] = -((BufferData[2] << 8) | BufferData[3]);
-            IMU.CompassRead[YAW] = ((BufferData[4] << 8) | BufferData[5]);
-            return;
-        }
-        else if (_CompassType == COMPASS_HMC5883)
-        {
-            if (COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883)
-            {
-                //ORIENTAÇÃO PARA O COMPASS HMC5883
-                IMU.CompassRead[ROLL] = -((BufferData[0] << 8) | BufferData[1]);
-                IMU.CompassRead[PITCH] = -((BufferData[4] << 8) | BufferData[5]);
-                IMU.CompassRead[YAW] = ((BufferData[2] << 8) | BufferData[3]);
-            }
-            else
-            {
-                //ORIENTAÇÃO PARA O COMPASS QMC5883
-                IMU.CompassRead[ROLL] = -((BufferData[1] << 8) | BufferData[0]);
-                IMU.CompassRead[PITCH] = -((BufferData[3] << 8) | BufferData[2]);
-                IMU.CompassRead[YAW] = ((BufferData[5] << 8) | BufferData[4]);
-            }
-            return;
-        }
+    case COMPASS_AK8975:
+        //ORIENTAÇÃO PARA O COMPASS AK8975
+        IMU.CompassRead[ROLL] = (BufferData[1] << 8) | BufferData[0];
+        IMU.CompassRead[PITCH] = (BufferData[3] << 8) | BufferData[2];
+        IMU.CompassRead[YAW] = (BufferData[5] << 8) | BufferData[4];
         break;
 
-    case EXTERNAL_COMPASS:
-        //ORIENTAÇÃO NORMAL PARA COMPASS EXTERNO
-        if (_CompassType == COMPASS_AK8975)
-        {
-            //ORIENTAÇÃO PARA O COMPASS AK8975
-            IMU.CompassRead[ROLL] = ((BufferData[1] << 8) | BufferData[0]);
-            IMU.CompassRead[PITCH] = ((BufferData[3] << 8) | BufferData[2]);
-            IMU.CompassRead[YAW] = -((BufferData[5] << 8) | BufferData[4]);
-            return;
-        }
-        else if (_CompassType == COMPASS_HMC5843)
-        {
-            //ORIENTAÇÃO PARA O COMPASS HMC5843
-            IMU.CompassRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]);
-            IMU.CompassRead[PITCH] = ((BufferData[2] << 8) | BufferData[3]);
-            IMU.CompassRead[YAW] = -((BufferData[4] << 8) | BufferData[5]);
-            return;
-        }
-        else if (_CompassType == COMPASS_HMC5883)
-        {
-            if (COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883)
-            {
-                //ORIENTAÇÃO PARA O COMPASS HMC5883
-                IMU.CompassRead[ROLL] = ((BufferData[0] << 8) | BufferData[1]);
-                IMU.CompassRead[PITCH] = ((BufferData[4] << 8) | BufferData[5]);
-                IMU.CompassRead[YAW] = -((BufferData[2] << 8) | BufferData[3]);
-            }
-            else
-            {
-                //ORIENTAÇÃO PARA O COMPASS QMC5883
-                IMU.CompassRead[ROLL] = ((BufferData[1] << 8) | BufferData[0]);
-                IMU.CompassRead[PITCH] = ((BufferData[3] << 8) | BufferData[2]);
-                IMU.CompassRead[YAW] = -((BufferData[5] << 8) | BufferData[4]);
-            }
-            return;
-        }
+        //POR ENQUANTO A JCFLIGHT IRÁ FUNCIONAR APENAS COM O HMC5883
+        //COMO DIFERENCIAR O HMC5843 DO HMC5883?O ENDERÇO I2C É IGUAL
+    case COMPASS_HMC5843:
+    case COMPASS_HMC5883:
+        /*
+        //ORIENTAÇÃO PARA O COMPASS HMC5843
+        IMU.CompassRead[ROLL] = (BufferData[0] << 8) | BufferData[1];
+        IMU.CompassRead[PITCH] = (BufferData[2] << 8) | BufferData[3];
+        IMU.CompassRead[YAW] = (BufferData[4] << 8) | BufferData[5];
+*/
+
+        //ORIENTAÇÃO PARA O COMPASS HMC5883
+        IMU.CompassRead[ROLL] = (BufferData[0] << 8) | BufferData[1];
+        IMU.CompassRead[PITCH] = (BufferData[4] << 8) | BufferData[5];
+        IMU.CompassRead[YAW] = (BufferData[2] << 8) | BufferData[3];
+        break;
+
+    case COMPASS_QMC5883:
+        //ORIENTAÇÃO PARA O COMPASS QMC5883
+        IMU.CompassRead[ROLL] = (BufferData[1] << 8) | BufferData[0];
+        IMU.CompassRead[PITCH] = (BufferData[3] << 8) | BufferData[2];
+        IMU.CompassRead[YAW] = (BufferData[5] << 8) | BufferData[4];
         break;
     }
 }

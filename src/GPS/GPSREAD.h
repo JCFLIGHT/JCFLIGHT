@@ -26,5 +26,5 @@ extern uint16_t GPS_Ground_Speed;
 extern uint16_t GPS_HDOP;
 void GPS_SerialInit(uint32_t Get_BaudRate);
 void GPS_SerialRead(uint8_t ReadData);
-void GetAllGPSData(void);
+void UBLOX_GetAllGPSData(void);
 #endif

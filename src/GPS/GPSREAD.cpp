@@ -22,6 +22,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "ProgMem/PROGMEM.h"
 #include "Common/ENUM.h"
+#include "GPS/GPSSTATES.h"
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464
@@ -138,225 +139,231 @@ static void SerialSendConfigToGPS(const char *STR)
 
 void GPS_SerialInit(uint32_t Get_BaudRate)
 {
-  //GPS AUTO BAUD-RATE
-  static uint8_t Parse_Baud_Rate = 0;
-  FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
-  SCHEDULERTIME.Sleep(1000);
-  if (Parse_Baud_Rate == 0)
+  if (Get_GPS_Type(GPS_UBLOX))
   {
-    FASTSERIAL.Begin(UART_NUMB_1, 9600);
-    if (Get_BaudRate == 19200)
+    //GPS AUTO BAUD-RATE
+    static uint8_t Parse_Baud_Rate = 0;
+    FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
+    SCHEDULERTIME.Sleep(1000);
+    if (Parse_Baud_Rate == 0)
     {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+      FASTSERIAL.Begin(UART_NUMB_1, 9600);
+      if (Get_BaudRate == 19200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+      }
+      else if (Get_BaudRate == 38400)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+      }
+      else if (Get_BaudRate == 57600)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+      }
+      else if (Get_BaudRate == 115200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+      }
+      while (!FASTSERIAL.TXFree(UART_NUMB_1))
+      {
+        SCHEDULERTIME.Sleep(50);
+      }
+      Parse_Baud_Rate = 1;
     }
-    else if (Get_BaudRate == 38400)
+    else if (Parse_Baud_Rate == 1)
     {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+      FASTSERIAL.Begin(UART_NUMB_1, 19200);
+      if (Get_BaudRate == 19200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+      }
+      else if (Get_BaudRate == 38400)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+      }
+      else if (Get_BaudRate == 57600)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+      }
+      else if (Get_BaudRate == 115200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+      }
+      while (!FASTSERIAL.TXFree(UART_NUMB_1))
+      {
+        SCHEDULERTIME.Sleep(50);
+      }
+      Parse_Baud_Rate = 2;
     }
-    else if (Get_BaudRate == 57600)
+    else if (Parse_Baud_Rate == 2)
     {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+      FASTSERIAL.Begin(UART_NUMB_1, 38400);
+      if (Get_BaudRate == 19200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+      }
+      else if (Get_BaudRate == 38400)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+      }
+      else if (Get_BaudRate == 57600)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+      }
+      else if (Get_BaudRate == 115200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+      }
+      while (!FASTSERIAL.TXFree(UART_NUMB_1))
+      {
+        SCHEDULERTIME.Sleep(50);
+      }
+      Parse_Baud_Rate = 3;
     }
-    else if (Get_BaudRate == 115200)
+    else if (Parse_Baud_Rate == 3)
     {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+      FASTSERIAL.Begin(UART_NUMB_1, 57600);
+      if (Get_BaudRate == 19200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+      }
+      else if (Get_BaudRate == 38400)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+      }
+      else if (Get_BaudRate == 57600)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+      }
+      else if (Get_BaudRate == 115200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+      }
+      while (!FASTSERIAL.TXFree(UART_NUMB_1))
+      {
+        SCHEDULERTIME.Sleep(50);
+      }
+      Parse_Baud_Rate = 4;
     }
-    while (!FASTSERIAL.TXFree(UART_NUMB_1))
+    else if (Parse_Baud_Rate == 4)
     {
-      SCHEDULERTIME.Sleep(50);
+      FASTSERIAL.Begin(UART_NUMB_1, 115200);
+      if (Get_BaudRate == 19200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+      }
+      else if (Get_BaudRate == 38400)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+      }
+      else if (Get_BaudRate == 57600)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+      }
+      else if (Get_BaudRate == 115200)
+      {
+        SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+      }
+      while (!FASTSERIAL.TXFree(UART_NUMB_1))
+      {
+        SCHEDULERTIME.Sleep(50);
+      }
     }
-    Parse_Baud_Rate = 1;
-  }
-  else if (Parse_Baud_Rate == 1)
-  {
-    FASTSERIAL.Begin(UART_NUMB_1, 19200);
-    if (Get_BaudRate == 19200)
+    SCHEDULERTIME.Sleep(200);
+    FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
+    for (uint8_t SizeOfCount = 0; SizeOfCount < sizeof(Ublox_Set_Configuration); SizeOfCount++)
     {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
-    }
-    else if (Get_BaudRate == 38400)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
-    }
-    else if (Get_BaudRate == 57600)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
-    }
-    else if (Get_BaudRate == 115200)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    }
-    while (!FASTSERIAL.TXFree(UART_NUMB_1))
-    {
-      SCHEDULERTIME.Sleep(50);
-    }
-    Parse_Baud_Rate = 2;
-  }
-  else if (Parse_Baud_Rate == 2)
-  {
-    FASTSERIAL.Begin(UART_NUMB_1, 38400);
-    if (Get_BaudRate == 19200)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
-    }
-    else if (Get_BaudRate == 38400)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
-    }
-    else if (Get_BaudRate == 57600)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
-    }
-    else if (Get_BaudRate == 115200)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    }
-    while (!FASTSERIAL.TXFree(UART_NUMB_1))
-    {
-      SCHEDULERTIME.Sleep(50);
-    }
-    Parse_Baud_Rate = 3;
-  }
-  else if (Parse_Baud_Rate == 3)
-  {
-    FASTSERIAL.Begin(UART_NUMB_1, 57600);
-    if (Get_BaudRate == 19200)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
-    }
-    else if (Get_BaudRate == 38400)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
-    }
-    else if (Get_BaudRate == 57600)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
-    }
-    else if (Get_BaudRate == 115200)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    }
-    while (!FASTSERIAL.TXFree(UART_NUMB_1))
-    {
-      SCHEDULERTIME.Sleep(50);
-    }
-    Parse_Baud_Rate = 4;
-  }
-  else if (Parse_Baud_Rate == 4)
-  {
-    FASTSERIAL.Begin(UART_NUMB_1, 115200);
-    if (Get_BaudRate == 19200)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
-    }
-    else if (Get_BaudRate == 38400)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
-    }
-    else if (Get_BaudRate == 57600)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
-    }
-    else if (Get_BaudRate == 115200)
-    {
-      SerialSendConfigToGPS(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
-    }
-    while (!FASTSERIAL.TXFree(UART_NUMB_1))
-    {
-      SCHEDULERTIME.Sleep(50);
-    }
-  }
-  SCHEDULERTIME.Sleep(200);
-  FASTSERIAL.Begin(UART_NUMB_1, Get_BaudRate);
-  for (uint8_t SizeOfCount = 0; SizeOfCount < sizeof(Ublox_Set_Configuration); SizeOfCount++)
-  {
 #ifdef __AVR_ATmega2560__
-    FASTSERIAL.Write(UART_NUMB_1, ProgMemReadByte(Ublox_Set_Configuration + SizeOfCount));
+      FASTSERIAL.Write(UART_NUMB_1, ProgMemReadByte(Ublox_Set_Configuration + SizeOfCount));
 #elif defined __arm__ || defined ESP32
 
 #endif
-    SCHEDULERTIME.Sleep(5);
+      SCHEDULERTIME.Sleep(5);
+    }
   }
 }
 
 void GPS_SerialRead(uint8_t ReadData)
 {
-  switch (Step_Counter)
+  if (Get_GPS_Type(GPS_UBLOX))
   {
-
-  case 1:
-    if (PREAMBLE2 == ReadData)
+    switch (Step_Counter)
     {
-      Step_Counter++;
-      break;
-    }
-    Step_Counter = 0;
 
-  case 0:
-    if (PREAMBLE1 == ReadData)
-      Step_Counter++;
-    break;
-
-  case 2:
-    Step_Counter++;
-    Check_Packet_B = Check_Packet_A = ReadData;
-    break;
-
-  case 3:
-    Step_Counter++;
-    Check_Packet_B += (Check_Packet_A += ReadData);
-    Get_GPS_Message_ID = ReadData;
-    break;
-
-  case 4:
-    Step_Counter++;
-    Check_Packet_B += (Check_Packet_A += ReadData);
-    Payload_Length = ReadData;
-    break;
-
-  case 5:
-    Step_Counter++;
-    Check_Packet_B += (Check_Packet_A += ReadData);
-    Payload_Length += (uint16_t)(ReadData << 8);
-    if (Payload_Length > UBLOX_BUFFER_SIZE)
-    {
-      Payload_Length = 0;
+    case 1:
+      if (PREAMBLE2 == ReadData)
+      {
+        Step_Counter++;
+        break;
+      }
       Step_Counter = 0;
-    }
-    Payload_Counter = 0;
-    break;
 
-  case 6:
-    Check_Packet_B += (Check_Packet_A += ReadData);
-    if (Payload_Counter < UBLOX_BUFFER_SIZE)
-    {
-      Buffer.Bytes_Array[Payload_Counter] = ReadData;
-    }
-    if (++Payload_Counter == Payload_Length)
-    {
-      Step_Counter++;
-    }
-    break;
-
-  case 7:
-    Step_Counter++;
-    if (Check_Packet_A != ReadData)
-    {
-      Step_Counter = 0;
-    }
-    break;
-
-  case 8:
-    Step_Counter = 0;
-    if (Check_Packet_B != ReadData)
-    {
+    case 0:
+      if (PREAMBLE1 == ReadData)
+        Step_Counter++;
       break;
+
+    case 2:
+      Step_Counter++;
+      Check_Packet_B = Check_Packet_A = ReadData;
+      break;
+
+    case 3:
+      Step_Counter++;
+      Check_Packet_B += (Check_Packet_A += ReadData);
+      Get_GPS_Message_ID = ReadData;
+      break;
+
+    case 4:
+      Step_Counter++;
+      Check_Packet_B += (Check_Packet_A += ReadData);
+      Payload_Length = ReadData;
+      break;
+
+    case 5:
+      Step_Counter++;
+      Check_Packet_B += (Check_Packet_A += ReadData);
+      Payload_Length += (uint16_t)(ReadData << 8);
+      if (Payload_Length > UBLOX_BUFFER_SIZE)
+      {
+        Payload_Length = 0;
+        Step_Counter = 0;
+      }
+      Payload_Counter = 0;
+      break;
+
+    case 6:
+      Check_Packet_B += (Check_Packet_A += ReadData);
+      if (Payload_Counter < UBLOX_BUFFER_SIZE)
+      {
+        Buffer.Bytes_Array[Payload_Counter] = ReadData;
+      }
+      if (++Payload_Counter == Payload_Length)
+      {
+        Step_Counter++;
+      }
+      break;
+
+    case 7:
+      Step_Counter++;
+      if (Check_Packet_A != ReadData)
+      {
+        Step_Counter = 0;
+      }
+      break;
+
+    case 8:
+      Step_Counter = 0;
+      if (Check_Packet_B != ReadData)
+      {
+        break;
+      }
+      UBLOX_GetAllGPSData();
     }
-    GetAllGPSData();
   }
 }
 
-void GetAllGPSData(void)
+void UBLOX_GetAllGPSData(void)
 {
   switch (Get_GPS_Message_ID)
   {

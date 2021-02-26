@@ -90,7 +90,7 @@ void IMU_Filters_Initialization()
 void Acc_Initialization()
 {
   I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1C, 0x10);
-  if (COMPASS.Type == COMPASS_HMC5883 && COMPASS.FakeHMC5883Address != ADDRESS_COMPASS_QMC5883 && I2C.CompassFound)
+  if (COMPASS.Type == COMPASS_HMC5883 && I2C.CompassFound)
   {
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x6A, 0b00100000);
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x37, 0x00);

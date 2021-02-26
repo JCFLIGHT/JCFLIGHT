@@ -161,7 +161,7 @@ struct _SendUserBasicGCSParameters
     uint8_t SendParachuteType;
     uint8_t SendSPIType;
     uint8_t SendUART_NUMB_2Type;
-    uint8_t SendCompassType;
+    uint8_t SendUartNumb1Type;
     uint8_t SendCompassRotationType;
     uint8_t SendRTHAltitudeType;
     uint8_t SendAcroType;
@@ -189,7 +189,7 @@ struct _GetUserBasicGCSParameters
     uint8_t GetParachuteType;
     uint8_t GetSPIType;
     uint8_t GetUART_NUMB_2Type;
-    uint8_t GetCompassType;
+    uint8_t GetUartNumb1Type;
     uint8_t GetCompassRotationType;
     uint8_t GetRTHAltitudeType;
     uint8_t GetAcroType;
@@ -950,7 +950,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendUserBasicGCSParameters.SendParachuteType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendSPIType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendUART_NUMB_2Type, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendCompassType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendUartNumb1Type, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendCompassRotationType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendRTHAltitudeType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAcroType, VAR_8BITS);
@@ -1399,7 +1399,7 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, GetUserBasicGCSParameters.GetParachuteType);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, GetUserBasicGCSParameters.GetSPIType);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, GetUserBasicGCSParameters.GetUART_NUMB_2Type);
-    STORAGEMANAGER.Write_8Bits(COMPASS_TYPE_ADDR, GetUserBasicGCSParameters.GetCompassType);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, GetUserBasicGCSParameters.GetUartNumb1Type);
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, GetUserBasicGCSParameters.GetCompassRotationType);
     STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, GetUserBasicGCSParameters.GetRTHAltitudeType);
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, GetUserBasicGCSParameters.GetAcroType);
@@ -1518,7 +1518,7 @@ void GCSClass::Default_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODULO RECEPTOR
     STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA UART_NUMB_2
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, 0);  //LIMPA A CONFIGURAÇÃO DE ROTAÇÃO DO COMPASS
-    STORAGEMANAGER.Write_8Bits(COMPASS_TYPE_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DO MODELO DO COMPASS
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA UART_NUMB_1
     STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DA ALTITUDE AO FAZER O RTH
     STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA SPI
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODO ACRO
@@ -1675,7 +1675,7 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendParachuteType = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR);
     SendUserBasicGCSParameters.SendSPIType = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR);
     SendUserBasicGCSParameters.SendUART_NUMB_2Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
-    SendUserBasicGCSParameters.SendCompassType = STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR);
+    SendUserBasicGCSParameters.SendUartNumb1Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
     SendUserBasicGCSParameters.SendCompassRotationType = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
     SendUserBasicGCSParameters.SendRTHAltitudeType = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
     SendUserBasicGCSParameters.SendAcroType = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);

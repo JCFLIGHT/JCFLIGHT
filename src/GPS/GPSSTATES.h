@@ -22,4 +22,5 @@ bool Get_State_Armed_With_GPS();
 bool Get_GPS_In_Good_Condition();
 bool Get_GPS_In_Bad_Condition();
 bool Get_GPS_In_Eight_Or_Plus_Satellites();
+bool Get_GPS_Type(uint8_t GPS_Type);
 #endif

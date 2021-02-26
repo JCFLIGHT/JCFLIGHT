@@ -20,6 +20,8 @@
 #include "GPS/GPSREAD.h"
 #include "BitArray/BITARRAY.h"
 #include "Common/ENUM.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 
 bool Get_State_Armed_With_GPS()
 {
@@ -51,6 +53,20 @@ bool Get_GPS_In_Bad_Condition()
 bool Get_GPS_In_Eight_Or_Plus_Satellites()
 {
     if (GPS_NumberOfSatellites >= 8)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Get_GPS_Type(uint8_t GPS_Type)
+{
+    static uint8_t Get_GPS_Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
+    if (Get_GPS_Type == GPS_UBLOX && GPS_Type == GPS_UBLOX)
+    {
+        return true;
+    }
+    else if (Get_GPS_Type == GPS_DJI && GPS_Type == GPS_DJI)
     {
         return true;
     }

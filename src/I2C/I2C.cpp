@@ -22,8 +22,8 @@
 #include "Compass/COMPASSREAD.h"
 #include "IMU/ACCGYROREAD.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "FastSerial/PRINTF.h"
 #include "BAR/BAR.h"
+#include "FastSerial/PRINTF.h"
 
 I2CPROTOCOL I2C;
 
@@ -38,25 +38,10 @@ void I2CPROTOCOL::Initialization(void)
   TWSR = 0;
   TWBR = 12;
   TWCR = 4;
-  //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
-  if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 ||
-      STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
-  {
-    COMPASS.Type = COMPASS_AK8975;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 ||
-           STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
-  {
-    COMPASS.Type = COMPASS_HMC5843;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 ||
-           STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
-  {
-    COMPASS.Type = COMPASS_HMC5883;
-  }
   I2C.SearchDevicesInBarrament();
   //AK8975 ENDEREÇO:0x0C
-  //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
+  //HMC5843 OU HMC5883 ENDEREÇO:0x1E
+  //QMC5883 ENDEREÇO:0x0D
   if (COMPASS.Type == COMPASS_AK8975)
   {
     COMPASS.Address = ADDRESS_COMPASS_AK8975;
@@ -64,16 +49,13 @@ void I2CPROTOCOL::Initialization(void)
   }
   else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
   {
-    if (COMPASS.FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
-    {
-      COMPASS.Address = ADDRESS_COMPASS_QMC5883;
-      COMPASS.Register = 0x00;
-    }
-    else
-    {
-      COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-      COMPASS.Register = 0x03;
-    }
+    COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
+    COMPASS.Register = 0x03;
+  }
+  else if (COMPASS.Type == COMPASS_QMC5883)
+  {
+    COMPASS.Address = ADDRESS_COMPASS_QMC5883;
+    COMPASS.Register = 0x00;
   }
 }
 
@@ -224,9 +206,25 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
       }
       PRINTF.SendToConsole(PSTR("\n"));
 #endif
+
+      if (NumbGenerator == ADDRESS_COMPASS_AK8975)
+      {
+        COMPASS.Type = COMPASS_AK8975;
+      }
+
+      if (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883)
+      {
+        COMPASS.Type = COMPASS_HMC5843;
+      }
+
       if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
       {
-        COMPASS.FakeHMC5883Address = ADDRESS_COMPASS_QMC5883;
+        COMPASS.Type = COMPASS_QMC5883;
+      }
+
+      if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
+      {
+        CompassFound = true;
       }
 
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
@@ -239,15 +237,13 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
         SetBaroType(ADDRESS_BAROMETER_BMP280);
       }
 
-      if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
-      {
-        CompassFound = true;
-      }
       if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
       {
         BarometerFound = true;
       }
+
       Devices++;
+
 #ifdef DEBUG_I2C
       SCHEDULERTIME.Sleep(20);
 #endif
@@ -258,22 +254,6 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
   if (!Devices)
   {
     PRINTF.SendToConsole(PSTR("NENHUM DISPOSITVO ENCONTRADO\n"));
-  }
-  if (CompassFound)
-  {
-    PRINTF.SendToConsole(PSTR("COMPASS CONECTADO AO I2C?SIM\n"));
-  }
-  else
-  {
-    PRINTF.SendToConsole(PSTR("COMPASS CONECTADO AO I2C?NÃO\n"));
-  }
-  if (BarometerFound)
-  {
-    PRINTF.SendToConsole(PSTR("BAROMETRO CONECTADO AO I2C?SIM\n"));
-  }
-  else
-  {
-    PRINTF.SendToConsole(PSTR("BAROMETRO CONECTADO AO I2C?NÃO\n"));
   }
 #endif
 }
@@ -344,22 +324,10 @@ uint8_t I2CPROTOCOL::SendHexadecimalValues(uint8_t Address)
 void I2CPROTOCOL::Initialization(void)
 {
   Wire.begin(21, 22, 400000);
-  //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
-  if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
-  {
-    COMPASS.Type = COMPASS_AK8975;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
-  {
-    COMPASS.Type = COMPASS_HMC5843;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
-  {
-    COMPASS.Type = COMPASS_HMC5883;
-  }
   I2C.SearchDevicesInBarrament();
   //AK8975 ENDEREÇO:0x0C
-  //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
+  //HMC5843 OU HMC5883 ENDEREÇO:0x1E
+  //QMC5883 ENDEREÇO:0x0D
   if (COMPASS.Type == COMPASS_AK8975)
   {
     COMPASS.Address = ADDRESS_COMPASS_AK8975;
@@ -367,16 +335,13 @@ void I2CPROTOCOL::Initialization(void)
   }
   else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
   {
-    if (COMPASS.FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
-    {
-      COMPASS.Address = ADDRESS_COMPASS_QMC5883;
-      COMPASS.Register = 0x00;
-    }
-    else
-    {
-      COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-      COMPASS.Register = 0x03;
-    }
+    COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
+    COMPASS.Register = 0x03;
+  }
+  else if (COMPASS.Type == COMPASS_QMC5883)
+  {
+    COMPASS.Address = ADDRESS_COMPASS_QMC5883;
+    COMPASS.Register = 0x00;
   }
 }
 
@@ -441,32 +406,42 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
       {
         Serial.println("MPU6050 ENCONTRADO!");
       }
-      if (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883 || NumbGenerator == ADDRESS_COMPASS_QMC5883)
-      {
-        Serial.println("HMC5843 OU HMC5883 ENCONTRADO!");
-        if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
-        {
-          COMPASS.FakeHMC5883Address = ADDRESS_COMPASS_QMC5883;
-        }
-      }
+
       if (NumbGenerator == ADDRESS_COMPASS_AK8975)
       {
+        COMPASS.Type = COMPASS_AK8975;
         Serial.println("AK8975 ENCONTRADO!");
       }
+
+      if (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883)
+      {
+        COMPASS.Type = COMPASS_HMC5843;
+        Serial.println("HMC5843 OU HMC5883 ENCONTRADO!");
+      }
+
+      if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
+      {
+        COMPASS.Type = COMPASS_QMC5883;
+        Serial.println("QMC5883 ENCONTRADO!");
+      }
+
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
       {
         SetBaroType(ADDRESS_BAROMETER_MS5611);
         Serial.println("MS5611 ENCONTRADO!");
       }
+
       if (NumbGenerator == ADDRESS_BAROMETER_BMP280)
       {
         SetBaroType(ADDRESS_BAROMETER_BMP280);
         Serial.println("BMP280 ENCONTRADO!");
       }
+
       if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
       {
         CompassFound = true;
       }
+
       if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
       {
         BarometerFound = true;
@@ -479,58 +454,6 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
 void I2CPROTOCOL::Initialization(void)
 {
-  //CARREGA O TIPO DE COMPASS USADO PELO USUARIO SALVO NA EEPROM
-  if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 0 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 3)
-  {
-    COMPASS.Type = COMPASS_AK8975;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 1 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 4)
-  {
-    COMPASS.Type = COMPASS_HMC5843;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 2 || STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR) == 5)
-  {
-    COMPASS.Type = COMPASS_HMC5883;
-  }
-
-  /*
-   if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
-        COMPASS.FakeHMC5883Address = ADDRESS_COMPASS_QMC5883;
-
-      if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
-        SetBaroType(ADDRESS_BAROMETER_MS5611);
-
-      if (NumbGenerator == ADDRESS_BAROMETER_BMP280)
-        SetBaroType(ADDRESS_BAROMETER_BMP280);
-
-      if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
-      {
-        CompassFound = true;
-      }
-      if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
-        BarometerFound = true;
-*/
-
-  //AK8975 ENDEREÇO:0x0C
-  //HMC5843 OU HMC5883 ENDEREÇO:0x1E OU 0x0D
-  if (COMPASS.Type == COMPASS_AK8975)
-  {
-    COMPASS.Address = ADDRESS_COMPASS_AK8975;
-    COMPASS.Register = 0x03;
-  }
-  else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
-  {
-    if (COMPASS.FakeHMC5883Address == ADDRESS_COMPASS_QMC5883)
-    {
-      COMPASS.Address = ADDRESS_COMPASS_QMC5883;
-      COMPASS.Register = 0x00;
-    }
-    else
-    {
-      COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-      COMPASS.Register = 0x03;
-    }
-  }
 }
 
 void I2CPROTOCOL::Restart(uint8_t Address)

@@ -1417,6 +1417,9 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADJUST_ADDR, GetUserBasicGCSParameters.GetAccRollAdjust);
     STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADJUST_ADDR, GetUserBasicGCSParameters.GetAccPitchAdjust);
     STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, GetUserBasicGCSParameters.GetAccYawAdjust);
+
+    //ATUALIZA OS PARAMETROS DO PID
+    GET_SET[PID_UPDATED].State = false;
 }
 
 void GCSClass::Save_Radio_Control_Configuration()

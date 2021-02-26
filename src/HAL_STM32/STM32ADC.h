@@ -18,7 +18,7 @@
 #ifndef STM32ADC_H_
 #define STM32ADC_H_
 #ifdef __arm__
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 int16_t GPIOAnalogRead(uint8_t AnalogPin);
 #endif
 #endif

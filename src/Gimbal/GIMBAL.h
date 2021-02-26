@@ -17,6 +17,6 @@
 
 #ifndef GIMBAL_H_
 #define GIMBAL_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void Gimbal_Controll();
 #endif

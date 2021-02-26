@@ -17,6 +17,6 @@
 
 #ifndef SWITCHFLAG_H_
 #define SWITCHFLAG_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void Switch_Flag(void);
 #endif

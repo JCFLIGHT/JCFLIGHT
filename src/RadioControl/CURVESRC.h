@@ -17,7 +17,7 @@
 
 #ifndef CURVESRC_H_
 #define CURVESRC_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void CurvesRC_SetValues();
 void CurvesRC_CalculeValue();
 int16_t RCControllerToRate(int16_t StickData, uint8_t Rate);

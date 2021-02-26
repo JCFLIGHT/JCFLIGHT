@@ -17,7 +17,7 @@
 
 #ifndef AUTOLAUNCH_H_
 #define AUTOLAUNCH_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class AutoLaunchClass
 {
 public:

@@ -17,7 +17,7 @@
 
 #ifndef I2C_H_
 #define I2C_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class I2CPROTOCOL
 {
 public:

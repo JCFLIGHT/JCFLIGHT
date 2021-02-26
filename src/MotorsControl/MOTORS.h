@@ -17,7 +17,7 @@
 
 #ifndef MOTORS_H_
 #define MOTORS_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern int16_t MotorControl[8];
 void ConfigureRegisters(bool Run_Calibrate_ESC);
 void ApplyMixingForMotorsAndServos(float DeltaTime);

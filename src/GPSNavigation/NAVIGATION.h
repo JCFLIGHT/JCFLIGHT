@@ -17,7 +17,7 @@
 
 #ifndef NAVIGATION_H_
 #define NAVIGATION_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern bool GPSHold_CallBaro;
 extern bool Home_Point;
 extern float ScaleDownOfLongitude;

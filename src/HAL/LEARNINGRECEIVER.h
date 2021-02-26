@@ -17,6 +17,6 @@
 
 #ifndef LEARNINGRECEIVER_H_
 #define LEARNINGRECEIVER_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 uint16_t LearningChannelsOfReceiver(uint8_t Channels);
 #endif

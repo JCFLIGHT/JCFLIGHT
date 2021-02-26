@@ -17,6 +17,6 @@
 
 #ifndef IOCMODE_H_
 #define IOCMODE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void IOC_Mode_Update();
 #endif

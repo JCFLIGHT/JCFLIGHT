@@ -17,7 +17,7 @@
 
 #ifndef PARACHUTE_H_
 #define PARACHUTE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class ParachuteClass
 {
 public:

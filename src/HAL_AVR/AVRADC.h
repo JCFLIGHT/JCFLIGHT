@@ -18,7 +18,7 @@
 #ifndef AVRADC_H_
 #define AVRADC_H_
 #ifdef __AVR_ATmega2560__
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 int16_t GPIOAnalogRead(uint8_t AnalogPin);
 #endif
 #endif

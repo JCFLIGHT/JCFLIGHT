@@ -17,7 +17,7 @@
 
 #ifndef ALTITUDEHOLD_H_
 #define ALTITUDEHOLD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void AltitudeHold_Update_Params();
 bool ApplyAltitudeHoldControl();
 void SetAltitudeHold(int32_t ValueOfNewAltitudeHold);

@@ -17,7 +17,7 @@
 
 #ifndef BIQUADFILTER_h
 #define BIQUADFILTER_h
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/ENUM.h"
 typedef struct
 {

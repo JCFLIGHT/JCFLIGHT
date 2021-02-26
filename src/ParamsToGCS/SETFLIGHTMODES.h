@@ -17,6 +17,6 @@
 
 #ifndef SETFLIGHTMODES_H
 #define SETFLIGHTMODES_H
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void SetFlightModeToGCS();
 #endif

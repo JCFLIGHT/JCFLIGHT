@@ -17,7 +17,7 @@
 
 #ifndef FLIGHTMODES_H_
 #define FLIGHTMODES_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern bool Do_Stabilize_Mode;
 extern bool Do_HeadingHold_Mode;
 extern bool Do_AltitudeHold_Mode;

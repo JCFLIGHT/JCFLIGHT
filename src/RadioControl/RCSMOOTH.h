@@ -17,7 +17,7 @@
 
 #ifndef RCSMOOTH_H_
 #define RCSMOOTH_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void RCInterpolationInit();
 void RCInterpolationApply();
 #endif

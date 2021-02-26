@@ -17,7 +17,7 @@
 
 #ifndef HALFREERAM_H_
 #define HALFREERAM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 uint16_t _MemoryRAM_Check_();
 uint8_t _GetPercentageRAMUsed_();
 #endif

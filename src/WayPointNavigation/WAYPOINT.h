@@ -17,7 +17,7 @@
 
 #ifndef WAYPOINT_H_
 #define WAYPOINT_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 struct _GetWayPointGCSParameters
 {
   int32_t LatitudeOne;

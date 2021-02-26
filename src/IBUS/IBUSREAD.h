@@ -17,7 +17,7 @@
 
 #ifndef IBUSREAD_H_
 #define IBUSREAD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern uint16_t IBUSReadChannels[12];
 void IBUS_Update(void);
 #endif

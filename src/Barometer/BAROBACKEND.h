@@ -17,7 +17,7 @@
 
 #ifndef BAROBACKEND_H_
 #define BAROBACKEND_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void SetBaroType(uint8_t _BaroType);
 void Baro_Initialization();
 void Barometer_Update();

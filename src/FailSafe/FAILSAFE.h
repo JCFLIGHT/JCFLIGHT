@@ -17,7 +17,7 @@
 
 #ifndef FAILSAFE_H_
 #define FAILSAFE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern volatile int16_t Fail_Safe_System_Count;
 bool FastSystemFailSafe();
 bool SystemInFailSafe();

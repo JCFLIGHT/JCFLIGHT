@@ -46,7 +46,7 @@ void Serial_Initialization()
     {
         //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
         Serial_Begin(UART_NUMB_2, 100000);
-        UCSR2C |= (1 << UPM21) | (1 << USBS2);
+        (*(volatile uint8_t *)(0xD2)) |= (1 << 5) | (1 << 3);
     }
     else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER)
     {
@@ -59,37 +59,37 @@ void Serial_Initialization()
 
 void Serial_Begin(uint8_t SerialPort, uint32_t BaudRate)
 {
-    uint8_t h = ((F_CPU / 4 / BaudRate - 1) / 2) >> 8;
-    uint8_t l = ((F_CPU / 4 / BaudRate - 1) / 2);
+    uint8_t CalcedHighByte = ((16000000L / 4 / BaudRate - 1) / 2) >> 8;
+    uint8_t CalcedLowByte = ((16000000L / 4 / BaudRate - 1) / 2);
     switch (SerialPort)
     {
 
     case UART_NUMB_0:
-        UCSR0A = (1 << U2X0);
-        UBRR0H = h;
-        UBRR0L = l;
-        UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+        (*(volatile uint8_t *)(0xC0)) = (1 << 1);
+        (*(volatile uint8_t *)(0xC5)) = CalcedHighByte;
+        (*(volatile uint8_t *)(0xC4)) = CalcedLowByte;
+        (*(volatile uint8_t *)(0XC1)) |= (1 << 4) | (1 << 3) | (1 << 7);
         break;
 
     case UART_NUMB_1:
-        UCSR1A = (1 << U2X1);
-        UBRR1H = h;
-        UBRR1L = l;
-        UCSR1B |= (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);
+        (*(volatile uint8_t *)(0xC8)) = (1 << 1);
+        (*(volatile uint8_t *)(0xCD)) = CalcedHighByte;
+        (*(volatile uint8_t *)(0xCC)) = CalcedLowByte;
+        (*(volatile uint8_t *)(0XC9)) |= (1 << 4) | (1 << 3) | (1 << 7);
         break;
 
     case UART_NUMB_2:
-        UCSR2A = (1 << U2X2);
-        UBRR2H = h;
-        UBRR2L = l;
-        UCSR2B |= (1 << RXEN2) | (1 << TXEN2) | (1 << RXCIE2);
+        (*(volatile uint8_t *)(0xD0)) = (1 << 1);
+        (*(volatile uint8_t *)(0xD5)) = CalcedHighByte;
+        (*(volatile uint8_t *)(0xD4)) = CalcedLowByte;
+        (*(volatile uint8_t *)(0xD1)) |= (1 << 4) | (1 << 3) | (1 << 7);
         break;
 
     case UART_NUMB_3:
-        UCSR3A = (1 << U2X3);
-        UBRR3H = h;
-        UBRR3L = l;
-        UCSR3B |= (1 << RXEN3) | (1 << TXEN3) | (1 << RXCIE3);
+        (*(volatile uint8_t *)(0x130)) = (1 << 1);
+        (*(volatile uint8_t *)(0x135)) = CalcedHighByte;
+        (*(volatile uint8_t *)(0x134)) = CalcedLowByte;
+        (*(volatile uint8_t *)(0x131)) |= (1 << 4) | (1 << 3) | (1 << 7);
         break;
     }
 }
@@ -100,19 +100,19 @@ void Serial_UartSendData(uint8_t SerialPort)
     {
 
     case UART_NUMB_0:
-        UCSR0B |= (1 << UDRIE0);
+        (*(volatile uint8_t *)(0XC1)) |= (1 << 5);
         break;
 
     case UART_NUMB_1:
-        UCSR1B |= (1 << UDRIE1);
+        (*(volatile uint8_t *)(0XC9)) |= (1 << 5);
         break;
 
     case UART_NUMB_2:
-        UCSR2B |= (1 << UDRIE2);
+        (*(volatile uint8_t *)(0XD1)) |= (1 << 5);
         break;
 
     case UART_NUMB_3:
-        UCSR3B |= (1 << UDRIE3);
+        (*(volatile uint8_t *)(0X131)) |= (1 << 5);
         break;
     }
 }
@@ -175,9 +175,10 @@ void Serial_Write(uint8_t SerialPort, uint8_t WriteData)
     Serial_UartSendData(SerialPort);
 }
 
-//SERIAL 0 DO MEGA (DEBUG & GCS)
+//SERIAL 0 (DEBUG & GCS)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
-ISR(USART0_UDRE_vect)
+extern "C" void __vector_26(void) __attribute__((signal, used, externally_visible));
+void __vector_26(void)
 {
     uint8_t TXBuffer = UARTTailTX[UART_NUMB_0];
     if (UARTHeadTX[UART_NUMB_0] != TXBuffer)
@@ -186,18 +187,19 @@ ISR(USART0_UDRE_vect)
         {
             TXBuffer = 0;
         }
-        UDR0 = UARTBufferTX[TXBuffer][UART_NUMB_0];
+        (*(volatile uint8_t *)(0XC6)) = UARTBufferTX[TXBuffer][UART_NUMB_0];
         UARTTailTX[UART_NUMB_0] = TXBuffer;
     }
     if (TXBuffer == UARTHeadTX[UART_NUMB_0])
     {
-        UCSR0B &= ~(1 << UDRIE0);
+        (*(volatile uint8_t *)(0XC1)) &= ~(1 << 5);
     }
 }
 
-//SERIAL 1 DO MEGA (GPS)
+//SERIAL 1 (GPS)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
-ISR(USART1_UDRE_vect)
+extern "C" void __vector_37(void) __attribute__((signal, used, externally_visible));
+void __vector_37(void)
 {
     uint8_t TXBuffer = UARTTailTX[UART_NUMB_1];
     if (UARTHeadTX[UART_NUMB_1] != TXBuffer)
@@ -206,18 +208,19 @@ ISR(USART1_UDRE_vect)
         {
             TXBuffer = 0;
         }
-        UDR1 = UARTBufferTX[TXBuffer][UART_NUMB_1];
+        (*(volatile uint8_t *)(0XCE)) = UARTBufferTX[TXBuffer][UART_NUMB_1];
         UARTTailTX[UART_NUMB_1] = TXBuffer;
     }
     if (TXBuffer == UARTHeadTX[UART_NUMB_1])
     {
-        UCSR1B &= ~(1 << UDRIE1);
+        (*(volatile uint8_t *)(0XC9)) &= ~(1 << 5);
     }
 }
 
-//SERIAL 2 DO MEGA (SBUS & IBUS)
+//SERIAL 2 (SBUS & IBUS)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
-ISR(USART2_UDRE_vect)
+extern "C" void __vector_52(void) __attribute__((signal, used, externally_visible));
+void __vector_52(void)
 {
     uint8_t TXBuffer = UARTTailTX[UART_NUMB_2];
     if (UARTHeadTX[UART_NUMB_2] != TXBuffer)
@@ -226,18 +229,19 @@ ISR(USART2_UDRE_vect)
         {
             TXBuffer = 0;
         }
-        UDR2 = UARTBufferTX[TXBuffer][UART_NUMB_2];
+        (*(volatile uint8_t *)(0XD6)) = UARTBufferTX[TXBuffer][UART_NUMB_2];
         UARTTailTX[UART_NUMB_2] = TXBuffer;
     }
     if (TXBuffer == UARTHeadTX[UART_NUMB_2])
     {
-        UCSR2B &= ~(1 << UDRIE2);
+        (*(volatile uint8_t *)(0XD1)) &= ~(1 << 5);
     }
 }
 
-//SERIAL 3 DO MEGA (MATEK3901L0X,SD LOGGER & OSD)
+//SERIAL 3 (MATEK3901L0X,SD LOGGER & OSD)
 //ROTINA DE INTERRUPÇÃO PARA O PINO TX
-ISR(USART3_UDRE_vect)
+extern "C" void __vector_55(void) __attribute__((signal, used, externally_visible));
+void __vector_55(void)
 {
     uint8_t TXBuffer = UARTTailTX[UART_NUMB_3];
     if (UARTHeadTX[UART_NUMB_3] != TXBuffer)
@@ -246,33 +250,38 @@ ISR(USART3_UDRE_vect)
         {
             TXBuffer = 0;
         }
-        UDR3 = UARTBufferTX[TXBuffer][UART_NUMB_3];
+        (*(volatile uint8_t *)(0X136)) = UARTBufferTX[TXBuffer][UART_NUMB_3];
         UARTTailTX[UART_NUMB_3] = TXBuffer;
     }
     if (TXBuffer == UARTHeadTX[UART_NUMB_3])
     {
-        UCSR3B &= ~(1 << UDRIE3);
+        (*(volatile uint8_t *)(0X131)) &= ~(1 << 5);
     }
 }
 
-ISR(USART0_RX_vect)
+extern "C" void __vector_25(void) __attribute__((signal, used, externally_visible));
+void __vector_25(void)
+
 {
-    Serial_UartBufferStore(UDR0, UART_NUMB_0);
+    Serial_UartBufferStore((*(volatile uint8_t *)(0XC6)), UART_NUMB_0);
 }
 
-ISR(USART1_RX_vect)
+extern "C" void __vector_36(void) __attribute__((signal, used, externally_visible));
+void __vector_36(void)
 {
-    Serial_UartBufferStore(UDR1, UART_NUMB_1);
+    Serial_UartBufferStore((*(volatile uint8_t *)(0XCE)), UART_NUMB_1);
 }
 
-ISR(USART2_RX_vect)
+extern "C" void __vector_51(void) __attribute__((signal, used, externally_visible));
+void __vector_51(void)
 {
-    Serial_UartBufferStore(UDR2, UART_NUMB_2);
+    Serial_UartBufferStore((*(volatile uint8_t *)(0XD6)), UART_NUMB_2);
 }
 
-ISR(USART3_RX_vect)
+extern "C" void __vector_54(void) __attribute__((signal, used, externally_visible));
+void __vector_54(void)
 {
-    Serial_UartBufferStore(UDR3, UART_NUMB_3);
+    Serial_UartBufferStore((*(volatile uint8_t *)(0X136)), UART_NUMB_3);
 }
 
 #endif

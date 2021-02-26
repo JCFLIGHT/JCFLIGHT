@@ -18,7 +18,7 @@
 #ifndef ESP32ADC_H_
 #define ESP32ADC_H_
 #ifdef ESP32
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 int16_t GPIOAnalogRead(uint8_t AnalogPin);
 #endif
 #endif

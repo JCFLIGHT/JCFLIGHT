@@ -17,6 +17,6 @@
 
 #ifndef EEPROMCHECK_H_
 #define EEPROMCHECK_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void Operator_Check_Values_In_Address(uint16_t Size);
 #endif

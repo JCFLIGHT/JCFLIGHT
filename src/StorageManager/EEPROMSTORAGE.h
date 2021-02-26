@@ -17,7 +17,7 @@
 
 #ifndef EEPROMSTORAGE_H_
 #define EEPROMSTORAGE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class EEPROMSTORAGE
 {
 public:

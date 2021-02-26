@@ -17,7 +17,7 @@
 
 #ifndef DESARMLOWTHR_H_
 #define DESARMLOWTHR_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class DesarmLowThrClass
 {
 public:

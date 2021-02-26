@@ -17,7 +17,7 @@
 
 #ifndef PRECISIONLAND_H_
 #define PRECISIONLAND_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void Update_PrecisionLand();
 float GetAccelerationTotal();
 bool GetLandSuccess();

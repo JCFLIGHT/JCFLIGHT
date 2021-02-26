@@ -18,7 +18,7 @@
 #ifndef AVRSERIAL_H_
 #define AVRSERIAL_H_
 #ifdef __AVR_ATmega2560__
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void Serial_Initialization();
 void Serial_Begin(uint8_t SerialPort, uint32_t BaudRate);
 uint8_t Serial_Read(uint8_t SerialPort);

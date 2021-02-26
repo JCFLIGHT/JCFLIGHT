@@ -17,7 +17,7 @@
 
 #ifndef BAROREAD_H_
 #define BAROREAD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern int16_t BaroTemperatureRaw;
 extern int32_t BaroPressureRaw;
 void RecalculateBaroTotalPressure();

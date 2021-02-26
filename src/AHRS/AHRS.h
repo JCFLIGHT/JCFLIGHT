@@ -17,7 +17,7 @@
 
 #ifndef AHRS_H_
 #define AHRS_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "VECTOR.h"
 extern Struct_Vector3x3 BodyFrameAcceleration;
 extern Struct_Vector3x3 BodyFrameRotation;

@@ -17,7 +17,7 @@
 
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 #define SCHEDULER_SET_FREQUENCY(Frequecy, Unidad) (1000000 / (Frequecy))
 bool Scheduler(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime);

@@ -18,7 +18,7 @@
 #ifndef ESP32PPM_H_
 #define ESP32PPM_H_
 #ifdef ESP32
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void _PPM_Initialization();
 #endif
 #endif

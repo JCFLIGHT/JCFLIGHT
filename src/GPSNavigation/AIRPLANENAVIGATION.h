@@ -17,7 +17,7 @@
 
 #ifndef AIRPLANENAVIGATION_H_
 #define AIRPLANENAVIGATION_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern int32_t GPS_Altitude_For_Plane;
 extern int32_t GPS_AltitudeHold_For_Plane;
 void Circle_Mode_Update();

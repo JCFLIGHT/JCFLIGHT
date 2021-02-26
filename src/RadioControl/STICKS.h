@@ -17,7 +17,7 @@
 
 #ifndef STICKS_H_
 #define STICKS_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class SticksClass
 {
 public:

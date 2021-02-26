@@ -17,7 +17,7 @@
 
 #ifndef HALSERIAL_H_
 #define HALSERIAL_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class HALSerialClass
 {
 public:

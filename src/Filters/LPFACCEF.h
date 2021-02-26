@@ -17,7 +17,7 @@
 
 #ifndef LPFACCEF
 #define LPFACCEF
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class LowPassFilterEarthFrame
 {
 public:

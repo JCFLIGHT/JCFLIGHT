@@ -18,7 +18,7 @@
 #ifndef AVRFREERAM_H_
 #define AVRFREERAM_H_
 #ifdef __AVR_ATmega2560__
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 uint16_t _MemoryRAM_Check();
 uint8_t _GetPercentageRAMUsed();
 #endif

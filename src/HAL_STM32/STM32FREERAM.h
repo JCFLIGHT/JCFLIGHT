@@ -18,7 +18,7 @@
 #ifndef STM32FREERAM_H_
 #define STM32FREERAM_H_
 #ifdef __arm__
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 uint16_t _MemoryRAM_Check();
 uint8_t _GetPercentageRAMUsed();
 #endif

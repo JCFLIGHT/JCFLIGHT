@@ -17,7 +17,7 @@
 
 #ifndef AUTOTHROTTLE_H_
 #define AUTOTHROTTLE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void AirSpeed_Update_Auto_Throttle();
 void AirSpeed_Apply_Auto_Throttle_Control();
 #endif

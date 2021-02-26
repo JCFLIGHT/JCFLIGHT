@@ -17,7 +17,7 @@
 
 #ifndef RCCONFIG_H_
 #define RCCONFIG_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class RC_Config
 {
 public:

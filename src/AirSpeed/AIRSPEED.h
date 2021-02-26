@@ -17,7 +17,7 @@
 
 #ifndef AIRSPEED_H_
 #define AIRSPEED_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class AirSpeedClass
 {
 public:

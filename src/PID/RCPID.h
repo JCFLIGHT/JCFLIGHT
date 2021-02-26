@@ -17,7 +17,7 @@
 
 #ifndef DYNAMICPID_H_
 #define DYNAMICPID_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern uint8_t RCRate;
 extern uint8_t RCExpo;
 extern uint8_t YawRate;

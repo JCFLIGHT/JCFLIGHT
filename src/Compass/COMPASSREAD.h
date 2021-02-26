@@ -17,7 +17,7 @@
 
 #ifndef COMPASSREAD_H_
 #define COMPASSREAD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class CompassReadClass
 {
 public:

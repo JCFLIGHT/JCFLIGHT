@@ -17,7 +17,7 @@
 
 #ifndef MS5611_H_
 #define MS5611_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void MS5611_Initialization();
 void MS5611_Update();
 #endif

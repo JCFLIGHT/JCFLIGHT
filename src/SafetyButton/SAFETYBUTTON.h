@@ -17,7 +17,7 @@
 
 #ifndef SAFETYBUTTON_H_
 #define SAFETYBUTTON_h_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/ENUM.h"
 class SAFETYBUTTONCLASS
 {

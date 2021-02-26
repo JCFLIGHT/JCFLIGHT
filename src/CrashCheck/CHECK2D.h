@@ -17,6 +17,6 @@
 
 #ifndef CHECK2D_H_
 #define CHECK2D_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 bool CrashCheck2D(int16_t AngleRoll, int16_t AnglePitch, float CrashAngle);
 #endif

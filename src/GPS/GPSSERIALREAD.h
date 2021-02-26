@@ -17,6 +17,6 @@
 
 #ifndef GPSSERIALREAD_H_
 #define GPSSERIALREAD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void GPS_Serial_Read();
 #endif

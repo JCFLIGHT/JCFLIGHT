@@ -17,7 +17,7 @@
 
 #ifndef HEADINGHOLD_H_
 #define HEADINGHOLD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern int16_t HeadingHoldTarget;
 void UpdateStateOfHeadingHold(void);
 bool GetSafeStateOfHeadingHold();

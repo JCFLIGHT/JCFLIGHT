@@ -17,7 +17,7 @@
 
 #ifndef IOMCU_H_
 #define IOMCU_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class GCSClass
 {
 public:

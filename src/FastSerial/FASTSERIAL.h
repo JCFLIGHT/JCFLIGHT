@@ -17,7 +17,7 @@
 
 #ifndef FASTSERIAL_H_
 #define FASTSERIAL_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class Fast_Serial
 {
 public:

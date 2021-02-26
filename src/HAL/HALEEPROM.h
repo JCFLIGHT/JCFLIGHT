@@ -17,7 +17,7 @@
 
 #ifndef HALEEPROM_H_
 #define HALEEPROM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class HALEEPROMClass
 {
 public:

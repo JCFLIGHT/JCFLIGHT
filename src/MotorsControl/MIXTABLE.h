@@ -17,7 +17,7 @@
 
 #ifndef MIXTABLE_H_
 #define MIXTABLE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 #include "Build/GCC.h"
 

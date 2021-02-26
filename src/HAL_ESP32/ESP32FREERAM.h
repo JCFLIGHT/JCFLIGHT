@@ -18,7 +18,7 @@
 #ifndef ESP32FREERAM_H_
 #define ESP32FREERAM_H_
 #ifdef ESP32
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 uint16_t _MemoryRAM_Check();
 uint8_t _GetPercentageRAMUsed();
 #endif

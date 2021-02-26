@@ -17,7 +17,7 @@
 
 #ifndef TPA_H_
 #define TPA_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 extern TPA_Parameters_Struct TPA_Parameters;
 void TPA_Initialization();

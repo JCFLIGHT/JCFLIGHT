@@ -17,7 +17,7 @@
 
 #ifndef DECODE_H_
 #define DECODE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class DecodeClass
 {
 public:

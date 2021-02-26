@@ -18,7 +18,7 @@
 #ifndef AVRPPM_H_
 #define AVRPPM_H_
 #ifdef __AVR_ATmega2560__
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void _PPM_Initialization();
 #endif
 #endif

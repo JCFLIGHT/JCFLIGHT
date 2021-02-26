@@ -17,7 +17,7 @@
 
 #ifndef PIDPARAMS_H_
 #define PIDPARAMS_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void LoadPID();
 void UpdateValuesOfPID();
 #endif

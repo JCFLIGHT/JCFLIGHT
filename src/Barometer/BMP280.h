@@ -17,7 +17,7 @@
 
 #ifndef BMP280_H_
 #define BMP280_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void BMP280_Initialization();
 void BMP280_Update();
 #endif

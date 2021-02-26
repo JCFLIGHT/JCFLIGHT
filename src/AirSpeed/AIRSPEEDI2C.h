@@ -17,7 +17,7 @@
 
 #ifndef AIRSPEEDI2C_H_
 #define AIRSPEEDI2C_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 float AirSpeed_I2C_Get_Calibration(void);
 float AirSpeed_I2C_Get_Actual_Value(void);
 #endif

@@ -17,7 +17,7 @@
 
 #ifndef ORIENTATION_H_
 #define ORIENTATION_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class ClassCompassOrientation
 {
 public:

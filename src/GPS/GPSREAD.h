@@ -17,7 +17,7 @@
 
 #ifndef GPSREAD_H_
 #define GPSREAD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern uint8_t GPS_NumberOfSatellites;
 extern int16_t GPSVelNED[3];
 extern uint16_t GPS_Ground_Course;

@@ -17,7 +17,7 @@
 
 #ifndef SBUSREAD_H_
 #define SBUSREAD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern uint16_t SBUSReadChannels[12];
 void SBUS_Update();
 class SBUS

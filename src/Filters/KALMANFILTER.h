@@ -17,7 +17,7 @@
 
 #ifndef KALMANFILTER_H_
 #define KALMANFILTER_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 typedef struct
 {
   float Q; //RUIDO GERADO NO PROCESSO

@@ -17,7 +17,7 @@
 
 #ifndef GPSSTATES_H_
 #define GPSSTATES_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 bool Get_State_Armed_With_GPS();
 bool Get_GPS_In_Good_Condition();
 bool Get_GPS_In_Bad_Condition();

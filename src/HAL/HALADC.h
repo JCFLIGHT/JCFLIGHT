@@ -17,7 +17,7 @@
 
 #ifndef HALADC_H_
 #define HALADC_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class HAL_ADC_Class
 {
 public:

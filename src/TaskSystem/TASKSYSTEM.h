@@ -17,7 +17,7 @@
 
 #ifndef TASKSYSTEM_H_
 #define TASKSYSTEM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 extern uint16_t SystemLoadPercent;
 void TaskSystemInitialization(void);

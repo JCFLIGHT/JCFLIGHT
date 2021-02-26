@@ -17,7 +17,7 @@
 
 #ifndef CHECKSUM_H_
 #define CHECKSUM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class CheckSumClass
 {
 public:

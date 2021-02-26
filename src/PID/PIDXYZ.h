@@ -17,7 +17,7 @@
 
 #ifndef PIDXYZ_H_
 #define PIDXYZ_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class PIDXYZClass
 {
 public:

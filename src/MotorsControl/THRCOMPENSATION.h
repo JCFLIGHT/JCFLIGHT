@@ -17,6 +17,6 @@
 
 #ifndef THRCOMPENSATION_H_
 #define THRCOMPENSATION_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 float CalculateThrottleCompensationFactor(float DeltaTime);
 #endif

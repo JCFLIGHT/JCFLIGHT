@@ -17,7 +17,7 @@
 
 #ifndef HALPPM_H_
 #define HALPPM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class ClassHALPPM
 {
 public:

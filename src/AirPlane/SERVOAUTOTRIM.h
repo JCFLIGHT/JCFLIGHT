@@ -17,7 +17,7 @@
 
 #ifndef SERVOAUTOTRIM_H_
 #define SERVOAUTOTRIM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 extern bool ServoAutoTrimEnabled;
 void ServoAutoTrimRun(void);
 #endif

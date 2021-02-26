@@ -17,7 +17,7 @@
 
 #ifndef BATTERY_H_
 #define BATTERY_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class BATT
 {
 public:

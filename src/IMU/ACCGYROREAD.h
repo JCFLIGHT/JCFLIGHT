@@ -17,7 +17,7 @@
 
 #ifndef ACCGYROREAD_H_
 #define ACCGYROREAD_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void IMU_Filters_Initialization();
 void Acc_Initialization();
 void Gyro_Initialization();

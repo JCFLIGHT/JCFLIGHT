@@ -17,7 +17,7 @@
 
 #ifndef GLITCH_H_
 #define GLITCH_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class GlitchClass
 {
 public:

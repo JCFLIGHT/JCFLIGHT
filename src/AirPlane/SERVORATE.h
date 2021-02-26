@@ -17,7 +17,7 @@
 
 #ifndef SERVORATE_H_
 #define SERVORATE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void Servo_Rate_Update();
 void Servo_Rate_Apply();
 #endif

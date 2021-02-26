@@ -17,7 +17,7 @@
 
 #ifndef GPSPID_H_
 #define GPSPID_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 int32_t GPSGetProportional(int32_t Error, struct _PID_PARAM *PID);
 int32_t GPSGetIntegral(int32_t Error, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);

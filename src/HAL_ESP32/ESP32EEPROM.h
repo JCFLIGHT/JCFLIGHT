@@ -18,7 +18,7 @@
 #ifndef FESP32EEPROM_H_
 #define ESP32EEPROM_H_
 #ifdef ESP32
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void EEPROM_Write_8Bits(int16_t Address, uint8_t Value);
 void EEPROM_Write_16Bits(int16_t Address, int16_t Value);
 void EEPROM_Write_32Bits(int16_t Address, int32_t Value);

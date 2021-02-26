@@ -17,6 +17,6 @@
 
 #ifndef IMUHEALTH_H_
 #define IMUHEALTH_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void CheckAndUpdateIMUCalibration();
 #endif

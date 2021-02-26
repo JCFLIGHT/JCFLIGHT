@@ -17,7 +17,7 @@
 
 #ifndef AIRPLANE_H_
 #define AIRPLANE_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #define MAX_SUPPORTED_SERVOS 4
 #define SAVE_SERVO_MIDDLE(Address, Value) STORAGEMANAGER.Write_16Bits(Address, Value) //SALVA O PONTO MÉDIO DOS SERVOS NA EEPROM
 #define GET_SERVO_MIN(Address) STORAGEMANAGER.Read_16Bits(Address)                    //OBTÉM O VALOR DO PULSO MINIMO DOS SERVOS

@@ -17,7 +17,7 @@
 
 #ifndef SCHEDULERTIME_h
 #define SCHEDULERTIME_h
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class SchedulerTimeClass
 {
 public:

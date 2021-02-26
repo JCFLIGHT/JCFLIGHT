@@ -17,7 +17,7 @@
 
 #ifndef LEDRGB_H_
 #define LEDRGB_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class LEDRGB
 {
 public:

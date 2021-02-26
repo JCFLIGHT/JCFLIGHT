@@ -17,7 +17,7 @@
 
 #ifndef AIRSPEEDANALOG_H_
 #define AIRSPEEDANALOG_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 float AirSpeed_Analog_Get_Calibration(void);
 float AirSpeed_Analog_Get_Actual_Value(void);
 #endif

@@ -17,7 +17,7 @@
 
 #ifndef CALIBESC_H_
 #define CALIBESC_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class ClassESC
 {
 public:

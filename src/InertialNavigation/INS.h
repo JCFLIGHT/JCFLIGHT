@@ -17,7 +17,7 @@
 
 #ifndef INS_H_
 #define INS_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class InertialNavigationClass
 {
 public:

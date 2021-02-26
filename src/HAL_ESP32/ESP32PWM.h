@@ -17,7 +17,7 @@
 
 #ifndef ESP32PWM_H_
 #define ESP32PWM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void AnalogWriteSetSettings(uint8_t Pin, double Frequency, uint8_t Resolution);
 void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse);
 #endif

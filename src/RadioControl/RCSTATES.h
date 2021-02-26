@@ -17,7 +17,7 @@
 
 #ifndef RCSTATES_H_
 #define RCSTATES_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 bool CheckInclinationForArm(void);
 bool ArmDelayedState(void);
 void ResetArmDelayed(void);

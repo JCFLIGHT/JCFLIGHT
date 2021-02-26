@@ -17,6 +17,6 @@
 
 #ifndef CRASHCHECK_H_
 #define CRASHCHECK_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void CrashCheck();
 #endif

@@ -17,7 +17,7 @@
 
 #ifndef FREERAM_H_
 #define FREERAM_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class MEMORYCLASS
 {
 public:

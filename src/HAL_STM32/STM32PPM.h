@@ -18,7 +18,7 @@
 #ifndef STM32PPM_H_
 #define STM32PPM_H_
 #ifdef __arm__
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void _PPM_Initialization();
 #endif
 #endif

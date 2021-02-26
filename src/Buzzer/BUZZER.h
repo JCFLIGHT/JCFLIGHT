@@ -17,7 +17,7 @@
 
 #ifndef BUZZER_H_
 #define BUZZER_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/ENUM.h"
 class BEEPERCLASS
 {

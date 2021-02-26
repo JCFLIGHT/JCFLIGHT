@@ -17,7 +17,7 @@
 
 #ifndef PRINTF_H_
 #define PRINTF_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #ifdef __AVR_ATmega2560__
 extern "C"
 {
@@ -40,7 +40,7 @@ private:
 #ifndef __AVR_ATmega2560__
   void SerialPrintF();
 #else
-  void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
+  void SerialPrintF(unsigned char in_progmem, const char *fmt, va_list ap);
 #endif
 };
 extern SerialPrint PRINTF;
@@ -51,11 +51,11 @@ extern SerialPrint PRINTF;
     PRINTF.SendToConsole(PSTR(fmt "\n"), ##args); \
     PRINTF.CallSchedulerSleep();                  \
   } while (0)
-#define LOG(fmt)                                                                        \
-  do                                                                                    \
-  {                                                                                     \
+#define LOG(fmt)                                                                             \
+  do                                                                                         \
+  {                                                                                          \
     PRINTF.SendToConsole(PSTR("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__); \
-    PRINTF.CallSchedulerSleep();                                                        \
+    PRINTF.CallSchedulerSleep();                                                             \
   } while (0)
 #else
 #define DEBUG(x, y) (void)(x), (void)(y)

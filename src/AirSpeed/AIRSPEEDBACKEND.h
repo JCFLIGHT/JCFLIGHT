@@ -17,7 +17,7 @@
 
 #ifndef AIRSPEEDBACKEND_H_
 #define AIRSPEEDBACKEND_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 #include "Common/ENUM.h"
 bool Get_AirSpeed_State(void);
 uint8_t Get_AirSpeed_Type(void);

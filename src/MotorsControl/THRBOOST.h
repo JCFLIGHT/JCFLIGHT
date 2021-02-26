@@ -17,6 +17,6 @@
 
 #ifndef THRBOOST_H_
 #define THRBOOST_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void ApplyThrottleBoost();
 #endif

@@ -76,7 +76,7 @@ void AVRInterruptRoutine(void)
     }
 }
 
-extern "C" void __vector_11(void) __attribute__((signal, __INTR_ATTRS));
+extern "C" void __vector_11(void) __attribute__((signal, used, externally_visible));
 void __vector_11(void)
 {
     if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||

@@ -17,7 +17,7 @@
 
 #ifndef FULLPARAMS_H_
 #define FULLPARAMS_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 void FullParamsListInitialization();
 void SetNewValue(const char *ParamName, int32_t NewValue);
 #endif

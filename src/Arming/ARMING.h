@@ -17,7 +17,7 @@
 
 #ifndef ARMING_H_
 #define ARMING_H_
-#include "Arduino.h"
+#include "Build/LIBDEPENDENCIES.h"
 class PreArmClass
 {
 public:

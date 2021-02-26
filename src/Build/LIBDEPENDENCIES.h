@@ -18,7 +18,7 @@
 #ifndef LIBDEPENDENCIES_H_
 #define LIBDEPENDENCIES_H_
 #define NULL 0
-#define PSTR(s) (__extension__({static const char __c[] __attribute__((__progmem__)) = (s); &__c[0]; }))
+#define PSTR(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
 #include <inttypes.h>     //int8_t,uint8_t,int16_t,uint16_t,int32_t & uint32_t
 #include <math.h>         //isnan & isinf
 #include <stdarg.h>       //va_list
@@ -28,8 +28,10 @@
 #include <avr/io.h>       //PARA MANIPULAÇÃO DE REGISTRADORES
 #include <avr/pgmspace.h> //strlen_P (STRING LENGTH COM PONTEIRO)
 /*
+//ERA PRA FUNCIONAR NÉ?!MAS ENFIM...
 static inline size_t strlen_P(const char *pstr) //STRING LENGTH COM PONTEIRO
 {
-  return strlen(pstr);
-}*/
+  return strlen((const char *)pstr);
+}
+*/
 #endif

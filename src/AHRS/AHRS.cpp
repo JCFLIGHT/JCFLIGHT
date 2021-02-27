@@ -457,7 +457,7 @@ float AHRSClass::CosineTiltAngle(void)
 
 bool AHRSClass::CheckAnglesInclination(int16_t Angle)
 {
-  if (CosineTiltAngle() < Fast_Cosine(ConvertToRadians(Angle)))
+  if (AHRS.CosineTiltAngle() < Fast_Cosine(ConvertToRadians(Angle)))
   {
     return true;
   }

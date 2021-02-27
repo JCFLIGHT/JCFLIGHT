@@ -55,11 +55,11 @@ void CompassReadClass::Initialization()
     I2C.WriteRegister(COMPASS.Address, 0x01, 0x60);
     I2C.WriteRegister(COMPASS.Address, 0x02, 0x01);
     SCHEDULERTIME.Sleep(100);
-    InitialReadBufferData();
+    COMPASS.InitialReadBufferData();
     SCHEDULERTIME.Sleep(10);
-    MagnetometerGain[ROLL] = 1000.0 / ABS(IMU.CompassRead[ROLL]);
-    MagnetometerGain[PITCH] = 1000.0 / ABS(IMU.CompassRead[PITCH]);
-    MagnetometerGain[YAW] = 1000.0 / ABS(IMU.CompassRead[YAW]);
+    COMPASS.MagnetometerGain[ROLL] = 1000.0 / ABS(IMU.CompassRead[ROLL]);
+    COMPASS.MagnetometerGain[PITCH] = 1000.0 / ABS(IMU.CompassRead[PITCH]);
+    COMPASS.MagnetometerGain[YAW] = 1000.0 / ABS(IMU.CompassRead[YAW]);
     I2C.WriteRegister(COMPASS.Address, 0x00, 0x70);
     I2C.WriteRegister(COMPASS.Address, 0x01, 0x20);
     I2C.WriteRegister(COMPASS.Address, 0x02, 0x00);
@@ -72,20 +72,20 @@ void CompassReadClass::Initialization()
     I2C.WriteRegister(COMPASS.Address, 2, 1);
     SCHEDULERTIME.Sleep(100);
     InitialReadBufferData();
-    if (!PushBias(0x011))
+    if (!COMPASS.PushBias(0x011))
     {
       BiasOk = false;
     }
-    if (!PushBias(0x012))
+    if (!COMPASS.PushBias(0x012))
     {
       BiasOk = false;
     }
     if (BiasOk)
     {
       //CALCULA O GANHO PARA CADA EIXO DO COMPASS
-      MagnetometerGain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
-      MagnetometerGain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
-      MagnetometerGain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
+      COMPASS.MagnetometerGain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
+      COMPASS.MagnetometerGain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
+      COMPASS.MagnetometerGain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
     }
     I2C.WriteRegister(COMPASS.Address, 0, 0x70);
     I2C.WriteRegister(COMPASS.Address, 1, 0x20);
@@ -108,7 +108,7 @@ bool CompassReadClass::PushBias(uint8_t InputBias)
   {
     I2C.WriteRegister(COMPASS.Address, 2, 1);
     SCHEDULERTIME.Sleep(100);
-    InitialReadBufferData();
+    COMPASS.InitialReadBufferData();
     //VERIFICA SE NENHUMA LEITURA DO MAG IRÁ EXCEDER O LIMITE DE 2^12
     //ROLL
     ABS_MagRead = ABS(IMU.CompassRead[ROLL]);

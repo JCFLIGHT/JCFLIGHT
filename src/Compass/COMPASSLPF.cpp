@@ -27,8 +27,8 @@ void CompassLPFClass::Apply()
     //APLICA O LPF NO COMPASS PARA EVITAR SPIKES DURANTE A CALIBRAÇÃO DO COMPASS
     if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
-        MagnetometerRead[ROLL] = MagnetometerRead[ROLL] * 0.9f + IMU.CompassRead[ROLL] * 0.1f;
-        MagnetometerRead[PITCH] = MagnetometerRead[PITCH] * 0.9f + IMU.CompassRead[PITCH] * 0.1f;
-        MagnetometerRead[YAW] = MagnetometerRead[YAW] * 0.9f + IMU.CompassRead[YAW] * 0.1f;
+        COMPASS.MagnetometerRead[ROLL] = COMPASS.MagnetometerRead[ROLL] * 0.9f + IMU.CompassRead[ROLL] * 0.1f;
+        COMPASS.MagnetometerRead[PITCH] = COMPASS.MagnetometerRead[PITCH] * 0.9f + IMU.CompassRead[PITCH] * 0.1f;
+        COMPASS.MagnetometerRead[YAW] = COMPASS.MagnetometerRead[YAW] * 0.9f + IMU.CompassRead[YAW] * 0.1f;
     }
 }

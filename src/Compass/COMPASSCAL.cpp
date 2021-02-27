@@ -31,75 +31,76 @@ CompassCalClass COMPASSCAL;
 void CompassCalClass::ApplyGain()
 {
     //APLICA O GANHO CALCULADO
-    IMU.CompassRead[ROLL] = IMU.CompassRead[ROLL] * MagnetometerGain[ROLL];
-    IMU.CompassRead[PITCH] = IMU.CompassRead[PITCH] * MagnetometerGain[PITCH];
-    IMU.CompassRead[YAW] = IMU.CompassRead[YAW] * MagnetometerGain[YAW];
+    IMU.CompassRead[ROLL] = IMU.CompassRead[ROLL] * COMPASS.MagnetometerGain[ROLL];
+    IMU.CompassRead[PITCH] = IMU.CompassRead[PITCH] * COMPASS.MagnetometerGain[PITCH];
+    IMU.CompassRead[YAW] = IMU.CompassRead[YAW] * COMPASS.MagnetometerGain[YAW];
 }
 
 void CompassCalClass::ApplyCalibration()
 {
     //AJUSTA O VALOR DO COMPASS COM A CALIBRAÇÃO GUARDADA NA EEPROM
-    if (!Calibrating)
+    if (!COMPASS.Calibrating)
     {
         IMU.CompassRead[ROLL] -= CALIBRATION.Magnetometer[ROLL];
         IMU.CompassRead[PITCH] -= CALIBRATION.Magnetometer[PITCH];
         IMU.CompassRead[YAW] -= CALIBRATION.Magnetometer[YAW];
     }
 }
-
+#include "FastSerial/FASTSERIAL.h"
+#include "FastSerial/PRINTF.h"
 void CompassCalClass::RunningCalibration()
 {
-    if (!Calibrating)
+    if (!COMPASS.Calibrating)
     {
         return;
     }
     else
     {
-        CalibrationCount++;
-        if (CalibrationCount < ((CALIBRATION_COUNT * 10) - 30))
+        COMPASS.CalibrationCount++;
+        if (COMPASS.CalibrationCount < ((CALIBRATION_COUNT * 10) - 30))
         {
             RGB.Function(MAGLED);
-            if (CalibrationCount == 1)
+            if (COMPASS.CalibrationCount == 1)
             {
-                MagCalibrationMinVector[ROLL] = MagnetometerRead[ROLL];
-                MagCalibrationMaxVector[ROLL] = MagnetometerRead[ROLL];
-                MagCalibrationMinVector[PITCH] = MagnetometerRead[PITCH];
-                MagCalibrationMaxVector[PITCH] = MagnetometerRead[PITCH];
-                MagCalibrationMinVector[YAW] = MagnetometerRead[YAW];
-                MagCalibrationMaxVector[YAW] = MagnetometerRead[YAW];
+                COMPASS.MagCalibrationMinVector[ROLL] = COMPASS.MagnetometerRead[ROLL];
+                COMPASS.MagCalibrationMaxVector[ROLL] = COMPASS.MagnetometerRead[ROLL];
+                COMPASS.MagCalibrationMinVector[PITCH] = COMPASS.MagnetometerRead[PITCH];
+                COMPASS.MagCalibrationMaxVector[PITCH] = COMPASS.MagnetometerRead[PITCH];
+                COMPASS.MagCalibrationMinVector[YAW] = COMPASS.MagnetometerRead[YAW];
+                COMPASS.MagCalibrationMaxVector[YAW] = COMPASS.MagnetometerRead[YAW];
             }
-            if (((int16_t)MagnetometerRead[ROLL]) < MagCalibrationMinVector[ROLL])
+            if (((int16_t)COMPASS.MagnetometerRead[ROLL]) < COMPASS.MagCalibrationMinVector[ROLL])
             {
-                MagCalibrationMinVector[ROLL] = MagnetometerRead[ROLL];
+                COMPASS.MagCalibrationMinVector[ROLL] = COMPASS.MagnetometerRead[ROLL];
             }
-            if (((int16_t)MagnetometerRead[PITCH]) < MagCalibrationMinVector[PITCH])
+            if (((int16_t)COMPASS.MagnetometerRead[PITCH]) < COMPASS.MagCalibrationMinVector[PITCH])
             {
-                MagCalibrationMinVector[PITCH] = MagnetometerRead[PITCH];
+                COMPASS.MagCalibrationMinVector[PITCH] = COMPASS.MagnetometerRead[PITCH];
             }
-            if (((int16_t)MagnetometerRead[YAW]) < MagCalibrationMinVector[YAW])
+            if (((int16_t)COMPASS.MagnetometerRead[YAW]) < COMPASS.MagCalibrationMinVector[YAW])
             {
-                MagCalibrationMinVector[YAW] = MagnetometerRead[YAW];
+                COMPASS.MagCalibrationMinVector[YAW] = COMPASS.MagnetometerRead[YAW];
             }
-            if (((int16_t)MagnetometerRead[ROLL]) > MagCalibrationMaxVector[ROLL])
+            if (((int16_t)COMPASS.MagnetometerRead[ROLL]) > COMPASS.MagCalibrationMaxVector[ROLL])
             {
-                MagCalibrationMaxVector[ROLL] = MagnetometerRead[ROLL];
+                COMPASS.MagCalibrationMaxVector[ROLL] = COMPASS.MagnetometerRead[ROLL];
             }
-            if (((int16_t)MagnetometerRead[PITCH]) > MagCalibrationMaxVector[PITCH])
+            if (((int16_t)COMPASS.MagnetometerRead[PITCH]) > COMPASS.MagCalibrationMaxVector[PITCH])
             {
-                MagCalibrationMaxVector[PITCH] = MagnetometerRead[PITCH];
+                COMPASS.MagCalibrationMaxVector[PITCH] = COMPASS.MagnetometerRead[PITCH];
             }
-            if (((int16_t)MagnetometerRead[YAW]) > MagCalibrationMaxVector[YAW])
+            if (((int16_t)COMPASS.MagnetometerRead[YAW]) > COMPASS.MagCalibrationMaxVector[YAW])
             {
-                MagCalibrationMaxVector[YAW] = MagnetometerRead[YAW];
+                COMPASS.MagCalibrationMaxVector[YAW] = COMPASS.MagnetometerRead[YAW];
             }
-            CALIBRATION.Magnetometer[ROLL] = (MagCalibrationMinVector[ROLL] + MagCalibrationMaxVector[ROLL]) >> 1;
-            CALIBRATION.Magnetometer[PITCH] = (MagCalibrationMinVector[PITCH] + MagCalibrationMaxVector[PITCH]) >> 1;
-            CALIBRATION.Magnetometer[YAW] = (MagCalibrationMinVector[YAW] + MagCalibrationMaxVector[YAW]) >> 1;
+            CALIBRATION.Magnetometer[ROLL] = (COMPASS.MagCalibrationMinVector[ROLL] + COMPASS.MagCalibrationMaxVector[ROLL]) >> 1;
+            CALIBRATION.Magnetometer[PITCH] = (COMPASS.MagCalibrationMinVector[PITCH] + COMPASS.MagCalibrationMaxVector[PITCH]) >> 1;
+            CALIBRATION.Magnetometer[YAW] = (COMPASS.MagCalibrationMinVector[YAW] + COMPASS.MagCalibrationMaxVector[YAW]) >> 1;
         }
         else
         {
-            Calibrating = false;
-            CalibrationCount = 0;
+            COMPASS.Calibrating = false;
+            COMPASS.CalibrationCount = 0;
             STORAGEMANAGER.Write_16Bits(MAG_ROLL_ADDR, CALIBRATION.Magnetometer[ROLL]);
             STORAGEMANAGER.Write_16Bits(MAG_PITCH_ADDR, CALIBRATION.Magnetometer[PITCH]);
             STORAGEMANAGER.Write_16Bits(MAG_YAW_ADDR, CALIBRATION.Magnetometer[YAW]);

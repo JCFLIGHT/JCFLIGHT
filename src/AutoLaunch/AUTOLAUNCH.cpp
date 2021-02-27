@@ -75,8 +75,8 @@ const bool AutoLaunchClass::GetSwingVelocityState()
 
 void AutoLaunchClass::AutoLaunchDetector()
 {
-  if (GetIMUAngleBanked(GetPitchAccelerationInMSS(), AHRS.CheckAnglesInclination(AHRS_BANKED_ANGLE)) ||
-      GetSwingVelocityState())
+  if (AUTOLAUNCH.GetIMUAngleBanked(GetPitchAccelerationInMSS(), AHRS.CheckAnglesInclination(AHRS_BANKED_ANGLE)) ||
+      AUTOLAUNCH.GetSwingVelocityState())
   {
     AutoLaunchDetectorSum += (SCHEDULERTIME.GetMillis() - AutoLaunchDetectorPreviousTime);
     AutoLaunchDetectorPreviousTime = SCHEDULERTIME.GetMillis();
@@ -98,10 +98,10 @@ void AutoLaunchClass::Update()
   {
     return;
   }
-  SetPlaneType();
+  AUTOLAUNCH.SetPlaneType();
   if (IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE))
   {
-    if (GetValidStateToRunLaunch() && !LaunchedDetect)
+    if (AUTOLAUNCH.GetValidStateToRunLaunch() && !LaunchedDetect)
     {
       if (!AutoLaunchState)
       {
@@ -118,23 +118,23 @@ void AutoLaunchClass::Update()
         {
           ENABLE_STATE(PRIMARY_ARM_DISARM);
         }
-        RCControllerThrottle_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
+        AUTOLAUNCH.RCControllerThrottle_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
       }
       if (AutoLaunchState)
       {
         if (PlaneType == WITHOUT_WHEELS)
         {
-          RCControllerThrottle_Apply_Logic(false); //FALSE PARA PLANES SEM TREM DE POUSO
+          AUTOLAUNCH.RCControllerThrottle_Apply_Logic(false); //FALSE PARA PLANES SEM TREM DE POUSO
         }
         if (PlaneType == WITH_WHEELS)
         {
-          RCControllerYawPitchRoll_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
+          AUTOLAUNCH.RCControllerYawPitchRoll_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
         }
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
           ENABLE_STATE(PRIMARY_ARM_DISARM);
         }
-        if (AutoLaunchCompleted())
+        if (AUTOLAUNCH.AutoLaunchCompleted())
         {
           LaunchedDetect = true;
           AutoLaunchState = false;
@@ -143,17 +143,17 @@ void AutoLaunchClass::Update()
       }
       else if (!StateLaunched && PlaneType == WITHOUT_WHEELS) //NÃO VAMOS USAR A IMU PARA ATIVAR O AUTO-LAUCH EM AEROMODELOS COM RODAS
       {
-        AutoLaunchDetector();
+        AUTOLAUNCH.AutoLaunchDetector();
       }
       if (PlaneType == WITHOUT_WHEELS && !LaunchedDetect)
       {
-        RCControllerYawPitchRoll_Apply_Logic(false); //A FUNÇÃO FICA SEMPRE ATIVA PARA PLANES SEM TREM DE POUSO
+        AUTOLAUNCH.RCControllerYawPitchRoll_Apply_Logic(false); //A FUNÇÃO FICA SEMPRE ATIVA PARA PLANES SEM TREM DE POUSO
       }
     }
   }
-  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !GetValidStateToRunLaunch())
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !AUTOLAUNCH.GetValidStateToRunLaunch())
   {
-    ResetParameters();
+    AUTOLAUNCH.ResetParameters();
   }
 }
 
@@ -214,11 +214,11 @@ void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
 {
   if (SlowControll)
   {
-    if (GetStateOfThrottle())
+    if (AUTOLAUNCH.GetStateOfThrottle())
     {
       //PARA PLANES COM RODAS O PITCH INCLINA QUANDO O THROTTLE CHEGAR EM UM DETERMINADO VALOR
       RCController[ROLL] = 0;
-      RCController[PITCH] = CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
+      RCController[PITCH] = AUTOLAUNCH.CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
       RCController[YAW] = 0;
     }
   }
@@ -226,7 +226,7 @@ void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
   {
     //PARA PLANES SEM RODAS O PITCH FICA SEMPRE INCLINADO
     RCController[ROLL] = 0;
-    RCController[PITCH] = CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
+    RCController[PITCH] = AUTOLAUNCH.CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
     RCController[YAW] = 0;
   }
 }
@@ -273,10 +273,10 @@ bool AutoLaunchClass::AutoLaunchCompleted()
   //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
   if (AUTO_LAUCH_EXIT_FUNCTION == 0)
   {
-    return (SticksDeflected(15)) || (AutoLaunchMaxAltitudeReached());
+    return (SticksDeflected(15)) || (AUTOLAUNCH.AutoLaunchMaxAltitudeReached());
   }
   //FAÇA A MESMA VERIFICAÇÃO DE CIMA,PORÉM COM O ESTOURO DO TEMPO MAXIMO DE LAUNCH
-  return (AutoLaunchTimerOverFlow()) || (SticksDeflected(15)) || (AutoLaunchMaxAltitudeReached());
+  return (AUTOLAUNCH.AutoLaunchTimerOverFlow()) || (SticksDeflected(15)) || (AUTOLAUNCH.AutoLaunchMaxAltitudeReached());
 }
 
 void AutoLaunchClass::SetPlaneType()

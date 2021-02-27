@@ -93,7 +93,7 @@ void SerialPrint::SendToConsole(const char *fmt, ...)
 {
   __gnuc_va_list ap;
   __builtin_va_start(ap, fmt);
-  SerialPrintF(1, fmt, ap);
+  PRINTF.SerialPrintF(1, fmt, ap);
   __builtin_va_end(ap);
 }
 

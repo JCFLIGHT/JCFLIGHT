@@ -21,7 +21,7 @@
 #define PSTR(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
 #include <inttypes.h>     //int8_t,uint8_t,int16_t,uint16_t,int32_t & uint32_t
 #include <math.h>         //isnan & isinf
-#include <stdarg.h>       //va_list
+#include <stdarg.h>       //__gnuc_va_list
 #include <stdio.h>        //size_t
 #include <stdlib.h>       //malloc & free
 #include <string.h>       //strnlen (STRING LENGTH COM DEFINIÇÃO DE TAMANHO)

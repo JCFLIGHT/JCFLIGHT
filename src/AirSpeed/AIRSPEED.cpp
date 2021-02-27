@@ -71,11 +71,11 @@ void AirSpeedClass::Update()
   }
   if ((AirSpeedPressureRead - AirSpeedAdjustOffSet) < 0)
   {
-    CalcedInCM = CalcedInKM = 0;
+    AIRSPEED.CalcedInCM = AIRSPEED.CalcedInKM = 0;
   }
   else
   {
-    CalcedInCM = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 100;  //EM CM/H
-    CalcedInKM = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 3.6f; //EM KM/H
+    AIRSPEED.CalcedInCM = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 100;  //EM CM/H
+    AIRSPEED.CalcedInKM = SquareRootU16Bits((float)(AirSpeedPressureRead - AirSpeedAdjustOffSet) * AIRSPEED_FACTOR) * 3.6f; //EM KM/H
   }
 }

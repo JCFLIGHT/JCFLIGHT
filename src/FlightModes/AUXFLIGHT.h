@@ -48,7 +48,6 @@ extern int16_t AltitudeHoldControlAux,
 class AUXFLIGHTCLASS
 {
 public:
-  AUXFLIGHTCLASS(){};
   void LoadEEPROM(void);
   void SelectMode(void);
   void FlightModesAuxSelect(void);

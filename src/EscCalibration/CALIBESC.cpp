@@ -68,7 +68,7 @@ void ClassESC::Calibration(void)
         PulseInAllMotors(MIN_STICKS_PULSE); //ENVIA PWM MINIMO A TODOS OS ESC'S
       }
     }
-    BeeperMode = ESC_FINISH_CALIBRATION_MODE;
+    ESC.BeeperMode = ESC_FINISH_CALIBRATION_MODE;
     LOG("Etapa de calib dos escs finalizada!");
     while (true) //FICA TRAVADO AQUI NO WHILE ATÉ QUE A CONTROLADORA SEJA REINICIADA MANUALMENTE
     {
@@ -81,27 +81,27 @@ void ClassESC::Calibration(void)
         BEEPER.Run();
         RGB.Function(CALIBRATIONESCFINISH); //ATIVA O LED VERDE
         RGB.Update();                       //ATUALIZA O ESTADO DOS LED'S
-        if (BeeperMode > 0)
+        if (ESC.BeeperMode > 0)
         {
-          BeeperMode--;
+          ESC.BeeperMode--;
         }
-        if (SticksStateToArm() && !EscCal_ArmTest)
+        if (SticksStateToArm() && !ESC.EscCal_ArmTest)
         {
-          EscCal_ArmCount++; //REALIZA 50 CONTAGENS = 1 SEGUNDO
-          if (EscCal_ArmCount >= 50)
+          ESC.EscCal_ArmCount++; //REALIZA 50 CONTAGENS = 1 SEGUNDO
+          if (ESC.EscCal_ArmCount >= 50)
           {
-            EscCal_ArmTest = true; //ARMA OS MOTORES PARA TESTE
+            ESC.EscCal_ArmTest = true; //ARMA OS MOTORES PARA TESTE
             LOG("Sistema armado para teste dos motores!");
           }
         }
-        if (SticksStateToDisarm() && EscCal_ArmTest)
+        if (SticksStateToDisarm() && ESC.EscCal_ArmTest)
         {
-          EscCal_ArmCount = EscCal_ArmTest = false; //DESARMA OS MOTORES E RESETA A CONTAGEM
+          ESC.EscCal_ArmCount = ESC.EscCal_ArmTest = false; //DESARMA OS MOTORES E RESETA A CONTAGEM
           LOG("Sistema desarmado!");
         }
         EscCalLoopRefresh = SCHEDULERTIME.GetMillis();
       }
-      if (EscCal_ArmTest)
+      if (ESC.EscCal_ArmTest)
       {
         PulseInAllMotors(Constrain_16Bits(DECODE.GetRxChannelOutput(THROTTLE), MIN_STICKS_PULSE, MAX_STICKS_PULSE)); //REALIZA O BY-PASS DO THROTTLE
       }

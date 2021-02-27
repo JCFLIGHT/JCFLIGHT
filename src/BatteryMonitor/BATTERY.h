@@ -22,11 +22,11 @@ class BATT
 {
 public:
   bool LowBattPreventArm;
-  uint8_t GetPercentage();
-  float Get_Current_In_Mah();
   float Voltage;
   float Total_Current;
   float TotalCurrentInMah;
+  uint8_t GetPercentage();
+  float Get_Current_In_Mah();
   float Get_Max_Voltage_Calced();
   void Update_Voltage(void);
   void Update_Current(void);
@@ -36,12 +36,12 @@ public:
 private:
   uint8_t BattMinVoltageSelect;
   uint8_t BattMaxVoltageSelect;
-  uint8_t CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt);
   float Percentage;
-  float AutoBatteryMin(float BattVoltage);
-  float AutoBatteryMax(float BattVoltage);
   uint16_t BattMinCount;
   uint16_t BattMaxCount;
+  uint8_t CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt);
+  float AutoBatteryMin(float BattVoltage);
+  float AutoBatteryMax(float BattVoltage);
   void Do_RTH_With_Low_Batt(bool FailSafeBatt);
 };
 extern BATT BATTERY;

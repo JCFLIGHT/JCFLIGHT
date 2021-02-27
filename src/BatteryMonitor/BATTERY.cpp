@@ -44,13 +44,13 @@ float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE
 void BATT::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  Voltage = Voltage_Filter.Apply(Voltage * 0.92f + (float)(ADCPIN.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
+  BATTERY.Voltage = Voltage_Filter.Apply(BATTERY.Voltage * 0.92f + (float)(ADCPIN.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
   //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
-  if (Voltage > 6)
+  if (BATTERY.Voltage > 6)
   {
     if (BATTERY.GetPercentage() < PREVENT_ARM_LOW_BATT) //MENOR QUE 20%
     {
-      LowBattPreventArm = true;
+      BATTERY.LowBattPreventArm = true;
       if (BEEPER.SafeToOthersBeepsCounter > 200)
       {
         BEEPER.Play(BEEPER_BAT_CRIT_LOW);
@@ -58,14 +58,14 @@ void BATT::Update_Voltage(void)
     }
     else
     {
-      LowBattPreventArm = false;
+      BATTERY.LowBattPreventArm = false;
     }
   }
   else
   {
-    LowBattPreventArm = false;
+    BATTERY.LowBattPreventArm = false;
   }
-  Do_RTH_With_Low_Batt(LowBattPreventArm);
+  BATTERY.Do_RTH_With_Low_Batt(BATTERY.LowBattPreventArm);
 }
 
 uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt)
@@ -85,8 +85,8 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
                        BattVoltage,
                        BattMinVolt,
                        BattMaxVolt,
-                       BattMinCount,
-                       BattMaxCount);
+                       BATTERY.BattMinCount,
+                       BATTERY.BattMaxCount);
 #endif
 
   return 100 * BATTERY.Percentage;
@@ -96,57 +96,57 @@ float BATT::AutoBatteryMin(float BattVoltage)
 {
   if (BattVoltage > 6)
   {
-    if (BattMinVoltageSelect == BATTERY_3S)
+    if (BATTERY.BattMinVoltageSelect == BATTERY_3S)
     {
       return BATT_3S_LOW_VOLTAGE;
     }
-    else if (BattMinVoltageSelect == BATTERY_4S)
+    else if (BATTERY.BattMinVoltageSelect == BATTERY_4S)
     {
       return BATT_4S_LOW_VOLTAGE;
     }
-    else if (BattMinVoltageSelect == BATTERY_6S)
+    else if (BATTERY.BattMinVoltageSelect == BATTERY_6S)
     {
       return BATT_6S_LOW_VOLTAGE;
     }
     if (BattVoltage > BATT_3S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_3S_SAFE_HIGH_VOLTAGE) //BATERIA 3S (3.6 x 3 = 10.8v)
     {
-      if (BattMinCount >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      if (BATTERY.BattMinCount >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
       {
-        BattMinVoltageSelect = BATTERY_3S;
+        BATTERY.BattMinVoltageSelect = BATTERY_3S;
       }
       else
       {
-        BattMinCount++;
+        BATTERY.BattMinCount++;
       }
       return BATT_3S_LOW_VOLTAGE;
     }
     else if (BattVoltage > BATT_4S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_4S_SAFE_HIGH_VOLTAGE) //BATERIA 4S (3.6 x 4 = 14.4v)
     {
-      if (BattMinCount >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      if (BATTERY.BattMinCount >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
       {
-        BattMinVoltageSelect = BATTERY_4S;
+        BATTERY.BattMinVoltageSelect = BATTERY_4S;
       }
       else
       {
-        BattMinCount++;
+        BATTERY.BattMinCount++;
       }
       return BATT_4S_LOW_VOLTAGE;
     }
     else if (BattVoltage > BATT_6S_SAFE_LOW_VOLTAGE && BattVoltage < BATT_6S_SAFE_HIGH_VOLTAGE) //BATERIA 6S (3.6 x 6 = 21.6v)
     {
-      if (BattMinCount >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
+      if (BATTERY.BattMinCount >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
       {
-        BattMinVoltageSelect = BATTERY_6S;
+        BATTERY.BattMinVoltageSelect = BATTERY_6S;
       }
       else
       {
-        BattMinCount++;
+        BATTERY.BattMinCount++;
       }
       return BATT_6S_LOW_VOLTAGE;
     }
   }
-  BattMinCount = 0;
-  BattMinVoltageSelect = 0;
+  BATTERY.BattMinCount = 0;
+  BATTERY.BattMinVoltageSelect = 0;
   return NONE_BATTERY;
 }
 
@@ -154,15 +154,15 @@ float BATT::AutoBatteryMax(float BattVoltage)
 {
   if (BattVoltage > 6)
   {
-    if (BattMaxVoltageSelect == BATTERY_3S)
+    if (BATTERY.BattMaxVoltageSelect == BATTERY_3S)
     {
       return BATT_3S_HIGH_VOLTAGE;
     }
-    else if (BattMaxVoltageSelect == BATTERY_4S)
+    else if (BATTERY.BattMaxVoltageSelect == BATTERY_4S)
     {
       return BATT_4S_HIGH_VOLTAGE;
     }
-    else if (BattMaxVoltageSelect == BATTERY_6S)
+    else if (BATTERY.BattMaxVoltageSelect == BATTERY_6S)
     {
       return BATT_6S_HIGH_VOLTAGE;
     }
@@ -170,7 +170,7 @@ float BATT::AutoBatteryMax(float BattVoltage)
     {
       if (BattMaxCount >= THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT)
       {
-        BattMaxVoltageSelect = BATTERY_3S;
+        BATTERY.BattMaxVoltageSelect = BATTERY_3S;
       }
       else
       {
@@ -182,7 +182,7 @@ float BATT::AutoBatteryMax(float BattVoltage)
     {
       if (BattMaxCount >= (THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT))
       {
-        BattMaxVoltageSelect = BATTERY_4S;
+        BATTERY.BattMaxVoltageSelect = BATTERY_4S;
       }
       else
       {
@@ -194,7 +194,7 @@ float BATT::AutoBatteryMax(float BattVoltage)
     {
       if (BattMaxCount >= (THIS_LOOP_RATE * TIMER_TO_AUTO_DETECT_BATT))
       {
-        BattMaxVoltageSelect = BATTERY_6S;
+        BATTERY.BattMaxVoltageSelect = BATTERY_6S;
       }
       else
       {
@@ -204,18 +204,18 @@ float BATT::AutoBatteryMax(float BattVoltage)
     }
   }
   BattMaxCount = 0;
-  BattMaxVoltageSelect = 0;
+  BATTERY.BattMaxVoltageSelect = 0;
   return NONE_BATTERY;
 }
 
 float BATT::Get_Max_Voltage_Calced()
 {
-  return BATTERY.AutoBatteryMax(Voltage);
+  return BATTERY.AutoBatteryMax(BATTERY.Voltage);
 }
 
 uint8_t BATT::GetPercentage()
 {
-  return BATTERY.CalculatePercentage(Voltage, BATTERY.AutoBatteryMin(Voltage), BATTERY.AutoBatteryMax(Voltage));
+  return BATTERY.CalculatePercentage(BATTERY.Voltage, BATTERY.AutoBatteryMin(BATTERY.Voltage), BATTERY.AutoBatteryMax(BATTERY.Voltage));
 }
 
 void BATT::Do_RTH_With_Low_Batt(bool FailSafeBatt)
@@ -243,8 +243,8 @@ void BATT::Do_RTH_With_Low_Batt(bool FailSafeBatt)
 void BATT::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  Total_Current = Current_Filter.Apply(((ADCPIN.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
-  Total_Current = MAX(0, Total_Current);
+  BATTERY.Total_Current = Current_Filter.Apply(((ADCPIN.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
+  BATTERY.Total_Current = MAX(0, BATTERY.Total_Current);
 }
 
 void BATT::Calculate_Total_Mah(void)
@@ -255,19 +255,19 @@ void BATT::Calculate_Total_Mah(void)
   if (Last_Time_Stored != 0 && Delta_Time < 2000000.0f)
   {
     //0.0002778 É 1/3600 (CONVERSÃO PRA HORAS)
-    TotalCurrentInMah += Total_Current * Delta_Time * 0.0000002778f;
+    BATTERY.TotalCurrentInMah += BATTERY.Total_Current * Delta_Time * 0.0000002778f;
   }
   Last_Time_Stored = TimeNow;
 }
 
 float BATT::Get_Current_In_Mah()
 {
-  return (TotalCurrentInMah / 1000);
+  return (BATTERY.TotalCurrentInMah / 1000);
 }
 
 uint32_t BATT::GetWatts()
 {
   //NO GCS,O RESULTADO DESTA OPERAÇÃO É DIVIDO POR 1000,AFIM DE OBTER OS VALORES DECIMAIS,
   //POR ESSE FATO ESSA FUNÇÃO ESTÁ EM 32 BITS
-  return (Total_Current * Voltage);
+  return (BATTERY.Total_Current * BATTERY.Voltage);
 }

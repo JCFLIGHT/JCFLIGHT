@@ -224,14 +224,14 @@ void BEEPERCLASS::Update()
       BEEP_OFF;
     }
   }
-  ProcessCommand();
+  BEEPER.ProcessCommand();
 }
 
 void BEEPERCLASS::ProcessCommand()
 {
   if (BeeperEntry->Sequence[BeeperPositionArray] == BEEPER_COMMAND_STOP)
   {
-    Silence();
+    BEEPER.Silence();
   }
   else
   {
@@ -245,7 +245,7 @@ void BEEPERCLASS::Run()
   if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
       STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_SWITCH)
   {
-    Silence();
+    BEEPER.Silence();
     return;
   }
   if (!BuzzerInit)
@@ -257,21 +257,21 @@ void BEEPERCLASS::Run()
   }
   if (ESC.BeeperMode == ESC_CALIBRATION_MODE)
   {
-    Play(BEEPER_CALIBRATION_DONE);
+    BEEPER.Play(BEEPER_CALIBRATION_DONE);
   }
   else if (ESC.BeeperMode == NORMAL_OPERATION_MODE)
   {
     if (!BuzzerInit)
     {
-      Play(BEEPER_ALGORITHM_INIT);
+      BEEPER.Play(BEEPER_ALGORITHM_INIT);
     }
   }
   //NÃO FAÇA A MUDANÇA DO SOM TÃO RAPIDO PARA NÃO EMBOLAR COM O BEEP DA BATERIA SE A MESMA ESTIVER COM BAIXA TENSÃO
-  if (SafeToOthersBeeps && SafeToOthersBeepsCounter < 254)
+  if (SafeToOthersBeeps && BEEPER.SafeToOthersBeepsCounter < 254)
   {
-    SafeToOthersBeepsCounter++;
+    BEEPER.SafeToOthersBeepsCounter++;
   }
-  Update();
+  BEEPER.Update();
   if (!BuzzerInit)
   {
     BuzzerInit = true;

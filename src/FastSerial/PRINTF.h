@@ -40,7 +40,7 @@ private:
 #ifndef __AVR_ATmega2560__
   void SerialPrintF();
 #else
-  void SerialPrintF(unsigned char in_progmem, const char *fmt, va_list ap);
+  void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
 #endif
 };
 extern SerialPrint PRINTF;

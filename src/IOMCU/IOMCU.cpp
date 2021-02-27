@@ -615,7 +615,7 @@ void GCSClass::Serial_Parse_Protocol()
             {
                 if (SerialCheckSum == SerialBuffer)
                 {
-                    BiDirectionalCommunication(ProtocolCommand);
+                    GCS.BiDirectionalCommunication(ProtocolCommand);
                 }
                 ProtocolTaskOrder = 0;
                 SerialAvailableGuard = 0;
@@ -643,12 +643,12 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     {
 
     case 1:
-        WayPoint_Request_Coordinates_Parameters();
+        GCS.WayPoint_Request_Coordinates_Parameters();
         GCS_Send_Struct_Params((uint8_t *)&SendWayPointGCSCoordinates, sizeof(_SendWayPointGCSCoordinates));
         break;
 
     case 2:
-        WayPoint_Request_Others_Parameters();
+        GCS.WayPoint_Request_Others_Parameters();
         GCS_Send_Struct_Params((uint8_t *)&SendWayPointGCSOthersParameters, sizeof(_SendWayPointGCSOthersParameters));
         break;
 
@@ -683,7 +683,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 7:
-        GCS_Request_Parameters();
+        GCS.GCS_Request_Parameters();
         GCS_Send_Struct_Params((uint8_t *)&GCSParameters, sizeof(_GCSParameters));
         break;
 
@@ -696,7 +696,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 10:
-        GCS_Request_Parameters_Two();
+        GCS.GCS_Request_Parameters_Two();
         GCS_Send_Struct_Params((uint8_t *)&GCSParameters_Two, sizeof(_GCSParameters_Two));
         break;
 
@@ -781,27 +781,27 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 21:
-        SendStringToGCS(PlatformName);
+        GCS.SendStringToGCS(PlatformName);
         break;
 
     case 22:
-        SendStringToGCS(FirwareName);
+        GCS.SendStringToGCS(FirwareName);
         break;
 
     case 23:
-        SendStringToGCS(FirmwareVersion);
+        GCS.SendStringToGCS(FirmwareVersion);
         break;
 
     case 24:
-        SendStringToGCS(CompilerVersion);
+        GCS.SendStringToGCS(CompilerVersion);
         break;
 
     case 25:
-        SendStringToGCS(BuildDate);
+        GCS.SendStringToGCS(BuildDate);
         break;
 
     case 26:
-        SendStringToGCS(BuildTime);
+        GCS.SendStringToGCS(BuildTime);
         break;
 
     case 27:
@@ -1112,27 +1112,27 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 21:
-        SendStringToGCS(PlatformName);
+        GCS.SendStringToGCS(PlatformName);
         break;
 
     case 22:
-        SendStringToGCS(FirwareName);
+        GCS.SendStringToGCS(FirwareName);
         break;
 
     case 23:
-        SendStringToGCS(FirmwareVersion);
+        GCS.SendStringToGCS(FirmwareVersion);
         break;
 
     case 24:
-        SendStringToGCS(CompilerVersion);
+        GCS.SendStringToGCS(CompilerVersion);
         break;
 
     case 25:
-        SendStringToGCS(BuildDate);
+        GCS.SendStringToGCS(BuildDate);
         break;
 
     case 26:
-        SendStringToGCS(BuildTime);
+        GCS.SendStringToGCS(BuildTime);
         break;
 
     case 27:
@@ -1661,9 +1661,9 @@ void GCSClass::Default_Medium_Configuration()
 
 void GCSClass::Default_All_Configs()
 {
-    Default_Basic_Configuration();
-    Default_Medium_Configuration();
-    Default_RadioControl_Configuration();
+    GCS.Default_Basic_Configuration();
+    GCS.Default_Medium_Configuration();
+    GCS.Default_RadioControl_Configuration();
 }
 
 void GCSClass::UpdateParametersToGCS()

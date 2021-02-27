@@ -62,7 +62,7 @@ void CheckSumClass::UpdateServosReverse()
 void CheckSumClass::UpdateChannelsReverse()
 {
     uint8_t ChannelsReverse = STORAGEMANAGER.Read_8Bits(CH_REVERSE_ADDR);
-    GetFailSafeValue = STORAGEMANAGER.Read_16Bits(FAILSAFE_VAL_ADDR);
+    CHECKSUM.GetFailSafeValue = STORAGEMANAGER.Read_16Bits(FAILSAFE_VAL_ADDR);
 
     //THROTTLE
     if ((ChannelsReverse & 1) > 0)

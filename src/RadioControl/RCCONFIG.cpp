@@ -47,47 +47,47 @@ RCConfigClass RCCONFIG;
 
 void RC_Config::Set_Range(int16_t Min, int16_t Max)
 {
-  _Max_Pulse = Max;
-  _Min_Pulse = Min;
+  RC_Config::_Max_Pulse = Max;
+  RC_Config::_Min_Pulse = Min;
 }
 
 void RC_Config::Set_Filter(bool Filter)
 {
-  _Filter = Filter;
+  RC_Config::_Filter = Filter;
 }
 
 void RC_Config::Set_Pulse(int16_t ChannelInputValue)
 {
-  if (_Filter)
+  if (RC_Config::_Filter)
   {
     //SMALL FILTERING NOS CANAIS (APENAS UMA MÉDIA ENTRE O VALOR ATUAL E O ANTERIOR)
-    Input = (ChannelInputValue + Input) >> 1;
+    RC_Config::Input = (ChannelInputValue + RC_Config::Input) >> 1;
   }
   else //SEM FILTRO
   {
-    Input = ChannelInputValue;
+    RC_Config::Input = ChannelInputValue;
   }
-  if (!_FailSafe)
+  if (!RC_Config::_FailSafe)
   {
-    _Fail_Safe = false;
+    RC_Config::_Fail_Safe = false;
   }
   else
   {
-    if (Input > (int16_t)CHECKSUM.GetFailSafeValue)
+    if (RC_Config::Input > (int16_t)CHECKSUM.GetFailSafeValue)
     {
-      _Fail_Safe = false;
+      RC_Config::_Fail_Safe = false;
     }
-    else if (Input < (int16_t)CHECKSUM.GetFailSafeValue)
+    else if (RC_Config::Input < (int16_t)CHECKSUM.GetFailSafeValue)
     {
-      _Fail_Safe = true;
+      RC_Config::_Fail_Safe = true;
     }
   }
-  Output = Get_Channel_Range();
+  RC_Config::Output = RC_Config::Get_Channel_Range();
 }
 
 void RC_Config::Set_Reverse(bool Reverse)
 {
-  _Reverse = Reverse;
+  RC_Config::_Reverse = Reverse;
 }
 
 void RC_Config::Set_Dead_Zone(uint8_t DeadZone)
@@ -96,51 +96,51 @@ void RC_Config::Set_Dead_Zone(uint8_t DeadZone)
   if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
       (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))
   {
-    _DeadZone = 0;
+    RC_Config::_DeadZone = 0;
   }
   else
   {
-    _DeadZone = Constrain_8Bits(DeadZone, 0, 50);
+    RC_Config::_DeadZone = Constrain_8Bits(DeadZone, 0, 50);
   }
 }
 
 void RC_Config::Set_Fail_Safe(bool FailSafe)
 {
-  _FailSafe = FailSafe;
+  RC_Config::_FailSafe = FailSafe;
 }
 
 int16_t RC_Config::Get_Channel_Range()
 {
-  if (!_Fail_Safe)
+  if (!RC_Config::_Fail_Safe)
   {
-    RcConstrain = Constrain_16Bits(Input, Min_Pulse, Max_Pulse);
+    RC_Config::RcConstrain = Constrain_16Bits(RC_Config::Input, RC_Config::Min_Pulse, RC_Config::Max_Pulse);
   }
   else
   {
-    RcConstrain = Constrain_16Bits(Input, RANGE_MIN, Max_Pulse);
+    RC_Config::RcConstrain = Constrain_16Bits(RC_Config::Input, RANGE_MIN, RC_Config::Max_Pulse);
   }
-  if (_Reverse)
+  if (RC_Config::_Reverse)
   {
-    RcConstrain = Max_Pulse - (RcConstrain - Min_Pulse);
+    RC_Config::RcConstrain = RC_Config::Max_Pulse - (RC_Config::RcConstrain - RC_Config::Min_Pulse);
   }
   if (!RCCONFIG.CancelDeadZone)
   {
-    if ((Input > 1450 + _DeadZone) && (Input < 1550 - _DeadZone) && (_DeadZone > 0))
+    if ((RC_Config::Input > 1450 + RC_Config::_DeadZone) && (RC_Config::Input < 1550 - RC_Config::_DeadZone) && (RC_Config::_DeadZone > 0))
     {
       return MIDDLE_STICKS_PULSE;
     }
   }
-  if (RcConstrain > Min_Pulse)
+  if (RC_Config::RcConstrain > RC_Config::Min_Pulse)
   {
-    return (_Min_Pulse + ((int32_t)(_Max_Pulse - _Min_Pulse) * (int32_t)(RcConstrain - Min_Pulse)) / (int32_t)(Max_Pulse - Min_Pulse));
+    return (RC_Config::_Min_Pulse + ((int32_t)(RC_Config::_Max_Pulse - RC_Config::_Min_Pulse) * (int32_t)(RC_Config::RcConstrain - RC_Config::Min_Pulse)) / (int32_t)(RC_Config::Max_Pulse - RC_Config::Min_Pulse));
   }
-  if (!_Fail_Safe)
+  if (!RC_Config::_Fail_Safe)
   {
-    return _Min_Pulse;
+    return RC_Config::_Min_Pulse;
   }
   else
   {
-    return RcConstrain;
+    return RC_Config::RcConstrain;
   }
 }
 
@@ -251,8 +251,8 @@ void RCConfigClass::Init()
     DECODE.Update();            //FAZ AS PRIMEIRA LEITURAS
     RCCONFIG.Set_Pulse();       //APLICA OS VALORES LIDOS
     RCCONFIG.Update_Channels(); //FAZ A LEITURA DOS CANAIS APÓS A CONFIGURAÇÃO
-    SBUS_Update();              //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO SBUS
-    IBUS_Update();              //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO IBUS
+    SBUSRC.Update();            //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO SBUS
+    IBUSRC.Update();              //FAZ A LEITURA DOS CANAIS DADO PELA COMUNICAÇÃO IBUS
   }
 }
 

@@ -29,10 +29,10 @@ public:
 private:
   bool ParachuteInAuto = false;
   bool ParachuteReleased = false;
-  bool Released();
-  bool ReleasedOverFlowTime();
   uint16_t ManualDetectTrigger = 0;
   uint32_t OverFlowTime = 0;
+  bool Released();
+  bool ReleasedOverFlowTime();
 };
 extern ParachuteClass PARACHUTE;
 #endif

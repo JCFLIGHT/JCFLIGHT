@@ -41,68 +41,68 @@ void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame()
   Sine_Roll = AHRS.SineRoll();
   Cosine_Pitch = -AHRS.CosinePitch();
   Sine_Pitch = -AHRS.SinePitch();
-  Cosine_Yaw = AHRS.CosineYaw();
-  Sine_Yaw = AHRS.SineYaw();
+  INERTIALNAVIGATION.Cosine_Yaw = AHRS.CosineYaw();
+  INERTIALNAVIGATION.Sine_Yaw = AHRS.SineYaw();
 
   //REALIZA A FUSÃO DE ALGUMAS VARIAVEIS PARA OBTER DIFERENTES VALORES DE ACELERAÇÃO EM TORNO DO EIXO Z
-  SinePitch_CosineYaw_Fusion = Sine_Pitch * Cosine_Yaw;
-  SinePitch_SineYaw_Fusion = Sine_Pitch * Sine_Yaw;
+  SinePitch_CosineYaw_Fusion = Sine_Pitch * INERTIALNAVIGATION.Cosine_Yaw;
+  SinePitch_SineYaw_Fusion = Sine_Pitch * INERTIALNAVIGATION.Sine_Yaw;
 
   //ROLL
-  INS.AccelerationEarthFrame[ROLL] = -((Cosine_Pitch * Cosine_Yaw) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * SinePitch_CosineYaw_Fusion - Cosine_Roll * Sine_Yaw) * IMU.AccelerometerRead[ROLL] + (Sine_Roll * Sine_Yaw + Cosine_Roll * SinePitch_CosineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
+  INS.AccelerationEarthFrame[ROLL] = -((Cosine_Pitch * INERTIALNAVIGATION.Cosine_Yaw) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * SinePitch_CosineYaw_Fusion - Cosine_Roll * Sine_Yaw) * IMU.AccelerometerRead[ROLL] + (Sine_Roll * INERTIALNAVIGATION.Sine_Yaw + Cosine_Roll * SinePitch_CosineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
 
   //PITCH
-  INS.AccelerationEarthFrame[PITCH] = -((Cosine_Pitch * Sine_Yaw) * IMU.AccelerometerRead[PITCH] + (Cosine_Roll * Cosine_Yaw + Sine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[ROLL] + (-Sine_Roll * Cosine_Yaw + Cosine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
+  INS.AccelerationEarthFrame[PITCH] = -((Cosine_Pitch * INERTIALNAVIGATION.Sine_Yaw) * IMU.AccelerometerRead[PITCH] + (Cosine_Roll * INERTIALNAVIGATION.Cosine_Yaw + Sine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[ROLL] + (-Sine_Roll * INERTIALNAVIGATION.Cosine_Yaw + Cosine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
 
   //YAW
   INS.AccelerationEarthFrame[YAW] = ((-Sine_Pitch) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[ROLL] + (Cosine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[YAW]) - 512;
 
   //ROLL
   INS.AccelerationEarthFrame[ROLL] = ConvertAccelerationEarthFrameToCMSS(INS.AccelerationEarthFrame[ROLL]);
-  AccelerationDifference[ROLL] = INS.AccelerationEarthFrame[ROLL] - AccelerationAdjustBias[ROLL];
+  INERTIALNAVIGATION.AccelerationDifference[ROLL] = INS.AccelerationEarthFrame[ROLL] - INERTIALNAVIGATION.AccelerationAdjustBias[ROLL];
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    AccelerationAdjustBias[ROLL] = AccelerationAdjustBias[ROLL] * 0.985f + INS.AccelerationEarthFrame[ROLL] * 0.015f; //2HZ LPF
+    INERTIALNAVIGATION.AccelerationAdjustBias[ROLL] = INERTIALNAVIGATION.AccelerationAdjustBias[ROLL] * 0.985f + INS.AccelerationEarthFrame[ROLL] * 0.015f; //2HZ LPF
   }
-  else if (ABS(AccelerationDifference[ROLL]) <= 80.0f)
+  else if (ABS(INERTIALNAVIGATION.AccelerationDifference[ROLL]) <= 80.0f)
   {
-    AccelerationAdjustBias[ROLL] = AccelerationAdjustBias[ROLL] * 0.9987f + INS.AccelerationEarthFrame[ROLL] * 0.0013f; //1HZ LPF
+    INERTIALNAVIGATION.AccelerationAdjustBias[ROLL] = INERTIALNAVIGATION.AccelerationAdjustBias[ROLL] * 0.9987f + INS.AccelerationEarthFrame[ROLL] * 0.0013f; //1HZ LPF
   }
-  INS.AccelerationEarthFrame[ROLL] = AccelerationDifference[ROLL];
-  AccelerationEarthFrame_LPF[ROLL] = AccelerationEarthFrame_LPF[ROLL] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[ROLL] * 0.14285714285714285714285714285714f; //25HZ LPF
-  INS.AccelerationEarthFrame_Sum[ROLL] += AccelerationEarthFrame_LPF[ROLL];
+  INS.AccelerationEarthFrame[ROLL] = INERTIALNAVIGATION.AccelerationDifference[ROLL];
+  INERTIALNAVIGATION.AccelerationEarthFrame_LPF[ROLL] = INERTIALNAVIGATION.AccelerationEarthFrame_LPF[ROLL] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[ROLL] * 0.14285714285714285714285714285714f; //25HZ LPF
+  INS.AccelerationEarthFrame_Sum[ROLL] += INERTIALNAVIGATION.AccelerationEarthFrame_LPF[ROLL];
   INS.AccelerationEarthFrame_Sum_Count[ROLL]++;
 
   //PITCH
   INS.AccelerationEarthFrame[PITCH] = ConvertAccelerationEarthFrameToCMSS(INS.AccelerationEarthFrame[PITCH]);
-  AccelerationDifference[PITCH] = INS.AccelerationEarthFrame[PITCH] - AccelerationAdjustBias[PITCH];
+  INERTIALNAVIGATION.AccelerationDifference[PITCH] = INS.AccelerationEarthFrame[PITCH] - INERTIALNAVIGATION.AccelerationAdjustBias[PITCH];
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    AccelerationAdjustBias[PITCH] = AccelerationAdjustBias[PITCH] * 0.985f + INS.AccelerationEarthFrame[PITCH] * 0.015f; //2HZ LPF
+    INERTIALNAVIGATION.AccelerationAdjustBias[PITCH] = INERTIALNAVIGATION.AccelerationAdjustBias[PITCH] * 0.985f + INS.AccelerationEarthFrame[PITCH] * 0.015f; //2HZ LPF
   }
-  else if (ABS(AccelerationDifference[PITCH]) <= 80.0f)
+  else if (ABS(INERTIALNAVIGATION.AccelerationDifference[PITCH]) <= 80.0f)
   {
-    AccelerationAdjustBias[PITCH] = AccelerationAdjustBias[PITCH] * 0.9987f + INS.AccelerationEarthFrame[PITCH] * 0.0013f; //1HZ LPF
+    INERTIALNAVIGATION.AccelerationAdjustBias[PITCH] = INERTIALNAVIGATION.AccelerationAdjustBias[PITCH] * 0.9987f + INS.AccelerationEarthFrame[PITCH] * 0.0013f; //1HZ LPF
   }
-  INS.AccelerationEarthFrame[PITCH] = AccelerationDifference[PITCH];
-  AccelerationEarthFrame_LPF[PITCH] = AccelerationEarthFrame_LPF[PITCH] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[PITCH] * 0.14285714285714285714285714285714f; //25HZ LPF
-  INS.AccelerationEarthFrame_Sum[PITCH] += AccelerationEarthFrame_LPF[PITCH];
+  INS.AccelerationEarthFrame[PITCH] = INERTIALNAVIGATION.AccelerationDifference[PITCH];
+  INERTIALNAVIGATION.AccelerationEarthFrame_LPF[PITCH] = INERTIALNAVIGATION.AccelerationEarthFrame_LPF[PITCH] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[PITCH] * 0.14285714285714285714285714285714f; //25HZ LPF
+  INS.AccelerationEarthFrame_Sum[PITCH] += INERTIALNAVIGATION.AccelerationEarthFrame_LPF[PITCH];
   INS.AccelerationEarthFrame_Sum_Count[PITCH]++;
 
   //YAW
   INS.AccelerationEarthFrame[YAW] = ConvertAccelerationEarthFrameToCMSS(INS.AccelerationEarthFrame[YAW]);
-  AccelerationDifference[YAW] = INS.AccelerationEarthFrame[YAW] - AccelerationAdjustBias[YAW];
+  INERTIALNAVIGATION.AccelerationDifference[YAW] = INS.AccelerationEarthFrame[YAW] - INERTIALNAVIGATION.AccelerationAdjustBias[YAW];
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    AccelerationAdjustBias[YAW] = AccelerationAdjustBias[YAW] * 0.985f + INS.AccelerationEarthFrame[YAW] * 0.015f; //2HZ LPF
+    INERTIALNAVIGATION.AccelerationAdjustBias[YAW] = INERTIALNAVIGATION.AccelerationAdjustBias[YAW] * 0.985f + INS.AccelerationEarthFrame[YAW] * 0.015f; //2HZ LPF
   }
-  else if (ABS(AccelerationDifference[YAW]) <= 80.0f)
+  else if (ABS(INERTIALNAVIGATION.AccelerationDifference[YAW]) <= 80.0f)
   {
-    AccelerationAdjustBias[YAW] = AccelerationAdjustBias[YAW] * 0.9987f + INS.AccelerationEarthFrame[YAW] * 0.0013f; //1HZ LPF
+    INERTIALNAVIGATION.AccelerationAdjustBias[YAW] = INERTIALNAVIGATION.AccelerationAdjustBias[YAW] * 0.9987f + INS.AccelerationEarthFrame[YAW] * 0.0013f; //1HZ LPF
   }
-  INS.AccelerationEarthFrame[YAW] = AccelerationDifference[YAW];
-  AccelerationEarthFrame_LPF[YAW] = AccelerationEarthFrame_LPF[YAW] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[YAW] * 0.14285714285714285714285714285714f; //25HZ LPF
-  INS.AccelerationEarthFrame_Sum[YAW] += AccelerationEarthFrame_LPF[YAW];
+  INS.AccelerationEarthFrame[YAW] = INERTIALNAVIGATION.AccelerationDifference[YAW];
+  INERTIALNAVIGATION.AccelerationEarthFrame_LPF[YAW] = INERTIALNAVIGATION.AccelerationEarthFrame_LPF[YAW] * 0.85714285714285714285714285714286f + INS.AccelerationEarthFrame[YAW] * 0.14285714285714285714285714285714f; //25HZ LPF
+  INS.AccelerationEarthFrame_Sum[YAW] += INERTIALNAVIGATION.AccelerationEarthFrame_LPF[YAW];
   INS.AccelerationEarthFrame_Sum_Count[YAW]++;
 }
 
@@ -119,19 +119,19 @@ void InertialNavigationClass::Calculate_AccelerationXY()
   if (Scheduler(&Calculate_AccelerationXYTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
   {
     static bool ResetAccelerationXY = false;
-    UpdateAccelerationEarthFrame_Filtered(0);
-    UpdateAccelerationEarthFrame_Filtered(1);
+    INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(0);
+    INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(1);
     if (Get_State_Armed_With_GPS())
     {
       if (!ResetAccelerationXY)
       {
         ResetAccelerationXY = true;
-        ResetXYState();
+        INERTIALNAVIGATION.ResetXYState();
       }
       float DeltaTime = Calculate_AccelerationXYTimer.ActualTime * 1e-6f;
-      CorrectXYStateWithGPS(&DeltaTime);
-      EstimationPredictXY(&DeltaTime);
-      SaveXYPositionToHistory();
+      INERTIALNAVIGATION.CorrectXYStateWithGPS(&DeltaTime);
+      INERTIALNAVIGATION.EstimationPredictXY(&DeltaTime);
+      INERTIALNAVIGATION.SaveXYPositionToHistory();
       return;
     }
     else
@@ -144,8 +144,8 @@ void InertialNavigationClass::Calculate_AccelerationXY()
 void InertialNavigationClass::CorrectXYStateWithGPS(float *DeltaTime)
 {
   float PositionError[2];
-  PositionError[0] = GPSDistanceToHome[0] - HistoryXYPosition[0][HistoryXYCount];
-  PositionError[1] = GPSDistanceToHome[1] - HistoryXYPosition[1][HistoryXYCount];
+  PositionError[0] = GPSDistanceToHome[0] - INERTIALNAVIGATION.HistoryXYPosition[0][INERTIALNAVIGATION.HistoryXYCount];
+  PositionError[1] = GPSDistanceToHome[1] - INERTIALNAVIGATION.HistoryXYPosition[1][INERTIALNAVIGATION.HistoryXYCount];
   PositionError[0] = Constrain_Float(PositionError[0], -1000, 1000);
   PositionError[1] = Constrain_Float(PositionError[1], -1000, 1000);
   float StoredDeltaTime;
@@ -170,25 +170,25 @@ void InertialNavigationClass::EstimationPredictXY(float *DeltaTime)
 
 void InertialNavigationClass::SaveXYPositionToHistory()
 {
-  HistoryXYPosition[0][HistoryXYCount] = INS.Position_EarthFrame[0];
-  HistoryXYPosition[1][HistoryXYCount] = INS.Position_EarthFrame[1];
-  HistoryXYCount++;
-  if (HistoryXYCount >= 10)
+  INERTIALNAVIGATION.HistoryXYPosition[0][INERTIALNAVIGATION.HistoryXYCount] = INS.Position_EarthFrame[0];
+  INERTIALNAVIGATION.HistoryXYPosition[1][INERTIALNAVIGATION.HistoryXYCount] = INS.Position_EarthFrame[1];
+  INERTIALNAVIGATION.HistoryXYCount++;
+  if (INERTIALNAVIGATION.HistoryXYCount >= 10)
   {
-    HistoryXYCount = 0;
+    INERTIALNAVIGATION.HistoryXYCount = 0;
   }
 }
 
 void InertialNavigationClass::ResetXYState()
 {
-  HistoryXYCount = 0;
+  INERTIALNAVIGATION.HistoryXYCount = 0;
   for (uint8_t i = 0; i < 2; i++)
   {
     INS.Velocity_EarthFrame[i] = (ABS(GPSActualSpeed[i]) > 50) ? GPSActualSpeed[i] : 0.0f;
     INS.Position_EarthFrame[i] = GPSDistanceToHome[i];
     for (uint8_t j = 0; j < 10; j++)
     {
-      HistoryXYPosition[i][j] = GPSDistanceToHome[i];
+      INERTIALNAVIGATION.HistoryXYPosition[i][j] = GPSDistanceToHome[i];
     }
   }
 }
@@ -200,18 +200,18 @@ void InertialNavigationClass::Calculate_AccelerationZ()
   {
     static bool ResetAccelerationZ = false;
     CalculateBaroAltitudeForFlight();
-    UpdateAccelerationEarthFrame_Filtered(2);
+    INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(2);
     if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (!ResetAccelerationZ)
       {
         ResetAccelerationZ = true;
-        ResetZState();
+        INERTIALNAVIGATION.ResetZState();
       }
       float DeltaTime = Calculate_AccelerationZTimer.ActualTime * 1e-6f;
-      CorrectZStateWithBaro(&DeltaTime);
-      EstimationPredictZ(&DeltaTime);
-      SaveZPositionToHistory();
+      INERTIALNAVIGATION.CorrectZStateWithBaro(&DeltaTime);
+      INERTIALNAVIGATION.EstimationPredictZ(&DeltaTime);
+      INERTIALNAVIGATION.SaveZPositionToHistory();
       return;
     }
     else
@@ -224,7 +224,7 @@ void InertialNavigationClass::Calculate_AccelerationZ()
 void InertialNavigationClass::CorrectZStateWithBaro(float *DeltaTime)
 {
   bool AirCushionEffectDetected = (GetTakeOffInProgress() || GetGroundDetected()) && (ALTITUDE.RealBaroAltitude < ALTITUDE.GroundAltitude);
-  float PositionError = (AirCushionEffectDetected ? ALTITUDE.GroundAltitude : ALTITUDE.RealBaroAltitude) - HistoryZPosition[HistoryZCount];
+  float PositionError = (AirCushionEffectDetected ? ALTITUDE.GroundAltitude : ALTITUDE.RealBaroAltitude) - INERTIALNAVIGATION.HistoryZPosition[INERTIALNAVIGATION.HistoryZCount];
   INS.Velocity_EarthFrame[2] += PositionError * (0.19753086419753086419753086419753f * *DeltaTime);
   INS.Position_EarthFrame[2] += PositionError * (0.66666666666666666666666666666667f * *DeltaTime);
 }
@@ -240,11 +240,11 @@ void InertialNavigationClass::EstimationPredictZ(float *DeltaTime)
 
 void InertialNavigationClass::SaveZPositionToHistory()
 {
-  HistoryZPosition[HistoryZCount] = ALTITUDE.EstimatedAltitude;
-  HistoryZCount++;
-  if (HistoryZCount >= 10)
+  INERTIALNAVIGATION.HistoryZPosition[INERTIALNAVIGATION.HistoryZCount] = ALTITUDE.EstimatedAltitude;
+  INERTIALNAVIGATION.HistoryZCount++;
+  if (INERTIALNAVIGATION.HistoryZCount >= 10)
   {
-    HistoryZCount = 0;
+    INERTIALNAVIGATION.HistoryZCount = 0;
   }
 }
 
@@ -252,15 +252,15 @@ void InertialNavigationClass::ResetZState()
 {
   INS.Position_EarthFrame[2] = 0.0f;
   INS.Velocity_EarthFrame[2] = 0.0f;
-  HistoryZCount = 0;
-  HistoryZPosition[0] = 0;
-  HistoryZPosition[1] = 0;
-  HistoryZPosition[2] = 0;
-  HistoryZPosition[3] = 0;
-  HistoryZPosition[4] = 0;
-  HistoryZPosition[5] = 0;
-  HistoryZPosition[6] = 0;
-  HistoryZPosition[7] = 0;
-  HistoryZPosition[8] = 0;
-  HistoryZPosition[9] = 0;
+  INERTIALNAVIGATION.HistoryZCount = 0;
+  INERTIALNAVIGATION.HistoryZPosition[0] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[1] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[2] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[3] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[4] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[5] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[6] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[7] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[8] = 0;
+  INERTIALNAVIGATION.HistoryZPosition[9] = 0;
 }

@@ -44,11 +44,11 @@ void SAFETYBUTTONCLASS::Initialization()
 
 bool SAFETYBUTTONCLASS::GetButtonInterval()
 {
-    if (SCHEDULERTIME.GetMillis() - LastDebounceTime < BUTTON_SCHEDULE)
+    if (SCHEDULERTIME.GetMillis() - SAFETYBUTTON.LastDebounceTime < BUTTON_SCHEDULE)
     {
         return false;
     }
-    LastDebounceTime = SCHEDULERTIME.GetMillis();
+    SAFETYBUTTON.LastDebounceTime = SCHEDULERTIME.GetMillis();
     return true;
 }
 
@@ -61,20 +61,20 @@ void SAFETYBUTTONCLASS::FlashButton()
 {
     static Led_Pattern Pattern;
 
-    if (DetectRise < FIRST_CYCLE_COUNT)
+    if (SAFETYBUTTON.DetectRise < FIRST_CYCLE_COUNT)
     {
         Pattern = Led_Pattern::FMU_REFUSE_TO_ARM;
     }
-    else if (DetectRise > FIRST_CYCLE_COUNT && DetectRise < SECOND_CYCLE_COUNT) //VERIFICAÇÃO 1
+    else if (SAFETYBUTTON.DetectRise > FIRST_CYCLE_COUNT && SAFETYBUTTON.DetectRise < SECOND_CYCLE_COUNT) //VERIFICAÇÃO 1
     {
         Pattern = Led_Pattern::FMU_INIT_ARM;
-        if (DetectRise == FIRST_CYCLE_COUNT + 1)
+        if (SAFETYBUTTON.DetectRise == FIRST_CYCLE_COUNT + 1)
         {
             BEEPER.Play(BEEPER_FMU_INIT);
         }
-        if (GetButtonState())
+        if (SAFETYBUTTON.GetButtonState())
         {
-            WaitToNextProcess = true;
+            SAFETYBUTTON.WaitToNextProcess = true;
             if (GetFrameStateOfMultirotor())
             {
                 PulseInAllMotors(MIN_STICKS_PULSE);
@@ -92,45 +92,45 @@ void SAFETYBUTTONCLASS::FlashButton()
         }
         else
         {
-            if (!WaitToNextProcess)
+            if (!SAFETYBUTTON.WaitToNextProcess)
             {
-                DetectRise = FIRST_CYCLE_COUNT + 1;
+                SAFETYBUTTON.DetectRise = FIRST_CYCLE_COUNT + 1;
             }
         }
     }
-    else if (DetectRise > SECOND_CYCLE_COUNT && DetectRise < RESET_CYCLE_COUNT) //VERIFICAÇÃO 2
+    else if (SAFETYBUTTON.DetectRise > SECOND_CYCLE_COUNT && SAFETYBUTTON.DetectRise < RESET_CYCLE_COUNT) //VERIFICAÇÃO 2
     {
         Pattern = Led_Pattern::FMU_SAFE_TO_ARM;
-        if (DetectRise == SECOND_CYCLE_COUNT + 1)
+        if (SAFETYBUTTON.DetectRise == SECOND_CYCLE_COUNT + 1)
         {
             BEEPER.Play(BEEPER_FMU_SAFE_TO_ARM);
-            WaitToNextProcess = false;
+            SAFETYBUTTON.WaitToNextProcess = false;
         }
-        if (GetButtonState())
+        if (SAFETYBUTTON.GetButtonState())
         {
-            WaitToNextProcess = true;
-            SafeStateToApplyPulse = true;
+            SAFETYBUTTON.WaitToNextProcess = true;
+            SAFETYBUTTON.SafeStateToApplyPulse = true;
         }
         else
         {
-            if (!WaitToNextProcess)
+            if (!SAFETYBUTTON.WaitToNextProcess)
             {
-                DetectRise = SECOND_CYCLE_COUNT + 1;
+                SAFETYBUTTON.DetectRise = SECOND_CYCLE_COUNT + 1;
             }
         }
     }
-    else if (DetectRise > RESET_CYCLE_COUNT) //RESET
+    else if (SAFETYBUTTON.DetectRise > RESET_CYCLE_COUNT) //RESET
     {
-        if (DetectRise == RESET_CYCLE_COUNT + 1)
+        if (SAFETYBUTTON.DetectRise == RESET_CYCLE_COUNT + 1)
         {
             BEEPER.Play(BEEPER_ACTION_FAIL);
-            WaitToNextProcess = false;
+            SAFETYBUTTON.WaitToNextProcess = false;
         }
         else
         {
-            if (GetButtonState())
+            if (SAFETYBUTTON.GetButtonState())
             {
-                DetectRise = 0;
+                SAFETYBUTTON.DetectRise = 0;
                 if (GetFrameStateOfMultirotor())
                 {
                     PulseInAllMotors(DISABLE_IO_PIN);
@@ -145,26 +145,26 @@ void SAFETYBUTTONCLASS::FlashButton()
                     MotorControl[MOTOR6] = MIDDLE_STICKS_PULSE;
                     ApplyPWMControlForMotorsAndServos();
                 }
-                SafeStateToApplyPulse = false;
+                SAFETYBUTTON.SafeStateToApplyPulse = false;
             }
             else
             {
-                if (DetectRise > RESET_CYCLE_COUNT + 1)
+                if (SAFETYBUTTON.DetectRise > RESET_CYCLE_COUNT + 1)
                 {
-                    DetectRise = MAX_BUTTON_COUNT - 2;
+                    SAFETYBUTTON.DetectRise = MAX_BUTTON_COUNT - 2;
                 }
             }
         }
     }
-    UpdateLedStatus(Pattern);
+    SAFETYBUTTON.UpdateLedStatus(Pattern);
 }
 
 void SAFETYBUTTONCLASS::UpdateLedStatus(enum Led_Pattern Instance)
 {
-    SetStateToLed(((uint16_t)Instance & (1 << (Blink_Counter++ / 3))));
-    if (Blink_Counter > 45)
+    SAFETYBUTTON.SetStateToLed(((uint16_t)Instance & (1 << (SAFETYBUTTON.Blink_Counter++ / 3))));
+    if (SAFETYBUTTON.Blink_Counter > 45)
     {
-        Blink_Counter = 0;
+        SAFETYBUTTON.Blink_Counter = 0;
     }
 }
 
@@ -182,11 +182,11 @@ void SAFETYBUTTONCLASS::SetStateToLed(bool State)
 
 bool SAFETYBUTTONCLASS::GetSafeStateToOutput()
 {
-    if (!SafeButtonEnabled())
+    if (!SAFETYBUTTON.SafeButtonEnabled())
     {
         return true;
     }
-    return SafeStateToApplyPulse;
+    return SAFETYBUTTON.SafeStateToApplyPulse;
 }
 
 bool SAFETYBUTTONCLASS::SafeButtonEnabled()
@@ -201,13 +201,13 @@ bool SAFETYBUTTONCLASS::SafeButtonEnabled()
 
 void SAFETYBUTTONCLASS::UpdateRoutine(void)
 {
-    if (!SafeButtonEnabled() || !GetButtonInterval() || IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
+    if (!SAFETYBUTTON.SafeButtonEnabled() || !SAFETYBUTTON.GetButtonInterval() || IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
         return;
     }
-    FlashButton();
-    if (!GetButtonState() && DetectRise < MAX_BUTTON_COUNT)
+    SAFETYBUTTON.FlashButton();
+    if (!SAFETYBUTTON.GetButtonState() && SAFETYBUTTON.DetectRise < MAX_BUTTON_COUNT)
     {
-        DetectRise++;
+        SAFETYBUTTON.DetectRise++;
     }
 }

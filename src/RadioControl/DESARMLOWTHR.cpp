@@ -67,22 +67,22 @@ void DesarmLowThrClass::Update()
   if (Check_Throttle() && Check_Others_Channels() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&
       !FastSystemFailSafe() && !IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && ArmDisarmConfig == 0)
   {
-    if (TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
+    if (DESARMLOWTHROTTLE.TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
     {
       DISABLE_STATE(PRIMARY_ARM_DISARM); //DESARMA OS MOTORES
       BEEPER.Play(BEEPER_DISARMING);     //TOCA A MÚSICA INDICANDO O DESARM
     }
-    else if (TimerDesarm > 254)
+    else if (DESARMLOWTHROTTLE.TimerDesarm > 254)
     {
-      TimerDesarm = 254;
+      DESARMLOWTHROTTLE.TimerDesarm = 254;
     }
     else
     {
-      TimerDesarm++; //INICIA A CONTAGEM
+      DESARMLOWTHROTTLE.TimerDesarm++; //INICIA A CONTAGEM
     }
   }
   else
   {
-    TimerDesarm = 0; //RESETA A CONTAGEM
+    DESARMLOWTHROTTLE.TimerDesarm = 0; //RESETA A CONTAGEM
   }
 }

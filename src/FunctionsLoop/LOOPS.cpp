@@ -70,8 +70,8 @@ void Super_Fast_Loop()
 {
         RGB.Update();
         SAFETYBUTTON.UpdateRoutine();
-        SBUS_Update();
-        IBUS_Update();
+        SBUSRC.Update();
+        IBUSRC.Update();
         INERTIALNAVIGATION.Calculate_AccelerationXYZ_To_EarthFrame();
         INERTIALNAVIGATION.Calculate_AccelerationXY();
         INERTIALNAVIGATION.Calculate_AccelerationZ();

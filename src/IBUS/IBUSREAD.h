@@ -19,5 +19,10 @@
 #define IBUSREAD_H_
 #include "Build/LIBDEPENDENCIES.h"
 extern uint16_t IBUSReadChannels[12];
-void IBUS_Update(void);
+class IBUSClass
+{
+public:
+  void Update(void);
+};
+extern IBUSClass IBUSRC;
 #endif

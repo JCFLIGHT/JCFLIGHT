@@ -24,11 +24,13 @@
 
 FILE_COMPILE_FOR_SPEED
 
+IBUSClass IBUSRC;
+
 static uint8_t IBUSIndex = 0;
 static uint8_t IBUS_Vector[32];
 uint16_t IBUSReadChannels[12];
 
-void IBUS_Update(void)
+void IBUSClass::Update(void)
 {
   if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2)
   {

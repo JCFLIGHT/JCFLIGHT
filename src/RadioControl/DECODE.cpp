@@ -17,7 +17,6 @@
 
 #include "DECODE.h"
 #include "Common/STRUCTS.h"
-#include "FastSerial/FASTSERIAL.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "SBUS/SBUSREAD.h"
@@ -40,26 +39,26 @@ void DecodeClass::Initialization()
   //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
   if (ReceiverModel <= 7)
   {
-    RcChannelMap[0] = ROLL;
-    RcChannelMap[1] = PITCH;
-    RcChannelMap[2] = THROTTLE;
-    RcChannelMap[3] = YAW;
+    DECODE.RcChannelMap[0] = ROLL;
+    DECODE.RcChannelMap[1] = PITCH;
+    DECODE.RcChannelMap[2] = THROTTLE;
+    DECODE.RcChannelMap[3] = YAW;
   }
   else
   { //FUTABA OU D4R-II
-    RcChannelMap[0] = PITCH;
-    RcChannelMap[1] = ROLL;
-    RcChannelMap[2] = THROTTLE;
-    RcChannelMap[3] = YAW;
+    DECODE.RcChannelMap[0] = PITCH;
+    DECODE.RcChannelMap[1] = ROLL;
+    DECODE.RcChannelMap[2] = THROTTLE;
+    DECODE.RcChannelMap[3] = YAW;
   }
-  RcChannelMap[4] = AUX1;
-  RcChannelMap[5] = AUX2;
-  RcChannelMap[6] = AUX3;
-  RcChannelMap[7] = AUX4;
-  RcChannelMap[8] = AUX5;
-  RcChannelMap[9] = AUX6;
-  RcChannelMap[10] = AUX7;
-  RcChannelMap[11] = AUX8;
+  DECODE.RcChannelMap[4] = AUX1;
+  DECODE.RcChannelMap[5] = AUX2;
+  DECODE.RcChannelMap[6] = AUX3;
+  DECODE.RcChannelMap[7] = AUX4;
+  DECODE.RcChannelMap[8] = AUX5;
+  DECODE.RcChannelMap[9] = AUX6;
+  DECODE.RcChannelMap[10] = AUX7;
+  DECODE.RcChannelMap[11] = AUX8;
 }
 
 void DecodeClass::Update()
@@ -90,7 +89,7 @@ void DecodeClass::Update()
     {
       if (CheckFailSafeState)
       {
-        DirectRadioControllRead[Channels] = RadioControllOutputDecoded;
+        DECODE.DirectRadioControllRead[Channels] = RadioControllOutputDecoded;
       }
     }
     else
@@ -103,13 +102,13 @@ void DecodeClass::Update()
           RadioControllOutputMeasured += RadioControllOutputTYPR[Channels][TYPR];
         }
         RadioControllOutputMeasured = (RadioControllOutputMeasured + 2) / 4;
-        if (RadioControllOutputMeasured < (uint16_t)DirectRadioControllRead[Channels] - 3)
+        if (RadioControllOutputMeasured < (uint16_t)DECODE.DirectRadioControllRead[Channels] - 3)
         {
-          DirectRadioControllRead[Channels] = RadioControllOutputMeasured + 2;
+          DECODE.DirectRadioControllRead[Channels] = RadioControllOutputMeasured + 2;
         }
-        if (RadioControllOutputMeasured > (uint16_t)DirectRadioControllRead[Channels] + 3)
+        if (RadioControllOutputMeasured > (uint16_t)DECODE.DirectRadioControllRead[Channels] + 3)
         {
-          DirectRadioControllRead[Channels] = RadioControllOutputMeasured - 2;
+          DECODE.DirectRadioControllRead[Channels] = RadioControllOutputMeasured - 2;
         }
         RadioControllOutputTYPR[Channels][TYPRIndex] = RadioControllOutputDecoded;
       }
@@ -119,10 +118,10 @@ void DecodeClass::Update()
 
 int16_t DecodeClass::GetRxChannelOutput(uint8_t Channel)
 {
-  return RadioControllOutput[Channel];
+  return DECODE.RadioControllOutput[Channel];
 }
 
 void DecodeClass::SetRxChannelInput(uint8_t Channel, int16_t Value)
 {
-  RadioControllOutput[Channel] = Value;
+  DECODE.RadioControllOutput[Channel] = Value;
 }

@@ -19,11 +19,10 @@
 #define SBUSREAD_H_
 #include "Build/LIBDEPENDENCIES.h"
 extern uint16_t SBUSReadChannels[12];
-void SBUS_Update();
 class SBUS
 {
 public:
-  void Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame);
+  void Update();
   bool FailSafe;
 
 private:
@@ -33,6 +32,7 @@ private:
   uint8_t PrevByte = 0x00;
   uint8_t ActualByte;
   uint8_t PayLoadArray[24];
+  void Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame);
 };
 extern SBUS SBUSRC;
 #endif

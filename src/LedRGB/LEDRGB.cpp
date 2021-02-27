@@ -52,21 +52,21 @@ void LEDRGB::Update()
   //REGISTRADORES DE MANIPULAÇÃO PWM DO LED RGB
 #ifdef __AVR_ATmega2560__
 
-  RED_LED_PWM_REGISTER = SetColorValue[RED];     //PINO DIGITAL 10
-  GREEN_LED_PWM_REGISTER = SetColorValue[GREEN]; //PINO DIGITAL 11
-  BLUE_LED_PWM_REGISTER = SetColorValue[BLUE];   //PINO DIGITAL 12
+  RED_LED_PWM_REGISTER = RGB.SetColorValue[RED];     //PINO DIGITAL 10
+  GREEN_LED_PWM_REGISTER = RGB.SetColorValue[GREEN]; //PINO DIGITAL 11
+  BLUE_LED_PWM_REGISTER = RGB.SetColorValue[BLUE];   //PINO DIGITAL 12
 
 #elif defined ESP32
 
-  AnalogWriteApplyPulse(RED_LED_PWM_REGISTER, SetColorValue[RED]);     //GPIO4
-  AnalogWriteApplyPulse(GREEN_LED_PWM_REGISTER, SetColorValue[GREEN]); //GPIO2
-  AnalogWriteApplyPulse(BLUE_LED_PWM_REGISTER, SetColorValue[BLUE]);   //GPIO15
+  AnalogWriteApplyPulse(RED_LED_PWM_REGISTER, RGB.SetColorValue[RED]);     //GPIO4
+  AnalogWriteApplyPulse(GREEN_LED_PWM_REGISTER, RGB.SetColorValue[GREEN]); //GPIO2
+  AnalogWriteApplyPulse(BLUE_LED_PWM_REGISTER, RGB.SetColorValue[BLUE]);   //GPIO15
 
 #elif defined __arm__
 
 #endif
 
-  if ((CalibratingAccelerometer == 0) && (!GCS.ConfigFlight) && (!COMPASS.Calibrating) && (!NotPriorit))
+  if ((CalibratingAccelerometer == 0) && (!GCS.ConfigFlight) && (!COMPASS.Calibrating) && (!RGB.NotPriorit))
   {
     RGB.Function(GPSLED);
   }
@@ -108,22 +108,22 @@ void LEDRGB::Function(uint8_t Mode)
 
   case PREARMINIT:
     RGB.Pre_Arm_Initializing();
-    NotPriorit = true;
+    RGB.NotPriorit = true;
     break;
 
   case PREARMSUCESS:
     RGB.Pre_Arm_Sucess();
-    NotPriorit = true;
+    RGB.NotPriorit = true;
     break;
 
   case PREARMFAIL:
     RGB.Pre_Arm_Fail();
-    NotPriorit = true;
+    RGB.NotPriorit = true;
     break;
 
   case OFFLEDS:
     RGB.Off_All_Leds();
-    NotPriorit = true;
+    RGB.NotPriorit = true;
     break;
   }
 }
@@ -132,13 +132,13 @@ void LEDRGB::CalibAccLed(void)
 {
   //LED RGB
 #ifdef __AVR_ATmega2560__
-  SetColorValue[RED] = 0;     //VERMELHO
-  SetColorValue[GREEN] = PWM; //VERDE
-  SetColorValue[BLUE] = 220;  //AZUL
+  RGB.SetColorValue[RED] = 0;     //VERMELHO
+  RGB.SetColorValue[GREEN] = PWM; //VERDE
+  RGB.SetColorValue[BLUE] = 220;  //AZUL
 #elif defined ESP32
-  SetColorValue[RED] = 0;                                              //VERMELHO
-  SetColorValue[GREEN] = PWM;                                          //VERDE
-  SetColorValue[BLUE] = 4061;                                          //AZUL
+  SetColorValue[RED] = 0;                                                  //VERMELHO
+  SetColorValue[GREEN] = PWM;                                              //VERDE
+  SetColorValue[BLUE] = 4061;                                              //AZUL
 #endif
 }
 
@@ -146,13 +146,13 @@ void LEDRGB::CalibMagLed(void)
 {
 //LED RGB
 #ifdef __AVR_ATmega2560__
-  SetColorValue[RED] = 180;  //VERMELHO
-  SetColorValue[GREEN] = 0;  //VERDE
-  SetColorValue[BLUE] = 220; //AZUL
+  RGB.SetColorValue[RED] = 180;  //VERMELHO
+  RGB.SetColorValue[GREEN] = 0;  //VERDE
+  RGB.SetColorValue[BLUE] = 220; //AZUL
 #elif defined ESP32
-  SetColorValue[RED] = 4021;                                           //VERMELHO
-  SetColorValue[GREEN] = 0;                                            //VERDE
-  SetColorValue[BLUE] = 4061;                                          //AZUL
+  RGB.SetColorValue[RED] = 4021;                                           //VERMELHO
+  RGB.SetColorValue[GREEN] = 0;                                            //VERDE
+  RGB.SetColorValue[BLUE] = 4061;                                          //AZUL
 #endif
 }
 
@@ -169,13 +169,13 @@ void LEDRGB::ConfigFlight_Led(void)
   {
     //LED RGB
 #ifdef __AVR_ATmega2560__
-    SetColorValue[RED] = 190;   //VERMELHO
-    SetColorValue[GREEN] = 240; //VERDE
-    SetColorValue[BLUE] = 0;    //AZUL
+    RGB.SetColorValue[RED] = 190;   //VERMELHO
+    RGB.SetColorValue[GREEN] = 240; //VERDE
+    RGB.SetColorValue[BLUE] = 0;    //AZUL
 #elif defined ESP32
-    SetColorValue[RED] = 4031;                                         //VERMELHO
-    SetColorValue[GREEN] = 4081;                                       //VERDE
-    SetColorValue[BLUE] = 0;                                           //AZUL
+    RGB.SetColorValue[RED] = 4031;                                         //VERMELHO
+    RGB.SetColorValue[GREEN] = 4081;                                       //VERDE
+    RGB.SetColorValue[BLUE] = 0;                                           //AZUL
 #endif
   }
   else
@@ -199,28 +199,28 @@ void LEDRGB::CalibEsc_Led(void)
   {
 
   case 1:
-    SetColorValue[RED] = PWM; //VERMELHO
-    SetColorValue[GREEN] = 0; //VERDE
-    SetColorValue[BLUE] = 0;  //AZUL
+    RGB.SetColorValue[RED] = PWM; //VERMELHO
+    RGB.SetColorValue[GREEN] = 0; //VERDE
+    RGB.SetColorValue[BLUE] = 0;  //AZUL
     break;
 
   case 2:
-    SetColorValue[RED] = 0;     //VERMELHO
-    SetColorValue[GREEN] = PWM; //VERDE
-    SetColorValue[BLUE] = 0;    //AZUL
+    RGB.SetColorValue[RED] = 0;     //VERMELHO
+    RGB.SetColorValue[GREEN] = PWM; //VERDE
+    RGB.SetColorValue[BLUE] = 0;    //AZUL
     break;
 
   case 3:
-    SetColorValue[RED] = 0;    //VERMELHO
-    SetColorValue[GREEN] = 0;  //VERDE
-    SetColorValue[BLUE] = PWM; //AZUL
+    RGB.SetColorValue[RED] = 0;    //VERMELHO
+    RGB.SetColorValue[GREEN] = 0;  //VERDE
+    RGB.SetColorValue[BLUE] = PWM; //AZUL
     break;
 
   case 4:
   case 5:
-    SetColorValue[RED] = 0;   //VERMELHO
-    SetColorValue[GREEN] = 0; //VERDE
-    SetColorValue[BLUE] = 0;  //AZUL
+    RGB.SetColorValue[RED] = 0;   //VERMELHO
+    RGB.SetColorValue[GREEN] = 0; //VERDE
+    RGB.SetColorValue[BLUE] = 0;  //AZUL
     break;
 
   case 6:
@@ -232,9 +232,9 @@ void LEDRGB::CalibEsc_Led(void)
 void LEDRGB::CalibEscFinish_Led(void)
 {
   //LED RGB
-  SetColorValue[RED] = 0;     //VERMELHO
-  SetColorValue[GREEN] = PWM; //VERDE
-  SetColorValue[BLUE] = 0;    //AZUL
+  RGB.SetColorValue[RED] = 0;     //VERMELHO
+  RGB.SetColorValue[GREEN] = PWM; //VERDE
+  RGB.SetColorValue[BLUE] = 0;    //AZUL
 }
 
 void LEDRGB::GPS_Led(void)
@@ -252,9 +252,9 @@ void LEDRGB::GPS_Led(void)
     if (GPS_Fail_Toggle)
     {
       //LIGA O LED VERMELHO
-      SetColorValue[RED] = PWM; //VERMELHO
-      SetColorValue[GREEN] = 0; //VERDE
-      SetColorValue[BLUE] = 0;  //AZUL
+      RGB.SetColorValue[RED] = PWM; //VERMELHO
+      RGB.SetColorValue[GREEN] = 0; //VERDE
+      RGB.SetColorValue[BLUE] = 0;  //AZUL
     }
     else
     {
@@ -290,16 +290,16 @@ void LEDRGB::GPS_Led(void)
         if (BlinkCount >= 10 && ((BlinkCount % 2) == 0))
         {
           //INDICA O NÚM. DE SAT.(VERDE)
-          SetColorValue[RED] = 0;     //VERMELHO
-          SetColorValue[GREEN] = PWM; //VERDE
-          SetColorValue[BLUE] = 0;    //AZUL
+          RGB.SetColorValue[RED] = 0;     //VERMELHO
+          RGB.SetColorValue[GREEN] = PWM; //VERDE
+          RGB.SetColorValue[BLUE] = 0;    //AZUL
         }
         if (BlinkCount == 6 && ((BlinkCount % 2) == 0))
         {
           //INDICA O HOME POINT (AZUL)
-          SetColorValue[RED] = 0;    //VERMELHO
-          SetColorValue[GREEN] = 0;  //VERDE
-          SetColorValue[BLUE] = PWM; //AZUL
+          RGB.SetColorValue[RED] = 0;    //VERMELHO
+          RGB.SetColorValue[GREEN] = 0;  //VERDE
+          RGB.SetColorValue[BLUE] = PWM; //AZUL
         }
       }
       else
@@ -318,9 +318,9 @@ void LEDRGB::GPS_Led(void)
   {
     if (SCHEDULERTIME.GetMicros() % 100000 > 50000)
     {
-      SetColorValue[RED] = 0;    //VERMELHO
-      SetColorValue[GREEN] = 0;  //VERDE
-      SetColorValue[BLUE] = PWM; //AZUL
+      RGB.SetColorValue[RED] = 0;    //VERMELHO
+      RGB.SetColorValue[GREEN] = 0;  //VERDE
+      RGB.SetColorValue[BLUE] = PWM; //AZUL
     }
     else
     {
@@ -331,28 +331,28 @@ void LEDRGB::GPS_Led(void)
 
 void LEDRGB::Pre_Arm_Initializing(void)
 {
-  SetColorValue[RED] = 0;    //VERMELHO
-  SetColorValue[GREEN] = 0;  //VERDE
-  SetColorValue[BLUE] = PWM; //AZUL
+  RGB.SetColorValue[RED] = 0;    //VERMELHO
+  RGB.SetColorValue[GREEN] = 0;  //VERDE
+  RGB.SetColorValue[BLUE] = PWM; //AZUL
 }
 
 void LEDRGB::Pre_Arm_Sucess(void)
 {
-  SetColorValue[RED] = 0;     //VERMELHO
-  SetColorValue[GREEN] = PWM; //VERDE
-  SetColorValue[BLUE] = 0;    //AZUL
+  RGB.SetColorValue[RED] = 0;     //VERMELHO
+  RGB.SetColorValue[GREEN] = PWM; //VERDE
+  RGB.SetColorValue[BLUE] = 0;    //AZUL
 }
 
 void LEDRGB::Pre_Arm_Fail(void)
 {
-  SetColorValue[RED] = PWM; //VERMELHO
-  SetColorValue[GREEN] = 0; //VERDE
-  SetColorValue[BLUE] = 0;  //AZUL
+  RGB.SetColorValue[RED] = PWM; //VERMELHO
+  RGB.SetColorValue[GREEN] = 0; //VERDE
+  RGB.SetColorValue[BLUE] = 0;  //AZUL
 }
 
 void LEDRGB::Off_All_Leds(void)
 {
-  SetColorValue[RED] = 0;   //VERMELHO
-  SetColorValue[GREEN] = 0; //VERDE
-  SetColorValue[BLUE] = 0;  //AZUL
+  RGB.SetColorValue[RED] = 0;   //VERMELHO
+  RGB.SetColorValue[GREEN] = 0; //VERDE
+  RGB.SetColorValue[BLUE] = 0;  //AZUL
 }

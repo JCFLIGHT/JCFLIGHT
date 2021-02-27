@@ -44,6 +44,7 @@ private:
   int16_t _Min_Pulse;
   int16_t RcConstrain;
 };
+
 class RCConfigClass
 {
 public:

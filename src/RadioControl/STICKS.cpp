@@ -40,7 +40,7 @@ void SticksClass::Update()
       {
         if (ArmDelayedState())
         {
-          PreArm_Delay = true;
+          STICKS.PreArm_Delay = true;
         }
       }
     }
@@ -98,10 +98,10 @@ void SticksClass::Pre_Arm(void)
     return; //FAÇA UMA RAPIDA SAÍDA SE O ARMDISARM ESTIVE CONFIGURADO PELA CHAVE AUX
   }
   //ROTINA PRE-ARM
-  if (PreArm_Delay)
+  if (STICKS.PreArm_Delay)
   {
-    PreArm_Delay_Count++;
-    if (PreArm_Delay_Count > 30)
+    STICKS.PreArm_Delay_Count++;
+    if (STICKS.PreArm_Delay_Count > 30)
     {
       if (!PREARM.CheckSafeState()) //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
       {
@@ -112,8 +112,8 @@ void SticksClass::Pre_Arm(void)
         ENABLE_STATE(PRIMARY_ARM_DISARM);
         COMPASS.IOC_Initial = ATTITUDE.AngleOut[YAW];
       }
-      PreArm_Delay = false;
-      PreArm_Delay_Count = 0;
+      STICKS.PreArm_Delay = false;
+      STICKS.PreArm_Delay_Count = 0;
     }
   }
 }
@@ -121,21 +121,21 @@ void SticksClass::Pre_Arm(void)
 void SticksClass::Pre_Arm_Leds(void)
 {
   //ROTINA PRE-ARM LED INDICADOR
-  if ((PreArm_Delay_Count > 0 && PreArm_Delay_Count <= 20))
+  if ((STICKS.PreArm_Delay_Count > 0 && STICKS.PreArm_Delay_Count <= 20))
   {
     RGB.Function(PREARMINIT);
     BEEPER.Play(BEEPER_ARM);
   }
   if (!PREARM.CheckSafeState()) //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
   {
-    if ((PreArm_Delay_Count > 20 && PreArm_Delay_Count <= 30))
+    if ((STICKS.PreArm_Delay_Count > 20 && STICKS.PreArm_Delay_Count <= 30))
     {
       RGB.Function(PREARMFAIL);
-      if (PreArm_Delay_Count == 21)
+      if (STICKS.PreArm_Delay_Count == 21)
       {
         BEEPER.Play(BEEPER_ACTION_FAIL);
       }
-      if (PreArm_Delay_Count == 30)
+      if (STICKS.PreArm_Delay_Count == 30)
       {
         RGB.NotPriorit = false;
       }
@@ -143,10 +143,10 @@ void SticksClass::Pre_Arm_Leds(void)
   }
   else //CASO CONTRARIO
   {
-    if ((PreArm_Delay_Count > 20 && PreArm_Delay_Count <= 30))
+    if ((STICKS.PreArm_Delay_Count > 20 && STICKS.PreArm_Delay_Count <= 30))
     {
       RGB.Function(PREARMSUCESS);
-      if (PreArm_Delay_Count == 30)
+      if (STICKS.PreArm_Delay_Count == 30)
       {
         RGB.NotPriorit = false;
       }

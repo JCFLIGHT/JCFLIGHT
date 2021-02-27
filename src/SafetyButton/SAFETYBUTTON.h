@@ -22,10 +22,10 @@
 class SAFETYBUTTONCLASS
 {
 public:
-  bool SafeButtonEnabled();
-  bool GetSafeStateToOutput();
   void Initialization();
   void UpdateRoutine();
+  bool SafeButtonEnabled();
+  bool GetSafeStateToOutput();
 
 private:
   bool GetButtonInterval();

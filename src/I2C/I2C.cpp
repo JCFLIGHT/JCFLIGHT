@@ -103,37 +103,37 @@ uint8_t I2CPROTOCOL::ReadNAK()
 {
   WaitTransmission((1 << TWINT) | (1 << TWEN));
   uint8_t _TWDR = TWDR;
-  Stop();
+  I2C.Stop();
   return _TWDR;
 }
 
 void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size)
 {
-  Restart(Address << 1);
-  Write(Register);
-  Restart((Address << 1) | 1);
+  I2C.Restart(Address << 1);
+  I2C.Write(Register);
+  I2C.Restart((Address << 1) | 1);
   uint8_t *BufferPointer = Buffer;
   while (Size--)
   {
-    *BufferPointer++ = ReadACK();
+    *BufferPointer++ = I2C.ReadACK();
   }
   WaitTransmission((1 << TWINT) | (1 << TWEN));
   uint8_t _TWDR = TWDR;
-  Stop();
+  I2C.Stop();
   *BufferPointer = _TWDR;
 }
 
 void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
 {
-  RegisterBuffer(Address, Register, BufferData, 6);
+  I2C.RegisterBuffer(Address, Register, BufferData, 6);
 }
 
 void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
 {
-  Restart(Address << 1);
-  Write(Register);
-  Write(Value);
-  Stop();
+  I2C.Restart(Address << 1);
+  I2C.Write(Register);
+  I2C.Write(Value);
+  I2C.Stop();
 }
 
 void I2CPROTOCOL::SearchDevicesInBarrament()
@@ -224,7 +224,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
       if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
       {
-        CompassFound = true;
+        I2C.CompassFound = true;
       }
 
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
@@ -239,7 +239,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
       if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
       {
-        BarometerFound = true;
+        I2C.BarometerFound = true;
       }
 
       Devices++;
@@ -439,12 +439,12 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
       if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
       {
-        CompassFound = true;
+        I2C.CompassFound = true;
       }
 
       if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
       {
-        BarometerFound = true;
+        I2C.BarometerFound = true;
       }
     }
   }

@@ -31,40 +31,40 @@ void ParachuteClass::Auto_Do_Now(bool ActiveParachute)
   if (!ActiveParachute)
   {
     MotorControl[PARACHUTESERVO] = 400; //0 GRAUS
-    ParachuteReleased = false;
+    PARACHUTE.ParachuteReleased = false;
     return;
   }
-  ParachuteInAuto = true;
+  PARACHUTE.ParachuteInAuto = true;
   MotorControl[PARACHUTESERVO] = 2400; //180 GRAUS
-  if (!ParachuteReleased)
+  if (!PARACHUTE.ParachuteReleased)
   {
     BEEPER.Play(BEEPER_PARACHUTE);
   }
-  ParachuteReleased = true;
+  PARACHUTE.ParachuteReleased = true;
 }
 
 void ParachuteClass::Manual_Do_Now()
 {
-  if (!ParachuteReleased)
+  if (!PARACHUTE.ParachuteReleased)
   {
-    OverFlowTime += SCHEDULERTIME.GetMillis();
+    PARACHUTE.OverFlowTime += SCHEDULERTIME.GetMillis();
   }
-  if (ParachuteInAuto)
+  if (PARACHUTE.ParachuteInAuto)
   {
     return;
   }
-  if (!ManualDetectTrigger)
+  if (!PARACHUTE.ManualDetectTrigger)
   {
     MotorControl[PARACHUTESERVO] = 400; //0 GRAUS
-    ParachuteReleased = false;
+    PARACHUTE.ParachuteReleased = false;
     return;
   }
   MotorControl[PARACHUTESERVO] = 2400; //180 GRAUS
-  if (!ParachuteReleased)
+  if (!PARACHUTE.ParachuteReleased)
   {
     BEEPER.Play(BEEPER_PARACHUTE);
   }
-  ParachuteReleased = true;
+  PARACHUTE.ParachuteReleased = true;
 }
 
 void ParachuteClass::Manual_Detect_Channel()
@@ -73,99 +73,99 @@ void ParachuteClass::Manual_Detect_Channel()
   {
 
   case PARACHUTEAUXONELOW:
-    ManualDetectTrigger = AUX1_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX1_LOW;
     break;
 
   case PARACHUTEAUXONEMIDDLE:
-    ManualDetectTrigger = AUX1_MID;
+    PARACHUTE.ManualDetectTrigger = AUX1_MID;
     break;
 
   case PARACHUTEAUXONEHIGH:
-    ManualDetectTrigger = AUX1_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX1_HIGH;
     break;
 
   case PARACHUTEAUXTWOLOW:
-    ManualDetectTrigger = AUX2_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX2_LOW;
     break;
 
   case PARACHUTEAUXTWOMIDDLE:
-    ManualDetectTrigger = AUX2_MID;
+    PARACHUTE.ManualDetectTrigger = AUX2_MID;
     break;
 
   case PARACHUTEAUXTWOHIGH:
-    ManualDetectTrigger = AUX2_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX2_HIGH;
     break;
 
   case PARACHUTEAUXTHREELOW:
-    ManualDetectTrigger = AUX3_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX3_LOW;
     break;
 
   case PARACHUTEAUXTHREEMIDDLE:
-    ManualDetectTrigger = AUX3_MID;
+    PARACHUTE.ManualDetectTrigger = AUX3_MID;
     break;
 
   case PARACHUTEAUXTHREEHIGH:
-    ManualDetectTrigger = AUX3_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX3_HIGH;
     break;
 
   case PARACHUTEAUXFOURLOW:
-    ManualDetectTrigger = AUX4_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX4_LOW;
     break;
 
   case PARACHUTEAUXFOURMIDDLE:
-    ManualDetectTrigger = AUX4_MID;
+    PARACHUTE.ManualDetectTrigger = AUX4_MID;
     break;
 
   case PARACHUTEAUXFOURHIGH:
-    ManualDetectTrigger = AUX4_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX4_HIGH;
     break;
 
   case PARACHUTEAUXFIVELOW:
-    ManualDetectTrigger = AUX5_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX5_LOW;
     break;
 
   case PARACHUTEAUXFIVEMIDDLE:
-    ManualDetectTrigger = AUX5_MID;
+    PARACHUTE.ManualDetectTrigger = AUX5_MID;
     break;
 
   case PARACHUTEAUXFIVEHIGH:
-    ManualDetectTrigger = AUX5_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX5_HIGH;
     break;
 
   case PARACHUTEAUXSIXLOW:
-    ManualDetectTrigger = AUX6_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX6_LOW;
     break;
 
   case PARACHUTEAUXSIXMIDDLE:
-    ManualDetectTrigger = AUX6_MID;
+    PARACHUTE.ManualDetectTrigger = AUX6_MID;
     break;
 
   case PARACHUTEAUXSIXHIGH:
-    ManualDetectTrigger = AUX6_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX6_HIGH;
     break;
 
   case PARACHUTEAUXSEVENLOW:
-    ManualDetectTrigger = AUX7_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX7_LOW;
     break;
 
   case PARACHUTEAUXSEVENMIDDLE:
-    ManualDetectTrigger = AUX7_MID;
+    PARACHUTE.ManualDetectTrigger = AUX7_MID;
     break;
 
   case PARACHUTEAUXSEVENHIGH:
-    ManualDetectTrigger = AUX7_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX7_HIGH;
     break;
 
   case PARACHUTEAUXEIGHTLOW:
-    ManualDetectTrigger = AUX8_LOW;
+    PARACHUTE.ManualDetectTrigger = AUX8_LOW;
     break;
 
   case PARACHUTEAUXEIGHTMIDDLE:
-    ManualDetectTrigger = AUX8_MID;
+    PARACHUTE.ManualDetectTrigger = AUX8_MID;
     break;
 
   case PARACHUTEAUXEIGHTHIGH:
-    ManualDetectTrigger = AUX8_HIGH;
+    PARACHUTE.ManualDetectTrigger = AUX8_HIGH;
     break;
   }
 }
@@ -185,12 +185,12 @@ bool ParachuteClass::GetSafeStateToDisarmMotors()
 
 bool ParachuteClass::Released()
 {
-  return (ParachuteReleased && ReleasedOverFlowTime());
+  return (PARACHUTE.ParachuteReleased && PARACHUTE.ReleasedOverFlowTime());
 }
 
 bool ParachuteClass::ReleasedOverFlowTime()
 {
-  if (SCHEDULERTIME.GetMillis() - OverFlowTime >= MOTORS_DISARM_TIME)
+  if (SCHEDULERTIME.GetMillis() - PARACHUTE.OverFlowTime >= MOTORS_DISARM_TIME)
   {
     return true;
   }

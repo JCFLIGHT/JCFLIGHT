@@ -23,9 +23,9 @@ class I2CPROTOCOL
 public:
   bool CompassFound = false;
   bool BarometerFound = false;
+  int16_t Errors;
   uint8_t ReadACK();
   uint8_t ReadNAK();
-  int16_t Errors;
   void Initialization(void);
   void All_Initialization();
   void Restart(uint8_t Address);

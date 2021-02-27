@@ -100,9 +100,9 @@ float ErrorGyroIntegralLimit[3];
 
 void PIDXYZClass::Initialization()
 {
-  Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
-  BIQUADFILTER.Settings(&Derivative_Roll_Smooth, Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  PIDXYZ.Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
+  BIQUADFILTER.Settings(&Derivative_Roll_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
@@ -113,13 +113,13 @@ void PIDXYZClass::Initialization()
 
 void PIDXYZClass::Update(float DeltaTime)
 {
-  CalcedRateTargetRoll = RCControllerToRate(RCController[ROLL], RCRate);
-  CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
-  CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], YawRate);
+  PIDXYZ.CalcedRateTargetRoll = RCControllerToRate(RCController[ROLL], RCRate);
+  PIDXYZ.CalcedRateTargetPitch = RCControllerToRate(RCController[PITCH], RCRate);
+  PIDXYZ.CalcedRateTargetYaw = RCControllerToRate(RCController[YAW], YawRate);
 
-  CalcedRateTargetRollToGCS = CalcedRateTargetRoll;
-  CalcedRateTargetPitchToGCS = CalcedRateTargetPitch;
-  CalcedRateTargetYawToGCS = CalcedRateTargetYaw;
+  PIDXYZ.CalcedRateTargetRollToGCS = PIDXYZ.CalcedRateTargetRoll;
+  PIDXYZ.CalcedRateTargetPitchToGCS = PIDXYZ.CalcedRateTargetPitch;
+  PIDXYZ.CalcedRateTargetYawToGCS = PIDXYZ.CalcedRateTargetYaw;
 
   if (GetSafeStateOfHeadingHold())
   {
@@ -132,29 +132,29 @@ void PIDXYZClass::Update(float DeltaTime)
 
   if (Do_Stabilize_Mode)
   {
-    CalcedRateTargetRoll = PIDLevelRoll(DeltaTime);
-    CalcedRateTargetPitch = PIDLevelPitch(DeltaTime);
+    PIDXYZ.CalcedRateTargetRoll = PIDXYZ.PIDLevelRoll(DeltaTime);
+    PIDXYZ.CalcedRateTargetPitch = PIDXYZ.PIDLevelPitch(DeltaTime);
   }
 
   if (GetFrameStateOfMultirotor())
   {
     AntiWindUpScaler = Constrain_Float((1.0f - GetMotorMixRange()) / MotorIntegralTermWindUpPoint, 0.0f, 1.0f);
-    PIDApplyMulticopterRateControllerRoll(DeltaTime);
-    PIDApplyMulticopterRateControllerPitch(DeltaTime);
-    PIDApplyMulticopterRateControllerYaw(DeltaTime);
+    PIDXYZ.PIDApplyMulticopterRateControllerRoll(DeltaTime);
+    PIDXYZ.PIDApplyMulticopterRateControllerPitch(DeltaTime);
+    PIDXYZ.PIDApplyMulticopterRateControllerYaw(DeltaTime);
   }
   else if (GetFrameStateOfAirPlane())
   {
-    GetNewControllerForPlaneWithTurn();
-    PIDApplyFixedWingRateControllerRoll(DeltaTime);
-    PIDApplyFixedWingRateControllerPitch(DeltaTime);
-    PIDApplyFixedWingRateControllerYaw(DeltaTime);
+    PIDXYZ.GetNewControllerForPlaneWithTurn();
+    PIDXYZ.PIDApplyFixedWingRateControllerRoll(DeltaTime);
+    PIDXYZ.PIDApplyFixedWingRateControllerPitch(DeltaTime);
+    PIDXYZ.PIDApplyFixedWingRateControllerYaw(DeltaTime);
   }
 
   if (GetActualThrottleStatus(THROTTLE_LOW) ||
       !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) /*|| !IS_FLIGHT_MODE_ACTIVE(PRIMARY_ARM_DISARM)*/)
   {
-    Reset_Integral_Accumulators();
+    PIDXYZ.Reset_Integral_Accumulators();
   }
 }
 
@@ -213,7 +213,7 @@ float PIDXYZClass::ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float I
 float PIDXYZClass::ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral)
 {
   if ((MixerIsOutputSaturated() && GetFrameStateOfMultirotor()) ||
-      (GetFrameStateOfAirPlane() && FixedWingIntegralTermLimitActive(Axis)))
+      (GetFrameStateOfAirPlane() && PIDXYZ.FixedWingIntegralTermLimitActive(Axis)))
   {
     ErrorGyroIntegral = Constrain_Float(ErrorGyroIntegral, -ErrorGyroIntegralLimit[Axis], ErrorGyroIntegralLimit[Axis]);
   }
@@ -574,9 +574,9 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
   IMUTransformVectorEarthToBody(&TurnControllerRates);
 
   //LIMITA O VALOR MINIMO E MAXIMO DE SAÍDA A PARTIR DOS VALOR DE RATE DEFINIDO PELO USUARIO NO GCS
-  CalcedRateTargetRoll = Constrain_16Bits(CalcedRateTargetRoll + TurnControllerRates.Roll, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
-  CalcedRateTargetPitch = Constrain_16Bits(CalcedRateTargetPitch + TurnControllerRates.Pitch, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
-  CalcedRateTargetYaw = Constrain_16Bits(CalcedRateTargetYaw + TurnControllerRates.Yaw, -ConvertDegreesToDecidegrees(YawRate), ConvertDegreesToDecidegrees(YawRate));
+  PIDXYZ.CalcedRateTargetRoll = Constrain_16Bits(PIDXYZ.CalcedRateTargetRoll + TurnControllerRates.Roll, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
+  PIDXYZ.CalcedRateTargetPitch = Constrain_16Bits(PIDXYZ.CalcedRateTargetPitch + TurnControllerRates.Pitch, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
+  PIDXYZ.CalcedRateTargetYaw = Constrain_16Bits(PIDXYZ.CalcedRateTargetYaw + TurnControllerRates.Yaw, -ConvertDegreesToDecidegrees(YawRate), ConvertDegreesToDecidegrees(YawRate));
 }
 
 void PIDXYZClass::Reset_Integral_Accumulators()

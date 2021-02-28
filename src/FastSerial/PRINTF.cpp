@@ -29,6 +29,7 @@
 #include "ProgMem/PROGMEM.h"
 #include "Common/ENUM.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "Common/STRUCTS.h"
 
 SerialPrint PRINTF;
 

@@ -18,15 +18,26 @@
 #ifndef LIBDEPENDENCIES_H_
 #define LIBDEPENDENCIES_H_
 #define NULL 0
-#define PSTR(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
-#include <inttypes.h>     //int8_t,uint8_t,int16_t,uint16_t,int32_t & uint32_t
-#include <math.h>         //isnan & isinf
-#include <stdarg.h>       //__gnuc_va_list
-#include <stdio.h>        //size_t
-#include <stdlib.h>       //malloc & free
-#include <string.h>       //strnlen (STRING LENGTH COM DEFINIÇÃO DE TAMANHO)
+
+#ifdef __AVR_ATmega2560__
+
 #include <avr/io.h>       //PARA MANIPULAÇÃO DE REGISTRADORES
 #include <avr/pgmspace.h> //strlen_P (STRING LENGTH COM PONTEIRO)
+//PARA O AVR:ALOQUE NA MEMORIA FLASH AFIM DE OCUPAR MENOS MEMORIA RAM
+#define PSTR(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
+
+#else
+
+#include "Arduino.h" //MANTÉM POR ENQUATO
+
+#endif
+
+#include <inttypes.h> //int8_t,uint8_t,int16_t,uint16_t,int32_t & uint32_t
+#include <math.h>     //isnan & isinf
+#include <stdarg.h>   //__gnuc_va_list
+#include <stdio.h>    //size_t
+#include <stdlib.h>   //malloc & free
+#include <string.h>   //strnlen (STRING LENGTH COM DEFINIÇÃO DE TAMANHO)
 /*
 //ERA PRA FUNCIONAR NÉ?!MAS ENFIM...
 static inline size_t strlen_P(const char *pstr) //STRING LENGTH COM PONTEIRO

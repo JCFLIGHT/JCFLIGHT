@@ -32,8 +32,7 @@
 #include "GPS/GPSREAD.h"
 #include "FlightModes/FLIGHTMODES.h"
 
-#define NAVTILTCOMPENSATION 20  //RETIRADO DA ARDUPILOT
-#define GPS_BANK_ANGLE_MAX 3000 //30 GRAUS
+#define NAVTILTCOMPENSATION 20 //RETIRADO DA ARDUPILOT
 
 static void GPS_Calcule_Bearing(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *Bearing);
 static void GPS_Calcule_Distance_In_CM(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *CalculateDistance);
@@ -323,7 +322,7 @@ static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
     RateError = Constrain_32Bits(RateError, -1000, 1000);
     GPS_Navigation_Array[axis] = GPSGetProportional(RateError, &PositionHoldRatePID) + GPSGetIntegral(RateError, DeltaTime, &PositionHoldRatePIDArray[axis], &PositionHoldRatePID);
     GPS_Navigation_Array[axis] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[axis] * PositionHoldRatePID.kD), -2000, 2000);
-    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis], -GPS_BANK_ANGLE_MAX, GPS_BANK_ANGLE_MAX);
+    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValueVector));
     NavigationPIDArray[axis].Integral = PositionHoldRatePIDArray[axis].Integral;
   }
 }
@@ -386,7 +385,7 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
     {
       NavCompensation = 0;
     }
-    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis] + NavCompensation, -GPS_BANK_ANGLE_MAX, GPS_BANK_ANGLE_MAX);
+    GPS_Navigation_Array[axis] = Constrain_16Bits(GPS_Navigation_Array[axis] + NavCompensation, -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValueVector));
     PositionHoldRatePIDArray[axis].Integral = NavigationPIDArray[axis].Integral;
   }
 }

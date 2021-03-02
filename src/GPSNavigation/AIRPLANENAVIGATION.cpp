@@ -46,8 +46,6 @@
 #define NAVIGATION_INTEGRAL 20
 #define NAVIGATION_DERIVATIVE 45
 
-#define MAX_PITCH_BANKANGLE 15
-#define MAX_ROLL_BANKANGLE 20 //PARA ASA-FIXA 35 GRAUS É MELHOR
 #define MAX_YAW_BANKANGLE 15
 
 float Alt_kP = (float)ALTITUDE_PROPORTIONAL / 10.0f;
@@ -189,7 +187,7 @@ void AirPlaneUpdateNavigation(void)
     {
       if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
       {
-        AltitudeError = -(MAX_PITCH_BANKANGLE * 10);
+        AltitudeError = -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector);
         GetThrottleToNavigation = AttitudeThrottleMax;
         if (CurrentAltitude < SAFE_NAV_ALT)
         {
@@ -284,13 +282,13 @@ void AirPlaneUpdateNavigation(void)
     NavigationDeltaSumPID = (NavigationDeltaSumPID * Nav_kD) / DeltaTime_Navigation_PID;
     HeadingDifference *= Nav_kP;
     HeadingDifference += IntegralErrorOfNavigation;
-    GPS_Angle[PITCH] = Constrain_16Bits(AltitudeDifference / 10, -MAX_PITCH_BANKANGLE * 10, MAX_PITCH_BANKANGLE * 10) + AltitudeDeltaSumPID;
-    GPS_Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -MAX_ROLL_BANKANGLE * 10, MAX_ROLL_BANKANGLE * 10) + NavigationDeltaSumPID;
+    GPS_Angle[PITCH] = Constrain_16Bits(AltitudeDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector)) + AltitudeDeltaSumPID;
+    GPS_Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector)) + NavigationDeltaSumPID;
     GPS_Angle[YAW] = Constrain_16Bits(HeadingDifference / 10, -MAX_YAW_BANKANGLE * 10, MAX_YAW_BANKANGLE * 10) + NavigationDeltaSumPID;
 
     if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
-      GPS_Angle[PITCH] = Constrain_16Bits(GPS_Angle[PITCH], 0, MAX_PITCH_BANKANGLE * 10);
+      GPS_Angle[PITCH] = Constrain_16Bits(GPS_Angle[PITCH], 0, ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector));
     }
 
     if (!IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))

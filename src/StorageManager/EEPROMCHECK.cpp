@@ -27,13 +27,14 @@ void Operator_Check_Values_In_Address(uint16_t Size)
 {
     while (true)
     {
-        PRINTF.SendToConsole(PSTR("Address:%d ValorGuardado:%d\n"),
-                             EPPROM_Address,
-                             STORAGEMANAGER.Read_8Bits(EPPROM_Address));
+        DEBUG("Address:%d ValorGuardado:%d\n",
+              EPPROM_Address,
+              STORAGEMANAGER.Read_8Bits(EPPROM_Address));
+
         EPPROM_Address++;
         if (EPPROM_Address == Size)
         {
-            PRINTF.SendToConsole(PSTR("Completo!\n"));
+            DEBUG("Completo!\n");
             while (true)
                 ;
         }

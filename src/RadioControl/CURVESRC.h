@@ -22,6 +22,7 @@ void CurvesRC_SetValues();
 void CurvesRC_CalculeValue();
 int16_t RCControllerToRate(int16_t StickData, uint8_t Rate);
 float RcControllerToAngle(int16_t RcControllerInput, int16_t MaxInclination);
+float RcControllerToAngleWithMinMax(int16_t RcControllerInput, int16_t MinInclination, int16_t MaxInclination);
 int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo);
 uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection);
 int16_t RCLookupThrottleMiddle(void);

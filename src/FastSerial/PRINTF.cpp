@@ -96,6 +96,9 @@ void SerialPrint::SendToConsole(const char *fmt, ...)
   __builtin_va_start(ap, fmt);
   PRINTF.SerialPrintF(1, fmt, ap);
   __builtin_va_end(ap);
+  while (!FASTSERIAL.TXFree(UART_NUMB_0))
+  {
+  }
 }
 
 //#define PRINTLN_RADIO
@@ -194,12 +197,16 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
     {
       c = GETBYTE(in_progmem, 1, fmt);
       if (!c)
+      {
         return;
+      }
       if (c == '%')
       {
         c = GETBYTE(in_progmem, 1, fmt);
         if (c != '%')
+        {
           break;
+        }
       }
       if (c == '\n')
       {
@@ -279,14 +286,22 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
       flags &= ~FL_FLTUPP;
     flt_oper:
       if (!(flags & FL_PREC))
+      {
         prec = 6;
+      }
       flags &= ~(FL_FLTEXP | FL_FLTFIX);
       if (c == 'e')
+      {
         flags |= FL_FLTEXP;
+      }
       else if (c == 'f')
+      {
         flags |= FL_FLTFIX;
+      }
       else if (prec > 0)
+      {
         prec -= 1;
+      }
       if (flags & FL_FLTFIX)
       {
         vtype = 7;
@@ -303,11 +318,17 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
       vtype = buf[0];
       sign = 0;
       if ((vtype & FTOA_MINUS) && !(vtype & FTOA_NAN))
+      {
         sign = '-';
+      }
       else if (flags & FL_PLUS)
+      {
         sign = '+';
+      }
       else if (flags & FL_SPACE)
+      {
         sign = ' ';
+      }
       if (vtype & (FTOA_NAN | FTOA_INF))
       {
         const char *p;
@@ -328,10 +349,14 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
           width = 0;
         }
         if (sign)
+        {
           FASTSERIAL.Write(UART_NUMB_0, sign);
+        }
         p = PSTR("inf");
         if (vtype & FTOA_NAN)
+        {
           p = PSTR("nan");
+        }
         while ((ndigs = ProgMemReadByte(p)) != 0)
         {
           if (flags & FL_FLTUPP)
@@ -345,18 +370,28 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
       {
         ndigs += exp;
         if ((vtype & FTOA_CARRY) && buf[1] == '1')
+        {
           ndigs -= 1;
+        }
         if ((signed char)ndigs < 1)
+        {
           ndigs = 1;
+        }
         else if (ndigs > 8)
+        {
           ndigs = 8;
+        }
       }
       else if (!(flags & FL_FLTEXP))
       {
         if (exp <= prec && exp >= -4)
+        {
           flags |= FL_FLTFIX;
+        }
         while (prec && buf[1 + prec] == '0')
+        {
           prec--;
+        }
         if (flags & FL_FLTFIX)
         {
           ndigs = prec + 1;
@@ -366,13 +401,19 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
         }
       }
       if (flags & FL_FLTFIX)
+      {
         n = (exp > 0 ? exp + 1 : 1);
+      }
       else
-        n = 5; /* 1e+00 */
+        n = 5;
       if (sign)
+      {
         n += 1;
+      }
       if (prec)
+      {
         n += prec + 1;
+      }
       width = width > n ? width - n : 0;
       if (!(flags & (FL_LPAD | FL_ZFILL)))
       {
@@ -398,12 +439,16 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
         do
         {
           if (n == -1)
+          {
             FASTSERIAL.Write(UART_NUMB_0, '.');
+          }
           flags = (n <= exp && n > exp - ndigs)
                       ? buf[exp - n + 1]
                       : '0';
           if (--n < -prec)
+          {
             break;
+          }
           FASTSERIAL.Write(UART_NUMB_0, flags);
         } while (1);
         if (n == exp && (buf[1] > '5' || (buf[1] == '5' && !(vtype & FTOA_CARRY))))
@@ -435,12 +480,15 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
         }
         FASTSERIAL.Write(UART_NUMB_0, ndigs);
         for (ndigs = '0'; exp >= 10; exp -= 10)
+        {
           ndigs += 1;
+        }
         FASTSERIAL.Write(UART_NUMB_0, ndigs);
         FASTSERIAL.Write(UART_NUMB_0, '0' + exp);
       }
       goto tail;
     }
+
     const char *pnt;
     size_t size;
     switch (c)
@@ -478,6 +526,7 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
       }
       goto tail;
     }
+
     if (c == 'd' || c == 'i')
     {
       long x = (flags & FL_LONG) ? va_arg(ap, long) : va_arg(ap, int);
@@ -492,13 +541,16 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
     else
     {
       int base;
+
       if (c == 'u')
       {
         flags &= ~FL_ALT;
         base = 10;
         goto ultoa;
       }
+
       flags &= ~(FL_PLUS | FL_SPACE);
+
       switch (c)
       {
 
@@ -541,7 +593,9 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
       {
         len = prec;
         if ((flags & FL_ALT) && !(flags & FL_ALTHEX))
+        {
           flags &= ~FL_ALT;
+        }
       }
     }
     if (flags & FL_ALT)
@@ -583,15 +637,21 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
     {
       FASTSERIAL.Write(UART_NUMB_0, '0');
       if (flags & FL_ALTHEX)
+      {
         FASTSERIAL.Write(UART_NUMB_0, flags & FL_ALTUPP ? 'X' : 'x');
+      }
     }
     else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE))
     {
       unsigned char z = ' ';
       if (flags & FL_PLUS)
+      {
         z = '+';
+      }
       if (flags & FL_NEGATIVE)
+      {
         z = '-';
+      }
       FASTSERIAL.Write(UART_NUMB_0, z);
     }
     while (prec > c)
@@ -610,11 +670,6 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
       width--;
     }
   }
-}
-
-void SerialPrint::CallSchedulerSleep()
-{
-  SCHEDULERTIME.Sleep(1);
 }
 
 #endif
@@ -660,9 +715,226 @@ void SerialPrint::ParamsToConsole()
   //Serial.println(STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR));
 }
 
-void SerialPrint::CallSchedulerSleep()
+#endif
+
+typedef void (*putcf)(void *, char);
+static putcf stdout_putf;
+static void *stdout_putp;
+
+static void uli2a(unsigned long int num, unsigned int base, int uc, char *bf)
 {
-  SCHEDULERTIME.Sleep(1);
+  int n = 0;
+  unsigned int d = 1;
+  while (num / d >= base)
+    d *= base;
+  while (d != 0)
+  {
+    int dgt = num / d;
+    num %= d;
+    d /= base;
+    if (n || dgt > 0 || d == 0)
+    {
+      *bf++ = dgt + (dgt < 10 ? '0' : (uc ? 'A' : 'a') - 10);
+      ++n;
+    }
+  }
+  *bf = 0;
 }
 
+static void li2a(long num, char *bf)
+{
+  if (num < 0)
+  {
+    num = -num;
+    *bf++ = '-';
+  }
+  uli2a(num, 10, 0, bf);
+}
+
+static void ui2a(unsigned int num, unsigned int base, int uc, char *bf)
+{
+  int n = 0;
+  unsigned int d = 1;
+  while (num / d >= base)
+    d *= base;
+  while (d != 0)
+  {
+    int dgt = num / d;
+    num %= d;
+    d /= base;
+    if (n || dgt > 0 || d == 0)
+    {
+      *bf++ = dgt + (dgt < 10 ? '0' : (uc ? 'A' : 'a') - 10);
+      ++n;
+    }
+  }
+  *bf = 0;
+}
+
+static void i2a(int num, char *bf)
+{
+  if (num < 0)
+  {
+    num = -num;
+    *bf++ = '-';
+  }
+  ui2a(num, 10, 0, bf);
+}
+
+static int a2d(char ch)
+{
+  if (ch >= '0' && ch <= '9')
+    return ch - '0';
+  else if (ch >= 'a' && ch <= 'f')
+    return ch - 'a' + 10;
+  else if (ch >= 'A' && ch <= 'F')
+    return ch - 'A' + 10;
+  else
+    return -1;
+}
+
+static char a2i(char ch, char **src, int base, int *nump)
+{
+  char *p = *src;
+  int num = 0;
+  int digit;
+  while ((digit = a2d(ch)) >= 0)
+  {
+    if (digit > base)
+      break;
+    num = num * base + digit;
+    ch = *p++;
+  }
+  *src = p;
+  *nump = num;
+  return ch;
+}
+
+static void putchw(void *putp, putcf putf, int n, char z, char *bf)
+{
+  char fc = z ? '0' : ' ';
+  char ch;
+  char *p = bf;
+  while (*p++ && n > 0)
+    n--;
+  while (n-- > 0)
+    putf(putp, fc);
+  while ((ch = *bf++))
+    putf(putp, ch);
+}
+
+void tfp_format(void *putp, putcf putf, char *fmt, va_list va)
+{
+  char bf[12];
+
+  char ch;
+
+  while ((ch = *(fmt++)))
+  {
+    if (ch != '%')
+      putf(putp, ch);
+    else
+    {
+      char lz = 0;
+      char lng = 0;
+      int w = 0;
+      ch = *(fmt++);
+      if (ch == '0')
+      {
+        ch = *(fmt++);
+        lz = 1;
+      }
+
+      if (ch >= '0' && ch <= '9')
+      {
+        ch = a2i(ch, &fmt, 10, &w);
+      }
+
+      if (ch == 'l')
+      {
+        ch = *(fmt++);
+        lng = 1;
+      }
+
+      switch (ch)
+      {
+
+      case 0:
+        goto abort;
+
+      case 'u':
+      {
+        if (lng)
+          uli2a(va_arg(va, unsigned long int), 10, 0, bf);
+        else
+          ui2a(va_arg(va, unsigned int), 10, 0, bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      }
+
+      case 'd':
+      {
+        if (lng)
+          li2a(va_arg(va, unsigned long int), bf);
+        else
+          i2a(va_arg(va, int), bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+      }
+
+      case 'x':
+      case 'X':
+        if (lng)
+          uli2a(va_arg(va, unsigned long int), 16, (ch == 'X'), bf);
+        else
+          ui2a(va_arg(va, unsigned int), 16, (ch == 'X'), bf);
+        putchw(putp, putf, w, lz, bf);
+        break;
+
+      case 'c':
+        putf(putp, (char)(va_arg(va, int)));
+        break;
+
+      case 's':
+        putchw(putp, putf, w, 0, va_arg(va, char *));
+        break;
+
+      case '%':
+        putf(putp, ch);
+      default:
+        break;
+      }
+    }
+  }
+abort:;
+}
+
+void _putc(void *p, char c)
+{
+  (void)p;
+  FASTSERIAL.Write(UART_NUMB_0, c);
+}
+
+void init_printf(void *putp, void (*putf)(void *, char))
+{
+  stdout_putf = putf;
+  stdout_putp = putp;
+}
+
+void SerialPrint::Initialization()
+{
+#ifndef __AVR_ATmega2560__
+  init_printf(NULL, _putc);
 #endif
+}
+
+void SerialPrint::tfp_printf(char *fmt, ...)
+{
+  va_list va;
+  va_start(va, fmt);
+  tfp_format(stdout_putp, stdout_putf, fmt, va);
+  va_end(va);
+  while (!FASTSERIAL.TXFree(UART_NUMB_0))
+  {
+  }
+}

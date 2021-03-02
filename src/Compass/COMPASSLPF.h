@@ -21,7 +21,7 @@
 class CompassLPFClass : CompassReadClass
 {
 public:
-    void Apply();
+    void ApplyFilter();
 };
 extern CompassLPFClass COMPASSLPF;
 #endif

@@ -46,8 +46,7 @@ void CompassCalClass::ApplyCalibration()
         IMU.CompassRead[YAW] -= CALIBRATION.Magnetometer[YAW];
     }
 }
-#include "FastSerial/FASTSERIAL.h"
-#include "FastSerial/PRINTF.h"
+
 void CompassCalClass::RunningCalibration()
 {
     if (!COMPASS.Calibrating)

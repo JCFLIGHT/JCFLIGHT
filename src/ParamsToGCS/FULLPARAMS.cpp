@@ -19,7 +19,6 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "StorageManager/EEPROMCHECK.h"
-#include "StringSupport/STRINGSUPPORT.h"
 #include "Common/ENUM.h"
 #include "StorageManager/ERASE.h"
 #include "Build/BOARDDEFS.h"
@@ -142,7 +141,7 @@ void SetNewValue(const char *ParamName, int32_t NewValue)
 {
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
-    if (StringCompare(ParamName, Params_Table[Table_Counter].Param_Name, strlen_P(Params_Table[Table_Counter].Param_Name)) == 0)
+    if (strncasecmp(ParamName, Params_Table[Table_Counter].Param_Name, strlen(Params_Table[Table_Counter].Param_Name)) == 0)
     {
       if (NewValue >= Params_Table[Table_Counter].Value_Min && NewValue <= Params_Table[Table_Counter].Value_Max)
       {

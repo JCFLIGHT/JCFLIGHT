@@ -31,10 +31,12 @@ BATT BATTERY;
 AverageFilterFloat_Size20 Voltage_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A TENSÃO,TAMANHO = 20 ITERAÇÕES
 AverageFilterFloat_Size20 Current_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A CORRENTE,TAMANHO = 20 ITERAÇÕES
 
+//DEBUG
+//#define PRINTLN_BATT
+
 #define THIS_LOOP_RATE 50            //HZ
 #define TIMER_TO_AUTO_DETECT_BATT 15 //SEGUNDOS
 #define PREVENT_ARM_LOW_BATT 20      //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
-//#define DEBUG_BATT
 
 //VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
 float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
@@ -51,7 +53,7 @@ void BATT::Update_Voltage(void)
     if (BATTERY.GetPercentage() < PREVENT_ARM_LOW_BATT) //MENOR QUE 20%
     {
       BATTERY.LowBattPreventArm = true;
-      if (BEEPER.SafeToOthersBeepsCounter > 200)
+      if (BEEPER.GetSafeStateToOthersBeeps())
       {
         BEEPER.Play(BEEPER_BAT_CRIT_LOW);
       }
@@ -80,7 +82,7 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
     BATTERY.Percentage = 1;
   }
 
-#ifdef DEBUG_BATT
+#ifdef PRINTLN_BATT
   PRINTF.SendToConsole(PSTR("volt:%0.2f min:%0.2f max:%0.2f mincount:%d maxcount:%d\n"),
                        BattVoltage,
                        BattMinVolt,

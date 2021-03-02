@@ -277,3 +277,8 @@ void BEEPERCLASS::Run()
     BuzzerInit = true;
   }
 }
+
+bool BEEPERCLASS::GetSafeStateToOthersBeeps()
+{
+  return BEEPER.SafeToOthersBeepsCounter > 200;
+}

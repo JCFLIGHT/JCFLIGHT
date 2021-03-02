@@ -71,7 +71,7 @@ void CompassReadClass::Initialization()
     I2C.WriteRegister(COMPASS.Address, 1, 40);
     I2C.WriteRegister(COMPASS.Address, 2, 1);
     SCHEDULERTIME.Sleep(100);
-    InitialReadBufferData();
+    COMPASS.InitialReadBufferData();
     if (!COMPASS.PushBias(0x011))
     {
       BiasOk = false;
@@ -178,7 +178,10 @@ void CompassReadClass::Constant_Read()
   COMPASSCAL.ApplyGain();
 
   //APLICA O LPF PARA REDUZIR SPIKES DURANTE A CALIBRAÇÃO
-  COMPASSLPF.Apply();
+  COMPASSLPF.ApplyFilter();
+
+  //APLICA A CALIBRAÇÃO DO COMPASS
+  COMPASSCAL.ApplyCalibration();
 
   //CORRE A CALIBRAÇÃO DO COMPASS
   COMPASSCAL.RunningCalibration();

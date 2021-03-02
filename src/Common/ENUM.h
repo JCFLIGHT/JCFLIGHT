@@ -59,6 +59,11 @@ enum PID_Params_Enum
     PI_AUTO_LEVEL,
     P_YAW_RATE,
     P_YAW_RATE_LIMIT,
+    ROLL_BANK_MAX,
+    PITCH_BANK_MIN,
+    PITCH_BANK_MAX,
+    ATTACK_BANK_MAX,
+    GPS_BANK_MAX,
     PID_UPDATED,
     SIZE_OF_PID_PARAMS
 };
@@ -291,16 +296,6 @@ enum Battery_Type_Enum
     BATTERY_3S,
     BATTERY_4S,
     BATTERY_6S
-};
-
-enum Flip_Stages_Enum
-{
-    STAGEONE = 0,
-    STAGETWO,
-    STAGETHREE,
-    STAGERECOVER,
-    STAGEABANDON,
-    STAGEWAITING
 };
 
 typedef enum

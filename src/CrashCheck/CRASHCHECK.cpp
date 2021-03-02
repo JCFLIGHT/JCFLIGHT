@@ -26,11 +26,16 @@
 #include "Common/RCDEFINES.h"
 #include "Common/STRUCTS.h"
 
-#define THIS_LOOP_RATE 100                  //100HZ
+#ifdef __AVR_ATmega2560__
+#define THIS_LOOP_RATE 70 //HZ
+#else
+#define THIS_LOOP_RATE 100 //HZ
+#endif
 #define CRASH_CHECK_TIMER 2                 //TEMPO MAXIMO DE CRASH EM SEGUNDOS
 #define ATTITUDE_CHECK_THRESH_ROLL_PITCH 30 //VALOR CONVERTIDO PARA RADIANOS E FATORADO POR 1000
 
-//#define DEBUG_CRASHCHECK
+//DEBUG
+//#define PRINTLN_CRASHCHECK
 
 void CrashCheck()
 {
@@ -38,7 +43,7 @@ void CrashCheck()
   static uint16_t Crash_Counter;        //NÚMERO DE ITERAÇÕES PARA VERIFICAR SE O VEICULO CAPOTOU
   static int32_t AltitudeBaroToCompare; //COMPARA OS VALORES DO BAROMETRO PARA SABER SE ESTAMOS CAINDO
 
-#ifdef DEBUG_CRASHCHECK
+#ifdef PRINTLN_CRASHCHECK
 
   if (GetLandSuccess())
   {
@@ -47,7 +52,7 @@ void CrashCheck()
 
 #endif
 
-#ifndef DEBUG_CRASHCHECK
+#ifndef PRINTLN_CRASHCHECK
 
   //VERIFICA SE OS MOTORES ESTÃO DESARMADOS
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
@@ -80,7 +85,7 @@ void CrashCheck()
     return;
   }
 
-#ifndef DEBUG_CRASHCHECK
+#ifndef PRINTLN_CRASHCHECK
 
   if (Crash_Counter == 1) //OK,PROVAVELMENTE ESTAMOS CAINDO
   {
@@ -99,7 +104,7 @@ void CrashCheck()
   if (Crash_Counter >= CRASH_CHECK_TIMER * THIS_LOOP_RATE)
   {
 
-#ifdef DEBUG_CRASHCHECK
+#ifdef PRINTLN_CRASHCHECK
 
     LOG("!!!Crash Detectado!!!");
 

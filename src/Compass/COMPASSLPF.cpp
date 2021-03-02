@@ -22,7 +22,7 @@
 
 CompassLPFClass COMPASSLPF;
 
-void CompassLPFClass::Apply()
+void CompassLPFClass::ApplyFilter()
 {
     //APLICA O LPF NO COMPASS PARA EVITAR SPIKES DURANTE A CALIBRAÇÃO DO COMPASS
     if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))

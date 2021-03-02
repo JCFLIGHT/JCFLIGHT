@@ -81,6 +81,12 @@ float RcControllerToAngle(int16_t RcControllerInput, int16_t MaxInclination)
   return Map_Float((float)RcControllerInput, -500.0f, 500.0f, (float)-MaxInclination, (float)MaxInclination);
 }
 
+float RcControllerToAngleWithMinMax(int16_t RcControllerInput, int16_t MinInclination, int16_t MaxInclination)
+{
+  RcControllerInput = Constrain_Float(RcControllerInput, -500, 500);
+  return Map_Float((float)RcControllerInput, -500.0f, 500.0f, (float)-MinInclination, (float)MaxInclination);
+}
+
 uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
 {
   if (CalcedDeflection > 999)

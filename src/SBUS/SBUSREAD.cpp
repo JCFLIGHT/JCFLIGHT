@@ -29,7 +29,8 @@ FILE_COMPILE_FOR_SPEED
 
 SBUS SBUSRC;
 
-//#define DEBUG_MODE
+//DEBUG
+//#define PRINTLN_MODE
 
 bool LostFrame = false;
 uint16_t SBUSReadChannels[12];
@@ -41,7 +42,7 @@ void SBUS::Update()
     return;
   }
   SBUSRC.Read(&SBUSReadChannels[0], &SBUSRC.FailSafe, &LostFrame);
-#if defined(DEBUG_MODE)
+#if defined(PRINTLN_MODE)
   static uint32_t SBUS_Serial_Refresh;
   if (SCHEDULERTIME.GetMillis() - SBUS_Serial_Refresh >= 20)
   {

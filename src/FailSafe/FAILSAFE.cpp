@@ -208,7 +208,7 @@ void FailSafeBuzzerNotification()
   {
     return;
   }
-  if (BEEPER.SafeToOthersBeepsCounter > 200 && CalibratingGyroscope == 0)
+  if (BEEPER.GetSafeStateToOthersBeeps() && CalibratingGyroscope == 0)
   {
     if (BuzzerFailSafeRunCount >= 150) //3 SEGUNDOS
     {

@@ -336,6 +336,11 @@ struct _SendUserMediumGCSParameters
     uint8_t SendAutoLevelIntegral;
     uint8_t SendHeadingHoldRate;
     uint8_t SendHeadingHoldRateLimit;
+    uint8_t SendRollBankMax;
+    uint8_t SendPitchBankMin;
+    uint8_t SendPitchBankMax;
+    uint8_t SendAttackBank;
+    uint8_t SendGPSBank;
 } SendUserMediumGCSParameters;
 
 struct _GetUserMediumGCSParameters
@@ -371,6 +376,11 @@ struct _GetUserMediumGCSParameters
     uint8_t GetAutoLevelIntegral;
     uint8_t GetHeadingHoldRate;
     uint8_t GetHeadingHoldRateLimit;
+    uint8_t GetRollBankMax;
+    uint8_t GetPitchBankMin;
+    uint8_t GetPitchBankMax;
+    uint8_t GetAttackBank;
+    uint8_t GetGPSBank;
 } GetUserMediumGCSParameters;
 
 struct _SendWayPointGCSCoordinates
@@ -977,7 +987,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 23) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 28) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 8)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         GCS_Send_Data(SendUserMediumGCSParameters.SendTPAInPercent, VAR_8BITS);
         GCS_Send_Data(SendUserMediumGCSParameters.SendBreakPointValue, VAR_16BITS);
@@ -1010,6 +1020,11 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendUserMediumGCSParameters.SendAutoLevelIntegral, VAR_8BITS);
         GCS_Send_Data(SendUserMediumGCSParameters.SendHeadingHoldRate, VAR_8BITS);
         GCS_Send_Data(SendUserMediumGCSParameters.SendHeadingHoldRateLimit, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendRollBankMax, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendPitchBankMin, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendPitchBankMax, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendAttackBank, VAR_8BITS);
+        GCS_Send_Data(SendUserMediumGCSParameters.SendGPSBank, VAR_8BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1500,6 +1515,11 @@ void GCSClass::Save_Medium_Configuration()
     STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, GetUserMediumGCSParameters.GetAutoLevelIntegral);
     STORAGEMANAGER.Write_8Bits(KP_HEADING_HOLD_ADDR, GetUserMediumGCSParameters.GetHeadingHoldRate);
     STORAGEMANAGER.Write_8Bits(HEADING_HOLD_RATE_LIMIT_ADDR, GetUserMediumGCSParameters.GetHeadingHoldRateLimit);
+    STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, GetUserMediumGCSParameters.GetRollBankMax);
+    STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, GetUserMediumGCSParameters.GetPitchBankMin);
+    STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, GetUserMediumGCSParameters.GetPitchBankMax);
+    STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, GetUserMediumGCSParameters.GetAttackBank);
+    STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, GetUserMediumGCSParameters.GetGPSBank);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1618,6 +1638,13 @@ void GCSClass::Default_Medium_Configuration()
         //AUTO-NÍVEL
         STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
         STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 15);
+
+        //ÂNGULOS DE NAVEGAÇÃO
+        STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 30);
+        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 30);
+        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 30);
+        STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
+        STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
     }
     else if (GetFrameStateOfAirPlane())
     {
@@ -1642,6 +1669,13 @@ void GCSClass::Default_Medium_Configuration()
         //AUTO-NÍVEL
         STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
         STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 5);
+
+        //ÂNGULOS DE NAVEGAÇÃO
+        STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 45);
+        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 20);
+        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 25);
+        STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
+        STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
     }
 
     //ALTITUDE-HOLD
@@ -1769,4 +1803,9 @@ void GCSClass::UpdateParametersToGCS()
     SendUserMediumGCSParameters.SendAutoLevelIntegral = STORAGEMANAGER.Read_8Bits(KI_AUTOLEVEL_ADDR);
     SendUserMediumGCSParameters.SendHeadingHoldRate = STORAGEMANAGER.Read_8Bits(KP_HEADING_HOLD_ADDR);
     SendUserMediumGCSParameters.SendHeadingHoldRateLimit = STORAGEMANAGER.Read_8Bits(HEADING_HOLD_RATE_LIMIT_ADDR);
+    SendUserMediumGCSParameters.SendRollBankMax = STORAGEMANAGER.Read_8Bits(ROLL_BANK_ADDR);
+    SendUserMediumGCSParameters.SendPitchBankMin = STORAGEMANAGER.Read_8Bits(PITCH_BANK_MIN_ADDR);
+    SendUserMediumGCSParameters.SendPitchBankMax = STORAGEMANAGER.Read_8Bits(PITCH_BANK_MAX_ADDR);
+    SendUserMediumGCSParameters.SendAttackBank = STORAGEMANAGER.Read_8Bits(ATTACK_BANK_ADDR);
+    SendUserMediumGCSParameters.SendGPSBank = STORAGEMANAGER.Read_8Bits(GPS_BANK_ADDR);
 }

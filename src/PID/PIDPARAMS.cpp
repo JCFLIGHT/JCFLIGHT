@@ -143,6 +143,13 @@ void UpdateValuesOfPID()
             //AUTO-NÍVEL
             STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
             STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 15);
+
+            //ÂNGULOS DE NAVEGAÇÃO
+            STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 30);
+            STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 30);
+            STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 30);
+            STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
+            STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
         }
         else if (ActualFrameType == AIRPLANE ||
                  ActualFrameType == FIXED_WING ||
@@ -169,6 +176,13 @@ void UpdateValuesOfPID()
             //AUTO-NÍVEL
             STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
             STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 5);
+
+            //ÂNGULOS DE NAVEGAÇÃO
+            STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 45);
+            STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 20);
+            STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 25);
+            STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
+            STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
         }
 
         //ALTITUDE-HOLD
@@ -208,6 +222,12 @@ void UpdateValuesOfPID()
 
     GET_SET[P_YAW_RATE].ProportionalVector = STORAGEMANAGER.Read_8Bits(KP_HEADING_HOLD_ADDR);
     GET_SET[P_YAW_RATE_LIMIT].MinMaxValueVector = STORAGEMANAGER.Read_8Bits(HEADING_HOLD_RATE_LIMIT_ADDR);
+
+    GET_SET[ROLL_BANK_MAX].MinMaxValueVector = STORAGEMANAGER.Read_8Bits(ROLL_BANK_ADDR);
+    GET_SET[PITCH_BANK_MIN].MinMaxValueVector = STORAGEMANAGER.Read_8Bits(PITCH_BANK_MIN_ADDR);
+    GET_SET[PITCH_BANK_MAX].MinMaxValueVector = STORAGEMANAGER.Read_8Bits(PITCH_BANK_MAX_ADDR);
+    GET_SET[ATTACK_BANK_MAX].MinMaxValueVector = STORAGEMANAGER.Read_8Bits(ATTACK_BANK_ADDR);
+    GET_SET[GPS_BANK_MAX].MinMaxValueVector = STORAGEMANAGER.Read_8Bits(GPS_BANK_ADDR);
 
     GET_SET[PID_UPDATED].State = true;
 }

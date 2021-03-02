@@ -28,7 +28,8 @@
 
 FILE_COMPILE_FOR_SPEED
 
-//#define DEBUG_IOC
+//DEBUG
+//#define PRINTLN_IOC
 
 void IOC_Mode_Update()
 {
@@ -41,7 +42,7 @@ void IOC_Mode_Update()
     RCController[ROLL] = RCController[ROLL] * CosineDifference - RCController[PITCH] * SineDifference;
     RCController[PITCH] = CalcedRCControllerPITCH;
   }
-#ifdef DEBUG_IOC
+#ifdef PRINTLN_IOC
   PRINTF.SendToConsole(PSTR("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
                        RCController[ROLL],
                        RCController[PITCH],

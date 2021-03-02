@@ -27,7 +27,8 @@
 
 I2CPROTOCOL I2C;
 
-//#define DEBUG_I2C
+//DEBUG
+#define PRINTLN_I2C
 
 uint8_t BufferData[6];
 
@@ -140,9 +141,10 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 {
   static uint8_t Status;
   uint8_t Devices = 0;
-#ifdef DEBUG_I2C
-  PRINTF.SendToConsole(PSTR("ESCANEANDO O BARRAMENTO I2C,AGUARDE...\n"));
-  PRINTF.SendToConsole(PSTR("\n"));
+#ifdef PRINTLN_I2C
+  LINE_SPACE;
+  LOG("ESCANEANDO O BARRAMENTO I2C,AGUARDE...");
+  LINE_SPACE;
 #endif
   for (uint8_t NumbGenerator = 0; NumbGenerator <= 0x7F; NumbGenerator++)
   {
@@ -156,55 +158,45 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
     {
       if (Status == 1)
       {
-#ifdef DEBUG_I2C
-        PRINTF.SendToConsole(PSTR("OCORREU ALGUM ERRO,NÃO FOI POSSIVEL COMPLETAR\n"));
+#ifdef PRINTLN_I2C
+        LOG("OCORREU ALGUM ERRO,NÃO FOI POSSIVEL COMPLETAR");
 #endif
         return;
       }
     }
     else
     {
-#ifdef DEBUG_I2C
-      PRINTF.SendToConsole(PSTR("DISPOSITIVO ENCONTRADO - "));
+#ifdef PRINTLN_I2C
+
       if (NumbGenerator == ADDRESS_IMU_MPU6050)
       {
-        PRINTF.SendToConsole(PSTR("0x68"));
+        LOG("DISPOSITIVO ENCONTRADO - 0x68 << MPU6050");
       }
-      if (NumbGenerator == ADDRESS_IMU_MPU6050)
-      {
-        PRINTF.SendToConsole(PSTR(" << MPU6050"));
-      }
+
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
       {
-        PRINTF.SendToConsole(PSTR("0x77"));
-        PRINTF.SendToConsole(PSTR(" << MS5611"));
+        LOG("DISPOSITIVO ENCONTRADO - 0x77 << MS5611");
       }
+
       if (NumbGenerator == ADDRESS_BAROMETER_BMP280)
       {
-        PRINTF.SendToConsole(PSTR("0x76"));
-        PRINTF.SendToConsole(PSTR(" << BMP280"));
+        LOG("DISPOSITIVO ENCONTRADO - 0x76 << BMP280");
       }
+
       if (NumbGenerator == ADDRESS_COMPASS_AK8975)
       {
-        PRINTF.SendToConsole(PSTR("0x0C"));
+        LOG("DISPOSITIVO ENCONTRADO - 0x0C < AK8975");
       }
-      if (NumbGenerator == ADDRESS_COMPASS_AK8975)
-      {
-        PRINTF.SendToConsole(PSTR(" << AK8975"));
-      }
+
       if (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883)
       {
-        PRINTF.SendToConsole(PSTR("0x1E"));
+        LOG("DISPOSITIVO ENCONTRADO - 0x1E << HMC5843 OU HMC5883");
       }
+
       if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
       {
-        PRINTF.SendToConsole(PSTR("0x0D"));
+        LOG("DISPOSITIVO ENCONTRADO - 0x0D << QMC5883");
       }
-      if ((NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
-      {
-        PRINTF.SendToConsole(PSTR(" << HMC5843 OU HMC5883"));
-      }
-      PRINTF.SendToConsole(PSTR("\n"));
 #endif
 
       if (NumbGenerator == ADDRESS_COMPASS_AK8975)
@@ -244,17 +236,18 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
       Devices++;
 
-#ifdef DEBUG_I2C
+#ifdef PRINTLN_I2C
       SCHEDULERTIME.Sleep(20);
 #endif
     }
     I2C.Stop();
   }
-#ifdef DEBUG_I2C
+#ifdef PRINTLN_I2C
   if (!Devices)
   {
-    PRINTF.SendToConsole(PSTR("NENHUM DISPOSITVO ENCONTRADO\n"));
+    LOG("NENHUM DISPOSITVO ENCONTRADO");
   }
+  LINE_SPACE;
 #endif
 }
 

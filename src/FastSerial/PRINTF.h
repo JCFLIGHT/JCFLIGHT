@@ -28,37 +28,47 @@ extern "C"
 class SerialPrint
 {
 public:
+  void Initialization();
+  void tfp_printf(char *fmt, ...);
+
   void ParamsToConsole();
+
 #ifndef __AVR_ATmega2560__
+
   void SendToConsole();
+
 #else
+
   void SendToConsole(const char *fmt, ...);
+
 #endif
-  void CallSchedulerSleep();
 
 private:
 #ifndef __AVR_ATmega2560__
+
   void SerialPrintF();
+
 #else
+
   void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
+
 #endif
 };
+
 extern SerialPrint PRINTF;
+
 #ifdef __AVR_ATmega2560__
-#define DEBUG(fmt, args...)                       \
-  do                                              \
-  {                                               \
-    PRINTF.SendToConsole(PSTR(fmt "\n"), ##args); \
-    PRINTF.CallSchedulerSleep();                  \
-  } while (0)
-#define LOG(fmt)                                                                             \
-  do                                                                                         \
-  {                                                                                          \
-    PRINTF.SendToConsole(PSTR("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__); \
-    PRINTF.CallSchedulerSleep();                                                             \
-  } while (0)
+
+#define DEBUG(fmt, args...) PRINTF.SendToConsole(PSTR(fmt "\n"), ##args);
+#define LOG(fmt) PRINTF.SendToConsole(PSTR("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__);
+#define LINE_SPACE PRINTF.SendToConsole(PSTR("\n"));
+
 #else
-#define DEBUG(x, y) (void)(x), (void)(y)
-#define LOG(x) (void)(x)
+
+#define DEBUG(fmt, args...) PRINTF.tfp_printf((char *)fmt "\n", ##args);
+#define LOG(fmt) PRINTF.tfp_printf((char *)"LOG: Funcao:%s Linha:%d " fmt "\n", __FUNCTION__, __LINE__);
+#define LINE_SPACE PRINTF.tfp_printf((char *)"\n");
+
 #endif
+
 #endif

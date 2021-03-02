@@ -57,21 +57,6 @@ PT1_Filter_Struct Angle_Smooth_Pitch;
 PT1_Filter_Struct WindUpRollLPF;
 PT1_Filter_Struct WindUpPitchLPF;
 
-//STABILIZE PARA MULTIROTORES
-#define STAB_COPTER_PITCH_ANGLE_MAX 30 //GRAUS
-#define STAB_COPTER_ROLL_ANGLE_MAX 30  //GRAUS
-
-//SPORT PARA MULTIROTORES
-#define ATTACK_COPTER_PITCH_ANGLE_MAX 40 //GRAUS
-#define ATTACK_COPTER_ROLL_ANGLE_MAX 40  //GRAUS
-
-//STABILIZE PARA AEROS
-#define STAB_PLANE_PITCH_ANGLE_MAX 35 //GRAUS
-#define STAB_PLANE_ROLL_ANGLE_MAX 35  //GRAUS
-
-//RATE MAXIMO DE SAÍDA DO PID YAW PARA AEROS E ASA-FIXA
-#define YAW_RATE_MAX_FOR_PLANE 36 //GRAUS
-
 //SAÍDA MAXIMA DE PITCH E ROLL
 #define MAX_PID_SUM_LIMIT 500
 
@@ -232,21 +217,21 @@ float PIDXYZClass::PIDLevelRoll(float DeltaTime)
   {
     if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
     {
-      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(ATTACK_COPTER_ROLL_ANGLE_MAX));
+      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector));
     }
     else
     {
-      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(STAB_COPTER_ROLL_ANGLE_MAX));
+      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector));
     }
   }
   else
   {
-    RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(STAB_PLANE_ROLL_ANGLE_MAX));
+    RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector));
   }
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
 
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -500, 500);
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -200, 200);
 
   if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {
@@ -267,21 +252,21 @@ float PIDXYZClass::PIDLevelPitch(float DeltaTime)
   {
     if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
     {
-      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(ATTACK_COPTER_PITCH_ANGLE_MAX));
+      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector));
     }
     else
     {
-      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(STAB_COPTER_PITCH_ANGLE_MAX));
+      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector));
     }
   }
   else
   {
-    RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(STAB_PLANE_PITCH_ANGLE_MAX));
+    RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector));
   }
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
 
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -500, 500);
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -200, 200);
 
   if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {
@@ -559,9 +544,13 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
     {
       //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1000CM/S = 36KM/H
       int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_State() ? AIRSPEED.CalcedInCM : ReferenceAirSpeed;
-      //10KM/H - 216KM/H
+      //LIMITE DE 10KM/H - 216KM/H
       AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 300, 6000);
-      CoordinatedTurnRateEarthFrame = ConvetToDegrees(980.665f * Fast_Tangent(-ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL])) / AirSpeedForCoordinatedTurn);
+      float BankAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector)));
+      float FinalBankAngleTarget = Constrain_Float(BankAngleTarget, -ConvertToRadians(60), ConvertToRadians(60));
+      float PitchAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector)));
+      float TurnRatePitchAdjustmentFactor = Fast_Cosine(fabsf(PitchAngleTarget));
+      CoordinatedTurnRateEarthFrame = ConvetToDegrees(980.665f * Fast_Tangent(-FinalBankAngleTarget) / AirSpeedForCoordinatedTurn * TurnRatePitchAdjustmentFactor);
       TurnControllerRates.Yaw = CoordinatedTurnRateEarthFrame;
     }
     else

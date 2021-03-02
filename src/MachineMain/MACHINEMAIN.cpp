@@ -26,6 +26,7 @@ void MachineInit()
     SetInitialTimeToInitTheMachine(&MachineInitTimeNow);
     //INICIALIZA A SERIAL
     FASTSERIAL.Initialization();
+    PRINTF.Initialization();
     //INICIALIZA O LED RGB
     RGB.Initialization();
     //ATIVA O LED VERMELHO

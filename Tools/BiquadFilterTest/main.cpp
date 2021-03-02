@@ -15,20 +15,26 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DJINAZAGPS_H_
-#define DJINAZAGPS_H_
-#include "inttypes.h"
-//VARIAVEIS DE SAÍDA
-extern uint8_t DJINaza_Num_Sat;
-extern uint8_t DJINaza_Fix_State;
-extern uint16_t DJINaza_HDOP;
-extern int16_t DJINaza_Compass_Roll;
-extern int16_t DJINaza_Compass_Pitch;
-extern int16_t DJINaza_Compass_Yaw;
-extern int32_t DJINaza_Latitude;
-extern int32_t DJINaza_Longitude;
-extern int32_t DJINaza_Altitude;
-extern int32_t DJINaza_GroundCourse;
-extern int32_t DJINaza_GroundSpeed;
-void DjiNazaGpsNewFrame(uint8_t SerialReceiverBuffer);
-#endif
+#include "Arduino.h"
+#include "BIQUADFILTER.h"
+
+static BiquadFilter_Struct Smooth_AnalogRead;
+
+#define THIS_LOOP_FREQUENCY 1000 //FREQUENCIA DO LOOP INFINITO
+#define FILTER_CUTOFF_FREQ 20    //20HZ
+
+void setup()
+{
+    Serial.begin(115200);
+    BIQUADFILTER.Settings(&Smooth_AnalogRead, FILTER_CUTOFF_FREQ, 0, BIQUAD_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHZ"), LPF);
+}
+
+void loop()
+{
+    int16_t GetAnalogReadValue = analogRead(0); //PINO ANALOGICO A0
+    Serial.print("RealAnalog:");
+    Serial.print(GetAnalogReadValue);
+    Serial.print(" AnalogFiltered:");
+    Serial.println(BIQUADFILTER.FilterApplyAndGet(&Smooth_AnalogRead, GetAnalogReadValue));
+    delay(1); //1KHZ LOOP
+}

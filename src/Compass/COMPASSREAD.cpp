@@ -27,6 +27,7 @@
 #include "COMPASSLPF.h"
 #include "Common/ENUM.h"
 #include "Common/STRUCTS.h"
+#include "WHOAMI.h"
 
 CompassReadClass COMPASS;
 
@@ -39,6 +40,8 @@ void CompassReadClass::Initialization()
   {
     return;
   }
+
+  Check_Whoami();
 
   if (COMPASS.Type == COMPASS_AK8975)
   {

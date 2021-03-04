@@ -16,17 +16,6 @@
 */
 
 #include "TASKSYSTEM.h"
-#include "TASKS.h"
-#include "Scheduler/SCHEDULERTIME.h"
-#include "Scheduler/SCHEDULER.h"
-#include "Math/MATHSUPPORT.h"
-#include "Build/BOARDDEFS.h"
-#include "Build/GCC.h"
-
-FILE_COMPILE_FOR_SPEED
-
-#define ACTIVE_THIS_TASK true
-#define DESACTIVE_THIS_TASK false
 
 static Task_Resources_Struct *TaskQueueArray[TASK_COUNT + 1];
 static Task_Resources_Struct *CurrentTask = NULL;
@@ -39,7 +28,7 @@ uint16_t SystemLoadPercent = 0;
 static uint32_t TotalWaitingTasks;
 static uint32_t WaitingTasksSamples;
 
-static void TaskQueueClear(void)
+void TaskQueueClear(void)
 {
   memset(TaskQueueArray, 0, sizeof(TaskQueueArray));
   TaskQueuePosition = 0;
@@ -58,7 +47,7 @@ static bool TaskQueueContains(Task_Resources_Struct *TaskPointer)
   return false;
 }
 
-static bool TaskQueueAdd(Task_Resources_Struct *TaskPointer)
+bool TaskQueueAdd(Task_Resources_Struct *TaskPointer)
 {
   if ((TaskQueueSize >= TASK_COUNT) || TaskQueueContains(TaskPointer))
   {
@@ -115,24 +104,9 @@ void SetTaskEnabled(Tasks_ID_Enum TaskID, bool Enabled)
   }
 }
 
-void TaskSystemInitialization(void)
-{
-  TaskQueueClear();
-  TaskQueueAdd(&Task_Resources[TASK_SLOW_LOOP]);
-  SetTaskEnabled(TASK_SLOW_LOOP, ACTIVE_THIS_TASK);
-  SetTaskEnabled(TASK_MEDIUM_LOOP, ACTIVE_THIS_TASK);
-#ifndef __AVR_ATmega2560__
-  SetTaskEnabled(TASK_FAST_MEDIUM_LOOP, ACTIVE_THIS_TASK);
-  SetTaskEnabled(TASK_FAST_LOOP, ACTIVE_THIS_TASK);
-  SetTaskEnabled(TASK_SUPER_FAST_LOOP, ACTIVE_THIS_TASK);
-#endif
-  SetTaskEnabled(TASK_INTEGRAL_LOOP, ACTIVE_THIS_TASK);
-  SetTaskEnabled(TASK_SYSTEM_LOAD, ACTIVE_THIS_TASK);
-}
-
 void TaskSystemRun(void)
 {
-  const uint32_t ActualCurrentTime = SCHEDULERTIME.GetMicros();
+  const uint32_t ActualCurrentTime = micros();
   uint32_t TimeToNextRealTimeTask = 0xffffffffUL;
   for (const Task_Resources_Struct *TaskPointer = QueueFirst(); TaskPointer != NULL && TaskPointer->StaticPriority >= TASK_PRIORITY_REALTIME; TaskPointer = TaskQueueNext())
   {
@@ -144,7 +118,7 @@ void TaskSystemRun(void)
     else
     {
       const uint32_t NewTimeInterval = NextExecuteTask - ActualCurrentTime;
-      TimeToNextRealTimeTask = MIN(TimeToNextRealTimeTask, NewTimeInterval);
+      TimeToNextRealTimeTask = min(TimeToNextRealTimeTask, NewTimeInterval);
     }
   }
   const bool OutsideRealtimeGuardInterval = (TimeToNextRealTimeTask > 0);
@@ -187,10 +161,12 @@ void SystemLoad()
 {
   if (WaitingTasksSamples > 0)
   {
-    SystemLoadPercent = Constrain_16Bits(100 * TotalWaitingTasks / WaitingTasksSamples, 0, 100);
+    SystemLoadPercent = 100 * TotalWaitingTasks / WaitingTasksSamples;
     WaitingTasksSamples = 0;
     TotalWaitingTasks = 0;
   }
+  Serial.print("Carga Da CPU:");
+  Serial.println(SystemLoadPercent);
 }
 
 uint32_t GetTaskDeltaTime(Tasks_ID_Enum TaskId)

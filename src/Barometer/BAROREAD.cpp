@@ -31,8 +31,8 @@ int16_t BaroTemperatureRaw;
 int32_t BaroPressureRaw;
 int32_t BaroPressureFiltered;
 
-AverageFilterInt32_Size5 Pressure_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A PRESSÃO BARO,TAMANHO = 5 ITERAÇÕES
-AverageFilterInt32_Size5 Altitude_Filter; //ISTANCIA DO FILTRO AVERAGE PARA A ALTITUDE,TAMANHO = 5 ITERAÇÕES
+AverageFilterInt32_Size5 Pressure_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A PRESSÃO BARO,TAMANHO = 5 ITERAÇÕES
+AverageFilterInt32_Size5 Altitude_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A ALTITUDE,TAMANHO = 5 ITERAÇÕES
 
 void RecalculateBaroTotalPressure()
 {

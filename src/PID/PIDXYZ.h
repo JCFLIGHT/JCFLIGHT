@@ -40,6 +40,8 @@ private:
   float ApplyIntegralTermRelaxRoll(float CurrentPIDSetpoint, float IntegralTermErrorRate);
   float ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float IntegralTermErrorRate);
   float ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral);
+  float ApplyDerivativeBoostRoll(int16_t ActualGyro, int16_t PrevGyro, int16_t ActualRateTagert, int16_t PrevRateTagert, float DeltaTime);
+  float ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyro, int16_t ActualRateTagert, int16_t PrevRateTagert, float DeltaTime);
   float PIDLevelRoll(float DeltaTime);
   float PIDLevelPitch(float DeltaTime);
   void PIDApplyMulticopterRateControllerRoll(float DeltaTime);

@@ -51,11 +51,18 @@ static BiquadFilter_Struct Derivative_Pitch_Smooth;
 static BiquadFilter_Struct ControlDerivative_Roll_Smooth;
 static BiquadFilter_Struct ControlDerivative_Pitch_Smooth;
 static BiquadFilter_Struct ControlDerivative_Yaw_Smooth;
+static BiquadFilter_Struct DerivativeBoost_Roll_Smooth;
+static BiquadFilter_Struct DerivativeBoost_Pitch_Smooth;
 
 PT1_Filter_Struct Angle_Smooth_Roll;
 PT1_Filter_Struct Angle_Smooth_Pitch;
 PT1_Filter_Struct WindUpRollLPF;
 PT1_Filter_Struct WindUpPitchLPF;
+PT1_Filter_Struct DerivativeBoost_Roll_LPF;
+PT1_Filter_Struct DerivativeBoost_Pitch_LPF;
+
+//MIGRAR ESSES PARAMETROS PARA A LISTA COMPLETA DE PARAMETROS
+/////////////////////////////////////////////////////////////////
 
 //SAÍDA MAXIMA DE PITCH E ROLL
 #define MAX_PID_SUM_LIMIT 500
@@ -69,12 +76,19 @@ PT1_Filter_Struct WindUpPitchLPF;
 //FREQUENCIA DE CORTE DO RELAXAMENTO DO TERMO INTEGRAL
 #define INTEGRAL_TERM_RELAX 15
 
-//MIGRAR ESSES PARAMETROS PARA A LISTA COMPLETA DE PARAMETROS
-/////////////////////////////////////////////////////////////////
+//FREQUENCIA DE CORTE DO GYRO APLICADO AO DERIVATIVE BOOST
+#define DERIVATIVE_BOOST_GYRO_LPF_HZ 80
+
+//FREQUENCIA DE CORTE DA ACELERAÇÃO CALCULADA PELO DERIVATIVE BOOST
+#define DERIVATIVE_BOOST_LPF_HZ 10
+
 uint8_t IntegralTermWindUpPercent = 50;                 //AJUSTAVEL PELO USUARIO
 int16_t ReferenceAirSpeed = 1000;                       //VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 int16_t FixedWingIntegralTermThrowLimit = 165;          //AJUSTAVEL PELO USUARIO
 float FixedWingIntegralTermLimitOnStickPosition = 0.5f; //AJUSTAVEL PELO USUARIO
+float DerivativeBoostFactor = 1.25f;                    //AJUSTAVEL PELO USUARIO
+float DerivativeBoostMaxAceleration = 7500.0f;          //AJUSTAVEL PELO USUARIO
+
 ///////////////////////////////////////////////////////////////
 
 float MotorIntegralTermWindUpPoint;
@@ -91,6 +105,8 @@ void PIDXYZClass::Initialization()
   BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&DerivativeBoost_Roll_Smooth, DERIVATIVE_BOOST_GYRO_LPF_HZ, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&DerivativeBoost_Pitch_Smooth, DERIVATIVE_BOOST_GYRO_LPF_HZ, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   PT1FilterInit(&WindUpRollLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
   PT1FilterInit(&WindUpPitchLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
   MotorIntegralTermWindUpPoint = 1.0f - (IntegralTermWindUpPercent / 100.0f);
@@ -209,6 +225,42 @@ float PIDXYZClass::ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegr
   return ErrorGyroIntegral;
 }
 
+float PIDXYZClass::ApplyDerivativeBoostRoll(int16_t ActualGyro, int16_t PrevGyro, int16_t ActualRateTagert, int16_t PrevRateTagert, float DeltaTime)
+{
+  float DerivativeBoost = 1.0f;
+
+  if (DerivativeBoostFactor > 1)
+  {
+    const float DerivativeBoostGyroDelta = (ActualGyro - PrevGyro) / DeltaTime;
+    const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.FilterApplyAndGet(&DerivativeBoost_Roll_Smooth, DerivativeBoostGyroDelta));
+    const float DerivativeBoostRateAcceleration = fabsf((ActualRateTagert - PrevRateTagert) / DeltaTime);
+    const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
+    DerivativeBoost = Map_Float(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
+    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Roll_LPF, DerivativeBoost, DERIVATIVE_BOOST_LPF_HZ, DeltaTime);
+    DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
+  }
+
+  return DerivativeBoost;
+}
+
+float PIDXYZClass::ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyro, int16_t ActualRateTagert, int16_t PrevRateTagert, float DeltaTime)
+{
+  float DerivativeBoost = 1.0f;
+
+  if (DerivativeBoostFactor > 1)
+  {
+    const float DerivativeBoostGyroDelta = (ActualGyro - PrevGyro) / DeltaTime;
+    const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.FilterApplyAndGet(&DerivativeBoost_Pitch_Smooth, DerivativeBoostGyroDelta));
+    const float DerivativeBoostRateAcceleration = fabsf((ActualRateTagert - PrevRateTagert) / DeltaTime);
+    const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
+    DerivativeBoost = Map_Float(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
+    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Pitch_LPF, DerivativeBoost, DERIVATIVE_BOOST_LPF_HZ, DeltaTime);
+    DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
+  }
+
+  return DerivativeBoost;
+}
+
 float PIDXYZClass::PIDLevelRoll(float DeltaTime)
 {
   float RcControllerAngle = 0;
@@ -307,7 +359,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
 
   GyroDifference = PIDXYZ.DerivativeTermProcessRoll(GyroDifference);
 
-  NewDerivativeTerm = GyroDifference * ((GET_SET[PID_ROLL].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * 1;
+  NewDerivativeTerm = GyroDifference * ((GET_SET[PID_ROLL].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostRoll(IMU.GyroscopeRead[ROLL], PIDXYZ.CalcedRateTargetRoll, PreviousRateTarget, PreviousRateGyro, DeltaTime);
 
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[ROLL] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
@@ -364,7 +416,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
 
   GyroDifference = PIDXYZ.DerivativeTermProcessPitch(GyroDifference);
 
-  NewDerivativeTerm = GyroDifference * ((GET_SET[PID_PITCH].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * 1;
+  NewDerivativeTerm = GyroDifference * ((GET_SET[PID_PITCH].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostPitch(IMU.GyroscopeRead[PITCH], PreviousRateGyro, PIDXYZ.CalcedRateTargetPitch, PreviousRateTarget, DeltaTime);
 
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[PITCH] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);

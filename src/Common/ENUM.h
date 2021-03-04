@@ -229,7 +229,8 @@ enum Compass_Type_Enum
     COMPASS_AK8975 = 0,
     COMPASS_HMC5843,
     COMPASS_HMC5883,
-    COMPASS_QMC5883
+    COMPASS_QMC5883,
+    COMPASS_DJI_NAZA
 };
 
 enum Compass_Rotation_Enum

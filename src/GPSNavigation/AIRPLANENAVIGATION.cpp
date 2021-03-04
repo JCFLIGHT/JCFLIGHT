@@ -25,7 +25,7 @@
 #include "I2C/I2C.h"
 #include "RadioControl/DECODE.h"
 #include "FailSafe/FAILSAFE.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "GPS/GPSORIENTATION.h"
 #include "PID/RCPID.h"
 

@@ -343,7 +343,7 @@ float Fast_Logarithm(float InputValue)
     return x * (3.529304993f + x * (-2.461222105f + x * (1.130626167f + x * (-0.288739945f + x * 3.110401639e-2f)))) + (addcst + 0.69314718055995f * exp);
 }
 
-float Fast_Pow(float ValueA, float ValueB)
+float Fast_Pow(float ValueA, float ValueB) //X^Y
 {
     return Fast_Exponential(ValueB * Fast_Logarithm(ValueA));
 }

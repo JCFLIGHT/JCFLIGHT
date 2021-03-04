@@ -29,7 +29,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "GPS/GPSSTATES.h"
 #include "Yaw/HEADINGHOLD.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "FlightModes/FLIGHTMODES.h"
 
 #define NAVTILTCOMPENSATION 20 //RETIRADO DA ARDUPILOT
@@ -64,7 +64,6 @@ static int16_t Navigation_Bearing_RTH;
 
 uint16_t DistanceToHome;
 
-int32_t GPS_Coordinates_Vector[2];
 int32_t Stored_Coordinates_Home_Point[2];
 int32_t GPS_CoordinatesToHold[2];
 int32_t Two_Points_Distance;

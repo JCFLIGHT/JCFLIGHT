@@ -15,26 +15,11 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "GPSSERIALREAD.h"
-#include "FastSerial/FASTSERIAL.h"
-#include "GPSNavigation/NAVIGATION.h"
-#include "GPS/GPSUBLOX.h"
-#include "Common/ENUM.h"
-
-void GPS_Serial_Read()
-{
-    uint8_t SerialAvailableGPS;
-    uint8_t SerialReadGPS;
-    uint8_t CheckGPSTXBuffer;
-    SerialAvailableGPS = FASTSERIAL.Available(UART_NUMB_1);
-    while (SerialAvailableGPS--)
-    {
-        CheckGPSTXBuffer = FASTSERIAL.UsedTXBuffer(UART_NUMB_1);
-        if (CheckGPSTXBuffer > 78)
-        {
-            return;
-        }
-        SerialReadGPS = FASTSERIAL.Read(UART_NUMB_1);
-        GPS_SerialRead(SerialReadGPS);
-    }
-}
+#ifndef DJINAZAGPS_H_
+#define DJINAZAGPS_H_
+#include "inttypes.h"
+extern int16_t DJINaza_Compass_Roll;
+extern int16_t DJINaza_Compass_Pitch;
+extern int16_t DJINaza_Compass_Yaw;
+void DjiNazaGpsNewFrame(uint8_t SerialReceiverBuffer);
+#endif

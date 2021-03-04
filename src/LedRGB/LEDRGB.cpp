@@ -21,7 +21,7 @@
 #include "Build/BOARDDEFS.h"
 #include "GPS/GPSSTATES.h"
 #include "Compass/COMPASSREAD.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "IMU/IMUCALIBRATE.h"
 

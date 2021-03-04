@@ -20,6 +20,7 @@
 #include "I2C/I2C.h"
 #include "Common/STRUCTS.h"
 #include "Common/ENUM.h"
+#include "GPS/DJINAZAGPS.h"
 
 ClassCompassOrientation COMPASSORIENTATION;
 
@@ -59,6 +60,13 @@ void ClassCompassOrientation::SetOrientation(uint8_t _CompassType)
         IMU.CompassRead[ROLL] = (BufferData[1] << 8) | BufferData[0];
         IMU.CompassRead[PITCH] = (BufferData[3] << 8) | BufferData[2];
         IMU.CompassRead[YAW] = (BufferData[5] << 8) | BufferData[4];
+        break;
+
+    case COMPASS_DJI_NAZA:
+        //ORIENTAÇÃO PARA O COMPASS DO GPS DA NAZA
+        IMU.CompassRead[ROLL] = DJINaza_Compass_Roll;
+        IMU.CompassRead[PITCH] = DJINaza_Compass_Pitch;
+        IMU.CompassRead[YAW] = DJINaza_Compass_Yaw;
         break;
     }
 }

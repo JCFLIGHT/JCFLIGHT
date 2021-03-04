@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "GPSREAD.h"
+#include "GPSUBLOX.h"
 #include "FastSerial/FASTSERIAL.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
@@ -23,6 +23,11 @@
 #include "ProgMem/PROGMEM.h"
 #include "Common/ENUM.h"
 #include "GPS/GPSSTATES.h"
+#include "DJINAZAGPS.h"
+
+#ifndef __AVR_ATmega2560__ //NÃO USE O GPS DA NAZA NA JCFLIGHT-CLASSIC
+#define USE_NAZA_GPS
+#endif
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464
@@ -100,6 +105,8 @@ uint16_t GPS_Ground_Course;
 uint16_t GPS_Altitude;
 uint16_t GPS_Ground_Speed;
 uint16_t GPS_HDOP;
+
+int32_t GPS_Coordinates_Vector[2];
 
 #ifdef __AVR_ATmega2560__
 const uint8_t Ublox_Set_Configuration[] __attribute__((__progmem__)) = {
@@ -360,6 +367,12 @@ void GPS_SerialRead(uint8_t ReadData)
       }
       UBLOX_GetAllGPSData();
     }
+  }
+  else if (Get_GPS_Type(GPS_DJI))
+  {
+#ifdef USE_NAZA_GPS
+    DjiNazaGpsNewFrame(ReadData);
+#endif
   }
 }
 

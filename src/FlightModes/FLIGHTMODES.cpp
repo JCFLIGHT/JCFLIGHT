@@ -27,7 +27,7 @@
 #include "GPS/GPSSTATES.h"
 #include "FailSafe/FAILSAFE.h"
 #include "Yaw/HEADINGHOLD.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
 #include "Common/STRUCTS.h"

@@ -27,6 +27,7 @@
 #include "COMPASSLPF.h"
 #include "Common/ENUM.h"
 #include "Common/STRUCTS.h"
+#include "GPS/GPSSTATES.h"
 #include "WHOAMI.h"
 
 CompassReadClass COMPASS;
@@ -150,26 +151,33 @@ void CompassReadClass::InitialReadBufferData()
 
 void CompassReadClass::ReadBufferData()
 {
-  if (COMPASS.Type == COMPASS_AK8975)
+  if (Get_GPS_Type(GPS_UBLOX))
   {
-    I2C.SensorsRead(ADDRESS_COMPASS_AK8975, 0x03);
-    I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
+    if (COMPASS.Type == COMPASS_AK8975)
+    {
+      I2C.SensorsRead(ADDRESS_COMPASS_AK8975, 0x03);
+      I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
+    }
+    else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
+    {
+      I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x49);
+    }
+    else if (COMPASS.Type == COMPASS_QMC5883)
+    {
+      I2C.SensorsRead(COMPASS.Address, COMPASS.Register);
+    }
+    COMPASSORIENTATION.SetOrientation(COMPASS.Type);
   }
-  else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
+  else if (Get_GPS_Type(GPS_DJI))
   {
-    I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x49);
+    COMPASSORIENTATION.SetOrientation(COMPASS_DJI_NAZA);
   }
-  else if (COMPASS.Type == COMPASS_QMC5883)
-  {
-    I2C.SensorsRead(COMPASS.Address, COMPASS.Register);
-  }
-  COMPASSORIENTATION.SetOrientation(COMPASS.Type);
 }
 
 void CompassReadClass::Constant_Read()
 {
   //SAIA DA FUNÇÃO SE NÃO FOR ENCONTRADO NENHUM COMPASS NO BARRAMENTO I2C
-  if (!I2C.CompassFound)
+  if (!I2C.CompassFound && Get_GPS_Type(GPS_UBLOX))
   {
     return;
   }
@@ -178,7 +186,10 @@ void CompassReadClass::Constant_Read()
   COMPASS.ReadBufferData();
 
   //APLICA OS AJUSTES DE BIAS CALCULADOS
-  COMPASSCAL.ApplyGain();
+  if (Get_GPS_Type(GPS_UBLOX))
+  {
+    COMPASSCAL.ApplyGain();
+  }
 
   //APLICA O LPF PARA REDUZIR SPIKES DURANTE A CALIBRAÇÃO
   COMPASSLPF.ApplyFilter();

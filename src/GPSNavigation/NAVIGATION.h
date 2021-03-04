@@ -27,7 +27,6 @@ extern uint8_t RTH_Altitude;
 extern int16_t GPSActualSpeed[2];
 extern int16_t GPS_Navigation_Array[2];
 extern uint16_t DistanceToHome;
-extern int32_t GPS_Coordinates_Vector[2];
 extern int32_t Stored_Coordinates_Home_Point[2];
 extern int32_t GPS_CoordinatesToHold[2];
 extern int32_t Two_Points_Distance;

@@ -17,7 +17,7 @@
 
 #include "ESP32SERIAL.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "BAR/BAR.h"
 #include "Common/ENUM.h"
 

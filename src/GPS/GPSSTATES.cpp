@@ -17,7 +17,7 @@
 
 #include "GPSSTATES.h"
 #include "GPSNavigation/NAVIGATION.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "BitArray/BITARRAY.h"
 #include "Common/ENUM.h"
 #include "StorageManager/EEPROMSTORAGE.h"

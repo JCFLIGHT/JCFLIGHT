@@ -26,7 +26,7 @@
 #include "QUATERNION.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "GPS/GPSSTATES.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

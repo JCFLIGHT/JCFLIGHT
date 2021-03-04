@@ -47,7 +47,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Compass/COMPASSREAD.h"
 #include "FailSafe/FAILSAFE.h"
-#include "GPS/GPSREAD.h"
+#include "GPS/GPSUBLOX.h"
 #include "PID/RCPID.h"
 #include "IMU/IMUCALIBRATE.h"
 

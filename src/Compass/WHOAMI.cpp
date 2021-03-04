@@ -36,9 +36,9 @@ bool Check_Whoami()
 #ifdef PRINTLN_WHOAMI
 
     //TABELA ASCII:
-    //H =
-    //4 =
-    //3 =
+    //H = 72 - 0x48
+    //4 = 4 - 0x04
+    //3 = 3 - 0x03
     DEBUG("BufferData[0]:%d BufferData[1]:%d BufferData[2]:%d",
           BufferData[0],
           BufferData[1],

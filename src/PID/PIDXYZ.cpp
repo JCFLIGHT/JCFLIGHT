@@ -51,15 +51,19 @@ static BiquadFilter_Struct Derivative_Pitch_Smooth;
 static BiquadFilter_Struct ControlDerivative_Roll_Smooth;
 static BiquadFilter_Struct ControlDerivative_Pitch_Smooth;
 static BiquadFilter_Struct ControlDerivative_Yaw_Smooth;
+#ifdef USE_DERIVATIVE_BOOST_PID
 static BiquadFilter_Struct DerivativeBoost_Roll_Smooth;
 static BiquadFilter_Struct DerivativeBoost_Pitch_Smooth;
+#endif
 
 PT1_Filter_Struct Angle_Smooth_Roll;
 PT1_Filter_Struct Angle_Smooth_Pitch;
 PT1_Filter_Struct WindUpRollLPF;
 PT1_Filter_Struct WindUpPitchLPF;
+#ifdef USE_DERIVATIVE_BOOST_PID
 PT1_Filter_Struct DerivativeBoost_Roll_LPF;
 PT1_Filter_Struct DerivativeBoost_Pitch_LPF;
+#endif
 
 //MIGRAR ESSES PARAMETROS PARA A LISTA COMPLETA DE PARAMETROS
 /////////////////////////////////////////////////////////////////
@@ -74,16 +78,16 @@ PT1_Filter_Struct DerivativeBoost_Pitch_LPF;
 #define CONTROL_DERIVATIVE_CUTOFF 30 //Hz
 
 //FREQUENCIA DE CORTE DO RELAXAMENTO DO TERMO INTEGRAL
-#define INTEGRAL_TERM_RELAX 15
+#define INTEGRAL_TERM_RELAX 15 //Hz
 
 //FREQUENCIA DE CORTE DO GYRO APLICADO AO DERIVATIVE BOOST
-#define DERIVATIVE_BOOST_GYRO_LPF_HZ 80
+#define DERIVATIVE_BOOST_GYRO_LPF_HZ 80 //Hz
 
 //FREQUENCIA DE CORTE DA ACELERAÇÃO CALCULADA PELO DERIVATIVE BOOST
-#define DERIVATIVE_BOOST_LPF_HZ 10
+#define DERIVATIVE_BOOST_LPF_HZ 10 //Hz
 
 uint8_t IntegralTermWindUpPercent = 50;                 //AJUSTAVEL PELO USUARIO
-int16_t ReferenceAirSpeed = 1000;                       //VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
+int16_t ReferenceAirSpeed = 1000;                       //AJUSTAVEL PELO USUARIO - VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 int16_t FixedWingIntegralTermThrowLimit = 165;          //AJUSTAVEL PELO USUARIO
 float FixedWingIntegralTermLimitOnStickPosition = 0.5f; //AJUSTAVEL PELO USUARIO
 float DerivativeBoostFactor = 1.25f;                    //AJUSTAVEL PELO USUARIO
@@ -105,8 +109,10 @@ void PIDXYZClass::Initialization()
   BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+#ifdef USE_DERIVATIVE_BOOST_PID
   BIQUADFILTER.Settings(&DerivativeBoost_Roll_Smooth, DERIVATIVE_BOOST_GYRO_LPF_HZ, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&DerivativeBoost_Pitch_Smooth, DERIVATIVE_BOOST_GYRO_LPF_HZ, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+#endif
   PT1FilterInit(&WindUpRollLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
   PT1FilterInit(&WindUpPitchLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
   MotorIntegralTermWindUpPoint = 1.0f - (IntegralTermWindUpPercent / 100.0f);
@@ -229,6 +235,8 @@ float PIDXYZClass::ApplyDerivativeBoostRoll(int16_t ActualGyro, int16_t PrevGyro
 {
   float DerivativeBoost = 1.0f;
 
+#ifdef USE_DERIVATIVE_BOOST_PID
+
   if (DerivativeBoostFactor > 1)
   {
     const float DerivativeBoostGyroDelta = (ActualGyro - PrevGyro) / DeltaTime;
@@ -240,12 +248,16 @@ float PIDXYZClass::ApplyDerivativeBoostRoll(int16_t ActualGyro, int16_t PrevGyro
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
 
+#endif
+
   return DerivativeBoost;
 }
 
 float PIDXYZClass::ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyro, int16_t ActualRateTagert, int16_t PrevRateTagert, float DeltaTime)
 {
   float DerivativeBoost = 1.0f;
+
+#ifdef USE_DERIVATIVE_BOOST_PID
 
   if (DerivativeBoostFactor > 1)
   {
@@ -257,6 +269,8 @@ float PIDXYZClass::ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyr
     DerivativeBoost = PT1FilterApply(&DerivativeBoost_Pitch_LPF, DerivativeBoost, DERIVATIVE_BOOST_LPF_HZ, DeltaTime);
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
+
+#endif
 
   return DerivativeBoost;
 }

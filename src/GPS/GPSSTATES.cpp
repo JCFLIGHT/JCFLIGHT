@@ -66,7 +66,7 @@ bool Get_GPS_Type(uint8_t GPS_Type)
     {
         return true;
     }
-    else if (Get_GPS_Type == GPS_DJI && GPS_Type == GPS_DJI)
+    else if (Get_GPS_Type == GPS_DJI_NAZA && GPS_Type == GPS_DJI_NAZA)
     {
         return true;
     }

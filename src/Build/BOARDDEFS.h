@@ -17,6 +17,6 @@
 
 #pragma once
 #include "Common/ENUM.h"
-#include "Targets/CLASSIC.h"
 #include "Targets/PASCAL.h"
 #include "Targets/EXTREME.h"
+#include "Targets/CLASSIC.h"

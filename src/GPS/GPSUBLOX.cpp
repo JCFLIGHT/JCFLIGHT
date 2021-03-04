@@ -24,10 +24,7 @@
 #include "Common/ENUM.h"
 #include "GPS/GPSSTATES.h"
 #include "DJINAZAGPS.h"
-
-#ifndef __AVR_ATmega2560__ //NÃO USE O GPS DA NAZA NA JCFLIGHT-CLASSIC
-#define USE_NAZA_GPS
-#endif
+#include "build/BOARDDEFS.h"
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464
@@ -368,7 +365,7 @@ void GPS_SerialRead(uint8_t ReadData)
       UBLOX_GetAllGPSData();
     }
   }
-  else if (Get_GPS_Type(GPS_DJI))
+  else if (Get_GPS_Type(GPS_DJI_NAZA))
   {
 #ifdef USE_NAZA_GPS
     DjiNazaGpsNewFrame(ReadData);

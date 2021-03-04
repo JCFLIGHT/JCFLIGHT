@@ -168,7 +168,7 @@ void CompassReadClass::ReadBufferData()
     }
     COMPASSORIENTATION.SetOrientation(COMPASS.Type);
   }
-  else if (Get_GPS_Type(GPS_DJI))
+  else if (Get_GPS_Type(GPS_DJI_NAZA))
   {
     COMPASSORIENTATION.SetOrientation(COMPASS_DJI_NAZA);
   }

@@ -543,7 +543,7 @@ enum Throttle_Status_Enum
 enum GPS_Type_Enum
 {
     GPS_UBLOX = 0,
-    GPS_DJI
+    GPS_DJI_NAZA
 };
 
 #endif

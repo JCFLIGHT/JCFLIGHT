@@ -233,7 +233,7 @@ void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
 
 bool AutoLaunchClass::GetStateOfThrottle()
 {
-  return (RCController[THROTTLE] >= 1400) && AutoLaunchState;
+  return (DECODE.GetRxChannelOutput(THROTTLE) >= 1400) && AutoLaunchState;
 }
 
 bool AutoLaunchClass::GetValidStateToRunLaunch()

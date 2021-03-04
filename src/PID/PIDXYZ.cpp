@@ -261,7 +261,7 @@ float PIDXYZClass::PIDLevelPitch(float DeltaTime)
   }
   else
   {
-    RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector));
+    RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValueVector));
   }
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
@@ -434,6 +434,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_YAW_PID_SUM_LIMIT, +MAX_YAW_PID_SUM_LIMIT);
 
   //float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelaxYaw(PIDXYZ.CalcedRateTargetYaw, RateError);
+
   float IntegralTermErrorRate = RateError;
 
   if ((GET_SET[PID_YAW].ProportionalVector != 0) && (GET_SET[PID_YAW].IntegralVector != 0))

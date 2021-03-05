@@ -14,11 +14,9 @@
 #   < https://docs.platformio.org/page/userguide/cmd_ci.html >
 #
 
-os:
-  - windows
-
-language: cpp
-compiler: gcc
+language: python
+python:
+    - "3.7"
 
 sudo: false
 
@@ -31,6 +29,7 @@ env:
 
 install:
   - pip install -U platformio
+  - pio update
 
 script:
   - platformio run

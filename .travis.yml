@@ -14,11 +14,10 @@
 #   < https://docs.platformio.org/page/userguide/cmd_ci.html >
 #
 
-language: python
-python:
-  - "3.6"
+language: cpp
 
 sudo: false
+
 cache:
   directories:
     - "~/.platformio"

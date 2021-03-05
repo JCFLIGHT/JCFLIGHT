@@ -47,7 +47,7 @@ float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE
 void BATT::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  BATTERY.Voltage = Voltage_Filter.Apply(BATTERY.Voltage * 0.92f + (float)(ANALOGDIGITALCONVERTER.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
+  BATTERY.Voltage = Voltage_Filter.Apply(BATTERY.Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
   //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
   if (BATTERY.Voltage > 6)
   {
@@ -232,7 +232,7 @@ uint8_t BATT::GetPercentage()
 void BATT::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  BATTERY.Total_Current = Current_Filter.Apply(((ANALOGDIGITALCONVERTER.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
+  BATTERY.Total_Current = Current_Filter.Apply(((ANALOGSOURCE.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
   BATTERY.Total_Current = MAX(0, BATTERY.Total_Current);
 }
 

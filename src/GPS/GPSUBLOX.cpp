@@ -24,7 +24,7 @@
 #include "Common/ENUM.h"
 #include "GPS/GPSSTATES.h"
 #include "DJINAZAGPS.h"
-#include "build/BOARDDEFS.h"
+#include "Build/BOARDDEFS.h"
 
 //COM OS GPS-M8N É POSSIVEL ATIGIR MAIS DE 30 SATELITES
 #define UBLOX_BUFFER_SIZE 464

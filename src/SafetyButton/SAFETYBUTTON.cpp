@@ -54,7 +54,7 @@ bool SAFETYBUTTONCLASS::GetButtonInterval()
 
 bool SAFETYBUTTONCLASS::GetButtonState()
 {
-    return (ANALOGDIGITALCONVERTER.Read(SAFETY_BUTTON_PIN_READ_STATE) > 0x200 ? false : true);
+    return (ANALOGSOURCE.Read(SAFETY_BUTTON_PIN_READ_STATE) > 0x200 ? false : true);
 }
 
 void SAFETYBUTTONCLASS::FlashButton()

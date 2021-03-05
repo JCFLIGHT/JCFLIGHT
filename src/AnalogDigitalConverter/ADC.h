@@ -23,5 +23,5 @@ class AnalogReadClass
 public:
   int16_t Read(uint8_t AnalogPin);
 };
-extern AnalogReadClass ANALOGDIGITALCONVERTER;
+extern AnalogReadClass ANALOGSOURCE;
 #endif

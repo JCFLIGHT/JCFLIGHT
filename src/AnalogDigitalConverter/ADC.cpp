@@ -18,7 +18,7 @@
 #include "ADC.h"
 #include "HAL/HALADC.h"
 
-AnalogReadClass ANALOGDIGITALCONVERTER;
+AnalogReadClass ANALOGSOURCE;
 
 int16_t AnalogReadClass::Read(uint8_t AnalogPin)
 {

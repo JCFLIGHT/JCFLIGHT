@@ -24,37 +24,22 @@ HALEEPROMClass HAL_EEPROM;
 
 void HALEEPROMClass::Write_8Bits(int16_t Address, uint8_t Value)
 {
-    if (HAL_EEPROM.Read_8Bits(Address) == Value)
-    {
-        return;
-    }
     EEPROM_Write_8Bits(Address, Value);
 }
 
 void HALEEPROMClass::Write_16Bits(int16_t Address, int16_t Value)
 {
-    if (HAL_EEPROM.Read_16Bits(Address) == Value)
-    {
-        return;
-    }
     EEPROM_Write_16Bits(Address, Value);
 }
 
 void HALEEPROMClass::Write_32Bits(int16_t Address, int32_t Value)
 {
-    if (HAL_EEPROM.Read_32Bits(Address) == Value)
-    {
-        return;
-    }
+
     EEPROM_Write_32Bits(Address, Value);
 }
 
 void HALEEPROMClass::Write_Float(int16_t Address, float Value)
 {
-    if (HAL_EEPROM.Read_Float(Address) == Value)
-    {
-        return;
-    }
     EEPROM_Write_Float(Address, Value);
 }
 

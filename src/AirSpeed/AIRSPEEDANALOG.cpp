@@ -32,7 +32,7 @@ float AirSpeed_Analog_Get_Calibration(void)
     static float AirSpeedAnalogReturnValue = 0;
     for (uint8_t CountSamples = 0; CountSamples < INITIAL_SAMPLES; CountSamples++)
     {
-        AirSpeedAnalogReturnValue = ANALOGDIGITALCONVERTER.Read(ADC_ANALOG_AIRSPEED);
+        AirSpeedAnalogReturnValue = ANALOGSOURCE.Read(ADC_ANALOG_AIRSPEED);
         SCHEDULERTIME.Sleep(20);
     }
     LOG("Calib do AirSpeed Analogico finalizada!");
@@ -42,5 +42,5 @@ float AirSpeed_Analog_Get_Calibration(void)
 
 float AirSpeed_Analog_Get_Actual_Value(void)
 {
-    return ANALOGDIGITALCONVERTER.Read(ADC_ANALOG_AIRSPEED);
+    return ANALOGSOURCE.Read(ADC_ANALOG_AIRSPEED);
 }

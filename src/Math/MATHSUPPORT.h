@@ -40,7 +40,7 @@ int16_t ScaleRange16Bits(int16_t Value, int16_t MinInputValue, int16_t MaxInputV
 int32_t ScaleRange32Bits(int32_t Value, int32_t MinInputValue, int32_t MaxInputValue, int32_t MinOutputValue, int32_t MaxOutputValue);
 float SquareFloat(float InputValue);
 int32_t Square32Bits(int32_t InputValue);
-float ConvetToDegrees(float InputValue);
+float ConvertToDegrees(float InputValue);
 float ConvertToRadians(float InputValue);
 float ConvertRadiansToDeciDegrees(float Inputvalue);
 float ConvertDeciDegreesToRadians(float Inputvalue);

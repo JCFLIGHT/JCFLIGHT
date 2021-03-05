@@ -81,7 +81,7 @@ int32_t Square32Bits(int32_t InputValue)
     return InputValue * InputValue;
 }
 
-float ConvetToDegrees(float InputValue)
+float ConvertToDegrees(float InputValue)
 {
     return InputValue * 57.2957795131f;
 }

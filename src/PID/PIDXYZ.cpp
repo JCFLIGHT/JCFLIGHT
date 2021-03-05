@@ -617,7 +617,7 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
       float FinalBankAngleTarget = Constrain_Float(BankAngleTarget, -ConvertToRadians(60), ConvertToRadians(60));
       float PitchAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector)));
       float TurnRatePitchAdjustmentFactor = Fast_Cosine(fabsf(PitchAngleTarget));
-      CoordinatedTurnRateEarthFrame = ConvetToDegrees(980.665f * Fast_Tangent(-FinalBankAngleTarget) / AirSpeedForCoordinatedTurn * TurnRatePitchAdjustmentFactor);
+      CoordinatedTurnRateEarthFrame = ConvertToDegrees(980.665f * Fast_Tangent(-FinalBankAngleTarget) / AirSpeedForCoordinatedTurn * TurnRatePitchAdjustmentFactor);
       TurnControllerRates.Yaw = CoordinatedTurnRateEarthFrame;
     }
     else

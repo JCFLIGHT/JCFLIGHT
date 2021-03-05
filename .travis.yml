@@ -14,7 +14,11 @@
 #   < https://docs.platformio.org/page/userguide/cmd_ci.html >
 #
 
+os:
+  - windows
+
 language: cpp
+compiler: clang
 
 sudo: false
 

@@ -97,42 +97,42 @@ void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
 #ifdef ESP32
   if (Pin == GPIO_NUM_25)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(12, Pulse);
   }
   else if (Pin == GPIO_NUM_26)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(1, Pulse);
   }
   else if (Pin == GPIO_NUM_27)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(2, Pulse);
   }
   else if (Pin == GPIO_NUM_14)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(3, Pulse);
   }
   else if (Pin == GPIO_NUM_12)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(4, Pulse);
   }
   else if (Pin == GPIO_NUM_13)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(5, Pulse);
   }
   else if (Pin == GPIO_NUM_23)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(6, Pulse);
   }
   else if (Pin == GPIO_NUM_19)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(7, Pulse);
   }
   else if (Pin == GPIO_NUM_4)
@@ -149,7 +149,7 @@ void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
   }
   else if (Pin == GPIO_NUM_18)
   {
-    Pulse = Map_16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
     ledcWrite(11, Pulse);
   }
   else if (Pin == GPIO_NUM_5)

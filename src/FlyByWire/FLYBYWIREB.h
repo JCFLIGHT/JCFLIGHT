@@ -15,24 +15,6 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MATHSUPPORT_H_
-#define MATHSUPPORT_H_
-#include "Arduino.h"
-#define MIN(a, b) \
-  __extension__({ __typeof__ (a) _a = (a); \
-  __typeof__ (b) _b = (b); \
-  _a < _b ? _a : _b; })
-#define MAX(a, b) \
-  __extension__({ __typeof__ (a) _a = (a); \
-  __typeof__ (b) _b = (b); \
-  _a > _b ? _a : _b; })
-#define ABS(x) \
-  __extension__({ __typeof__ (x) _x = (x); \
-  _x > 0 ? _x : -_x; })
-float Fast_SquareRoot(float ValueInput);
-float Fast_Sine(float X);
-float Fast_Cosine(float X);
-float Fast_Atan2(float Y, float X);
-float Fast_AtanCosine(float X);
-float Fast_Tangent(float InputValue);
+#ifndef FLYBYWIREB_H_
+#define FLYBYWIREB_H_
 #endif

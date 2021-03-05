@@ -145,7 +145,6 @@ static void Println_Timings(void)
     TIMEIT("tan()", v_out = Fast_Tangent(v_f), 20);
     TIMEIT("acos()", v_out = Fast_AtanCosine(v_f * 0.2), 20);
     TIMEIT("asin()", v_out = asinf(v_f * 0.2), 20);
-    TIMEIT("atan2()", v_out = atan2(v_f * 0.2, v_f * 0.3), 20);
     TIMEIT("fast_atan2()", v_out = Fast_Atan2(v_f * 0.2, v_f * 0.3), 20);
     TIMEIT("sqrt()", v_out = Fast_SquareRoot(v_f), 20);
 

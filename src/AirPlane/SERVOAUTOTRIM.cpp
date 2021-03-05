@@ -49,11 +49,6 @@ void ServosSaveAndUpdateMiddlePoint(void)
     AIR_PLANE.UpdateServosMiddlePoint();
 }
 
-void Reset_Gyro_PID_Accum()
-{
-    PIDXYZ.Reset_Integral_Accumulators();
-}
-
 void ServoAutoTrimRun(void)
 {
     static ServoAutoTrimState_Enum ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
@@ -102,7 +97,7 @@ void ServoAutoTrimRun(void)
                         AIR_PLANE.ServoMiddle[ServoIndex] = ServoMiddleAccum[ServoIndex] / ServoMiddleAccumCount;
                     }
                     ServoAutoTrimState = SERVO_AUTOTRIM_SAVE_PENDING;
-                    Reset_Gyro_PID_Accum();
+                    PIDXYZ.Reset_Integral_Accumulators();
                 }
             }
             else

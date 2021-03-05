@@ -18,9 +18,9 @@
 #include "ADC.h"
 #include "HAL/HALADC.h"
 
-AnalogPinClass ADCPIN;
+AnalogReadClass ANALOGDIGITALCONVERTER;
 
-int16_t AnalogPinClass::Read(uint8_t AnalogPin)
+int16_t AnalogReadClass::Read(uint8_t AnalogPin)
 {
   return HAL_ADC.AnalogRead(AnalogPin);
 }

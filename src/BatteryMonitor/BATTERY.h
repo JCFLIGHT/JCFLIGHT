@@ -34,6 +34,7 @@ public:
   uint32_t GetWatts();
 
 private:
+  uint8_t LowBatteryCount;
   uint8_t BattMinVoltageSelect;
   uint8_t BattMaxVoltageSelect;
   float Percentage;
@@ -42,7 +43,6 @@ private:
   uint8_t CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt);
   float AutoBatteryMin(float BattVoltage);
   float AutoBatteryMax(float BattVoltage);
-  void Do_RTH_With_Low_Batt(bool FailSafeBatt);
 };
 extern BATT BATTERY;
 #endif

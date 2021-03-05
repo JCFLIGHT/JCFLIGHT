@@ -137,7 +137,7 @@ void PIDXYZClass::Update(float DeltaTime)
     UpdateStateOfHeadingHold();
   }
 
-  if (Do_Stabilize_Mode)
+  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
     PIDXYZ.CalcedRateTargetRoll = PIDXYZ.PIDLevelRoll(DeltaTime);
     PIDXYZ.CalcedRateTargetPitch = PIDXYZ.PIDLevelPitch(DeltaTime);
@@ -243,7 +243,7 @@ float PIDXYZClass::ApplyDerivativeBoostRoll(int16_t ActualGyro, int16_t PrevGyro
     const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.FilterApplyAndGet(&DerivativeBoost_Roll_Smooth, DerivativeBoostGyroDelta));
     const float DerivativeBoostRateAcceleration = fabsf((ActualRateTagert - PrevRateTagert) / DeltaTime);
     const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
-    DerivativeBoost = Map_Float(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
+    DerivativeBoost = ScaleRangeFloat(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
     DerivativeBoost = PT1FilterApply(&DerivativeBoost_Roll_LPF, DerivativeBoost, DERIVATIVE_BOOST_LPF_HZ, DeltaTime);
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
@@ -265,7 +265,7 @@ float PIDXYZClass::ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyr
     const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.FilterApplyAndGet(&DerivativeBoost_Pitch_Smooth, DerivativeBoostGyroDelta));
     const float DerivativeBoostRateAcceleration = fabsf((ActualRateTagert - PrevRateTagert) / DeltaTime);
     const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
-    DerivativeBoost = Map_Float(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
+    DerivativeBoost = ScaleRangeFloat(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
     DerivativeBoost = PT1FilterApply(&DerivativeBoost_Pitch_LPF, DerivativeBoost, DERIVATIVE_BOOST_LPF_HZ, DeltaTime);
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
@@ -360,7 +360,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
   float NewDerivativeTerm;
   float NewControlTracking;
 
-  if (Do_Stabilize_Mode)
+  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
     NewControlDerivativeTerm = 0.0f;
   }
@@ -417,7 +417,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
   float NewDerivativeTerm;
   float NewControlTracking;
 
-  if (Do_Stabilize_Mode)
+  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
     NewControlDerivativeTerm = 0.0f;
   }
@@ -474,7 +474,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
   float NewDerivativeTerm;
   float NewControlTracking;
 
-  if (Do_Stabilize_Mode)
+  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
     NewControlDerivativeTerm = 0.0f;
   }
@@ -582,7 +582,7 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
 bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
 {
   float StickPosition = (float)Constrain_16Bits(DECODE.GetRxChannelOutput(Axis) - MIDDLE_STICKS_PULSE, -500, 500) / 500.0f;
-  if (Do_Stabilize_Mode)
+  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
     return false;
   }

@@ -18,10 +18,10 @@
 #ifndef ADC_H_
 #define ADC_H_
 #include "Build/LIBDEPENDENCIES.h"
-class AnalogPinClass
+class AnalogReadClass
 {
 public:
   int16_t Read(uint8_t AnalogPin);
 };
-extern AnalogPinClass ADCPIN;
+extern AnalogReadClass ANALOGDIGITALCONVERTER;
 #endif

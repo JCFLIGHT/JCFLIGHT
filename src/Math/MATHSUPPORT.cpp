@@ -50,19 +50,25 @@ int32_t Constrain_32Bits(int32_t ValueInput, int32_t ValueInputMin, int32_t Valu
     return ((ValueInput) < (ValueInputMin) ? (ValueInputMin) : ((ValueInput) > (ValueInputMax) ? (ValueInputMax) : (ValueInput)));
 }
 
-float Map_Float(float Value, float MinInputValue, float MaxInputValue, float MinOutputValue, float MaxOutputValue)
+float ScaleRangeFloat(float Value, float MinInputValue, float MaxInputValue, float MinOutputValue, float MaxOutputValue)
 {
-    return (Value - MinInputValue) * (MaxOutputValue - MinOutputValue) / (MaxInputValue - MinInputValue) + MinOutputValue;
+    float ValA = (MaxOutputValue - MinOutputValue) * (Value - MinInputValue);
+    float ValB = MaxInputValue - MinInputValue;
+    return ((ValA / ValB) + MinOutputValue);
 }
 
-int16_t Map_16Bits(int16_t Value, int16_t MinInputValue, int16_t MaxInputValue, int16_t MinOutputValue, int16_t MaxOutputValue)
+int16_t ScaleRange16Bits(int16_t Value, int16_t MinInputValue, int16_t MaxInputValue, int16_t MinOutputValue, int16_t MaxOutputValue)
 {
-    return (Value - MinInputValue) * (MaxOutputValue - MinOutputValue) / (MaxInputValue - MinInputValue) + MinOutputValue;
+    int16_t ValA = ((int16_t)MaxOutputValue - (int16_t)MinOutputValue) * ((int16_t)Value - (int16_t)MinInputValue);
+    int16_t ValB = (int16_t)MaxInputValue - (int16_t)MinInputValue;
+    return ((ValA / ValB) + MinOutputValue);
 }
 
-int32_t Map_32Bits(int32_t Value, int32_t MinInputValue, int32_t MaxInputValue, int32_t MinOutputValue, int32_t MaxOutputValue)
+int32_t ScaleRange32Bits(int32_t Value, int32_t MinInputValue, int32_t MaxInputValue, int32_t MinOutputValue, int32_t MaxOutputValue)
 {
-    return (Value - MinInputValue) * (MaxOutputValue - MinOutputValue) / (MaxInputValue - MinInputValue) + MinOutputValue;
+    int32_t ValA = ((int32_t)MaxOutputValue - (int32_t)MinOutputValue) * ((int32_t)Value - (int32_t)MinInputValue);
+    int32_t ValB = (int32_t)MaxInputValue - (int32_t)MinInputValue;
+    return ((ValA / ValB) + MinOutputValue);
 }
 
 float SquareFloat(float InputValue)

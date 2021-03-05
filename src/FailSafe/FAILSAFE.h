@@ -22,4 +22,5 @@ extern volatile int16_t Fail_Safe_System_Count;
 bool FastSystemFailSafe();
 bool SystemInFailSafe();
 void FailSafeCheck();
+void FailSafe_Do_RTH_With_Low_Batt(bool FailSafeBatt);
 #endif

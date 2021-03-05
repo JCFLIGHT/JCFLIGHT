@@ -23,7 +23,7 @@
 #include "BATTLEVELS.h"
 #include "Build/BOARDDEFS.h"
 #include "Math/MATHSUPPORT.h"
-#include "BitArray/BITARRAY.h"
+#include "FailSafe/FAILSAFE.h"
 #include "FastSerial/PRINTF.h"
 
 BATT BATTERY;
@@ -36,6 +36,7 @@ AverageFilterFloat_Size20 Current_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A C
 
 #define THIS_LOOP_RATE 50            //HZ
 #define TIMER_TO_AUTO_DETECT_BATT 15 //SEGUNDOS
+#define LOW_BATT_DETECT_OVERFLOW 4   //SEGUNDOS
 #define PREVENT_ARM_LOW_BATT 20      //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
 
 //VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
@@ -46,28 +47,36 @@ float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE
 void BATT::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  BATTERY.Voltage = Voltage_Filter.Apply(BATTERY.Voltage * 0.92f + (float)(ADCPIN.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
+  BATTERY.Voltage = Voltage_Filter.Apply(BATTERY.Voltage * 0.92f + (float)(ANALOGDIGITALCONVERTER.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
   //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
   if (BATTERY.Voltage > 6)
   {
-    if (BATTERY.GetPercentage() < PREVENT_ARM_LOW_BATT) //MENOR QUE 20%
+    if (BATTERY.GetPercentage() <= PREVENT_ARM_LOW_BATT) //MENOR OU IGUAL QUE 20% DA CAPACIDADE TOTAL DA BATERIA?SIM...
     {
-      BATTERY.LowBattPreventArm = true;
-      if (BEEPER.GetSafeStateToOthersBeeps())
+      if (LowBatteryCount >= (THIS_LOOP_RATE * LOW_BATT_DETECT_OVERFLOW))
       {
-        BEEPER.Play(BEEPER_BAT_CRIT_LOW);
+        BATTERY.LowBattPreventArm = true;
+        if (BEEPER.GetSafeStateToOthersBeeps())
+        {
+          BEEPER.Play(BEEPER_BATT_CRIT_LOW);
+        }
+      }
+      else
+      {
+        LowBatteryCount++;
       }
     }
     else
     {
       BATTERY.LowBattPreventArm = false;
+      LowBatteryCount = 0;
     }
   }
   else
   {
     BATTERY.LowBattPreventArm = false;
   }
-  BATTERY.Do_RTH_With_Low_Batt(BATTERY.LowBattPreventArm);
+  FailSafe_Do_RTH_With_Low_Batt(BATTERY.LowBattPreventArm);
 }
 
 uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt)
@@ -220,32 +229,10 @@ uint8_t BATT::GetPercentage()
   return BATTERY.CalculatePercentage(BATTERY.Voltage, BATTERY.AutoBatteryMin(BATTERY.Voltage), BATTERY.AutoBatteryMax(BATTERY.Voltage));
 }
 
-void BATT::Do_RTH_With_Low_Batt(bool FailSafeBatt)
-{
-  //ENTRA EM MODO RTH OU LAND (SE ESTIVER PROXIMO DO HOME-POINT)
-  //SE A BATERIA ESTIVER COM A TENSÃO ABAIXO DE 20% DA CARGA TOTAL
-  static bool FailSafeBattDetect = false;
-  if (FailSafeBatt)
-  {
-    //EVITA COM QUE UMA TROCA RAPIDA DE TRUE PARA FALSE OCORRA
-    //A FIM DE NÃO INTERFERIR NO FUNCIONAMENTO DESSA FUNÇÃO
-    FailSafeBattDetect = true;
-  }
-  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-  {
-    FailSafeBattDetect = false;
-    return;
-  }
-  if (!FailSafeBattDetect)
-  {
-    return;
-  }
-}
-
 void BATT::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  BATTERY.Total_Current = Current_Filter.Apply(((ADCPIN.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
+  BATTERY.Total_Current = Current_Filter.Apply(((ANALOGDIGITALCONVERTER.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
   BATTERY.Total_Current = MAX(0, BATTERY.Total_Current);
 }
 

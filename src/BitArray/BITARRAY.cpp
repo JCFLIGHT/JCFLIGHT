@@ -18,7 +18,7 @@
 #include "BITARRAY.h"
 #include "FlightModes/AUXFLIGHT.h"
 
-//ESSE BIT ARRAY ESTÁ EM UINT8_T (BYTE -> 0 - 255)
+//ESSE BIT ARRAY ESTÁ EM uint8_t (BYTE -> 0 - 255)
 
 #define BITARRAY_BIT_OP(Array, Bit, Operator) ((Array)[(Bit) / (sizeof((Array)[0]) * 8)] Operator(1 << ((Bit) % (sizeof((Array)[0]) * 8))))
 
@@ -42,6 +42,18 @@ void BitArrayClear(BitArrayElement8Bits *Array, unsigned Bit)
 bool IS_FLIGHT_MODE_ACTIVE(uint8_t FlightModeName)
 {
     return BitArrayGet(SetFlightMode, FlightModeName);
+}
+
+bool IS_FLIGHT_MODE_ACTIVE_ONCE(uint8_t FlightModeName)
+{
+    static uint8_t Previous_Mode = 0;
+    uint8_t Check_Actual_State = BitArrayGet(SetFlightMode, FlightModeName);
+    if (Previous_Mode != Check_Actual_State)
+    {
+        Previous_Mode = Check_Actual_State;
+        return true;
+    }
+    return false;
 }
 
 void ENABLE_THIS_FLIGHT_MODE(uint8_t FlightModeName)

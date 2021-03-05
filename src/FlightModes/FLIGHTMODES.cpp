@@ -32,11 +32,8 @@
 #include "BitArray/BITARRAY.h"
 #include "Common/STRUCTS.h"
 
-bool Do_Stabilize_Mode;
-bool Do_HeadingHold_Mode;
 bool Do_AltitudeHold_Mode;
 bool Do_GPS_Altitude;
-bool Do_AutoThrottle_Mode;
 
 bool Multirotor_GPS_FlightModes_Once()
 {
@@ -181,14 +178,16 @@ void ProcessFlightModesToAirPlane()
 
   if (Get_State_Armed_With_GPS())
   {
-    if (GPS_Flight_Mode != GPS_MODE_NONE && !Do_Stabilize_Mode)
+    if (GPS_Flight_Mode != GPS_MODE_NONE && !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
     {
-      Do_Stabilize_Mode = true;
+      ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE); //FORÇA O MODO STABILIZE EM MODO NAVEGAÇÃO POR GPS
     }
+
     if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
     {
       ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(CIRCLE_MODE, SticksInAutoPilotPosition(20));
     }
+
     if (AirPlane_GPS_FlightModes_Once())
     {
       if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
@@ -227,29 +226,12 @@ void ProcessFlightModesToAirPlane()
 
 void FlightModesUpdate()
 {
-  if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) || SystemInFailSafe())
-  {
-    if (!Do_Stabilize_Mode)
-    {
-      Do_Stabilize_Mode = true;
-    }
-  }
-  else
-  {
-    Do_Stabilize_Mode = false;
-  }
-
   if (IS_FLIGHT_MODE_ACTIVE(HEADING_HOLD_MODE))
   {
-    if (!Do_HeadingHold_Mode)
+    if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
     {
       HeadingHoldTarget = ATTITUDE.AngleOut[YAW];
-      Do_HeadingHold_Mode = true;
     }
-  }
-  else
-  {
-    Do_HeadingHold_Mode = false;
   }
 
   ProcessFlightModesToMultirotor();

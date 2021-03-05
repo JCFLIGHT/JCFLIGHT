@@ -24,6 +24,7 @@
 #include "Common/RCDEFINES.h"
 #include "RadioControl/DECODE.h"
 #include "IMU/IMUCALIBRATE.h"
+#include "BitArray/BITARRAY.h"
 
 #define THIS_LOOP_RATE 50                //HZ
 #define IMMEDIATELY_FAILSAFE_DELAY 0.25f //MS
@@ -243,4 +244,26 @@ void FailSafeCheck()
   }
   UpdateFailSafeSystem();
   FailSafeBuzzerNotification();
+}
+
+void FailSafe_Do_RTH_With_Low_Batt(bool FailSafeBatt)
+{
+  //ENTRA EM MODO RTH OU LAND (SE ESTIVER PROXIMO DO HOME-POINT)
+  //SE A BATERIA ESTIVER COM A TENSÃO ABAIXO DE 20% DA CARGA TOTAL
+  static bool FailSafeBattDetect = false;
+  if (FailSafeBatt)
+  {
+    //EVITA COM QUE UMA TROCA RAPIDA DE TRUE PARA FALSE OCORRA
+    //A FIM DE NÃO INTERFERIR NO FUNCIONAMENTO DESSA FUNÇÃO
+    FailSafeBattDetect = true;
+  }
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
+  {
+    FailSafeBattDetect = false;
+    return;
+  }
+  if (!FailSafeBattDetect)
+  {
+    return;
+  }
 }

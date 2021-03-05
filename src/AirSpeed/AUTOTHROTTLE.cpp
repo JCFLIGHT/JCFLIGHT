@@ -20,7 +20,6 @@
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "PID/RCPID.h"
-#include "FlightModes/FLIGHTMODES.h"
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
 #include "Common/STRUCTS.h"
@@ -34,17 +33,13 @@ void AirSpeed_Update_Auto_Throttle()
     {
         return;
     }
+
     if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE))
     {
-        if (!Do_AutoThrottle_Mode)
+        if (IS_FLIGHT_MODE_ACTIVE_ONCE(AUTO_THROTTLE_MODE))
         {
-            Do_AutoThrottle_Mode = true;
             PreviousValueOfAirSpeed = AIRSPEED.CalcedInKM;
         }
-    }
-    else
-    {
-        Do_AutoThrottle_Mode = false;
     }
 }
 
@@ -54,7 +49,8 @@ void AirSpeed_Apply_Auto_Throttle_Control()
     {
         return;
     }
-    if (Do_AutoThrottle_Mode && (RCController[THROTTLE] > 1200))
+
+    if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) && (RCController[THROTTLE] > 1200))
     {
         int16_t CalculateError = PreviousValueOfAirSpeed - AIRSPEED.CalcedInKM;
         int16_t CalculateProportional = (CalculateError * GET_SET[PID_ALTITUDE].ProportionalVector >> 3);

@@ -19,6 +19,7 @@
 #define BITARRAY_H_
 #include "inttypes.h"
 bool IS_FLIGHT_MODE_ACTIVE(uint8_t FlightModeName);
+bool IS_FLIGHT_MODE_ACTIVE_ONCE(uint8_t FlightModeName);
 void ENABLE_THIS_FLIGHT_MODE(uint8_t FlightModeName);
 void DISABLE_THIS_FLIGHT_MODE(uint8_t FlightModeName);
 void ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(uint8_t FlightModeName, bool Dependency);

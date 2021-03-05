@@ -309,7 +309,7 @@ void AirPlaneUpdateNavigation(void)
     GetThrottleToNavigation = Constrain_16Bits(GetThrottleToNavigation, 1300, AttitudeThrottleMax);
   }
 
-  if ((!Do_Stabilize_Mode) || (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && !SystemInFailSafe()))
+  if ((!IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE)) || (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && !SystemInFailSafe()))
   {
     GetThrottleToNavigation = Read_Throttle;
     GPS_Angle[PITCH] = 0;

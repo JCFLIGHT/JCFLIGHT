@@ -46,7 +46,7 @@ void UpdateStateOfHeadingHold(void)
 
 bool GetSafeStateOfHeadingHold()
 {
-  if (!Do_HeadingHold_Mode) //NÃO APLICA A CORREÇÃO DO YAW SE O MODO NÃO ESTIVER ATIVO
+  if (!IS_FLIGHT_MODE_ACTIVE(HEADING_HOLD_MODE)) //NÃO APLICA A CORREÇÃO DO YAW SE O MODO NÃO ESTIVER ATIVO
   {
     return false;
   }

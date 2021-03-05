@@ -77,7 +77,7 @@ void MachineInit()
     TaskSystemInitialization();
     //CALCULA E IMPRIME O TEMPO GASTO PELA INICIALIZAÇÃO
     CalculeTheFinalTimeToInitTheMachine(&MachineInitTimeNow);
-    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos", GetTheFinalTimeToInitTheMachine(&MachineInitTimeNow));
+    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos\n", GetTheFinalTimeToInitTheMachine(&MachineInitTimeNow));
 }
 
 void MachineRun()

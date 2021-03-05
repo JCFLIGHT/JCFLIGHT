@@ -135,7 +135,7 @@ static const uint8_t Parachute_Beep[] = {
 const Struct_BeeperEntry BeeperTable[] = {
     {BEEPER_CALIBRATION_DONE, 0, Calibration_Beep},
     {BEEPER_DISARMING, 1, Disarm_Beep},
-    {BEEPER_BAT_CRIT_LOW, 2, LowBattery_Beep},
+    {BEEPER_BATT_CRIT_LOW, 2, LowBattery_Beep},
     {BEEPER_ACTION_SUCCESS, 3, Success_Beep},
     {BEEPER_ACTION_FAIL, 4, Fail_Beep},
     {BEEPER_ARM, 5, Arm_Beep},

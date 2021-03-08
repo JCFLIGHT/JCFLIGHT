@@ -21,10 +21,10 @@
 #include "FlightModes/AUXFLIGHT.h"
 #include "PrecisionLand/PRECISIONLAND.h"
 #include "CHECK2D.h"
-#include "FastSerial/PRINTF.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/RCDEFINES.h"
 #include "Common/STRUCTS.h"
+#include "FastSerial/PRINTF.h"
 
 #ifdef __AVR_ATmega2560__
 #define THIS_LOOP_RATE 70 //HZ
@@ -101,7 +101,7 @@ void CrashCheck()
 
   Crash_Counter++; //CONTROLADOR DE ATTITUDE DETECTOU CRASH
 
-  if (Crash_Counter >= CRASH_CHECK_TIMER * THIS_LOOP_RATE)
+  if (Crash_Counter >= (CRASH_CHECK_TIMER * THIS_LOOP_RATE))
   {
 
 #ifdef PRINTLN_CRASHCHECK
@@ -115,14 +115,8 @@ void CrashCheck()
     {
       DISABLE_STATE(PRIMARY_ARM_DISARM);
     }
+
     //CHAMA O PARACHUTE SE ESTIVER EQUIPADO
-    if (ParachuteDetectTrigger > 0)
-    {
-      PARACHUTE.Auto_Do_Now(true);
-    }
-    else
-    {
-      PARACHUTE.Auto_Do_Now(false);
-    }
+    PARACHUTE.Auto_Do_Now(ParachuteDetectTrigger > 0);
   }
 }

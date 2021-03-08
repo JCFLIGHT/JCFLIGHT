@@ -16,7 +16,7 @@
 */
 
 #include "SERVORATE.h"
-#include "AIRPLANE.h"
+#include "AirPlane/AIRPLANE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "BAR/BAR.h"

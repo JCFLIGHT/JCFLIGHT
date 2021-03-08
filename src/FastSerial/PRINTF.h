@@ -61,12 +61,14 @@ extern SerialPrint PRINTF;
 
 #define DEBUG(fmt, args...) PRINTF.SendToConsole(PSTR(fmt "\n"), ##args);
 #define LOG(fmt) PRINTF.SendToConsole(PSTR("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__);
+#define LOG_PARAM_ERROR(fmt) PRINTF.SendToConsole(PSTR("ERRO:" fmt "\n"));
 #define LINE_SPACE PRINTF.SendToConsole(PSTR("\n"));
 
 #else
 
 #define DEBUG(fmt, args...) PRINTF.tfp_printf((char *)fmt "\n", ##args);
 #define LOG(fmt) PRINTF.tfp_printf((char *)"LOG: Funcao:%s Linha:%d " fmt "\n", __FUNCTION__, __LINE__);
+#define LOG_PARAM_ERROR(fmt) PRINTF.tfp_printf((char *)"ERRO:" fmt "\n");
 #define LINE_SPACE PRINTF.tfp_printf((char *)"\n");
 
 #endif

@@ -121,6 +121,11 @@ float ConvertAccelerationEarthFrameToCMSS(float InputAccEF)
     return InputAccEF * (980.665f / 512);
 }
 
+int32_t ConvertCMToMeters(int32_t CM_Input)
+{
+    return CM_Input * 100;
+}
+
 float Fast_SquareRoot(float ValueInput)
 {
     if (ValueInput <= 5.877471754e-39f)

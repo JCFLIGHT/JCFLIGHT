@@ -17,10 +17,10 @@
 
 #include "SWITCHFLAG.h"
 #include "FlightModes/AUXFLIGHT.h"
-#include "AirPlane/SERVORATE.h"
+#include "ServosMaster/SERVORATE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "AirPlane/SERVOAUTOTRIM.h"
+#include "ServosMaster/SERVOAUTOTRIM.h"
 #include "Compass/COMPASSREAD.h"
 #include "BitArray/BITARRAY.h"
 

@@ -35,13 +35,13 @@
 #include "AirSpeed/AIRSPEED.h"
 #include "AHRS/AHRS.h"
 #include "SafetyButton/SAFETYBUTTON.h"
-#include "ParamsToGCS/FULLPARAMS.h"
+#include "Param/PARAM.h"
 #include "RadioControl/RCSMOOTH.h"
-#include "AirPlane/SERVORATE.h"
+#include "ServosMaster/SERVORATE.h"
 
 void GeneralSettingsInitialization()
 {
-  FullParamsListInitialization();
+  PARAM.Initialization();
   CurvesRC_SetValues();
   TPA_Initialization();
   CurvesRC_CalculeValue();

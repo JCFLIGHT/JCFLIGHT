@@ -20,7 +20,7 @@
 #include "Scheduler/SCHEDULER.h"
 #include "Build/BOARDDEFS.h"
 #include "Math/MATHSUPPORT.h"
-#include "SERVORATE.h"
+#include "ServosMaster/SERVORATE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"

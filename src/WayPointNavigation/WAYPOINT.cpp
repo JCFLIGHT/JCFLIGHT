@@ -195,6 +195,36 @@ bool WayPointSync10Hz()
   return false;
 }
 
+void MulticopterAutoTakeOff(bool MulticopterAutoTakeOff)
+{
+  if (!MulticopterAutoTakeOff)
+  {
+    return;
+  }
+  if (WayPointSync10Hz())
+  {
+    if (ThrottleIncrement < THROTTLE_TAKEOFF_ASCENT && !WPTakeOffNomalized)
+    {
+      if (ThrottleIncrementCount >= THROTTLE_INCREMENT_TIME)
+      {
+        ThrottleIncrement += THROTTLE_INCREMENT;
+        ThrottleIncrementCount = 0;
+      }
+      else
+      {
+        ThrottleIncrementCount++;
+      }
+    }
+    else
+    {
+      WPTakeOffNomalized = true;
+      ThrottleIncrement = THROTTLE_TAKEOFF_NORMALIZE;
+    }
+  }
+  DECODE.SetRxChannelInput(THROTTLE, ThrottleIncrement);
+  RCController[THROTTLE] = Constrain_16Bits(ThrottleIncrement, AttitudeThrottleMin, AttitudeThrottleMax);
+}
+
 void WayPointRun()
 {
   int16_t Navigation_Speed_Result = 0;
@@ -258,7 +288,7 @@ void WayPointRun()
     {
       if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
       {
-        AutoTakeOff(true);
+        MulticopterAutoTakeOff(true);
       }
       else
       {
@@ -339,7 +369,7 @@ void WayPointRun()
       //DESATIVA O TAKEOFF SE A MISSÃO NÃO ESTIVER CONFIGURADA PARA O MESMO E SE O THROTTLE ESTIVER ACIMA DE UM CERTO NIVEL
       if (WayPointFlightMode[MissionNumber] != WP_TAKEOFF && Throttle.Output >= THROTTLE_CANCEL_TAKEOFF)
       {
-        AutoTakeOff(false);
+        MulticopterAutoTakeOff(false);
       }
       //AVANÇA O WAYPOINT
       if (WayPointFlightMode[MissionNumber] == WP_ADVANCE)
@@ -385,145 +415,115 @@ void WayPointRun()
   }
 }
 
-void AutoTakeOff(bool AutoTakeOff)
-{
-  if (!AutoTakeOff)
-  {
-    return;
-  }
-  if (WayPointSync10Hz())
-  {
-    if (ThrottleIncrement < THROTTLE_TAKEOFF_ASCENT && !WPTakeOffNomalized)
-    {
-      if (ThrottleIncrementCount >= THROTTLE_INCREMENT_TIME)
-      {
-        ThrottleIncrement += THROTTLE_INCREMENT;
-        ThrottleIncrementCount = 0;
-      }
-      else
-      {
-        ThrottleIncrementCount++;
-      }
-    }
-    else
-    {
-      WPTakeOffNomalized = true;
-      ThrottleIncrement = THROTTLE_TAKEOFF_NORMALIZE;
-    }
-  }
-  DECODE.SetRxChannelInput(THROTTLE, ThrottleIncrement);
-  RCController[THROTTLE] = Constrain_16Bits(ThrottleIncrement, AttitudeThrottleMin, AttitudeThrottleMax);
-}
-
 void Get_Altitude()
 {
   if (WayPointAltitude[MissionNumber] == 0)
   {
-    SetAltitudeHold(10 * 100);
+    SetAltitudeHold(ConvertCMToMeters(10));
   }
   else if (WayPointAltitude[MissionNumber] == 1)
   {
-    SetAltitudeHold(15 * 100);
+    SetAltitudeHold(ConvertCMToMeters(15));
   }
   else if (WayPointAltitude[MissionNumber] == 2)
   {
-    SetAltitudeHold(20 * 100);
+    SetAltitudeHold(ConvertCMToMeters(20));
   }
   else if (WayPointAltitude[MissionNumber] == 3)
   {
-    SetAltitudeHold(25 * 100);
+    SetAltitudeHold(ConvertCMToMeters(25));
   }
   else if (WayPointAltitude[MissionNumber] == 4)
   {
-    SetAltitudeHold(30 * 100);
+    SetAltitudeHold(ConvertCMToMeters(30));
   }
   else if (WayPointAltitude[MissionNumber] == 5)
   {
-    SetAltitudeHold(35 * 100);
+    SetAltitudeHold(ConvertCMToMeters(35));
   }
   else if (WayPointAltitude[MissionNumber] == 6)
   {
-    SetAltitudeHold(40 * 100);
+    SetAltitudeHold(ConvertCMToMeters(40));
   }
   else if (WayPointAltitude[MissionNumber] == 7)
   {
-    SetAltitudeHold(45 * 100);
+    SetAltitudeHold(ConvertCMToMeters(45));
   }
   else if (WayPointAltitude[MissionNumber] == 8)
   {
-    SetAltitudeHold(50 * 100);
+    SetAltitudeHold(ConvertCMToMeters(50));
   }
   else if (WayPointAltitude[MissionNumber] == 9)
   {
-    SetAltitudeHold(55 * 100);
+    SetAltitudeHold(ConvertCMToMeters(55));
   }
   else if (WayPointAltitude[MissionNumber] == 10)
   {
-    SetAltitudeHold(60 * 100);
+    SetAltitudeHold(ConvertCMToMeters(60));
   }
   else if (WayPointAltitude[MissionNumber] == 11)
   {
-    SetAltitudeHold(65 * 100);
+    SetAltitudeHold(ConvertCMToMeters(65));
   }
   else if (WayPointAltitude[MissionNumber] == 12)
   {
-    SetAltitudeHold(70 * 100);
+    SetAltitudeHold(ConvertCMToMeters(70));
   }
   else if (WayPointAltitude[MissionNumber] == 13)
   {
-    SetAltitudeHold(75 * 100);
+    SetAltitudeHold(ConvertCMToMeters(75));
   }
   else if (WayPointAltitude[MissionNumber] == 14)
   {
-    SetAltitudeHold(80 * 100);
+    SetAltitudeHold(ConvertCMToMeters(80));
   }
   else if (WayPointAltitude[MissionNumber] == 15)
   {
-    SetAltitudeHold(85 * 100);
+    SetAltitudeHold(ConvertCMToMeters(85));
   }
   else if (WayPointAltitude[MissionNumber] == 16)
   {
-    SetAltitudeHold(90 * 100);
+    SetAltitudeHold(ConvertCMToMeters(90));
   }
   else if (WayPointAltitude[MissionNumber] == 17)
   {
-    SetAltitudeHold(95 * 100);
+    SetAltitudeHold(ConvertCMToMeters(95));
   }
   else if (WayPointAltitude[MissionNumber] == 18)
   {
-    SetAltitudeHold(100 * 100);
+    SetAltitudeHold(ConvertCMToMeters(100));
   }
   else if (WayPointAltitude[MissionNumber] == 19)
   {
-    SetAltitudeHold(105 * 100);
+    SetAltitudeHold(ConvertCMToMeters(105));
   }
   else if (WayPointAltitude[MissionNumber] == 20)
   {
-    SetAltitudeHold(110 * 100);
+    SetAltitudeHold(ConvertCMToMeters(110));
   }
   else if (WayPointAltitude[MissionNumber] == 21)
   {
-    SetAltitudeHold(115 * 100);
+    SetAltitudeHold(ConvertCMToMeters(115));
   }
   else if (WayPointAltitude[MissionNumber] == 22)
   {
-    SetAltitudeHold(120 * 100);
+    SetAltitudeHold(ConvertCMToMeters(120));
   }
   else if (WayPointAltitude[MissionNumber] == 23)
   {
-    SetAltitudeHold(125 * 100);
+    SetAltitudeHold(ConvertCMToMeters(125));
   }
   else if (WayPointAltitude[MissionNumber] == 24)
   {
-    SetAltitudeHold(130 * 100);
+    SetAltitudeHold(ConvertCMToMeters(130));
   }
   else if (WayPointAltitude[MissionNumber] == 25)
   {
-    SetAltitudeHold(135 * 100);
+    SetAltitudeHold(ConvertCMToMeters(135));
   }
   else if (WayPointAltitude[MissionNumber] == 26)
   {
-    SetAltitudeHold(140 * 100);
+    SetAltitudeHold(ConvertCMToMeters(140));
   }
 }
 

@@ -15,9 +15,16 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FULLPARAMS_H_
-#define FULLPARAMS_H_
+#ifndef PARAM_H_
+#define PARAM_H_
 #include "Build/LIBDEPENDENCIES.h"
-void FullParamsListInitialization();
-void SetNewValue(const char *ParamName, int32_t NewValue);
+class ParamClass
+{
+public:
+  void Initialization();
+
+private:
+  void Set_And_Save(const char *ParamName, int32_t NewValue);
+};
+extern ParamClass PARAM;
 #endif

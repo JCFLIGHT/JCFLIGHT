@@ -48,6 +48,7 @@ float ConvertDeciDegreesToDegrees(float Inputvalue);
 float ConvertDegreesToDecidegrees(float Inputvalue);
 float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput);
 float ConvertAccelerationEarthFrameToCMSS(float InputAccEF);
+int32_t ConvertCMToMeters(int32_t CM_Input);
 float Fast_SquareRoot(float ValueInput);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);

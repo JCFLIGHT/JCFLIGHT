@@ -138,7 +138,6 @@ extern uint8_t EEPROM_Function;
 void WayPoint_Initialization();
 void PushWayPointParameters();
 void WayPointRun();
-void AutoTakeOff(bool _TAKEOFF);
 void Get_Altitude();
 void Store_And_Clear_WayPoints();
 #endif

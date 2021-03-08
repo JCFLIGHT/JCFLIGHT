@@ -411,9 +411,9 @@ void Do_Mode_RTH_Now()
 {
   GPS_Flight_Mode = GPS_MODE_RTH;
   Do_GPS_Altitude = true;
-  if (ALTITUDE.EstimatedAltitude < RTH_Altitude * 100)
+  if (ALTITUDE.EstimatedAltitude < ConvertCMToMeters(RTH_Altitude))
   {
-    SetAltitudeHold(RTH_Altitude * 100);
+    SetAltitudeHold(ConvertCMToMeters(RTH_Altitude));
   }
   else
   {

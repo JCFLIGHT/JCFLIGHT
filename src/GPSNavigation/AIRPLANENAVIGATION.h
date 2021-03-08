@@ -23,4 +23,5 @@ extern int32_t GPS_AltitudeHold_For_Plane;
 void Circle_Mode_Update();
 void AirPlaneUpdateNavigation(void);
 void PlaneResetNavigation(void);
+bool AirPlaneNavigationIsControllingThrottle();
 #endif

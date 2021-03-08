@@ -339,3 +339,12 @@ void PlaneResetNavigation(void)
   NavigationDifferenceVector[3] = 0;
   NavigationDifferenceVector[4] = 0;
 }
+
+bool AirPlaneNavigationIsControllingThrottle()
+{
+  return GetFrameStateOfAirPlane() &&
+         !IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE) &&
+         !IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE) &&
+         !IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) &&
+         !IS_FLIGHT_MODE_ACTIVE(RTH_MODE);
+}

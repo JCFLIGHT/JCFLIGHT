@@ -40,6 +40,7 @@
 #include "FlightModes/FLIGHTMODES.h"
 #include "AHRS/AHRS.h"
 #include "AHRS/QUATERNION.h"
+#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -86,15 +87,18 @@ PT1_Filter_Struct DerivativeBoost_Pitch_LPF;
 //FREQUENCIA DE CORTE DA ACELERAÇÃO CALCULADA PELO DERIVATIVE BOOST
 #define DERIVATIVE_BOOST_LPF_HZ 10 //Hz
 
-uint8_t IntegralTermWindUpPercent = 50;                 //AJUSTAVEL PELO USUARIO
-int16_t ReferenceAirSpeed = 1000;                       //AJUSTAVEL PELO USUARIO - VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
-int16_t FixedWingIntegralTermThrowLimit = 165;          //AJUSTAVEL PELO USUARIO
-float FixedWingIntegralTermLimitOnStickPosition = 0.5f; //AJUSTAVEL PELO USUARIO
-float DerivativeBoostFactor = 1.25f;                    //AJUSTAVEL PELO USUARIO
-float DerivativeBoostMaxAceleration = 7500.0f;          //AJUSTAVEL PELO USUARIO
+uint8_t IntegralTermWindUpPercent = 50;        //AJUSTAVEL PELO USUARIO -> (0 a 90)
+int16_t ReferenceAirSpeed = 1000;              //AJUSTAVEL PELO USUARIO - VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
+int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO -> (0 a 500)
+int16_t Cruise_Throttle = 1400;                //AJUSTAVEL PELO USUARIO -> (1000 a 2000)
+int16_t MinThrottleDownPitchAngle = 0;         //AJUSTAVEL PELO USUARIO -> (0 a 450)
+float PitchLevelTrim = 0;                      //AJUSTAVEL PELO USUARIO -> (-10 a +10)
+float DerivativeBoostFactor = 1.25f;           //AJUSTAVEL PELO USUARIO -> (-1.0 a 3.0 (float))
+float DerivativeBoostMaxAceleration = 7500.0f; //AJUSTAVEL PELO USUARIO -> (1000 a 16000)
 
 ///////////////////////////////////////////////////////////////
 
+float FixedWingIntegralTermLimitOnStickPosition = 0.5f;
 float MotorIntegralTermWindUpPoint;
 float AntiWindUpScaler;
 float CoordinatedTurnRateEarthFrame;
@@ -158,8 +162,7 @@ void PIDXYZClass::Update(float DeltaTime)
     PIDXYZ.PIDApplyFixedWingRateControllerYaw(DeltaTime);
   }
 
-  if (GetActualThrottleStatus(THROTTLE_LOW) ||
-      !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) /*|| !IS_FLIGHT_MODE_ACTIVE(PRIMARY_ARM_DISARM)*/)
+  if (GetActualThrottleStatus(THROTTLE_LOW) || !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) || !IS_FLIGHT_MODE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     PIDXYZ.Reset_Integral_Accumulators();
   }
@@ -328,6 +331,16 @@ float PIDXYZClass::PIDLevelPitch(float DeltaTime)
   else
   {
     RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValueVector));
+  }
+
+  if (AirPlaneNavigationIsControllingThrottle())
+  {
+    RcControllerAngle += ScaleRange16Bits(MAX(0, Cruise_Throttle - RCController[THROTTLE]), 0, Cruise_Throttle - MIN_STICKS_PULSE, 0, MinThrottleDownPitchAngle);
+  }
+
+  if (GetFrameStateOfAirPlane())
+  {
+    RcControllerAngle -= ConvertDegreesToDecidegrees(PitchLevelTrim);
   }
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);

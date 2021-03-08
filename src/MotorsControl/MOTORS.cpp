@@ -194,8 +194,6 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
 
   if (NumberOfMotors >= 4 && Yaw_Jump_Prevention < 500)
   {
-    //PREVINE UM "PULO" NO YAW,ESSE ERRO É UM PROBLEMA PRESENTE NA NAZA V2,
-    //MAS PRA QUE ELE ACONTEÇA,DEPENDE DO TIPO DE ESC,MOTOR & FRAME QUE VOCÊ ESTÁ USANDO
     PIDXYZ.PIDControllerApply[YAW] = Constrain_16Bits(PIDXYZ.PIDControllerApply[YAW],
                                                       -Yaw_Jump_Prevention - ABS(RCController[YAW]),
                                                       Yaw_Jump_Prevention + ABS(RCController[YAW]));

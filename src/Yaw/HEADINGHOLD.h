@@ -21,5 +21,5 @@
 extern int16_t HeadingHoldTarget;
 void UpdateStateOfHeadingHold(void);
 bool GetSafeStateOfHeadingHold();
-float GetHeadingHoldValue(int32_t DeltaTimeUs);
+float GetHeadingHoldValue(float DeltaTime);
 #endif

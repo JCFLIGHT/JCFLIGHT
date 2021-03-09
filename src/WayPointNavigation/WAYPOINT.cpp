@@ -275,7 +275,7 @@ void WayPointRun()
     Get_Altitude();
     GPS_Flight_Mode = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
-    NavigationMode = Do_PositionHold;
+    NavigationMode = DO_POSITION_HOLD;
     if (GetAltitudeReached() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
@@ -302,7 +302,7 @@ void WayPointRun()
     Get_Altitude();
     GPS_Flight_Mode = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
-    NavigationMode = Do_PositionHold;
+    NavigationMode = DO_POSITION_HOLD;
     if (GetAltitudeReached())
     {
       WayPointMode = WP_START_MISSION;
@@ -387,9 +387,9 @@ void WayPointRun()
         Do_GPS_Altitude = false;
         GPS_Flight_Mode = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
-        NavigationMode = Do_PositionHold;
+        NavigationMode = DO_POSITION_HOLD;
         GPS_Flight_Mode = WAYPOINT;
-        NavigationMode = Do_PositionHold;
+        NavigationMode = DO_POSITION_HOLD;
         if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber])) //MULT POR 10 PARA OBTÉR O VALOR EM SEGUNDOS PARA TRABALHAR EM CONJUNTO COM A FUNÇÃO WayPointSync10Hz()
         {
           WayPointMode = GET_ALTITUDE;
@@ -401,8 +401,8 @@ void WayPointRun()
         GPS_Flight_Mode = WAYPOINT;
         GPS_Flight_Mode = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
-        NavigationMode = Do_PositionHold;
-        NavigationMode = Do_Land_Init;
+        NavigationMode = DO_POSITION_HOLD;
+        NavigationMode = DO_LAND_INIT;
       }
       //RTH
       if (WayPointFlightMode[MissionNumber] == WP_RTH)

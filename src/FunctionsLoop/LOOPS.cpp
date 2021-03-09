@@ -104,4 +104,5 @@ void Integral_Loop()
         ServoAutoTrimRun();
         ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();
+        //ParamSerialProcess(); //EM DESENVOLVIMENTO
 }

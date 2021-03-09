@@ -87,7 +87,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"kI_Acc_AHRS", KI_ACC_AHRS_ADDR, VAR_8BITS, &JCF_Param.kI_Acc_AHRS, 0, 255},
     {"kP_Mag_AHRS", KP_MAG_AHRS_ADDR, VAR_8BITS, &JCF_Param.kP_Mag_AHRS, 0, 255},
     {"kI_Mag_AHRS", KI_MAG_AHRS_ADDR, VAR_8BITS, &JCF_Param.kI_Mag_AHRS, 0, 255},
-    {"AutoLaunch_AHRS_BankAngle", AL_AHRS_BA_ADDR, VAR_8BITS, &JCF_Param.AutoLaunch_AHRS_BankAngle, 0, 255},
+    /*{"AutoLaunch_AHRS_BankAngle", AL_AHRS_BA_ADDR, VAR_8BITS, &JCF_Param.AutoLaunch_AHRS_BankAngle, 0, 255},
     {"AutoLaunch_IMU_BankAngle", AL_IMU_BA_ADDR, VAR_16BITS, &JCF_Param.AutoLaunch_IMU_BankAngle, 0, 1000},
     {"AutoLaunch_IMU_Swing", AL_IMU_SWING_ADDR, VAR_8BITS, &JCF_Param.AutoLaunch_IMU_Swing, 0, 255},
     {"AutoLaunch_Trigger_Motor_Delay", AL_TRIGGER_MOTOR_DELAY_ADDR, VAR_16BITS, &JCF_Param.AutoLaunch_Trigger_Motor_Delay, 0, 10000},
@@ -119,14 +119,28 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GPS_RTH_Land", RTH_LAND_ADDR, VAR_8BITS, &JCF_Param.GPS_RTH_Land, 0, 255},
     {"GPS_TiltCompensation", GPS_TILT_COMP_ADDR, VAR_8BITS, &JCF_Param.GPS_TiltCompensation, 0, 100},
     {"AirSpeed_Samples", AIRSPEED_SAMPLES_ADDR, VAR_8BITS, &JCF_Param.AirSpeed_Samples, 0, 255},
-    {"AirSpeed_Factor", AIRSPEED_FACTOR_ADDR, VAR_16BITS, &JCF_Param.AirSpeed_Factor, 0, 5000},
+    {"AirSpeed_Factor", AIRSPEED_FACTOR_ADDR, VAR_16BITS, &JCF_Param.AirSpeed_Factor, 0, 5000},*/
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Requesited_Values_Of_Param))
 
 void ParamClass::Initialization()
 {
-  //Set_And_Save("kP_Acc_AHRS", 242); //APENAS PARA TESTE INICIAL
+
+  //PASSA OS VALORES DA EEPROM PARA OS PARAMETROS,ISSO DEVE FICAR SEMPRE ATIVO NA VERSÃO FINAL,ATÉ MESMO EM TESTES DE DESENVOLVIMENTO
+  //PARAM.LoadSketch();
+
+  //PARAM.Set_And_Save("dagasdg = 54"); //TESTE DE PARAMETRO INEXISTENTE
+
+  //PARAM.Set_And_Save("kP_Acc_AHRS = 12"); //TESTE DE PARAMETRO EXISTENTE
+
+  //PARAM.Set_And_Save("kP_Acc_AHRS = 300"); //TESTE DE LIMITE MAXIMO DO PARAMETRO
+
+  //PARAM.Set_And_Save("kP_Acc_AHRS = -10"); //TESTE DE LIMITE MINIMO DO PARAMETRO
+
+  //PARAM.Set_And_Save("relatorio"); //TESTE DE RELATORIO ATUAL DOS PARAMETROS
+
+  //DEBUG("%d", JCF_Param.kP_Acc_AHRS); //VERFICAÇÃO DO FUNCIONAMENTO DO LoadSketch()
 
 #ifdef OPERATOR_CHECK_EEPROM
   Operator_Check_Values_In_Address(SIZE_OF_EEPROM);
@@ -137,33 +151,174 @@ void ParamClass::Initialization()
 #endif
 }
 
-void ParamClass::Set_And_Save(const char *Param_Name, int32_t New_Value)
+void ParamClass::LoadSketch()
 {
+  const Requesited_Values_Of_Param *ParamValue;
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
-    if (strncasecmp(Param_Name, Params_Table[Table_Counter].Param_Name, strlen(Params_Table[Table_Counter].Param_Name)) == 0)
+    ParamValue = &Params_Table[Table_Counter];
+
+    switch (ParamValue->Variable_Type)
     {
-      if (New_Value >= Params_Table[Table_Counter].Value_Min && New_Value <= Params_Table[Table_Counter].Value_Max)
-      {
-        if (Params_Table[Table_Counter].Variable_Type == VAR_8BITS)
-        {
-          STORAGEMANAGER.Write_8Bits(Params_Table[Table_Counter].Address, New_Value);
-        }
-        else if (Params_Table[Table_Counter].Variable_Type == VAR_16BITS)
-        {
-          STORAGEMANAGER.Write_16Bits(Params_Table[Table_Counter].Address, New_Value);
-        }
-        else if (Params_Table[Table_Counter].Variable_Type == VAR_32BITS)
-        {
-          STORAGEMANAGER.Write_32Bits(Params_Table[Table_Counter].Address, New_Value);
-        }
-      }
-      else
-      {
-        //VALOR SETADO FORA DO RANGE MIN E MAX
-        LOG_PARAM_ERROR("O valor setado esta fora dos limites minimo e maximo!");
-      }
-      return;
+
+    case VAR_8BITS:
+      *(uint8_t *)ParamValue->Ptr = STORAGEMANAGER.Read_8Bits(ParamValue->Address);
+      break;
+
+    case VAR_16BITS:
+      *(int16_t *)ParamValue->Ptr = STORAGEMANAGER.Read_16Bits(ParamValue->Address);
+      break;
+
+    case VAR_32BITS:
+      *(int32_t *)ParamValue->Ptr = STORAGEMANAGER.Read_32Bits(ParamValue->Address);
+      break;
     }
   }
+}
+
+static void ParamSetValue(const Requesited_Values_Of_Param *VariablePointer, const int32_t New_Value)
+{
+  switch (VariablePointer->Variable_Type)
+  {
+
+  case VAR_8BITS:
+    *(uint8_t *)VariablePointer->Ptr = (uint8_t)New_Value;
+    STORAGEMANAGER.Write_8Bits(VariablePointer->Address, New_Value);
+    break;
+
+  case VAR_16BITS:
+    *(int16_t *)VariablePointer->Ptr = (int16_t)New_Value;
+    STORAGEMANAGER.Write_16Bits(VariablePointer->Address, New_Value);
+    break;
+
+  case VAR_32BITS:
+    *(int32_t *)VariablePointer->Ptr = (int32_t)New_Value;
+    STORAGEMANAGER.Write_32Bits(VariablePointer->Address, New_Value);
+    break;
+  }
+}
+
+static void ParamPrintValue(const Requesited_Values_Of_Param *VariablePointer)
+{
+  int32_t New_Value = 0;
+
+  switch (VariablePointer->Variable_Type)
+  {
+
+  case VAR_8BITS:
+    New_Value = STORAGEMANAGER.Read_8Bits(VariablePointer->Address);
+    break;
+
+  case VAR_16BITS:
+    New_Value = STORAGEMANAGER.Read_16Bits(VariablePointer->Address);
+    break;
+
+  case VAR_32BITS:
+    New_Value = STORAGEMANAGER.Read_32Bits(VariablePointer->Address);
+    DEBUG("%ld", New_Value);
+    return;
+  }
+  DEBUG("%d", New_Value);
+}
+
+void ParamClass::Set_And_Save(char *ParamCommandLine)
+{
+  const Requesited_Values_Of_Param *ParamValue;
+  char *PtrInput = NULL;
+  int32_t New_Value = 0;
+  uint32_t Table_Counter;
+  uint32_t StringLength;
+
+  StringLength = strlen(ParamCommandLine);
+
+  if (StringLength == 0)
+  {
+    return;
+  }
+  else if ((PtrInput = strstr(ParamCommandLine, "=")) != NULL)
+  {
+    PtrInput++;
+    StringLength--;
+    New_Value = atoi(PtrInput);
+    for (Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
+    {
+      ParamValue = &Params_Table[Table_Counter];
+      if (strncasecmp(ParamCommandLine, Params_Table[Table_Counter].Param_Name, strlen(Params_Table[Table_Counter].Param_Name)) == 0)
+      {
+        if (New_Value >= Params_Table[Table_Counter].Value_Min && New_Value <= Params_Table[Table_Counter].Value_Max)
+        {
+          ParamSetValue(ParamValue, New_Value);
+          PRINTF.SendToConsole(PSTR("%s setado para "), Params_Table[Table_Counter].Param_Name);
+          ParamPrintValue(ParamValue);
+        }
+        else if (New_Value < Params_Table[Table_Counter].Value_Min)
+        {
+          LOG_PARAM_ERROR("O valor setado esta fora do limite minimo!");
+        }
+        else if (New_Value > Params_Table[Table_Counter].Value_Max)
+        {
+          LOG_PARAM_ERROR("O valor setado esta fora do limite maximo!");
+        }
+        return;
+      }
+    }
+    LOG_PARAM_ERROR("Parametro nao encontrado na lista");
+  }
+  else if (strncasecmp(ParamCommandLine, "relatorio", 9) == 0)
+  {
+    for (Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
+    {
+      ParamValue = &Params_Table[Table_Counter];
+      PRINTF.SendToConsole(PSTR("%s = "), Params_Table[Table_Counter].Param_Name);
+      ParamPrintValue(ParamValue);
+    }
+    DEBUG("\r");
+  }
+  else if (strncasecmp(ParamCommandLine, "reiniciar", 9) == 0)
+  {
+  }
+  else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
+  {
+  }
+  else
+  {
+    LOG_PARAM_ERROR("Comando invalido!");
+  }
+}
+
+#include "FastSerial/FASTSERIAL.h"
+
+static char SerialBuffer[48];
+static uint32_t SerialBufferIndex = 0;
+
+void ParamSerialProcess()
+{
+  while (FASTSERIAL.Available(UART_NUMB_0))
+  {
+    uint8_t SerialReadCommand = FASTSERIAL.Read(UART_NUMB_0);
+
+    if (SerialReadCommand == 127)
+    {
+      if (SerialBufferIndex)
+      {
+        SerialBuffer[--SerialBufferIndex] = 0;
+      }
+    }
+
+    if (SerialBufferIndex < sizeof(SerialBuffer) && SerialReadCommand >= 32 && SerialReadCommand <= 126)
+    {
+      if (!SerialBufferIndex && SerialReadCommand == 32)
+      {
+        continue;
+      }
+      SerialBuffer[SerialBufferIndex++] = SerialReadCommand;
+    }
+
+    if (SerialBufferIndex)
+    {
+      SerialBuffer[SerialBufferIndex] = 0;
+      PARAM.Set_And_Save(SerialBuffer);
+    }
+  }
+  SerialBufferIndex = 0;
 }

@@ -22,9 +22,11 @@ class ParamClass
 {
 public:
   void Initialization();
+  void Set_And_Save(char *TerminalCommandLine);
 
 private:
-  void Set_And_Save(const char *ParamName, int32_t NewValue);
+  void LoadSketch();
 };
 extern ParamClass PARAM;
+void ParamSerialProcess();
 #endif

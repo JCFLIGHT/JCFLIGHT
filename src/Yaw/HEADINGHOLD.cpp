@@ -29,7 +29,7 @@
 //DEBUG
 //#define PRINTLN_HEADING_HOLD
 
-#define HEADING_HOLD_ERROR_LPF_FREQ 2
+#define HEADING_HOLD_LPF_FREQ 2
 
 PT1_Filter_Struct HeadingHoldRateFilter;
 
@@ -56,7 +56,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (GPS_Flight_Mode == Do_None) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
+  if (GPS_Flight_Mode == DO_NONE) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
   {
     return false;
   }
@@ -69,7 +69,7 @@ bool GetSafeStateOfHeadingHold()
   return true; //TUDO ESTÁ OK
 }
 
-float GetHeadingHoldValue(int32_t DeltaTimeUs)
+float GetHeadingHoldValue(float DeltaTime)
 {
   float HeadingHoldRate;
 
@@ -88,6 +88,7 @@ float GetHeadingHoldValue(int32_t DeltaTimeUs)
 
   //CALCULA O VALOR DO RATE
   HeadingHoldRate = YawError * GET_SET[P_YAW_RATE].ProportionalVector / 30.0f;
+
   //APLICA LIMITES MIN E MAX NO RATE
   HeadingHoldRate = Constrain_Float(HeadingHoldRate, -GET_SET[P_YAW_RATE_LIMIT].MinMaxValueVector, GET_SET[P_YAW_RATE_LIMIT].MinMaxValueVector);
 
@@ -97,11 +98,9 @@ float GetHeadingHoldValue(int32_t DeltaTimeUs)
 
 //REALIZA FILTRAGEM DO RATE COM O PT1
 #ifndef __AVR_ATmega2560__
-  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, DeltaTimeUs * 1e-6f);
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, DeltaTime);
 #else
-  //DEVIDO O CICLO DE MAQUINA EM 100HZ,NÃO É POSSIVEL FILTRAR A 2HZ USANDO O VALOR MEDIDO DO PROPRIO CICLO DE MAQUINA
-  //É NECESSARIO "ENGANAR" O ALGORITIMO,E FINGIR QUE ELE ESTÁ TRABALHANDO A 1KHZ PARA FREQUENCIA DE CORTE DE 2HZ SER APLICADA CORRETAMENTE
-  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_ERROR_LPF_FREQ, 1.0f / 1000);
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, 1.0f / 1000);
 #endif
 
 #ifdef PRINTLN_HEADING_HOLD

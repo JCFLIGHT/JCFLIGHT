@@ -33,7 +33,7 @@ void GPS_Orientation_Update()
     static Scheduler_Struct GPSControlTimer;
     if (!AltHoldControlApplied && Scheduler(&GPSControlTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
     {
-      if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != Do_None))
+      if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != DO_NONE))
       {
         if (NavStateForPosHold())
         {
@@ -53,7 +53,7 @@ void GPS_Orientation_Update()
   }
   else
   {
-    if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != Do_None))
+    if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (NavigationMode != DO_NONE))
     {
       AirPlaneUpdateNavigation();
       //ApplyAltitudeHoldControl(); //É REALMENTE CORRETO USAR ESSA FUNÇÃO PARA O ALT-HOLD EM AEROS???

@@ -157,16 +157,16 @@ enum GPS_Modes_Enum
 
 enum GPS_Flight_Modes_Enum
 {
-    Do_None = 0,
-    Do_Start_RTH,
-    Do_RTH_Enroute,
-    Do_PositionHold,
-    Do_Land_Init,
-    Do_LandInProgress,
-    Do_Landed,
-    Do_Land_Settle,
-    Do_Land_Descent,
-    Do_Land_Detected
+    DO_NONE = 0,
+    DO_START_RTH,
+    DO_RTH_ENROUTE,
+    DO_POSITION_HOLD,
+    DO_LAND_INIT,
+    DO_LAND_IN_PROGRESS,
+    DO_LANDED,
+    DO_LAND_SETTLE,
+    DO_LAND_DESCENT,
+    DO_LAND_DETECTED
 };
 
 enum AuxiliarChannels

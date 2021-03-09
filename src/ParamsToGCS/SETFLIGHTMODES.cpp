@@ -21,12 +21,12 @@
 
 void SetFlightModeToGCS()
 {
-  if ((NavigationMode == Do_Land_Settle) ||
-      (NavigationMode == Do_LandInProgress) ||
-      (NavigationMode == Do_Land_Detected) ||
-      (NavigationMode == Do_Landed))
+  if ((NavigationMode == DO_LAND_SETTLE) ||
+      (NavigationMode == DO_LAND_IN_PROGRESS) ||
+      (NavigationMode == DO_LAND_DETECTED) ||
+      (NavigationMode == DO_LANDED))
   {
-    if (NavigationMode == Do_Landed)
+    if (NavigationMode == DO_LANDED)
     {
       FlightMode = GCS_LANDED_MODE;
     }

@@ -130,32 +130,32 @@ void GPS_Process_FlightModes(float DeltaTime)
 
     if (GetFrameStateOfAirPlane())
     {
-      NavigationMode = Do_RTH_Enroute;
+      NavigationMode = DO_RTH_ENROUTE;
     }
 
     switch (NavigationMode)
     {
 
-    case Do_None:
+    case DO_NONE:
       break;
 
-    case Do_PositionHold:
+    case DO_POSITION_HOLD:
       break;
 
-    case Do_Start_RTH:
+    case DO_START_RTH:
       if (DistanceToHome <= 10)
       {
-        NavigationMode = Do_Land_Init;
+        NavigationMode = DO_LAND_INIT;
         HeadingHoldTarget = Navigation_Bearing_RTH;
       }
       else if (GetAltitudeReached())
       {
         Set_Next_Point_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1]);
-        NavigationMode = Do_RTH_Enroute;
+        NavigationMode = DO_RTH_ENROUTE;
       }
       break;
 
-    case Do_RTH_Enroute:
+    case DO_RTH_ENROUTE:
       CalculateNavigationSpeed = Calculate_Navigation_Speed(400);
       GPSCalculateNavigationRate(CalculateNavigationSpeed);
       GPS_Adjust_Heading();
@@ -163,45 +163,45 @@ void GPS_Process_FlightModes(float DeltaTime)
       {
         if (GetFrameStateOfMultirotor())
         {
-          NavigationMode = Do_Land_Init;
+          NavigationMode = DO_LAND_INIT;
         }
         HeadingHoldTarget = Navigation_Bearing_RTH;
       }
       break;
 
-    case Do_Land_Init:
+    case DO_LAND_INIT:
       Do_GPS_Altitude = true;
       SetAltitudeHold(ALTITUDE.EstimatedAltitude);
       Time_To_Start_The_Land = SCHEDULERTIME.GetMillis() + 100;
-      NavigationMode = Do_Land_Settle;
+      NavigationMode = DO_LAND_SETTLE;
       break;
 
-    case Do_Land_Settle:
+    case DO_LAND_SETTLE:
       if (SCHEDULERTIME.GetMillis() >= Time_To_Start_The_Land)
       {
-        NavigationMode = Do_LandInProgress;
+        NavigationMode = DO_LAND_IN_PROGRESS;
       }
       break;
 
-    case Do_LandInProgress:
+    case DO_LAND_IN_PROGRESS:
       if (GetLanded())
       {
-        NavigationMode = Do_Landed;
+        NavigationMode = DO_LANDED;
       }
       else if (GetGroundDetected())
       {
-        NavigationMode = Do_Land_Detected;
+        NavigationMode = DO_LAND_DETECTED;
       }
       break;
 
-    case Do_Land_Detected:
+    case DO_LAND_DETECTED:
       if (GetLanded())
       {
-        NavigationMode = Do_Landed;
+        NavigationMode = DO_LANDED;
       }
       break;
 
-    case Do_Landed:
+    case DO_LANDED:
       DISABLE_STATE(PRIMARY_ARM_DISARM);
       Do_GPS_Altitude = false;
       BEEPER.Play(BEEPER_ACTION_SUCCESS);
@@ -343,9 +343,9 @@ void ApplyPosHoldPIDControl(float *DeltaTime)
 
 bool NavStateForPosHold()
 {
-  return NavigationMode == Do_Land_Init || NavigationMode == Do_Land_Settle ||
-         NavigationMode == Do_LandInProgress || NavigationMode == Do_PositionHold ||
-         NavigationMode == Do_Start_RTH;
+  return NavigationMode == DO_LAND_INIT || NavigationMode == DO_LAND_SETTLE ||
+         NavigationMode == DO_LAND_IN_PROGRESS || NavigationMode == DO_POSITION_HOLD ||
+         NavigationMode == DO_START_RTH;
 }
 
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
@@ -420,7 +420,7 @@ void Do_Mode_RTH_Now()
     SetAltitudeHold(ALTITUDE.EstimatedAltitude);
   }
   SetThisPointToPositionHold();
-  NavigationMode = Do_Start_RTH;
+  NavigationMode = DO_START_RTH;
 }
 
 void Reset_Home_Point(void)
@@ -435,7 +435,7 @@ void Reset_Home_Point(void)
 
 void GPS_Reset_Navigation(void)
 {
-  NavigationMode = Do_None;
+  NavigationMode = DO_NONE;
   GPS_Navigation_Array[0] = 0;
   GPS_Navigation_Array[1] = 0;
   GPSResetPID(&PositionHoldPIDArray[0]);

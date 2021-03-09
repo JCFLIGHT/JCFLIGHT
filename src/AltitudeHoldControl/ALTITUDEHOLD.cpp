@@ -78,7 +78,7 @@ bool ApplyAltitudeHoldControl()
         {
           TakeOffInProgress = false;
         }
-        if (NavigationMode == Do_LandInProgress || NavigationMode == Do_Land_Detected || NavigationMode == Do_Landed)
+        if (NavigationMode == DO_LAND_IN_PROGRESS || NavigationMode == DO_LAND_DETECTED || NavigationMode == DO_LANDED)
         {
           if (HoveringState)
           {

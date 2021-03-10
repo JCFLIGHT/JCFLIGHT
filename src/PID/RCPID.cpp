@@ -150,7 +150,7 @@ void RC_PID_Update()
     TPA_Parameters.UpdateRequired = false;
   }
 #if defined(PRINTLN_TPA)
-  PRINTF.SendToConsole(PSTR("TPA:%d\n"), TPA_Parameters.CalcedValue);
+  PRINTF.SendToConsole(ProgmemString("TPA:%d\n"), TPA_Parameters.CalcedValue);
 #endif
   IOC_Mode_Update();
 }

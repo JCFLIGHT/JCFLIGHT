@@ -79,7 +79,12 @@ void Super_Fast_Loop()
         Switch_Flag();
         BATTERY.Calculate_Total_Mah();
 }
+/*
+#include "Param/VARTEST.h"
 
+VARTEST VarTest(VarParam_Test);
+VARTEST2 VarTest2(VarParam_Test2);
+*/
 void Integral_Loop()
 {
         int32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
@@ -104,5 +109,8 @@ void Integral_Loop()
         ServoAutoTrimRun();
         ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();
-        //ParamSerialProcess(); //EM DESENVOLVIMENTO
+        //EM DESENVOLVIMENTO
+        //ParamSerialProcess();
+        //VarTest.TestVar();
+        //VarTest2.TestVar();
 }

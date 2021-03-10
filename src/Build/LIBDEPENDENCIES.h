@@ -17,17 +17,18 @@
 
 #ifndef LIBDEPENDENCIES_H_
 #define LIBDEPENDENCIES_H_
+
+#ifndef NULL
 #define NULL 0
+#endif
 
 #ifdef __AVR_ATmega2560__
 
 #include <avr/io.h>       //PARA MANIPULAÇÃO DE REGISTRADORES
 #include <avr/pgmspace.h> //strlen_P (STRING LENGTH COM PONTEIRO)
+
 //PARA O AVR:ALOQUE NA MEMORIA FLASH AFIM DE OCUPAR MENOS MEMORIA RAM
-#ifdef PSTR
-#undef PSTR
-#define PSTR(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
-#endif
+#define ProgmemString(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
 
 #else
 

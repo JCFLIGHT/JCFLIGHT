@@ -248,7 +248,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
         if (New_Value >= Params_Table[Table_Counter].Value_Min && New_Value <= Params_Table[Table_Counter].Value_Max)
         {
           ParamSetValue(ParamValue, New_Value);
-          PRINTF.SendToConsole(PSTR("%s setado para "), Params_Table[Table_Counter].Param_Name);
+          PRINTF.SendToConsole(ProgmemString("%s setado para "), Params_Table[Table_Counter].Param_Name);
           ParamPrintValue(ParamValue);
         }
         else if (New_Value < Params_Table[Table_Counter].Value_Min)
@@ -269,7 +269,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
     for (Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
     {
       ParamValue = &Params_Table[Table_Counter];
-      PRINTF.SendToConsole(PSTR("%s = "), Params_Table[Table_Counter].Param_Name);
+      PRINTF.SendToConsole(ProgmemString("%s = "), Params_Table[Table_Counter].Param_Name);
       ParamPrintValue(ParamValue);
     }
     DEBUG("\r");

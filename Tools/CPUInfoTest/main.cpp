@@ -77,7 +77,7 @@ static void Println_Sizes(void)
         TENTIMES(x);  \
     } while (0)
 
-#define TIMEIT(name, op, count)                                   \
+#define TIMEIT(Name, op, count)                                   \
     do                                                            \
     {                                                             \
         uint32_t us_end, us_start;                                \
@@ -87,7 +87,7 @@ static void Println_Sizes(void)
             FIFTYTIMES(op);                                       \
         }                                                         \
         us_end = micros();                                        \
-        Serial.print(name);                                       \
+        Serial.print(Name);                                       \
         Serial.print("          ");                               \
         Serial.print(double(us_end - us_start) / (count * 50.0)); \
         Serial.println(" MicroSegundo/Chamada");                  \

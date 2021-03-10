@@ -78,7 +78,7 @@ void RCInterpolationApply()
   static uint32_t Refresh = SCHEDULERTIME.GetMillis();
   if (SCHEDULERTIME.GetMillis() - Refresh >= 20)
   {
-    PRINTF.SendToConsole(PSTR("NotFiltered:%d Filtered:%d\n"),
+    PRINTF.SendToConsole(ProgmemString("NotFiltered:%d Filtered:%d\n"),
                          RCControllerUnFiltered[ROLL],
                          RCController[ROLL]);
     Refresh = SCHEDULERTIME.GetMillis();

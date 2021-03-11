@@ -115,9 +115,8 @@ void Integral_Loop()
         {
                 Parameters.Initialization();
                 //Parameters.Throttle_Min.Set_And_Save(1050);
-                //Parameters.Proportional_Roll.Set_And_Save(50);
                 initt = true;
         }
-        DEBUG("Throttle_Min:%d", Parameters.Proportional_Roll.Get());
+        DEBUG("Throttle_Min:%d", Parameters.Throttle_Min.Get());
 #endif
 }

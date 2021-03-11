@@ -76,10 +76,15 @@ public:
     void Initialization();
 };
 
+//#define VARPARAM_TEST
+
+#ifdef VARPARAM_TEST
 static ParametersClass Parameters;
+#endif
 
 void ParametersClass::Initialization() //PRIMEIRA INSTRUÇÃO DE MAQUINA A SER CARREGADA NO SETUP
 {
+#ifdef VARPARAM_TEST
     if (!Parameters.Format_Version.Load() || Parameters.Format_Version != ParametersClass::Actual_Format_Version)
     {
         PRINTF.SendToConsole(ProgramMemoryString("Primeira linkagem,limpando a EEPROM...\n"));
@@ -91,4 +96,5 @@ void ParametersClass::Initialization() //PRIMEIRA INSTRUÇÃO DE MAQUINA A SER C
     {
         VarParam::Load_All();
     }
+#endif
 }

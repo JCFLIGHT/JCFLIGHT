@@ -110,6 +110,7 @@ void Integral_Loop()
         ApplyPWMControlForMotorsAndServos();
         //EM DESENVOLVIMENTO
         //ParamSerialProcess();
+#ifdef VARPARAM_TEST
         if (!initt)
         {
                 Parameters.Initialization();
@@ -118,4 +119,5 @@ void Integral_Loop()
                 initt = true;
         }
         DEBUG("Throttle_Min:%d", Parameters.Proportional_Roll.Get());
+#endif
 }

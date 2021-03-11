@@ -59,10 +59,10 @@ extern SerialPrint PRINTF;
 
 #ifdef __AVR_ATmega2560__
 
-#define DEBUG(fmt, args...) PRINTF.SendToConsole(ProgmemString(fmt "\n"), ##args);
-#define LOG(fmt) PRINTF.SendToConsole(ProgmemString("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__);
-#define LOG_PARAM_ERROR(fmt) PRINTF.SendToConsole(ProgmemString("ERRO:" fmt "\n"));
-#define LINE_SPACE PRINTF.SendToConsole(ProgmemString("\n"));
+#define DEBUG(fmt, args...) PRINTF.SendToConsole(ProgramMemoryString(fmt "\n"), ##args);
+#define LOG(fmt) PRINTF.SendToConsole(ProgramMemoryString("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__);
+#define LOG_PARAM_ERROR(fmt) PRINTF.SendToConsole(ProgramMemoryString("ERRO:" fmt "\n"));
+#define LINE_SPACE PRINTF.SendToConsole(ProgramMemoryString("\n"));
 
 #else
 

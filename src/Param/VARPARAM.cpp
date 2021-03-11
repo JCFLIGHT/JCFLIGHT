@@ -215,18 +215,18 @@ bool VarParam::Save(void)
 
     if (Size <= sizeof(VectorBuffer))
     {
-        uint8_t *ep = (uint8_t *)_Key;
-        for (size_t i = 0; i < Size; i++, ep++)
+        uint8_t *EEPROM_AddressCount = (uint8_t *)_Key;
+        for (size_t Index = 0; Index < Size; Index++, EEPROM_AddressCount++)
         {
             uint8_t NewVectorBuffer;
 
-            if (eeprom_read_byte(ep) != VectorBuffer[i])
+            if (eeprom_read_byte(EEPROM_AddressCount) != VectorBuffer[Index])
             {
-                eeprom_write_byte(ep, VectorBuffer[i]);
+                eeprom_write_byte(EEPROM_AddressCount, VectorBuffer[Index]);
             }
 
-            NewVectorBuffer = eeprom_read_byte(ep);
-            if (NewVectorBuffer != VectorBuffer[i])
+            NewVectorBuffer = eeprom_read_byte(EEPROM_AddressCount);
+            if (NewVectorBuffer != VectorBuffer[Index])
             {
                 return false;
             }
@@ -291,7 +291,7 @@ bool VarParam::Load(void)
     return false;
 }
 
-bool VarParam::Load_all(void)
+bool VarParam::Load_All(void)
 {
     bool Result = true;
     VarParam *Var_Param = _Variables;
@@ -319,7 +319,6 @@ bool VarParam::Load_all(void)
 void VarParam::Erase_All()
 {
     VarParam *Var_Param;
-    uint16_t i;
     Var_Param = _Variables;
     size_t LoopCount = 0;
 
@@ -334,9 +333,13 @@ void VarParam::Erase_All()
         Var_Param = Var_Param->_Link;
     }
 
-    for (i = 0; i < Param_EEPROM_Size; i++)
+    for (uint16_t Index = 0; Index < Param_EEPROM_Size; Index++)
     {
-        eeprom_write_byte((uint8_t *)i, 0xff);
+        uint8_t *EEPROM_AddressCount = (uint8_t *)Param_EEPROM_Size;
+        if (eeprom_read_byte(EEPROM_AddressCount) != 0)
+        {
+            eeprom_write_byte(EEPROM_AddressCount, 0);
+        }
     }
 
     _Tail_Sentinel = 0;

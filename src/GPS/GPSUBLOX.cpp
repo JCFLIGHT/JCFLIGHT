@@ -154,19 +154,19 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       FASTSERIAL.Begin(UART_NUMB_1, 9600);
       if (Get_BaudRate == 19200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
       }
       else if (Get_BaudRate == 38400)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
       }
       else if (Get_BaudRate == 57600)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
       }
       else if (Get_BaudRate == 115200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
       }
       while (!FASTSERIAL.TXFree(UART_NUMB_1))
       {
@@ -179,19 +179,19 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       FASTSERIAL.Begin(UART_NUMB_1, 19200);
       if (Get_BaudRate == 19200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
       }
       else if (Get_BaudRate == 38400)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
       }
       else if (Get_BaudRate == 57600)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
       }
       else if (Get_BaudRate == 115200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
       }
       while (!FASTSERIAL.TXFree(UART_NUMB_1))
       {
@@ -204,19 +204,19 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       FASTSERIAL.Begin(UART_NUMB_1, 38400);
       if (Get_BaudRate == 19200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
       }
       else if (Get_BaudRate == 38400)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
       }
       else if (Get_BaudRate == 57600)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
       }
       else if (Get_BaudRate == 115200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
       }
       while (!FASTSERIAL.TXFree(UART_NUMB_1))
       {
@@ -229,19 +229,19 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       FASTSERIAL.Begin(UART_NUMB_1, 57600);
       if (Get_BaudRate == 19200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
       }
       else if (Get_BaudRate == 38400)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
       }
       else if (Get_BaudRate == 57600)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
       }
       else if (Get_BaudRate == 115200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
       }
       while (!FASTSERIAL.TXFree(UART_NUMB_1))
       {
@@ -254,19 +254,19 @@ void GPS_SerialInit(uint32_t Get_BaudRate)
       FASTSERIAL.Begin(UART_NUMB_1, 115200);
       if (Get_BaudRate == 19200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,19200,0*23\r\n"));
       }
       else if (Get_BaudRate == 38400)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,38400,0*26\r\n"));
       }
       else if (Get_BaudRate == 57600)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,57600,0*2D\r\n"));
       }
       else if (Get_BaudRate == 115200)
       {
-        SerialSendConfigToGPS(ProgmemString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
+        SerialSendConfigToGPS(ProgramMemoryString("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));
       }
       while (!FASTSERIAL.TXFree(UART_NUMB_1))
       {

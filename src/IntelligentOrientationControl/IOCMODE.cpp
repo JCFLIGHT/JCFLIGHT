@@ -43,7 +43,7 @@ void IOC_Mode_Update()
     RCController[PITCH] = CalcedRCControllerPITCH;
   }
 #ifdef PRINTLN_IOC
-  PRINTF.SendToConsole(ProgmemString("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
+  PRINTF.SendToConsole(ProgramMemoryString("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
                        RCController[ROLL],
                        RCController[PITCH],
                        CalcedRCControllerPITCH,

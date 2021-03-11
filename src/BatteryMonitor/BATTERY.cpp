@@ -92,7 +92,7 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
   }
 
 #ifdef PRINTLN_BATT
-  PRINTF.SendToConsole(ProgmemString("volt:%0.2f min:%0.2f max:%0.2f mincount:%d maxcount:%d\n"),
+  PRINTF.SendToConsole(ProgramMemoryString("volt:%0.2f min:%0.2f max:%0.2f mincount:%d maxcount:%d\n"),
                        BattVoltage,
                        BattMinVolt,
                        BattMaxVolt,

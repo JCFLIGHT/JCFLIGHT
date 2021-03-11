@@ -214,13 +214,13 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
 
   if (GetFrameStateOfMultirotor())
   {
-    PRINTF.SendToConsole(ProgmemString("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
+    PRINTF.SendToConsole(ProgramMemoryString("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
                          RCController[THROTTLE],
                          (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], 4, 1.0f / 1000));
   }
   else if (GetFrameStateOfAirPlane())
   {
-    PRINTF.SendToConsole(ProgmemString("RCController[PITCH]:%d PT1RCController[PITCH]:%d\n"),
+    PRINTF.SendToConsole(ProgramMemoryString("RCController[PITCH]:%d PT1RCController[PITCH]:%d\n"),
                          RCController[PITCH],
                          (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], 4, 1.0f / 1000));
   }

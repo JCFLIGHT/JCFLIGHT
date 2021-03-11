@@ -79,12 +79,11 @@ void Super_Fast_Loop()
         Switch_Flag();
         BATTERY.Calculate_Total_Mah();
 }
-/*
-#include "Param/VARTEST.h"
 
-VARTEST VarTest(VarParam_Test);
-VARTEST2 VarTest2(VarParam_Test2);
-*/
+#include "Param/PARAMETERS.h"
+
+bool initt = false;
+
 void Integral_Loop()
 {
         int32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
@@ -111,6 +110,12 @@ void Integral_Loop()
         ApplyPWMControlForMotorsAndServos();
         //EM DESENVOLVIMENTO
         //ParamSerialProcess();
-        //VarTest.TestVar();
-        //VarTest2.TestVar();
+        if (!initt)
+        {
+                Parameters.Initialization();
+                //Parameters.Throttle_Min.Set_And_Save(1050);
+                //Parameters.Proportional_Roll.Set_And_Save(50);
+                initt = true;
+        }
+        DEBUG("Throttle_Min:%d", Parameters.Proportional_Roll.Get());
 }

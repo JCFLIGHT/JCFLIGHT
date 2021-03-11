@@ -104,7 +104,7 @@ float GetHeadingHoldValue(float DeltaTime)
 #endif
 
 #ifdef PRINTLN_HEADING_HOLD
-  PRINTF.SendToConsole(ProgmemString("HHR:%.2f HHRF:%.2f\n"),
+  PRINTF.SendToConsole(ProgramMemoryString("HHR:%.2f HHRF:%.2f\n"),
                        HeadingHoldRateNF,
                        HeadingHoldRate);
 #endif

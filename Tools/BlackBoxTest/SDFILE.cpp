@@ -167,7 +167,7 @@ uint8_t SdFile::make83Name(const char *str, uint8_t *name)
     else
     {
       uint8_t b;
-      PGM_P p = ProgmemString("|<>^+=?/[];,*\"\\");
+      PGM_P p = ProgramMemoryString("|<>^+=?/[];,*\"\\");
       while ((b = pgm_read_byte(p++)))
         if (b == c)
         {

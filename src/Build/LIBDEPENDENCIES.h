@@ -28,7 +28,7 @@
 #include <avr/pgmspace.h> //strlen_P (STRING LENGTH COM PONTEIRO)
 
 //PARA O AVR:ALOQUE NA MEMORIA FLASH AFIM DE OCUPAR MENOS MEMORIA RAM
-#define ProgmemString(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
+#define ProgramMemoryString(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
 
 #else
 

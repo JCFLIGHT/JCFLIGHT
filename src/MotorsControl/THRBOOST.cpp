@@ -56,6 +56,6 @@ void ApplyThrottleBoost()
     }
     Set_Throttle_Out(RCController[THROTTLE], IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE)); //APLIQUE APENAS NO MODO STABILIZE
 #ifdef PRINTLN_THR_BOOST
-    PRINTF.SendToConsole(ProgmemString("RCController[THROTTLE]:%d\n"), RCController[THROTTLE]);
+    PRINTF.SendToConsole(ProgramMemoryString("RCController[THROTTLE]:%d\n"), RCController[THROTTLE]);
 #endif
 }

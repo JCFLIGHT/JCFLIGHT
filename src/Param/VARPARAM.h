@@ -20,13 +20,6 @@
 
 #include "Build/LIBDEPENDENCIES.h"
 
-enum //255 KEYS NO MAXIMO
-{
-    Param_Format_Version = 0,
-    VarParam_Test,
-    VarParam_Test2
-};
-
 class VarParam_Group;
 
 class MetaClass
@@ -108,7 +101,7 @@ public:
 
     static bool Save_All(void);
 
-    static bool Load_all(void);
+    static bool Load_All(void);
 
     static void Erase_All(void);
 

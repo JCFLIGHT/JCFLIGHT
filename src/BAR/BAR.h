@@ -90,7 +90,7 @@
 #define MAG_PITCH_ADDR 492
 #define MAG_ROLL_ADDR 494
 #define MAG_YAW_ADDR 496
-#define IOC_ADDR 500
+#define SIMPLE_ADDR 500
 #define ALT_HOLD_ADDR 501
 #define GPS_HOLD_ADDR 502
 #define RTH_ADDR 503

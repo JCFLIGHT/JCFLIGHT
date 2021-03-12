@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "IOCMODE.h"
+#include "SIMPLEMODE.h"
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Compass/COMPASSREAD.h"
@@ -29,20 +29,20 @@
 FILE_COMPILE_FOR_SPEED
 
 //DEBUG
-//#define PRINTLN_IOC
+//#define PRINTLN_SIMPLE_MODE
 
-void IOC_Mode_Update()
+void Simple_Mode_Update()
 {
-  if (IS_FLIGHT_MODE_ACTIVE(IOC_MODE) && GetFrameStateOfMultirotor())
+  if (IS_FLIGHT_MODE_ACTIVE(SIMPLE_MODE) && GetFrameStateOfMultirotor())
   {
-    const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - COMPASS.IOC_Initial);
+    const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - COMPASS.Simple_Initial);
     const float CosineDifference = Fast_Cosine(HeadingDifference);
     const float SineDifference = Fast_Sine(HeadingDifference);
     const int16_t CalcedRCControllerPITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;
     RCController[ROLL] = RCController[ROLL] * CosineDifference - RCController[PITCH] * SineDifference;
     RCController[PITCH] = CalcedRCControllerPITCH;
   }
-#ifdef PRINTLN_IOC
+#ifdef PRINTLN_SIMPLE_MODE
   PRINTF.SendToConsole(ProgramMemoryString("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
                        RCController[ROLL],
                        RCController[PITCH],

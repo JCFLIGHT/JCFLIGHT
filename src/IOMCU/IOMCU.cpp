@@ -1420,7 +1420,7 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, GetUserBasicGCSParameters.GetAcroType);
     STORAGEMANAGER.Write_8Bits(ALT_HOLD_ADDR, GetUserBasicGCSParameters.GetAltitudeHoldType);
     STORAGEMANAGER.Write_8Bits(GPS_HOLD_ADDR, GetUserBasicGCSParameters.GetPositionHoldType);
-    STORAGEMANAGER.Write_8Bits(IOC_ADDR, GetUserBasicGCSParameters.GetInteligentOrientationControlType);
+    STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, GetUserBasicGCSParameters.GetInteligentOrientationControlType);
     STORAGEMANAGER.Write_8Bits(RTH_ADDR, GetUserBasicGCSParameters.GetReturnToHomeType);
     STORAGEMANAGER.Write_8Bits(ATACK_ADDR, GetUserBasicGCSParameters.GetAtackType);
     STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, GetUserBasicGCSParameters.GetAutomaticFlipType);
@@ -1528,7 +1528,7 @@ void GCSClass::Save_Medium_Configuration()
 void GCSClass::Default_Basic_Configuration()
 {
     //LIMPA TODAS AS CONFIGURAÇÕES SALVAS
-    STORAGEMANAGER.Write_8Bits(IOC_ADDR, 0);               //LIMPA A CONFIGURAÇÃO DO MODO IOC
+    STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DO MODO SIMPLES
     STORAGEMANAGER.Write_8Bits(ALT_HOLD_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODO ALTITUDE-HOLD
     STORAGEMANAGER.Write_8Bits(GPS_HOLD_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODO GPS-HOLD
     STORAGEMANAGER.Write_8Bits(RTH_ADDR, 0);               //LIMPA A CONFIGURAÇÃO DO MODO RTH
@@ -1715,7 +1715,7 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendAcroType = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);
     SendUserBasicGCSParameters.SendAltitudeHoldType = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR);
     SendUserBasicGCSParameters.SendPositionHoldType = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);
-    SendUserBasicGCSParameters.SendInteligentOrientationControlType = STORAGEMANAGER.Read_8Bits(IOC_ADDR);
+    SendUserBasicGCSParameters.SendInteligentOrientationControlType = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);
     SendUserBasicGCSParameters.SendReturnToHomeType = STORAGEMANAGER.Read_8Bits(RTH_ADDR);
     SendUserBasicGCSParameters.SendAtackType = STORAGEMANAGER.Read_8Bits(ATACK_ADDR);
     SendUserBasicGCSParameters.SendAutomaticFlipType = STORAGEMANAGER.Read_8Bits(AUTOFLIP_ADDR);

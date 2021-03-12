@@ -37,7 +37,7 @@ uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
 //VARIAVEIS DE CARREGAMENTO DA EEPROM
 uint8_t GPSHoldConfig,
     RTHConfig,
-    IOCConfig,
+    SimpleConfig,
     AltitudeHoldConfig,
     AcroConfig,
     AttackConfig,
@@ -53,7 +53,7 @@ uint8_t GPSHoldConfig,
 int16_t AltitudeHoldControlAux,
     GPSHoldControlAux,
     RTHControlAux,
-    IOCControlAux,
+    SimpleControlAux,
     GimbalControlAux,
     AcroControlAux,
     AttackControlAux,
@@ -64,7 +64,7 @@ int16_t AltitudeHoldControlAux,
 
 void AUXFLIGHTCLASS::LoadEEPROM(void)
 {
-  IOCConfig = STORAGEMANAGER.Read_8Bits(IOC_ADDR);                    //CHAVE AUX ATRIBUIDA PARA O MODO IOC
+  SimpleConfig = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);              //CHAVE AUX ATRIBUIDA PARA O MODO SIMPLES
   AltitudeHoldConfig = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR);      //CHAVE AUX ATRIBUIDA PARA O MODO ALT-HOLD
   GPSHoldConfig = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);           //CHAVE AUX ATRIBUIDA PARA O MODO GPS-HOLD
   RTHConfig = STORAGEMANAGER.Read_8Bits(RTH_ADDR);                    //CHAVE AUX ATRIBUIDA PARA O MODO RTH
@@ -83,103 +83,103 @@ void AUXFLIGHTCLASS::LoadEEPROM(void)
 void AUXFLIGHTCLASS::SelectMode(void)
 {
   //INTELLIGENT ORIENTATION CONTROL
-  switch (IOCConfig)
+  switch (SimpleConfig)
   {
 
   case AUXONELOW:
-    IOCControlAux = AUX1_LOW;
+    SimpleControlAux = AUX1_LOW;
     break;
 
   case AUXONEMIDDLE:
-    IOCControlAux = AUX1_MID;
+    SimpleControlAux = AUX1_MID;
     break;
 
   case AUXONEHIGH:
-    IOCControlAux = AUX1_HIGH;
+    SimpleControlAux = AUX1_HIGH;
     break;
 
   case AUXTWOLOW:
-    IOCControlAux = AUX2_LOW;
+    SimpleControlAux = AUX2_LOW;
     break;
 
   case AUXTWOMIDDLE:
-    IOCControlAux = AUX2_MID;
+    SimpleControlAux = AUX2_MID;
     break;
 
   case AUXTWOHIGH:
-    IOCControlAux = AUX2_HIGH;
+    SimpleControlAux = AUX2_HIGH;
     break;
 
   case AUXTHREELOW:
-    IOCControlAux = AUX3_LOW;
+    SimpleControlAux = AUX3_LOW;
     break;
 
   case AUXTHREEMIDDLE:
-    IOCControlAux = AUX3_MID;
+    SimpleControlAux = AUX3_MID;
     break;
 
   case AUXTHREEHIGH:
-    IOCControlAux = AUX3_HIGH;
+    SimpleControlAux = AUX3_HIGH;
     break;
 
   case AUXFOURLOW:
-    IOCControlAux = AUX4_LOW;
+    SimpleControlAux = AUX4_LOW;
     break;
 
   case AUXFOURMIDDLE:
-    IOCControlAux = AUX4_MID;
+    SimpleControlAux = AUX4_MID;
     break;
 
   case AUXFOURHIGH:
-    IOCControlAux = AUX4_HIGH;
+    SimpleControlAux = AUX4_HIGH;
     break;
 
   case AUXFIVELOW:
-    IOCControlAux = AUX5_LOW;
+    SimpleControlAux = AUX5_LOW;
     break;
 
   case AUXFIVEMIDDLE:
-    IOCControlAux = AUX5_MID;
+    SimpleControlAux = AUX5_MID;
     break;
 
   case AUXFIVEHIGH:
-    IOCControlAux = AUX5_HIGH;
+    SimpleControlAux = AUX5_HIGH;
     break;
 
   case AUXSIXLOW:
-    IOCControlAux = AUX6_LOW;
+    SimpleControlAux = AUX6_LOW;
     break;
 
   case AUXSIXMIDDLE:
-    IOCControlAux = AUX6_MID;
+    SimpleControlAux = AUX6_MID;
     break;
 
   case AUXSIXHIGH:
-    IOCControlAux = AUX6_HIGH;
+    SimpleControlAux = AUX6_HIGH;
     break;
 
   case AUXSEVENLOW:
-    IOCControlAux = AUX7_LOW;
+    SimpleControlAux = AUX7_LOW;
     break;
 
   case AUXSEVENMIDDLE:
-    IOCControlAux = AUX7_MID;
+    SimpleControlAux = AUX7_MID;
     break;
 
   case AUXSEVENHIGH:
-    IOCControlAux = AUX7_HIGH;
+    SimpleControlAux = AUX7_HIGH;
     break;
 
   case AUXEIGHTLOW:
-    IOCControlAux = AUX8_LOW;
+    SimpleControlAux = AUX8_LOW;
     break;
 
   case AUXEIGHTMIDDLE:
-    IOCControlAux = AUX8_MID;
+    SimpleControlAux = AUX8_MID;
     break;
 
   case AUXEIGHTHIGH:
-    IOCControlAux = AUX8_HIGH;
+    SimpleControlAux = AUX8_HIGH;
     break;
   }
 
@@ -1109,15 +1109,15 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
   {
     ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE);
   }
-  //IOC
-  if (IOCControlAux)
+  //SIMPLES
+  if (SimpleControlAux)
   {
-    ENABLE_THIS_FLIGHT_MODE(IOC_MODE);
+    ENABLE_THIS_FLIGHT_MODE(SIMPLE_MODE);
     ENABLE_THIS_FLIGHT_MODE(MANUAL_MODE);
   }
   else
   {
-    DISABLE_THIS_FLIGHT_MODE(IOC_MODE);
+    DISABLE_THIS_FLIGHT_MODE(SIMPLE_MODE);
     DISABLE_THIS_FLIGHT_MODE(MANUAL_MODE);
   }
   //ALTITUDE-HOLD

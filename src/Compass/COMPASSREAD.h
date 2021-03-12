@@ -30,7 +30,7 @@ public:
   int16_t MagCalibrationMinVector[3];
   int16_t MagCalibrationMaxVector[3];
   int16_t CalibrationCount = 0;
-  int16_t IOC_Initial;
+  int16_t Simple_Initial;
   void Initialization();
   void Constant_Read();
   void UpdateCompassCalibration();

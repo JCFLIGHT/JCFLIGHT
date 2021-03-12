@@ -41,9 +41,9 @@ void SetFlightModeToGCS()
     {
       FlightMode = GCS_ACRO_MODE;
     }
-    if (IOCControlAux)
+    if (SimpleControlAux)
     {
-      FlightMode = GCS_IOC_MODE;
+      FlightMode = GCS_SIMPLE_MODE;
     }
     if (AltitudeHoldControlAux)
     {
@@ -73,7 +73,7 @@ void SetFlightModeToGCS()
     {
       FlightMode = GCS_LAND_MODE;
     }
-    if (!AcroControlAux && !IOCControlAux && !AltitudeHoldControlAux &&
+    if (!AcroControlAux && !SimpleControlAux && !AltitudeHoldControlAux &&
         !GPSHoldControlAux && !RTHControlAux && !AttackControlAux &&
         !AutoFlipControlAux && !WayPointControlAux && !AutoLandControlAux)
     {

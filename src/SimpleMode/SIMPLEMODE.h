@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IOCMODE_H_
-#define IOCMODE_H_
+#ifndef SIMPLEMODE_H_
+#define SIMPLEMODE_H_
 #include "Build/LIBDEPENDENCIES.h"
-void IOC_Mode_Update();
+void Simple_Mode_Update();
 #endif

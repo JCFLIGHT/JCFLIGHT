@@ -16,7 +16,7 @@
 */
 
 #include "RCPID.h"
-#include "IntelligentOrientationControl/IOCMODE.h"
+#include "SimpleMode/SIMPLEMODE.h"
 #include "TPA.h"
 #include "Math/MATHSUPPORT.h"
 #include "RadioControl/RCSMOOTH.h"
@@ -152,5 +152,5 @@ void RC_PID_Update()
 #if defined(PRINTLN_TPA)
   PRINTF.SendToConsole(ProgramMemoryString("TPA:%d\n"), TPA_Parameters.CalcedValue);
 #endif
-  IOC_Mode_Update();
+  Simple_Mode_Update();
 }

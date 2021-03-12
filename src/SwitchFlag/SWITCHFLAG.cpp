@@ -27,7 +27,7 @@
 //***********************************************************************************************
 //ATIVAÇÃO PARA O CALIBRÇÃO DO MAG,SERVO AUTO-TRIM & TRIMAGEM MANUAL DOS SERVOS VIA CHAVE AUX
 //
-//PERFIL MULTIROTOR >> CHAVE DO MODO DE VOO IOC
+//PERFIL MULTIROTOR >> CHAVE DO MODO DE VOO SIMPLES
 //PERFIL AERO E ASA-FIXA >> CHAVE DO MODO DE VOO MANUAL
 //
 //CALIB MAG IMPLEMENTADO       >> 28/06/2020 (8 TOQUES PARA ATIVAR)
@@ -53,7 +53,7 @@ uint32_t CR_Clear;
 void Switch_Flag(void)
 {
   //INICIA A CONTAGEM DA FLAG PRINCIPAL
-  if (IOCControlAux)
+  if (SimpleControlAux)
   {
     if ((SCHEDULERTIME.GetMillis() - TimerFunction) > 50) //DEBOUNCE
     {
@@ -74,23 +74,23 @@ void Switch_Flag(void)
   {
     CloseReset = 0; //EVITA GUARDAR VALORES NEGATIVOS CAUSADO PELA DECREMENTAÇÃO DA FUNÇÃO ACIMA
   }
-  //RESETA A FLAG SE O VALOR DELA FOR IGUAL A 8,E A CHAVE AUX DO MODO IOC FOR FALSA
-  if (FlagParameterFunction == 8 && !IOCControlAux)
+  //RESETA A FLAG SE O VALOR DELA FOR IGUAL A 8,E A CHAVE AUX DO MODO SIMPLES FOR FALSA
+  if (FlagParameterFunction == 8 && !SimpleControlAux)
   {
     FlagParameterFunction = 0;
   }
   //ESPERA A DECREMENTAÇÃO DA VARIAVEL ACABAR E RESETA A FLAG PRINCIPAL
-  if (!IOCControlAux && CloseReset == 0)
+  if (!SimpleControlAux && CloseReset == 0)
   {
     FlagParameterFunction = 0;
   }
   //FLAG PRINCIPAL IGUAL A 4?CHAVE AUX ATIVADA?CAL DO MAG ACABOU?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
-  if (FlagParameterFunction == 4 && IOCControlAux && !COMPASS.Calibrating)
+  if (FlagParameterFunction == 4 && SimpleControlAux && !COMPASS.Calibrating)
   {
     GuardValue = FlagParameterFunction;
   }
   //FLAG PRINCIPAL IGUAL A 8?CHAVE AUX ATIVADA?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
-  if (FlagParameterFunction == 8 && IOCControlAux)
+  if (FlagParameterFunction == 8 && SimpleControlAux)
   {
     GuardValue = FlagParameterFunction;
   }

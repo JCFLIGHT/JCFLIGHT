@@ -78,7 +78,7 @@ void SticksClass::Update()
             if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
               ENABLE_STATE(PRIMARY_ARM_DISARM);
-              COMPASS.IOC_Initial = ATTITUDE.AngleOut[YAW];
+              COMPASS.Simple_Initial = ATTITUDE.AngleOut[YAW];
             }
           }
         }
@@ -110,7 +110,7 @@ void SticksClass::Pre_Arm(void)
       else //IMU CALIBRADA?SIM...ARMA OS MOTORES
       {
         ENABLE_STATE(PRIMARY_ARM_DISARM);
-        COMPASS.IOC_Initial = ATTITUDE.AngleOut[YAW];
+        COMPASS.Simple_Initial = ATTITUDE.AngleOut[YAW];
       }
       STICKS.PreArm_Delay = false;
       STICKS.PreArm_Delay_Count = 0;

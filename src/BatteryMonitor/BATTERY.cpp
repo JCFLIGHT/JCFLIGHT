@@ -48,8 +48,7 @@ void BATT::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
   BATTERY.Voltage = Voltage_Filter.Apply(BATTERY.Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
-  //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
-  if (BATTERY.Voltage > 6)
+  if (BATTERY.Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
   {
     if (BATTERY.GetPercentage() <= PREVENT_ARM_LOW_BATT) //MENOR OU IGUAL QUE 20% DA CAPACIDADE TOTAL DA BATERIA?SIM...
     {
@@ -105,7 +104,7 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
 
 float BATT::AutoBatteryMin(float BattVoltage)
 {
-  if (BattVoltage > 6)
+  if (BattVoltage > 6.0f)
   {
     if (BATTERY.BattMinVoltageSelect == BATTERY_3S)
     {
@@ -163,7 +162,7 @@ float BATT::AutoBatteryMin(float BattVoltage)
 
 float BATT::AutoBatteryMax(float BattVoltage)
 {
-  if (BattVoltage > 6)
+  if (BattVoltage > 6.0f)
   {
     if (BATTERY.BattMaxVoltageSelect == BATTERY_3S)
     {

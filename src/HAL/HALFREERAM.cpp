@@ -16,9 +16,7 @@
 */
 
 #include "HALFREERAM.h"
-#include "HAL_AVR/AVRFREERAM.h"
-#include "HAL_ESP32/ESP32FREERAM.h"
-#include "HAL_STM32/STM32FREERAM.h"
+#include "HALLIBRARY.h"
 
 uint16_t _MemoryRAM_Check_()
 {

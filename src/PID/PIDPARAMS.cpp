@@ -47,7 +47,7 @@ void LoadPID()
         GET_SET[PID_YAW].DerivativeVector = 0;
         GET_SET[PID_YAW].FeedForwardVector = 60;
 
-        //PID DO MODO AUTO-NIVEL
+        //PI DO MODO AUTO-NIVEL
         GET_SET[PI_AUTO_LEVEL].ProportionalVector = 20;
         GET_SET[PI_AUTO_LEVEL].IntegralVector = 15;
     }

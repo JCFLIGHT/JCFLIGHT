@@ -15,12 +15,31 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "HALADC.h"
-#include "HALLIBRARY.h"
+#ifndef HALLIBRARY_H_
+#define HALLIBRARY_H_
 
-HAL_ADC_Class HAL_ADC;
+#ifdef __AVR_ATmega2560__
+#include "HAL_AVR/AVRADC.h"
+#include "HAL_AVR/AVREEPROM.h"
+#include "HAL_AVR/AVRFREERAM.h"
+#include "HAL_AVR/AVRPPM.h"
+#include "HAL_AVR/AVRSERIAL.h"
+#endif
 
-int16_t HAL_ADC_Class::AnalogRead(uint8_t AnalogPin)
-{
-  return GPIOAnalogRead(AnalogPin);
-}
+#ifdef ESP32
+#include "HAL_ESP32/ESP32ADC.h"
+#include "HAL_ESP32/ESP32EEPROM.h"
+#include "HAL_ESP32/ESP32FREERAM.h"
+#include "HAL_ESP32/ESP32PPM.h"
+#include "HAL_ESP32/ESP32SERIAL.h"
+#endif
+
+#ifdef __arm__
+#include "HAL_STM32/STM32ADC.h"
+#include "HAL_STM32/STM32EEPROM.h"
+#include "HAL_STM32/STM32FREERAM.h"
+#include "HAL_STM32/STM32PPM.h"
+#include "HAL_STM32/STM32SERIAL.h"
+#endif
+
+#endif

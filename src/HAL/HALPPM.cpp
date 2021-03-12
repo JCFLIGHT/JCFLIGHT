@@ -16,9 +16,7 @@
 */
 
 #include "HALPPM.h"
-#include "HAL_AVR/AVRPPM.h"
-#include "HAL_ESP32/ESP32PPM.h"
-#include "HAL_STM32/STM32PPM.h"
+#include "HALLIBRARY.h"
 
 ClassHALPPM HALPPM;
 

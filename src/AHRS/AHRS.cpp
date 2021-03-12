@@ -331,31 +331,31 @@ static float CalculateAccelerometerWeight()
   return AccWeight_Nearness;
 }
 
-static void ComputeQuaternionFromRPY(int16_t initialRoll, int16_t initialPitch, int16_t initialYaw)
+static void ComputeQuaternionFromRPY(int16_t InitialRoll, int16_t InitialPitch, int16_t InitialYaw)
 {
-  if (initialRoll > 1800)
+  if (InitialRoll > 1800)
   {
-    initialRoll -= 3600;
+    InitialRoll -= 3600;
   }
 
-  if (initialPitch > 1800)
+  if (InitialPitch > 1800)
   {
-    initialPitch -= 3600;
+    InitialPitch -= 3600;
   }
 
-  if (initialYaw > 1800)
+  if (InitialYaw > 1800)
   {
-    initialYaw -= 3600;
+    InitialYaw -= 3600;
   }
 
-  const float cosRoll = Fast_Cosine(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
-  const float sinRoll = Fast_Sine(ConvertDeciDegreesToRadians(initialRoll) * 0.5f);
+  const float cosRoll = Fast_Cosine(ConvertDeciDegreesToRadians(InitialRoll) * 0.5f);
+  const float sinRoll = Fast_Sine(ConvertDeciDegreesToRadians(InitialRoll) * 0.5f);
 
-  const float cosPitch = Fast_Cosine(ConvertDeciDegreesToRadians(initialPitch) * 0.5f);
-  const float sinPitch = Fast_Sine(ConvertDeciDegreesToRadians(initialPitch) * 0.5f);
+  const float cosPitch = Fast_Cosine(ConvertDeciDegreesToRadians(InitialPitch) * 0.5f);
+  const float sinPitch = Fast_Sine(ConvertDeciDegreesToRadians(InitialPitch) * 0.5f);
 
-  const float cosYaw = Fast_Cosine(ConvertDeciDegreesToRadians(-initialYaw) * 0.5f);
-  const float sinYaw = Fast_Sine(ConvertDeciDegreesToRadians(-initialYaw) * 0.5f);
+  const float cosYaw = Fast_Cosine(ConvertDeciDegreesToRadians(-InitialYaw) * 0.5f);
+  const float sinYaw = Fast_Sine(ConvertDeciDegreesToRadians(-InitialYaw) * 0.5f);
 
   Orientation.q0 = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
   Orientation.q1 = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;

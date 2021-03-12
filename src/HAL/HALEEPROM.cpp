@@ -16,9 +16,7 @@
 */
 
 #include "HALEEPROM.h"
-#include "HAL_AVR/AVREEPROM.h"
-#include "HAL_ESP32/ESP32EEPROM.h"
-#include "HAL_STM32/STM32EEPROM.h"
+#include "HALLIBRARY.h"
 
 HALEEPROMClass HAL_EEPROM;
 

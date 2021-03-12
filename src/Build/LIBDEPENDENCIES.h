@@ -28,11 +28,13 @@
 #include <avr/pgmspace.h> //strlen_P (STRING LENGTH COM PONTEIRO)
 
 //PARA O AVR:ALOQUE NA MEMORIA FLASH AFIM DE OCUPAR MENOS MEMORIA RAM
-#define ProgramMemoryString(String) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (String); &__CharArray[0]; }))
+#define ProgramMemoryString(StringToArray) (__extension__({static const char __CharArray[] __attribute__((__progmem__)) = (StringToArray); &__CharArray[0]; }))
 
 #else
 
 #include "Arduino.h" //MANTÉM POR ENQUATO
+
+#define ProgramMemoryString(StringToArray) (StringToArray)
 
 #endif
 

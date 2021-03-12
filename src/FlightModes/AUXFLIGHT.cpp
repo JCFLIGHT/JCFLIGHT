@@ -82,7 +82,7 @@ void AUXFLIGHTCLASS::LoadEEPROM(void)
 
 void AUXFLIGHTCLASS::SelectMode(void)
 {
-  //INTELLIGENT ORIENTATION CONTROL
+  //MODO SIMPLES
   switch (SimpleConfig)
   {
 

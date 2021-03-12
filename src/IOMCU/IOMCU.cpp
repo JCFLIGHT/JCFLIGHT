@@ -167,7 +167,7 @@ struct _SendUserBasicGCSParameters
     uint8_t SendAcroType;
     uint8_t SendAltitudeHoldType;
     uint8_t SendPositionHoldType;
-    uint8_t SendInteligentOrientationControlType;
+    uint8_t SendSimpleControlType;
     uint8_t SendReturnToHomeType;
     uint8_t SendAtackType;
     uint8_t SendAutomaticFlipType;
@@ -195,7 +195,7 @@ struct _GetUserBasicGCSParameters
     uint8_t GetAcroType;
     uint8_t GetAltitudeHoldType;
     uint8_t GetPositionHoldType;
-    uint8_t GetInteligentOrientationControlType;
+    uint8_t GetSimpleControlType;
     uint8_t GetReturnToHomeType;
     uint8_t GetAtackType;
     uint8_t GetAutomaticFlipType;
@@ -966,7 +966,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         GCS_Send_Data(SendUserBasicGCSParameters.SendAcroType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAltitudeHoldType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendPositionHoldType, VAR_8BITS);
-        GCS_Send_Data(SendUserBasicGCSParameters.SendInteligentOrientationControlType, VAR_8BITS);
+        GCS_Send_Data(SendUserBasicGCSParameters.SendSimpleControlType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendReturnToHomeType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAtackType, VAR_8BITS);
         GCS_Send_Data(SendUserBasicGCSParameters.SendAutomaticFlipType, VAR_8BITS);
@@ -1420,7 +1420,7 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, GetUserBasicGCSParameters.GetAcroType);
     STORAGEMANAGER.Write_8Bits(ALT_HOLD_ADDR, GetUserBasicGCSParameters.GetAltitudeHoldType);
     STORAGEMANAGER.Write_8Bits(GPS_HOLD_ADDR, GetUserBasicGCSParameters.GetPositionHoldType);
-    STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, GetUserBasicGCSParameters.GetInteligentOrientationControlType);
+    STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, GetUserBasicGCSParameters.GetSimpleControlType);
     STORAGEMANAGER.Write_8Bits(RTH_ADDR, GetUserBasicGCSParameters.GetReturnToHomeType);
     STORAGEMANAGER.Write_8Bits(ATACK_ADDR, GetUserBasicGCSParameters.GetAtackType);
     STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, GetUserBasicGCSParameters.GetAutomaticFlipType);
@@ -1715,7 +1715,7 @@ void GCSClass::UpdateParametersToGCS()
     SendUserBasicGCSParameters.SendAcroType = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);
     SendUserBasicGCSParameters.SendAltitudeHoldType = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR);
     SendUserBasicGCSParameters.SendPositionHoldType = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);
-    SendUserBasicGCSParameters.SendInteligentOrientationControlType = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);
+    SendUserBasicGCSParameters.SendSimpleControlType = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);
     SendUserBasicGCSParameters.SendReturnToHomeType = STORAGEMANAGER.Read_8Bits(RTH_ADDR);
     SendUserBasicGCSParameters.SendAtackType = STORAGEMANAGER.Read_8Bits(ATACK_ADDR);
     SendUserBasicGCSParameters.SendAutomaticFlipType = STORAGEMANAGER.Read_8Bits(AUTOFLIP_ADDR);

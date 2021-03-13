@@ -1284,11 +1284,11 @@ void GCSClass::GCS_Request_Parameters()
         GCSParameters.SendBarometerValue = (GPS_Altitude - GPS_Altitude_For_Plane) * 100;
     }
     GCSParameters.SendFailSafeState = SystemInFailSafe();
-    GCSParameters.SendBatteryVoltageValue = BATTERY.Voltage * 100;
+    GCSParameters.SendBatteryVoltageValue = BATTERY.Get_Actual_Voltage() * 100;
     GCSParameters.SendBatteryPercentageValue = BATTERY.GetPercentage();
     GCSParameters.SendArmDisarmState = IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
     GCSParameters.SendHDOPValue = GPS_HDOP;
-    GCSParameters.SendCurrentValue = BATTERY.Total_Current;
+    GCSParameters.SendCurrentValue = BATTERY.Get_Actual_Current();
     GCSParameters.SendWattsValue = BATTERY.GetWatts();
     GCSParameters.SendDeclinationValue = (int16_t)(STORAGEMANAGER.Read_Float(DECLINATION_ADDR) * 100);
     GCSParameters.SendActualFlightMode = FlightMode;

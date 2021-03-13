@@ -37,7 +37,7 @@ float ActualBatteryCurrent;
 float PreviousBatteryVoltage;
 float PreviousAmperage;
 
-static uint16_t SaggingCompensatedVBat = 0; //TENSÃO DA BATERIA SEM CARGA CALCULADA
+static uint16_t SaggingCompensatedVBat = 0; //TENSÃO DA BATERIA SEM CARGA CALCULADA (SEM A INTERFERENCIA DO CONSUMO DOS MOTORES)
 static uint16_t PowerSupplyImpedance = 0;   //IMPEDANCIA DA BATERIA CALCULADA EM MILLIOHM
 
 void SaggingCompensatedUpdate(float DeltaTime)
@@ -50,8 +50,8 @@ void SaggingCompensatedUpdate(float DeltaTime)
   static PT1_Filter_Struct ImpedanceFilterState;
   static PT1_Filter_Struct SaggingCompVBatFilterState;
 
-  ActualBatteryVoltage = BATTERY.Voltage;
-  ActualBatteryCurrent = BATTERY.Total_Current;
+  ActualBatteryVoltage = BATTERY.Get_Actual_Voltage();
+  ActualBatteryCurrent = BATTERY.Get_Actual_Current();
   BatteryFullVoltage = BATTERY.Get_Max_Voltage_Calced();
 
   if (BatteryFullVoltage == 0)

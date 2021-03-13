@@ -77,7 +77,7 @@ void Super_Fast_Loop()
         INERTIALNAVIGATION.Calculate_AccelerationZ();
         AIRSPEED.Update();
         Switch_Flag();
-        BATTERY.Calculate_Total_Mah();
+        BATTERY.Calculate_Total_Current_In_Mah();
 }
 
 #include "Param/PARAMETERS.h"

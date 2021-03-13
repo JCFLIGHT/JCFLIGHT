@@ -26,7 +26,7 @@
 #include "FailSafe/FAILSAFE.h"
 #include "FastSerial/PRINTF.h"
 
-BATT BATTERY;
+BatteryClass BATTERY;
 
 AverageFilterFloat_Size20 Voltage_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A TENSÃO,TAMANHO = 20 ITERAÇÕES
 AverageFilterFloat_Size20 Current_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A CORRENTE,TAMANHO = 20 ITERAÇÕES
@@ -44,11 +44,11 @@ float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESIS
 float Amps_Per_Volt = 62.0f;        //FATOR DE MULTIPLICAÇÃO DA TENSÃO DO PINO ANALOGICO PARA CONVERTER EM CORRENTE (AMPERES)
 float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE)
 
-void BATT::Update_Voltage(void)
+void BatteryClass::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  BATTERY.Voltage = Voltage_Filter.Apply(BATTERY.Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
-  if (BATTERY.Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
+  BATTERY.Calced_Voltage = Voltage_Filter.Apply(BATTERY.Calced_Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
+  if (BATTERY.Calced_Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
   {
     if (BATTERY.GetPercentage() <= PREVENT_ARM_LOW_BATT) //MENOR OU IGUAL QUE 20% DA CAPACIDADE TOTAL DA BATERIA?SIM...
     {
@@ -78,7 +78,7 @@ void BATT::Update_Voltage(void)
   FailSafe_Do_RTH_With_Low_Batt(BATTERY.LowBattPreventArm);
 }
 
-uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt)
+uint8_t BatteryClass::CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt)
 {
   BATTERY.Percentage = (BattVoltage - BattMinVolt) / (BattMaxVolt - BattMinVolt);
   if (BATTERY.Percentage < 0)
@@ -102,7 +102,7 @@ uint8_t BATT::CalculatePercentage(float BattVoltage, float BattMinVolt, float Ba
   return 100 * BATTERY.Percentage;
 }
 
-float BATT::AutoBatteryMin(float BattVoltage)
+float BatteryClass::AutoBatteryMin(float BattVoltage)
 {
   if (BattVoltage > 6.0f)
   {
@@ -160,7 +160,7 @@ float BATT::AutoBatteryMin(float BattVoltage)
   return NONE_BATTERY;
 }
 
-float BATT::AutoBatteryMax(float BattVoltage)
+float BatteryClass::AutoBatteryMax(float BattVoltage)
 {
   if (BattVoltage > 6.0f)
   {
@@ -218,24 +218,24 @@ float BATT::AutoBatteryMax(float BattVoltage)
   return NONE_BATTERY;
 }
 
-float BATT::Get_Max_Voltage_Calced()
+float BatteryClass::Get_Max_Voltage_Calced(void)
 {
-  return BATTERY.AutoBatteryMax(BATTERY.Voltage);
+  return BATTERY.AutoBatteryMax(BATTERY.Calced_Voltage);
 }
 
-uint8_t BATT::GetPercentage()
+uint8_t BatteryClass::GetPercentage(void)
 {
-  return BATTERY.CalculatePercentage(BATTERY.Voltage, BATTERY.AutoBatteryMin(BATTERY.Voltage), BATTERY.AutoBatteryMax(BATTERY.Voltage));
+  return BATTERY.CalculatePercentage(BATTERY.Calced_Voltage, BATTERY.AutoBatteryMin(BATTERY.Calced_Voltage), BATTERY.AutoBatteryMax(BATTERY.Calced_Voltage));
 }
 
-void BATT::Update_Current(void)
+void BatteryClass::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  BATTERY.Total_Current = Current_Filter.Apply(((ANALOGSOURCE.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
-  BATTERY.Total_Current = MAX(0, BATTERY.Total_Current);
+  BATTERY.Calced_Current = Current_Filter.Apply(((ANALOGSOURCE.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
+  BATTERY.Calced_Current = MAX(0, BATTERY.Calced_Current);
 }
 
-void BATT::Calculate_Total_Mah(void)
+void BatteryClass::Calculate_Total_Current_In_Mah(void)
 {
   uint32_t TimeNow = SCHEDULERTIME.GetMicros();
   static uint32_t Last_Time_Stored;
@@ -243,19 +243,29 @@ void BATT::Calculate_Total_Mah(void)
   if (Last_Time_Stored != 0 && Delta_Time < 2000000.0f)
   {
     //0.0002778 É 1/3600 (CONVERSÃO PRA HORAS)
-    BATTERY.TotalCurrentInMah += BATTERY.Total_Current * Delta_Time * 0.0000002778f;
+    BATTERY.TotalCurrentInMah += BATTERY.Calced_Current * Delta_Time * 0.0000002778f;
   }
   Last_Time_Stored = TimeNow;
 }
 
-float BATT::Get_Current_In_Mah()
+float BatteryClass::Get_Actual_Voltage(void)
+{
+  return BATTERY.Calced_Voltage;
+}
+
+float BatteryClass::Get_Actual_Current(void)
+{
+  return BATTERY.Calced_Current;
+}
+
+float BatteryClass::Get_Current_In_Mah()
 {
   return (BATTERY.TotalCurrentInMah / 1000);
 }
 
-uint32_t BATT::GetWatts()
+uint32_t BatteryClass::GetWatts()
 {
   //NO GCS,O RESULTADO DESTA OPERAÇÃO É DIVIDO POR 1000,AFIM DE OBTER OS VALORES DECIMAIS,
   //POR ESSE FATO ESSA FUNÇÃO ESTÁ EM 32 BITS
-  return (BATTERY.Total_Current * BATTERY.Voltage);
+  return (BATTERY.Calced_Current * BATTERY.Calced_Voltage);
 }

@@ -144,7 +144,7 @@ void SerialPrint::ParamsToConsole()
 
 #if defined(PRINTLN_BATTERY)
   PRINTF.SendToConsole(ProgramMemoryString("Tensão:%.2f Porcentagem:%u Corrente:%.2f TotalCurrentInMah:%.2f Watts:%u\n"),
-                       BATTERY.Voltage, BATTERY.GetPercentage(), BATTERY.Total_Current, BATTERY.Get_Current_In_Mah(), BATTERY.GetWatts());
+                       BATTERY.Get_Actual_Voltage(), BATTERY.GetPercentage(), BATTERY.Get_Actual_Current(), BATTERY.Get_Current_In_Mah(), BATTERY.GetWatts());
 #endif
 
 #if defined(PRINTLN_ALLSENSORS)

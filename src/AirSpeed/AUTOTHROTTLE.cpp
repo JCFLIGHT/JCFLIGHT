@@ -23,6 +23,13 @@
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
 #include "Common/STRUCTS.h"
+#include "GenericPI/GENERICPI.h"
+
+//#define APPLY_NEW_PI
+
+#ifdef APPLY_NEW_PI
+GenericPIClass AutoThrottlePI;
+#endif
 
 int16_t CalculateIntegral = 0;
 uint16_t PreviousValueOfAirSpeed = 0;
@@ -49,9 +56,23 @@ void AirSpeed_Apply_Auto_Throttle_Control()
         CalculateIntegral += (CalculateError * GET_SET[PID_ALTITUDE].IntegralVector >> 5);
         CalculateIntegral = Constrain_16Bits(CalculateIntegral, -24000, 24000);
         RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE] + CalculateProportional + (CalculateIntegral >> 7), 1100, 1900);
+
+#ifdef APPLY_NEW_PI
+        ///////////////////////////////DENTRO DO SETUP////////////////////////////
+        AutoThrottlePI.SetkP(GET_SET[PID_ALTITUDE].ProportionalVector / 8); //AINDA FALTA VERIFICAR SE ISSO ESTÁ CORRETO
+        AutoThrottlePI.SetkI(GET_SET[PID_ALTITUDE].IntegralVector / 32);    //AINDA FALTA VERIFICAR SE ISSO ESTÁ CORRETO
+        AutoThrottlePI.SetIntegratorMax(24000);
+        AutoThrottlePI.SetOutputMin(MIN_PULSE);
+        AutoThrottlePI.SetOutputMax(MAX_PULSE);
+        /////////////////////////////////////////////////////////////////////////
+        RCController[THROTTLE] = AutoThrottlePI.Get_PI_Calced(CalculateError, 1000); //AINDA FALTA PUXAR O DELTA TIME
+#endif
     }
     else
     {
         CalculateIntegral = 0;
+#ifdef APPLY_NEW_PI
+        AutoThrottlePI.Reset_Integrator();
+#endif
     }
 }

@@ -23,18 +23,33 @@
 class GenericPIClass
 {
 public:
-	int32_t Get_PI_Calced(int32_t Error, float DeltaTime, bool Calc_Integrator = true);
+	int32_t Get_PI_Calced(int32_t Error, float DeltaTime);
 
 	void Reset_Integrator();
+
+	void SetkP(const float Value)
+	{
+		kP = Value;
+	}
+
+	void SetkI(const float Value)
+	{
+		kI = Value;
+	}
 
 	void SetIntegratorMax(const int16_t Value)
 	{
 		Integrator_Max = Value;
 	}
 
-	float GetIntegrator_Sum()
+	void SetOutputMin(const int16_t Value)
 	{
-		return Integrator_Sum;
+		OutputMin = Value;
+	}
+
+	void SetOutputMax(const int16_t Value)
+	{
+		OutputMax = Value;
 	}
 
 private:
@@ -42,6 +57,8 @@ private:
 	float kI;
 	float Integrator_Sum;
 	int16_t Integrator_Max;
+	int16_t OutputMin;
+	int16_t OutputMax;
 };
 
 #endif

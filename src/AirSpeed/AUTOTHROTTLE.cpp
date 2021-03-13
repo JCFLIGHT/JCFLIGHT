@@ -27,7 +27,7 @@
 int16_t CalculateIntegral = 0;
 uint16_t PreviousValueOfAirSpeed = 0;
 
-void AirSpeed_Update_Auto_Throttle()
+void AirSpeed_Apply_Auto_Throttle_Control()
 {
     if (GetFrameStateOfMultirotor())
     {
@@ -40,14 +40,6 @@ void AirSpeed_Update_Auto_Throttle()
         {
             PreviousValueOfAirSpeed = AIRSPEED.CalcedInKM;
         }
-    }
-}
-
-void AirSpeed_Apply_Auto_Throttle_Control()
-{
-    if (GetFrameStateOfMultirotor())
-    {
-        return;
     }
 
     if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) && (RCController[THROTTLE] > 1200))

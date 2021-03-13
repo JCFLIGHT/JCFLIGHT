@@ -15,8 +15,27 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef AUTOTHROTTLE_H_
-#define AUTOTHROTTLE_H_
-#include "Build/LIBDEPENDENCIES.h"
-void AirSpeed_Apply_Auto_Throttle_Control();
-#endif
+#include "GENERICPI.h"
+
+int32_t GenericPIClass::Get_PI_Calced(int32_t Error, float DeltaTime, bool Calc_Integrator)
+{
+	if (Calc_Integrator)
+	{
+		Integrator_Sum += ((float)Error * kI) * DeltaTime;
+
+		if (Integrator_Sum < -Integrator_Max)
+		{
+			Integrator_Sum = -Integrator_Max;
+		}
+		else if (Integrator_Sum > Integrator_Max)
+		{
+			Integrator_Sum = Integrator_Max;
+		}
+	}
+	return (float)Error * kP + Integrator_Sum;
+}
+
+void GenericPIClass::Reset_Integrator()
+{
+	Integrator_Sum = 0;
+}

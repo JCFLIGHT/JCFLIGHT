@@ -218,6 +218,14 @@ typedef struct
   int32_t TaskLatestDeltaTime;
 } Task_Resources_Struct;
 
+typedef struct
+{
+  float a, b, g, e;
+  float aK, vK, xK, jK;
+  float DeltaTime, DeltaTime2, DeltaTime3;
+  float HalfLife, Boost;
+} AlphaBetaGammaFilter_Struct;
+
 extern CALIBRATION_STRUCT CALIBRATION;
 extern IMU_STRUCT IMU;
 extern INS_STRUCT INS;

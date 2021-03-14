@@ -582,7 +582,7 @@ void GCSClass::Serial_Parse_Protocol()
         {
 
         case 0:
-            if (SerialBuffer == 0x4a)
+            if (SerialBuffer == 0x4A)
             {
                 ProtocolTaskOrder = 1;
             }
@@ -593,7 +593,7 @@ void GCSClass::Serial_Parse_Protocol()
             break;
 
         case 2:
-            ProtocolTaskOrder = (SerialBuffer == 0x3c) ? 3 : 0;
+            ProtocolTaskOrder = (SerialBuffer == 0x3C) ? 3 : 0;
             break;
 
         case 3:

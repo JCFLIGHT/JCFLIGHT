@@ -187,7 +187,7 @@ void Accelerometer_Calibration()
           CALIBRATION.AccelerometerZero[AxisToCalibration] = (AccMinMaxValue[AxisToCalibration][0] + AccMinMaxValue[AxisToCalibration][1]) / 2;
           CALIBRATION.AccelerometerScale[AxisToCalibration] = ((int32_t)512) * 2048 / (AccMinMaxValue[AxisToCalibration][0] - AccMinMaxValue[AxisToCalibration][1]);
         }
-        else if (AxisToCalibration == YAW && MeasuredLimit == 0)
+        else if (AxisToCalibration == YAW && MeasuredLimit == NONE)
         {
           CALIBRATION.AccelerometerZero[ROLL] = AccReadVector[ROLL] / 512;
           CALIBRATION.AccelerometerZero[PITCH] = AccReadVector[PITCH] / 512;

@@ -30,9 +30,9 @@ void CheckAndUpdateIMUCalibration()
   CALIBRATION.AccelerometerScale[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_SCALE_ADDR);
   CALIBRATION.AccelerometerScale[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_SCALE_ADDR);
   //APENAS PARA INDICAR PARA O GCS QUE A IMU NÃO ESTÁ CALIBRADA
-  if (CALIBRATION.AccelerometerZero[ROLL] == 0 &&
-      CALIBRATION.AccelerometerZero[PITCH] == 0 &&
-      CALIBRATION.AccelerometerZero[YAW] == 0)
+  if (CALIBRATION.AccelerometerZero[ROLL] == NONE &&
+      CALIBRATION.AccelerometerZero[PITCH] == NONE &&
+      CALIBRATION.AccelerometerZero[YAW] == NONE)
   {
     CALIBRATION.AccelerometerZero[ROLL] = 0x10FE;
   }

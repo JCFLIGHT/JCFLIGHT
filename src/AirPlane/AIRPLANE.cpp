@@ -183,7 +183,7 @@ void AirPlaneClass::Servo_Rate_Adjust_And_Apply_LPF()
 
   Servo_Rate_Apply();
 
-  if (AIR_PLANE.Servo_LPF_CutOff == 0)
+  if (AIR_PLANE.Servo_LPF_CutOff == NONE)
   {
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
     MotorControl[MOTOR2] = Constrain_16Bits(AIR_PLANE.ServoToFilter[SERVO1], AIR_PLANE.ServoMin[SERVO1], AIR_PLANE.ServoMax[SERVO1]); //SERVO 1

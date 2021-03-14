@@ -271,7 +271,7 @@ bool AutoLaunchClass::AutoLaunchMaxAltitudeReached(void)
 bool AutoLaunchClass::AutoLaunchCompleted()
 {
   //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
-  if (AUTO_LAUCH_EXIT_FUNCTION == 0)
+  if (AUTO_LAUCH_EXIT_FUNCTION == NONE)
   {
     return (SticksDeflected(15)) || (AUTOLAUNCH.AutoLaunchMaxAltitudeReached());
   }

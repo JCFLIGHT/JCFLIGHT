@@ -53,7 +53,7 @@ int16_t Biquad_Gyro_Notch = 0;
 void IMU_Filters_Initialization()
 {
   //ATUALIZA O ESTADO GUARDADO DO ESTADO DO KALMAN
-  if (STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == 0)
+  if (STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == NONE)
   {
     ActiveKalman = false;
   }

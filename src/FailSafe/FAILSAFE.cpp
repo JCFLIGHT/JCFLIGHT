@@ -182,7 +182,7 @@ void AbortFailSafe()
 
 bool RxConsistenceOK()
 {
-  return RxConsistenceCount == 0;
+  return RxConsistenceCount == NONE;
 }
 
 void UpdateFailSafeSystem()
@@ -209,7 +209,7 @@ void FailSafeBuzzerNotification()
   {
     return;
   }
-  if (BEEPER.GetSafeStateToOthersBeeps() && CalibratingGyroscope == 0)
+  if (BEEPER.GetSafeStateToOthersBeeps() && CalibratingGyroscope == NONE)
   {
     if (BuzzerFailSafeRunCount >= 150) //3 SEGUNDOS
     {

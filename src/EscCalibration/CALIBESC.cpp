@@ -52,7 +52,7 @@ void ClassESC::Calibration(void)
       //5 SEGUNDOS ENVIANDO 1000uS PARA OS ESCS
       static uint32_t CountDelay = SCHEDULERTIME.GetMillis();
       static bool IgnoreThis = false;
-      RGB.Function(CALIBRATIONESC);                       //ATIVA O LED VERMELHO
+      RGB.Function(CALL_LED_CALIBRATION_ESC);                       //ATIVA O LED VERMELHO
       RGB.Update();                                       //ATUALIZA O ESTADO DOS LED'S
       if (SCHEDULERTIME.GetMillis() - CountDelay >= 5000) //ROTINA DE CONTAGEM DE 5 SEGUNDOS
       {
@@ -79,7 +79,7 @@ void ClassESC::Calibration(void)
         RCCONFIG.Set_Pulse();       //SETA A SAÍDA PARA CONFIGURAÇÃO PARA O RECEPTOR DO RADIO
         RCCONFIG.Update_Channels(); //FAZ A LEITURA DOS CANAIS DO RECEPTOR DO RADIO APÓS A CONFIGURAÇÃO
         BEEPER.Run();
-        RGB.Function(CALIBRATIONESCFINISH); //ATIVA O LED VERDE
+        RGB.Function(CALL_LED_CALIBRATION_ESC_FINISH); //ATIVA O LED VERDE
         RGB.Update();                       //ATUALIZA O ESTADO DOS LED'S
         if (ESC.BeeperMode > 0)
         {

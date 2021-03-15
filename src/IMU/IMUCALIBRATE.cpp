@@ -25,11 +25,12 @@
 #include "BAR/BAR.h"
 #include "IMUHEALTH.h"
 #include "Scheduler/SCHEDULER.h"
+#include "ACCGYROREAD.h"
 
 int16_t StoredValueOfGyro[3] = {0, 0, 0};
 
 uint16_t CalibratingAccelerometer;
-uint16_t CalibratingGyroscope = 512;
+uint16_t CalibratingGyroscope = ACC_1G;
 
 int32_t StoredGyroZero[3] = {0, 0, 0};
 
@@ -65,6 +66,16 @@ static float DeviceStandardDeviation(Device_Struct *Device)
   return Fast_SquareRoot(DeviceVariance(Device));
 }
 
+void StartGyroCalibration()
+{
+  CalibratingGyroscope = ACC_1G;
+}
+
+bool GyroCalibrationRunning()
+{
+  return CalibratingGyroscope > 0;
+}
+
 void Gyroscope_Calibration()
 {
   float GyroDeviation[3];
@@ -79,23 +90,21 @@ void Gyroscope_Calibration()
       GyroDeviation[ROLL] = DeviceStandardDeviation(&GyroDevice[ROLL]);
       GyroDeviation[PITCH] = DeviceStandardDeviation(&GyroDevice[PITCH]);
       GyroDeviation[YAW] = DeviceStandardDeviation(&GyroDevice[YAW]);
-      if ((GyroDeviation[ROLL] > 32) ||
-          (GyroDeviation[PITCH] > 32) ||
-          (GyroDeviation[YAW] > 32))
-      {                                  //CHECA SE A IMU FOI MOVIDA DURANTE A CALIBRAÇÃO
-        CalibratingGyroscope = 513;      //REINICIA A CALIBRAÇÃO
-        BEEPER.Play(BEEPER_ACTION_FAIL); //SINALIZA COM O BUZZER QUE HOUVE UM ERRO
+      if ((GyroDeviation[ROLL] > 32) || (GyroDeviation[PITCH] > 32) || (GyroDeviation[YAW] > 32))
+      {                                    //CHECA SE A IMU FOI MOVIDA DURANTE A CALIBRAÇÃO
+        CalibratingGyroscope = ACC_1G + 1; //REINICIA A CALIBRAÇÃO
+        BEEPER.Play(BEEPER_ACTION_FAIL);   //SINALIZA COM O BUZZER QUE HOUVE UM ERRO
       }
       else
       {
-        StoredGyroZero[ROLL] /= 512;
-        StoredGyroZero[PITCH] /= 512;
-        StoredGyroZero[YAW] /= 512;
-        BEEPER.Play(BEEPER_ACTION_SUCCESS); //SINALIZA COM O BUZZER QUE TUDO OCORREU BEM
+        StoredGyroZero[ROLL] /= ACC_1G;
+        StoredGyroZero[PITCH] /= ACC_1G;
+        StoredGyroZero[YAW] /= ACC_1G;
+        BEEPER.Play(BEEPER_CALIBRATION_DONE); //SINALIZA COM O BUZZER QUE TUDO OCORREU BEM
       }
       break;
 
-    case 512:
+    case ACC_1G:
       StoredGyroZero[ROLL] = 0;
       StoredGyroZero[PITCH] = 0;
       StoredGyroZero[YAW] = 0;
@@ -108,9 +117,9 @@ void Gyroscope_Calibration()
       StoredGyroZero[ROLL] += IMU.GyroscopeRead[ROLL];
       StoredGyroZero[PITCH] += IMU.GyroscopeRead[PITCH];
       StoredGyroZero[YAW] += IMU.GyroscopeRead[YAW];
-      DevicePushValues(&GyroDevice[ROLL], IMU.GyroscopeRead[ROLL] * 0.25f);
-      DevicePushValues(&GyroDevice[PITCH], IMU.GyroscopeRead[PITCH] * 0.25f);
-      DevicePushValues(&GyroDevice[YAW], IMU.GyroscopeRead[YAW] * 0.25f);
+      DevicePushValues(&GyroDevice[ROLL], IMU.GyroscopeRead[ROLL] * GYRO_SCALE);
+      DevicePushValues(&GyroDevice[PITCH], IMU.GyroscopeRead[PITCH] * GYRO_SCALE);
+      DevicePushValues(&GyroDevice[YAW], IMU.GyroscopeRead[YAW] * GYRO_SCALE);
       break;
     }
     CalibratingGyroscope--;
@@ -118,29 +127,39 @@ void Gyroscope_Calibration()
   else
   {
     //ROLL
-    IMU.GyroscopeRead[ROLL] = (IMU.GyroscopeRead[ROLL] - StoredGyroZero[ROLL]) * 0.25f;
+    IMU.GyroscopeRead[ROLL] = (IMU.GyroscopeRead[ROLL] - StoredGyroZero[ROLL]) * GYRO_SCALE;
     IMU.GyroscopeRead[ROLL] = Constrain_16Bits(IMU.GyroscopeRead[ROLL], StoredValueOfGyro[ROLL] - 800, StoredValueOfGyro[ROLL] + 800);
     StoredValueOfGyro[ROLL] = IMU.GyroscopeRead[ROLL];
     //PITCH
-    IMU.GyroscopeRead[PITCH] = (IMU.GyroscopeRead[PITCH] - StoredGyroZero[PITCH]) * 0.25f;
+    IMU.GyroscopeRead[PITCH] = (IMU.GyroscopeRead[PITCH] - StoredGyroZero[PITCH]) * GYRO_SCALE;
     IMU.GyroscopeRead[PITCH] = Constrain_16Bits(IMU.GyroscopeRead[PITCH], StoredValueOfGyro[PITCH] - 800, StoredValueOfGyro[PITCH] + 800);
     StoredValueOfGyro[PITCH] = IMU.GyroscopeRead[PITCH];
     //YAW
-    IMU.GyroscopeRead[YAW] = (IMU.GyroscopeRead[YAW] - StoredGyroZero[YAW]) * 0.25f;
+    IMU.GyroscopeRead[YAW] = (IMU.GyroscopeRead[YAW] - StoredGyroZero[YAW]) * GYRO_SCALE;
     IMU.GyroscopeRead[YAW] = Constrain_16Bits(IMU.GyroscopeRead[YAW], StoredValueOfGyro[YAW] - 800, StoredValueOfGyro[YAW] + 800);
     StoredValueOfGyro[YAW] = IMU.GyroscopeRead[YAW];
   }
 }
 
+void StartAccCalibration()
+{
+  CalibratingAccelerometer = ACC_1G;
+}
+
+bool AccCalibrationRunning()
+{
+  return CalibratingAccelerometer > 0;
+}
+
 void Accelerometer_Calibration()
 {
-  int8_t GetPositionActualOfAcc = GetAxisInclinedToCalibration(IMU.AccelerometerRead);
+  int8_t GetActualPositionOfAcc = GetAxisInclinedToCalibration(IMU.AccelerometerRead);
   static uint8_t AxisToCalibration = YAW;
   static int16_t AccMinMaxValue[3][2] = {{0, 0}, {0, 0}, {0, 0}};
   static int32_t AccReadVector[3] = {0, 0, 0};
 
-  if ((GetPositionActualOfAcc == -1 && CalibratingAccelerometer > 0) ||
-      (AccCalibratedPosition[GetPositionActualOfAcc] && CalibratingAccelerometer > 0))
+  if ((GetActualPositionOfAcc == -1 && AccCalibrationRunning()) ||
+      (AccCalibratedPosition[GetActualPositionOfAcc] && AccCalibrationRunning()))
   {
     CalibratingAccelerometer = 0;
     BEEPER.Play(BEEPER_ACTION_FAIL);
@@ -153,21 +172,17 @@ void Accelerometer_Calibration()
   {
 #endif
 
-    if (CalibratingAccelerometer > 0)
+    if (AccCalibrationRunning())
     {
-      RGB.Function(ACCLED);
+      RGB.Function(CALL_LED_ACC_CALIBRATION);
       for (uint8_t AccCalibIndex = 0; AccCalibIndex < 3; AccCalibIndex++)
       {
-        if (CalibratingAccelerometer == 512)
+        if (CalibratingAccelerometer == ACC_1G)
         {
-          int8_t AccCalibIndexTwo = (AccCalibIndex + 1) % 3;
-          int8_t AccCalibIndexThree = (AccCalibIndex + 2) % 3;
-          if (ABS(IMU.AccelerometerRead[AccCalibIndex] -
-                  CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexTwo] -
-                                                                      CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
-              ABS(IMU.AccelerometerRead[AccCalibIndex] -
-                  CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexThree] -
-                                                                      CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
+          uint8_t AccCalibIndexTwo = (AccCalibIndex + 1) % 3;
+          uint8_t AccCalibIndexThree = (AccCalibIndex + 2) % 3;
+          if (ABS(IMU.AccelerometerRead[AccCalibIndex] - CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexTwo] - CALIBRATION.AccelerometerZero[AccCalibIndexTwo]) &&
+              ABS(IMU.AccelerometerRead[AccCalibIndex] - CALIBRATION.AccelerometerZero[AccCalibIndex]) > ABS(IMU.AccelerometerRead[AccCalibIndexThree] - CALIBRATION.AccelerometerZero[AccCalibIndexThree]))
           {
             AxisToCalibration = AccCalibIndex;
             CALIBRATION.AccelerometerZero[AxisToCalibration] = 0;
@@ -180,30 +195,33 @@ void Accelerometer_Calibration()
       IMU.AccelerometerRead[AxisToCalibration] = 0;
       if (CalibratingAccelerometer == 1)
       {
-        int8_t MeasuredLimit = AccReadVector[AxisToCalibration] > 0 ? 0 : 1;
-        AccMinMaxValue[AxisToCalibration][MeasuredLimit] = AccReadVector[AxisToCalibration] / 512;
+        uint8_t MeasuredLimit = AccReadVector[AxisToCalibration] > 0 ? 0 : 1;
+        AccMinMaxValue[AxisToCalibration][MeasuredLimit] = AccReadVector[AxisToCalibration] / ACC_1G;
         if (AccMinMaxValue[AxisToCalibration][0] > 0 && AccMinMaxValue[AxisToCalibration][1] < 0)
         {
           CALIBRATION.AccelerometerZero[AxisToCalibration] = (AccMinMaxValue[AxisToCalibration][0] + AccMinMaxValue[AxisToCalibration][1]) / 2;
-          CALIBRATION.AccelerometerScale[AxisToCalibration] = ((int32_t)512) * 2048 / (AccMinMaxValue[AxisToCalibration][0] - AccMinMaxValue[AxisToCalibration][1]);
+          CALIBRATION.AccelerometerScale[AxisToCalibration] = ((int32_t)ACC_1G * 2048) / (AccMinMaxValue[AxisToCalibration][0] - AccMinMaxValue[AxisToCalibration][1]);
         }
         else if (AxisToCalibration == YAW && MeasuredLimit == NONE)
         {
-          CALIBRATION.AccelerometerZero[ROLL] = AccReadVector[ROLL] / 512;
-          CALIBRATION.AccelerometerZero[PITCH] = AccReadVector[PITCH] / 512;
-          CALIBRATION.AccelerometerZero[YAW] = AccReadVector[YAW] / 512;
-          CALIBRATION.AccelerometerZero[YAW] -= 512;
+          CALIBRATION.AccelerometerZero[ROLL] = AccReadVector[ROLL] / ACC_1G;
+          CALIBRATION.AccelerometerZero[PITCH] = AccReadVector[PITCH] / ACC_1G;
+          CALIBRATION.AccelerometerZero[YAW] = AccReadVector[YAW] / ACC_1G;
+          CALIBRATION.AccelerometerZero[YAW] -= ACC_1G;
           CALIBRATION.AccelerometerScale[ROLL] = 0;
           CALIBRATION.AccelerometerScale[PITCH] = 0;
           CALIBRATION.AccelerometerScale[YAW] = 0;
         }
-        AccCalibratedPosition[GetPositionActualOfAcc] = true;
+        AccCalibratedPosition[GetActualPositionOfAcc] = true;
+        //PONTO A SER MARCADO COMO ZERO
         STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADDR, CALIBRATION.AccelerometerZero[ROLL]);
         STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADDR, CALIBRATION.AccelerometerZero[PITCH]);
         STORAGEMANAGER.Write_16Bits(ACC_YAW_ADDR, CALIBRATION.AccelerometerZero[YAW]);
+        //ESCALA
         STORAGEMANAGER.Write_16Bits(ACC_ROLL_SCALE_ADDR, CALIBRATION.AccelerometerScale[ROLL]);
         STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, CALIBRATION.AccelerometerScale[PITCH]);
         STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, CALIBRATION.AccelerometerScale[YAW]);
+        //ATUALIZA PARA OS NOVOS VALORES
         CheckAndUpdateIMUCalibration();
         BEEPER.Play(BEEPER_CALIBRATION_DONE);
       }
@@ -214,22 +232,12 @@ void Accelerometer_Calibration()
   }
 #endif
 
-  if (CALIBRATION.AccelerometerScale[ROLL] ||
-      CALIBRATION.AccelerometerScale[PITCH] ||
-      CALIBRATION.AccelerometerScale[YAW]) //APLICA ACELERAÇÃO ZERO
+  //APLICA A ACELERAÇÃO ZERO
+  if (CALIBRATION.AccelerometerScale[ROLL] || CALIBRATION.AccelerometerScale[PITCH] || CALIBRATION.AccelerometerScale[YAW])
   {
-    IMU.AccelerometerRead[ROLL] = (((int32_t)(IMU.AccelerometerRead[ROLL] -
-                                              CALIBRATION.AccelerometerZero[ROLL])) *
-                                   CALIBRATION.AccelerometerScale[ROLL]) /
-                                  1024;
-    IMU.AccelerometerRead[PITCH] = (((int32_t)(IMU.AccelerometerRead[PITCH] -
-                                               CALIBRATION.AccelerometerZero[PITCH])) *
-                                    CALIBRATION.AccelerometerScale[PITCH]) /
-                                   1024;
-    IMU.AccelerometerRead[YAW] = (((int32_t)(IMU.AccelerometerRead[YAW] -
-                                             CALIBRATION.AccelerometerZero[YAW])) *
-                                  CALIBRATION.AccelerometerScale[YAW]) /
-                                 1024;
+    IMU.AccelerometerRead[ROLL] = (((int32_t)(IMU.AccelerometerRead[ROLL] - CALIBRATION.AccelerometerZero[ROLL])) * CALIBRATION.AccelerometerScale[ROLL]) / 1024;
+    IMU.AccelerometerRead[PITCH] = (((int32_t)(IMU.AccelerometerRead[PITCH] - CALIBRATION.AccelerometerZero[PITCH])) * CALIBRATION.AccelerometerScale[PITCH]) / 1024;
+    IMU.AccelerometerRead[YAW] = (((int32_t)(IMU.AccelerometerRead[YAW] - CALIBRATION.AccelerometerZero[YAW])) * CALIBRATION.AccelerometerScale[YAW]) / 1024;
   }
   else
   {

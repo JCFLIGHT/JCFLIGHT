@@ -127,7 +127,7 @@ uint8_t PreArmClass::Checking(void)
         return FAIL_SAFE_ERROR;
     }
 
-    if (CalibratingGyroscope > 0) //GYROSCOPIO EM CALIBRAÇÃO
+    if (GyroCalibrationRunning()) //GYROSCOPIO EM CALIBRAÇÃO
     {
         return GYRO_EEROR;
     }

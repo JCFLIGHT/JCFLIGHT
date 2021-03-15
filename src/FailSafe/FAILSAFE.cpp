@@ -209,7 +209,7 @@ void FailSafeBuzzerNotification()
   {
     return;
   }
-  if (BEEPER.GetSafeStateToOthersBeeps() && CalibratingGyroscope == NONE)
+  if (BEEPER.GetSafeStateToOthersBeeps() && !GyroCalibrationRunning())
   {
     if (BuzzerFailSafeRunCount >= 150) //3 SEGUNDOS
     {

@@ -713,7 +713,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 11:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-            CalibratingAccelerometer = 512;
+            StartAccCalibration();
         }
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
@@ -1079,7 +1079,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 11:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-            CalibratingAccelerometer = 512;
+            StartAccCalibration();
         }
         break;
 

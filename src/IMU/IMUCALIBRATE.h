@@ -18,8 +18,10 @@
 #ifndef IMUCALIBRATE_H_
 #define IMUCALIBRATE_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern uint16_t CalibratingAccelerometer;
-extern uint16_t CalibratingGyroscope;
+void StartAccCalibration();
+bool AccCalibrationRunning();
+void StartGyroCalibration();
+bool GyroCalibrationRunning();
 void Accelerometer_Calibration();
 void Gyroscope_Calibration();
 #endif

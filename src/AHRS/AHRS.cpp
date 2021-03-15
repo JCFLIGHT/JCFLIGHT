@@ -27,6 +27,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "GPS/GPSSTATES.h"
 #include "GPS/GPSUBLOX.h"
+#include "IMU/ACCGYROREAD.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -40,9 +41,6 @@ AHRSClass AHRS;
 #else
 #define NEARNESS 1.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #endif
-#define ACC_1G 512.0f             //1G DA IMU - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
-#define GYRO_SCALE (1.0f / 16.4f) //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
-#define GRAVITY_CMSS 980.665f     //VALOR DA GRAVIDADE EM CM/S^2
 
 Struct_Vector3x3 BodyFrameAcceleration;
 Struct_Vector3x3 BodyFrameRotation;
@@ -374,9 +372,9 @@ void GetMeasuredAcceleration(Struct_Vector3x3 *MeasureAcceleration)
 
 void GetMeasuredRotationRate(Struct_Vector3x3 *MeasureRotation)
 {
-  MeasureRotation->Vector[ROLL] = ConvertToRadians(((float)IMU.GyroscopeRead[ROLL] * GYRO_SCALE));
-  MeasureRotation->Vector[PITCH] = ConvertToRadians(((float)IMU.GyroscopeRead[PITCH] * GYRO_SCALE));
-  MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.GyroscopeRead[YAW] * GYRO_SCALE));
+  MeasureRotation->Vector[ROLL] = ConvertToRadians(((float)IMU.GyroscopeRead[ROLL]));
+  MeasureRotation->Vector[PITCH] = ConvertToRadians(((float)IMU.GyroscopeRead[PITCH]));
+  MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.GyroscopeRead[YAW]));
 }
 
 void AHRSClass::Update(float DeltaTime)

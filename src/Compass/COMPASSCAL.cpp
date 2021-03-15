@@ -58,7 +58,7 @@ void CompassCalClass::RunningCalibration()
         COMPASS.CalibrationCount++;
         if (COMPASS.CalibrationCount < ((CALIBRATION_COUNT * 10) - 30))
         {
-            RGB.Function(MAGLED);
+            RGB.Function(CALL_LED_MAG_CALIBRATION);
             if (COMPASS.CalibrationCount == 1)
             {
                 COMPASS.MagCalibrationMinVector[ROLL] = COMPASS.MagnetometerRead[ROLL];

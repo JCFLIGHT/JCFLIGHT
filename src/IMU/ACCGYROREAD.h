@@ -18,6 +18,9 @@
 #ifndef ACCGYROREAD_H_
 #define ACCGYROREAD_H_
 #include "Build/LIBDEPENDENCIES.h"
+#define ACC_1G 512                //1G NA IMU - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
+#define GYRO_SCALE (1.0f / 16.4f) //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
+#define GRAVITY_CMSS 980.665f     //VALOR DA GRAVIDADE EM CM/S^2
 void IMU_Filters_Initialization();
 void Acc_Initialization();
 void Gyro_Initialization();

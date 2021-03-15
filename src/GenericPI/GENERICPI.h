@@ -57,8 +57,8 @@ private:
 	float kI;
 	float Integrator_Sum;
 	int16_t Integrator_Max;
-	int16_t OutputMin;
-	int16_t OutputMax;
+	int32_t OutputMin;
+	int32_t OutputMax;
 };
 
 #endif

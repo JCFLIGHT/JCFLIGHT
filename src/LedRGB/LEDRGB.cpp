@@ -66,13 +66,13 @@ void LEDRGB::Update()
 
 #endif
 
-  if ((CalibratingAccelerometer == 0) && (!GCS.ConfigFlight) && (!COMPASS.Calibrating) && (!RGB.NotPriorit))
+  if (!AccCalibrationRunning() && !GCS.ConfigFlight && !COMPASS.Calibrating && !RGB.NotPriorit)
   {
-    RGB.Function(GPSLED);
+    RGB.Function(CALL_LED_GPS);
   }
   if (GCS.ConfigFlight)
   {
-    RGB.Function(CONFIGFLIGHT);
+    RGB.Function(CALL_LED_CONFIG_FLIGHT);
   }
 }
 
@@ -82,46 +82,46 @@ void LEDRGB::Function(uint8_t Mode)
   {
 
   //GPS LED É PRIORIDADE
-  case GPSLED:
+  case CALL_LED_GPS:
     RGB.GPS_Led();
     break;
 
-  case ACCLED:
+  case CALL_LED_ACC_CALIBRATION:
     RGB.CalibAccLed();
     break;
 
-  case MAGLED:
+  case CALL_LED_MAG_CALIBRATION:
     RGB.CalibMagLed();
     break;
 
-  case CONFIGFLIGHT:
+  case CALL_LED_CONFIG_FLIGHT:
     RGB.ConfigFlight_Led();
     break;
 
-  case CALIBRATIONESC:
+  case CALL_LED_CALIBRATION_ESC:
     RGB.CalibEsc_Led();
     break;
 
-  case CALIBRATIONESCFINISH:
+  case CALL_LED_CALIBRATION_ESC_FINISH:
     RGB.CalibEscFinish_Led();
     break;
 
-  case PREARMINIT:
+  case CALL_LED_PRE_ARM_INIT:
     RGB.Pre_Arm_Initializing();
     RGB.NotPriorit = true;
     break;
 
-  case PREARMSUCESS:
+  case CALL_LED_PRE_ARM_SUCESS:
     RGB.Pre_Arm_Sucess();
     RGB.NotPriorit = true;
     break;
 
-  case PREARMFAIL:
+  case CALL_LED_PRE_ARM_FAIL:
     RGB.Pre_Arm_Fail();
     RGB.NotPriorit = true;
     break;
 
-  case OFFLEDS:
+  case OFF_ALL_LEDS:
     RGB.Off_All_Leds();
     RGB.NotPriorit = true;
     break;

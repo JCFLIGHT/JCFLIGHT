@@ -686,15 +686,6 @@ void SerialPrint::SerialPrintF()
 
 void SerialPrint::ParamsToConsole()
 {
-  /*
-  if (Serial.read() == 'c')
-    CalibratingAccelerometer = 512;
-  Serial.print(CalibratingAccelerometer);
-  Serial.print("  ");
-  Serial.print(IMU.AccelerometerRead[ROLL]);
-  Serial.print("  ");
-  Serial.println(STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADDR));
-*/
 
   /*
   Serial.print(IMU.AccelerometerRead[PITCH]);

@@ -123,14 +123,14 @@ void SticksClass::Pre_Arm_Leds(void)
   //ROTINA PRE-ARM LED INDICADOR
   if ((STICKS.PreArm_Delay_Count > 0 && STICKS.PreArm_Delay_Count <= 20))
   {
-    RGB.Function(PREARMINIT);
+    RGB.Function(CALL_LED_PRE_ARM_INIT);
     BEEPER.Play(BEEPER_ARM);
   }
   if (!PREARM.CheckSafeState()) //SE TIVER ALGUMA CONDIÇÃO INCORRETA,NÃO ARMA
   {
     if ((STICKS.PreArm_Delay_Count > 20 && STICKS.PreArm_Delay_Count <= 30))
     {
-      RGB.Function(PREARMFAIL);
+      RGB.Function(CALL_LED_PRE_ARM_FAIL);
       if (STICKS.PreArm_Delay_Count == 21)
       {
         BEEPER.Play(BEEPER_ACTION_FAIL);
@@ -145,7 +145,7 @@ void SticksClass::Pre_Arm_Leds(void)
   {
     if ((STICKS.PreArm_Delay_Count > 20 && STICKS.PreArm_Delay_Count <= 30))
     {
-      RGB.Function(PREARMSUCESS);
+      RGB.Function(CALL_LED_PRE_ARM_SUCESS);
       if (STICKS.PreArm_Delay_Count == 30)
       {
         RGB.NotPriorit = false;

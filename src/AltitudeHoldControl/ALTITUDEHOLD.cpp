@@ -186,6 +186,8 @@ bool GetTakeOffInProgress()
 
 PT1_Filter_Struct Smooth_ThrottleHover;
 
+#define ALT_HOLD_LPF_CUTOFF 4 //HZ
+
 #endif
 
 void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
@@ -216,13 +218,13 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   {
     PRINTF.SendToConsole(ProgramMemoryString("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
                          RCController[THROTTLE],
-                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], 4, 1.0f / 1000));
+                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], ALT_HOLD_LPF_CUTOFF, 1.0f / 1000));
   }
   else if (GetFrameStateOfAirPlane())
   {
     PRINTF.SendToConsole(ProgramMemoryString("RCController[PITCH]:%d PT1RCController[PITCH]:%d\n"),
                          RCController[PITCH],
-                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], 4, 1.0f / 1000));
+                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], ALT_HOLD_LPF_CUTOFF, 1.0f / 1000));
   }
 
 #endif

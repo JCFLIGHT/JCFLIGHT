@@ -50,10 +50,11 @@ void loop()
     digitalWrite(RED, LOW);
     digitalWrite(GREEN, LOW);
     digitalWrite(BLUE, HIGH);
+    Serial.println("Azul");
     delay(741);
     digitalWrite(RED, LOW);
     digitalWrite(GREEN, LOW);
     digitalWrite(BLUE, LOW);
-    Serial.println("Azul");
+    Serial.println("Tudo desligado");
     delay(741);
 }

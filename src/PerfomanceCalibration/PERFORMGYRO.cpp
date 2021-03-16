@@ -49,8 +49,9 @@ void Gyroscope_Calibration()
             GyroDeviation[ROLL] = DeviceStandardDeviation(&GyroDevice[ROLL]);
             GyroDeviation[PITCH] = DeviceStandardDeviation(&GyroDevice[PITCH]);
             GyroDeviation[YAW] = DeviceStandardDeviation(&GyroDevice[YAW]);
+            //CHECA SE A IMU FOI MOVIDA DURANTE A CALIBRAÇÃO
             if ((GyroDeviation[ROLL] > 32) || (GyroDeviation[PITCH] > 32) || (GyroDeviation[YAW] > 32))
-            {                                      //CHECA SE A IMU FOI MOVIDA DURANTE A CALIBRAÇÃO
+            {
                 CalibratingGyroscope = ACC_1G + 1; //REINICIA A CALIBRAÇÃO
                 BEEPER.Play(BEEPER_ACTION_FAIL);   //SINALIZA COM O BUZZER QUE HOUVE UM ERRO
             }

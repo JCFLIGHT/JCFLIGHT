@@ -33,10 +33,10 @@
 
 FILE_COMPILE_FOR_SPEED
 
-#ifndef __AVR_ATmega2560__
 //INSTANCIAS PARA O LPF
 static BiquadFilter_Struct BiquadAccLPF[3];
 static BiquadFilter_Struct BiquadGyroLPF[3];
+#ifndef __AVR_ATmega2560__
 //INSTANCIAS PARA O NOTCH
 static BiquadFilter_Struct BiquadAccNotch[3];
 static BiquadFilter_Struct BiquadGyroNotch[3];
@@ -44,9 +44,9 @@ static BiquadFilter_Struct BiquadGyroNotch[3];
 
 bool ActiveKalman = false;
 
-#ifndef __AVR_ATmega2560__
 int16_t Biquad_Acc_LPF = 0;
 int16_t Biquad_Gyro_LPF = 0;
+#ifndef __AVR_ATmega2560__
 int16_t Biquad_Acc_Notch = 0;
 int16_t Biquad_Gyro_Notch = 0;
 #endif
@@ -62,7 +62,6 @@ void IMU_Filters_Initialization()
   {
     ActiveKalman = true;
   }
-#ifndef __AVR_ATmega2560__
   //CARREGA OS VALORES GUARDADOS DO LPF
   Biquad_Acc_LPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Biquad_Gyro_LPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
@@ -74,6 +73,7 @@ void IMU_Filters_Initialization()
   BIQUADFILTER.Settings(&BiquadGyroLPF[ROLL], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&BiquadGyroLPF[PITCH], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
   BIQUADFILTER.Settings(&BiquadGyroLPF[YAW], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+#ifndef __AVR_ATmega2560__
   //CARREGA OS VALORES GUARDADOS DO NOTCH
   Biquad_Acc_Notch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
   Biquad_Gyro_Notch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
@@ -178,8 +178,6 @@ void Acc_ReadBufferData()
     KALMAN.Apply_In_Acc(IMU.AccelerometerRead);
   }
 
-#ifndef __AVR_ATmega2560__
-
   //LPF
   if (Biquad_Acc_LPF > 0)
   {
@@ -189,6 +187,7 @@ void Acc_ReadBufferData()
     IMU.AccelerometerRead[YAW] = BIQUADFILTER.FilterApplyAndGet(&BiquadAccLPF[YAW], IMU.AccelerometerRead[YAW]);
   }
 
+#ifndef __AVR_ATmega2560__
   //NOTCH
   if (Biquad_Acc_Notch > 0)
   {
@@ -222,8 +221,6 @@ void Gyro_ReadBufferData()
     KALMAN.Apply_In_Gyro(IMU.GyroscopeRead);
   }
 
-#ifndef __AVR_ATmega2560__
-
   //LPF
   if (Biquad_Gyro_LPF > 0)
   {
@@ -233,6 +230,7 @@ void Gyro_ReadBufferData()
     IMU.GyroscopeRead[YAW] = BIQUADFILTER.FilterApplyAndGet(&BiquadGyroLPF[YAW], IMU.GyroscopeRead[YAW]);
   }
 
+#ifndef __AVR_ATmega2560__
   //NOTCH
   if (Biquad_Gyro_Notch > 0)
   {

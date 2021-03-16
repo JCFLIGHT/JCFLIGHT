@@ -24,8 +24,8 @@
 #include "IOMCU/IOMCU.h"
 #include "FailSafe/FAILSAFE.h"
 #include "GPSNavigation/NAVIGATION.h"
-#include "IMU/IMUCALIBRATE.h"
 #include "Common/STRUCTS.h"
+#include "PerfomanceCalibration/PERFORMGYRO.h"
 
 PreArmClass PREARM;
 

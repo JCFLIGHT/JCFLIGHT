@@ -27,7 +27,8 @@
 #include "BAR/BAR.h"
 #include "SensorAlignment/ALIGNMENT.h"
 #include "Build/BOARDDEFS.h"
-#include "IMUCALIBRATE.h"
+#include "PerfomanceCalibration/PERFORMACC.h"
+#include "PerfomanceCalibration/PERFORMGYRO.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

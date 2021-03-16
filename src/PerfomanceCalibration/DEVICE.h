@@ -15,13 +15,12 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMUCALIBRATE_H_
-#define IMUCALIBRATE_H_
+#ifndef DEVICE_H_
+#define DEVICE_H_
 #include "Build/LIBDEPENDENCIES.h"
-void StartAccCalibration();
-bool AccCalibrationRunning();
-void StartGyroCalibration();
-bool GyroCalibrationRunning();
-void Accelerometer_Calibration();
-void Gyroscope_Calibration();
+#include "Common/STRUCTS.h"
+void DevicePushValues(Device_Struct *Device, float Value);
+void DeviceClear(Device_Struct *Device);
+float DeviceVariance(Device_Struct *Device);
+float DeviceStandardDeviation(Device_Struct *Device);
 #endif

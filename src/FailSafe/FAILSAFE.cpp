@@ -23,8 +23,8 @@
 #include "Buzzer/BUZZER.h"
 #include "Common/RCDEFINES.h"
 #include "RadioControl/DECODE.h"
-#include "IMU/IMUCALIBRATE.h"
 #include "BitArray/BITARRAY.h"
+#include "PerfomanceCalibration/PERFORMGYRO.h"
 
 #define THIS_LOOP_RATE 50                //HZ
 #define IMMEDIATELY_FAILSAFE_DELAY 0.25f //MS

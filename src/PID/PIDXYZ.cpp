@@ -93,6 +93,8 @@ int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO -> (0 a 
 int16_t Cruise_Throttle = 1400;                //AJUSTAVEL PELO USUARIO -> (1000 a 2000)
 int16_t MinThrottleDownPitchAngle = 0;         //AJUSTAVEL PELO USUARIO -> (0 a 450)
 float PitchLevelTrim = 0;                      //AJUSTAVEL PELO USUARIO -> (-10 a +10)
+float CoordinatedPitchGain = 1.0f;             //AJUSTAVEL PELO USUARIO -> (0.0 a 2.0 (float))
+float CoordinatedYawGain = 1.0f;               //AJUSTAVEL PELO USUARIO -> (0.0 a 2.0 (float))
 float DerivativeBoostFactor = 1.25f;           //AJUSTAVEL PELO USUARIO -> (-1.0 a 3.0 (float))
 float DerivativeBoostMaxAceleration = 7500.0f; //AJUSTAVEL PELO USUARIO -> (1000 a 16000)
 
@@ -644,8 +646,8 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
 
   //LIMITA O VALOR MINIMO E MAXIMO DE SAÍDA A PARTIR DOS VALOR DE RATE DEFINIDO PELO USUARIO NO GCS
   PIDXYZ.CalcedRateTargetRoll = Constrain_16Bits(PIDXYZ.CalcedRateTargetRoll + TurnControllerRates.Roll, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
-  PIDXYZ.CalcedRateTargetPitch = Constrain_16Bits(PIDXYZ.CalcedRateTargetPitch + TurnControllerRates.Pitch, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
-  PIDXYZ.CalcedRateTargetYaw = Constrain_16Bits(PIDXYZ.CalcedRateTargetYaw + TurnControllerRates.Yaw, -ConvertDegreesToDecidegrees(YawRate), ConvertDegreesToDecidegrees(YawRate));
+  PIDXYZ.CalcedRateTargetPitch = Constrain_16Bits(PIDXYZ.CalcedRateTargetPitch + TurnControllerRates.Pitch * CoordinatedPitchGain, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));
+  PIDXYZ.CalcedRateTargetYaw = Constrain_16Bits(PIDXYZ.CalcedRateTargetYaw + TurnControllerRates.Yaw * CoordinatedYawGain, -ConvertDegreesToDecidegrees(YawRate), ConvertDegreesToDecidegrees(YawRate));
 }
 
 void PIDXYZClass::Reset_Integral_Accumulators()

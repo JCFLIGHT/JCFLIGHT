@@ -60,7 +60,7 @@ extern SerialPrint PRINTF;
 #ifdef __AVR_ATmega2560__
 
 #define DEBUG(fmt, args...) PRINTF.SendToConsole(ProgramMemoryString(fmt "\n"), ##args);
-#define DEBUG_WITH_OUT_NEW_LINE(fmt, args...) PRINTF.SendToConsole(ProgramMemoryString(fmt), ##args);
+#define DEBUG_WITHOUT_NEW_LINE(fmt, args...) PRINTF.SendToConsole(ProgramMemoryString(fmt), ##args);
 #define LOG(fmt) PRINTF.SendToConsole(ProgramMemoryString("LOG: Funcao:%s Linha:%d " fmt "\n"), __FUNCTION__, __LINE__);
 #define LOG_PARAM_ERROR(fmt) PRINTF.SendToConsole(ProgramMemoryString("ERRO:" fmt "\n"));
 #define LINE_SPACE PRINTF.SendToConsole(ProgramMemoryString("\n"));
@@ -68,7 +68,7 @@ extern SerialPrint PRINTF;
 #else
 
 #define DEBUG(fmt, args...) PRINTF.tfp_printf((char *)fmt "\n", ##args);
-#define DEBUG_WITH_OUT_NEW_LINE(fmt, args...) PRINTF.tfp_printf((char *)fmt, ##args);
+#define DEBUG_WITHOUT_NEW_LINE(fmt, args...) PRINTF.tfp_printf((char *)fmt, ##args);
 #define LOG(fmt) PRINTF.tfp_printf((char *)"LOG: Funcao:%s Linha:%d " fmt "\n", __FUNCTION__, __LINE__);
 #define LOG_PARAM_ERROR(fmt) PRINTF.tfp_printf((char *)"ERRO:" fmt "\n");
 #define LINE_SPACE PRINTF.tfp_printf((char *)"\n");

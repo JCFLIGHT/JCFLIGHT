@@ -20,5 +20,6 @@
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 #define SCHEDULER_SET_FREQUENCY(Frequecy, Unidad) (1000000 / (Frequecy))
+#define SCHEDULER_SET_PERIOD_US(uS) (uS)
 bool Scheduler(Scheduler_Struct *SchedulerPointer, uint32_t RefreshTime);
 #endif

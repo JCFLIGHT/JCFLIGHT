@@ -25,7 +25,7 @@
 #include "FailSafe/FAILSAFE.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "Common/STRUCTS.h"
-#include "PerfomanceCalibration/PERFORMGYRO.h"
+#include "PerformanceCalibration/PERFORMGYRO.h"
 
 PreArmClass PREARM;
 

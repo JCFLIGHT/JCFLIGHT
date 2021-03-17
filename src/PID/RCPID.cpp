@@ -67,13 +67,13 @@ void GetRCDataConvertedAndApplyFilter()
   {
     RCController[YAW] = 0;
   }
-  if (ABS(RCController[PITCH]) < 5)
-  {
-    RCController[PITCH] = 0;
-  }
   if (ABS(RCController[ROLL]) < 5)
   {
     RCController[ROLL] = 0;
+  }
+  if (ABS(RCController[PITCH]) < 5)
+  {
+    RCController[PITCH] = 0;
   }
 
   //REMOVE OS VALORES MAIORES QUE -500 E 500 CAUSADOS PELO FILTRO

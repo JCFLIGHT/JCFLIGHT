@@ -604,7 +604,7 @@ bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
   return fabsf(StickPosition) > FixedWingIntegralTermLimitOnStickPosition;
 }
 
-void IMUTransformVectorEarthToBody(Struct_Vector3x3 *Vector)
+static void TransformVectorEarthFrameToBodyFrame(Struct_Vector3x3 *Vector)
 {
   Vector->Pitch = -Vector->Pitch;
   QuaternionRotateVector(Vector, Vector, &Orientation);
@@ -642,7 +642,7 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
   }
 
   //CONVERTE DE EARTH-FRAME PARA BODY-FRAME
-  IMUTransformVectorEarthToBody(&TurnControllerRates);
+  TransformVectorEarthFrameToBodyFrame(&TurnControllerRates);
 
   //LIMITA O VALOR MINIMO E MAXIMO DE SAÍDA A PARTIR DOS VALOR DE RATE DEFINIDO PELO USUARIO NO GCS
   PIDXYZ.CalcedRateTargetRoll = Constrain_16Bits(PIDXYZ.CalcedRateTargetRoll + TurnControllerRates.Roll, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));

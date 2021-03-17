@@ -49,7 +49,7 @@
 #include "FailSafe/FAILSAFE.h"
 #include "GPS/GPSUBLOX.h"
 #include "PID/RCPID.h"
-#include "PerfomanceCalibration/PERFORMACC.h"
+#include "PerformanceCalibration/PERFORMACC.h"
 
 GCSClass GCS;
 

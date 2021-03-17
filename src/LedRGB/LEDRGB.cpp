@@ -23,7 +23,7 @@
 #include "Compass/COMPASSREAD.h"
 #include "GPS/GPSUBLOX.h"
 #include "GPSNavigation/NAVIGATION.h"
-#include "PerfomanceCalibration/PERFORMACC.h"
+#include "PerformanceCalibration/PERFORMACC.h"
 #include "RadioControl/STICKS.h"
 
 LEDRGB RGB;

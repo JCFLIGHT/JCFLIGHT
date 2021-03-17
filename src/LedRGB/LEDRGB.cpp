@@ -24,6 +24,7 @@
 #include "GPS/GPSUBLOX.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "PerfomanceCalibration/PERFORMACC.h"
+#include "RadioControl/STICKS.h"
 
 LEDRGB RGB;
 
@@ -49,6 +50,15 @@ void LEDRGB::Initialization()
 
 void LEDRGB::Update()
 {
+  if (!AccCalibrationRunning() && !GCS.ConfigFlight && !COMPASS.Calibrating && !STICKS.PreArm_Run)
+  {
+    RGB.Function(CALL_LED_GPS);
+  }
+  if (GCS.ConfigFlight)
+  {
+    RGB.Function(CALL_LED_CONFIG_FLIGHT);
+  }
+
   //REGISTRADORES DE MANIPULAÇÃO PWM DO LED RGB
 #ifdef __AVR_ATmega2560__
 
@@ -65,15 +75,6 @@ void LEDRGB::Update()
 #elif defined __arm__
 
 #endif
-
-  if (!AccCalibrationRunning() && !GCS.ConfigFlight && !COMPASS.Calibrating && !RGB.NotPriorit)
-  {
-    RGB.Function(CALL_LED_GPS);
-  }
-  if (GCS.ConfigFlight)
-  {
-    RGB.Function(CALL_LED_CONFIG_FLIGHT);
-  }
 }
 
 void LEDRGB::Function(uint8_t Mode)
@@ -102,28 +103,16 @@ void LEDRGB::Function(uint8_t Mode)
     RGB.CalibEsc_Led();
     break;
 
-  case CALL_LED_CALIBRATION_ESC_FINISH:
-    RGB.CalibEscFinish_Led();
-    break;
-
   case CALL_LED_PRE_ARM_INIT:
     RGB.Pre_Arm_Initializing();
-    RGB.NotPriorit = true;
     break;
 
   case CALL_LED_PRE_ARM_SUCESS:
     RGB.Pre_Arm_Sucess();
-    RGB.NotPriorit = true;
     break;
 
   case CALL_LED_PRE_ARM_FAIL:
     RGB.Pre_Arm_Fail();
-    RGB.NotPriorit = true;
-    break;
-
-  case OFF_ALL_LEDS:
-    RGB.Off_All_Leds();
-    RGB.NotPriorit = true;
     break;
   }
 }
@@ -135,10 +124,12 @@ void LEDRGB::CalibAccLed(void)
   RGB.SetColorValue[RED] = 0;     //VERMELHO
   RGB.SetColorValue[GREEN] = PWM; //VERDE
   RGB.SetColorValue[BLUE] = 220;  //AZUL
-#elif defined ESP32
-  SetColorValue[RED] = 0;                                                  //VERMELHO
-  SetColorValue[GREEN] = PWM;                                              //VERDE
-  SetColorValue[BLUE] = 4061;                                              //AZUL
+#endif
+
+#ifdef ESP32
+  RGB.SetColorValue[RED] = 0;     //VERMELHO
+  RGB.SetColorValue[GREEN] = PWM; //VERDE
+  RGB.SetColorValue[BLUE] = 4061; //AZUL
 #endif
 }
 
@@ -149,10 +140,12 @@ void LEDRGB::CalibMagLed(void)
   RGB.SetColorValue[RED] = 180;  //VERMELHO
   RGB.SetColorValue[GREEN] = 0;  //VERDE
   RGB.SetColorValue[BLUE] = 220; //AZUL
-#elif defined ESP32
-  RGB.SetColorValue[RED] = 4021;                                           //VERMELHO
-  RGB.SetColorValue[GREEN] = 0;                                            //VERDE
-  RGB.SetColorValue[BLUE] = 4061;                                          //AZUL
+#endif
+
+#ifdef ESP32
+  RGB.SetColorValue[RED] = 4021;  //VERMELHO
+  RGB.SetColorValue[GREEN] = 0;   //VERDE
+  RGB.SetColorValue[BLUE] = 4061; //AZUL
 #endif
 }
 
@@ -172,10 +165,12 @@ void LEDRGB::ConfigFlight_Led(void)
     RGB.SetColorValue[RED] = 190;   //VERMELHO
     RGB.SetColorValue[GREEN] = 240; //VERDE
     RGB.SetColorValue[BLUE] = 0;    //AZUL
-#elif defined ESP32
-    RGB.SetColorValue[RED] = 4031;                                         //VERMELHO
-    RGB.SetColorValue[GREEN] = 4081;                                       //VERDE
-    RGB.SetColorValue[BLUE] = 0;                                           //AZUL
+#endif
+
+#ifdef ESP32
+    RGB.SetColorValue[RED] = 4031;   //VERMELHO
+    RGB.SetColorValue[GREEN] = 4081; //VERDE
+    RGB.SetColorValue[BLUE] = 0;     //AZUL
 #endif
   }
   else
@@ -227,14 +222,6 @@ void LEDRGB::CalibEsc_Led(void)
     FlashLedCount = 1;
     break;
   }
-}
-
-void LEDRGB::CalibEscFinish_Led(void)
-{
-  //LED RGB
-  RGB.SetColorValue[RED] = 0;     //VERMELHO
-  RGB.SetColorValue[GREEN] = PWM; //VERDE
-  RGB.SetColorValue[BLUE] = 0;    //AZUL
 }
 
 void LEDRGB::GPS_Led(void)

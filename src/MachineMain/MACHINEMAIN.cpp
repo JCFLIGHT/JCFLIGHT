@@ -26,13 +26,8 @@ void MachineInit()
     SetInitialTimeToInitTheMachine(&MachineInitTimeNow);
     //INICIALIZA A SERIAL
     FASTSERIAL.Initialization();
-    PRINTF.Initialization();
     //INICIALIZA O LED RGB
     RGB.Initialization();
-    //ATIVA O LED VERMELHO
-    RED_LED_ON;
-    GREEN_LED_OFF;
-    BLUE_LED_OFF;
     //CHECA SE É A PRIMEIRA VEZ QUE O FIRMWARE FOI CARREGADO
     CheckFirstLinkOrganizeEEPROM();
     //INICIALIZA OS PARAMETROS GERAIS
@@ -45,32 +40,6 @@ void MachineInit()
     COMPASS.UpdateCompassCalibration();
     //INICIALIZA OS DISPOSITIVOS I2C
     I2C.All_Initialization();
-    //INICIA O BUZZER EM OPERAÇÃO NORMAL
-    ESC.BeeperMode = NORMAL_OPERATION_MODE;
-    //DESATIVA TODOS OS LEDS
-    RED_LED_OFF;
-    GREEN_LED_OFF;
-    BLUE_LED_OFF;
-    for (uint8_t LedCount = 0; LedCount < 6; LedCount++)
-    {
-        RED_LED_ON;
-        GREEN_LED_OFF;
-        BLUE_LED_OFF;
-        SCHEDULERTIME.Sleep(133);
-        RED_LED_OFF;
-        GREEN_LED_ON;
-        BLUE_LED_OFF;
-        SCHEDULERTIME.Sleep(133);
-        RED_LED_OFF;
-        GREEN_LED_OFF;
-        BLUE_LED_ON;
-        SCHEDULERTIME.Sleep(133);
-        //133 * 3 * 5 = 1.995 SEGUNDO
-    }
-    //DESATIVA TODOS OS LEDS
-    RED_LED_OFF;
-    GREEN_LED_OFF;
-    BLUE_LED_OFF;
     //DECLARA OS PINOS GERAIS DE SAÍDA
     ConfigureRegisters(false);
     //INICIA O SISTEMA DE TASKS

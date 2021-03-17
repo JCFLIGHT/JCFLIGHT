@@ -42,10 +42,4 @@
 #define RED_LED_PWM_REGISTER
 #define GREEN_LED_PWM_REGISTER
 #define BLUE_LED_PWM_REGISTER
-#define RED_LED_ON
-#define RED_LED_OFF
-#define GREEN_LED_ON
-#define GREEN_LED_OFF
-#define BLUE_LED_ON
-#define BLUE_LED_OFF
 #endif

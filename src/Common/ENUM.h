@@ -196,11 +196,9 @@ enum RGB_Led_State_Enum
     CALL_LED_MAG_CALIBRATION,
     CALL_LED_CONFIG_FLIGHT,
     CALL_LED_CALIBRATION_ESC,
-    CALL_LED_CALIBRATION_ESC_FINISH,
     CALL_LED_PRE_ARM_INIT,
     CALL_LED_PRE_ARM_SUCESS,
-    CALL_LED_PRE_ARM_FAIL,
-    OFF_ALL_LEDS
+    CALL_LED_PRE_ARM_FAIL
 };
 
 enum ADC_Pins_Enum
@@ -410,7 +408,7 @@ enum AirSpeed_Type_Enum
 
 enum Ublox_Protocol_Byte_Enum
 {
-    PREAMBLE1 = 0xb5,
+    PREAMBLE1 = 0xB5,
     PREAMBLE2 = 0x62,
     CLASS_NAV = 0x01,
     CLASS_ACK = 0x05,
@@ -435,18 +433,6 @@ enum Ublox_Navigation_Fix_Type_Enum
     FIX_3D = 3,
     FIX_GPS_DEAD_RECKONING = 4,
     FIX_TIME = 5
-};
-
-enum Ublox_Navigation_Status_Enum
-{
-    NAV_STATUS_FIX_VALID = 1
-};
-
-enum Buzzer_Modes_Enum
-{
-    NORMAL_OPERATION_MODE = -10,
-    ESC_CALIBRATION_MODE = 1,
-    ESC_FINISH_CALIBRATION_MODE = 2
 };
 
 enum Dispositives_Passives_Enum

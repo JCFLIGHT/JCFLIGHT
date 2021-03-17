@@ -385,11 +385,11 @@ void UBLOX_GetAllGPSData(void)
     break;
 
   case MSG_STATUS:
-    GPS_3DFIX = (Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D);
+    GPS_3DFIX = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
     break;
 
   case MSG_SOL:
-    GPS_3DFIX = (Buffer.Solution.Fix_Status & NAV_STATUS_FIX_VALID) && (Buffer.Solution.Fix_Type == FIX_3D);
+    GPS_3DFIX = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
     GPS_NumberOfSatellites = Buffer.Solution.Satellites;
     GPS_HDOP = Buffer.Solution.Position_DOP;
     break;

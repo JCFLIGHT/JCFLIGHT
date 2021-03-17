@@ -17,12 +17,14 @@
 
 #include "FASTSERIAL.h"
 #include "HAL/HALSERIAL.h"
+#include "PRINTF.h"
 
 Fast_Serial FASTSERIAL;
 
 void Fast_Serial::Initialization()
 {
   HAL_SERIAL.Initialization();
+  PRINTF.Initialization();
 }
 
 void Fast_Serial::Begin(uint8_t SerialPort, uint32_t BaudRate)

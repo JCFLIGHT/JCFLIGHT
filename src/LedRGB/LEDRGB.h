@@ -21,19 +21,17 @@
 class LEDRGB
 {
 public:
-  bool NotPriorit;
-  uint16_t SetColorValue[3];
   void Initialization();
   void Update();
   void Function(uint8_t Mode);
   void Off_All_Leds(void);
 
 private:
+  uint16_t SetColorValue[3];
   void CalibAccLed(void);
   void CalibMagLed(void);
   void ConfigFlight_Led(void);
   void CalibEsc_Led(void);
-  void CalibEscFinish_Led(void);
   void GPS_Led(void);
   void Pre_Arm_Initializing(void);
   void Pre_Arm_Sucess(void);

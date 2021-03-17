@@ -21,13 +21,13 @@
 class SticksClass
 {
 public:
-  bool PreArm_Delay;
+  bool PreArm_Run;
   void Update();
   void Pre_Arm(void);
   void Pre_Arm_Leds(void);
 
 private:
-  uint8_t PreArm_Delay_Count = 0;
+  uint8_t PreArm_Run_Count = 0;
 };
 extern SticksClass STICKS;
 #endif

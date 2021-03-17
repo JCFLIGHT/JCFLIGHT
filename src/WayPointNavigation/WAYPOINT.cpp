@@ -280,7 +280,7 @@ void WayPointRun()
     {
       if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
       {
-        STICKS.PreArm_Delay = false;
+        STICKS.PreArm_Run = false;
         WayPointMode = WP_START_MISSION;
       }
     }
@@ -292,7 +292,7 @@ void WayPointRun()
       }
       else
       {
-        STICKS.PreArm_Delay = true;
+        STICKS.PreArm_Run = true;
       }
     }
     break;

@@ -255,16 +255,9 @@ void BEEPERCLASS::Run()
     AnalogWriteSetSettings(GPIO_NUM_18, 490, 12);
 #endif
   }
-  if (ESC.BeeperMode == ESC_CALIBRATION_MODE)
+  if (!BuzzerInit)
   {
-    BEEPER.Play(BEEPER_CALIBRATION_DONE);
-  }
-  else if (ESC.BeeperMode == NORMAL_OPERATION_MODE)
-  {
-    if (!BuzzerInit)
-    {
-      BEEPER.Play(BEEPER_ALGORITHM_INIT);
-    }
+    BEEPER.Play(BEEPER_ALGORITHM_INIT);
   }
   //NÃO FAÇA A MUDANÇA DO SOM TÃO RAPIDO PARA NÃO EMBOLAR COM O BEEP DA BATERIA SE A MESMA ESTIVER COM BAIXA TENSÃO
   if (SafeToOthersBeeps && BEEPER.SafeToOthersBeepsCounter < 254)

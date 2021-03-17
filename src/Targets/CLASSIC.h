@@ -41,10 +41,4 @@
 #define RED_LED_PWM_REGISTER OCR2A                //PINO DIGITAL 10
 #define GREEN_LED_PWM_REGISTER OCR1A              //PINO DIGITAL 11
 #define BLUE_LED_PWM_REGISTER OCR1B               //PINO DIGITAL 12
-#define RED_LED_ON PORTB |= 1 << 4                //PINO DIGITAL 10
-#define RED_LED_OFF PORTB &= ~(1 << 4)            //PINO DIGITAL 10
-#define GREEN_LED_ON PORTB |= 1 << 5              //PINO DIGITAL 11
-#define GREEN_LED_OFF PORTB &= ~(1 << 5)          //PINO DIGITAL 11
-#define BLUE_LED_ON PORTB |= 1 << 6               //PINO DIGITAL 12
-#define BLUE_LED_OFF PORTB &= ~(1 << 6)           //PINO DIGITAL 12
 #endif

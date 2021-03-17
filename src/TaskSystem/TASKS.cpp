@@ -70,7 +70,7 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
 #ifndef __AVR_ATmega2560__
         .DesiredPeriod = SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"),
 #else
-        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(70, "Hz"),
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(60, "Hz"),
 #endif
         .StaticPriority = TASK_PRIORITY_REALTIME,
     },

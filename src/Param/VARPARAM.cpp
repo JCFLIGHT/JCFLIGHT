@@ -17,7 +17,9 @@
 
 #include "VARPARAM.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#ifdef __AVR_ATmega2560__
 #include <avr/eeprom.h>
+#endif
 
 VarParam *VarParam::_Variables;
 VarParam *VarParam::_Grouped_Variables;
@@ -220,12 +222,15 @@ bool VarParam::Save(void)
         {
             uint8_t NewVectorBuffer;
 
+#ifdef __AVR_ATmega2560__
             if (eeprom_read_byte(EEPROM_AddressCount) != VectorBuffer[Index])
             {
                 eeprom_write_byte(EEPROM_AddressCount, VectorBuffer[Index]);
             }
 
             NewVectorBuffer = eeprom_read_byte(EEPROM_AddressCount);
+#endif
+
             if (NewVectorBuffer != VectorBuffer[Index])
             {
                 return false;
@@ -285,7 +290,11 @@ bool VarParam::Load(void)
 
     if (Size <= sizeof(VectorBuffer))
     {
+
+#ifdef __AVR_ATmega2560__
         eeprom_read_block(VectorBuffer, (void *)_Key, Size);
+#endif
+
         return Unserialize(VectorBuffer, Size);
     }
     return false;
@@ -336,10 +345,13 @@ void VarParam::Erase_All()
     for (uint16_t Index = 0; Index < Param_EEPROM_Size; Index++)
     {
         uint8_t *EEPROM_AddressCount = (uint8_t *)Param_EEPROM_Size;
+
+#ifdef __AVR_ATmega2560__
         if (eeprom_read_byte(EEPROM_AddressCount) != 0)
         {
             eeprom_write_byte(EEPROM_AddressCount, 0);
         }
+#endif
     }
 
     _Tail_Sentinel = 0;
@@ -359,7 +371,10 @@ VarParam::Var_Key VarParam::Key(void)
         return _Key & Param_Key_Mask;
     }
 
+#ifdef __AVR_ATmega2560__
     eeprom_read_block(&Var_Header, (void *)(_Key - sizeof(Var_Header)), sizeof(Var_Header));
+#endif
+
     return Var_Header.Key;
 }
 
@@ -432,7 +447,9 @@ bool VarParam::EEPROM_Scan(void)
     _Tail_Sentinel = 0;
     EEPROM_Address = 0;
 
+#ifdef __AVR_ATmega2560__
     eeprom_read_block(&EE_Header, (void *)EEPROM_Address, sizeof(EE_Header));
+#endif
 
     if ((EE_Header.Magic != Param_EEPROM_Magic) || (EE_Header.Revision != Param_EEPROM_Revision))
     {
@@ -451,7 +468,9 @@ bool VarParam::EEPROM_Scan(void)
             return NULL;
         }
 
+#ifdef __AVR_ATmega2560__
         eeprom_read_block(&Var_Header, (void *)EEPROM_Address, sizeof(Var_Header));
+#endif
 
         if (Var_Header.Key == Param_Key_Sentinel)
         {
@@ -558,7 +577,9 @@ bool VarParam::EEPROM_Locate(bool allocate)
         EE_Header.Revision = Param_EEPROM_Revision;
         EE_Header.Spare = 0;
 
+#ifdef __AVR_ATmega2560__
         eeprom_write_block(&EE_Header, (void *)0, sizeof(EE_Header));
+#endif
 
         _Tail_Sentinel = sizeof(EE_Header);
 
@@ -567,7 +588,10 @@ bool VarParam::EEPROM_Locate(bool allocate)
         Var_Header.Size = Pad_Size - 1;
         Var_Header.Spare = 0;
 
+#ifdef __AVR_ATmega2560__
         eeprom_write_block(&Var_Header, (void *)_Tail_Sentinel, sizeof(Var_Header));
+#endif
+
         _Tail_Sentinel += sizeof(Var_Header) + Pad_Size;
     }
 
@@ -577,11 +601,17 @@ bool VarParam::EEPROM_Locate(bool allocate)
     Var_Header.Key = Param_Key_Sentinel;
     Var_Header.Size = 0;
     Var_Header.Spare = 0;
+
+#ifdef __AVR_ATmega2560__
     eeprom_write_block(&Var_Header, (void *)_Tail_Sentinel, sizeof(Var_Header));
+#endif
 
     Var_Header.Key = Key();
     Var_Header.Size = Size - 1;
+
+#ifdef __AVR_ATmega2560__
     eeprom_write_block(&Var_Header, (void *)New_Location, sizeof(Var_Header));
+#endif
 
     _Key = New_Location + sizeof(Var_Header);
     return true;

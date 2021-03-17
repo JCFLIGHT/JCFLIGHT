@@ -27,7 +27,7 @@
 #include "FastSerial/PRINTF.h"
 
 #ifdef __AVR_ATmega2560__
-#define THIS_LOOP_RATE 70 //HZ
+#define THIS_LOOP_RATE 60 //HZ
 #else
 #define THIS_LOOP_RATE 100 //HZ
 #endif

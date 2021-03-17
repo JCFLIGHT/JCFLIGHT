@@ -36,6 +36,10 @@
 
 #define ProgramMemoryString(StringToArray) (StringToArray)
 
+#ifndef strlcat_P
+#define strlcat_P(dest, src, len) strlcat((dest), (src), (len))
+#endif
+
 #endif
 
 #include <inttypes.h> //int8_t,uint8_t,int16_t,uint16_t,int32_t & uint32_t

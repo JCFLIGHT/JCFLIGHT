@@ -25,6 +25,7 @@
 #include "LedRGB/LEDRGB.h"
 #include "Math/MATHSUPPORT.h"
 #include "IMU/IMUHEALTH.h"
+#include "Scheduler/SCHEDULER.h"
 
 int16_t CalibratingAccelerometer;
 
@@ -55,7 +56,7 @@ void Accelerometer_Calibration()
 
 #ifndef __AVR_ATmega2560__
     static Scheduler_Struct ACC_Calibration_Timer;
-    if (Scheduler(&ACC_Calibration_Timer, SCHEDULER_SET_FREQUENCY(200, "Hz")))
+    if (Scheduler(&ACC_Calibration_Timer, SCHEDULER_SET_FREQUENCY(100, "Hz")))
     {
 #endif
 

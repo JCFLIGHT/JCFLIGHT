@@ -1271,8 +1271,8 @@ void GCSClass::GCS_Request_Parameters()
     GCSParameters.SendAuxSevenValue = AuxiliarSeven.Output;
     GCSParameters.SendAuxEightValue = AuxiliarEight.Output;
     GCSParameters.SendGPSNumberOfSat = GPS_NumberOfSatellites;
-    GCSParameters.SendGPSLatitude = GPS_Coordinates_Vector[0];
-    GCSParameters.SendGPSLongitude = GPS_Coordinates_Vector[1];
+    GCSParameters.SendGPSLatitude = GPS_Coordinates_Vector[COORD_LATITUDE];
+    GCSParameters.SendGPSLongitude = GPS_Coordinates_Vector[COORD_LONGITUDE];
     GCSParameters.SendHomePointLatitude = Stored_Coordinates_Home_Point[0];
     GCSParameters.SendHomePointLongitude = Stored_Coordinates_Home_Point[1];
     if (I2C.BarometerFound)

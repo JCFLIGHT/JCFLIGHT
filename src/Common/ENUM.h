@@ -531,4 +531,16 @@ enum GPS_Type_Enum
     GPS_DJI_NAZA
 };
 
+enum Inertial_Navigation_Enum
+{
+    INS_LATITUDE = 0,
+    INS_LONGITUDE,
+    INS_VERTICAL_Z
+};
+
+enum GPS_Orientation_Enum
+{
+    COORD_LATITUDE = 0,
+    COORD_LONGITUDE
+};
 #endif

@@ -379,8 +379,8 @@ void UBLOX_GetAllGPSData(void)
   {
 
   case MSG_POSLLH:
-    GPS_Coordinates_Vector[0] = Buffer.PositionLLH.Latitude;
-    GPS_Coordinates_Vector[1] = Buffer.PositionLLH.Longitude;
+    GPS_Coordinates_Vector[COORD_LATITUDE] = Buffer.PositionLLH.Latitude;
+    GPS_Coordinates_Vector[COORD_LONGITUDE] = Buffer.PositionLLH.Longitude;
     GPS_Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
     break;
 

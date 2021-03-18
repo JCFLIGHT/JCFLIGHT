@@ -319,8 +319,8 @@ void DjiNazaGpsNewFrame(uint8_t SerialReceiverBuffer)
   DJINaza_Compass_Roll = GPSSolutionData.GPS_Read_Compass[ROLL];
   DJINaza_Compass_Pitch = GPSSolutionData.GPS_Read_Compass[PITCH];
   DJINaza_Compass_Yaw = GPSSolutionData.GPS_Read_Compass[YAW];
-  GPS_Coordinates_Vector[0] = GPSSolutionData.GPS_Location_Data.Latitude;
-  GPS_Coordinates_Vector[1] = GPSSolutionData.GPS_Location_Data.Longitude;
+  GPS_Coordinates_Vector[COORD_LATITUDE] = GPSSolutionData.GPS_Location_Data.Latitude;
+  GPS_Coordinates_Vector[COORD_LONGITUDE] = GPSSolutionData.GPS_Location_Data.Longitude;
   GPS_Altitude = (uint16_t)GPSSolutionData.GPS_Location_Data.Altitude;
   GPS_Ground_Course = (uint16_t)GPSSolutionData.GroundCourse;
   GPS_Ground_Speed = (uint16_t)GPSSolutionData.GroundSpeed;

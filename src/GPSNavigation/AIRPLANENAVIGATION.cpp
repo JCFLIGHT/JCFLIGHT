@@ -114,8 +114,8 @@ void Circle_Mode_Update()
   Scale_Of_Circle = (89.832f / ScaleDownOfLongitude) * CRUISE_DISTANCE;
   Latitude_To_Circle = Fast_Cosine(ConvertToRadians(HeadingToCircle));
   Longitude_To_Circle = Fast_Sine(ConvertToRadians(HeadingToCircle)) * ScaleDownOfLongitude;
-  Coordinates_To_Navigation[0] += Latitude_To_Circle * Scale_Of_Circle;
-  Coordinates_To_Navigation[1] += Longitude_To_Circle * Scale_Of_Circle;
+  Coordinates_To_Navigation[COORD_LATITUDE] += Latitude_To_Circle * Scale_Of_Circle;
+  Coordinates_To_Navigation[COORD_LONGITUDE] += Longitude_To_Circle * Scale_Of_Circle;
 }
 
 void AirPlaneUpdateNavigation(void)

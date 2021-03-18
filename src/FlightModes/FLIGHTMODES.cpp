@@ -204,7 +204,7 @@ void ProcessFlightModesToAirPlane()
           GPS_Navigation_Mode = DO_POSITION_HOLD;
           GPS_Flight_Mode = GPS_MODE_HOLD;
           GPS_AltitudeHold_For_Plane = GPS_Altitude;
-          Set_Next_Point_To_Navigation(&GPS_Coordinates_Vector[0], &GPS_Coordinates_Vector[1]);
+          Set_Next_Point_To_Navigation(&GPS_Coordinates_Vector[COORD_LATITUDE], &GPS_Coordinates_Vector[COORD_LONGITUDE]);
           DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
         }
         else

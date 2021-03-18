@@ -65,7 +65,6 @@ static int16_t Navigation_Bearing_RTH;
 uint16_t DistanceToHome;
 
 int32_t Stored_Coordinates_Home_Point[2];
-int32_t GPS_CoordinatesToHold[2];
 int32_t Two_Points_Distance;
 int32_t Target_Bearing;
 int32_t GPSDistanceToHome[2];
@@ -96,7 +95,7 @@ void GPS_Process_FlightModes(float DeltaTime)
   //OBTÉM A DECLINAÇÃO MAGNETICA AUTOMATICAMENTE
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !DeclinationPushed)
   {
-    Set_Initial_Location(GPS_Coordinates_Vector[0], GPS_Coordinates_Vector[1]);
+    Set_Initial_Location(GPS_Coordinates_Vector[COORD_LATITUDE], GPS_Coordinates_Vector[COORD_LONGITUDE]);
     DeclinationPushedCount++;
   }
   //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
@@ -123,8 +122,8 @@ void GPS_Process_FlightModes(float DeltaTime)
   GPS_Calcule_Velocity();
   if (GPS_Flight_Mode != GPS_MODE_NONE)
   {
-    GPS_Calcule_Bearing(&Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
-    GPS_Calcule_Distance_In_CM(&Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
+    GPS_Calcule_Bearing(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Target_Bearing);
+    GPS_Calcule_Distance_In_CM(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Two_Points_Distance);
 
     int16_t CalculateNavigationSpeed = 0;
 
@@ -223,14 +222,14 @@ void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput)
 
 void Set_Next_Point_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_Destiny)
 {
-  Coordinates_To_Navigation[0] = *Latitude_Destiny;
-  Coordinates_To_Navigation[1] = *Longitude_Destiny;
+  Coordinates_To_Navigation[COORD_LATITUDE] = *Latitude_Destiny;
+  Coordinates_To_Navigation[COORD_LONGITUDE] = *Longitude_Destiny;
   GPS_Calcule_Longitude_Scaling(*Latitude_Destiny);
   Circle_Mode_Update();
-  GPS_Calcule_Bearing(&Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Target_Bearing);
-  GPS_Calcule_Distance_In_CM(&Coordinates_To_Navigation[0], &Coordinates_To_Navigation[1], &Two_Points_Distance);
-  INS.PositionToHold[0] = (Coordinates_To_Navigation[0] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
-  INS.PositionToHold[1] = (Coordinates_To_Navigation[1] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
+  GPS_Calcule_Bearing(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Target_Bearing);
+  GPS_Calcule_Distance_In_CM(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Two_Points_Distance);
+  INS.PositionToHold[COORD_LATITUDE] = (Coordinates_To_Navigation[COORD_LATITUDE] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
+  INS.PositionToHold[COORD_LONGITUDE] = (Coordinates_To_Navigation[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
   Coordinates_Navigation_Speed = 100;
   Original_Target_Bearing = Target_Bearing;
 }
@@ -245,8 +244,8 @@ bool Point_Reached(void)
 
 void GPS_Calcule_Bearing(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *Bearing)
 {
-  int32_t Adjust_OffSet_Lat = (*InputLatitude - GPS_Coordinates_Vector[0]) / ScaleDownOfLongitude;
-  int32_t Adjust_OffSet_Long = *InputLongitude - GPS_Coordinates_Vector[1];
+  int32_t Adjust_OffSet_Lat = (*InputLatitude - GPS_Coordinates_Vector[COORD_LATITUDE]) / ScaleDownOfLongitude;
+  int32_t Adjust_OffSet_Long = *InputLongitude - GPS_Coordinates_Vector[COORD_LONGITUDE];
   *Bearing = 9000 + atan2(-Adjust_OffSet_Lat, Adjust_OffSet_Long) * 5729.57795f;
   if (*Bearing < 0)
   {
@@ -256,16 +255,16 @@ void GPS_Calcule_Bearing(int32_t *InputLatitude, int32_t *InputLongitude, int32_
 
 void GPS_Calcule_Distance_In_CM(int32_t *InputLatitude, int32_t *InputLongitude, int32_t *CalculateDistance)
 {
-  float DistanceOfLatitude = (float)(GPS_Coordinates_Vector[0] - *InputLatitude);
-  float DistanceOfLongitude = (float)(GPS_Coordinates_Vector[1] - *InputLongitude) * ScaleDownOfLongitude;
+  float DistanceOfLatitude = (float)(GPS_Coordinates_Vector[COORD_LATITUDE] - *InputLatitude);
+  float DistanceOfLongitude = (float)(GPS_Coordinates_Vector[COORD_LONGITUDE] - *InputLongitude) * ScaleDownOfLongitude;
   *CalculateDistance = SquareRootU32Bits(SquareFloat(DistanceOfLatitude) + SquareFloat(DistanceOfLongitude)) * 1.11318845f;
 }
 
 void GPS_Calcule_Distance_To_Home(uint32_t *CalculateDistance)
 {
-  GPSDistanceToHome[0] = (GPS_Coordinates_Vector[0] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
-  GPSDistanceToHome[1] = (GPS_Coordinates_Vector[1] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
-  *CalculateDistance = SquareRootU32Bits(Square32Bits(GPSDistanceToHome[0]) + Square32Bits(GPSDistanceToHome[1]));
+  GPSDistanceToHome[COORD_LATITUDE] = (GPS_Coordinates_Vector[COORD_LATITUDE] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
+  GPSDistanceToHome[COORD_LONGITUDE] = (GPS_Coordinates_Vector[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
+  *CalculateDistance = SquareRootU32Bits(Square32Bits(GPSDistanceToHome[COORD_LATITUDE]) + Square32Bits(GPSDistanceToHome[COORD_LONGITUDE]));
 }
 
 static void GPS_Calcule_Velocity(void)
@@ -289,24 +288,22 @@ static void GPS_Calcule_Velocity(void)
       DeltaTimeStored = DeltaTimeGPSNavigation;
     }
     DeltaTimeStored = 1.0 / DeltaTimeStored;
-    GPSActualSpeed[0] = (float)(GPS_Coordinates_Vector[0] - Last_CoordinatesOfGPS[0]) * DeltaTimeStored;
-    GPSActualSpeed[1] = (float)(GPS_Coordinates_Vector[1] - Last_CoordinatesOfGPS[1]) * ScaleDownOfLongitude * DeltaTimeStored;
-    GPSActualSpeed[0] = (GPSActualSpeed[0] + Previous_Velocity[0]) / 2;
-    GPSActualSpeed[1] = (GPSActualSpeed[1] + Previous_Velocity[1]) / 2;
-    Previous_Velocity[0] = GPSActualSpeed[0];
-    Previous_Velocity[1] = GPSActualSpeed[1];
+    GPSActualSpeed[COORD_LATITUDE] = (float)(GPS_Coordinates_Vector[COORD_LATITUDE] - Last_CoordinatesOfGPS[COORD_LATITUDE]) * DeltaTimeStored;
+    GPSActualSpeed[COORD_LONGITUDE] = (float)(GPS_Coordinates_Vector[COORD_LONGITUDE] - Last_CoordinatesOfGPS[COORD_LONGITUDE]) * ScaleDownOfLongitude * DeltaTimeStored;
+    GPSActualSpeed[COORD_LATITUDE] = (GPSActualSpeed[COORD_LATITUDE] + Previous_Velocity[COORD_LATITUDE]) / 2;
+    GPSActualSpeed[COORD_LONGITUDE] = (GPSActualSpeed[COORD_LONGITUDE] + Previous_Velocity[COORD_LONGITUDE]) / 2;
+    Previous_Velocity[COORD_LATITUDE] = GPSActualSpeed[COORD_LATITUDE];
+    Previous_Velocity[COORD_LONGITUDE] = GPSActualSpeed[COORD_LONGITUDE];
   }
   IgnoreFirstPeak = true;
-  Last_CoordinatesOfGPS[0] = GPS_Coordinates_Vector[0];
-  Last_CoordinatesOfGPS[1] = GPS_Coordinates_Vector[1];
+  Last_CoordinatesOfGPS[COORD_LATITUDE] = GPS_Coordinates_Vector[COORD_LATITUDE];
+  Last_CoordinatesOfGPS[COORD_LONGITUDE] = GPS_Coordinates_Vector[COORD_LONGITUDE];
 }
 
 void SetThisPointToPositionHold()
 {
-  INS.PositionToHold[0] = INS.Position_EarthFrame[0] + INS.Velocity_EarthFrame[0] * PositionHoldPID.kI;
-  INS.PositionToHold[1] = INS.Position_EarthFrame[1] + INS.Velocity_EarthFrame[1] * PositionHoldPID.kI;
-  GPS_CoordinatesToHold[0] = Stored_Coordinates_Home_Point[0] + INS.PositionToHold[0] / 1.11318845f;
-  GPS_CoordinatesToHold[1] = Stored_Coordinates_Home_Point[1] + INS.PositionToHold[1] / (1.11318845f * ScaleDownOfLongitude);
+  INS.PositionToHold[COORD_LATITUDE] = INS.Position_EarthFrame[INS_LATITUDE] + INS.Velocity_EarthFrame[INS_LATITUDE] * PositionHoldPID.kI;
+  INS.PositionToHold[COORD_LONGITUDE] = INS.Position_EarthFrame[INS_LONGITUDE] + INS.Velocity_EarthFrame[INS_LONGITUDE] * PositionHoldPID.kI;
 }
 
 static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
@@ -334,8 +331,8 @@ void ApplyPosHoldPIDControl(float *DeltaTime)
   }
   else
   {
-    GPS_Navigation_Array[0] = 0;
-    GPS_Navigation_Array[1] = 0;
+    GPS_Navigation_Array[COORD_LATITUDE] = 0;
+    GPS_Navigation_Array[COORD_LONGITUDE] = 0;
     GPSResetPID(&PositionHoldRatePIDArray[0]);
     GPSResetPID(&PositionHoldRatePIDArray[1]);
   }
@@ -425,9 +422,9 @@ void Do_Mode_RTH_Now()
 
 void Reset_Home_Point(void)
 {
-  Stored_Coordinates_Home_Point[0] = GPS_Coordinates_Vector[0];
-  Stored_Coordinates_Home_Point[1] = GPS_Coordinates_Vector[1];
-  GPS_Calcule_Longitude_Scaling(GPS_Coordinates_Vector[0]);
+  Stored_Coordinates_Home_Point[0] = GPS_Coordinates_Vector[COORD_LATITUDE];
+  Stored_Coordinates_Home_Point[1] = GPS_Coordinates_Vector[COORD_LONGITUDE];
+  GPS_Calcule_Longitude_Scaling(GPS_Coordinates_Vector[COORD_LATITUDE]);
   Navigation_Bearing_RTH = ATTITUDE.AngleOut[YAW];
   GPS_Altitude_For_Plane = GPS_Altitude;
   Home_Point = true;
@@ -436,8 +433,8 @@ void Reset_Home_Point(void)
 void GPS_Reset_Navigation(void)
 {
   GPS_Navigation_Mode = DO_NONE;
-  GPS_Navigation_Array[0] = 0;
-  GPS_Navigation_Array[1] = 0;
+  GPS_Navigation_Array[COORD_LATITUDE] = 0;
+  GPS_Navigation_Array[COORD_LONGITUDE] = 0;
   GPSResetPID(&PositionHoldPIDArray[0]);
   GPSResetPID(&PositionHoldRatePIDArray[0]);
   GPSResetPID(&NavigationPIDArray[0]);

@@ -132,7 +132,7 @@ static const uint8_t Parachute_Beep[] = {
     7, 50,
     BEEPER_COMMAND_STOP};
 
-const Struct_BeeperEntry BeeperTable[] = {
+const BeeperEntry_Struct BeeperTable[] = {
     {BEEPER_CALIBRATION_DONE, 0, Calibration_Beep},
     {BEEPER_DISARMING, 1, Disarm_Beep},
     {BEEPER_BATT_CRIT_LOW, 2, LowBattery_Beep},
@@ -149,9 +149,9 @@ const Struct_BeeperEntry BeeperTable[] = {
     {BEEPER_PARACHUTE, 13, Parachute_Beep},
 };
 
-static const Struct_BeeperEntry *BeeperEntry = NULL;
+static const BeeperEntry_Struct *BeeperEntry = NULL;
 
-#define BEEPER_TABLE_ENTRY_COUNT (sizeof(BeeperTable) / sizeof(Struct_BeeperEntry))
+#define BEEPER_TABLE_ENTRY_COUNT (sizeof(BeeperTable) / sizeof(BeeperEntry_Struct))
 
 void BEEPERCLASS::Play(Beeper_Mode Mode)
 {
@@ -160,10 +160,10 @@ void BEEPERCLASS::Play(Beeper_Mode Mode)
   {
     return;
   }
-  const Struct_BeeperEntry *SelectedSong = NULL;
+  const BeeperEntry_Struct *SelectedSong = NULL;
   for (uint8_t i = 0; i < BEEPER_TABLE_ENTRY_COUNT; i++)
   {
-    const Struct_BeeperEntry *SelectedSongTable = &BeeperTable[i];
+    const BeeperEntry_Struct *SelectedSongTable = &BeeperTable[i];
     if (SelectedSongTable->Mode != Mode)
     {
       continue;

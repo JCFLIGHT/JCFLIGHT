@@ -18,20 +18,20 @@
 #include "MACHINEINIT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 
-MachineInitTime MachineInitTimeNow;
+MachineInitTime_Struct MachineInitTime_StructNow;
 
-void SetInitialTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer)
+void SetInitialTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer)
 {
-    MachineInitTimePointer->PreviousTime = SCHEDULERTIME.GetMillis();
+    MachineInitTime_StructPointer->PreviousTime = SCHEDULERTIME.GetMillis();
 }
 
-void CalculeTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer)
+void CalculeTheFinalTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer)
 {
-    MachineInitTimePointer->ActualTime = SCHEDULERTIME.GetMillis();
-    MachineInitTimePointer->TotalTime = MachineInitTimePointer->ActualTime - MachineInitTimePointer->PreviousTime;
+    MachineInitTime_StructPointer->ActualTime = SCHEDULERTIME.GetMillis();
+    MachineInitTime_StructPointer->TotalTime = MachineInitTime_StructPointer->ActualTime - MachineInitTime_StructPointer->PreviousTime;
 }
 
-uint32_t GetTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer)
+uint32_t GetTheFinalTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer)
 {
-    return MachineInitTimePointer->TotalTime / 1000;
+    return MachineInitTime_StructPointer->TotalTime / 1000;
 }

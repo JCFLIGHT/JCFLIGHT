@@ -30,7 +30,7 @@ typedef struct
   int16_t GyroscopeReadNotFiltered[3];
   int16_t CompassRead[3];
   float CalcedGForce;
-} IMU_STRUCT;
+} IMU_Struct;
 
 typedef struct
 {
@@ -41,7 +41,7 @@ typedef struct
   float Velocity_EarthFrame[3];
   float Position_EarthFrame[3];
   int32_t PositionToHold[2];
-} INS_STRUCT;
+} INS_Struct;
 
 typedef struct
 {
@@ -49,20 +49,20 @@ typedef struct
   int32_t EstimatedAltitude;
   int16_t EstimatedVariometer;
   int32_t GroundAltitude;
-} ALTITUDE_STRUCT;
+} Altitude_Struct;
 
 typedef struct
 {
   int16_t AngleOut[3];
   int16_t CompassHeading;
-} ATTITUDE_STRUCT;
+} Attitude_Struct;
 
 typedef struct
 {
   int16_t AccelerometerZero[3];
   uint16_t AccelerometerScale[3];
   int16_t Magnetometer[3];
-} CALIBRATION_STRUCT;
+} Calibration_Struct;
 
 struct PID_TERMS
 {
@@ -111,7 +111,7 @@ typedef struct
   uint8_t Mode;
   uint8_t Priority;
   const uint8_t *Sequence;
-} Struct_BeeperEntry;
+} BeeperEntry_Struct;
 
 typedef struct
 {
@@ -119,7 +119,7 @@ typedef struct
   float kI_Accelerometer = 0.0050f;
   float kP_Magnetometer = 1;
   float kI_Magnetometer = 0;
-} Struct_IMURuntimeConfiguration;
+} AHRS_Configuration_Struct;
 
 typedef struct
 {
@@ -127,7 +127,7 @@ typedef struct
   float q1;
   float q2;
   float q3;
-} Struct_Quaternion;
+} Quaternion_Struct;
 
 typedef struct
 {
@@ -204,7 +204,7 @@ typedef struct
   uint32_t ActualTime;
   uint32_t PreviousTime;
   uint32_t TotalTime;
-} MachineInitTime;
+} MachineInitTime_Struct;
 
 typedef struct
 {
@@ -226,10 +226,10 @@ typedef struct
   float HalfLife, Boost;
 } AlphaBetaGammaFilter_Struct;
 
-extern CALIBRATION_STRUCT CALIBRATION;
-extern IMU_STRUCT IMU;
-extern INS_STRUCT INS;
-extern ALTITUDE_STRUCT ALTITUDE;
-extern ATTITUDE_STRUCT ATTITUDE;
+extern Calibration_Struct CALIBRATION;
+extern IMU_Struct IMU;
+extern INS_Struct INS;
+extern Altitude_Struct ALTITUDE;
+extern Attitude_Struct ATTITUDE;
 extern PID_TERMS GET_SET[SIZE_OF_PID_PARAMS];
 #endif

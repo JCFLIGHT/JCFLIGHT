@@ -23,7 +23,7 @@ FILE_COMPILE_FOR_SPEED
 void MachineInit()
 {
     //OBTÉM O VALOR INICIAL DE MILLIS PARA CALCULAR O TEMPO DE INICIALIZAÇÃO
-    SetInitialTimeToInitTheMachine(&MachineInitTimeNow);
+    SetInitialTimeToInitTheMachine(&MachineInitTime_StructNow);
     //INICIALIZA A SERIAL
     FASTSERIAL.Initialization();
     //INICIALIZA O LED RGB
@@ -45,8 +45,8 @@ void MachineInit()
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
     //CALCULA E IMPRIME O TEMPO GASTO PELA INICIALIZAÇÃO
-    CalculeTheFinalTimeToInitTheMachine(&MachineInitTimeNow);
-    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos\n", GetTheFinalTimeToInitTheMachine(&MachineInitTimeNow));
+    CalculeTheFinalTimeToInitTheMachine(&MachineInitTime_StructNow);
+    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos\n", GetTheFinalTimeToInitTheMachine(&MachineInitTime_StructNow));
 }
 
 void MachineRun()

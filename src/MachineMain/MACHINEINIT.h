@@ -18,8 +18,8 @@
 #ifndef MACHINEINIT_H_
 #define MACHINEINIT_H_
 #include "Common/STRUCTS.h"
-extern MachineInitTime MachineInitTimeNow;
-void SetInitialTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer);
-void CalculeTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer);
-uint32_t GetTheFinalTimeToInitTheMachine(MachineInitTime *MachineInitTimePointer);
+extern MachineInitTime_Struct MachineInitTime_StructNow;
+void SetInitialTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer);
+void CalculeTheFinalTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer);
+uint32_t GetTheFinalTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer);
 #endif

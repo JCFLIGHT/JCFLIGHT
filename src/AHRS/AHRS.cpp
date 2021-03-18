@@ -46,9 +46,9 @@ Struct_Vector3x3 BodyFrameAcceleration;
 Struct_Vector3x3 BodyFrameRotation;
 static Struct_Vector3x3 CorrectedMagneticFieldNorth;
 
-Struct_Quaternion Orientation;
+Quaternion_Struct Orientation;
 
-static Struct_IMURuntimeConfiguration IMURuntimeConfiguration;
+static AHRS_Configuration_Struct IMURuntimeConfiguration;
 
 static bool GPSHeadingInitialized = false;
 
@@ -90,7 +90,7 @@ void AHRSClass::Initialization(void)
   ComputeRotationMatrix();
 }
 
-static bool ValidateQuaternion(const Struct_Quaternion *Quaternion)
+static bool ValidateQuaternion(const Quaternion_Struct *Quaternion)
 {
   const float CheckAbsoluteValue = ABS(Quaternion->q0) +
                                    ABS(Quaternion->q1) +
@@ -118,7 +118,7 @@ static void ResetOrientationQuaternion(const Struct_Vector3x3 *AccelerationBodyF
   QuaternionNormalize(&Orientation, &Orientation);
 }
 
-static void CheckAndResetOrientationQuaternion(const Struct_Quaternion *Quaternion,
+static void CheckAndResetOrientationQuaternion(const Quaternion_Struct *Quaternion,
                                                const Struct_Vector3x3 *AccelerationBodyFrame)
 {
   //CHECA SE O QUATERNION ESTÁ NORMAL
@@ -149,7 +149,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
 {
   static Struct_Vector3x3 GyroDriftEstimate = {0};
 
-  Struct_Quaternion PreviousOrientation = Orientation;
+  Quaternion_Struct PreviousOrientation = Orientation;
   Struct_Vector3x3 RotationRate = *RotationBodyFrame;
 
   //CALCULA O VALOR DO SPIN RATE EM RADIANOS/S
@@ -277,7 +277,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
 
   //TAXA DE MUDANÇA DO QUATERNION
   Struct_Vector3x3 Theta; //THETA É A ROTAÇÃO DE EIXO/ÂNGULO.
-  Struct_Quaternion QuaternionDelta;
+  Quaternion_Struct QuaternionDelta;
 
   VectorScale(&Theta, &RotationRate, 0.5f * DeltaTime);
   QuaternionInitFromVector(&QuaternionDelta, &Theta);

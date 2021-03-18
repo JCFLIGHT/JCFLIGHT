@@ -59,15 +59,15 @@ bool SAFETYBUTTONCLASS::GetButtonState()
 
 void SAFETYBUTTONCLASS::FlashButton()
 {
-    static Led_Pattern Pattern;
+    static Led_Pattern_Enum Pattern;
 
     if (SAFETYBUTTON.DetectRise < FIRST_CYCLE_COUNT)
     {
-        Pattern = Led_Pattern::FMU_REFUSE_TO_ARM;
+        Pattern = Led_Pattern_Enum::FMU_REFUSE_TO_ARM;
     }
     else if (SAFETYBUTTON.DetectRise > FIRST_CYCLE_COUNT && SAFETYBUTTON.DetectRise < SECOND_CYCLE_COUNT) //VERIFICAÇÃO 1
     {
-        Pattern = Led_Pattern::FMU_INIT_ARM;
+        Pattern = Led_Pattern_Enum::FMU_INIT_ARM;
         if (SAFETYBUTTON.DetectRise == FIRST_CYCLE_COUNT + 1)
         {
             BEEPER.Play(BEEPER_FMU_INIT);
@@ -100,7 +100,7 @@ void SAFETYBUTTONCLASS::FlashButton()
     }
     else if (SAFETYBUTTON.DetectRise > SECOND_CYCLE_COUNT && SAFETYBUTTON.DetectRise < RESET_CYCLE_COUNT) //VERIFICAÇÃO 2
     {
-        Pattern = Led_Pattern::FMU_SAFE_TO_ARM;
+        Pattern = Led_Pattern_Enum::FMU_SAFE_TO_ARM;
         if (SAFETYBUTTON.DetectRise == SECOND_CYCLE_COUNT + 1)
         {
             BEEPER.Play(BEEPER_FMU_SAFE_TO_ARM);
@@ -159,10 +159,10 @@ void SAFETYBUTTONCLASS::FlashButton()
     SAFETYBUTTON.UpdateLedStatus(Pattern);
 }
 
-void SAFETYBUTTONCLASS::UpdateLedStatus(enum Led_Pattern Instance)
+void SAFETYBUTTONCLASS::UpdateLedStatus(enum Led_Pattern_Enum Instance)
 {
     SAFETYBUTTON.SetStateToLed(((uint16_t)Instance & (1 << (SAFETYBUTTON.Blink_Counter++ / 3))));
-    if (SAFETYBUTTON.Blink_Counter > 45)
+    if (SAFETYBUTTON.Blink_Counter >= 48)
     {
         SAFETYBUTTON.Blink_Counter = 0;
     }

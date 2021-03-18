@@ -367,11 +367,11 @@ enum VarType_Enum
     VAR_32BITS
 };
 
-enum class Led_Pattern : uint16_t
+enum Led_Pattern_Enum
 {
     FMU_INIT_ARM = 0x0003,
     FMU_REFUSE_TO_ARM = 0x5555,
-    FMU_SAFE_TO_ARM = 0xffff,
+    FMU_SAFE_TO_ARM = 0xFFFF,
 };
 
 enum WayPoint_States_Enum

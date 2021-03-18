@@ -18,7 +18,6 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
-#include <inttypes.h>
 #include "ENUM.h"
 #include "RCDEFINES.h"
 
@@ -64,7 +63,7 @@ typedef struct
   int16_t Magnetometer[3];
 } Calibration_Struct;
 
-struct PID_TERMS
+struct PID_Terms_Struct
 {
   bool State;
   uint8_t ProportionalVector;
@@ -231,5 +230,5 @@ extern IMU_Struct IMU;
 extern INS_Struct INS;
 extern Altitude_Struct ALTITUDE;
 extern Attitude_Struct ATTITUDE;
-extern PID_TERMS GET_SET[SIZE_OF_PID_PARAMS];
+extern PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
 #endif

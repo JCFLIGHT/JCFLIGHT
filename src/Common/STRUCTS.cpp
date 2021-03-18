@@ -22,4 +22,4 @@ INS_Struct INS;
 Altitude_Struct ALTITUDE;
 Attitude_Struct ATTITUDE;
 Calibration_Struct CALIBRATION;
-PID_TERMS GET_SET[SIZE_OF_PID_PARAMS];
+PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];

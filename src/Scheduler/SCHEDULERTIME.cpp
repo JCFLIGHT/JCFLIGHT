@@ -119,16 +119,16 @@ void SchedulerTimeClass::MicroSecondsSleep(uint16_t MicroSeconds)
                        : "0"(MicroSeconds));
 }
 
-extern "C" void __vector_23(void) __attribute__((signal, __INTR_ATTRS));
+extern "C" void __vector_23(void) __attribute__((signal, used, externally_visible));
 void __vector_23(void)
 {
   uint32_t MillisCount = Timer0_Scheduler_Millis;
   uint8_t FractionCount = Timer0_Fraction;
   MillisCount += 1;
-  FractionCount += (1024 % 1000) >> 3;
-  if (FractionCount >= 1000 >> 3)
+  FractionCount += 3;
+  if (FractionCount >= 125)
   {
-    FractionCount -= 1000 >> 3;
+    FractionCount -= 125;
     MillisCount += 1;
   }
   Timer0_Fraction = FractionCount;

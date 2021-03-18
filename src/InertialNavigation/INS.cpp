@@ -164,7 +164,7 @@ void InertialNavigationClass::EstimationPredictXY(float *DeltaTime)
   VelocityIncrease[1] = INS.AccelerationEarthFrame_Filtered[1] * *DeltaTime;
   INS.Position_EarthFrame[0] += (INS.Velocity_EarthFrame[0] + VelocityIncrease[0] * 0.5f) * *DeltaTime; //POSIÇÃO FINAL X ESTIMADA PELO INS
   INS.Position_EarthFrame[1] += (INS.Velocity_EarthFrame[1] + VelocityIncrease[1] * 0.5f) * *DeltaTime; //POSIÇÃO FINAL Y ESTIMADA PELO INS
-  INS.Velocity_EarthFrame[0] += VelocityIncrease[0];                                                    //VALOCIDADE FINAL X ESTIMADA PELO INS
+  INS.Velocity_EarthFrame[0] += VelocityIncrease[0];                                                    //VELOCIDADE FINAL X ESTIMADA PELO INS
   INS.Velocity_EarthFrame[1] += VelocityIncrease[1];                                                    //VELOCIDADE FINAL Y ESTIMADA PELO INS
 }
 
@@ -234,8 +234,8 @@ void InertialNavigationClass::EstimationPredictZ(float *DeltaTime)
   float VelocityIncrease = INS.AccelerationEarthFrame_Filtered[2] * *DeltaTime;
   INS.Position_EarthFrame[2] += (INS.Velocity_EarthFrame[2] + VelocityIncrease * 0.5f) * *DeltaTime;
   INS.Velocity_EarthFrame[2] += VelocityIncrease;
-  ALTITUDE.EstimatedAltitude = INS.Position_EarthFrame[2];   //ALTITUDE FINAL ESTIMADA APÓS O INS
-  ALTITUDE.EstimatedVariometer = INS.Velocity_EarthFrame[2]; //VELOCIDADE VERTICAL(Z) FINAL ESTIMADA APÓS O INS
+  ALTITUDE.EstimatedAltitude = INS.Position_EarthFrame[2];   //ALTITUDE FINAL ESTIMADA PELO INS
+  ALTITUDE.EstimatedVariometer = INS.Velocity_EarthFrame[2]; //VELOCIDADE VERTICAL(Z) FINAL ESTIMADA PELO INS
 }
 
 void InertialNavigationClass::SaveZPositionToHistory()

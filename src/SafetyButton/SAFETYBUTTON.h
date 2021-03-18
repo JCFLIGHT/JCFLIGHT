@@ -35,7 +35,7 @@ private:
   uint8_t DetectRise = 0;
   uint8_t Blink_Counter = 0;
   uint32_t LastDebounceTime = 0;
-  void UpdateLedStatus(enum Led_Pattern Instance);
+  void UpdateLedStatus(enum Led_Pattern_Enum Instance);
   void SetStateToLed(bool State);
   void FlashButton();
 };

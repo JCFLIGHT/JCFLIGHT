@@ -275,7 +275,7 @@ void WayPointRun()
     Get_Altitude();
     GPS_Flight_Mode = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
-    NavigationMode = DO_POSITION_HOLD;
+    GPS_Navigation_Mode = DO_POSITION_HOLD;
     if (GetAltitudeReached() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
@@ -302,7 +302,7 @@ void WayPointRun()
     Get_Altitude();
     GPS_Flight_Mode = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
-    NavigationMode = DO_POSITION_HOLD;
+    GPS_Navigation_Mode = DO_POSITION_HOLD;
     if (GetAltitudeReached())
     {
       WayPointMode = WP_START_MISSION;
@@ -374,7 +374,6 @@ void WayPointRun()
       //AVANÇA O WAYPOINT
       if (WayPointFlightMode[MissionNumber] == WP_ADVANCE)
       {
-        GPS_Flight_Mode = WAYPOINT;
         WayPointMode = GET_ALTITUDE;
       }
       //GPS-HOLD TIMERIZADO
@@ -387,9 +386,7 @@ void WayPointRun()
         Do_GPS_Altitude = false;
         GPS_Flight_Mode = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
-        NavigationMode = DO_POSITION_HOLD;
-        GPS_Flight_Mode = WAYPOINT;
-        NavigationMode = DO_POSITION_HOLD;
+        GPS_Navigation_Mode = DO_POSITION_HOLD;
         if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber])) //MULT POR 10 PARA OBTÉR O VALOR EM SEGUNDOS PARA TRABALHAR EM CONJUNTO COM A FUNÇÃO WayPointSync10Hz()
         {
           WayPointMode = GET_ALTITUDE;
@@ -398,17 +395,16 @@ void WayPointRun()
       //LAND
       if (WayPointFlightMode[MissionNumber] == WP_LAND)
       {
-        GPS_Flight_Mode = WAYPOINT;
         GPS_Flight_Mode = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
-        NavigationMode = DO_POSITION_HOLD;
-        NavigationMode = DO_LAND_INIT;
+        GPS_Navigation_Mode = DO_POSITION_HOLD;
+        GPS_Navigation_Mode = DO_LAND_INIT;
       }
       //RTH
       if (WayPointFlightMode[MissionNumber] == WP_RTH)
       {
         Do_Mode_RTH_Now();
-        HeadingHoldTarget = ATTITUDE.AngleOut[YAW];
+        ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
       }
     }
     break;
@@ -417,114 +413,135 @@ void WayPointRun()
 
 void Get_Altitude()
 {
+  static uint8_t MissionNumberCount;
+  static uint8_t AltitudeSum;
+
+  if (MissionNumberCount != MissionNumber)
+  {
+    if (MissionNumberCount < MissionNumber)
+    {
+      MissionNumberCount++;
+      AltitudeSum += 5;
+    }
+    else
+    {
+      MissionNumberCount--;
+      AltitudeSum -= 5;
+    }
+  }
+
+  SetAltitudeToHold(ConvertCMToMeters(10 + AltitudeSum));
+
+  /*
   if (WayPointAltitude[MissionNumber] == 0)
   {
-    SetAltitudeHold(ConvertCMToMeters(10));
+    SetAltitudeToHold(ConvertCMToMeters(10));
   }
   else if (WayPointAltitude[MissionNumber] == 1)
   {
-    SetAltitudeHold(ConvertCMToMeters(15));
+    SetAltitudeToHold(ConvertCMToMeters(15));
   }
   else if (WayPointAltitude[MissionNumber] == 2)
   {
-    SetAltitudeHold(ConvertCMToMeters(20));
+    SetAltitudeToHold(ConvertCMToMeters(20));
   }
   else if (WayPointAltitude[MissionNumber] == 3)
   {
-    SetAltitudeHold(ConvertCMToMeters(25));
+    SetAltitudeToHold(ConvertCMToMeters(25));
   }
   else if (WayPointAltitude[MissionNumber] == 4)
   {
-    SetAltitudeHold(ConvertCMToMeters(30));
+    SetAltitudeToHold(ConvertCMToMeters(30));
   }
   else if (WayPointAltitude[MissionNumber] == 5)
   {
-    SetAltitudeHold(ConvertCMToMeters(35));
+    SetAltitudeToHold(ConvertCMToMeters(35));
   }
   else if (WayPointAltitude[MissionNumber] == 6)
   {
-    SetAltitudeHold(ConvertCMToMeters(40));
+    SetAltitudeToHold(ConvertCMToMeters(40));
   }
   else if (WayPointAltitude[MissionNumber] == 7)
   {
-    SetAltitudeHold(ConvertCMToMeters(45));
+    SetAltitudeToHold(ConvertCMToMeters(45));
   }
   else if (WayPointAltitude[MissionNumber] == 8)
   {
-    SetAltitudeHold(ConvertCMToMeters(50));
+    SetAltitudeToHold(ConvertCMToMeters(50));
   }
   else if (WayPointAltitude[MissionNumber] == 9)
   {
-    SetAltitudeHold(ConvertCMToMeters(55));
+    SetAltitudeToHold(ConvertCMToMeters(55));
   }
   else if (WayPointAltitude[MissionNumber] == 10)
   {
-    SetAltitudeHold(ConvertCMToMeters(60));
+    SetAltitudeToHold(ConvertCMToMeters(60));
   }
   else if (WayPointAltitude[MissionNumber] == 11)
   {
-    SetAltitudeHold(ConvertCMToMeters(65));
+    SetAltitudeToHold(ConvertCMToMeters(65));
   }
   else if (WayPointAltitude[MissionNumber] == 12)
   {
-    SetAltitudeHold(ConvertCMToMeters(70));
+    SetAltitudeToHold(ConvertCMToMeters(70));
   }
   else if (WayPointAltitude[MissionNumber] == 13)
   {
-    SetAltitudeHold(ConvertCMToMeters(75));
+    SetAltitudeToHold(ConvertCMToMeters(75));
   }
   else if (WayPointAltitude[MissionNumber] == 14)
   {
-    SetAltitudeHold(ConvertCMToMeters(80));
+    SetAltitudeToHold(ConvertCMToMeters(80));
   }
   else if (WayPointAltitude[MissionNumber] == 15)
   {
-    SetAltitudeHold(ConvertCMToMeters(85));
+    SetAltitudeToHold(ConvertCMToMeters(85));
   }
   else if (WayPointAltitude[MissionNumber] == 16)
   {
-    SetAltitudeHold(ConvertCMToMeters(90));
+    SetAltitudeToHold(ConvertCMToMeters(90));
   }
   else if (WayPointAltitude[MissionNumber] == 17)
   {
-    SetAltitudeHold(ConvertCMToMeters(95));
+    SetAltitudeToHold(ConvertCMToMeters(95));
   }
   else if (WayPointAltitude[MissionNumber] == 18)
   {
-    SetAltitudeHold(ConvertCMToMeters(100));
+    SetAltitudeToHold(ConvertCMToMeters(100));
   }
   else if (WayPointAltitude[MissionNumber] == 19)
   {
-    SetAltitudeHold(ConvertCMToMeters(105));
+    SetAltitudeToHold(ConvertCMToMeters(105));
   }
   else if (WayPointAltitude[MissionNumber] == 20)
   {
-    SetAltitudeHold(ConvertCMToMeters(110));
+    SetAltitudeToHold(ConvertCMToMeters(110));
   }
   else if (WayPointAltitude[MissionNumber] == 21)
   {
-    SetAltitudeHold(ConvertCMToMeters(115));
+    SetAltitudeToHold(ConvertCMToMeters(115));
   }
   else if (WayPointAltitude[MissionNumber] == 22)
   {
-    SetAltitudeHold(ConvertCMToMeters(120));
+    SetAltitudeToHold(ConvertCMToMeters(120));
   }
   else if (WayPointAltitude[MissionNumber] == 23)
   {
-    SetAltitudeHold(ConvertCMToMeters(125));
+    SetAltitudeToHold(ConvertCMToMeters(125));
   }
   else if (WayPointAltitude[MissionNumber] == 24)
   {
-    SetAltitudeHold(ConvertCMToMeters(130));
+    SetAltitudeToHold(ConvertCMToMeters(130));
   }
   else if (WayPointAltitude[MissionNumber] == 25)
   {
-    SetAltitudeHold(ConvertCMToMeters(135));
+    SetAltitudeToHold(ConvertCMToMeters(135));
   }
   else if (WayPointAltitude[MissionNumber] == 26)
   {
-    SetAltitudeHold(ConvertCMToMeters(140));
+    SetAltitudeToHold(ConvertCMToMeters(140));
   }
+  */
 }
 
 void Store_And_Clear_WayPoints()
@@ -543,6 +560,9 @@ void Store_And_Clear_WayPoints()
     }
     if (!ClearEEPROM)
     {
+      STORAGEMANAGER.Erase(704, 813);
+
+      /*
       //4 BYTES DA PRIMEIRA LATITUDE
       STORAGEMANAGER.Write_8Bits(704, 0);
       STORAGEMANAGER.Write_8Bits(705, 0);
@@ -676,6 +696,7 @@ void Store_And_Clear_WayPoints()
       STORAGEMANAGER.Write_8Bits(811, 0);
       STORAGEMANAGER.Write_8Bits(812, 0);
       STORAGEMANAGER.Write_8Bits(813, 0);
+      */
       EEPROM_Function = 0;
       ClearEEPROM = true;
     }

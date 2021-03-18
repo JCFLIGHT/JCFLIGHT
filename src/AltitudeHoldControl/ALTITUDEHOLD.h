@@ -20,7 +20,7 @@
 #include "Build/LIBDEPENDENCIES.h"
 void AltitudeHold_Update_Params();
 bool ApplyAltitudeHoldControl();
-void SetAltitudeHold(int32_t ValueOfNewAltitudeHold);
+void SetAltitudeToHold(int32_t ValueOfNewAltitudeHold);
 bool GetAltitudeReached();
 bool GetTakeOffInProgress();
 bool isLandDetected();

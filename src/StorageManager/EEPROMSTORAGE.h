@@ -29,6 +29,7 @@ public:
   void Write_16Bits(int16_t Address, int16_t Value);
   void Write_32Bits(int16_t Address, int32_t Value);
   void Write_Float(int16_t Address, float Value);
+  void Erase(uint16_t GetInitialAddress, uint16_t GetFinalAddress);
 };
 extern EEPROMSTORAGE STORAGEMANAGER;
 #endif

@@ -47,7 +47,7 @@ bool Home_Point;
 
 uint8_t DeclinationPushedCount = 0;
 uint8_t GPS_Flight_Mode;
-uint8_t NavigationMode;
+uint8_t GPS_Navigation_Mode;
 uint8_t RTH_Altitude;
 
 static float DeltaTimeGPSNavigation;
@@ -130,10 +130,10 @@ void GPS_Process_FlightModes(float DeltaTime)
 
     if (GetFrameStateOfAirPlane())
     {
-      NavigationMode = DO_RTH_ENROUTE;
+      GPS_Navigation_Mode = DO_RTH_ENROUTE;
     }
 
-    switch (NavigationMode)
+    switch (GPS_Navigation_Mode)
     {
 
     case DO_NONE:
@@ -145,13 +145,13 @@ void GPS_Process_FlightModes(float DeltaTime)
     case DO_START_RTH:
       if (DistanceToHome <= 10)
       {
-        NavigationMode = DO_LAND_INIT;
+        GPS_Navigation_Mode = DO_LAND_INIT;
         HeadingHoldTarget = Navigation_Bearing_RTH;
       }
       else if (GetAltitudeReached())
       {
         Set_Next_Point_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1]);
-        NavigationMode = DO_RTH_ENROUTE;
+        GPS_Navigation_Mode = DO_RTH_ENROUTE;
       }
       break;
 
@@ -163,7 +163,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       {
         if (GetFrameStateOfMultirotor())
         {
-          NavigationMode = DO_LAND_INIT;
+          GPS_Navigation_Mode = DO_LAND_INIT;
         }
         HeadingHoldTarget = Navigation_Bearing_RTH;
       }
@@ -171,33 +171,33 @@ void GPS_Process_FlightModes(float DeltaTime)
 
     case DO_LAND_INIT:
       Do_GPS_Altitude = true;
-      SetAltitudeHold(ALTITUDE.EstimatedAltitude);
+      SetAltitudeToHold(ALTITUDE.EstimatedAltitude);
       Time_To_Start_The_Land = SCHEDULERTIME.GetMillis() + 100;
-      NavigationMode = DO_LAND_SETTLE;
+      GPS_Navigation_Mode = DO_LAND_SETTLE;
       break;
 
     case DO_LAND_SETTLE:
       if (SCHEDULERTIME.GetMillis() >= Time_To_Start_The_Land)
       {
-        NavigationMode = DO_LAND_IN_PROGRESS;
+        GPS_Navigation_Mode = DO_LAND_IN_PROGRESS;
       }
       break;
 
     case DO_LAND_IN_PROGRESS:
       if (GetLanded())
       {
-        NavigationMode = DO_LANDED;
+        GPS_Navigation_Mode = DO_LANDED;
       }
       else if (GetGroundDetected())
       {
-        NavigationMode = DO_LAND_DETECTED;
+        GPS_Navigation_Mode = DO_LAND_DETECTED;
       }
       break;
 
     case DO_LAND_DETECTED:
       if (GetLanded())
       {
-        NavigationMode = DO_LANDED;
+        GPS_Navigation_Mode = DO_LANDED;
       }
       break;
 
@@ -343,9 +343,9 @@ void ApplyPosHoldPIDControl(float *DeltaTime)
 
 bool NavStateForPosHold()
 {
-  return NavigationMode == DO_LAND_INIT || NavigationMode == DO_LAND_SETTLE ||
-         NavigationMode == DO_LAND_IN_PROGRESS || NavigationMode == DO_POSITION_HOLD ||
-         NavigationMode == DO_START_RTH;
+  return GPS_Navigation_Mode == DO_LAND_INIT || GPS_Navigation_Mode == DO_LAND_SETTLE ||
+         GPS_Navigation_Mode == DO_LAND_IN_PROGRESS || GPS_Navigation_Mode == DO_POSITION_HOLD ||
+         GPS_Navigation_Mode == DO_START_RTH;
 }
 
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
@@ -413,14 +413,14 @@ void Do_Mode_RTH_Now()
   Do_GPS_Altitude = true;
   if (ALTITUDE.EstimatedAltitude < ConvertCMToMeters(RTH_Altitude))
   {
-    SetAltitudeHold(ConvertCMToMeters(RTH_Altitude));
+    SetAltitudeToHold(ConvertCMToMeters(RTH_Altitude));
   }
   else
   {
-    SetAltitudeHold(ALTITUDE.EstimatedAltitude);
+    SetAltitudeToHold(ALTITUDE.EstimatedAltitude);
   }
   SetThisPointToPositionHold();
-  NavigationMode = DO_START_RTH;
+  GPS_Navigation_Mode = DO_START_RTH;
 }
 
 void Reset_Home_Point(void)
@@ -435,7 +435,7 @@ void Reset_Home_Point(void)
 
 void GPS_Reset_Navigation(void)
 {
-  NavigationMode = DO_NONE;
+  GPS_Navigation_Mode = DO_NONE;
   GPS_Navigation_Array[0] = 0;
   GPS_Navigation_Array[1] = 0;
   GPSResetPID(&PositionHoldPIDArray[0]);
@@ -467,6 +467,26 @@ void LoadGPSParameters(void)
 
 void RTH_Altitude_EEPROM()
 {
+  static uint8_t RTHNumberCount;
+  static uint8_t AltitudeSum;
+
+  if (RTHNumberCount != STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR))
+  {
+    if (RTHNumberCount < STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR))
+    {
+      RTHNumberCount++;
+      AltitudeSum += 5;
+    }
+    else
+    {
+      RTHNumberCount--;
+      AltitudeSum -= 5;
+    }
+  }
+
+  RTH_Altitude = 10 + AltitudeSum;
+
+  /*
   if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 0)
   {
     RTH_Altitude = 10;
@@ -543,4 +563,5 @@ void RTH_Altitude_EEPROM()
   {
     RTH_Altitude = 100;
   }
+  */
 }

@@ -20,7 +20,6 @@
 #include "BAR/BAR.h"
 #include "StorageManager/EEPROMCHECK.h"
 #include "Common/ENUM.h"
-#include "StorageManager/ERASE.h"
 #include "Build/BOARDDEFS.h"
 #include "FastSerial/PRINTF.h"
 

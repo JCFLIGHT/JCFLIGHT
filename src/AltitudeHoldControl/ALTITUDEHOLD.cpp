@@ -78,13 +78,13 @@ bool ApplyAltitudeHoldControl()
         {
           TakeOffInProgress = false;
         }
-        if (NavigationMode == DO_LAND_IN_PROGRESS || NavigationMode == DO_LAND_DETECTED || NavigationMode == DO_LANDED)
+        if (GPS_Navigation_Mode == DO_LAND_IN_PROGRESS || GPS_Navigation_Mode == DO_LAND_DETECTED || GPS_Navigation_Mode == DO_LANDED)
         {
           if (HoveringState)
           {
             HoveringState = false;
           }
-          SetAltitudeHold(ALTITUDE.EstimatedAltitude);
+          SetAltitudeToHold(ALTITUDE.EstimatedAltitude);
           TargetVariometer = Constrain_8Bits(MinVariometer, 30, 100);
           if (ALTITUDE.EstimatedAltitude > (SafeAltitude * 100))
           {
@@ -245,7 +245,7 @@ void InitializeHoveringThrottle()
   }
 }
 
-void SetAltitudeHold(int32_t ValueOfNewAltitudeHold)
+void SetAltitudeToHold(int32_t ValueOfNewAltitudeHold)
 {
   if (ValueOfNewAltitudeHold > 15000)
   {

@@ -15,48 +15,19 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "ERASE.h"
-#ifdef __AVR_ATmega2560__
-#include <avr/eeprom.h>
+#include "EEPROMSTORAGE.h"
 
-void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size)
+void EEPROMSTORAGE::Erase(uint16_t GetInitialAddress, uint16_t GetFinalAddress)
 {
     uint16_t InitialAddress = GetInitialAddress;
-    Size += 1;
+    uint16_t Size = (GetFinalAddress - GetInitialAddress) + 1;
     while (Size--)
     {
-        uint16_t GetAddrUsed = eeprom_read_byte((uint8_t *)InitialAddress);
+        uint8_t GetAddrUsed = STORAGEMANAGER.Read_8Bits(InitialAddress);
         if (GetAddrUsed != 0) //LIMPA APENAS OS ENDEREÇOS UTILIZADOS
         {
-            eeprom_write_byte((uint8_t *)InitialAddress, 0);
+            STORAGEMANAGER.Write_8Bits(InitialAddress, 0);
         }
         InitialAddress++;
     }
 }
-#elif defined ESP32
-
-#include "EEPROM.h"
-
-void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size)
-{
-    uint16_t InitialAddress = GetInitialAddress;
-    Size += 1;
-    while (Size--)
-    {
-        uint16_t GetAddrUsed = EEPROM.read(InitialAddress);
-        if (GetAddrUsed != 0) //LIMPA APENAS OS ENDEREÇOS UTILIZADOS
-        {
-            EEPROM.write(InitialAddress, 0);
-        }
-        InitialAddress++;
-    }
-    EEPROM.commit();
-}
-
-#elif defined __arm__
-
-void EraseEEPROM(uint16_t GetInitialAddress, uint16_t GetFinalAddress, uint16_t Size)
-{
-}
-
-#endif

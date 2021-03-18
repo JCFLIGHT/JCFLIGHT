@@ -22,7 +22,7 @@ extern bool GPSHold_CallBaro;
 extern bool Home_Point;
 extern float ScaleDownOfLongitude;
 extern uint8_t GPS_Flight_Mode;
-extern uint8_t NavigationMode;
+extern uint8_t GPS_Navigation_Mode;
 extern uint8_t RTH_Altitude;
 extern int16_t GPSActualSpeed[2];
 extern int16_t GPS_Navigation_Array[2];

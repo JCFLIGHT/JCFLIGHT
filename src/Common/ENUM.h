@@ -151,8 +151,7 @@ enum GPS_Modes_Enum
 {
     GPS_MODE_NONE = 0,
     GPS_MODE_HOLD,
-    GPS_MODE_RTH,
-    WAYPOINT
+    GPS_MODE_RTH
 };
 
 enum GPS_Flight_Modes_Enum

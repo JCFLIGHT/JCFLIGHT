@@ -1,7 +1,6 @@
 #ifndef BIQUADFILTER_h
 #define BIQUADFILTER_h
 #include "Arduino.h"
-#define BIQUAD_SET_FREQUENCY(Frequecy, Unidad) (1000000 / (Frequecy))
 enum {
   LPF,
   NOTCH

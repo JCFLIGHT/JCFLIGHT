@@ -42,7 +42,7 @@ void BiQuadFilterSetupPassthrough(BiquadFilter_Struct *Filter)
   Filter->Alpha2 = 0.0f;
 }
 
-void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int16_t CutOffFreq, int16_t SampleInterval, uint8_t FilterType)
+void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, uint16_t FilterFreq, int16_t CutOffFreq, uint32_t SampleIntervalMicros, uint8_t FilterType)
 {
 
   float Q_Quality = 0;
@@ -56,11 +56,11 @@ void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int
     Q_Quality = FilterGetNotch_Quality(FilterFreq, CutOffFreq);
   }
 
-  if (FilterFreq < (1000000 / SampleInterval / 2))
+  if (FilterFreq < (1000000 / SampleIntervalMicros / 2))
   {
 
     float Beta0, Beta1, Beta2;
-    const float SampleRate = 1.0f / ((float)SampleInterval * 0.000001f);
+    const float SampleRate = 1.0f / ((float)SampleIntervalMicros * 0.000001f);
     const float Omega = 6.283185482f * ((float)FilterFreq) / SampleRate;
     const float CalcedSine = Fast_Sine(Omega);
     const float CalcedCosine = Fast_Cosine(Omega);
@@ -102,7 +102,7 @@ void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int
   Filter->SampleY1 = Filter->SampleY2 = 0;
 }
 
-float BiQuadFilter::FilterApplyAndGet(BiquadFilter_Struct *Filter, float DeviceToFilter)
+float BiQuadFilter::ApplyAndGet(BiquadFilter_Struct *Filter, float DeviceToFilter)
 {
   const float Result = Filter->Beta0 * DeviceToFilter + Filter->SampleX1;
   Filter->SampleX1 = Filter->Beta1 * DeviceToFilter - Filter->Alpha1 * Result + Filter->SampleX2;

@@ -18,7 +18,8 @@
 #include "HEADINGHOLD.h"
 #include "Math/MATHSUPPORT.h"
 #include "AHRS/AHRS.h"
-#include "Scheduler/SCHEDULERTIME.h"
+#include "Scheduler/SCHEDULER.h"
+#include "Build/BOARDDEFS.h"
 #include "Filters/PT1.h"
 #include "Scheduler/SCHEDULER.h"
 #include "GPSNavigation/NAVIGATION.h"
@@ -100,7 +101,7 @@ float GetHeadingHoldValue(float DeltaTime)
 #ifndef __AVR_ATmega2560__
   HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, DeltaTime);
 #else
-  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, 1.0f / 1000);
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
 #endif
 
 #ifdef PRINTLN_HEADING_HOLD

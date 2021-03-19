@@ -17,7 +17,8 @@
 
 #include "BATTERY.h"
 #include "AnalogDigitalConverter/ADC.h"
-#include "Filters/AVERAGEFILTER.h"
+#include "Filters/PT1.h"
+#include "Scheduler/SCHEDULER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Buzzer/BUZZER.h"
 #include "BATTLEVELS.h"
@@ -28,8 +29,8 @@
 
 BatteryClass BATTERY;
 
-AverageFilterFloat_Size20 Voltage_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A TENSÃO,TAMANHO = 20 ITERAÇÕES
-AverageFilterFloat_Size20 Current_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A CORRENTE,TAMANHO = 20 ITERAÇÕES
+PT1_Filter_Struct VoltageFilter_LPF;
+PT1_Filter_Struct CurrentFilter_LPF;
 
 //DEBUG
 //#define PRINTLN_BATT
@@ -38,16 +39,24 @@ AverageFilterFloat_Size20 Current_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A C
 #define TIMER_TO_AUTO_DETECT_BATT 15 //SEGUNDOS
 #define LOW_BATT_DETECT_OVERFLOW 4   //SEGUNDOS
 #define PREVENT_ARM_LOW_BATT 20      //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
+#define VOLTAGE_CUTOFF 15            //Hz
+#define CURRENT_CUTOFF 15            //Hz
 
 //VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
 float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
 float Amps_Per_Volt = 62.0f;        //FATOR DE MULTIPLICAÇÃO DA TENSÃO DO PINO ANALOGICO PARA CONVERTER EM CORRENTE (AMPERES)
 float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE)
 
+void BatteryClass::Initialization(void)
+{
+  PT1FilterInit(&VoltageFilter_LPF, VOLTAGE_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+  PT1FilterInit(&CurrentFilter_LPF, CURRENT_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+}
+
 void BatteryClass::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  BATTERY.Calced_Voltage = Voltage_Filter.Apply(BATTERY.Calced_Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
+  BATTERY.Calced_Voltage = PT1FilterApply3(&VoltageFilter_LPF, BATTERY.Calced_Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
   if (BATTERY.Calced_Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
   {
     if (BATTERY.GetPercentage() <= PREVENT_ARM_LOW_BATT) //MENOR OU IGUAL QUE 20% DA CAPACIDADE TOTAL DA BATERIA?SIM...
@@ -231,7 +240,7 @@ uint8_t BatteryClass::GetPercentage(void)
 void BatteryClass::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  BATTERY.Calced_Current = Current_Filter.Apply(((ANALOGSOURCE.Read(ADC_BATTERY_CURRENT)) - Amps_OffSet) * Amps_Per_Volt);
+  BATTERY.Calced_Current = PT1FilterApply3(&CurrentFilter_LPF, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - Amps_OffSet) * Amps_Per_Volt);
   BATTERY.Calced_Current = MAX(0, BATTERY.Calced_Current);
 }
 

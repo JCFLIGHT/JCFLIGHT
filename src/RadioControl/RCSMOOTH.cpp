@@ -41,10 +41,10 @@ int16_t RCAttitudeFiltered[4];
 void RCInterpolationInit()
 {
   RC_LPF_CutOff = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
-  BIQUADFILTER.Settings(&Smooth_RC_Throttle, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
-  BIQUADFILTER.Settings(&Smooth_RC_Yaw, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
-  BIQUADFILTER.Settings(&Smooth_RC_Roll, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
-  BIQUADFILTER.Settings(&Smooth_RC_Pitch, RC_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_RC_Throttle, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Smooth_RC_Yaw, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Smooth_RC_Roll, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Smooth_RC_Pitch, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
 }
 
 void RCInterpolationApply()
@@ -59,10 +59,10 @@ void RCInterpolationApply()
     RCControllerUnFiltered[ROLL] = RCController[ROLL];
 
     //APLICA O FILTRO
-    RCAttitudeFiltered[THROTTLE] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Throttle, RCControllerUnFiltered[THROTTLE]);
-    RCAttitudeFiltered[YAW] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Yaw, RCControllerUnFiltered[YAW]);
-    RCAttitudeFiltered[PITCH] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Pitch, RCControllerUnFiltered[PITCH]);
-    RCAttitudeFiltered[ROLL] = BIQUADFILTER.FilterApplyAndGet(&Smooth_RC_Roll, RCControllerUnFiltered[ROLL]);
+    RCAttitudeFiltered[THROTTLE] = BIQUADFILTER.ApplyAndGet(&Smooth_RC_Throttle, RCControllerUnFiltered[THROTTLE]);
+    RCAttitudeFiltered[YAW] = BIQUADFILTER.ApplyAndGet(&Smooth_RC_Yaw, RCControllerUnFiltered[YAW]);
+    RCAttitudeFiltered[PITCH] = BIQUADFILTER.ApplyAndGet(&Smooth_RC_Pitch, RCControllerUnFiltered[PITCH]);
+    RCAttitudeFiltered[ROLL] = BIQUADFILTER.ApplyAndGet(&Smooth_RC_Roll, RCControllerUnFiltered[ROLL]);
 
     //OBTÉM O VALOR FILTRADO
     RCController[THROTTLE] = ((RCAttitudeFiltered[THROTTLE]) >= (AttitudeThrottleMin) ? (RCAttitudeFiltered[THROTTLE]) : (AttitudeThrottleMin));

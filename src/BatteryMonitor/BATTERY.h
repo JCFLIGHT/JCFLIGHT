@@ -25,6 +25,7 @@ public:
   uint8_t GetPercentage();
   float Get_Current_In_Mah(void);
   float Get_Max_Voltage_Calced(void);
+  void Initialization(void);
   void Update_Voltage(void);
   void Update_Current(void);
   float Get_Actual_Voltage(void);

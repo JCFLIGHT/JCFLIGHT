@@ -182,6 +182,7 @@ bool GetTakeOffInProgress()
 #ifdef THR_SMOOTH_TEST
 
 #include "FastSerial/PRINTF.h"
+#include "Build/BOARDDEFS.h"
 #include "Filters/PT1.h"
 
 PT1_Filter_Struct Smooth_ThrottleHover;
@@ -218,13 +219,13 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   {
     PRINTF.SendToConsole(ProgramMemoryString("RCController[THROTTLE]:%d PT1RCController[THROTTLE]:%d\n"),
                          RCController[THROTTLE],
-                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], ALT_HOLD_LPF_CUTOFF, 1.0f / 1000));
+                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], ALT_HOLD_LPF_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f));
   }
   else if (GetFrameStateOfAirPlane())
   {
     PRINTF.SendToConsole(ProgramMemoryString("RCController[PITCH]:%d PT1RCController[PITCH]:%d\n"),
                          RCController[PITCH],
-                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], ALT_HOLD_LPF_CUTOFF, 1.0f / 1000));
+                         (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[PITCH], ALT_HOLD_LPF_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f));
   }
 
 #endif

@@ -20,6 +20,8 @@
 #include "AHRS/AHRS.h"
 #include "Filters/PT1.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "Scheduler/SCHEDULER.h"
+#include "Build/BOARDDEFS.h"
 #include "FastSerial/PRINTF.h"
 
 PT1_Filter_Struct GForce_Smooth;
@@ -41,7 +43,7 @@ void IMU_GForce_Update()
 #ifndef __AVR_ATmega2560__
     IMU.CalcedGForce = PT1FilterApply2(&GForce_Smooth, IMU.CalcedGForce, CalcedDeltaTime);
 #else
-    IMU.CalcedGForce = PT1FilterApply2(&GForce_Smooth, IMU.CalcedGForce, 1.0f / 1000.0f);
+    IMU.CalcedGForce = PT1FilterApply2(&GForce_Smooth, IMU.CalcedGForce, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
 #endif
   }
   else

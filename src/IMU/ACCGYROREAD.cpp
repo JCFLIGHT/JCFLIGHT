@@ -66,25 +66,25 @@ void IMU_Filters_Initialization()
   Biquad_Acc_LPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Biquad_Gyro_LPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
   //GERA UM COEFICIENTE PARA O LPF DO ACELEROMETRO
-  BIQUADFILTER.Settings(&BiquadAccLPF[ROLL], Biquad_Acc_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&BiquadAccLPF[PITCH], Biquad_Acc_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&BiquadAccLPF[YAW], Biquad_Acc_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&BiquadAccLPF[ROLL], Biquad_Acc_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&BiquadAccLPF[PITCH], Biquad_Acc_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&BiquadAccLPF[YAW], Biquad_Acc_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   //GERA UM COEFICIENTE PARA O LPF DO GYROSCOPIO
-  BIQUADFILTER.Settings(&BiquadGyroLPF[ROLL], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&BiquadGyroLPF[PITCH], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&BiquadGyroLPF[YAW], Biquad_Gyro_LPF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&BiquadGyroLPF[ROLL], Biquad_Gyro_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&BiquadGyroLPF[PITCH], Biquad_Gyro_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&BiquadGyroLPF[YAW], Biquad_Gyro_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
 #ifndef __AVR_ATmega2560__
   //CARREGA OS VALORES GUARDADOS DO NOTCH
   Biquad_Acc_Notch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
   Biquad_Gyro_Notch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
   //GERA UM COEFICIENTE PARA O NOTCH DO ACELEROMETRO
-  BIQUADFILTER.Settings(&BiquadAccNotch[ROLL], Biquad_Acc_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);
-  BIQUADFILTER.Settings(&BiquadAccNotch[PITCH], Biquad_Acc_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);
-  BIQUADFILTER.Settings(&BiquadAccNotch[YAW], Biquad_Acc_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);
+  BIQUADFILTER.Settings(&BiquadAccNotch[ROLL], Biquad_Acc_Notch, 1, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), NOTCH);
+  BIQUADFILTER.Settings(&BiquadAccNotch[PITCH], Biquad_Acc_Notch, 1, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), NOTCH);
+  BIQUADFILTER.Settings(&BiquadAccNotch[YAW], Biquad_Acc_Notch, 1, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), NOTCH);
   //GERA UM COEFICIENTE PARA O NOTCH DO GYROSCOPIO
-  BIQUADFILTER.Settings(&BiquadGyroNotch[ROLL], Biquad_Gyro_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);
-  BIQUADFILTER.Settings(&BiquadGyroNotch[PITCH], Biquad_Gyro_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);
-  BIQUADFILTER.Settings(&BiquadGyroNotch[YAW], Biquad_Gyro_Notch, 1, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), NOTCH);
+  BIQUADFILTER.Settings(&BiquadGyroNotch[ROLL], Biquad_Gyro_Notch, 1, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), NOTCH);
+  BIQUADFILTER.Settings(&BiquadGyroNotch[PITCH], Biquad_Gyro_Notch, 1, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), NOTCH);
+  BIQUADFILTER.Settings(&BiquadGyroNotch[YAW], Biquad_Gyro_Notch, 1, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), NOTCH);
 #endif
 }
 
@@ -182,9 +182,9 @@ void Acc_ReadBufferData()
   if (Biquad_Acc_LPF > 0)
   {
     //APLICA O FILTRO
-    IMU.AccelerometerRead[ROLL] = BIQUADFILTER.FilterApplyAndGet(&BiquadAccLPF[ROLL], IMU.AccelerometerRead[ROLL]);
-    IMU.AccelerometerRead[PITCH] = BIQUADFILTER.FilterApplyAndGet(&BiquadAccLPF[PITCH], IMU.AccelerometerRead[PITCH]);
-    IMU.AccelerometerRead[YAW] = BIQUADFILTER.FilterApplyAndGet(&BiquadAccLPF[YAW], IMU.AccelerometerRead[YAW]);
+    IMU.AccelerometerRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[ROLL], IMU.AccelerometerRead[ROLL]);
+    IMU.AccelerometerRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[PITCH], IMU.AccelerometerRead[PITCH]);
+    IMU.AccelerometerRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[YAW], IMU.AccelerometerRead[YAW]);
   }
 
 #ifndef __AVR_ATmega2560__
@@ -192,9 +192,9 @@ void Acc_ReadBufferData()
   if (Biquad_Acc_Notch > 0)
   {
     //APLICA O FILTRO
-    IMU.AccelerometerRead[ROLL] = BIQUADFILTER.FilterApplyAndGet(&BiquadAccNotch[ROLL], IMU.AccelerometerRead[ROLL]);
-    IMU.AccelerometerRead[PITCH] = BIQUADFILTER.FilterApplyAndGet(&BiquadAccNotch[PITCH], IMU.AccelerometerRead[PITCH]);
-    IMU.AccelerometerRead[YAW] = BIQUADFILTER.FilterApplyAndGet(&BiquadAccNotch[YAW], IMU.AccelerometerRead[YAW]);
+    IMU.AccelerometerRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[ROLL], IMU.AccelerometerRead[ROLL]);
+    IMU.AccelerometerRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[PITCH], IMU.AccelerometerRead[PITCH]);
+    IMU.AccelerometerRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[YAW], IMU.AccelerometerRead[YAW]);
   }
 #endif
 }
@@ -225,9 +225,9 @@ void Gyro_ReadBufferData()
   if (Biquad_Gyro_LPF > 0)
   {
     //APLICA O FILTRO
-    IMU.GyroscopeRead[ROLL] = BIQUADFILTER.FilterApplyAndGet(&BiquadGyroLPF[ROLL], IMU.GyroscopeRead[ROLL]);
-    IMU.GyroscopeRead[PITCH] = BIQUADFILTER.FilterApplyAndGet(&BiquadGyroLPF[PITCH], IMU.GyroscopeRead[PITCH]);
-    IMU.GyroscopeRead[YAW] = BIQUADFILTER.FilterApplyAndGet(&BiquadGyroLPF[YAW], IMU.GyroscopeRead[YAW]);
+    IMU.GyroscopeRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[ROLL], IMU.GyroscopeRead[ROLL]);
+    IMU.GyroscopeRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[PITCH], IMU.GyroscopeRead[PITCH]);
+    IMU.GyroscopeRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[YAW], IMU.GyroscopeRead[YAW]);
   }
 
 #ifndef __AVR_ATmega2560__
@@ -235,9 +235,9 @@ void Gyro_ReadBufferData()
   if (Biquad_Gyro_Notch > 0)
   {
     //APLICA O FILTRO
-    IMU.GyroscopeRead[ROLL] = BIQUADFILTER.FilterApplyAndGet(&BiquadGyroNotch[ROLL], IMU.GyroscopeRead[ROLL]);
-    IMU.GyroscopeRead[PITCH] = BIQUADFILTER.FilterApplyAndGet(&BiquadGyroNotch[PITCH], IMU.GyroscopeRead[PITCH]);
-    IMU.GyroscopeRead[YAW] = BIQUADFILTER.FilterApplyAndGet(&BiquadGyroNotch[YAW], IMU.GyroscopeRead[YAW]);
+    IMU.GyroscopeRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[ROLL], IMU.GyroscopeRead[ROLL]);
+    IMU.GyroscopeRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[PITCH], IMU.GyroscopeRead[PITCH]);
+    IMU.GyroscopeRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[YAW], IMU.GyroscopeRead[YAW]);
   }
 #endif
 }

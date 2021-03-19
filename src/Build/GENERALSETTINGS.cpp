@@ -38,6 +38,7 @@
 #include "Param/PARAM.h"
 #include "RadioControl/RCSMOOTH.h"
 #include "ServosMaster/SERVORATE.h"
+#include "BatteryMonitor/BATTERY.h"
 
 void GeneralSettingsInitialization()
 {
@@ -67,4 +68,5 @@ void GeneralSettingsInitialization()
   SAFETYBUTTON.Initialization();
   RCInterpolationInit();
   Servo_Rate_Update();
+  BATTERY.Initialization();
 }

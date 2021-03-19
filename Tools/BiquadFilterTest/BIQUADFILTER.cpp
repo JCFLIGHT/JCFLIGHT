@@ -113,7 +113,7 @@ void BiQuadFilter::Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int
   Filter->SampleY1 = Filter->SampleY2 = 0;
 }
 
-float BiQuadFilter::FilterApplyAndGet(BiquadFilter_Struct *Filter, float DeviceToFilter)
+float BiQuadFilter::ApplyAndGet(BiquadFilter_Struct *Filter, float DeviceToFilter)
 {
   const float Result = Filter->Beta0 * DeviceToFilter + Filter->SampleX1;
   Filter->SampleX1 = Filter->Beta1 * DeviceToFilter - Filter->Alpha1 * Result + Filter->SampleX2;

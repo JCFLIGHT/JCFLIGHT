@@ -15,7 +15,7 @@ class BiQuadFilter
 {
   public:
     void Settings(BiquadFilter_Struct *Filter, int16_t FilterFreq, int16_t CutOffFreq, int16_t SampleInterval, uint8_t FilterType);
-    float FilterApplyAndGet(BiquadFilter_Struct *Filter, float DeviceToFilter);
+    float ApplyAndGet(BiquadFilter_Struct *Filter, float DeviceToFilter);
 };
 extern BiQuadFilter BIQUADFILTER;
 #endif

@@ -79,13 +79,13 @@ PT1_Filter_Struct DerivativeBoost_Pitch_LPF;
 #define CONTROL_DERIVATIVE_CUTOFF 30 //Hz
 
 //FREQUENCIA DE CORTE DO RELAXAMENTO DO TERMO INTEGRAL
-#define INTEGRAL_TERM_RELAX 15 //Hz
+#define INTEGRAL_TERM_RELAX_CUTOFF 15 //Hz
 
 //FREQUENCIA DE CORTE DO GYRO APLICADO AO DERIVATIVE BOOST
-#define DERIVATIVE_BOOST_GYRO_LPF_HZ 80 //Hz
+#define DERIVATIVE_BOOST_GYRO_CUTOFF 80 //Hz
 
 //FREQUENCIA DE CORTE DA ACELERAÇÃO CALCULADA PELO DERIVATIVE BOOST
-#define DERIVATIVE_BOOST_LPF_HZ 10 //Hz
+#define DERIVATIVE_BOOST_CUTOFF 10 //Hz
 
 uint8_t IntegralTermWindUpPercent = 50;        //AJUSTAVEL PELO USUARIO -> (0 a 90)
 int16_t ReferenceAirSpeed = 1000;              //AJUSTAVEL PELO USUARIO - VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
@@ -110,17 +110,17 @@ float ErrorGyroIntegralLimit[3];
 void PIDXYZClass::Initialization()
 {
   PIDXYZ.Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
-  BIQUADFILTER.Settings(&Derivative_Roll_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&Derivative_Roll_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
 #ifdef USE_DERIVATIVE_BOOST_PID
-  BIQUADFILTER.Settings(&DerivativeBoost_Roll_Smooth, DERIVATIVE_BOOST_GYRO_LPF_HZ, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
-  BIQUADFILTER.Settings(&DerivativeBoost_Pitch_Smooth, DERIVATIVE_BOOST_GYRO_LPF_HZ, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"), LPF);
+  BIQUADFILTER.Settings(&DerivativeBoost_Roll_Smooth, DERIVATIVE_BOOST_GYRO_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&DerivativeBoost_Pitch_Smooth, DERIVATIVE_BOOST_GYRO_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
 #endif
-  PT1FilterInit(&WindUpRollLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
-  PT1FilterInit(&WindUpPitchLPF, INTEGRAL_TERM_RELAX, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
+  PT1FilterInit(&WindUpRollLPF, INTEGRAL_TERM_RELAX_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+  PT1FilterInit(&WindUpPitchLPF, INTEGRAL_TERM_RELAX_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
   MotorIntegralTermWindUpPoint = 1.0f - (IntegralTermWindUpPercent / 100.0f);
 }
 
@@ -182,7 +182,7 @@ float PIDXYZClass::DerivativeTermProcessRoll(float GyroDiffInput)
 
   if (PIDXYZ.Get_LPF_Derivative_Value > 0)
   {
-    NewDTermCalced = BIQUADFILTER.FilterApplyAndGet(&Derivative_Roll_Smooth, GyroDiffInput);
+    NewDTermCalced = BIQUADFILTER.ApplyAndGet(&Derivative_Roll_Smooth, GyroDiffInput);
   }
   else
   {
@@ -197,7 +197,7 @@ float PIDXYZClass::DerivativeTermProcessPitch(float GyroDiffInput)
 
   if (PIDXYZ.Get_LPF_Derivative_Value > 0)
   {
-    NewDTermCalced = BIQUADFILTER.FilterApplyAndGet(&Derivative_Pitch_Smooth, GyroDiffInput);
+    NewDTermCalced = BIQUADFILTER.ApplyAndGet(&Derivative_Pitch_Smooth, GyroDiffInput);
   }
   else
   {
@@ -245,11 +245,11 @@ float PIDXYZClass::ApplyDerivativeBoostRoll(int16_t ActualGyro, int16_t PrevGyro
   if (DerivativeBoostFactor > 1)
   {
     const float DerivativeBoostGyroDelta = (ActualGyro - PrevGyro) / DeltaTime;
-    const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.FilterApplyAndGet(&DerivativeBoost_Roll_Smooth, DerivativeBoostGyroDelta));
+    const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.ApplyAndGet(&DerivativeBoost_Roll_Smooth, DerivativeBoostGyroDelta));
     const float DerivativeBoostRateAcceleration = fabsf((ActualRateTagert - PrevRateTagert) / DeltaTime);
     const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
     DerivativeBoost = ScaleRangeFloat(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
-    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Roll_LPF, DerivativeBoost, DERIVATIVE_BOOST_LPF_HZ, DeltaTime);
+    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Roll_LPF, DerivativeBoost, DERIVATIVE_BOOST_CUTOFF, DeltaTime);
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
 
@@ -267,11 +267,11 @@ float PIDXYZClass::ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyr
   if (DerivativeBoostFactor > 1)
   {
     const float DerivativeBoostGyroDelta = (ActualGyro - PrevGyro) / DeltaTime;
-    const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.FilterApplyAndGet(&DerivativeBoost_Pitch_Smooth, DerivativeBoostGyroDelta));
+    const float DerivativeBoostGyroAcceleration = fabsf(BIQUADFILTER.ApplyAndGet(&DerivativeBoost_Pitch_Smooth, DerivativeBoostGyroDelta));
     const float DerivativeBoostRateAcceleration = fabsf((ActualRateTagert - PrevRateTagert) / DeltaTime);
     const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
     DerivativeBoost = ScaleRangeFloat(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
-    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Pitch_LPF, DerivativeBoost, DERIVATIVE_BOOST_LPF_HZ, DeltaTime);
+    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Pitch_LPF, DerivativeBoost, DERIVATIVE_BOOST_CUTOFF, DeltaTime);
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
 
@@ -309,7 +309,7 @@ float PIDXYZClass::PIDLevelRoll(float DeltaTime)
 #ifndef __AVR_ATmega2560__
     AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, DeltaTime);
 #else
-    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, 1.0f / 1000.0f);
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Roll, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
 #endif
   }
   return AngleRateTarget;
@@ -354,7 +354,7 @@ float PIDXYZClass::PIDLevelPitch(float DeltaTime)
 #ifndef __AVR_ATmega2560__
     AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, DeltaTime);
 #else
-    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, 1.0f / 1000.0f);
+    AngleRateTarget = PT1FilterApply(&Angle_Smooth_Pitch, AngleRateTarget, GET_SET[PI_AUTO_LEVEL].IntegralVector, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
 #endif
   }
   return AngleRateTarget;
@@ -369,7 +369,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_ROLL].ProportionalVector, RateError);
 
   const float RateTargetDelta = PIDXYZ.CalcedRateTargetRoll - PreviousRateTarget;
-  const float RateTargetDeltaFiltered = BIQUADFILTER.FilterApplyAndGet(&ControlDerivative_Roll_Smooth, RateTargetDelta);
+  const float RateTargetDeltaFiltered = BIQUADFILTER.ApplyAndGet(&ControlDerivative_Roll_Smooth, RateTargetDelta);
 
   float NewControlDerivativeTerm;
   float NewDerivativeTerm;
@@ -426,7 +426,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_PITCH].ProportionalVector, RateError);
 
   const float RateTargetDelta = PIDXYZ.CalcedRateTargetPitch - PreviousRateTarget;
-  const float RateTargetDeltaFiltered = BIQUADFILTER.FilterApplyAndGet(&ControlDerivative_Pitch_Smooth, RateTargetDelta);
+  const float RateTargetDeltaFiltered = BIQUADFILTER.ApplyAndGet(&ControlDerivative_Pitch_Smooth, RateTargetDelta);
 
   float NewControlDerivativeTerm;
   float NewDerivativeTerm;
@@ -483,7 +483,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[YAW].ProportionalVector, RateError);
 
   const float RateTargetDelta = PIDXYZ.CalcedRateTargetYaw - PreviousRateTarget;
-  const float RateTargetDeltaFiltered = BIQUADFILTER.FilterApplyAndGet(&ControlDerivative_Yaw_Smooth, RateTargetDelta);
+  const float RateTargetDeltaFiltered = BIQUADFILTER.ApplyAndGet(&ControlDerivative_Yaw_Smooth, RateTargetDelta);
 
   float NewControlDerivativeTerm;
   float NewDerivativeTerm;

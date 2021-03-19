@@ -42,12 +42,12 @@ static BiquadFilter_Struct Smooth_Servo2_Aileron;
 static BiquadFilter_Struct Smooth_Servo_Rudder;
 static BiquadFilter_Struct Smooth_Servo_Elevator;
 
-void AirPlaneClass::LoadBiquadLPFSettings()
+void AirPlaneClass::LoadBiquadSettings()
 {
-  BIQUADFILTER.Settings(&Smooth_Servo1_Aileron, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
-  BIQUADFILTER.Settings(&Smooth_Servo2_Aileron, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
-  BIQUADFILTER.Settings(&Smooth_Servo_Rudder, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
-  BIQUADFILTER.Settings(&Smooth_Servo_Elevator, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "HZ"), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo1_Aileron, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo2_Aileron, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo_Rudder, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo_Elevator, AIR_PLANE.Servo_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
 }
 
 void AirPlaneClass::UpdateServosMinAndMax()
@@ -73,7 +73,7 @@ void AirPlaneClass::UpdateServosMinAndMax()
   AIR_PLANE.Servo_LPF_CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
 
   //INICIALIZA O FILTRO LPF DO SERVOS
-  AIR_PLANE.LoadBiquadLPFSettings();
+  AIR_PLANE.LoadBiquadSettings();
 }
 
 void AirPlaneClass::UpdateServosMiddlePoint(void)
@@ -194,10 +194,10 @@ void AirPlaneClass::Servo_Rate_Adjust_And_Apply_LPF()
   else
   {
     //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
-    AIR_PLANE.ServosFiltered[SERVO1] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo1_Aileron, AIR_PLANE.ServoToFilter[SERVO1]);
-    AIR_PLANE.ServosFiltered[SERVO2] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo2_Aileron, AIR_PLANE.ServoToFilter[SERVO2]);
-    AIR_PLANE.ServosFiltered[SERVO3] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo_Rudder, AIR_PLANE.ServoToFilter[SERVO3]);
-    AIR_PLANE.ServosFiltered[SERVO4] = BIQUADFILTER.FilterApplyAndGet(&Smooth_Servo_Elevator, AIR_PLANE.ServoToFilter[SERVO4]);
+    AIR_PLANE.ServosFiltered[SERVO1] = BIQUADFILTER.ApplyAndGet(&Smooth_Servo1_Aileron, AIR_PLANE.ServoToFilter[SERVO1]);
+    AIR_PLANE.ServosFiltered[SERVO2] = BIQUADFILTER.ApplyAndGet(&Smooth_Servo2_Aileron, AIR_PLANE.ServoToFilter[SERVO2]);
+    AIR_PLANE.ServosFiltered[SERVO3] = BIQUADFILTER.ApplyAndGet(&Smooth_Servo_Rudder, AIR_PLANE.ServoToFilter[SERVO3]);
+    AIR_PLANE.ServosFiltered[SERVO4] = BIQUADFILTER.ApplyAndGet(&Smooth_Servo_Elevator, AIR_PLANE.ServoToFilter[SERVO4]);
 
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
     MotorControl[MOTOR2] = Constrain_16Bits(AIR_PLANE.ServosFiltered[SERVO1], AIR_PLANE.ServoMin[SERVO1], AIR_PLANE.ServoMax[SERVO1]); //SERVO 1

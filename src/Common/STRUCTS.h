@@ -231,7 +231,7 @@ typedef struct
   //http://en.wikipedia.org/wiki/Jacobian_matrix
   float Matrix_JtR[4];
   float Matrix_JtJ[4][4];
-} GaussNewtonMatrices_Struct;
+} Jacobian_Struct;
 
 extern Calibration_Struct CALIBRATION;
 extern IMU_Struct IMU;

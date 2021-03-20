@@ -27,7 +27,7 @@
 #include "Scheduler/SCHEDULER.h"
 #include "GaussNewton/GAUSSNEWTON.h"
 
-static GaussNewtonMatrices_Struct CalibrationState;
+static Jacobian_Struct CalibrationState;
 
 #define CALIBRATING_ACC_CYCLES 400
 

@@ -15,9 +15,12 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMUHEALTH_H_
-#define IMUHEALTH_H_
-#include "Build/LIBDEPENDENCIES.h"
-void UpdateIMUCalibration(void);
-void SaveIMUCalibration(void);
+#ifndef GAUSSNEWTON_H_
+#define GAUSSNEWTON_H_
+#include "Common/STRUCTS.h"
+void ClearGaussNewtonMatrices(GaussNewtonMatrices_Struct *CalibrationStatePointer);
+void GaussNewtonPushSampleForOffsetCalculation(GaussNewtonMatrices_Struct *CalibrationStatePointer, int16_t SensorSample[3]);
+void GaussNewtonPushSampleForScaleCalculation(GaussNewtonMatrices_Struct *CalibrationStatePointer, int16_t AxisIndex, int16_t SensorSample[3], int16_t Target);
+void GaussNewtonSolveForOffSet(GaussNewtonMatrices_Struct *CalibrationStatePointer, float Result[3]);
+void GaussNewtonSolveForScale(GaussNewtonMatrices_Struct *CalibrationStatePointer, float Result[3]);
 #endif

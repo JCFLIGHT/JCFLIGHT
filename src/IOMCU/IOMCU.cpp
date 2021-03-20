@@ -1241,14 +1241,7 @@ void GCSClass::GCS_Request_Parameters()
 {
     //ENVIA OS PARAMETROS FUNDAMENTAIS PARA O GCS
     GCSParameters.SendAttitudePitch = Constrain_16Bits(ATTITUDE.AngleOut[PITCH], -900, 900);
-    if (CALIBRATION.AccelerometerZero[ROLL] > 1000)
-    {
-        GCSParameters.SendAttitudeRoll = 0xBB8; //INDICA PARA O GCS QUE A IMU NÃO ESTÁ CALIBRADA
-    }
-    else
-    {
-        GCSParameters.SendAttitudeRoll = Constrain_16Bits(ATTITUDE.AngleOut[ROLL], -900, 900);
-    }
+    GCSParameters.SendAttitudeRoll = Constrain_16Bits(ATTITUDE.AngleOut[ROLL], -900, 900);
     if (I2C.CompassFound)
     {
         GCSParameters.SendAttitudeYaw = ATTITUDE.AngleOut[YAW];

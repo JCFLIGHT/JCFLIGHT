@@ -225,6 +225,14 @@ typedef struct
   float HalfLife, Boost;
 } AlphaBetaGammaFilter_Struct;
 
+typedef struct
+{
+  //MATRIX JACOBIANA
+  //http://en.wikipedia.org/wiki/Jacobian_matrix
+  float Matrix_JtR[4];
+  float Matrix_JtJ[4][4];
+} GaussNewtonMatrices_Struct;
+
 extern Calibration_Struct CALIBRATION;
 extern IMU_Struct IMU;
 extern INS_Struct INS;

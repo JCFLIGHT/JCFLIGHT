@@ -17,7 +17,7 @@
 
 #ifndef PERFORMACC_H_
 #define PERFORMACC_H_
-void StartAccCalibration();
-bool AccCalibrationRunning();
-void Accelerometer_Calibration();
+void StartAccCalibration(void);
+bool AccCalibrationRunning(void);
+void Accelerometer_Calibration(void);
 #endif

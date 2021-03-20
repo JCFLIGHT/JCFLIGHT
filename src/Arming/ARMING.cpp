@@ -26,6 +26,7 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "Common/STRUCTS.h"
 #include "PerformanceCalibration/PERFORMGYRO.h"
+#include "ParamsToGCS/IMUCALGCS.h"
 
 PreArmClass PREARM;
 
@@ -112,7 +113,7 @@ void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 
 uint8_t PreArmClass::Checking(void)
 {
-    if (CALIBRATION.AccelerometerZero[ROLL] > 0x7D0) //IMU NÃO CALIBRADA
+    if (GetImageToGCS() != 63) //IMU NÃO CALIBRADA
     {
         return IMU_ERROR;
     }

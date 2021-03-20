@@ -34,8 +34,8 @@ void MachineInit()
     GeneralSettingsInitialization();
     //CALIBRAÇÃO DOS ESCS
     ESC.Calibration();
-    //CHECA SE A IMU ESTÁ CALIBRADA E CARREGA OS VALORES DE CALIBRAÇÃO DA MESMA
-    CheckAndUpdateIMUCalibration();
+    //CARREGA OS VALORES DE CALIBRAÇÃO DA IMU
+    UpdateIMUCalibration();
     //CARREGA OS VALORES DE CALIBRAÇÃO DO COMPASS
     COMPASS.UpdateCompassCalibration();
     //INICIALIZA OS DISPOSITIVOS I2C

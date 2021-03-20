@@ -21,7 +21,7 @@
 #include "Common/ENUM.h"
 #include "Common/STRUCTS.h"
 
-void CheckAndUpdateIMUCalibration()
+void UpdateIMUCalibration(void)
 {
   CALIBRATION.AccelerometerZero[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADDR);
   CALIBRATION.AccelerometerZero[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADDR);
@@ -29,11 +29,18 @@ void CheckAndUpdateIMUCalibration()
   CALIBRATION.AccelerometerScale[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_SCALE_ADDR);
   CALIBRATION.AccelerometerScale[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_SCALE_ADDR);
   CALIBRATION.AccelerometerScale[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_SCALE_ADDR);
-  //APENAS PARA INDICAR PARA O GCS QUE A IMU NÃO ESTÁ CALIBRADA
-  if (CALIBRATION.AccelerometerZero[ROLL] == NONE &&
-      CALIBRATION.AccelerometerZero[PITCH] == NONE &&
-      CALIBRATION.AccelerometerZero[YAW] == NONE)
-  {
-    CALIBRATION.AccelerometerZero[ROLL] = 0x10FE;
-  }
+}
+
+void SaveIMUCalibration(void)
+{
+  //PONTO A SER MARCADO COMO ZERO
+  STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADDR, CALIBRATION.AccelerometerZero[ROLL]);
+  STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADDR, CALIBRATION.AccelerometerZero[PITCH]);
+  STORAGEMANAGER.Write_16Bits(ACC_YAW_ADDR, CALIBRATION.AccelerometerZero[YAW]);
+  //ESCALA
+  STORAGEMANAGER.Write_16Bits(ACC_ROLL_SCALE_ADDR, CALIBRATION.AccelerometerScale[ROLL]);
+  STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, CALIBRATION.AccelerometerScale[PITCH]);
+  STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, CALIBRATION.AccelerometerScale[YAW]);
+  //ATUALIZA PARA OS NOVOS VALORES
+  UpdateIMUCalibration();
 }

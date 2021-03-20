@@ -86,7 +86,7 @@ void PerformAccelerationCalibration(void)
 
     if (!AccCalibratedPosition[GetActualPositionOfAcc])
     {
-        GaussNewtonPushSampleForOffsetCalculation(&CalibrationState, IMU.AccelerometerRead);
+        GaussNewtonPushSampleForOffSetCalculation(&CalibrationState, IMU.AccelerometerRead);
         AccSamples[GetActualPositionOfAcc][ROLL] += IMU.AccelerometerRead[ROLL];
         AccSamples[GetActualPositionOfAcc][PITCH] += IMU.AccelerometerRead[PITCH];
         AccSamples[GetActualPositionOfAcc][YAW] += IMU.AccelerometerRead[YAW];

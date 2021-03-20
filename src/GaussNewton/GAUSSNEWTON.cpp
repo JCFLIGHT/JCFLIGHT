@@ -37,7 +37,7 @@ void ClearGaussNewtonMatrices(GaussNewtonMatrices_Struct *CalibrationStatePointe
   }
 }
 
-void GaussNewtonPushSampleForOffsetCalculation(GaussNewtonMatrices_Struct *CalibrationStatePointer, int16_t SensorSample[3])
+void GaussNewtonPushSampleForOffSetCalculation(GaussNewtonMatrices_Struct *CalibrationStatePointer, int16_t SensorSample[3])
 {
   CalibrationStatePointer->Matrix_JtJ[0][0] += (float)SensorSample[0] * SensorSample[0];
   CalibrationStatePointer->Matrix_JtJ[0][1] += (float)SensorSample[0] * SensorSample[1];

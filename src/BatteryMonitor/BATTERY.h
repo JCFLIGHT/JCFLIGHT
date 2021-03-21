@@ -32,6 +32,7 @@ public:
   float Get_Actual_Current(void);
   void Calculate_Total_Current_In_Mah(void);
   uint32_t GetWatts();
+  void Exhausted();
 
 private:
   uint8_t LowBatteryCount;

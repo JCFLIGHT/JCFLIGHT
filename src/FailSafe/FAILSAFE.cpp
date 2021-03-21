@@ -249,7 +249,7 @@ void FailSafeCheck()
 void FailSafe_Do_RTH_With_Low_Batt(bool FailSafeBatt)
 {
   //ENTRA EM MODO RTH OU LAND (SE ESTIVER PROXIMO DO HOME-POINT)
-  //SE A BATERIA ESTIVER COM A TENSÃO ABAIXO DE 20% DA CARGA TOTAL
+  //SE A BATERIA ESTIVER COM A CAPACIDADE ABAIXO DA CAPACIDADE CRITICA
   static bool FailSafeBattDetect = false;
   if (FailSafeBatt)
   {

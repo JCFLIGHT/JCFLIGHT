@@ -36,11 +36,11 @@ PT1_Filter_Struct CurrentFilter_LPF;
 //#define PRINTLN_BATT
 
 #define THIS_LOOP_RATE 50            //HZ
-#define TIMER_TO_AUTO_DETECT_BATT 15 //SEGUNDOS
-#define LOW_BATT_DETECT_OVERFLOW 4   //SEGUNDOS
-#define PREVENT_ARM_LOW_BATT 20      //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 20% DA CAPACIDADE
-#define VOLTAGE_CUTOFF 15            //Hz
-#define CURRENT_CUTOFF 15            //Hz
+#define TIMER_TO_AUTO_DETECT_BATT 15 //TEMPO EM SEGUNDOS PARA AUTO DETECTAR O NÚMERO DE CELULAS DA BATERIA DO USUARIO
+#define LOW_BATT_DETECT_EXHAUSTED 10 //VALIDA QUE REALMENTE A BATERIA ESTÁ ABAIXO DA CAPACIDADE MINIMA POR 'N' SEGUNDOS
+#define LOW_BATT_CRITIC_PERCENT 20   //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 'N%' DA CAPACIDADE
+#define VOLTAGE_CUTOFF 15            //HZ
+#define CURRENT_CUTOFF 15            //HZ
 
 //VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
 float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
@@ -57,33 +57,7 @@ void BatteryClass::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
   BATTERY.Calced_Voltage = PT1FilterApply3(&VoltageFilter_LPF, BATTERY.Calced_Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
-  if (BATTERY.Calced_Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
-  {
-    if (BATTERY.GetPercentage() <= PREVENT_ARM_LOW_BATT) //MENOR OU IGUAL QUE 20% DA CAPACIDADE TOTAL DA BATERIA?SIM...
-    {
-      if (LowBatteryCount >= (THIS_LOOP_RATE * LOW_BATT_DETECT_OVERFLOW))
-      {
-        BATTERY.LowBattPreventArm = true;
-        if (BEEPER.GetSafeStateToOthersBeeps())
-        {
-          BEEPER.Play(BEEPER_BATT_CRIT_LOW);
-        }
-      }
-      else
-      {
-        LowBatteryCount++;
-      }
-    }
-    else
-    {
-      BATTERY.LowBattPreventArm = false;
-      LowBatteryCount = 0;
-    }
-  }
-  else
-  {
-    BATTERY.LowBattPreventArm = false;
-  }
+  BATTERY.Exhausted();
   FailSafe_Do_RTH_With_Low_Batt(BATTERY.LowBattPreventArm);
 }
 
@@ -277,4 +251,33 @@ uint32_t BatteryClass::GetWatts()
   //NO GCS,O RESULTADO DESTA OPERAÇÃO É DIVIDO POR 1000,AFIM DE OBTER OS VALORES DECIMAIS,
   //POR ESSE FATO ESSA FUNÇÃO ESTÁ EM 32 BITS
   return (BATTERY.Calced_Current * BATTERY.Calced_Voltage);
+}
+
+//VALIDA QUE REALMENTE A BATERIA ESTÁ ABAIXO DA CAPACIDADE MINIMA POR 'N' SEGUNDOS
+void BatteryClass::Exhausted()
+{
+  if (BATTERY.Calced_Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
+  {
+    if (BATTERY.GetPercentage() <= LOW_BATT_CRITIC_PERCENT) //MENOR OU IGUAL QUE 'N%' DA CAPACIDADE TOTAL DA BATERIA?SIM...
+    {
+      if (BATTERY.LowBatteryCount >= (THIS_LOOP_RATE * LOW_BATT_DETECT_EXHAUSTED)) //CHECA SE NÃO É APENAS UM PICO POR 'N' SEGUNDOS
+      {
+        BATTERY.LowBattPreventArm = true;
+        BEEPER.Play(BEEPER_BATT_CRIT_LOW);
+      }
+      else
+      {
+        BATTERY.LowBatteryCount++;
+      }
+    }
+    else
+    {
+      BATTERY.LowBattPreventArm = false;
+      BATTERY.LowBatteryCount = 0;
+    }
+  }
+  else
+  {
+    BATTERY.LowBattPreventArm = false;
+  }
 }

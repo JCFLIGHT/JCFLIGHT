@@ -18,9 +18,9 @@
 #ifndef GAUSSNEWTON_H_
 #define GAUSSNEWTON_H_
 #include "Common/STRUCTS.h"
-void ClearGaussNewtonMatrices(Jacobian_Struct *JacobianStatePointer);
-void GaussNewtonPushSampleForOffSetCalculation(Jacobian_Struct *JacobianStatePointer, int16_t SensorSample[3]);
-void GaussNewtonPushSampleForScaleCalculation(Jacobian_Struct *JacobianStatePointer, int16_t AxisIndex, int16_t SensorSample[3], int16_t Target);
-void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianStatePointer, float Result[3]);
-void GaussNewtonSolveForScale(Jacobian_Struct *JacobianStatePointer, float Result[3]);
+void ClearGaussNewtonMatrices(Jacobian_Struct *JacobianPointer);
+void GaussNewtonPushSampleForOffSetCalculation(Jacobian_Struct *JacobianPointer, int16_t SensorSample[3]);
+void GaussNewtonPushSampleForScaleCalculation(Jacobian_Struct *JacobianPointer, int16_t AxisIndex, int16_t SensorSample[3], int16_t Target);
+void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianPointer, float Result[3]);
+void GaussNewtonSolveForScale(Jacobian_Struct *JacobianPointer, float Result[3]);
 #endif

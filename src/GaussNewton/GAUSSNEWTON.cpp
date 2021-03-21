@@ -24,60 +24,60 @@
 
 //https://en.wikipedia.org/wiki/Gaussian_elimination
 
-void ClearGaussNewtonMatrices(Jacobian_Struct *JacobianStatePointer)
+void ClearGaussNewtonMatrices(Jacobian_Struct *JacobianPointer)
 {
   for (int16_t FirstIndex = 0; FirstIndex < 4; FirstIndex++)
   {
     for (int16_t SecondIndex = 0; SecondIndex < 4; SecondIndex++)
     {
-      JacobianStatePointer->Matrix_JtJ[FirstIndex][SecondIndex] = 0;
+      JacobianPointer->Matrix_JtJ[FirstIndex][SecondIndex] = 0;
     }
 
-    JacobianStatePointer->Matrix_JtR[FirstIndex] = 0;
+    JacobianPointer->Matrix_JtR[FirstIndex] = 0;
   }
 }
 
-void GaussNewtonPushSampleForOffSetCalculation(Jacobian_Struct *JacobianStatePointer, int16_t SensorSample[3])
+void GaussNewtonPushSampleForOffSetCalculation(Jacobian_Struct *JacobianPointer, int16_t SensorSample[3])
 {
-  JacobianStatePointer->Matrix_JtJ[0][0] += (float)SensorSample[0] * SensorSample[0];
-  JacobianStatePointer->Matrix_JtJ[0][1] += (float)SensorSample[0] * SensorSample[1];
-  JacobianStatePointer->Matrix_JtJ[0][2] += (float)SensorSample[0] * SensorSample[2];
-  JacobianStatePointer->Matrix_JtJ[0][3] += (float)SensorSample[0];
+  JacobianPointer->Matrix_JtJ[0][0] += (float)SensorSample[0] * SensorSample[0];
+  JacobianPointer->Matrix_JtJ[0][1] += (float)SensorSample[0] * SensorSample[1];
+  JacobianPointer->Matrix_JtJ[0][2] += (float)SensorSample[0] * SensorSample[2];
+  JacobianPointer->Matrix_JtJ[0][3] += (float)SensorSample[0];
 
-  JacobianStatePointer->Matrix_JtJ[1][0] += (float)SensorSample[1] * SensorSample[0];
-  JacobianStatePointer->Matrix_JtJ[1][1] += (float)SensorSample[1] * SensorSample[1];
-  JacobianStatePointer->Matrix_JtJ[1][2] += (float)SensorSample[1] * SensorSample[2];
-  JacobianStatePointer->Matrix_JtJ[1][3] += (float)SensorSample[1];
+  JacobianPointer->Matrix_JtJ[1][0] += (float)SensorSample[1] * SensorSample[0];
+  JacobianPointer->Matrix_JtJ[1][1] += (float)SensorSample[1] * SensorSample[1];
+  JacobianPointer->Matrix_JtJ[1][2] += (float)SensorSample[1] * SensorSample[2];
+  JacobianPointer->Matrix_JtJ[1][3] += (float)SensorSample[1];
 
-  JacobianStatePointer->Matrix_JtJ[2][0] += (float)SensorSample[2] * SensorSample[0];
-  JacobianStatePointer->Matrix_JtJ[2][1] += (float)SensorSample[2] * SensorSample[1];
-  JacobianStatePointer->Matrix_JtJ[2][2] += (float)SensorSample[2] * SensorSample[2];
-  JacobianStatePointer->Matrix_JtJ[2][3] += (float)SensorSample[2];
+  JacobianPointer->Matrix_JtJ[2][0] += (float)SensorSample[2] * SensorSample[0];
+  JacobianPointer->Matrix_JtJ[2][1] += (float)SensorSample[2] * SensorSample[1];
+  JacobianPointer->Matrix_JtJ[2][2] += (float)SensorSample[2] * SensorSample[2];
+  JacobianPointer->Matrix_JtJ[2][3] += (float)SensorSample[2];
 
-  JacobianStatePointer->Matrix_JtJ[3][0] += (float)SensorSample[0];
-  JacobianStatePointer->Matrix_JtJ[3][1] += (float)SensorSample[1];
-  JacobianStatePointer->Matrix_JtJ[3][2] += (float)SensorSample[2];
-  JacobianStatePointer->Matrix_JtJ[3][3] += 1;
+  JacobianPointer->Matrix_JtJ[3][0] += (float)SensorSample[0];
+  JacobianPointer->Matrix_JtJ[3][1] += (float)SensorSample[1];
+  JacobianPointer->Matrix_JtJ[3][2] += (float)SensorSample[2];
+  JacobianPointer->Matrix_JtJ[3][3] += 1;
 
   float SquareObservation = ((float)SensorSample[0] * SensorSample[0]) + ((float)SensorSample[1] * SensorSample[1]) + ((float)SensorSample[2] * SensorSample[2]);
-  JacobianStatePointer->Matrix_JtR[0] += SensorSample[0] * SquareObservation;
-  JacobianStatePointer->Matrix_JtR[1] += SensorSample[1] * SquareObservation;
-  JacobianStatePointer->Matrix_JtR[2] += SensorSample[2] * SquareObservation;
-  JacobianStatePointer->Matrix_JtR[3] += SquareObservation;
+  JacobianPointer->Matrix_JtR[0] += SensorSample[0] * SquareObservation;
+  JacobianPointer->Matrix_JtR[1] += SensorSample[1] * SquareObservation;
+  JacobianPointer->Matrix_JtR[2] += SensorSample[2] * SquareObservation;
+  JacobianPointer->Matrix_JtR[3] += SquareObservation;
 }
 
-void GaussNewtonPushSampleForScaleCalculation(Jacobian_Struct *JacobianStatePointer, int16_t AxisIndex, int16_t SensorSample[3], int16_t Target)
+void GaussNewtonPushSampleForScaleCalculation(Jacobian_Struct *JacobianPointer, int16_t AxisIndex, int16_t SensorSample[3], int16_t Target)
 {
   for (int16_t IndexCount = 0; IndexCount < 3; IndexCount++)
   {
     float ScaledSample = (float)SensorSample[IndexCount] / (float)Target;
-    JacobianStatePointer->Matrix_JtJ[AxisIndex][IndexCount] += ScaledSample * ScaledSample;
-    JacobianStatePointer->Matrix_JtJ[3][IndexCount] += ScaledSample * ScaledSample;
+    JacobianPointer->Matrix_JtJ[AxisIndex][IndexCount] += ScaledSample * ScaledSample;
+    JacobianPointer->Matrix_JtJ[3][IndexCount] += ScaledSample * ScaledSample;
   }
 
-  JacobianStatePointer->Matrix_JtJ[AxisIndex][3] += 1;
-  JacobianStatePointer->Matrix_JtR[AxisIndex] += 1;
-  JacobianStatePointer->Matrix_JtR[3] += 1;
+  JacobianPointer->Matrix_JtJ[AxisIndex][3] += 1;
+  JacobianPointer->Matrix_JtR[AxisIndex] += 1;
+  JacobianPointer->Matrix_JtR[3] += 1;
 }
 
 static void GaussNewton_Left_Right(float Math[4][4])
@@ -153,11 +153,11 @@ static void GaussNewton_SolveLGS(float JacobObservationA[4][4], float JacobObser
   GaussNewton_BackwardSubstitution(JacobObservationA, JacobObservationX, JacobObservationY);
 }
 
-void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianStatePointer, float Result[3])
+void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianPointer, float Result[3])
 {
   float Beta[4];
 
-  GaussNewton_SolveLGS(JacobianStatePointer->Matrix_JtJ, Beta, JacobianStatePointer->Matrix_JtR);
+  GaussNewton_SolveLGS(JacobianPointer->Matrix_JtJ, Beta, JacobianPointer->Matrix_JtR);
 
   for (int16_t IndexCount = 0; IndexCount < 3; IndexCount++)
   {
@@ -165,11 +165,11 @@ void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianStatePointer, float Resu
   }
 }
 
-void GaussNewtonSolveForScale(Jacobian_Struct *JacobianStatePointer, float Result[3])
+void GaussNewtonSolveForScale(Jacobian_Struct *JacobianPointer, float Result[3])
 {
   float Beta[4];
 
-  GaussNewton_SolveLGS(JacobianStatePointer->Matrix_JtJ, Beta, JacobianStatePointer->Matrix_JtR);
+  GaussNewton_SolveLGS(JacobianPointer->Matrix_JtJ, Beta, JacobianPointer->Matrix_JtR);
 
   for (int16_t IndexCount = 0; IndexCount < 3; IndexCount++)
   {

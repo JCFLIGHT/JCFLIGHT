@@ -77,9 +77,9 @@ void Gyroscope_Calibration()
             StoredGyroSum[ROLL] += IMU.GyroscopeRead[ROLL];
             StoredGyroSum[PITCH] += IMU.GyroscopeRead[PITCH];
             StoredGyroSum[YAW] += IMU.GyroscopeRead[YAW];
-            DevicePushValues(&GyroDevice[ROLL], IMU.GyroscopeRead[ROLL] * GYRO_SCALE);
-            DevicePushValues(&GyroDevice[PITCH], IMU.GyroscopeRead[PITCH] * GYRO_SCALE);
-            DevicePushValues(&GyroDevice[YAW], IMU.GyroscopeRead[YAW] * GYRO_SCALE);
+            DevicePushValues(&GyroDevice[ROLL], IMU.GyroscopeRead[ROLL]);
+            DevicePushValues(&GyroDevice[PITCH], IMU.GyroscopeRead[PITCH]);
+            DevicePushValues(&GyroDevice[YAW], IMU.GyroscopeRead[YAW]);
             break;
         }
         CalibratingGyroscope--;
@@ -87,16 +87,19 @@ void Gyroscope_Calibration()
     else
     {
         //ROLL
-        IMU.GyroscopeRead[ROLL] = (IMU.GyroscopeRead[ROLL] - StoredGyroSum[ROLL]) * GYRO_SCALE;
+        IMU.GyroscopeRead[ROLL] = (IMU.GyroscopeRead[ROLL] - StoredGyroSum[ROLL]);
         IMU.GyroscopeRead[ROLL] = Constrain_16Bits(IMU.GyroscopeRead[ROLL], StoredPreviousValueOfGyro[ROLL] - 800, StoredPreviousValueOfGyro[ROLL] + 800);
         StoredPreviousValueOfGyro[ROLL] = IMU.GyroscopeRead[ROLL];
+        IMU.GyroscopeRead[ROLL] = IMU.GyroscopeRead[ROLL] * GYRO_SCALE;
         //PITCH
-        IMU.GyroscopeRead[PITCH] = (IMU.GyroscopeRead[PITCH] - StoredGyroSum[PITCH]) * GYRO_SCALE;
+        IMU.GyroscopeRead[PITCH] = (IMU.GyroscopeRead[PITCH] - StoredGyroSum[PITCH]);
         IMU.GyroscopeRead[PITCH] = Constrain_16Bits(IMU.GyroscopeRead[PITCH], StoredPreviousValueOfGyro[PITCH] - 800, StoredPreviousValueOfGyro[PITCH] + 800);
         StoredPreviousValueOfGyro[PITCH] = IMU.GyroscopeRead[PITCH];
+        IMU.GyroscopeRead[PITCH] = IMU.GyroscopeRead[PITCH] * GYRO_SCALE;
         //YAW
-        IMU.GyroscopeRead[YAW] = (IMU.GyroscopeRead[YAW] - StoredGyroSum[YAW]) * GYRO_SCALE;
+        IMU.GyroscopeRead[YAW] = (IMU.GyroscopeRead[YAW] - StoredGyroSum[YAW]);
         IMU.GyroscopeRead[YAW] = Constrain_16Bits(IMU.GyroscopeRead[YAW], StoredPreviousValueOfGyro[YAW] - 800, StoredPreviousValueOfGyro[YAW] + 800);
         StoredPreviousValueOfGyro[YAW] = IMU.GyroscopeRead[YAW];
+        IMU.GyroscopeRead[YAW] = IMU.GyroscopeRead[YAW] * GYRO_SCALE;
     }
 }

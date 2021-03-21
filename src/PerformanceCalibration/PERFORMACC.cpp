@@ -19,17 +19,11 @@
 #include "IMU/ACCGYROREAD.h"
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "Buzzer/BUZZER.h"
-#include "StorageManager/EEPROMSTORAGE.h"
-#include "BAR/BAR.h"
 #include "LedRGB/LEDRGB.h"
-#include "Math/MATHSUPPORT.h"
 #include "IMU/IMUHEALTH.h"
-#include "Scheduler/SCHEDULER.h"
 #include "GaussNewton/GAUSSNEWTON.h"
 
-static Jacobian_Struct CalibrationState;
-
-#define CALIBRATING_ACC_CYCLES 400
+static Jacobian_Struct Jacobian_Matrices_To_Acc;
 
 int16_t CalibratingAccelerometer;
 static int16_t AccCalibratedPositionCount = 0;
@@ -81,12 +75,12 @@ void PerformAccelerationCalibration(void)
         }
 
         AccCalibratedPositionCount = 0;
-        ClearGaussNewtonMatrices(&CalibrationState);
+        ClearGaussNewtonMatrices(&Jacobian_Matrices_To_Acc);
     }
 
     if (!AccCalibratedPosition[GetActualPositionOfAcc])
     {
-        GaussNewtonPushSampleForOffSetCalculation(&CalibrationState, IMU.AccelerometerRead);
+        GaussNewtonPushSampleForOffSetCalculation(&Jacobian_Matrices_To_Acc, IMU.AccelerometerRead);
         AccSamples[GetActualPositionOfAcc][ROLL] += IMU.AccelerometerRead[ROLL];
         AccSamples[GetActualPositionOfAcc][PITCH] += IMU.AccelerometerRead[PITCH];
         AccSamples[GetActualPositionOfAcc][YAW] += IMU.AccelerometerRead[YAW];
@@ -106,7 +100,7 @@ void PerformAccelerationCalibration(void)
         int16_t AccSampleToScale[3];
 
         //CALCULA O OFFSET
-        GaussNewtonSolveForOffSet(&CalibrationState, AccOffSetAndScaleBeta);
+        GaussNewtonSolveForOffSet(&Jacobian_Matrices_To_Acc, AccOffSetAndScaleBeta);
 
         for (uint8_t AxisIndex = 0; AxisIndex < 3; AxisIndex++)
         {
@@ -114,7 +108,7 @@ void PerformAccelerationCalibration(void)
         }
 
         //LIMPA A MATRIX AFIM DE NÃO COMPENSAR AS AMOSTRAS MÉDIAS,ESCALAS E GANHOS
-        ClearGaussNewtonMatrices(&CalibrationState);
+        ClearGaussNewtonMatrices(&Jacobian_Matrices_To_Acc);
 
         for (uint8_t AxisIndex = 0; AxisIndex < 6; AxisIndex++)
         {
@@ -122,11 +116,11 @@ void PerformAccelerationCalibration(void)
             AccSampleToScale[PITCH] = AccSamples[AxisIndex][PITCH] / CALIBRATING_ACC_CYCLES - CALIBRATION.AccelerometerZero[PITCH];
             AccSampleToScale[YAW] = AccSamples[AxisIndex][YAW] / CALIBRATING_ACC_CYCLES - CALIBRATION.AccelerometerZero[YAW];
 
-            GaussNewtonPushSampleForScaleCalculation(&CalibrationState, AxisIndex / 2, AccSampleToScale, 256);
+            GaussNewtonPushSampleForScaleCalculation(&Jacobian_Matrices_To_Acc, AxisIndex / 2, AccSampleToScale, 256);
         }
 
         //CALCULA A ESCALA
-        GaussNewtonSolveForScale(&CalibrationState, AccOffSetAndScaleBeta);
+        GaussNewtonSolveForScale(&Jacobian_Matrices_To_Acc, AccOffSetAndScaleBeta);
 
         for (uint8_t AxisIndex = 0; AxisIndex < 3; AxisIndex++)
         {

@@ -64,7 +64,6 @@
 #include "Barometer/BAROREAD.h"
 #include "AirSpeed/AIRSPEED.h"
 #include "GPS/GPSSERIALREAD.h"
-#include "AirSpeed/AUTOTHROTTLE.h"
 #include "Barometer/BAROBACKEND.h"
 #include "IOMCU/IOMCU.h"
 #include "FunctionsLoop/LOOPS.h"
@@ -78,3 +77,4 @@
 #include "Build/GENERALSETTINGS.h"
 #include "MachineMain/MACHINEINIT.h"
 #include "IMU/GFORCE.h"
+#include "TECS/TECS.h"

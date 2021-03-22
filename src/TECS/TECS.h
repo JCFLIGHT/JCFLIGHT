@@ -15,8 +15,13 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef AUTOTHROTTLE_H_
-#define AUTOTHROTTLE_H_
+#ifndef TECS_H_
+#define TECS_H_
 #include "Build/LIBDEPENDENCIES.h"
-void AirSpeed_Apply_Auto_Throttle_Control();
+class TecsClass
+{
+public:
+    void Update(float DeltaTime);
+};
+extern TecsClass TECS;
 #endif

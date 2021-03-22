@@ -101,7 +101,7 @@ void Integral_Loop()
         GPS_Orientation_Update();
         WayPointRun();
         AUTOLAUNCH.Update();
-        AirSpeed_Apply_Auto_Throttle_Control();
+        TECS.Update(ThisDeltaTime);
         PIDXYZ.Update(ThisDeltaTime);
         AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
         ServoAutoTrimRun();

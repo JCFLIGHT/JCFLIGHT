@@ -15,8 +15,10 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "AUTOTHROTTLE.h"
-#include "AIRSPEED.h"
+//TOTAL ENERGY CONSERVATION SYSTEM - SISTEMA DE CONSERVAÇÃO TOTAL DE ENERGIA
+
+#include "TECS.h"
+#include "AirSpeed/AIRSPEED.h"
 #include "Math/MATHSUPPORT.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "PID/RCPID.h"
@@ -24,6 +26,8 @@
 #include "BitArray/BITARRAY.h"
 #include "Common/STRUCTS.h"
 #include "GenericPI/GENERICPI.h"
+
+TecsClass TECS;
 
 //#define APPLY_NEW_PI
 
@@ -34,7 +38,7 @@ GenericPIClass AutoThrottlePI;
 int16_t CalculateIntegral = 0;
 uint16_t PreviousValueOfAirSpeed = 0;
 
-void AirSpeed_Apply_Auto_Throttle_Control()
+static void Apply_Auto_Throttle_Control(float DeltaTime)
 {
     if (GetFrameStateOfMultirotor())
     {
@@ -59,13 +63,16 @@ void AirSpeed_Apply_Auto_Throttle_Control()
 
 #ifdef APPLY_NEW_PI
         ///////////////////////////////DENTRO DO SETUP////////////////////////////
+        //FUTURAMENTE NÃO UTILIZAR MAIS KP E O KI DO AJUSTE DE ALTITUDE PARA SETAR VALORES,
+        //E SIM USAR O KI E O KD PARA SETAR O KP E KI.DESSA FORMA O KP DO AJUSTE DE ALTITUDE
+        //FICARÁ POR CONTA APENAS DO AJUSTE DO ALTITUDE-HOLD
         AutoThrottlePI.SetkP(GET_SET[PID_ALTITUDE].ProportionalVector / 8); //AINDA FALTA VERIFICAR SE ISSO ESTÁ CORRETO
         AutoThrottlePI.SetkI(GET_SET[PID_ALTITUDE].IntegralVector / 32);    //AINDA FALTA VERIFICAR SE ISSO ESTÁ CORRETO
         AutoThrottlePI.SetIntegratorMax(24000);
         AutoThrottlePI.SetOutputMin(MIN_PULSE);
         AutoThrottlePI.SetOutputMax(MAX_PULSE);
         /////////////////////////////////////////////////////////////////////////
-        RCController[THROTTLE] = AutoThrottlePI.Get_PI_Calced(CalculateError, 1000); //AINDA FALTA PUXAR O DELTA TIME
+        RCController[THROTTLE] = AutoThrottlePI.Get_PI_Calced(CalculateError, DeltaTime); //AINDA FALTA PUXAR O DELTA TIME
 #endif
     }
     else
@@ -75,4 +82,9 @@ void AirSpeed_Apply_Auto_Throttle_Control()
         AutoThrottlePI.Reset_Integrator();
 #endif
     }
+}
+
+void TecsClass::Update(float DeltaTime)
+{
+    Apply_Auto_Throttle_Control(DeltaTime);
 }

@@ -625,7 +625,7 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
     if (AHRS.CheckAnglesInclination(10)) //10 GRAUS DE INCLINAÇÃO
     {
       //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1000CM/S = 36KM/H
-      int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_State() ? AIRSPEED.CalcedInCM : ReferenceAirSpeed;
+      int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_Enabled() ? AIRSPEED.CalcedInCM : ReferenceAirSpeed;
       //LIMITE DE 10KM/H - 216KM/H
       AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 300, 6000);
       float BankAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector)));

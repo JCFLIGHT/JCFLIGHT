@@ -15,14 +15,9 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ADC_H_
-#define ADC_H_
-#include "Build/LIBDEPENDENCIES.h"
-class AnalogReadClass
-{
-public:
-  int16_t Read(uint8_t AnalogPin);
-  float Read_Voltage_Ratiometric(uint8_t AnalogPin);
-};
-extern AnalogReadClass ANALOGSOURCE;
-#endif
+#include "AIRSPEEDVIRTUAL.h"
+
+//ESTIMAÇÃO GENERICA DA VELOCIDADE DA FUSELAGEM COM BASE NOS DADOS DO GPS
+//GENERIA POR QUE OS DADOS DE VELOCIDADE NED DO GPS NÃO TEM MUITA PRECISÃO
+//O CORRETO É O USUARIO USAR UM TUBO DE PITOT REAL DO TIPO ANALOGICO OU DIGITAL
+//ISSO SERÁ CONSTRUIDO NO FUTURO,NÃO SEI QUANDO,POR QUE EU SOU PREGUIÇOSO

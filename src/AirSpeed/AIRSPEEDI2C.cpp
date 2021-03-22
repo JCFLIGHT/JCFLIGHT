@@ -17,12 +17,13 @@
 
 #include "AIRSPEEDI2C.h"
 
-float AirSpeed_I2C_Get_Calibration(void)
+//CONSTRUIR AQUI O SUPORTE FUTURO PARA O MS4525 E MS5525
+
+void AirSpeed_I2C_Initialization(void)
 {
-    return 0;
 }
 
 float AirSpeed_I2C_Get_Actual_Value(void)
 {
-    return 0;
+  return 0;
 }

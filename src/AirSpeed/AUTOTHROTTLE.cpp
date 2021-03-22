@@ -45,13 +45,13 @@ void AirSpeed_Apply_Auto_Throttle_Control()
     {
         if (IS_FLIGHT_MODE_ACTIVE_ONCE(AUTO_THROTTLE_MODE))
         {
-            PreviousValueOfAirSpeed = AIRSPEED.CalcedInKM;
+            PreviousValueOfAirSpeed = ConvertCentimeterPerSecondsToKmPerHour(AIRSPEED.CalcedInCM);
         }
     }
 
     if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) && (RCController[THROTTLE] > 1200))
     {
-        int16_t CalculateError = PreviousValueOfAirSpeed - AIRSPEED.CalcedInKM;
+        int16_t CalculateError = PreviousValueOfAirSpeed - ConvertCentimeterPerSecondsToKmPerHour(AIRSPEED.CalcedInCM);
         int16_t CalculateProportional = (CalculateError * GET_SET[PID_ALTITUDE].ProportionalVector >> 3);
         CalculateIntegral += (CalculateError * GET_SET[PID_ALTITUDE].IntegralVector >> 5);
         CalculateIntegral = Constrain_16Bits(CalculateIntegral, -24000, 24000);

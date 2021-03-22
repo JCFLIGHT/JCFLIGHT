@@ -15,14 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ADC_H_
-#define ADC_H_
-#include "Build/LIBDEPENDENCIES.h"
-class AnalogReadClass
-{
-public:
-  int16_t Read(uint8_t AnalogPin);
-  float Read_Voltage_Ratiometric(uint8_t AnalogPin);
-};
-extern AnalogReadClass ANALOGSOURCE;
+#ifndef AIRSPEEDVIRTUAL_H_
+#define AIRSPEEDVIRTUAL_H_
+
 #endif

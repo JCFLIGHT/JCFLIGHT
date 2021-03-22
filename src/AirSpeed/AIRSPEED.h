@@ -22,9 +22,17 @@ class AirSpeedClass
 {
 public:
   uint16_t CalcedInCM;
-  uint16_t CalcedInKM;
   void Initialization();
   void Update();
+
+private:
+  float RawValue;
+  float OffSetValue;
+  float CalibrationSum;
+  float CalibrationSumCount;
+  float Get_Raw_Value();
+  void GetPressure(float &Pressure);
+  void Calibrate();
 };
 extern AirSpeedClass AIRSPEED;
 #endif

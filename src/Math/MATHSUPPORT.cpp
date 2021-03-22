@@ -368,3 +368,8 @@ float Power_Float(float Base, int16_t Exponential) //X^Y
     }
     return Result;
 }
+
+float ConvertCentimeterPerSecondsToKmPerHour(float Value)
+{
+    return Value / 27.778f;
+}

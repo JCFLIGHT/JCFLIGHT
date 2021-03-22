@@ -16,31 +16,22 @@
 */
 
 #include "AIRSPEEDANALOG.h"
-#include "Common/STRUCTS.h"
-#include "Scheduler/SCHEDULERTIME.h"
 #include "AnalogDigitalConverter/ADC.h"
 #include "Build/BOARDDEFS.h"
-#include "FastSerial/PRINTF.h"
 
 //AIR-SPEED MODELO MPXV7002DP (CONEXÃO DO TIPO ANALOGICA)
 
-#define INITIAL_SAMPLES 50 //RECOLHE 50 AMOSTRAS INICIAIS DO SENSOR
+#ifndef __AVR_ATmega2560__
+#define PITOT_ADC_VOLTAGE_SCALER 2
+#define PITOT_ADC_VOLTAGE_ZERO 2.5f
+#else
+#define PITOT_ADC_VOLTAGE_SCALER 1.0f
+#define PITOT_ADC_VOLTAGE_ZERO 0.0f
+#endif
 
-float AirSpeed_Analog_Get_Calibration(void)
-{
-    LOG("AirSpeed Analogico em calib.Aguarde...");
-    static float AirSpeedAnalogReturnValue = 0;
-    for (uint8_t CountSamples = 0; CountSamples < INITIAL_SAMPLES; CountSamples++)
-    {
-        AirSpeedAnalogReturnValue = ANALOGSOURCE.Read(ADC_ANALOG_AIRSPEED);
-        SCHEDULERTIME.Sleep(20);
-    }
-    LOG("Calib do AirSpeed Analogico finalizada!");
-    LINE_SPACE;
-    return AirSpeedAnalogReturnValue;
-}
+#define PITOT_ADC_VOLTAGE_TO_PRESSURE 1000.0f
 
 float AirSpeed_Analog_Get_Actual_Value(void)
 {
-    return ANALOGSOURCE.Read(ADC_ANALOG_AIRSPEED);
+  return (ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_ANALOG_AIRSPEED) * PITOT_ADC_VOLTAGE_SCALER - PITOT_ADC_VOLTAGE_ZERO) * PITOT_ADC_VOLTAGE_TO_PRESSURE;
 }

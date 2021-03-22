@@ -32,7 +32,7 @@ uint8_t Get_AirSpeed_Type(void)
   return STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR);
 }
 
-bool Get_AirSpeed_State(void)
+bool Get_AirSpeed_Enabled(void)
 {
   return STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR) > 0;
 }

@@ -215,7 +215,7 @@ void BatteryClass::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
   BATTERY.Calced_Current = PT1FilterApply3(&CurrentFilter_LPF, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - Amps_OffSet) * Amps_Per_Volt);
-  BATTERY.Calced_Current = MAX(0, BATTERY.Calced_Current);
+  BATTERY.Calced_Current = MAX(BATTERY.Calced_Current, 0);
 }
 
 void BatteryClass::Calculate_Total_Current_In_Mah(void)

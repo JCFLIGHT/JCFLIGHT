@@ -18,6 +18,6 @@
 #ifndef AIRSPEEDI2C_H_
 #define AIRSPEEDI2C_H_
 #include "Build/LIBDEPENDENCIES.h"
-float AirSpeed_I2C_Get_Calibration(void);
+void AirSpeed_I2C_Initialization(void);
 float AirSpeed_I2C_Get_Actual_Value(void);
 #endif

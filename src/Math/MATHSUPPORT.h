@@ -61,4 +61,5 @@ float Fast_Tangent(float InputValue);
 int32_t WRap_18000(int32_t AngleInput);
 float Fast_Pow(float ValueA, float ValueB);
 float Power_Float(float Base, int16_t Exponential);
+float ConvertCentimeterPerSecondsToKmPerHour(float Value);
 #endif

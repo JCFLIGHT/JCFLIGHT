@@ -400,7 +400,7 @@ enum AirPlane_Wheels_Enum
 
 enum AirSpeed_Type_Enum
 {
-    NONE_AIRSPEED = 0,
+    AIR_SPEED_DISABLED = 0,
     ANALOG_AIR_SPEED,
     DIGITAL_AIR_SPEED,
     VIRTUAL_AIR_SPEED

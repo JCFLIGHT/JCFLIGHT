@@ -28,7 +28,7 @@
 #define SIZE_OF_EEPROM 2000                                          //TAMANHO TOTAL DA EEPROM
 #define ADC_BATTERY_VOLTAGE ADC_NUM_0                                //GPIO34
 #define ADC_BATTERY_CURRENT ADC_NUM_1                                //GPIO35
-#define ADC_ANALOG_AIRSPEED ADC_NUM_2                                //GPIO32
+#define ADC_ANALOG_AIR_SPEED ADC_NUM_2                                //GPIO32
 #define SAFETY_BUTTON_PIN_READ_STATE ADC_NUM_3                       //GPIO33
 #define SAFETY_BUTTON_LED_PINOUT pinMode(GPIO_NUM_5, OUTPUT)         //GPIO5
 #define SAFETY_BUTTON_LED_ON AnalogWriteApplyPulse(GPIO_NUM_5, 4095) //ATIVA O LED DO SAFE BUTTON

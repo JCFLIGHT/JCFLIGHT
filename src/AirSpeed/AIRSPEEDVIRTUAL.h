@@ -17,5 +17,5 @@
 
 #ifndef AIRSPEEDVIRTUAL_H_
 #define AIRSPEEDVIRTUAL_H_
-
+float AirSpeed_Virtual_Get_Actual_Value(void);
 #endif

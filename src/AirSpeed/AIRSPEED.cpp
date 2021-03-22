@@ -19,6 +19,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "AIRSPEEDANALOG.h"
 #include "AIRSPEEDI2C.h"
+#include "AIRSPEEDVIRTUAL.h"
 #include "AIRSPEEDBACKEND.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Scheduler/SCHEDULERTIME.h"
@@ -80,13 +81,17 @@ void AirSpeedClass::GetPressure(float &Pressure)
 
 float AirSpeedClass::Get_Raw_Value()
 {
-  if (Get_AirSpeed_Type() == ANALOG_AIRSPEED)
+  if (Get_AirSpeed_Type() == ANALOG_AIR_SPEED)
   {
     return AirSpeed_Analog_Get_Actual_Value();
   }
-  else if (Get_AirSpeed_Type() == I2C_AIRSPEED)
+  else if (Get_AirSpeed_Type() == DIGITAL_AIR_SPEED)
   {
     return AirSpeed_I2C_Get_Actual_Value();
+  }
+  else if (Get_AirSpeed_Type() == VIRTUAL_AIR_SPEED)
+  {
+    return AirSpeed_Virtual_Get_Actual_Value();
   }
   return 0;
 }

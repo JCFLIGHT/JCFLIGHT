@@ -319,9 +319,9 @@ static float CalculateAccelerometerWeight()
   float AccelerometerMagnitudeSquare = 0;
 
   //CALCULA A RAIZ QUADRADA DE TODOS OS EIXOS DO ACELEROMETRO PARA EXTRAIR A MAGNITUDE
-  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[ROLL] / ACC_1G);
-  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[PITCH] / ACC_1G);
-  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.AccelerometerRead[YAW] / ACC_1G);
+  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[ROLL] / ACC_1G);
+  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[PITCH] / ACC_1G);
+  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[YAW] / ACC_1G);
 
   //CALCULA A CURVA DE SENO DA MAGNITUDE DO ACELEROMETRO
   const float AccWeight_Nearness = Sine_Curve(Fast_SquareRoot(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS) * NEARNESS;
@@ -365,16 +365,16 @@ static void ComputeQuaternionFromRPY(int16_t InitialRoll, int16_t InitialPitch, 
 
 void GetMeasuredAcceleration(Struct_Vector3x3 *MeasureAcceleration)
 {
-  MeasureAcceleration->Vector[ROLL] = ((float)IMU.AccelerometerRead[ROLL] / ACC_1G) * GRAVITY_CMSS;
-  MeasureAcceleration->Vector[PITCH] = ((float)IMU.AccelerometerRead[PITCH] / ACC_1G) * GRAVITY_CMSS;
-  MeasureAcceleration->Vector[YAW] = ((float)IMU.AccelerometerRead[YAW] / ACC_1G) * GRAVITY_CMSS;
+  MeasureAcceleration->Vector[ROLL] = ((float)IMU.Accelerometer.Read[ROLL] / ACC_1G) * GRAVITY_CMSS;
+  MeasureAcceleration->Vector[PITCH] = ((float)IMU.Accelerometer.Read[PITCH] / ACC_1G) * GRAVITY_CMSS;
+  MeasureAcceleration->Vector[YAW] = ((float)IMU.Accelerometer.Read[YAW] / ACC_1G) * GRAVITY_CMSS;
 }
 
 void GetMeasuredRotationRate(Struct_Vector3x3 *MeasureRotation)
 {
-  MeasureRotation->Vector[ROLL] = ConvertToRadians(((float)IMU.GyroscopeRead[ROLL]));
-  MeasureRotation->Vector[PITCH] = ConvertToRadians(((float)IMU.GyroscopeRead[PITCH]));
-  MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.GyroscopeRead[YAW]));
+  MeasureRotation->Vector[ROLL] = ConvertToRadians(((float)IMU.Gyroscope.Read[ROLL]));
+  MeasureRotation->Vector[PITCH] = ConvertToRadians(((float)IMU.Gyroscope.Read[PITCH]));
+  MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.Gyroscope.Read[YAW]));
 }
 
 void AHRSClass::Update(float DeltaTime)

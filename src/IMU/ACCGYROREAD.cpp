@@ -144,12 +144,12 @@ void IMU_Get_Data()
 {
   uint8_t Data_Read[14];
   I2C.RegisterBuffer(ADDRESS_IMU_MPU6050, 0x3B, &Data_Read[0], 14);
-  IMU.AccelerometerRead[ROLL] = -(Data_Read[0] << 8 | Data_Read[1]);
-  IMU.AccelerometerRead[PITCH] = -(Data_Read[2] << 8 | Data_Read[3]);
-  IMU.AccelerometerRead[YAW] = Data_Read[4] << 8 | Data_Read[5];
-  IMU.GyroscopeRead[PITCH] = -(Data_Read[8] << 8 | Data_Read[9]);
-  IMU.GyroscopeRead[ROLL] = Data_Read[10] << 8 | Data_Read[11];
-  IMU.GyroscopeRead[YAW] = -(Data_Read[12] << 8 | Data_Read[13]);
+  IMU.Accelerometer.Read[ROLL] = -(Data_Read[0] << 8 | Data_Read[1]);
+  IMU.Accelerometer.Read[PITCH] = -(Data_Read[2] << 8 | Data_Read[3]);
+  IMU.Accelerometer.Read[YAW] = Data_Read[4] << 8 | Data_Read[5];
+  IMU.Gyroscope.Read[PITCH] = -(Data_Read[8] << 8 | Data_Read[9]);
+  IMU.Gyroscope.Read[ROLL] = Data_Read[10] << 8 | Data_Read[11];
+  IMU.Gyroscope.Read[YAW] = -(Data_Read[12] << 8 | Data_Read[13]);
 }
 #endif
 
@@ -157,9 +157,9 @@ void Acc_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x3B);
-  IMU.AccelerometerRead[ROLL] = -(((BufferData[0] << 8) | BufferData[1]) >> 3);
-  IMU.AccelerometerRead[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
-  IMU.AccelerometerRead[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
+  IMU.Accelerometer.Read[ROLL] = -(((BufferData[0] << 8) | BufferData[1]) >> 3);
+  IMU.Accelerometer.Read[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
+  IMU.Accelerometer.Read[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
 #elif defined ESP32
   IMU_Get_Data();
 #endif
@@ -167,26 +167,26 @@ void Acc_ReadBufferData()
   Accelerometer_Calibration();
 
   //APLICA O AJUSTE DO ACELEROMETRO
-  ApplySensorAlignment(IMU.AccelerometerRead);
+  ApplySensorAlignment(IMU.Accelerometer.Read);
 
   //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS
-  IMU.AccelerometerReadNotFiltered[ROLL] = IMU.AccelerometerRead[ROLL];
-  IMU.AccelerometerReadNotFiltered[PITCH] = IMU.AccelerometerRead[PITCH];
-  IMU.AccelerometerReadNotFiltered[YAW] = IMU.AccelerometerRead[YAW];
+  IMU.Accelerometer.ReadNotFiltered[ROLL] = IMU.Accelerometer.Read[ROLL];
+  IMU.Accelerometer.ReadNotFiltered[PITCH] = IMU.Accelerometer.Read[PITCH];
+  IMU.Accelerometer.ReadNotFiltered[YAW] = IMU.Accelerometer.Read[YAW];
 
   //KALMAN
   if (ActiveKalman)
   {
-    KALMAN.Apply_In_Acc(IMU.AccelerometerRead);
+    KALMAN.Apply_In_Acc(IMU.Accelerometer.Read);
   }
 
   //LPF
   if (Biquad_Acc_LPF > 0)
   {
     //APLICA O FILTRO
-    IMU.AccelerometerRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[ROLL], IMU.AccelerometerRead[ROLL]);
-    IMU.AccelerometerRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[PITCH], IMU.AccelerometerRead[PITCH]);
-    IMU.AccelerometerRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[YAW], IMU.AccelerometerRead[YAW]);
+    IMU.Accelerometer.Read[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[ROLL], IMU.Accelerometer.Read[ROLL]);
+    IMU.Accelerometer.Read[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[PITCH], IMU.Accelerometer.Read[PITCH]);
+    IMU.Accelerometer.Read[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[YAW], IMU.Accelerometer.Read[YAW]);
   }
 
 #ifndef __AVR_ATmega2560__
@@ -194,9 +194,9 @@ void Acc_ReadBufferData()
   if (Biquad_Acc_Notch > 0)
   {
     //APLICA O FILTRO
-    IMU.AccelerometerRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[ROLL], IMU.AccelerometerRead[ROLL]);
-    IMU.AccelerometerRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[PITCH], IMU.AccelerometerRead[PITCH]);
-    IMU.AccelerometerRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[YAW], IMU.AccelerometerRead[YAW]);
+    IMU.Accelerometer.Read[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[ROLL], IMU.Accelerometer.Read[ROLL]);
+    IMU.Accelerometer.Read[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[PITCH], IMU.Accelerometer.Read[PITCH]);
+    IMU.Accelerometer.Read[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadAccNotch[YAW], IMU.Accelerometer.Read[YAW]);
   }
 #endif
 }
@@ -205,31 +205,31 @@ void Gyro_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x43);
-  IMU.GyroscopeRead[PITCH] = -(((BufferData[0] << 8) | BufferData[1]) >> 2);
-  IMU.GyroscopeRead[ROLL] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
-  IMU.GyroscopeRead[YAW] = -(((BufferData[4] << 8) | BufferData[5]) >> 2);
+  IMU.Gyroscope.Read[PITCH] = -(((BufferData[0] << 8) | BufferData[1]) >> 2);
+  IMU.Gyroscope.Read[ROLL] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
+  IMU.Gyroscope.Read[YAW] = -(((BufferData[4] << 8) | BufferData[5]) >> 2);
 #endif
 
   Gyroscope_Calibration();
 
   //OBTÉM OS VALORES DO GYROSCOPIO ANTES DOS FILTROS
-  IMU.GyroscopeReadNotFiltered[ROLL] = IMU.GyroscopeRead[ROLL];
-  IMU.GyroscopeReadNotFiltered[PITCH] = IMU.GyroscopeRead[PITCH];
-  IMU.GyroscopeReadNotFiltered[YAW] = IMU.GyroscopeRead[YAW];
+  IMU.Gyroscope.ReadNotFiltered[ROLL] = IMU.Gyroscope.Read[ROLL];
+  IMU.Gyroscope.ReadNotFiltered[PITCH] = IMU.Gyroscope.Read[PITCH];
+  IMU.Gyroscope.ReadNotFiltered[YAW] = IMU.Gyroscope.Read[YAW];
 
   //KALMAN
   if (ActiveKalman)
   {
-    KALMAN.Apply_In_Gyro(IMU.GyroscopeRead);
+    KALMAN.Apply_In_Gyro(IMU.Gyroscope.Read);
   }
 
   //LPF
   if (Biquad_Gyro_LPF > 0)
   {
     //APLICA O FILTRO
-    IMU.GyroscopeRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[ROLL], IMU.GyroscopeRead[ROLL]);
-    IMU.GyroscopeRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[PITCH], IMU.GyroscopeRead[PITCH]);
-    IMU.GyroscopeRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[YAW], IMU.GyroscopeRead[YAW]);
+    IMU.Gyroscope.Read[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[ROLL], IMU.Gyroscope.Read[ROLL]);
+    IMU.Gyroscope.Read[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[PITCH], IMU.Gyroscope.Read[PITCH]);
+    IMU.Gyroscope.Read[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[YAW], IMU.Gyroscope.Read[YAW]);
   }
 
 #ifndef __AVR_ATmega2560__
@@ -237,9 +237,9 @@ void Gyro_ReadBufferData()
   if (Biquad_Gyro_Notch > 0)
   {
     //APLICA O FILTRO
-    IMU.GyroscopeRead[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[ROLL], IMU.GyroscopeRead[ROLL]);
-    IMU.GyroscopeRead[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[PITCH], IMU.GyroscopeRead[PITCH]);
-    IMU.GyroscopeRead[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[YAW], IMU.GyroscopeRead[YAW]);
+    IMU.Gyroscope.Read[ROLL] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[ROLL], IMU.Gyroscope.Read[ROLL]);
+    IMU.Gyroscope.Read[PITCH] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[PITCH], IMU.Gyroscope.Read[PITCH]);
+    IMU.Gyroscope.Read[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadGyroNotch[YAW], IMU.Gyroscope.Read[YAW]);
   }
 #endif
 }

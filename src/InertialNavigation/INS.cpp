@@ -51,13 +51,13 @@ void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame()
   SinePitch_SineYaw_Fusion = Sine_Pitch * INERTIALNAVIGATION.Sine_Yaw;
 
   //ROLL
-  INS.AccelerationEarthFrame[ROLL] = -((Cosine_Pitch * INERTIALNAVIGATION.Cosine_Yaw) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * SinePitch_CosineYaw_Fusion - Cosine_Roll * Sine_Yaw) * IMU.AccelerometerRead[ROLL] + (Sine_Roll * INERTIALNAVIGATION.Sine_Yaw + Cosine_Roll * SinePitch_CosineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
+  INS.AccelerationEarthFrame[ROLL] = -((Cosine_Pitch * INERTIALNAVIGATION.Cosine_Yaw) * IMU.Accelerometer.Read[PITCH] + (Sine_Roll * SinePitch_CosineYaw_Fusion - Cosine_Roll * Sine_Yaw) * IMU.Accelerometer.Read[ROLL] + (Sine_Roll * INERTIALNAVIGATION.Sine_Yaw + Cosine_Roll * SinePitch_CosineYaw_Fusion) * IMU.Accelerometer.Read[YAW]);
 
   //PITCH
-  INS.AccelerationEarthFrame[PITCH] = -((Cosine_Pitch * INERTIALNAVIGATION.Sine_Yaw) * IMU.AccelerometerRead[PITCH] + (Cosine_Roll * INERTIALNAVIGATION.Cosine_Yaw + Sine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[ROLL] + (-Sine_Roll * INERTIALNAVIGATION.Cosine_Yaw + Cosine_Roll * SinePitch_SineYaw_Fusion) * IMU.AccelerometerRead[YAW]);
+  INS.AccelerationEarthFrame[PITCH] = -((Cosine_Pitch * INERTIALNAVIGATION.Sine_Yaw) * IMU.Accelerometer.Read[PITCH] + (Cosine_Roll * INERTIALNAVIGATION.Cosine_Yaw + Sine_Roll * SinePitch_SineYaw_Fusion) * IMU.Accelerometer.Read[ROLL] + (-Sine_Roll * INERTIALNAVIGATION.Cosine_Yaw + Cosine_Roll * SinePitch_SineYaw_Fusion) * IMU.Accelerometer.Read[YAW]);
 
   //YAW
-  INS.AccelerationEarthFrame[YAW] = ((-Sine_Pitch) * IMU.AccelerometerRead[PITCH] + (Sine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[ROLL] + (Cosine_Roll * Cosine_Pitch) * IMU.AccelerometerRead[YAW]) - 512;
+  INS.AccelerationEarthFrame[YAW] = ((-Sine_Pitch) * IMU.Accelerometer.Read[PITCH] + (Sine_Roll * Cosine_Pitch) * IMU.Accelerometer.Read[ROLL] + (Cosine_Roll * Cosine_Pitch) * IMU.Accelerometer.Read[YAW]) - 512;
 
   //ROLL
   INS.AccelerationEarthFrame[ROLL] = ConvertAccelerationEarthFrameToCMSS(INS.AccelerationEarthFrame[ROLL]);

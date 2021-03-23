@@ -23,11 +23,22 @@
 
 typedef struct
 {
-  int16_t AccelerometerRead[3];
-  int16_t AccelerometerReadNotFiltered[3];
-  int16_t GyroscopeRead[3];
-  int16_t GyroscopeReadNotFiltered[3];
-  float CalcedGForce;
+  struct Accelerometer_Struct
+  {
+    int16_t Read[3] = {0, 0, 0};
+    int16_t ReadNotFiltered[3] = {0, 0, 0};
+    struct Gravity_Struct
+    {
+      bool Initialization = false;
+      float Value = 0;
+    } GravityForce;
+  } Accelerometer;
+
+  struct Gyroscope_Struct
+  {
+    int16_t Read[3] = {0, 0, 0};
+    int16_t ReadNotFiltered[3] = {0, 0, 0};
+  } Gyroscope;
 
   struct Compass_Struct
   {

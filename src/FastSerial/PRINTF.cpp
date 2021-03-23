@@ -149,14 +149,14 @@ void SerialPrint::ParamsToConsole()
 
 #if defined(PRINTLN_ALLSENSORS)
   PRINTF.SendToConsole(ProgramMemoryString("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d Mx:%d My:%d Mz:%d Baro:%ld\n"),
-                       IMU.AccelerometerRead[ROLL], IMU.AccelerometerRead[PITCH], IMU.AccelerometerRead[YAW], IMU.GyroscopeRead[ROLL], IMU.GyroscopeRead[PITCH], IMU.GyroscopeRead[YAW],
+                       IMU.Accelerometer.Read[ROLL], IMU.Accelerometer.Read[PITCH], IMU.Accelerometer.Read[YAW], IMU.Gyroscope.Read[ROLL], IMU.Gyroscope.Read[PITCH], IMU.Gyroscope.Read[YAW],
                        IMU.CompassRead[ROLL], IMU.CompassRead[PITCH], IMU.CompassRead[YAW], ALTITUDE.RealBaroAltitude);
 #endif
 
 #if defined(PRINTLN_IMU)
   PRINTF.SendToConsole(ProgramMemoryString("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d\n"),
-                       IMU.AccelerometerRead[ROLL], IMU.AccelerometerRead[PITCH], IMU.AccelerometerRead[YAW],
-                       IMU.GyroscopeRead[ROLL], IMU.GyroscopeRead[PITCH], IMU.GyroscopeRead[YAW]);
+                       IMU.Accelerometer.Read[ROLL], IMU.Accelerometer.Read[PITCH], IMU.Accelerometer.Read[YAW],
+                       IMU.Gyroscope.Read[ROLL], IMU.Gyroscope.Read[PITCH], IMU.Gyroscope.Read[YAW]);
 #endif
 
 #if defined(PRINTLN_COMPASS)
@@ -688,11 +688,11 @@ void SerialPrint::ParamsToConsole()
 {
 
   /*
-  Serial.print(IMU.AccelerometerRead[PITCH]);
+  Serial.print(IMU.Accelerometer.Read[PITCH]);
   Serial.print("  ");
-  Serial.print(IMU.AccelerometerRead[ROLL]);
+  Serial.print(IMU.Accelerometer.Read[ROLL]);
   Serial.print("  ");
-  Serial.println(IMU.AccelerometerRead[YAW]);
+  Serial.println(IMU.Accelerometer.Read[YAW]);
   */
 
   /*

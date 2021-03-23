@@ -48,7 +48,7 @@ bool FinalAccelerationCalibrationCycle(void)
 
 void PerformAccelerationCalibration(void)
 {
-    int8_t GetActualPositionOfAcc = GetAxisInclinedToCalibration(IMU.AccelerometerRead);
+    int8_t GetActualPositionOfAcc = GetAxisInclinedToCalibration(IMU.Accelerometer.Read);
 
     if ((GetActualPositionOfAcc == -1 && AccCalibrationRunning()) ||
         (AccCalibratedPosition[GetActualPositionOfAcc] && AccCalibrationRunning()))
@@ -77,10 +77,10 @@ void PerformAccelerationCalibration(void)
 
     if (!AccCalibratedPosition[GetActualPositionOfAcc])
     {
-        GaussNewtonPushSampleForOffSetCalculation(&Jacobian_Matrices_To_Acc, IMU.AccelerometerRead);
-        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][ROLL] += IMU.AccelerometerRead[ROLL];
-        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][PITCH] += IMU.AccelerometerRead[PITCH];
-        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][YAW] += IMU.AccelerometerRead[YAW];
+        GaussNewtonPushSampleForOffSetCalculation(&Jacobian_Matrices_To_Acc, IMU.Accelerometer.Read);
+        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][ROLL] += IMU.Accelerometer.Read[ROLL];
+        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][PITCH] += IMU.Accelerometer.Read[PITCH];
+        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][YAW] += IMU.Accelerometer.Read[YAW];
 
         if (FinalAccelerationCalibrationCycle())
         {
@@ -138,7 +138,7 @@ void Accelerometer_Calibration()
     }
 
     //APLICA A ACELERAÇÃO ZERO
-    IMU.AccelerometerRead[ROLL] = (((int32_t)(IMU.AccelerometerRead[ROLL] - CALIBRATION.Accelerometer.OffSet[ROLL])) * CALIBRATION.Accelerometer.Scale[ROLL]) / 1024;
-    IMU.AccelerometerRead[PITCH] = (((int32_t)(IMU.AccelerometerRead[PITCH] - CALIBRATION.Accelerometer.OffSet[PITCH])) * CALIBRATION.Accelerometer.Scale[PITCH]) / 1024;
-    IMU.AccelerometerRead[YAW] = (((int32_t)(IMU.AccelerometerRead[YAW] - CALIBRATION.Accelerometer.OffSet[YAW])) * CALIBRATION.Accelerometer.Scale[YAW]) / 1024;
+    IMU.Accelerometer.Read[ROLL] = (((int32_t)(IMU.Accelerometer.Read[ROLL] - CALIBRATION.Accelerometer.OffSet[ROLL])) * CALIBRATION.Accelerometer.Scale[ROLL]) / 1024;
+    IMU.Accelerometer.Read[PITCH] = (((int32_t)(IMU.Accelerometer.Read[PITCH] - CALIBRATION.Accelerometer.OffSet[PITCH])) * CALIBRATION.Accelerometer.Scale[PITCH]) / 1024;
+    IMU.Accelerometer.Read[YAW] = (((int32_t)(IMU.Accelerometer.Read[YAW] - CALIBRATION.Accelerometer.OffSet[YAW])) * CALIBRATION.Accelerometer.Scale[YAW]) / 1024;
 }

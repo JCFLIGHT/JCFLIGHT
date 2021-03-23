@@ -50,6 +50,8 @@
 #include "GPS/GPSUBLOX.h"
 #include "PID/RCPID.h"
 #include "PerformanceCalibration/PERFORMACC.h"
+#include "IMU/ACCGYROREAD.h"
+#include "PID/PIDPARAMS.h"
 
 GCSClass GCS;
 
@@ -723,7 +725,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 12:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-            COMPASS.Calibrating = true;
+            IMU.Compass.Calibrating = true;
         }
         Communication_Passed(false, 0);
         GCS_Send_Data(SerialCheckSum);
@@ -1298,9 +1300,9 @@ void GCSClass::GCS_Request_Parameters()
     GCSParameters.SendBearing = Target_Bearing;
     GCSParameters.SendAccGForce = IMU.CalcedGForce;
     GCSParameters.SendAccImageBitMap = GetImageToGCS();
-    GCSParameters.SendCompassRoll = IMU.CompassRead[ROLL];
-    GCSParameters.SendCompassPitch = IMU.CompassRead[PITCH];
-    GCSParameters.SendCompassYaw = IMU.CompassRead[YAW];
+    GCSParameters.SendCompassRoll = IMU.Compass.Read[ROLL];
+    GCSParameters.SendCompassPitch = IMU.Compass.Read[PITCH];
+    GCSParameters.SendCompassYaw = IMU.Compass.Read[YAW];
 }
 
 void GCSClass::GCS_Request_Parameters_Two()

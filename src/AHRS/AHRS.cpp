@@ -44,15 +44,15 @@ AHRSClass AHRS;
 
 Struct_Vector3x3 BodyFrameAcceleration;
 Struct_Vector3x3 BodyFrameRotation;
-static Struct_Vector3x3 CorrectedMagneticFieldNorth;
-
 Quaternion_Struct Orientation;
+Attitude_Struct ATTITUDE;
 
+static Struct_Vector3x3 CorrectedMagneticFieldNorth;
 static AHRS_Configuration_Struct IMURuntimeConfiguration;
 
 static bool GPSHeadingInitialized = false;
 
-float RotationMath[3][3];
+float RotationMatrix[3][3];
 
 static void ComputeRotationMatrix(void)
 {
@@ -65,15 +65,15 @@ static void ComputeRotationMatrix(void)
   float q1q2 = Orientation.q1 * Orientation.q2;
   float q1q3 = Orientation.q1 * Orientation.q3;
   float q2q3 = Orientation.q2 * Orientation.q3;
-  RotationMath[0][0] = 1.0f - 2.0f * q2q2 - 2.0f * q3q3;
-  RotationMath[0][1] = 2.0f * (q1q2 + -q0q3);
-  RotationMath[0][2] = 2.0f * (q1q3 - -q0q2);
-  RotationMath[1][0] = 2.0f * (q1q2 - -q0q3);
-  RotationMath[1][1] = 1.0f - 2.0f * q1q1 - 2.0f * q3q3;
-  RotationMath[1][2] = 2.0f * (q2q3 + -q0q1);
-  RotationMath[2][0] = 2.0f * (q1q3 + -q0q2);
-  RotationMath[2][1] = 2.0f * (q2q3 - -q0q1);
-  RotationMath[2][2] = 1.0f - 2.0f * q1q1 - 2.0f * q2q2;
+  RotationMatrix[0][0] = 1.0f - 2.0f * q2q2 - 2.0f * q3q3;
+  RotationMatrix[0][1] = 2.0f * (q1q2 + -q0q3);
+  RotationMatrix[0][2] = 2.0f * (q1q3 - -q0q2);
+  RotationMatrix[1][0] = 2.0f * (q1q2 - -q0q3);
+  RotationMatrix[1][1] = 1.0f - 2.0f * q1q1 - 2.0f * q3q3;
+  RotationMatrix[1][2] = 2.0f * (q2q3 + -q0q1);
+  RotationMatrix[2][0] = 2.0f * (q1q3 + -q0q2);
+  RotationMatrix[2][1] = 2.0f * (q2q3 - -q0q1);
+  RotationMatrix[2][2] = 1.0f - 2.0f * q1q1 - 2.0f * q2q2;
 }
 
 void AHRSClass::Initialization(void)
@@ -417,9 +417,9 @@ void AHRSClass::Update(float DeltaTime)
     }
   }
 
-  Struct_Vector3x3 MagnetometerBodyFrame = {.Vector = {(float)IMU.CompassRead[ROLL],
-                                                       (float)IMU.CompassRead[PITCH],
-                                                       (float)IMU.CompassRead[YAW]}};
+  Struct_Vector3x3 MagnetometerBodyFrame = {.Vector = {(float)IMU.Compass.Read[ROLL],
+                                                       (float)IMU.Compass.Read[PITCH],
+                                                       (float)IMU.Compass.Read[YAW]}};
 
   const float CalcedCompassWeight = NEARNESS;
   const float CalcedAccelerometerWeight = CalculateAccelerometerWeight();
@@ -435,11 +435,11 @@ void AHRSClass::Update(float DeltaTime)
 
   //SAÍDA DOS EIXOS DO APÓS O AHRS
   //PITCH
-  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMath[2][1], RotationMath[2][2]));
+  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMatrix[2][1], RotationMatrix[2][2]));
   //ROLL
-  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-RotationMath[2][0]));
+  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-RotationMatrix[2][0]));
   //YAW
-  ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMath[1][0], RotationMath[0][0]));
+  ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMatrix[1][0], RotationMatrix[0][0]));
   //CONVERTE O VALOR DE COMPASS HEADING PARA O VALOR ACEITAVEL
   if (ATTITUDE.CompassHeading < 0)
   {

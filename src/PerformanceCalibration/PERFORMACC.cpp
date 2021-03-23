@@ -23,30 +23,27 @@
 #include "IMU/IMUHEALTH.h"
 #include "GaussNewton/GAUSSNEWTON.h"
 
+Calibration_Struct CALIBRATION;
 static Jacobian_Struct Jacobian_Matrices_To_Acc;
-
-int16_t CalibratingAccelerometer;
-static int16_t AccCalibratedPositionCount = 0;
-static int32_t AccSamples[6][3];
 
 void StartAccCalibration(void)
 {
-    CalibratingAccelerometer = CALIBRATING_ACC_CYCLES;
+    CALIBRATION.Accelerometer.Counter = CALIBRATING_ACC_CYCLES;
 }
 
 bool AccCalibrationRunning(void)
 {
-    return CalibratingAccelerometer > 0;
+    return CALIBRATION.Accelerometer.Counter > 0;
 }
 
 bool FirstAccelerationCalibrationCycle(void)
 {
-    return CalibratingAccelerometer == CALIBRATING_ACC_CYCLES;
+    return CALIBRATION.Accelerometer.Counter == CALIBRATING_ACC_CYCLES;
 }
 
 bool FinalAccelerationCalibrationCycle(void)
 {
-    return CalibratingAccelerometer == 1;
+    return CALIBRATION.Accelerometer.Counter == 1;
 }
 
 void PerformAccelerationCalibration(void)
@@ -56,7 +53,7 @@ void PerformAccelerationCalibration(void)
     if ((GetActualPositionOfAcc == -1 && AccCalibrationRunning()) ||
         (AccCalibratedPosition[GetActualPositionOfAcc] && AccCalibrationRunning()))
     {
-        CalibratingAccelerometer = 0;
+        CALIBRATION.Accelerometer.Counter = 0;
         BEEPER.Play(BEEPER_ACTION_FAIL);
         return;
     }
@@ -69,32 +66,32 @@ void PerformAccelerationCalibration(void)
         for (uint8_t AxisIndex = 0; AxisIndex < 6; AxisIndex++)
         {
             AccCalibratedPosition[AxisIndex] = false;
-            AccSamples[AxisIndex][ROLL] = 0;
-            AccSamples[AxisIndex][PITCH] = 0;
-            AccSamples[AxisIndex][YAW] = 0;
+            CALIBRATION.Accelerometer.Samples[AxisIndex][ROLL] = 0;
+            CALIBRATION.Accelerometer.Samples[AxisIndex][PITCH] = 0;
+            CALIBRATION.Accelerometer.Samples[AxisIndex][YAW] = 0;
         }
 
-        AccCalibratedPositionCount = 0;
+        CALIBRATION.Accelerometer.PositionCount = 0;
         ClearGaussNewtonMatrices(&Jacobian_Matrices_To_Acc);
     }
 
     if (!AccCalibratedPosition[GetActualPositionOfAcc])
     {
         GaussNewtonPushSampleForOffSetCalculation(&Jacobian_Matrices_To_Acc, IMU.AccelerometerRead);
-        AccSamples[GetActualPositionOfAcc][ROLL] += IMU.AccelerometerRead[ROLL];
-        AccSamples[GetActualPositionOfAcc][PITCH] += IMU.AccelerometerRead[PITCH];
-        AccSamples[GetActualPositionOfAcc][YAW] += IMU.AccelerometerRead[YAW];
+        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][ROLL] += IMU.AccelerometerRead[ROLL];
+        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][PITCH] += IMU.AccelerometerRead[PITCH];
+        CALIBRATION.Accelerometer.Samples[GetActualPositionOfAcc][YAW] += IMU.AccelerometerRead[YAW];
 
         if (FinalAccelerationCalibrationCycle())
         {
             AccCalibratedPosition[GetActualPositionOfAcc] = true;
-            AccCalibratedPositionCount++;
+            CALIBRATION.Accelerometer.PositionCount++;
 
             BEEPER.Play(BEEPER_CALIBRATION_DONE);
         }
     }
 
-    if (AccCalibratedPositionCount == 6)
+    if (CALIBRATION.Accelerometer.PositionCount == 6)
     {
         float AccOffSetAndScaleBeta[3];
         int16_t AccSampleToScale[3];
@@ -104,7 +101,7 @@ void PerformAccelerationCalibration(void)
 
         for (uint8_t AxisIndex = 0; AxisIndex < 3; AxisIndex++)
         {
-            CALIBRATION.AccelerometerZero[AxisIndex] = lrintf(AccOffSetAndScaleBeta[AxisIndex]);
+            CALIBRATION.Accelerometer.OffSet[AxisIndex] = lrintf(AccOffSetAndScaleBeta[AxisIndex]);
         }
 
         //LIMPA A MATRIX AFIM DE NÃO COMPENSAR AS AMOSTRAS MÉDIAS,ESCALAS E GANHOS
@@ -112,9 +109,9 @@ void PerformAccelerationCalibration(void)
 
         for (uint8_t AxisIndex = 0; AxisIndex < 6; AxisIndex++)
         {
-            AccSampleToScale[ROLL] = AccSamples[AxisIndex][ROLL] / CALIBRATING_ACC_CYCLES - CALIBRATION.AccelerometerZero[ROLL];
-            AccSampleToScale[PITCH] = AccSamples[AxisIndex][PITCH] / CALIBRATING_ACC_CYCLES - CALIBRATION.AccelerometerZero[PITCH];
-            AccSampleToScale[YAW] = AccSamples[AxisIndex][YAW] / CALIBRATING_ACC_CYCLES - CALIBRATION.AccelerometerZero[YAW];
+            AccSampleToScale[ROLL] = CALIBRATION.Accelerometer.Samples[AxisIndex][ROLL] / CALIBRATING_ACC_CYCLES - CALIBRATION.Accelerometer.OffSet[ROLL];
+            AccSampleToScale[PITCH] = CALIBRATION.Accelerometer.Samples[AxisIndex][PITCH] / CALIBRATING_ACC_CYCLES - CALIBRATION.Accelerometer.OffSet[PITCH];
+            AccSampleToScale[YAW] = CALIBRATION.Accelerometer.Samples[AxisIndex][YAW] / CALIBRATING_ACC_CYCLES - CALIBRATION.Accelerometer.OffSet[YAW];
 
             GaussNewtonPushSampleForScaleCalculation(&Jacobian_Matrices_To_Acc, AxisIndex / 2, AccSampleToScale, 256);
         }
@@ -124,13 +121,13 @@ void PerformAccelerationCalibration(void)
 
         for (uint8_t AxisIndex = 0; AxisIndex < 3; AxisIndex++)
         {
-            CALIBRATION.AccelerometerScale[AxisIndex] = lrintf(AccOffSetAndScaleBeta[AxisIndex] * 2048);
+            CALIBRATION.Accelerometer.Scale[AxisIndex] = lrintf(AccOffSetAndScaleBeta[AxisIndex] * 2048);
         }
 
         SaveIMUCalibration();
     }
 
-    CalibratingAccelerometer--;
+    CALIBRATION.Accelerometer.Counter--;
 }
 
 void Accelerometer_Calibration()
@@ -141,7 +138,7 @@ void Accelerometer_Calibration()
     }
 
     //APLICA A ACELERAÇÃO ZERO
-    IMU.AccelerometerRead[ROLL] = (((int32_t)(IMU.AccelerometerRead[ROLL] - CALIBRATION.AccelerometerZero[ROLL])) * CALIBRATION.AccelerometerScale[ROLL]) / 1024;
-    IMU.AccelerometerRead[PITCH] = (((int32_t)(IMU.AccelerometerRead[PITCH] - CALIBRATION.AccelerometerZero[PITCH])) * CALIBRATION.AccelerometerScale[PITCH]) / 1024;
-    IMU.AccelerometerRead[YAW] = (((int32_t)(IMU.AccelerometerRead[YAW] - CALIBRATION.AccelerometerZero[YAW])) * CALIBRATION.AccelerometerScale[YAW]) / 1024;
+    IMU.AccelerometerRead[ROLL] = (((int32_t)(IMU.AccelerometerRead[ROLL] - CALIBRATION.Accelerometer.OffSet[ROLL])) * CALIBRATION.Accelerometer.Scale[ROLL]) / 1024;
+    IMU.AccelerometerRead[PITCH] = (((int32_t)(IMU.AccelerometerRead[PITCH] - CALIBRATION.Accelerometer.OffSet[PITCH])) * CALIBRATION.Accelerometer.Scale[PITCH]) / 1024;
+    IMU.AccelerometerRead[YAW] = (((int32_t)(IMU.AccelerometerRead[YAW] - CALIBRATION.Accelerometer.OffSet[YAW])) * CALIBRATION.Accelerometer.Scale[YAW]) / 1024;
 }

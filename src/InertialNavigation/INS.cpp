@@ -24,8 +24,10 @@
 #include "Math/MATHSUPPORT.h"
 #include "GPS/GPSSTATES.h"
 #include "AHRS/AHRS.h"
+#include "IMU/ACCGYROREAD.h"
 
 InertialNavigationClass INERTIALNAVIGATION;
+INS_Struct INS;
 
 void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame()
 {

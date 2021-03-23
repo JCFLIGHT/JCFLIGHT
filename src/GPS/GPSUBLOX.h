@@ -18,6 +18,7 @@
 #ifndef GPSUBLOX_H_
 #define GPSUBLOX_H_
 #include "Build/LIBDEPENDENCIES.h"
+extern bool ValidNED;
 extern uint8_t GPS_NumberOfSatellites;
 extern int16_t GPSVelNED[3];
 extern uint16_t GPS_Ground_Course;

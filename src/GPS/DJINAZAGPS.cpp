@@ -209,6 +209,8 @@ static void NazaGPS_Check_Valid_Data()
     //CALCULA O GROUND COURSE DADO PELO GPS A PARTIR DAS VELOCIDADES NORTH & EASTH
     GPSSolutionData.GroundCourse = (uint16_t)(fmodf((Fast_Atan2(GPSSolutionData.VelocityNED[EAST], GPSSolutionData.VelocityNED[NORTH]) * 57.295779513082320876798154814105f) + 3600.0f, 3600.0f));
 
+    ValidNED = true;
+
     //NOVAS INFORMAÇÕES
     GPS_New_Information = true;
     break;
@@ -220,9 +222,9 @@ static void NazaGPS_Check_Valid_Data()
     Data_Mask_Mag = (((Data_Mask_Mag ^ (Data_Mask_Mag >> 4)) & 0x0F) | ((Data_Mask_Mag << 3) & 0xF0)) ^ (((Data_Mask_Mag & 0x01) << 3) | ((Data_Mask_Mag & 0x01) << 7));
 
     //DECODE OS EIXOS X,Y E Z DO MAGNETOMETRO
-    GPSSolutionData.GPS_Read_Compass[0] = Decode16BitsValues(NazaGPS_Buffer_Read.NazaGPS_Mag_Data.MagAxisRoll, Data_Mask_Mag);
-    GPSSolutionData.GPS_Read_Compass[1] = Decode16BitsValues(NazaGPS_Buffer_Read.NazaGPS_Mag_Data.MagAxisPitch, Data_Mask_Mag);
-    GPSSolutionData.GPS_Read_Compass[2] = NazaGPS_Buffer_Read.NazaGPS_Mag_Data.MagAxisYaw ^ (Data_Mask_Mag << 8);
+    GPSSolutionData.GPS_Read_Compass[ROLL] = Decode16BitsValues(NazaGPS_Buffer_Read.NazaGPS_Mag_Data.MagAxisRoll, Data_Mask_Mag);
+    GPSSolutionData.GPS_Read_Compass[PITCH] = Decode16BitsValues(NazaGPS_Buffer_Read.NazaGPS_Mag_Data.MagAxisPitch, Data_Mask_Mag);
+    GPSSolutionData.GPS_Read_Compass[YAW] = NazaGPS_Buffer_Read.NazaGPS_Mag_Data.MagAxisYaw ^ (Data_Mask_Mag << 8);
     break;
   }
   }

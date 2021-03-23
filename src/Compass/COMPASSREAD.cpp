@@ -29,6 +29,8 @@
 #include "Common/STRUCTS.h"
 #include "GPS/GPSSTATES.h"
 #include "WHOAMI.h"
+#include "PerformanceCalibration/PERFORMACC.h"
+#include "IMU/ACCGYROREAD.h"
 
 CompassReadClass COMPASS;
 
@@ -61,9 +63,9 @@ void CompassReadClass::Initialization()
     SCHEDULERTIME.Sleep(100);
     COMPASS.InitialReadBufferData();
     SCHEDULERTIME.Sleep(10);
-    COMPASS.MagnetometerGain[ROLL] = 1000.0 / ABS(IMU.CompassRead[ROLL]);
-    COMPASS.MagnetometerGain[PITCH] = 1000.0 / ABS(IMU.CompassRead[PITCH]);
-    COMPASS.MagnetometerGain[YAW] = 1000.0 / ABS(IMU.CompassRead[YAW]);
+    CALIBRATION.Magnetometer.Gain[ROLL] = 1000.0 / ABS(IMU.Compass.Read[ROLL]);
+    CALIBRATION.Magnetometer.Gain[PITCH] = 1000.0 / ABS(IMU.Compass.Read[PITCH]);
+    CALIBRATION.Magnetometer.Gain[YAW] = 1000.0 / ABS(IMU.Compass.Read[YAW]);
     I2C.WriteRegister(COMPASS.Address, 0x00, 0x70);
     I2C.WriteRegister(COMPASS.Address, 0x01, 0x20);
     I2C.WriteRegister(COMPASS.Address, 0x02, 0x00);
@@ -87,9 +89,9 @@ void CompassReadClass::Initialization()
     if (BiasOk)
     {
       //CALCULA O GANHO PARA CADA EIXO DO COMPASS
-      COMPASS.MagnetometerGain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
-      COMPASS.MagnetometerGain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
-      COMPASS.MagnetometerGain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
+      CALIBRATION.Magnetometer.Gain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
+      CALIBRATION.Magnetometer.Gain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
+      CALIBRATION.Magnetometer.Gain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
     }
     I2C.WriteRegister(COMPASS.Address, 0, 0x70);
     I2C.WriteRegister(COMPASS.Address, 1, 0x20);
@@ -115,21 +117,21 @@ bool CompassReadClass::PushBias(uint8_t InputBias)
     COMPASS.InitialReadBufferData();
     //VERIFICA SE NENHUMA LEITURA DO MAG IRÁ EXCEDER O LIMITE DE 2^12
     //ROLL
-    ABS_MagRead = ABS(IMU.CompassRead[ROLL]);
+    ABS_MagRead = ABS(IMU.Compass.Read[ROLL]);
     XYZ_CompassBias[ROLL] += ABS_MagRead;
     if (ABS_MagRead > 4096)
     {
       return false;
     }
     //PITCH
-    ABS_MagRead = ABS(IMU.CompassRead[PITCH]);
+    ABS_MagRead = ABS(IMU.Compass.Read[PITCH]);
     XYZ_CompassBias[PITCH] += ABS_MagRead;
     if (ABS_MagRead > 4096)
     {
       return false;
     }
     //YAW
-    ABS_MagRead = ABS(IMU.CompassRead[YAW]);
+    ABS_MagRead = ABS(IMU.Compass.Read[YAW]);
     XYZ_CompassBias[YAW] += ABS_MagRead;
     if (ABS_MagRead > 4096)
     {

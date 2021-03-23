@@ -26,7 +26,8 @@
 #include "RCSTATES.h"
 #include "Compass/COMPASSREAD.h"
 #include "FailSafe/FAILSAFE.h"
-#include "Common/STRUCTS.h"
+#include "AHRS/AHRS.h"
+#include "PerformanceCalibration/PERFORMACC.h"
 
 SticksClass STICKS;
 
@@ -78,7 +79,7 @@ void SticksClass::Update()
             if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
               ENABLE_STATE(PRIMARY_ARM_DISARM);
-              COMPASS.Simple_Initial = ATTITUDE.AngleOut[YAW];
+              CALIBRATION.Magnetometer.SimpleMode_Initial_Value = ATTITUDE.AngleOut[YAW];
             }
           }
         }
@@ -110,7 +111,7 @@ void SticksClass::Pre_Arm(void)
       else //IMU CALIBRADA?SIM...ARMA OS MOTORES
       {
         ENABLE_STATE(PRIMARY_ARM_DISARM);
-        COMPASS.Simple_Initial = ATTITUDE.AngleOut[YAW];
+        CALIBRATION.Magnetometer.SimpleMode_Initial_Value = ATTITUDE.AngleOut[YAW];
       }
       STICKS.PreArm_Run = false;
       STICKS.PreArm_Run_Count = 0;

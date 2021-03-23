@@ -18,6 +18,8 @@
 #ifndef INS_H_
 #define INS_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern INS_Struct INS;
 class InertialNavigationClass
 {
 public:

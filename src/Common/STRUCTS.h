@@ -27,8 +27,14 @@ typedef struct
   int16_t AccelerometerReadNotFiltered[3];
   int16_t GyroscopeRead[3];
   int16_t GyroscopeReadNotFiltered[3];
-  int16_t CompassRead[3];
   float CalcedGForce;
+
+  struct Compass_Struct
+  {
+    bool Calibrating = false;
+    int16_t Read[3] = {0, 0, 0};
+    float ReadSmooth[3] = {0, 0, 0};
+  } Compass;
 } IMU_Struct;
 
 typedef struct
@@ -58,9 +64,25 @@ typedef struct
 
 typedef struct
 {
-  int16_t AccelerometerZero[3];
-  uint16_t AccelerometerScale[3];
-  int16_t Magnetometer[3];
+  struct Accelerometer_Struct
+  {
+    int16_t Counter = 0;
+    int16_t PositionCount = 0;
+    int16_t OffSet[3] = {0, 0, 0};
+    uint16_t Scale[3] = {0, 0, 0};
+    int32_t Samples[6][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+  } Accelerometer;
+
+  struct Magnetometer_Struct
+  {
+    float Gain[3] = {1.0f, 1.0f, 1.0f};
+    int16_t OffSet[3] = {0, 0, 0};
+    int16_t MinOffSet[3] = {0, 0, 0};
+    int16_t MaxOffSet[3] = {0, 0, 0};
+    int16_t Count = 0;
+    int16_t SimpleMode_Initial_Value = 0;
+  } Magnetometer;
+
 } Calibration_Struct;
 
 struct PID_Terms_Struct
@@ -233,10 +255,50 @@ typedef struct
   float Matrix_JtJ[4][4];
 } Jacobian_Struct;
 
-extern Calibration_Struct CALIBRATION;
-extern IMU_Struct IMU;
-extern INS_Struct INS;
-extern Altitude_Struct ALTITUDE;
-extern Attitude_Struct ATTITUDE;
-extern PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
+typedef struct
+{
+  bool Healthy = false;
+  float RawValue = 0;
+  float OffSetValue = 0;
+  struct AirSpeed_State_Stuct
+  {
+    bool Initialized = false;
+    float Sum = 0;
+    uint16_t Count = 0;
+    uint16_t Read_Count = 0;
+    uint32_t Start_MS = 0;
+  } Calibration;
+} AirSpeed_State_Struct;
+
+typedef struct
+{
+  bool ValidWindEstimated = false;
+  struct Ground_Struct
+  {
+    float Velocity[3] = {0, 0, 0};
+    float VelocityDifference[3] = {0, 0, 0};
+    float VelocitySum[3] = {0, 0, 0};
+    float LastVelocity[3] = {0, 0, 0};
+  } Ground;
+
+  struct Fuselage_Struct
+  {
+    float Direction[3] = {0, 0, 0};
+    float DirectionDifference[3] = {0, 0, 0};
+    float DirectionSum[3] = {0, 0, 0};
+    float LastDirection[3] = {0, 0, 0};
+  } Fuselage;
+
+  struct EarthFrame_Struct
+  {
+    float EstimatedWindVelocity[3] = {0, 0, 0};
+  } Earth_Frame;
+
+  struct Time_Struct
+  {
+    uint32_t Now = 0;
+    uint32_t LastUpdate = 0;
+  } Time;
+} WindEstimator_Struct;
+
 #endif

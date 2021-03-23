@@ -83,6 +83,7 @@ static union
 } Buffer;
 
 bool GPS_3DFIX;
+bool ValidNED = false;
 
 //VERIFICAÇÃO DOS PACOTES DE DADOS
 static uint8_t Check_Packet_A;
@@ -400,6 +401,7 @@ void UBLOX_GetAllGPSData(void)
     GPSVelNED[NORTH] = Buffer.VelocityNED.North;
     GPSVelNED[EAST] = Buffer.VelocityNED.East;
     GPSVelNED[DOWN] = Buffer.VelocityNED.Down;
+    ValidNED = true;
     break;
   }
 }

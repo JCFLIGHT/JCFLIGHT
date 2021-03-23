@@ -21,16 +21,9 @@
 class CompassReadClass
 {
 public:
-  bool Calibrating;
   uint8_t Type;
   uint8_t Address;
   uint8_t Register;
-  float MagnetometerRead[3];
-  float MagnetometerGain[3] = {1.0f, 1.0f, 1.0f};
-  int16_t MagCalibrationMinVector[3];
-  int16_t MagCalibrationMaxVector[3];
-  int16_t CalibrationCount = 0;
-  int16_t Simple_Initial;
   void Initialization();
   void Constant_Read();
   void UpdateCompassCalibration();

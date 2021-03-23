@@ -28,6 +28,10 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "PID/RCPID.h"
 #include "FlightModes/FLIGHTMODES.h"
+#include "InertialNavigation/INS.h"
+#include "PID/PIDPARAMS.h"
+
+Altitude_Struct ALTITUDE;
 
 bool TakeOffInProgress = false;
 bool GroundAltitudeSet = false;

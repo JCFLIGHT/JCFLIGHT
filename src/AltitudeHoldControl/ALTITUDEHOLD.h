@@ -18,6 +18,8 @@
 #ifndef ALTITUDEHOLD_H_
 #define ALTITUDEHOLD_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern Altitude_Struct ALTITUDE;
 void AltitudeHold_Update_Params();
 bool ApplyAltitudeHoldControl();
 void SetAltitudeToHold(int32_t ValueOfNewAltitudeHold);

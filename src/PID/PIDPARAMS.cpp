@@ -21,7 +21,8 @@
 #include "BAR/BAR.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/ENUM.h"
-#include "Common/STRUCTS.h"
+
+PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
 
 uint8_t PreviousFrameType = 0;
 

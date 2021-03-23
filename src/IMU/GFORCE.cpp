@@ -22,6 +22,7 @@
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Build/BOARDDEFS.h"
+#include "IMU/ACCGYROREAD.h"
 #include "FastSerial/PRINTF.h"
 
 PT1_Filter_Struct GForce_Smooth;

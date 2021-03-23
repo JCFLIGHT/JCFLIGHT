@@ -23,7 +23,7 @@
 #include "CHECK2D.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/RCDEFINES.h"
-#include "Common/STRUCTS.h"
+#include "AHRS/AHRS.h"
 #include "FastSerial/PRINTF.h"
 
 #ifdef __AVR_ATmega2560__

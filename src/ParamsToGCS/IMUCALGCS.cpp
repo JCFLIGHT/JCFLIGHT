@@ -18,6 +18,7 @@
 #include "IMUCALGCS.h"
 #include "Common/STRUCTS.h"
 #include "Math/MATHSUPPORT.h"
+#include "PerformanceCalibration/PERFORMACC.h"
 
 bool AccCalibratedPosition[6];
 
@@ -50,12 +51,12 @@ uint8_t GetImageToGCS(void)
   static const uint8_t ImageBitMap[6] = {0, 1, 2, 3, 4, 5};
   uint8_t FlagCheck = 0;
 
-  if (CALIBRATION.AccelerometerZero[ROLL] != 0 &&
-      CALIBRATION.AccelerometerZero[PITCH] != 0 &&
-      CALIBRATION.AccelerometerZero[YAW] != 0 &&
-      CALIBRATION.AccelerometerScale[ROLL] != 0 &&
-      CALIBRATION.AccelerometerScale[PITCH] != 0 &&
-      CALIBRATION.AccelerometerScale[YAW] != 0)
+  if (CALIBRATION.Accelerometer.OffSet[ROLL] != 0 &&
+      CALIBRATION.Accelerometer.OffSet[PITCH] != 0 &&
+      CALIBRATION.Accelerometer.OffSet[YAW] != 0 &&
+      CALIBRATION.Accelerometer.Scale[ROLL] != 0 &&
+      CALIBRATION.Accelerometer.Scale[PITCH] != 0 &&
+      CALIBRATION.Accelerometer.Scale[YAW] != 0)
   {
     return 0x3F;
   }

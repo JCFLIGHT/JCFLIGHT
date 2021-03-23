@@ -25,6 +25,7 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "PerformanceCalibration/PERFORMACC.h"
 #include "RadioControl/STICKS.h"
+#include "IMU/ACCGYROREAD.h"
 
 LEDRGB RGB;
 
@@ -50,7 +51,7 @@ void LEDRGB::Initialization()
 
 void LEDRGB::Update()
 {
-  if (!AccCalibrationRunning() && !GCS.ConfigFlight && !COMPASS.Calibrating && !STICKS.PreArm_Run)
+  if (!AccCalibrationRunning() && !GCS.ConfigFlight && !IMU.Compass.Calibrating && !STICKS.PreArm_Run)
   {
     RGB.Function(CALL_LED_GPS);
   }

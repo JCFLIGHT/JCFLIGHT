@@ -41,6 +41,8 @@
 #include "AHRS/AHRS.h"
 #include "AHRS/QUATERNION.h"
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
+#include "IMU/ACCGYROREAD.h"
+#include "PID/PIDPARAMS.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

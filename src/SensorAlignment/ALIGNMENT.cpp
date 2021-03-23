@@ -33,17 +33,17 @@ int16_t RollDeciDegrees = 0;
 int16_t PitchDeciDegrees = 0;
 int16_t YawDeciDegrees = 0;
 
-static inline Vector3x3_Struct *MatrixRotationToVector(Vector3x3_Struct *Result, const Vector3x3_Struct *VectorPointer, const Matrix3x3_Struct *RotationMath)
+static inline Vector3x3_Struct *MatrixRotationToVector(Vector3x3_Struct *Result, const Vector3x3_Struct *VectorPointer, const Matrix3x3_Struct *RotationMatrix)
 {
     Vector3x3_Struct CalcedResult;
-    CalcedResult.Roll = RotationMath->Matrix3x3[0][0] * VectorPointer->Roll + RotationMath->Matrix3x3[1][0] * VectorPointer->Pitch + RotationMath->Matrix3x3[2][0] * VectorPointer->Yaw;
-    CalcedResult.Pitch = RotationMath->Matrix3x3[0][1] * VectorPointer->Roll + RotationMath->Matrix3x3[1][1] * VectorPointer->Pitch + RotationMath->Matrix3x3[2][1] * VectorPointer->Yaw;
-    CalcedResult.Yaw = RotationMath->Matrix3x3[0][2] * VectorPointer->Roll + RotationMath->Matrix3x3[1][2] * VectorPointer->Pitch + RotationMath->Matrix3x3[2][2] * VectorPointer->Yaw;
+    CalcedResult.Roll = RotationMatrix->Matrix3x3[0][0] * VectorPointer->Roll + RotationMatrix->Matrix3x3[1][0] * VectorPointer->Pitch + RotationMatrix->Matrix3x3[2][0] * VectorPointer->Yaw;
+    CalcedResult.Pitch = RotationMatrix->Matrix3x3[0][1] * VectorPointer->Roll + RotationMatrix->Matrix3x3[1][1] * VectorPointer->Pitch + RotationMatrix->Matrix3x3[2][1] * VectorPointer->Yaw;
+    CalcedResult.Yaw = RotationMatrix->Matrix3x3[0][2] * VectorPointer->Roll + RotationMatrix->Matrix3x3[1][2] * VectorPointer->Pitch + RotationMatrix->Matrix3x3[2][2] * VectorPointer->Yaw;
     *Result = CalcedResult;
     return Result;
 }
 
-void RotationMatrixFromAngles(Matrix3x3_Struct *RotationMath, const Union_Angles_Struct *Angles)
+void RotationMatrixFromAngles(Matrix3x3_Struct *RotationMatrix, const Union_Angles_Struct *Angles)
 {
     float CosX;
     float SinX;
@@ -68,15 +68,15 @@ void RotationMatrixFromAngles(Matrix3x3_Struct *RotationMath, const Union_Angles
     CosZSinX = SinX * CosZ;
     SinZSinX = SinX * SinZ;
 
-    RotationMath->Matrix3x3[0][0] = CosZ * CosY;
-    RotationMath->Matrix3x3[0][1] = -CosY * SinZ;
-    RotationMath->Matrix3x3[0][2] = SinY;
-    RotationMath->Matrix3x3[1][0] = SinZCosX + (CosZSinX * SinY);
-    RotationMath->Matrix3x3[1][1] = CosZCosX - (SinZSinX * SinY);
-    RotationMath->Matrix3x3[1][2] = -SinX * CosY;
-    RotationMath->Matrix3x3[2][0] = (SinZSinX) - (CosZCosX * SinY);
-    RotationMath->Matrix3x3[2][1] = (CosZSinX) + (SinZCosX * SinY);
-    RotationMath->Matrix3x3[2][2] = CosY * CosX;
+    RotationMatrix->Matrix3x3[0][0] = CosZ * CosY;
+    RotationMatrix->Matrix3x3[0][1] = -CosY * SinZ;
+    RotationMatrix->Matrix3x3[0][2] = SinY;
+    RotationMatrix->Matrix3x3[1][0] = SinZCosX + (CosZSinX * SinY);
+    RotationMatrix->Matrix3x3[1][1] = CosZCosX - (SinZSinX * SinY);
+    RotationMatrix->Matrix3x3[1][2] = -SinX * CosY;
+    RotationMatrix->Matrix3x3[2][0] = (SinZSinX) - (CosZCosX * SinY);
+    RotationMatrix->Matrix3x3[2][1] = (CosZSinX) + (SinZCosX * SinY);
+    RotationMatrix->Matrix3x3[2][2] = CosY * CosX;
 }
 
 static bool CheckValidSensorAlignment()

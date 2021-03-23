@@ -21,6 +21,7 @@
 #include "Common/STRUCTS.h"
 #include "Common/ENUM.h"
 #include "GPS/DJINAZAGPS.h"
+#include "IMU/ACCGYROREAD.h"
 
 ClassCompassOrientation COMPASSORIENTATION;
 
@@ -32,9 +33,9 @@ void ClassCompassOrientation::SetOrientation(uint8_t _CompassType)
 
     case COMPASS_AK8975:
         //ORIENTAÇÃO PARA O COMPASS AK8975
-        IMU.CompassRead[ROLL] = (BufferData[1] << 8) | BufferData[0];
-        IMU.CompassRead[PITCH] = (BufferData[3] << 8) | BufferData[2];
-        IMU.CompassRead[YAW] = (BufferData[5] << 8) | BufferData[4];
+        IMU.Compass.Read[ROLL] = (BufferData[1] << 8) | BufferData[0];
+        IMU.Compass.Read[PITCH] = (BufferData[3] << 8) | BufferData[2];
+        IMU.Compass.Read[YAW] = (BufferData[5] << 8) | BufferData[4];
         break;
 
         //POR ENQUANTO A JCFLIGHT IRÁ FUNCIONAR APENAS COM O HMC5883
@@ -44,29 +45,29 @@ void ClassCompassOrientation::SetOrientation(uint8_t _CompassType)
     case COMPASS_HMC5883:
         /*
         //ORIENTAÇÃO PARA O COMPASS HMC5843
-        IMU.CompassRead[ROLL] = (BufferData[0] << 8) | BufferData[1];
-        IMU.CompassRead[PITCH] = (BufferData[2] << 8) | BufferData[3];
-        IMU.CompassRead[YAW] = (BufferData[4] << 8) | BufferData[5];
+        IMU.Compass.Read[ROLL] = (BufferData[0] << 8) | BufferData[1];
+        IMU.Compass.Read[PITCH] = (BufferData[2] << 8) | BufferData[3];
+        IMU.Compass.Read[YAW] = (BufferData[4] << 8) | BufferData[5];
 */
 
         //ORIENTAÇÃO PARA O COMPASS HMC5883
-        IMU.CompassRead[ROLL] = (BufferData[0] << 8) | BufferData[1];
-        IMU.CompassRead[PITCH] = (BufferData[4] << 8) | BufferData[5];
-        IMU.CompassRead[YAW] = (BufferData[2] << 8) | BufferData[3];
+        IMU.Compass.Read[ROLL] = (BufferData[0] << 8) | BufferData[1];
+        IMU.Compass.Read[PITCH] = (BufferData[4] << 8) | BufferData[5];
+        IMU.Compass.Read[YAW] = (BufferData[2] << 8) | BufferData[3];
         break;
 
     case COMPASS_QMC5883:
         //ORIENTAÇÃO PARA O COMPASS QMC5883
-        IMU.CompassRead[ROLL] = (BufferData[1] << 8) | BufferData[0];
-        IMU.CompassRead[PITCH] = (BufferData[3] << 8) | BufferData[2];
-        IMU.CompassRead[YAW] = (BufferData[5] << 8) | BufferData[4];
+        IMU.Compass.Read[ROLL] = (BufferData[1] << 8) | BufferData[0];
+        IMU.Compass.Read[PITCH] = (BufferData[3] << 8) | BufferData[2];
+        IMU.Compass.Read[YAW] = (BufferData[5] << 8) | BufferData[4];
         break;
 
     case COMPASS_DJI_NAZA:
         //ORIENTAÇÃO PARA O COMPASS DO GPS DA NAZA
-        IMU.CompassRead[ROLL] = DJINaza_Compass_Roll;
-        IMU.CompassRead[PITCH] = DJINaza_Compass_Pitch;
-        IMU.CompassRead[YAW] = DJINaza_Compass_Yaw;
+        IMU.Compass.Read[ROLL] = DJINaza_Compass_Roll;
+        IMU.Compass.Read[PITCH] = DJINaza_Compass_Pitch;
+        IMU.Compass.Read[YAW] = DJINaza_Compass_Yaw;
         break;
     }
 }

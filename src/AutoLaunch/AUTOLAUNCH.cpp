@@ -25,6 +25,7 @@
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "PID/RCPID.h"
+#include "AltitudeHoldControl/ALTITUDEHOLD.h"
 
 AutoLaunchClass AUTOLAUNCH;
 

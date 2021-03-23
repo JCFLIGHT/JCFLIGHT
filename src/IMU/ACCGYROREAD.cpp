@@ -33,6 +33,8 @@
 
 FILE_COMPILE_FOR_SPEED
 
+IMU_Struct IMU;
+
 //INSTANCIAS PARA O LPF
 static BiquadFilter_Struct BiquadAccLPF[3];
 static BiquadFilter_Struct BiquadGyroLPF[3];

@@ -27,6 +27,7 @@
 
 AirSpeedClass AIRSPEED;
 
+AirSpeed_State_Struct AirSpeed_State;
 PT1_Filter_Struct Pitot_Smooth;
 
 #define AIR_DENSITY_SEA_LEVEL_15C 1.225f //DENSIDADE DO AR ACIMA DO NIVEL DO MAR COM A TEMPERATURA DE 15 GRAUS °C

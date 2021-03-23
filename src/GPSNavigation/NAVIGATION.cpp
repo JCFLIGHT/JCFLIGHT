@@ -31,6 +31,8 @@
 #include "Yaw/HEADINGHOLD.h"
 #include "GPS/GPSUBLOX.h"
 #include "FlightModes/FLIGHTMODES.h"
+#include "InertialNavigation/INS.h"
+#include "AHRS/AHRS.h"
 
 #define NAVTILTCOMPENSATION 20 //RETIRADO DA ARDUPILOT
 
@@ -80,6 +82,7 @@ void GPS_Process_FlightModes(float DeltaTime)
   //SAIA DA FUNÇÃO SE O GPS ESTIVER RUIM
   if (Get_GPS_In_Bad_Condition())
   {
+    ValidNED = false;
     return;
   }
   //SAFE PARA RESETAR O HOME-POINT

@@ -24,7 +24,7 @@
 #include "PID/RCPID.h"
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
-#include "Common/STRUCTS.h"
+#include "PID/PIDPARAMS.h"
 #include "GenericPI/GENERICPI.h"
 
 TecsClass TECS;

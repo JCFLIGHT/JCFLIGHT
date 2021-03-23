@@ -19,9 +19,12 @@
 #define AHRS_H_
 #include "Build/LIBDEPENDENCIES.h"
 #include "VECTOR.h"
+#include "Common/STRUCTS.h"
+extern Attitude_Struct ATTITUDE;
 extern Struct_Vector3x3 BodyFrameAcceleration;
 extern Struct_Vector3x3 BodyFrameRotation;
 extern Quaternion_Struct Orientation;
+extern float RotationMatrix[3][3];
 class AHRSClass
 {
 public:

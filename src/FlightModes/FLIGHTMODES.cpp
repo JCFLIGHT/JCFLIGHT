@@ -30,7 +30,7 @@
 #include "GPS/GPSUBLOX.h"
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
-#include "Common/STRUCTS.h"
+#include "AHRS/AHRS.h"
 
 bool Do_AltitudeHold_Mode;
 bool Do_GPS_Altitude;

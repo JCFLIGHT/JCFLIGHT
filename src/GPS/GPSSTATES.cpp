@@ -62,13 +62,15 @@ bool Get_GPS_In_Eight_Or_Plus_Satellites()
 bool Get_GPS_Type(uint8_t GPS_Type)
 {
     static uint8_t Get_GPS_Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
-    if (Get_GPS_Type == GPS_UBLOX && GPS_Type == GPS_UBLOX)
-    {
-        return true;
-    }
-    else if (Get_GPS_Type == GPS_DJI_NAZA && GPS_Type == GPS_DJI_NAZA)
+    if ((Get_GPS_Type == GPS_UBLOX && GPS_Type == GPS_UBLOX) ||
+        (Get_GPS_Type == GPS_DJI_NAZA && GPS_Type == GPS_DJI_NAZA))
     {
         return true;
     }
     return false;
+}
+
+bool GPS_Heading_Is_Valid()
+{
+    return GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300;
 }

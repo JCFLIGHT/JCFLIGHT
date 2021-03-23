@@ -26,20 +26,6 @@ public:
   void Update();
 
 private:
-  struct AirSpeed_State_Struct
-  {
-    bool Healthy;
-    float RawValue;
-    float OffSetValue;
-    struct
-    {
-      bool Initialized;
-      float Sum;
-      uint16_t Count;
-      uint16_t Read_Count;
-      uint32_t Start_MS;
-    } Calibration;
-  } AirSpeed_State;
   bool Calibrate();
   float Get_Raw_Pressure();
   void Get_Bernoulli_IAS_Pressure(float &Pressure);

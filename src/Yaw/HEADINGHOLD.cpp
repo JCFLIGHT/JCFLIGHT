@@ -25,6 +25,7 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "PID/RCPID.h"
 #include "FlightModes/FLIGHTMODES.h"
+#include "PID/PIDPARAMS.h"
 #include "FastSerial/PRINTF.h"
 
 //DEBUG

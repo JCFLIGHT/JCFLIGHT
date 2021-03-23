@@ -20,6 +20,7 @@
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
 #include "Common/STRUCTS.h"
+#include "AltitudeHoldControl/ALTITUDEHOLD.h"
 
 #define BARO_SPIKES_SIZE 0x15
 

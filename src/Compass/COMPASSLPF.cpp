@@ -19,6 +19,7 @@
 #include "BitArray/BITARRAY.h"
 #include "Common/ENUM.h"
 #include "Common/STRUCTS.h"
+#include "IMU/ACCGYROREAD.h"
 
 CompassLPFClass COMPASSLPF;
 
@@ -27,8 +28,8 @@ void CompassLPFClass::ApplyFilter()
     //APLICA O LPF NO COMPASS PARA EVITAR SPIKES DURANTE A CALIBRAÇÃO DO COMPASS
     if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
-        COMPASS.MagnetometerRead[ROLL] = COMPASS.MagnetometerRead[ROLL] * 0.9f + IMU.CompassRead[ROLL] * 0.1f;
-        COMPASS.MagnetometerRead[PITCH] = COMPASS.MagnetometerRead[PITCH] * 0.9f + IMU.CompassRead[PITCH] * 0.1f;
-        COMPASS.MagnetometerRead[YAW] = COMPASS.MagnetometerRead[YAW] * 0.9f + IMU.CompassRead[YAW] * 0.1f;
+        IMU.Compass.ReadSmooth[ROLL] = IMU.Compass.ReadSmooth[ROLL] * 0.9f + IMU.Compass.Read[ROLL] * 0.1f;
+        IMU.Compass.ReadSmooth[PITCH] = IMU.Compass.ReadSmooth[PITCH] * 0.9f + IMU.Compass.Read[PITCH] * 0.1f;
+        IMU.Compass.ReadSmooth[YAW] = IMU.Compass.ReadSmooth[YAW] * 0.9f + IMU.Compass.Read[YAW] * 0.1f;
     }
 }

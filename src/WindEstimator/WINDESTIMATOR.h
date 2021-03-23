@@ -15,11 +15,12 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "STRUCTS.h"
-
-IMU_Struct IMU;
-INS_Struct INS;
-Altitude_Struct ALTITUDE;
-Attitude_Struct ATTITUDE;
-Calibration_Struct CALIBRATION;
-PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
+#ifndef WINDESTIMATOR_H_
+#define WINDESTIMATOR_H_
+#include "Build/LIBDEPENDENCIES.h"
+class WindEstimatorClass
+{
+public:
+};
+extern WindEstimatorClass WINDESTIMATOR;
+#endif

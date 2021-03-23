@@ -19,6 +19,7 @@
 #include "Filters/LPFACCEF.h"
 #include "Math/MATHSUPPORT.h"
 #include "Common/STRUCTS.h"
+#include "InertialNavigation/INS.h"
 #include "FastSerial/PRINTF.h"
 
 #ifndef __AVR_ATmega2560__

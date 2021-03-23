@@ -18,6 +18,8 @@
 #ifndef PIDPARAMS_H_
 #define PIDPARAMS_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
 void LoadPID();
 void UpdateValuesOfPID();
 #endif

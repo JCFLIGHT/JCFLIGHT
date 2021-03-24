@@ -26,6 +26,8 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "PID/RCPID.h"
 #include "Barometer/BAROBACKEND.h"
+#include "GPS/GPSUBLOX.h"
+#include "GPS/GPSSTATES.h"
 
 AutoLaunchClass AUTOLAUNCH;
 
@@ -74,10 +76,16 @@ const bool AutoLaunchClass::GetSwingVelocityState()
   return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (GetPitchAccelerationInMSS() > 0);
 }
 
+const bool AutoLaunchClass::GetForwardState()
+{
+  return GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH);
+}
+
 void AutoLaunchClass::AutoLaunchDetector()
 {
   if (AUTOLAUNCH.GetIMUAngleBanked(GetPitchAccelerationInMSS(), AHRS.CheckAnglesInclination(AHRS_BANKED_ANGLE)) ||
-      AUTOLAUNCH.GetSwingVelocityState())
+      AUTOLAUNCH.GetSwingVelocityState() ||
+      AUTOLAUNCH.GetForwardState())
   {
     AutoLaunchDetectorSum += (SCHEDULERTIME.GetMillis() - AutoLaunchDetectorPreviousTime);
     AutoLaunchDetectorPreviousTime = SCHEDULERTIME.GetMillis();

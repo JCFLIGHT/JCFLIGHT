@@ -25,6 +25,7 @@ public:
 
 private:
   const bool GetSwingVelocityState();
+  const bool GetForwardState();
   void AutoLaunchDetector();
   void RCControllerThrottle_Apply_Logic(bool SlowThr);
   int16_t CalculeControllToPitch(float AngleInDegrees, int16_t InclinationMaxOfStabilize);

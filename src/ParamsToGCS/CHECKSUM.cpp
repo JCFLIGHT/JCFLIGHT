@@ -22,6 +22,7 @@
 #include "BAR/BAR.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "AirPlane/AIRPLANE.h"
+#include "ServosMaster/SERVOSMASTER.h"
 #include "RadioControl/RCCONFIG.h"
 #include "Build/GCC.h"
 
@@ -47,16 +48,16 @@ void CheckSumClass::UpdateServosReverse()
     uint8_t ServosReverse = STORAGEMANAGER.Read_8Bits(SERVOS_REVERSE_ADDR);
 
     //ASA
-    AIR_PLANE.ServoDirection[SERVO1] = GET_SERVO_DIRECTION(ServosReverse & 1);
+    Servo.Direction.GetAndSet[SERVO1] = GET_SERVO_DIRECTION(ServosReverse & 1);
 
     //ASA
-    AIR_PLANE.ServoDirection[SERVO2] = GET_SERVO_DIRECTION(ServosReverse & 2);
+    Servo.Direction.GetAndSet[SERVO2] = GET_SERVO_DIRECTION(ServosReverse & 2);
 
     //LEME
-    AIR_PLANE.ServoDirection[SERVO3] = GET_SERVO_DIRECTION(ServosReverse & 4);
+    Servo.Direction.GetAndSet[SERVO3] = GET_SERVO_DIRECTION(ServosReverse & 4);
 
     //PROFUNDOR
-    AIR_PLANE.ServoDirection[SERVO4] = GET_SERVO_DIRECTION(ServosReverse & 8);
+    Servo.Direction.GetAndSet[SERVO4] = GET_SERVO_DIRECTION(ServosReverse & 8);
 }
 
 void CheckSumClass::UpdateChannelsReverse()

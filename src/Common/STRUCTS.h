@@ -347,4 +347,36 @@ typedef struct
   } Time;
 } WindEstimator_Struct;
 
+typedef struct
+{
+  struct Pulse_Struct
+  {
+    int16_t Min[4] = {0, 0, 0, 0};
+    int16_t Middle[4] = {0, 0, 0, 0};
+    int16_t Max[4] = {0, 0, 0, 0};
+  } Pulse;
+
+  struct Direction_Struct
+  {
+    int8_t GetAndSet[4] = {1, 1, 1, 1};
+  } Direction;
+
+  struct Rate_Struct
+  {
+    int8_t GetAndSet[4] = {0, 0, 0, 0};
+  } Rate;
+
+  struct Filter_Struct
+  {
+    int16_t CutOff = 0;
+  } Filter;
+
+  struct Signal_Struct
+  {
+    int16_t UnFiltered[4] = {0, 0, 0, 0};
+    int16_t Filtered[4] = {0, 0, 0, 0};
+  } Signal;
+
+} Servo_Struct;
+
 #endif

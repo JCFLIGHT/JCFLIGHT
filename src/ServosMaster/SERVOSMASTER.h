@@ -18,6 +18,8 @@
 #ifndef SERVOSMASTER_H_
 #define SERVOSMASTER_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern Servo_Struct Servo;
 class ServosMasterClass
 {
 public:

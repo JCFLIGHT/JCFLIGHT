@@ -28,14 +28,6 @@
 class AirPlaneClass
 {
 public:
-  int8_t ServoDirection[MAX_SUPPORTED_SERVOS] = {1, 1, 1, 1};
-  int8_t ServoRate[MAX_SUPPORTED_SERVOS];
-  int16_t ServoMin[MAX_SUPPORTED_SERVOS];
-  int16_t ServoMiddle[MAX_SUPPORTED_SERVOS];
-  int16_t ServoMax[MAX_SUPPORTED_SERVOS];
-  int16_t Servo_LPF_CutOff;
-  int16_t ServoToFilter[MAX_SUPPORTED_SERVOS];
-  int16_t ServosFiltered[MAX_SUPPORTED_SERVOS];
   void Mode_ConventionalPlane_Run();
   void Mode_FixedWing_Run();
   void Mode_PlaneVTail_Run();

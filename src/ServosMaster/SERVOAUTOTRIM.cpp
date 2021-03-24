@@ -26,6 +26,7 @@
 #include "BitArray/BITARRAY.h"
 #include "SERVOSMASTER.h"
 #include "AirPlane/AIRPLANE.h"
+#include "ServosMaster/SERVOSMASTER.h"
 
 #define SERVO_AUTOTRIM_OVERFLOW 2000
 #define SAVE_OVERFLOW 2500
@@ -43,10 +44,10 @@ uint32_t SavePreviuosTime;
 
 void ServosSaveAndUpdateMiddlePoint(void)
 {
-    SAVE_SERVO_MIDDLE(SERVO1_MID_ADDR, AIR_PLANE.ServoMiddle[SERVO1]);
-    SAVE_SERVO_MIDDLE(SERVO2_MID_ADDR, AIR_PLANE.ServoMiddle[SERVO2]);
-    SAVE_SERVO_MIDDLE(SERVO3_MID_ADDR, AIR_PLANE.ServoMiddle[SERVO3]);
-    SAVE_SERVO_MIDDLE(SERVO4_MID_ADDR, AIR_PLANE.ServoMiddle[SERVO4]);
+    SAVE_SERVO_MIDDLE(SERVO1_MID_ADDR, Servo.Pulse.Middle[SERVO1]);
+    SAVE_SERVO_MIDDLE(SERVO2_MID_ADDR, Servo.Pulse.Middle[SERVO2]);
+    SAVE_SERVO_MIDDLE(SERVO3_MID_ADDR, Servo.Pulse.Middle[SERVO3]);
+    SAVE_SERVO_MIDDLE(SERVO4_MID_ADDR, Servo.Pulse.Middle[SERVO4]);
     SERVOSMASTER.UpdateMiddlePoint();
 }
 
@@ -68,7 +69,7 @@ void ServoAutoTrimRun(void)
             {
                 for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
                 {
-                    ServoMiddleBackup[ServoIndex] = AIR_PLANE.ServoMiddle[ServoIndex];
+                    ServoMiddleBackup[ServoIndex] = Servo.Pulse.Middle[ServoIndex];
                     ServoMiddleAccum[ServoIndex] = 0;
                 }
 
@@ -95,7 +96,7 @@ void ServoAutoTrimRun(void)
                 {
                     for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
                     {
-                        AIR_PLANE.ServoMiddle[ServoIndex] = ServoMiddleAccum[ServoIndex] / ServoMiddleAccumCount;
+                        Servo.Pulse.Middle[ServoIndex] = ServoMiddleAccum[ServoIndex] / ServoMiddleAccumCount;
                     }
                     ServoAutoTrimState = SERVO_AUTOTRIM_SAVE_PENDING;
                     PIDXYZ.Reset_Integral_Accumulators();
@@ -133,7 +134,7 @@ void ServoAutoTrimRun(void)
         {
             for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
             {
-                AIR_PLANE.ServoMiddle[ServoIndex] = ServoMiddleBackup[ServoIndex];
+                Servo.Pulse.Middle[ServoIndex] = ServoMiddleBackup[ServoIndex];
             }
         }
         ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;

@@ -23,7 +23,6 @@ extern AirSpeed_Struct AirSpeed;
 class AirSpeedClass
 {
 public:
-  uint16_t CalcedInCM;
   void Initialization();
   void Update();
 

@@ -125,5 +125,5 @@ void AirSpeedClass::Update()
   AirSpeed.Raw.IASPressure = 0;
   AIRSPEED.Get_Bernoulli_IAS_Pressure(AirSpeed.Raw.IASPressure);
 
-  AIRSPEED.CalcedInCM = AirSpeed.Raw.IASPressure * 100; //EM CM/S
+  AirSpeed.Raw.IASPressureInCM = AirSpeed.Raw.IASPressure * 100; //EM CM/S
 }

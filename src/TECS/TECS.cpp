@@ -49,13 +49,13 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
     {
         if (IS_FLIGHT_MODE_ACTIVE_ONCE(AUTO_THROTTLE_MODE))
         {
-            PreviousValueOfAirSpeed = ConvertCentimeterPerSecondsToKmPerHour(AIRSPEED.CalcedInCM);
+            PreviousValueOfAirSpeed = ConvertCentimeterPerSecondsToKmPerHour(AirSpeed.Raw.IASPressureInCM);
         }
     }
 
     if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) && (RCController[THROTTLE] > 1200))
     {
-        int16_t CalculateError = PreviousValueOfAirSpeed - ConvertCentimeterPerSecondsToKmPerHour(AIRSPEED.CalcedInCM);
+        int16_t CalculateError = PreviousValueOfAirSpeed - ConvertCentimeterPerSecondsToKmPerHour(AirSpeed.Raw.IASPressureInCM);
         int16_t CalculateProportional = (CalculateError * GET_SET[PID_ALTITUDE].ProportionalVector >> 3);
         CalculateIntegral += (CalculateError * GET_SET[PID_ALTITUDE].IntegralVector >> 5);
         CalculateIntegral = Constrain_16Bits(CalculateIntegral, -24000, 24000);

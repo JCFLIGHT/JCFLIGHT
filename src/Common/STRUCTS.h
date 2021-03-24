@@ -302,6 +302,7 @@ typedef struct
   {
     float Pressure = 0;
     float IASPressure = 0;
+    uint16_t IASPressureInCM = 0;
   } Raw;
 
   struct Calibration_Stuct

@@ -61,11 +61,39 @@ typedef struct
 
 typedef struct
 {
-  int32_t RealBaroAltitude;
-  int32_t EstimatedAltitude;
-  int16_t EstimatedVariometer;
-  int32_t GroundAltitude;
-} Altitude_Struct;
+  struct Calibration_Struct
+  {
+    float GroundPressure = 0;
+    float GroundTemperature = 0;
+  } Calibration;
+
+  struct Raw_Struct
+  {
+    int16_t Temperature = 0;
+    int32_t Pressure = 0;
+    int32_t PressureFiltered = 0;
+  } Raw;
+
+  struct Altitude_Struct
+  {
+    int32_t Actual = 0;
+    int32_t GroundOffSet = 0;
+  } Altitude;
+
+  struct INS_Struct
+  {
+    struct Velocity_Struct
+    {
+      int16_t Vertical = 0;
+    } Velocity;
+
+    struct Altitude_Struct
+    {
+      int32_t Estimated = 0;
+    } Altitude;
+  } INS;
+
+} Barometer_Struct;
 
 typedef struct
 {
@@ -269,17 +297,23 @@ typedef struct
 typedef struct
 {
   bool Healthy = false;
-  float RawValue = 0;
-  float OffSetValue = 0;
-  struct AirSpeed_State_Stuct
+
+  struct Raw_Stuct
+  {
+    float Pressure = 0;
+    float IASPressure = 0;
+  } Raw;
+
+  struct Calibration_Stuct
   {
     bool Initialized = false;
+    float OffSet = 0;
     float Sum = 0;
     uint16_t Count = 0;
     uint16_t Read_Count = 0;
     uint32_t Start_MS = 0;
   } Calibration;
-} AirSpeed_State_Struct;
+} AirSpeed_Struct;
 
 typedef struct
 {
@@ -303,7 +337,7 @@ typedef struct
   struct EarthFrame_Struct
   {
     float EstimatedWindVelocity[3] = {0, 0, 0};
-  } Earth_Frame;
+  } EarthFrame;
 
   struct Time_Struct
   {

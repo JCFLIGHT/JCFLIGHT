@@ -21,48 +21,53 @@
 #include "BMP280.h"
 #include "I2C/I2C.h"
 
+Barometer_Struct Barometer;
+
 uint8_t BaroType = 0; //DETECTA O BARÔMETRO AUTOMATICAMENTE
 
 void SetBaroType(uint8_t _BaroType)
 {
-    if (_BaroType == ADDRESS_BAROMETER_MS5611)
+    switch (_BaroType)
     {
+    case ADDRESS_BAROMETER_MS5611:
         BaroType = BAROMETER_MS5611;
-        return;
-    }
-    if (_BaroType == ADDRESS_BAROMETER_BMP280)
-    {
+        break;
+
+    case ADDRESS_BAROMETER_BMP280:
         BaroType = BAROMETER_BMP280;
-        return;
+        break;
     }
 }
 
 void Baro_Initialization()
 {
-    if (BaroType == BAROMETER_MS5611)
+    switch (BaroType)
     {
+    case BAROMETER_MS5611:
         MS5611_Initialization();
-        return;
-    }
-    if (BaroType == BAROMETER_BMP280)
-    {
+        break;
+
+    case BAROMETER_BMP280:
         BMP280_Initialization();
-        return;
+        break;
     }
 }
 
 void Barometer_Update()
 {
     if (!I2C.BarometerFound)
-        return;
-    if (BaroType == BAROMETER_MS5611)
     {
-        MS5611_Update();
         return;
     }
-    if (BaroType == BAROMETER_BMP280)
+
+    switch (BaroType)
     {
+    case BAROMETER_MS5611:
+        MS5611_Update();
+        break;
+
+    case BAROMETER_BMP280:
         BMP280_Update();
-        return;
+        break;
     }
 }

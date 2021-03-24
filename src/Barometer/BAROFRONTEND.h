@@ -15,12 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef BAROBACKEND_H_
-#define BAROBACKEND_H_
-#include "Build/LIBDEPENDENCIES.h"
-#include "Common/STRUCTS.h"
-extern Barometer_Struct Barometer;
-void SetBaroType(uint8_t _BaroType);
-void Baro_Initialization();
-void Barometer_Update();
+#ifndef BAROFRONTEND_H_
+#define BAROFRONTEND_H_
+#include "inttypes.h"
+int32_t Get_EAS2TAS(void);
 #endif

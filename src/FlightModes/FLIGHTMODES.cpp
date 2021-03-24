@@ -31,6 +31,7 @@
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
 #include "AHRS/AHRS.h"
+#include "Barometer/BAROBACKEND.h"
 
 bool Do_AltitudeHold_Mode;
 bool Do_GPS_Altitude;
@@ -142,7 +143,7 @@ void ProcessFlightModesToMultirotor()
       {
         if (Do_GPS_Altitude)
         {
-          SetAltitudeToHold(ALTITUDE.EstimatedAltitude);
+          SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
         }
         GPS_Flight_Mode = GPS_MODE_NONE;
       }

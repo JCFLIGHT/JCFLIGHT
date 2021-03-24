@@ -18,6 +18,8 @@
 #ifndef AIRSPEED_H_
 #define AIRSPEED_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern AirSpeed_Struct AirSpeed;
 class AirSpeedClass
 {
 public:

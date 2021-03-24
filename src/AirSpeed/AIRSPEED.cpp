@@ -27,7 +27,7 @@
 
 AirSpeedClass AIRSPEED;
 
-AirSpeed_State_Struct AirSpeed_State;
+AirSpeed_Struct AirSpeed;
 PT1_Filter_Struct Pitot_Smooth;
 
 #define AIR_DENSITY_SEA_LEVEL_15C 1.225f //DENSIDADE DO AR ACIMA DO NIVEL DO MAR COM A TEMPERATURA DE 15 GRAUS °C
@@ -42,40 +42,40 @@ void AirSpeedClass::Initialization()
     return;
   }
 
-  AirSpeed_State.Healthy = true;
+  AirSpeed.Healthy = true;
 
   PT1FilterInit(&Pitot_Smooth, PITOT_LPF_CUTOFF, 1000.0f * 1e-6f);
 }
 
 bool AirSpeedClass::Calibrate()
 {
-  if (!AirSpeed_State.Calibration.Initialized)
+  if (!AirSpeed.Calibration.Initialized)
   {
-    AirSpeed_State.Calibration.Start_MS = SCHEDULERTIME.GetMillis();
-    AirSpeed_State.Calibration.Initialized = true;
+    AirSpeed.Calibration.Start_MS = SCHEDULERTIME.GetMillis();
+    AirSpeed.Calibration.Initialized = true;
   }
 
-  if (AirSpeed_State.Calibration.Start_MS == 0)
+  if (AirSpeed.Calibration.Start_MS == 0)
   {
     return true;
   }
 
-  if (SCHEDULERTIME.GetMillis() - AirSpeed_State.Calibration.Start_MS >= 1000 && AirSpeed_State.Calibration.Read_Count > 15)
+  if (SCHEDULERTIME.GetMillis() - AirSpeed.Calibration.Start_MS >= 1000 && AirSpeed.Calibration.Read_Count > 15)
   {
-    if (AirSpeed_State.Calibration.Count > 0)
+    if (AirSpeed.Calibration.Count > 0)
     {
-      AirSpeed_State.OffSetValue = AirSpeed_State.Calibration.Sum / AirSpeed_State.Calibration.Count;
+      AirSpeed.Calibration.OffSet = AirSpeed.Calibration.Sum / AirSpeed.Calibration.Count;
     }
-    AirSpeed_State.Calibration.Start_MS = 0;
+    AirSpeed.Calibration.Start_MS = 0;
     return false;
   }
   //DESCARTA AS 5 PRIMEIRAS AMOSTRAS
-  if (AirSpeed_State.Calibration.Read_Count > 5)
+  if (AirSpeed.Calibration.Read_Count > 5)
   {
-    AirSpeed_State.Calibration.Sum += AirSpeed_State.RawValue;
-    AirSpeed_State.Calibration.Count++;
+    AirSpeed.Calibration.Sum += AirSpeed.Raw.Pressure;
+    AirSpeed.Calibration.Count++;
   }
-  AirSpeed_State.Calibration.Read_Count++;
+  AirSpeed.Calibration.Read_Count++;
   return false;
 }
 
@@ -104,26 +104,26 @@ float AirSpeedClass::Get_Raw_Pressure()
 void AirSpeedClass::Get_Bernoulli_IAS_Pressure(float &Pressure)
 {
   //https://en.wikipedia.org/wiki/Indicated_airspeed
-  Pressure = AirSpeedRatio * Fast_SquareRoot(2.0f * ABS(AirSpeed_State.RawValue - AirSpeed_State.OffSetValue) / AIR_DENSITY_SEA_LEVEL_15C);
+  Pressure = AirSpeedRatio * Fast_SquareRoot(2.0f * ABS(AirSpeed.Raw.Pressure - AirSpeed.Calibration.OffSet) / AIR_DENSITY_SEA_LEVEL_15C);
   Pressure = PT1FilterApply3(&Pitot_Smooth, Pressure);
 }
 
 void AirSpeedClass::Update()
 {
-  if (!AirSpeed_State.Healthy)
+  if (!AirSpeed.Healthy)
   {
     return;
   }
 
-  AirSpeed_State.RawValue = AIRSPEED.Get_Raw_Pressure();
+  AirSpeed.Raw.Pressure = AIRSPEED.Get_Raw_Pressure();
 
   if (!AIRSPEED.Calibrate())
   {
     return;
   }
 
-  float Pressure = 0;
-  AIRSPEED.Get_Bernoulli_IAS_Pressure(Pressure);
+  AirSpeed.Raw.IASPressure = 0;
+  AIRSPEED.Get_Bernoulli_IAS_Pressure(AirSpeed.Raw.IASPressure);
 
-  AIRSPEED.CalcedInCM = Pressure * 100; //EM CM/S
+  AIRSPEED.CalcedInCM = AirSpeed.Raw.IASPressure * 100; //EM CM/S
 }

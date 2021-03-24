@@ -25,7 +25,7 @@
 #include "Buzzer/BUZZER.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "PID/RCPID.h"
-#include "AltitudeHoldControl/ALTITUDEHOLD.h"
+#include "Barometer/BAROBACKEND.h"
 
 AutoLaunchClass AUTOLAUNCH;
 
@@ -266,7 +266,7 @@ bool AutoLaunchClass::AutoLaunchTimerOverFlow()
 
 bool AutoLaunchClass::AutoLaunchMaxAltitudeReached(void)
 {
-  return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (ALTITUDE.EstimatedAltitude >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
+  return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (Barometer.INS.Altitude.Estimated >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
 }
 
 bool AutoLaunchClass::AutoLaunchCompleted()

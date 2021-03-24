@@ -19,6 +19,7 @@
 #include "BAROREAD.h"
 #include "I2C/I2C.h"
 #include "Common/ENUM.h"
+#include "BAROBACKEND.h"
 
 static union
 {
@@ -74,7 +75,7 @@ void CalculatePressure(void)
                          ((int32_t)BMP280_Calculation.dig_T3)) >>
                         14;
   BMP280_VariationOffSet = BMP280_VariationOne + BMP280_VariationTwo;
-  BaroTemperatureRaw = (BMP280_VariationOffSet * 5 + 128) >> 8;
+  Barometer.Raw.Temperature = (BMP280_VariationOffSet * 5 + 128) >> 8;
   BMP280_VariationOne = ((int64_t)BMP280_VariationOffSet) - 128000;
   BMP280_VariationTwo = BMP280_VariationOne * BMP280_VariationOne * (int64_t)BMP280_Calculation.dig_P6;
   BMP280_VariationTwo = BMP280_VariationTwo + ((BMP280_VariationOne * (int64_t)BMP280_Calculation.dig_P5) << 17);
@@ -88,7 +89,7 @@ void CalculatePressure(void)
   BMP280_VariationOne = (((int64_t)BMP280_Calculation.dig_P9) * (BMP280_Pressure >> 13) * (BMP280_Pressure >> 13)) >> 25;
   BMP280_VariationTwo = (((int64_t)BMP280_Calculation.dig_P8) * BMP280_Pressure) >> 19;
   BMP280_Pressure = ((BMP280_Pressure + BMP280_VariationOne + BMP280_VariationTwo) >> 8) + (((int64_t)BMP280_Calculation.dig_P7) << 4);
-  BaroPressureRaw = BMP280_Pressure >> 8;
+  Barometer.Raw.Pressure = BMP280_Pressure >> 8;
 }
 
 void BMP280_Initialization()

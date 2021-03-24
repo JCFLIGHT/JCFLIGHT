@@ -25,6 +25,7 @@
 #include "GPS/GPSSTATES.h"
 #include "AHRS/AHRS.h"
 #include "IMU/ACCGYROREAD.h"
+#include "Barometer/BAROBACKEND.h"
 
 InertialNavigationClass INERTIALNAVIGATION;
 INS_Struct INS;
@@ -225,8 +226,8 @@ void InertialNavigationClass::Calculate_AccelerationZ()
 
 void InertialNavigationClass::CorrectZStateWithBaro(float *DeltaTime)
 {
-  bool AirCushionEffectDetected = (GetTakeOffInProgress() || GetGroundDetected()) && (ALTITUDE.RealBaroAltitude < ALTITUDE.GroundAltitude);
-  float PositionError = (AirCushionEffectDetected ? ALTITUDE.GroundAltitude : ALTITUDE.RealBaroAltitude) - INERTIALNAVIGATION.HistoryZPosition[INERTIALNAVIGATION.HistoryZCount];
+  bool AirCushionEffectDetected = (GetTakeOffInProgress() || GetGroundDetected()) && (Barometer.Altitude.Actual < Barometer.Altitude.GroundOffSet);
+  float PositionError = (AirCushionEffectDetected ? Barometer.Altitude.GroundOffSet : Barometer.Altitude.Actual) - INERTIALNAVIGATION.HistoryZPosition[INERTIALNAVIGATION.HistoryZCount];
   INS.Velocity_EarthFrame[INS_VERTICAL_Z] += PositionError * (0.19753086419753086419753086419753f * *DeltaTime);
   INS.Position_EarthFrame[INS_VERTICAL_Z] += PositionError * (0.66666666666666666666666666666667f * *DeltaTime);
 }
@@ -236,13 +237,13 @@ void InertialNavigationClass::EstimationPredictZ(float *DeltaTime)
   float VelocityIncrease = INS.AccelerationEarthFrame_Filtered[INS_VERTICAL_Z] * *DeltaTime;
   INS.Position_EarthFrame[INS_VERTICAL_Z] += (INS.Velocity_EarthFrame[INS_VERTICAL_Z] + VelocityIncrease * 0.5f) * *DeltaTime;
   INS.Velocity_EarthFrame[INS_VERTICAL_Z] += VelocityIncrease;
-  ALTITUDE.EstimatedAltitude = INS.Position_EarthFrame[INS_VERTICAL_Z];   //ALTITUDE FINAL ESTIMADA PELO INS
-  ALTITUDE.EstimatedVariometer = INS.Velocity_EarthFrame[INS_VERTICAL_Z]; //VELOCIDADE VERTICAL(Z) FINAL ESTIMADA PELO INS
+  Barometer.INS.Altitude.Estimated = INS.Position_EarthFrame[INS_VERTICAL_Z]; //ALTITUDE FINAL ESTIMADA PELO INS
+  Barometer.INS.Velocity.Vertical = INS.Velocity_EarthFrame[INS_VERTICAL_Z];  //VELOCIDADE VERTICAL(Z) FINAL ESTIMADA PELO INS
 }
 
 void InertialNavigationClass::SaveZPositionToHistory()
 {
-  INERTIALNAVIGATION.HistoryZPosition[INERTIALNAVIGATION.HistoryZCount] = ALTITUDE.EstimatedAltitude;
+  INERTIALNAVIGATION.HistoryZPosition[INERTIALNAVIGATION.HistoryZCount] = Barometer.INS.Altitude.Estimated;
   INERTIALNAVIGATION.HistoryZCount++;
   if (INERTIALNAVIGATION.HistoryZCount >= 10)
   {

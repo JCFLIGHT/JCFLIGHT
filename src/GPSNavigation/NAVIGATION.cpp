@@ -33,6 +33,7 @@
 #include "FlightModes/FLIGHTMODES.h"
 #include "InertialNavigation/INS.h"
 #include "AHRS/AHRS.h"
+#include "Barometer/BAROBACKEND.h"
 
 #define NAVTILTCOMPENSATION 20 //RETIRADO DA ARDUPILOT
 
@@ -173,7 +174,7 @@ void GPS_Process_FlightModes(float DeltaTime)
 
     case DO_LAND_INIT:
       Do_GPS_Altitude = true;
-      SetAltitudeToHold(ALTITUDE.EstimatedAltitude);
+      SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
       Time_To_Start_The_Land = SCHEDULERTIME.GetMillis() + 100;
       GPS_Navigation_Mode = DO_LAND_SETTLE;
       break;
@@ -411,13 +412,13 @@ void Do_Mode_RTH_Now()
 {
   GPS_Flight_Mode = GPS_MODE_RTH;
   Do_GPS_Altitude = true;
-  if (ALTITUDE.EstimatedAltitude < ConvertCMToMeters(RTH_Altitude))
+  if (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(RTH_Altitude))
   {
     SetAltitudeToHold(ConvertCMToMeters(RTH_Altitude));
   }
   else
   {
-    SetAltitudeToHold(ALTITUDE.EstimatedAltitude);
+    SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
   }
   SetThisPointToPositionHold();
   GPS_Navigation_Mode = DO_START_RTH;

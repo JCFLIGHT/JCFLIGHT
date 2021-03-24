@@ -19,18 +19,9 @@
 #include "Filters/AVERAGEFILTER.h"
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
-#include "Common/STRUCTS.h"
-#include "AltitudeHoldControl/ALTITUDEHOLD.h"
+#include "BAROBACKEND.h"
 
 #define BARO_SPIKES_SIZE 0x15
-
-float BarometerGroundPressureForFlight;
-float BarometerTemperatureScale;
-
-int16_t BaroTemperatureRaw;
-
-int32_t BaroPressureRaw;
-int32_t BaroPressureFiltered;
 
 AverageFilterInt32_Size5 Pressure_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A PRESSÃO BARO,TAMANHO = 5 ITERAÇÕES
 AverageFilterInt32_Size5 Altitude_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A ALTITUDE,TAMANHO = 5 ITERAÇÕES
@@ -44,9 +35,9 @@ void RecalculateBaroTotalPressure()
   {
     PressureIndexCount = 0;
   }
-  PressureVector[PressureIndex] = Pressure_Filter.Apply(BaroPressureRaw);
-  BaroPressureFiltered += PressureVector[PressureIndex];
-  BaroPressureFiltered -= PressureVector[PressureIndexCount];
+  PressureVector[PressureIndex] = Pressure_Filter.Apply(Barometer.Raw.Pressure);
+  Barometer.Raw.PressureFiltered += PressureVector[PressureIndex];
+  Barometer.Raw.PressureFiltered -= PressureVector[PressureIndexCount];
   PressureIndex = PressureIndexCount;
 }
 
@@ -68,22 +59,19 @@ float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t Bar
   return Result;
 }
 
-void DoBaroCalibrationForFlight()
-{
-  BarometerGroundPressureForFlight = BaroPressureFiltered;
-  BarometerTemperatureScale = BaroTemperatureRaw;
-}
-
 void CalculateBaroAltitudeForFlight()
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    DoBaroCalibrationForFlight();
+    Barometer.Calibration.GroundPressure = Barometer.Raw.PressureFiltered;
+    Barometer.Calibration.GroundTemperature = Barometer.Raw.Temperature;
     Altitude_Filter.Reset();
   }
   else
   {
-    ALTITUDE.RealBaroAltitude = Altitude_Filter.Apply((int32_t)Get_Altitude_Difference(BarometerGroundPressureForFlight, BaroPressureFiltered, BarometerTemperatureScale));
+    Barometer.Altitude.Actual = Altitude_Filter.Apply((int32_t)Get_Altitude_Difference(Barometer.Calibration.GroundPressure,
+                                                                                       Barometer.Raw.PressureFiltered,
+                                                                                       Barometer.Calibration.GroundTemperature));
   }
 }
 
@@ -96,16 +84,16 @@ int32_t GetAltitudeForGCS()
   if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     InitialSamples = 0xC8; //RECALIBRA A ALTITUDE DO BARO PARA O MODO DESARMADO
-    return ALTITUDE.RealBaroAltitude;
+    return Barometer.Altitude.Actual;
   }
 
   if (InitialSamples > 0)
   {
-    BarometerGroundPressure = BaroPressureFiltered;
-    BarometerTemperatureScaleForGCS = BaroTemperatureRaw;
+    BarometerGroundPressure = Barometer.Raw.PressureFiltered;
+    BarometerTemperatureScaleForGCS = Barometer.Raw.Temperature;
     InitialSamples--;
     return 0;
   }
 
-  return (int32_t)Get_Altitude_Difference(BarometerGroundPressure, BaroPressureFiltered, BarometerTemperatureScaleForGCS);
+  return (int32_t)Get_Altitude_Difference(BarometerGroundPressure, Barometer.Raw.PressureFiltered, BarometerTemperatureScaleForGCS);
 }

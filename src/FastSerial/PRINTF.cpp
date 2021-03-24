@@ -150,7 +150,7 @@ void SerialPrint::ParamsToConsole()
 #if defined(PRINTLN_ALLSENSORS)
   PRINTF.SendToConsole(ProgramMemoryString("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d Mx:%d My:%d Mz:%d Baro:%ld\n"),
                        IMU.Accelerometer.Read[ROLL], IMU.Accelerometer.Read[PITCH], IMU.Accelerometer.Read[YAW], IMU.Gyroscope.Read[ROLL], IMU.Gyroscope.Read[PITCH], IMU.Gyroscope.Read[YAW],
-                       IMU.CompassRead[ROLL], IMU.CompassRead[PITCH], IMU.CompassRead[YAW], ALTITUDE.RealBaroAltitude);
+                       IMU.CompassRead[ROLL], IMU.CompassRead[PITCH], IMU.CompassRead[YAW], Barometer.Altitude.Actual);
 #endif
 
 #if defined(PRINTLN_IMU)
@@ -166,7 +166,7 @@ void SerialPrint::ParamsToConsole()
 
 #if defined(PRINTLN_BARO)
   PRINTF.SendToConsole(ProgramMemoryString("BaroFiltered:%ld INSBaro:%ld\n"),
-                       ALTITUDE.RealBaroAltitude, ALTITUDE.EstimatedAltitude);
+                       Barometer.Altitude.Actual, Barometer.INS.Altitude.Estimated);
 #endif
 
 #if defined(PRINTLN_MEMORY)

@@ -30,8 +30,7 @@
 #include "FlightModes/FLIGHTMODES.h"
 #include "InertialNavigation/INS.h"
 #include "PID/PIDPARAMS.h"
-
-Altitude_Struct ALTITUDE;
+#include "Barometer/BAROBACKEND.h"
 
 bool TakeOffInProgress = false;
 bool GroundAltitudeSet = false;
@@ -88,11 +87,11 @@ bool ApplyAltitudeHoldControl()
           {
             HoveringState = false;
           }
-          SetAltitudeToHold(ALTITUDE.EstimatedAltitude);
+          SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
           TargetVariometer = Constrain_8Bits(MinVariometer, 30, 100);
-          if (ALTITUDE.EstimatedAltitude > (SafeAltitude * 100))
+          if (Barometer.INS.Altitude.Estimated > (SafeAltitude * 100))
           {
-            TargetVariometer += (int32_t)(250 - MinVariometer) * (ALTITUDE.EstimatedAltitude - (SafeAltitude * 100)) / (RTH_Altitude * 100 - (SafeAltitude * 100));
+            TargetVariometer += (int32_t)(250 - MinVariometer) * (Barometer.INS.Altitude.Estimated - (SafeAltitude * 100)) / (RTH_Altitude * 100 - (SafeAltitude * 100));
           }
           TargetVariometer = -TargetVariometer;
         }
@@ -102,8 +101,8 @@ bool ApplyAltitudeHoldControl()
           {
             HoveringState = true;
           }
-          TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimatedAltitude) * 3) / 2;
-          if (ALTITUDE.EstimatedAltitude > (SafeAltitude * 100))
+          TargetVariometer = ((AltitudeToHold - Barometer.INS.Altitude.Estimated) * 3) / 2;
+          if (Barometer.INS.Altitude.Estimated > (SafeAltitude * 100))
           {
             TargetVariometer = Constrain_32Bits(TargetVariometer, -250, 250);
           }
@@ -128,7 +127,7 @@ bool ApplyAltitudeHoldControl()
         }
         else
         {
-          if ((ThrottleDifference > SafeZoneToCompleteTakeOff) && (ALTITUDE.EstimatedVariometer >= 15))
+          if ((ThrottleDifference > SafeZoneToCompleteTakeOff) && (Barometer.INS.Velocity.Vertical >= 15))
           {
             TakeOffInProgress = false;
           }
@@ -153,9 +152,9 @@ bool ApplyAltitudeHoldControl()
           if (!HoveringState)
           {
             HoveringState = true;
-            AltitudeToHold = ALTITUDE.EstimatedAltitude;
+            AltitudeToHold = Barometer.INS.Altitude.Estimated;
           }
-          TargetVariometer = ((AltitudeToHold - ALTITUDE.EstimatedAltitude) * 3) / 2;
+          TargetVariometer = ((AltitudeToHold - Barometer.INS.Altitude.Estimated) * 3) / 2;
         }
       }
       ApplyAltitudeHoldPIDControl(AltitudeHoldControlTimer.ActualTime, HoveringState);
@@ -198,7 +197,7 @@ PT1_Filter_Struct Smooth_ThrottleHover;
 void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
 {
   TargetVariometer = Constrain_32Bits(TargetVariometer, -350, 350);
-  int32_t VariometerError = TargetVariometer - ALTITUDE.EstimatedVariometer;
+  int32_t VariometerError = TargetVariometer - Barometer.INS.Velocity.Vertical;
   VariometerError = Constrain_32Bits(VariometerError, -600, 600);
   VariometerErrorISum += ((VariometerError * GET_SET[PID_ALTITUDE].IntegralVector * DeltaTime) >> 7) / ((HoveringState && ABS(TargetVariometer) < 100) ? 2 : 1);
   VariometerErrorISum = Constrain_32Bits(VariometerErrorISum, -16384000, 16384000);
@@ -261,7 +260,7 @@ void SetAltitudeToHold(int32_t ValueOfNewAltitudeHold)
 
 bool GetAltitudeReached()
 {
-  return ABS(AltitudeToHold - ALTITUDE.EstimatedAltitude) < 50;
+  return ABS(AltitudeToHold - Barometer.INS.Altitude.Estimated) < 50;
 }
 
 void RunLandDetector()
@@ -277,7 +276,7 @@ void RunLandDetector()
   if (!GroundAltitudeSet && (TimeOnLand >= 100))
   {
     GroundAltitudeSet = true;
-    ALTITUDE.GroundAltitude = ALTITUDE.RealBaroAltitude;
+    Barometer.Altitude.GroundOffSet = Barometer.Altitude.Actual;
   }
 }
 
@@ -290,7 +289,7 @@ void ResetLandDetector()
 
 bool GetGroundDetected()
 {
-  return (ABS(ALTITUDE.EstimatedVariometer) < 15) && (VariometerErrorIPart <= -185) && (ALTITUDE.EstimatedAltitude < (SafeAltitude * 100));
+  return (ABS(Barometer.INS.Velocity.Vertical) < 15) && (VariometerErrorIPart <= -185) && (Barometer.INS.Altitude.Estimated < (SafeAltitude * 100));
 }
 
 bool GetGroundDetectedFor100ms()

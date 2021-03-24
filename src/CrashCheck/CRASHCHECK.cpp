@@ -16,7 +16,6 @@
 */
 
 #include "CRASHCHECK.h"
-#include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Parachute/PARACHUTE.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "PrecisionLand/PRECISIONLAND.h"
@@ -24,6 +23,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/RCDEFINES.h"
 #include "AHRS/AHRS.h"
+#include "Barometer/BAROBACKEND.h"
 #include "FastSerial/PRINTF.h"
 
 #ifdef __AVR_ATmega2560__
@@ -89,9 +89,9 @@ void CrashCheck()
 
   if (Crash_Counter == 1) //OK,PROVAVELMENTE ESTAMOS CAINDO
   {
-    AltitudeBaroToCompare = ALTITUDE.RealBaroAltitude;
+    AltitudeBaroToCompare = Barometer.Altitude.Actual;
   }
-  else if (ALTITUDE.RealBaroAltitude >= AltitudeBaroToCompare)
+  else if (Barometer.Altitude.Actual >= AltitudeBaroToCompare)
   {
     Crash_Counter = 0;
     return;

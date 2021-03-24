@@ -20,6 +20,7 @@
 #include "I2C/I2C.h"
 #include "Common/ENUM.h"
 #include "Scheduler/SCHEDULERTIME.h"
+#include "Barometer/BAROBACKEND.h"
 
 static struct
 {
@@ -106,14 +107,14 @@ static void CalculatePressure()
   float OffSet = ((uint32_t)StructBarometer.CountVector[2] << 16) + ((DeltaTimeFloat * StructBarometer.CountVector[4]) / 128);
   float Sense = ((uint32_t)StructBarometer.CountVector[1] << 15) + ((DeltaTimeFloat * StructBarometer.CountVector[3]) / 256);
   DeltaTimeSigned = (DeltaTimeFloat * StructBarometer.CountVector[6]) / 8388608;
-  BaroTemperatureRaw = DeltaTimeSigned + 2000;
+  Barometer.Raw.Temperature = DeltaTimeSigned + 2000;
   if (DeltaTimeSigned < 0)
   {
     DeltaTimeSigned *= 5 * DeltaTimeSigned;
     OffSet -= DeltaTimeSigned >> 1;
     Sense -= DeltaTimeSigned >> 2;
   }
-  BaroPressureRaw = (((StructBarometer.UP * Sense) / 2097152) - OffSet) / 32768;
+  Barometer.Raw.Pressure = (((StructBarometer.UP * Sense) / 2097152) - OffSet) / 32768;
 }
 
 void MS5611_Update()

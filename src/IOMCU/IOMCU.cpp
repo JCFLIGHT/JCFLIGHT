@@ -23,6 +23,7 @@
 #include "FlightModes/AUXFLIGHT.h"
 #include "RadioControl/RCCONFIG.h"
 #include "Barometer/BAROREAD.h"
+#include "Barometer/BAROBACKEND.h"
 #include "BatteryMonitor/BATTERY.h"
 #include "LedRGB/LEDRGB.h"
 #include "Scheduler/SCHEDULERTIME.h"
@@ -1289,7 +1290,7 @@ void GCSClass::GCS_Request_Parameters()
     GCSParameters.SendActualFlightMode = FlightMode;
     GCSParameters.SendFrameType = FrameType;
     GCSParameters.SendHomePointState = Home_Point;
-    GCSParameters.SendTemperature = BaroTemperatureRaw / 100;
+    GCSParameters.SendTemperature = Barometer.Raw.Temperature / 100;
     GCSParameters.SendHomePointDistance = DistanceToHome;
     GCSParameters.SendCurrentInMah = BATTERY.Get_Current_In_Mah();
 #ifndef MACHINE_CYCLE

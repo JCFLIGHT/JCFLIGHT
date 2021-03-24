@@ -421,7 +421,7 @@ void AHRSClass::Update(float DeltaTime)
                                                        (float)IMU.Compass.Read[PITCH],
                                                        (float)IMU.Compass.Read[YAW]}};
 
-  const float CalcedCompassWeight = NEARNESS;
+  const float CalcedCompassWeight = 10.0f;
   const float CalcedAccelerometerWeight = CalculateAccelerometerWeight();
   const bool SafeToUseAccelerometer = (CalcedAccelerometerWeight > 0.001f);
 

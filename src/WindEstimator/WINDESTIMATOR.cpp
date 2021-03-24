@@ -101,9 +101,9 @@ void UpdateWindEstimator() //50Hz
         WindEstimator.Ground.VelocityDifference[YAW] = WindEstimator.Ground.Velocity[ROLL] - WindEstimator.Ground.LastVelocity[YAW];
 
         //VELOCIDADE ESTIMADA DO AR
-        float EstimatedAirSpeed = (Fast_SquareRoot(SquareFloat(WindEstimator.Ground.VelocityDifference[0]) +
-                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[1]) +
-                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[2]))) /
+        float EstimatedAirSpeed = (Fast_SquareRoot(SquareFloat(WindEstimator.Ground.VelocityDifference[ROLL]) +
+                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[PITCH]) +
+                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[YAW]))) /
                                   Fast_SquareRoot(DifferenceLenght);
 
         WindEstimator.Fuselage.DirectionSum[ROLL] = WindEstimator.Fuselage.Direction[ROLL] + WindEstimator.Fuselage.LastDirection[ROLL];
@@ -117,7 +117,11 @@ void UpdateWindEstimator() //50Hz
         memcpy(WindEstimator.Fuselage.LastDirection, WindEstimator.Fuselage.Direction, sizeof(WindEstimator.Fuselage.LastDirection));
         memcpy(WindEstimator.Ground.LastVelocity, WindEstimator.Ground.Velocity, sizeof(WindEstimator.Ground.LastVelocity));
 
-        float Theta = atan2f(WindEstimator.Ground.VelocityDifference[1], WindEstimator.Ground.VelocityDifference[0]) - atan2f(WindEstimator.Fuselage.DirectionDifference[1], WindEstimator.Fuselage.DirectionDifference[0]); //EQUAÇÃO 9
+        float Theta = Fast_Atan2(WindEstimator.Ground.VelocityDifference[PITCH],
+                                 WindEstimator.Ground.VelocityDifference[ROLL]) -
+                      Fast_Atan2(WindEstimator.Fuselage.DirectionDifference[PITCH],
+                                 WindEstimator.Fuselage.DirectionDifference[ROLL]); //EQUAÇÃO 9
+
         float SinTheta = Fast_Sine(Theta);
         float CosTheta = Fast_Cosine(Theta);
 

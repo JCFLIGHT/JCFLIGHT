@@ -51,7 +51,7 @@
 #include "EscCalibration/CALIBESC.h"
 #include "SBUS/SBUSREAD.h"
 #include "FastSerial/UART2MODE.h"
-#include "ServosMaster/SERVORATE.h"
+#include "ServosMaster/SERVOSMASTER.h"
 #include "RadioControl/CURVESRC.h"
 #include "AirPlane/AIRPLANE.h"
 #include "AutoLaunch/AUTOLAUNCH.h"

@@ -103,7 +103,7 @@ void Integral_Loop()
         AUTOLAUNCH.Update();
         TECS.Update(ThisDeltaTime);
         PIDXYZ.Update(ThisDeltaTime);
-        AIR_PLANE.Servo_Rate_Adjust_And_Apply_LPF();
+        SERVOSMASTER.Update();
         ServoAutoTrimRun();
         ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();

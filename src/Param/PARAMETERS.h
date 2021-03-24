@@ -126,7 +126,7 @@ void ParametersClass::Initialization() //PRIMEIRA INSTRUÇÃO DE MAQUINA A SER C
         LOG("Primeira linkagem,limpando a EEPROM...");
         VarParam::Erase_All();
         Parameters.Format_Version.Set_And_Save(ParametersClass::Actual_Format_Version);
-        LOG("Ok...Parametros reconfigurados com valores de fabrica");
+        LOG("Ok...Parametros reconfigurados para os valores de fabrica");
     }
     else
     {

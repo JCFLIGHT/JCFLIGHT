@@ -37,7 +37,7 @@
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "Param/PARAM.h"
 #include "RadioControl/RCSMOOTH.h"
-#include "ServosMaster/SERVORATE.h"
+#include "ServosMaster/SERVOSMASTER.h"
 #include "BatteryMonitor/BATTERY.h"
 
 void GeneralSettingsInitialization()
@@ -57,9 +57,6 @@ void GeneralSettingsInitialization()
   KALMAN.Init();
   IMU_Filters_Initialization();
   RCCONFIG.Init();
-  AIR_PLANE.UpdateServosMinAndMax();
-  AIR_PLANE.UpdateServosMiddlePoint();
-  AIR_PLANE.UpdateServosDirection();
   AltitudeHold_Update_Params();
   WayPoint_Initialization();
   AIRSPEED.Initialization();
@@ -67,6 +64,6 @@ void GeneralSettingsInitialization()
   AHRS.Initialization();
   SAFETYBUTTON.Initialization();
   RCInterpolationInit();
-  Servo_Rate_Update();
+  SERVOSMASTER.Initialization();
   BATTERY.Initialization();
 }

@@ -17,7 +17,6 @@
 
 #include "SWITCHFLAG.h"
 #include "FlightModes/AUXFLIGHT.h"
-#include "ServosMaster/SERVORATE.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "ServosMaster/SERVOAUTOTRIM.h"

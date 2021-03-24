@@ -19,12 +19,13 @@
 #include "PID/PIDXYZ.h"
 #include "SwitchFlag/SWITCHFLAG.h"
 #include "Scheduler/SCHEDULERTIME.h"
-#include "AirPlane/AIRPLANE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "Buzzer/BUZZER.h"
 #include "MotorsControl/MOTORS.h"
 #include "BitArray/BITARRAY.h"
+#include "SERVOSMASTER.h"
+#include "AirPlane/AIRPLANE.h"
 
 #define SERVO_AUTOTRIM_OVERFLOW 2000
 #define SAVE_OVERFLOW 2500
@@ -46,7 +47,7 @@ void ServosSaveAndUpdateMiddlePoint(void)
     SAVE_SERVO_MIDDLE(SERVO2_MID_ADDR, AIR_PLANE.ServoMiddle[SERVO2]);
     SAVE_SERVO_MIDDLE(SERVO3_MID_ADDR, AIR_PLANE.ServoMiddle[SERVO3]);
     SAVE_SERVO_MIDDLE(SERVO4_MID_ADDR, AIR_PLANE.ServoMiddle[SERVO4]);
-    AIR_PLANE.UpdateServosMiddlePoint();
+    SERVOSMASTER.UpdateMiddlePoint();
 }
 
 void ServoAutoTrimRun(void)

@@ -15,9 +15,22 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SERVORATE_H_
-#define SERVORATE_H_
+#ifndef SERVOSMASTER_H_
+#define SERVOSMASTER_H_
 #include "Build/LIBDEPENDENCIES.h"
-void Servo_Rate_Update();
-void Servo_Rate_Apply();
+class ServosMasterClass
+{
+public:
+  void Initialization(void);
+  void Update(void);
+  void UpdateMiddlePoint(void);
+
+private:
+  bool LoadBiquadSettings(void);
+  void Rate_Update(void);
+  void UpdateMinAndMax(void);
+  void UpdateDirection(void);
+  void Rate_Apply(void);
+};
+extern ServosMasterClass SERVOSMASTER;
 #endif

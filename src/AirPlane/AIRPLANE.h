@@ -36,14 +36,9 @@ public:
   int16_t Servo_LPF_CutOff;
   int16_t ServoToFilter[MAX_SUPPORTED_SERVOS];
   int16_t ServosFiltered[MAX_SUPPORTED_SERVOS];
-  void LoadBiquadSettings();
-  void UpdateServosMinAndMax();
-  void UpdateServosMiddlePoint();
-  void UpdateServosDirection(void);
   void Mode_ConventionalPlane_Run();
   void Mode_FixedWing_Run();
   void Mode_PlaneVTail_Run();
-  void Servo_Rate_Adjust_And_Apply_LPF();
 };
 extern AirPlaneClass AIR_PLANE;
 #endif

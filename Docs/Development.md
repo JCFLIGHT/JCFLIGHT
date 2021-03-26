@@ -150,4 +150,4 @@ BAROMETER.h
 
 ## Qualidade do código
 
-Código ruim não será aceito,tem que funcionar bem,e ter uma boa aparência.
+Código ruim não será aceito,tem que funcionar bem e,ter uma boa aparência.

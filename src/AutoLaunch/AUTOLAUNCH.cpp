@@ -298,7 +298,7 @@ void AutoLaunchClass::SetPlaneType()
   {
     PlaneType = WITHOUT_WHEELS;
   }
-  else if (GetActualFrameState(AIRPLANE))
+  else if (GetActualFrameState(AIR_PLANE))
   {
     PlaneType = WITH_WHEELS;
   }

@@ -40,21 +40,21 @@ LowPassFilterEarthFrame AccelerationEarthFrameFilteredYaw;
 
 void Update_PrecisionLand()
 {
-  AccelerationEarthFrameFilteredRoll.Apply(INS.AccelerationEarthFrame[ROLL], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
-  AccelerationEarthFrameFilteredPitch.Apply(INS.AccelerationEarthFrame[PITCH], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
-  AccelerationEarthFrameFilteredYaw.Apply(INS.AccelerationEarthFrame[YAW], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  AccelerationEarthFrameFilteredRoll.Apply(INS.EarthFrame.Acceleration[ROLL], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  AccelerationEarthFrameFilteredPitch.Apply(INS.EarthFrame.Acceleration[PITCH], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  AccelerationEarthFrameFilteredYaw.Apply(INS.EarthFrame.Acceleration[YAW], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
 
 #ifdef PRINTLN_PRECISIONLAND
 
   PRINTF.SendToConsole(ProgramMemoryString("GetAccelerationTotal:%f GetLandSuccess:%d\n"),
-                    GetAccelerationTotal(), GetLandSuccess());
+                       GetAccelerationTotal(), GetLandSuccess());
 
 #endif
 
 #ifdef PRINTLN_LPFINROLL
 
-  PRINTF.SendToConsole(ProgramMemoryString("INS.AccelerationEarthFrame[ROLL]:%f AccelerationEarthFrameFilteredRoll.GetOutputFiltered():%f\n"),
-                    INS.AccelerationEarthFrame[ROLL], AccelerationEarthFrameFilteredRoll.GetOutputFiltered());
+  PRINTF.SendToConsole(ProgramMemoryString("INS.EarthFrame.Acceleration[ROLL]:%f AccelerationEarthFrameFilteredRoll.GetOutputFiltered():%f\n"),
+                       INS.EarthFrame.Acceleration[ROLL], AccelerationEarthFrameFilteredRoll.GetOutputFiltered());
 
 #endif
 }
@@ -63,8 +63,8 @@ void Update_PrecisionLand()
 float GetAccelerationTotal()
 {
   return Fast_SquareRoot(SquareFloat(AccelerationEarthFrameFilteredRoll.GetOutputFiltered()) +
-               SquareFloat(AccelerationEarthFrameFilteredPitch.GetOutputFiltered()) +
-               SquareFloat(AccelerationEarthFrameFilteredYaw.GetOutputFiltered()));
+                         SquareFloat(AccelerationEarthFrameFilteredPitch.GetOutputFiltered()) +
+                         SquareFloat(AccelerationEarthFrameFilteredYaw.GetOutputFiltered()));
 }
 
 //SE A VELOCIDADE FOR MAIOR OU IGUAL AO PARAMETRO "LAND_CHECK_ACCEL_MOVING" ISSO QUER DIZER QUE O UAV NÃO ESTÁ NO CHÃO

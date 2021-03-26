@@ -46,17 +46,57 @@ typedef struct
     int16_t Read[3] = {0, 0, 0};
     float ReadSmooth[3] = {0, 0, 0};
   } Compass;
+
 } IMU_Struct;
 
 typedef struct
 {
+  //LPF
+  float AccelerationEarthFrame_LPF[3];
+
+  //AVERAGE
   uint8_t AccelerationEarthFrame_Sum_Count[3];
-  float AccelerationEarthFrame[3];
   float AccelerationEarthFrame_Filtered[3];
   float AccelerationEarthFrame_Sum[3];
-  float Velocity_EarthFrame[3];
-  float Position_EarthFrame[3];
-  int32_t PositionToHold[2];
+
+  struct Math_Struct
+  {
+    float Cosine_Roll = 0;
+    float Sine_Roll = 0;
+    float Cosine_Pitch = 0;
+    float Sine_Pitch = 0;
+    float Cosine_Yaw = 0;
+    float Sine_Yaw = 0;
+    float Sine_Pitch_Cosine_Yaw_Fusion = 0;
+    float Sine_Pitch_Sine_Yaw_Fusion = 0;
+  } Math;
+
+  struct History_Struct
+  {
+    uint8_t XYCount = 0;
+    uint8_t ZCount = 0;
+    int32_t XYPosition[2][10] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    int32_t ZPosition[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  } History;
+
+  struct EarthFrame_Struct
+  {
+    float Acceleration[3] = {0, 0, 0};
+    float Velocity[3] = {0, 0, 0};
+    float Position[3] = {0, 0, 0};
+  } EarthFrame;
+
+  struct Bias_Struct
+  {
+    float Adjust[3] = {0, 0, 0};
+    float Difference[3] = {0, 0, 0};
+  } Bias;
+
+  struct Position_Struct
+  {
+    int32_t Hold[2] = {0, 0};
+  } Position;
+
 } INS_Struct;
 
 typedef struct
@@ -314,6 +354,7 @@ typedef struct
     uint16_t Read_Count = 0;
     uint32_t Start_MS = 0;
   } Calibration;
+
 } AirSpeed_Struct;
 
 typedef struct
@@ -345,6 +386,7 @@ typedef struct
     uint32_t Now = 0;
     uint32_t LastUpdate = 0;
   } Time;
+
 } WindEstimator_Struct;
 
 typedef struct

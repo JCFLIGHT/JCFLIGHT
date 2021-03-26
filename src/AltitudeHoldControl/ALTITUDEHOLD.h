@@ -23,7 +23,6 @@ bool ApplyAltitudeHoldControl();
 void SetAltitudeToHold(int32_t ValueOfNewAltitudeHold);
 bool GetAltitudeReached();
 bool GetTakeOffInProgress();
-bool isLandDetected();
 void ResetIntegralOfVariometerError();
 void RunLandDetector();
 void ResetLandDetector();

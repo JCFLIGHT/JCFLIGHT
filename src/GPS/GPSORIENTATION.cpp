@@ -40,8 +40,8 @@ void GPS_Orientation_Update()
           float DeltaTime = GPSControlTimer.ActualTime * 1e-6f;
           ApplyPosHoldPIDControl(&DeltaTime);
         }
-        GPS_Angle[ROLL] = (GPS_Navigation_Array[COORD_LONGITUDE] * INERTIALNAVIGATION.Cosine_Yaw - GPS_Navigation_Array[COORD_LATITUDE] * INERTIALNAVIGATION.Sine_Yaw) / 10;
-        GPS_Angle[PITCH] = (GPS_Navigation_Array[COORD_LONGITUDE] * INERTIALNAVIGATION.Sine_Yaw + GPS_Navigation_Array[COORD_LATITUDE] * INERTIALNAVIGATION.Cosine_Yaw) / 10;
+        GPS_Angle[ROLL] = (GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Cosine_Yaw - GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Sine_Yaw) / 10;
+        GPS_Angle[PITCH] = (GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Sine_Yaw + GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Cosine_Yaw) / 10;
       }
       else
       {

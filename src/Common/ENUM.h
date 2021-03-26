@@ -39,10 +39,10 @@ enum Frames_Type_Enum
     QUAD_X = 0,
     HEXA_X,
     HEXA_I,
-    AIRPLANE,
+    AIR_PLANE,
     FIXED_WING,
     PLANE_VTAIL,
-    ZMR250,
+    ZMR_250,
     TBS
 
 };

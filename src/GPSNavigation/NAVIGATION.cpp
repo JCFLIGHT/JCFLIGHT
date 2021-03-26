@@ -232,8 +232,8 @@ void Set_Next_Point_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_
   Circle_Mode_Update();
   GPS_Calcule_Bearing(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Target_Bearing);
   GPS_Calcule_Distance_In_CM(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Two_Points_Distance);
-  INS.PositionToHold[COORD_LATITUDE] = (Coordinates_To_Navigation[COORD_LATITUDE] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
-  INS.PositionToHold[COORD_LONGITUDE] = (Coordinates_To_Navigation[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
+  INS.Position.Hold[COORD_LATITUDE] = (Coordinates_To_Navigation[COORD_LATITUDE] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
+  INS.Position.Hold[COORD_LONGITUDE] = (Coordinates_To_Navigation[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
   Coordinates_Navigation_Speed = 100;
   Original_Target_Bearing = Target_Bearing;
 }
@@ -306,8 +306,8 @@ static void GPS_Calcule_Velocity(void)
 
 void SetThisPointToPositionHold()
 {
-  INS.PositionToHold[COORD_LATITUDE] = INS.Position_EarthFrame[INS_LATITUDE] + INS.Velocity_EarthFrame[INS_LATITUDE] * PositionHoldPID.kI;
-  INS.PositionToHold[COORD_LONGITUDE] = INS.Position_EarthFrame[INS_LONGITUDE] + INS.Velocity_EarthFrame[INS_LONGITUDE] * PositionHoldPID.kI;
+  INS.Position.Hold[COORD_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + INS.EarthFrame.Velocity[INS_LATITUDE] * PositionHoldPID.kI;
+  INS.Position.Hold[COORD_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + INS.EarthFrame.Velocity[INS_LONGITUDE] * PositionHoldPID.kI;
 }
 
 static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
@@ -315,10 +315,10 @@ static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
   uint8_t axis;
   for (axis = 0; axis < 2; axis++)
   {
-    int32_t INSPositionError = INS.PositionToHold[axis] - INS.Position_EarthFrame[axis];
+    int32_t INSPositionError = INS.Position.Hold[axis] - INS.EarthFrame.Position[axis];
     int32_t GPSTargetSpeed = GPSGetProportional(INSPositionError, &PositionHoldPID);
     GPSTargetSpeed = Constrain_32Bits(GPSTargetSpeed, -1000, 1000);
-    int32_t RateError = GPSTargetSpeed - INS.Velocity_EarthFrame[axis];
+    int32_t RateError = GPSTargetSpeed - INS.EarthFrame.Velocity[axis];
     RateError = Constrain_32Bits(RateError, -1000, 1000);
     GPS_Navigation_Array[axis] = GPSGetProportional(RateError, &PositionHoldRatePID) + GPSGetIntegral(RateError, DeltaTime, &PositionHoldRatePIDArray[axis], &PositionHoldRatePID);
     GPS_Navigation_Array[axis] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[axis] * PositionHoldRatePID.kD), -2000, 2000);

@@ -32,5 +32,5 @@ public:
   void Mode_FixedWing_Run();
   void Mode_PlaneVTail_Run();
 };
-extern AirPlaneClass AIR_PLANE;
+extern AirPlaneClass AIRPLANE;
 #endif

@@ -27,11 +27,11 @@
 
 FILE_COMPILE_FOR_SPEED
 
-AirPlaneClass AIR_PLANE;
+AirPlaneClass AIRPLANE;
 
 void AirPlaneClass::Mode_ConventionalPlane_Run()
 {
-  if (!GetActualFrameState(AIRPLANE))
+  if (!GetActualFrameState(AIR_PLANE))
   {
     return;
   }

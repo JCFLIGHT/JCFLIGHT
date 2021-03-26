@@ -462,32 +462,32 @@ bool AHRSClass::CheckAnglesInclination(int16_t Angle)
   return false;
 }
 
-float AHRSClass::SineRoll()
+float AHRSClass::GetSineRoll()
 {
   return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
 }
 
-float AHRSClass::CosineRoll()
+float AHRSClass::GetCosineRoll()
 {
   return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
 }
 
-float AHRSClass::SinePitch()
+float AHRSClass::GetSinePitch()
 {
   return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[PITCH]));
 }
 
-float AHRSClass::CosinePitch()
+float AHRSClass::GetCosinePitch()
 {
   return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[PITCH]));
 }
 
-float AHRSClass::SineYaw()
+float AHRSClass::GetSineYaw()
 {
   return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
 }
 
-float AHRSClass::CosineYaw()
+float AHRSClass::GetCosineYaw()
 {
   return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
 }

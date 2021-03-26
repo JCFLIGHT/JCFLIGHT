@@ -120,7 +120,7 @@ void UpdateValuesOfPID()
         if (ActualFrameType == QUAD_X ||
             ActualFrameType == HEXA_X ||
             ActualFrameType == HEXA_I ||
-            ActualFrameType == ZMR250 ||
+            ActualFrameType == ZMR_250 ||
             ActualFrameType == TBS)
         {
             //PITCH
@@ -152,7 +152,7 @@ void UpdateValuesOfPID()
             STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
             STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
         }
-        else if (ActualFrameType == AIRPLANE ||
+        else if (ActualFrameType == AIR_PLANE ||
                  ActualFrameType == FIXED_WING ||
                  ActualFrameType == PLANE_VTAIL)
         {

@@ -31,12 +31,12 @@ public:
   void Initialization();
   void Update(float DeltaTime);
   bool CheckAnglesInclination(int16_t Angle);
-  float SineRoll();
-  float CosineRoll();
-  float SinePitch();
-  float CosinePitch();
-  float SineYaw();
-  float CosineYaw();
+  float GetSineRoll();
+  float GetCosineRoll();
+  float GetSinePitch();
+  float GetCosinePitch();
+  float GetSineYaw();
+  float GetCosineYaw();
 
 private:
   float CosineTiltAngle(void);

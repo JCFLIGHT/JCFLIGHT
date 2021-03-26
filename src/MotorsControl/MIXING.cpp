@@ -115,19 +115,19 @@ void MixingApplyControl()
         return;
     }
 
-    case AIRPLANE:
+    case AIR_PLANE:
     {
         //AEROMODELO
-        AIR_PLANE.Mode_ConventionalPlane_Run();
+        AIRPLANE.Mode_ConventionalPlane_Run();
         MotorControl[MOTOR6] = 1000;
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[AIRPLANE].FrameMotorsCount);
+        NumberOfMotors = ProgMemReadByte(&Motors_Count[AIR_PLANE].FrameMotorsCount);
         return;
     }
 
     case FIXED_WING:
     {
         //ASA-FIXA
-        AIR_PLANE.Mode_FixedWing_Run();
+        AIRPLANE.Mode_FixedWing_Run();
         MotorControl[MOTOR4] = 1000;
         MotorControl[MOTOR5] = 1000;
         MotorControl[MOTOR6] = 1000;
@@ -138,13 +138,13 @@ void MixingApplyControl()
     case PLANE_VTAIL:
     {
         //AERO TIPO V-TAIL
-        AIR_PLANE.Mode_PlaneVTail_Run();
+        AIRPLANE.Mode_PlaneVTail_Run();
         MotorControl[MOTOR6] = 1000;
         NumberOfMotors = ProgMemReadByte(&Motors_Count[PLANE_VTAIL].FrameMotorsCount);
         return;
     }
 
-    case ZMR250:
+    case ZMR_250:
     {
         //ZMR250
         MotorControl[MOTOR1] = PIDXYZ.PIDControllerApply[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[0].Roll) +
@@ -163,7 +163,7 @@ void MixingApplyControl()
                                PIDXYZ.PIDControllerApply[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Pitch) +
                                1 * PIDXYZ.PIDControllerApply[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Yaw);
 
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[ZMR250].FrameMotorsCount);
+        NumberOfMotors = ProgMemReadByte(&Motors_Count[ZMR_250].FrameMotorsCount);
         return;
     }
 

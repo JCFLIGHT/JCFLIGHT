@@ -175,30 +175,16 @@ void InertialNavigationClass::SaveXYPositionToHistory()
 void InertialNavigationClass::ResetXYState()
 {
   INS.History.XYCount = 0;
-  INS.EarthFrame.Velocity[INS_LATITUDE] = (ABS(GPSActualSpeed[INS_LATITUDE]) > 50) ? GPSActualSpeed[INS_LATITUDE] : 0.0f;
-  INS.EarthFrame.Position[INS_LATITUDE] = GPSDistanceToHome[INS_LATITUDE];
-  INS.EarthFrame.Velocity[INS_LONGITUDE] = (ABS(GPSActualSpeed[INS_LONGITUDE]) > 50) ? GPSActualSpeed[INS_LONGITUDE] : 0.0f;
-  INS.EarthFrame.Position[INS_LONGITUDE] = GPSDistanceToHome[INS_LONGITUDE];
-  INS.History.XYPosition[INS_LATITUDE][0] = GPSDistanceToHome[0];
-  INS.History.XYPosition[INS_LATITUDE][1] = GPSDistanceToHome[1];
-  INS.History.XYPosition[INS_LATITUDE][2] = GPSDistanceToHome[2];
-  INS.History.XYPosition[INS_LATITUDE][3] = GPSDistanceToHome[3];
-  INS.History.XYPosition[INS_LATITUDE][4] = GPSDistanceToHome[4];
-  INS.History.XYPosition[INS_LATITUDE][5] = GPSDistanceToHome[5];
-  INS.History.XYPosition[INS_LATITUDE][6] = GPSDistanceToHome[6];
-  INS.History.XYPosition[INS_LATITUDE][7] = GPSDistanceToHome[7];
-  INS.History.XYPosition[INS_LATITUDE][8] = GPSDistanceToHome[8];
-  INS.History.XYPosition[INS_LATITUDE][9] = GPSDistanceToHome[9];
-  INS.History.XYPosition[INS_LONGITUDE][0] = GPSDistanceToHome[0];
-  INS.History.XYPosition[INS_LONGITUDE][1] = GPSDistanceToHome[1];
-  INS.History.XYPosition[INS_LONGITUDE][2] = GPSDistanceToHome[2];
-  INS.History.XYPosition[INS_LONGITUDE][3] = GPSDistanceToHome[3];
-  INS.History.XYPosition[INS_LONGITUDE][4] = GPSDistanceToHome[4];
-  INS.History.XYPosition[INS_LONGITUDE][5] = GPSDistanceToHome[5];
-  INS.History.XYPosition[INS_LONGITUDE][6] = GPSDistanceToHome[6];
-  INS.History.XYPosition[INS_LONGITUDE][7] = GPSDistanceToHome[7];
-  INS.History.XYPosition[INS_LONGITUDE][8] = GPSDistanceToHome[8];
-  INS.History.XYPosition[INS_LONGITUDE][9] = GPSDistanceToHome[9];
+  for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
+  {
+    INS.EarthFrame.Velocity[IndexCount] = (ABS(GPSActualSpeed[IndexCount]) > 50) ? GPSActualSpeed[IndexCount] : 0.0f;
+    INS.EarthFrame.Position[IndexCount] = GPSDistanceToHome[IndexCount];
+
+    for (uint8_t SecondIndexCount = 0; SecondIndexCount < 10; SecondIndexCount++)
+    {
+      INS.History.XYPosition[IndexCount][SecondIndexCount] = GPSDistanceToHome[IndexCount];
+    }
+  }
 }
 
 void InertialNavigationClass::Calculate_AccelerationZ()
@@ -232,9 +218,9 @@ void InertialNavigationClass::Calculate_AccelerationZ()
 void InertialNavigationClass::CorrectZStateWithBaro(float DeltaTime)
 {
   bool AirCushionEffectDetected = (GetTakeOffInProgress() || GetGroundDetected()) && (Barometer.Altitude.Actual < Barometer.Altitude.GroundOffSet);
-  float PositionError = (AirCushionEffectDetected ? Barometer.Altitude.GroundOffSet : Barometer.Altitude.Actual) - INS.History.ZPosition[INS.History.ZCount];
-  INS.EarthFrame.Velocity[INS_VERTICAL_Z] += PositionError * (0.19753086419753086419753086419753f * DeltaTime);
-  INS.EarthFrame.Position[INS_VERTICAL_Z] += PositionError * (0.66666666666666666666666666666667f * DeltaTime);
+  float BaroAltitudeResidual = (AirCushionEffectDetected ? Barometer.Altitude.GroundOffSet : Barometer.Altitude.Actual) - INS.History.ZPosition[INS.History.ZCount];
+  INS.EarthFrame.Position[INS_VERTICAL_Z] += BaroAltitudeResidual * (0.66666666666666666666666666666667f * DeltaTime);
+  INS.EarthFrame.Velocity[INS_VERTICAL_Z] += BaroAltitudeResidual * (0.19753086419753086419753086419753f * DeltaTime);
 }
 
 void InertialNavigationClass::EstimationPredictZ(float DeltaTime)

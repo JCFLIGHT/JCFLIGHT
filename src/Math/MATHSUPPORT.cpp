@@ -16,6 +16,7 @@
 */
 
 #include "MATHSUPPORT.h"
+#include "IMU/ACCGYROREAD.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -116,9 +117,9 @@ float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput)
     return CoordinateInput * 1.0e-7f;
 }
 
-float ConvertAccelerationEarthFrameToCMSS(float InputAccEF)
+float ConvertAccelerationEarthFrameToCMSS(float InputAcc)
 {
-    return InputAccEF * (980.665f / 512);
+    return InputAcc * (GRAVITY_CMSS / ACC_1G);
 }
 
 int32_t ConvertCMToMeters(int32_t CM_Input)

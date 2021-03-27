@@ -346,28 +346,28 @@ static void ComputeQuaternionFromRPY(int16_t InitialRoll, int16_t InitialPitch, 
     InitialYaw -= 3600;
   }
 
-  const float cosRoll = Fast_Cosine(ConvertDeciDegreesToRadians(InitialRoll) * 0.5f);
-  const float sinRoll = Fast_Sine(ConvertDeciDegreesToRadians(InitialRoll) * 0.5f);
+  const float CosineRoll = Fast_Cosine(ConvertDeciDegreesToRadians(InitialRoll) * 0.5f);
+  const float SineRoll = Fast_Sine(ConvertDeciDegreesToRadians(InitialRoll) * 0.5f);
 
-  const float cosPitch = Fast_Cosine(ConvertDeciDegreesToRadians(InitialPitch) * 0.5f);
-  const float sinPitch = Fast_Sine(ConvertDeciDegreesToRadians(InitialPitch) * 0.5f);
+  const float CosinePitch = Fast_Cosine(ConvertDeciDegreesToRadians(InitialPitch) * 0.5f);
+  const float SinePitch = Fast_Sine(ConvertDeciDegreesToRadians(InitialPitch) * 0.5f);
 
-  const float cosYaw = Fast_Cosine(ConvertDeciDegreesToRadians(-InitialYaw) * 0.5f);
-  const float sinYaw = Fast_Sine(ConvertDeciDegreesToRadians(-InitialYaw) * 0.5f);
+  const float CosineYaw = Fast_Cosine(ConvertDeciDegreesToRadians(-InitialYaw) * 0.5f);
+  const float SineYaw = Fast_Sine(ConvertDeciDegreesToRadians(-InitialYaw) * 0.5f);
 
-  Orientation.q0 = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
-  Orientation.q1 = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
-  Orientation.q2 = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
-  Orientation.q3 = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+  Orientation.q0 = CosineRoll * CosinePitch * CosineYaw + SineRoll * SinePitch * SineYaw;
+  Orientation.q1 = SineRoll * CosinePitch * CosineYaw - CosineRoll * SinePitch * SineYaw;
+  Orientation.q2 = CosineRoll * SinePitch * CosineYaw + SineRoll * CosinePitch * SineYaw;
+  Orientation.q3 = CosineRoll * CosinePitch * SineYaw - SineRoll * SinePitch * CosineYaw;
 
   ComputeRotationMatrix();
 }
 
 void GetMeasuredAcceleration(Struct_Vector3x3 *MeasureAcceleration)
 {
-  MeasureAcceleration->Vector[ROLL] = ((float)IMU.Accelerometer.Read[ROLL] / ACC_1G) * GRAVITY_CMSS;
-  MeasureAcceleration->Vector[PITCH] = ((float)IMU.Accelerometer.Read[PITCH] / ACC_1G) * GRAVITY_CMSS;
-  MeasureAcceleration->Vector[YAW] = ((float)IMU.Accelerometer.Read[YAW] / ACC_1G) * GRAVITY_CMSS;
+  MeasureAcceleration->Vector[ROLL] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[ROLL]);
+  MeasureAcceleration->Vector[PITCH] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[PITCH]);
+  MeasureAcceleration->Vector[YAW] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[YAW]);
 }
 
 void GetMeasuredRotationRate(Struct_Vector3x3 *MeasureRotation)
@@ -383,8 +383,8 @@ void AHRSClass::Update(float DeltaTime)
   bool GPS_HeadingState = false;
   float CourseOverGround = 0;
 
-  GetMeasuredRotationRate(&BodyFrameRotation);     //CALCULA A ROTAÇÃO DA IMU EM RADIANOS/S
   GetMeasuredAcceleration(&BodyFrameAcceleration); //CALCULA A ACELERAÇÃO DA IMU EM CM/S^2
+  GetMeasuredRotationRate(&BodyFrameRotation);     //CALCULA A ROTAÇÃO DA IMU EM RADIANOS/S
 
   if (GetFrameStateOfAirPlane())
   {

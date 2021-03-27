@@ -51,6 +51,7 @@ PIDXYZClass PIDXYZ;
 
 static BiquadFilter_Struct Derivative_Roll_Smooth;
 static BiquadFilter_Struct Derivative_Pitch_Smooth;
+static BiquadFilter_Struct Derivative_Yaw_Smooth;
 static BiquadFilter_Struct ControlDerivative_Roll_Smooth;
 static BiquadFilter_Struct ControlDerivative_Pitch_Smooth;
 static BiquadFilter_Struct ControlDerivative_Yaw_Smooth;
@@ -114,6 +115,7 @@ void PIDXYZClass::Initialization()
   PIDXYZ.Get_LPF_Derivative_Value = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
   BIQUADFILTER.Settings(&Derivative_Roll_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Derivative_Yaw_Smooth, PIDXYZ.Get_LPF_Derivative_Value, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Roll_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Pitch_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&ControlDerivative_Yaw_Smooth, CONTROL_DERIVATIVE_CUTOFF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
@@ -147,23 +149,23 @@ void PIDXYZClass::Update(float DeltaTime)
 
   if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
-    PIDXYZ.CalcedRateTargetRoll = PIDXYZ.PIDLevelRoll(DeltaTime);
-    PIDXYZ.CalcedRateTargetPitch = PIDXYZ.PIDLevelPitch(DeltaTime);
+    PIDXYZ.CalcedRateTargetRoll = PIDXYZ.LevelRoll(DeltaTime);
+    PIDXYZ.CalcedRateTargetPitch = PIDXYZ.LevelPitch(DeltaTime);
   }
 
   if (GetFrameStateOfMultirotor())
   {
     AntiWindUpScaler = Constrain_Float((1.0f - GetMotorMixRange()) / MotorIntegralTermWindUpPoint, 0.0f, 1.0f);
-    PIDXYZ.PIDApplyMulticopterRateControllerRoll(DeltaTime);
-    PIDXYZ.PIDApplyMulticopterRateControllerPitch(DeltaTime);
-    PIDXYZ.PIDApplyMulticopterRateControllerYaw(DeltaTime);
+    PIDXYZ.ApplyMulticopterRateControllerRoll(DeltaTime);
+    PIDXYZ.ApplyMulticopterRateControllerPitch(DeltaTime);
+    PIDXYZ.ApplyMulticopterRateControllerYaw(DeltaTime);
   }
   else if (GetFrameStateOfAirPlane())
   {
     PIDXYZ.GetNewControllerForPlaneWithTurn();
-    PIDXYZ.PIDApplyFixedWingRateControllerRoll(DeltaTime);
-    PIDXYZ.PIDApplyFixedWingRateControllerPitch(DeltaTime);
-    PIDXYZ.PIDApplyFixedWingRateControllerYaw(DeltaTime);
+    PIDXYZ.ApplyFixedWingRateControllerRoll(DeltaTime);
+    PIDXYZ.ApplyFixedWingRateControllerPitch(DeltaTime);
+    PIDXYZ.ApplyFixedWingRateControllerYaw(DeltaTime);
   }
 
   if (GetActualThrottleStatus(THROTTLE_LOW) || !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) || !IS_FLIGHT_MODE_ACTIVE(PRIMARY_ARM_DISARM))
@@ -178,33 +180,51 @@ float PIDXYZClass::ProportionalTermProcess(uint8_t kP, float RateError)
   return NewPTermCalced;
 }
 
-float PIDXYZClass::DerivativeTermProcessRoll(float GyroDiffInput)
+float PIDXYZClass::DerivativeTermProcessRoll(int16_t ActualGyro, float PreviousRateGyro, float PreviousRateTarget, float DeltaTime)
 {
   float NewDTermCalced;
 
+  float GyroDifference = PreviousRateGyro - ActualGyro;
+
   if (PIDXYZ.Get_LPF_Derivative_Value > 0)
   {
-    NewDTermCalced = BIQUADFILTER.ApplyAndGet(&Derivative_Roll_Smooth, GyroDiffInput);
+    GyroDifference = BIQUADFILTER.ApplyAndGet(&Derivative_Roll_Smooth, GyroDifference);
   }
-  else
-  {
-    NewDTermCalced = GyroDiffInput;
-  }
+
+  NewDTermCalced = GyroDifference * ((GET_SET[PID_ROLL].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostRoll(IMU.Gyroscope.Read[ROLL], PreviousRateGyro, PIDXYZ.CalcedRateTargetRoll, PreviousRateTarget, DeltaTime);
+
   return NewDTermCalced;
 }
 
-float PIDXYZClass::DerivativeTermProcessPitch(float GyroDiffInput)
+float PIDXYZClass::DerivativeTermProcessPitch(int16_t ActualGyro, float PreviousRateGyro, float PreviousRateTarget, float DeltaTime)
 {
   float NewDTermCalced;
 
+  float GyroDifference = PreviousRateGyro - ActualGyro;
+
   if (PIDXYZ.Get_LPF_Derivative_Value > 0)
   {
-    NewDTermCalced = BIQUADFILTER.ApplyAndGet(&Derivative_Pitch_Smooth, GyroDiffInput);
+    NewDTermCalced = BIQUADFILTER.ApplyAndGet(&Derivative_Pitch_Smooth, GyroDifference);
   }
-  else
+
+  NewDTermCalced = GyroDifference * ((GET_SET[PID_PITCH].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostPitch(IMU.Gyroscope.Read[PITCH], PreviousRateGyro, PIDXYZ.CalcedRateTargetPitch, PreviousRateTarget, DeltaTime);
+
+  return NewDTermCalced;
+}
+
+float PIDXYZClass::DerivativeTermProcessYaw(int16_t ActualGyro, float PreviousRateGyro, float PreviousRateTarget, float DeltaTime)
+{
+  float NewDTermCalced;
+
+  float GyroDifference = PreviousRateGyro - ActualGyro;
+
+  if (PIDXYZ.Get_LPF_Derivative_Value > 0)
   {
-    NewDTermCalced = GyroDiffInput;
+    NewDTermCalced = BIQUADFILTER.ApplyAndGet(&Derivative_Yaw_Smooth, GyroDifference);
   }
+
+  NewDTermCalced = GyroDifference * ((GET_SET[YAW].DerivativeVector / 1905.0f * 1.0f) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostPitch(IMU.Gyroscope.Read[YAW], PreviousRateGyro, PIDXYZ.CalcedRateTargetYaw, PreviousRateTarget, DeltaTime);
+
   return NewDTermCalced;
 }
 
@@ -282,7 +302,7 @@ float PIDXYZClass::ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyr
   return DerivativeBoost;
 }
 
-float PIDXYZClass::PIDLevelRoll(float DeltaTime)
+float PIDXYZClass::LevelRoll(float DeltaTime)
 {
   float RcControllerAngle = 0;
 
@@ -317,7 +337,7 @@ float PIDXYZClass::PIDLevelRoll(float DeltaTime)
   return AngleRateTarget;
 }
 
-float PIDXYZClass::PIDLevelPitch(float DeltaTime)
+float PIDXYZClass::LevelPitch(float DeltaTime)
 {
   float RcControllerAngle = 0;
 
@@ -362,7 +382,7 @@ float PIDXYZClass::PIDLevelPitch(float DeltaTime)
   return AngleRateTarget;
 }
 
-void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
+void PIDXYZClass::ApplyMulticopterRateControllerRoll(float DeltaTime)
 {
   static float PreviousRateTarget;
   static float PreviousRateGyro;
@@ -386,11 +406,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
     NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_ROLL].FeedForwardVector / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
   }
 
-  float GyroDifference = PreviousRateGyro - IMU.Gyroscope.Read[ROLL];
-
-  GyroDifference = PIDXYZ.DerivativeTermProcessRoll(GyroDifference);
-
-  NewDerivativeTerm = GyroDifference * ((GET_SET[PID_ROLL].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostRoll(IMU.Gyroscope.Read[ROLL], PIDXYZ.CalcedRateTargetRoll, PreviousRateTarget, PreviousRateGyro, DeltaTime);
+  NewDerivativeTerm = PIDXYZ.DerivativeTermProcessRoll(IMU.Gyroscope.Read[ROLL], PreviousRateGyro, PreviousRateTarget, DeltaTime);
 
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[ROLL] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
@@ -419,7 +435,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerRoll(float DeltaTime)
   PreviousRateGyro = IMU.Gyroscope.Read[ROLL];
 }
 
-void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
+void PIDXYZClass::ApplyMulticopterRateControllerPitch(float DeltaTime)
 {
   static float PreviousRateTarget;
   static float PreviousRateGyro;
@@ -443,11 +459,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
     NewControlDerivativeTerm = RateTargetDeltaFiltered * ((GET_SET[PID_PITCH].FeedForwardVector / 7270.0f * TPA_Parameters.CalcedValue) / DeltaTime);
   }
 
-  float GyroDifference = PreviousRateGyro - IMU.Gyroscope.Read[PITCH];
-
-  GyroDifference = PIDXYZ.DerivativeTermProcessPitch(GyroDifference);
-
-  NewDerivativeTerm = GyroDifference * ((GET_SET[PID_PITCH].DerivativeVector / 1905.0f * TPA_Parameters.CalcedValue) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostPitch(IMU.Gyroscope.Read[PITCH], PreviousRateGyro, PIDXYZ.CalcedRateTargetPitch, PreviousRateTarget, DeltaTime);
+  NewDerivativeTerm = PIDXYZ.DerivativeTermProcessPitch(IMU.Gyroscope.Read[PITCH], PreviousRateGyro, PreviousRateTarget, DeltaTime);
 
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[PITCH] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
@@ -476,7 +488,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerPitch(float DeltaTime)
   PreviousRateGyro = IMU.Gyroscope.Read[PITCH];
 }
 
-void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
+void PIDXYZClass::ApplyMulticopterRateControllerYaw(float DeltaTime)
 {
   static float PreviousRateTarget;
   static float PreviousRateGyro;
@@ -506,11 +518,7 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
   }
   else
   {
-    float GyroDifference = PreviousRateGyro - IMU.Gyroscope.Read[YAW];
-
-    //GyroDifference = PIDXYZ.DerivativeTermProcessYaw(GyroDifference, DeltaTime);
-
-    NewDerivativeTerm = GyroDifference * ((GET_SET[PID_YAW].DerivativeVector / 1905.0f * 1.0f) / DeltaTime) * 1;
+    NewDerivativeTerm = PIDXYZ.DerivativeTermProcessYaw(IMU.Gyroscope.Read[YAW], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   }
 
   const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[YAW] + NewControlDerivativeTerm;
@@ -542,10 +550,14 @@ void PIDXYZClass::PIDApplyMulticopterRateControllerYaw(float DeltaTime)
   PreviousRateGyro = IMU.Gyroscope.Read[YAW];
 }
 
-void PIDXYZClass::PIDApplyFixedWingRateControllerRoll(float DeltaTime)
+void PIDXYZClass::ApplyFixedWingRateControllerRoll(float DeltaTime)
 {
+  static float PreviousRateTarget;
+  static float PreviousRateGyro;
+
   const float RateError = PIDXYZ.CalcedRateTargetRoll - IMU.Gyroscope.Read[ROLL];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_ROLL].ProportionalVector, RateError);
+  const float NewDerivativeTerm = PIDXYZ.DerivativeTermProcessRoll(IMU.Gyroscope.Read[ROLL], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetRoll * (GET_SET[PID_ROLL].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[ROLL] += RateError * (GET_SET[PID_ROLL].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
@@ -557,13 +569,20 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerRoll(float DeltaTime)
     ErrorGyroIntegral[ROLL] = Constrain_Float(ErrorGyroIntegral[ROLL], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PIDXYZ.PIDControllerApply[ROLL] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[ROLL], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PIDXYZ.PIDControllerApply[ROLL] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[ROLL] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+
+  PreviousRateTarget = PIDXYZ.CalcedRateTargetRoll;
+  PreviousRateGyro = IMU.Gyroscope.Read[ROLL];
 }
 
-void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
+void PIDXYZClass::ApplyFixedWingRateControllerPitch(float DeltaTime)
 {
+  static float PreviousRateTarget;
+  static float PreviousRateGyro;
+
   const float RateError = PIDXYZ.CalcedRateTargetPitch - IMU.Gyroscope.Read[PITCH];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_PITCH].ProportionalVector, RateError);
+  const float NewDerivativeTerm = PIDXYZ.DerivativeTermProcessPitch(IMU.Gyroscope.Read[PITCH], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetPitch * (GET_SET[PID_PITCH].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[PITCH] += RateError * (GET_SET[PID_PITCH].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
@@ -575,13 +594,20 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerPitch(float DeltaTime)
     ErrorGyroIntegral[PITCH] = Constrain_Float(ErrorGyroIntegral[PITCH], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PIDXYZ.PIDControllerApply[PITCH] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[PITCH], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PIDXYZ.PIDControllerApply[PITCH] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[PITCH] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+
+  PreviousRateTarget = PIDXYZ.CalcedRateTargetPitch;
+  PreviousRateGyro = IMU.Gyroscope.Read[PITCH];
 }
 
-void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
+void PIDXYZClass::ApplyFixedWingRateControllerYaw(float DeltaTime)
 {
+  static float PreviousRateTarget;
+  static float PreviousRateGyro;
+
   const float RateError = PIDXYZ.CalcedRateTargetYaw - IMU.Gyroscope.Read[YAW];
   const float NewProportionalTerm = PIDXYZ.ProportionalTermProcess(GET_SET[PID_YAW].ProportionalVector, RateError);
+  const float NewDerivativeTerm = PIDXYZ.DerivativeTermProcessYaw(IMU.Gyroscope.Read[YAW], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   const float NewFeedForwardTerm = PIDXYZ.CalcedRateTargetYaw * (GET_SET[PID_YAW].FeedForwardVector / 31.0f * TPA_Parameters.CalcedValue);
 
   ErrorGyroIntegral[YAW] += RateError * (GET_SET[PID_YAW].IntegralVector / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
@@ -593,7 +619,10 @@ void PIDXYZClass::PIDApplyFixedWingRateControllerYaw(float DeltaTime)
     ErrorGyroIntegral[YAW] = Constrain_Float(ErrorGyroIntegral[YAW], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PIDXYZ.PIDControllerApply[YAW] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[YAW], -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PIDXYZ.PIDControllerApply[YAW] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[YAW] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+
+  PreviousRateTarget = PIDXYZ.CalcedRateTargetYaw;
+  PreviousRateGyro = IMU.Gyroscope.Read[YAW];
 }
 
 bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)

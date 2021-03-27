@@ -29,7 +29,7 @@ FILE_COMPILE_FOR_SPEED
 
 AirPlaneClass AIRPLANE;
 
-void AirPlaneClass::Mode_ConventionalPlane_Run()
+void AirPlaneClass::Update_Conventional_AirPlane(void)
 {
   if (!GetActualFrameState(AIR_PLANE))
   {
@@ -53,7 +53,7 @@ void AirPlaneClass::Mode_ConventionalPlane_Run()
   }
 }
 
-void AirPlaneClass::Mode_FixedWing_Run()
+void AirPlaneClass::Update_FixedWing(void)
 {
   if (!GetActualFrameState(FIXED_WING))
   {
@@ -73,7 +73,7 @@ void AirPlaneClass::Mode_FixedWing_Run()
   }
 }
 
-void AirPlaneClass::Mode_PlaneVTail_Run()
+void AirPlaneClass::Update_AirPlaneVTail(void)
 {
   if (!GetActualFrameState(PLANE_VTAIL))
   {

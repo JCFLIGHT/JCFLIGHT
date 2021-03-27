@@ -28,6 +28,7 @@
 #include "MotorsControl/MOTORS.h"
 #include "Build/BOARDDEFS.h"
 #include "ParamsToGCS/CHECKSUM.h"
+#include "SERVOAUTOTRIM.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -47,6 +48,7 @@ void ServosMasterClass::Initialization(void)
     SERVOSMASTER.UpdateMinAndMax();
     SERVOSMASTER.UpdateMiddlePoint();
     SERVOSMASTER.UpdateDirection();
+    SERVOSMASTER.Rate_Update();
   }
 }
 
@@ -91,13 +93,6 @@ void ServosMasterClass::UpdateMinAndMax()
 
 void ServosMasterClass::UpdateMiddlePoint(void)
 {
-  if (GET_SERVO_MIDDLE(SERVO1_MID_ADDR) == NONE)
-  {
-    SAVE_SERVO_MIDDLE(SERVO1_MID_ADDR, MIDDLE_STICKS_PULSE);
-    SAVE_SERVO_MIDDLE(SERVO2_MID_ADDR, MIDDLE_STICKS_PULSE);
-    SAVE_SERVO_MIDDLE(SERVO3_MID_ADDR, MIDDLE_STICKS_PULSE);
-    SAVE_SERVO_MIDDLE(SERVO4_MID_ADDR, MIDDLE_STICKS_PULSE);
-  }
   Servo.Pulse.Middle[SERVO1] = GET_SERVO_MIDDLE(SERVO1_MID_ADDR);
   Servo.Pulse.Middle[SERVO2] = GET_SERVO_MIDDLE(SERVO2_MID_ADDR);
   Servo.Pulse.Middle[SERVO3] = GET_SERVO_MIDDLE(SERVO3_MID_ADDR);
@@ -131,6 +126,10 @@ void ServosMasterClass::Update(void)
     return;
   }
 
+  AIRPLANE.Update_Conventional_AirPlane();
+  AIRPLANE.Update_FixedWing();
+  AIRPLANE.Update_AirPlaneVTail();
+
   SERVOSMASTER.Rate_Apply();
 
   if (Servo.Filter.CutOff == NONE)
@@ -155,4 +154,5 @@ void ServosMasterClass::Update(void)
     MotorControl[MOTOR4] = Constrain_16Bits(Servo.Signal.Filtered[SERVO3], Servo.Pulse.Min[SERVO3], Servo.Pulse.Max[SERVO3]); //SERVO 3
     MotorControl[MOTOR5] = Constrain_16Bits(Servo.Signal.Filtered[SERVO4], Servo.Pulse.Min[SERVO4], Servo.Pulse.Max[SERVO4]); //SERVO 4
   }
+  ServoAutoTrimRun();
 }

@@ -72,7 +72,6 @@
 #include "Build/BOARDDEFS.h"
 #include "Build/DEFAULT.h"
 #include "TaskSystem/TASKSYSTEM.h"
-#include "ServosMaster/SERVOAUTOTRIM.h"
 #include "ParamsToGCS/CHECKSUM.h"
 #include "Build/GENERALSETTINGS.h"
 #include "MachineMain/MACHINEINIT.h"

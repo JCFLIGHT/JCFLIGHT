@@ -28,9 +28,9 @@
 class AirPlaneClass
 {
 public:
-  void Mode_ConventionalPlane_Run();
-  void Mode_FixedWing_Run();
-  void Mode_PlaneVTail_Run();
+  void Update_Conventional_AirPlane(void);
+  void Update_FixedWing(void);
+  void Update_AirPlaneVTail(void);
 };
 extern AirPlaneClass AIRPLANE;
 #endif

@@ -16,6 +16,7 @@
 */
 
 #include "SERVOAUTOTRIM.h"
+#include "AirPlane/AIRPLANE.h"
 #include "PID/PIDXYZ.h"
 #include "SwitchFlag/SWITCHFLAG.h"
 #include "Scheduler/SCHEDULERTIME.h"
@@ -25,13 +26,12 @@
 #include "MotorsControl/MOTORS.h"
 #include "BitArray/BITARRAY.h"
 #include "SERVOSMASTER.h"
-#include "AirPlane/AIRPLANE.h"
 #include "ServosMaster/SERVOSMASTER.h"
 
 #define SERVO_AUTOTRIM_OVERFLOW 2000
 #define SAVE_OVERFLOW 2500
 
-bool ServoAutoTrimEnabled;
+bool ServoAutoTrimEnabled; //O ESTADO É MANIPULADO LÁ EM SWITCHFLAG.cpp
 
 int16_t ServoActualPulse[MAX_SUPPORTED_SERVOS];
 int16_t ServoMiddleBackup[MAX_SUPPORTED_SERVOS];

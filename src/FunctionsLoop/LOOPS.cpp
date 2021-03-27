@@ -106,7 +106,6 @@ void Integral_Loop()
         TECS.Update(ThisDeltaTime);
         PIDXYZ.Update(ThisDeltaTime);
         SERVOSMASTER.Update();
-        ServoAutoTrimRun();
         ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();
         //EM DESENVOLVIMENTO

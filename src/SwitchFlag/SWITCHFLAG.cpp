@@ -59,7 +59,9 @@ void Switch_Flag(void)
     {
       FlagParameterFunction += 1;
       if (GuardValue >= 4 && GuardValue <= 12)
+      {
         GuardValue += 1;
+      }
     }
     CloseReset = 5; //5 SEGUNDOS
     TimerFunction = SCHEDULERTIME.GetMillis();

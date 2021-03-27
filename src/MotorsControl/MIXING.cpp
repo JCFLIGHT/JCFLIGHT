@@ -118,7 +118,6 @@ void MixingApplyControl()
     case AIR_PLANE:
     {
         //AEROMODELO
-        AIRPLANE.Mode_ConventionalPlane_Run();
         MotorControl[MOTOR6] = 1000;
         NumberOfMotors = ProgMemReadByte(&Motors_Count[AIR_PLANE].FrameMotorsCount);
         return;
@@ -127,7 +126,6 @@ void MixingApplyControl()
     case FIXED_WING:
     {
         //ASA-FIXA
-        AIRPLANE.Mode_FixedWing_Run();
         MotorControl[MOTOR4] = 1000;
         MotorControl[MOTOR5] = 1000;
         MotorControl[MOTOR6] = 1000;
@@ -138,7 +136,6 @@ void MixingApplyControl()
     case PLANE_VTAIL:
     {
         //AERO TIPO V-TAIL
-        AIRPLANE.Mode_PlaneVTail_Run();
         MotorControl[MOTOR6] = 1000;
         NumberOfMotors = ProgMemReadByte(&Motors_Count[PLANE_VTAIL].FrameMotorsCount);
         return;

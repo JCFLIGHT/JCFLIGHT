@@ -33,7 +33,7 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 
 ## Contribuidor
 
-[Julio Cesar Matias](https://github.com/JuliooCesarMDM)                                                        
+[Julio Cesar Matias](https://github.com/JulioCesarMatias)                                                        
 **Veículo**: Multirotores,Aeros e Asa-Fixa.                                                                    
 **Plataformas**: JCFLIGHT-CLASSIC,JCFLIGHT-PASCAL e JCFLIGHT-EXTREME
 

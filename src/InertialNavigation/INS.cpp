@@ -19,7 +19,6 @@
 #include "I2C/I2C.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
-#include "Scheduler/SCHEDULER.h"
 #include "Barometer/BAROREAD.h"
 #include "Math/MATHSUPPORT.h"
 #include "GPS/GPSSTATES.h"
@@ -29,6 +28,8 @@
 
 InertialNavigationClass INERTIALNAVIGATION;
 INS_Struct INS;
+
+#define INS_MAX_ESTIMATED_POSITION 1000.0f //DISTANCIA MAXIMA DE POSIÇÃO TOLERADA NO INS (EM CM)
 
 void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame()
 {
@@ -51,7 +52,7 @@ void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame()
   INS.EarthFrame.Acceleration[PITCH] = -((INS.Math.Cosine_Pitch * INS.Math.Sine_Yaw) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Cosine_Roll * INS.Math.Cosine_Yaw + INS.Math.Sine_Roll * INS.Math.Sine_Pitch_Sine_Yaw_Fusion) * IMU.Accelerometer.Read[ROLL] + (-INS.Math.Sine_Roll * INS.Math.Cosine_Yaw + INS.Math.Cosine_Roll * INS.Math.Sine_Pitch_Sine_Yaw_Fusion) * IMU.Accelerometer.Read[YAW]);
 
   //YAW
-  INS.EarthFrame.Acceleration[YAW] = ((-INS.Math.Sine_Pitch) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Sine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[ROLL] + (INS.Math.Cosine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[YAW]) - 512;
+  INS.EarthFrame.Acceleration[YAW] = ((-INS.Math.Sine_Pitch) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Sine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[ROLL] + (INS.Math.Cosine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[YAW]) - ACC_1G;
 
   //ROLL
   INS.EarthFrame.Acceleration[ROLL] = ConvertAccelerationEarthFrameToCMSS(INS.EarthFrame.Acceleration[ROLL]);
@@ -109,31 +110,20 @@ void InertialNavigationClass::UpdateAccelerationEarthFrame_Filtered(uint8_t Arra
   INS.AccelerationEarthFrame_Sum_Count[ArrayCount] = 0;
 }
 
-void InertialNavigationClass::Calculate_AccelerationXY()
+void InertialNavigationClass::Calculate_AccelerationXY(float DeltaTime)
 {
-  static Scheduler_Struct Calculate_AccelerationXYTimer;
-  if (Scheduler(&Calculate_AccelerationXYTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
+  INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(INS_LATITUDE);
+  INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(INS_LONGITUDE);
+  if (Get_State_Armed_With_GPS())
   {
-    static bool ResetAccelerationXY = false;
-    INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(INS_LATITUDE);
-    INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(INS_LONGITUDE);
-    if (Get_State_Armed_With_GPS())
-    {
-      if (!ResetAccelerationXY)
-      {
-        ResetAccelerationXY = true;
-        INERTIALNAVIGATION.ResetXYState();
-      }
-      float DeltaTime = Calculate_AccelerationXYTimer.ActualTime * 1e-6f;
-      INERTIALNAVIGATION.CorrectXYStateWithGPS(DeltaTime);
-      INERTIALNAVIGATION.EstimationPredictXY(DeltaTime);
-      INERTIALNAVIGATION.SaveXYPositionToHistory();
-      return;
-    }
-    else
-    {
-      ResetAccelerationXY = false;
-    }
+    INERTIALNAVIGATION.CorrectXYStateWithGPS(DeltaTime);
+    INERTIALNAVIGATION.EstimationPredictXY(DeltaTime);
+    INERTIALNAVIGATION.SaveXYPositionToHistory();
+    return;
+  }
+  else
+  {
+    INERTIALNAVIGATION.ResetXYState();
   }
 }
 
@@ -142,8 +132,8 @@ void InertialNavigationClass::CorrectXYStateWithGPS(float DeltaTime)
   float PositionError[2];
   PositionError[INS_LATITUDE] = GPSDistanceToHome[INS_LATITUDE] - INS.History.XYPosition[INS_LATITUDE][INS.History.XYCount];
   PositionError[INS_LONGITUDE] = GPSDistanceToHome[INS_LONGITUDE] - INS.History.XYPosition[INS_LONGITUDE][INS.History.XYCount];
-  PositionError[INS_LATITUDE] = Constrain_Float(PositionError[INS_LATITUDE], -1000, 1000);
-  PositionError[INS_LONGITUDE] = Constrain_Float(PositionError[INS_LONGITUDE], -1000, 1000);
+  PositionError[INS_LATITUDE] = Constrain_Float(PositionError[INS_LATITUDE], -INS_MAX_ESTIMATED_POSITION, INS_MAX_ESTIMATED_POSITION);
+  PositionError[INS_LONGITUDE] = Constrain_Float(PositionError[INS_LONGITUDE], -INS_MAX_ESTIMATED_POSITION, INS_MAX_ESTIMATED_POSITION);
   INS.EarthFrame.Velocity[INS_LATITUDE] += PositionError[INS_LATITUDE] * (DeltaTime * 0.48f);
   INS.EarthFrame.Velocity[INS_LONGITUDE] += PositionError[INS_LONGITUDE] * (DeltaTime * 0.48f);
   INS.EarthFrame.Position[INS_LATITUDE] += PositionError[INS_LATITUDE] * (DeltaTime * 1.2f);
@@ -187,31 +177,19 @@ void InertialNavigationClass::ResetXYState()
   }
 }
 
-void InertialNavigationClass::Calculate_AccelerationZ()
+void InertialNavigationClass::Calculate_AccelerationZ(float DeltaTime)
 {
-  static Scheduler_Struct Calculate_AccelerationZTimer;
-  if (Scheduler(&Calculate_AccelerationZTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
+  CalculateBaroAltitudeForFlight();
+  INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(INS_VERTICAL_Z);
+  if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    static bool ResetAccelerationZ = false;
-    CalculateBaroAltitudeForFlight();
-    INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(INS_VERTICAL_Z);
-    if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-    {
-      if (!ResetAccelerationZ)
-      {
-        ResetAccelerationZ = true;
-        INERTIALNAVIGATION.ResetZState();
-      }
-      float DeltaTime = Calculate_AccelerationZTimer.ActualTime * 1e-6f;
-      INERTIALNAVIGATION.CorrectZStateWithBaro(DeltaTime);
-      INERTIALNAVIGATION.EstimationPredictZ(DeltaTime);
-      INERTIALNAVIGATION.SaveZPositionToHistory();
-      return;
-    }
-    else
-    {
-      ResetAccelerationZ = false;
-    }
+    INERTIALNAVIGATION.CorrectZStateWithBaro(DeltaTime);
+    INERTIALNAVIGATION.EstimationPredictZ(DeltaTime);
+    INERTIALNAVIGATION.SaveZPositionToHistory();
+  }
+  else
+  {
+    INERTIALNAVIGATION.ResetZState();
   }
 }
 
@@ -247,14 +225,8 @@ void InertialNavigationClass::ResetZState()
   INS.EarthFrame.Position[INS_VERTICAL_Z] = 0.0f;
   INS.EarthFrame.Velocity[INS_VERTICAL_Z] = 0.0f;
   INS.History.ZCount = 0;
-  INS.History.ZPosition[0] = 0;
-  INS.History.ZPosition[1] = 0;
-  INS.History.ZPosition[2] = 0;
-  INS.History.ZPosition[3] = 0;
-  INS.History.ZPosition[4] = 0;
-  INS.History.ZPosition[5] = 0;
-  INS.History.ZPosition[6] = 0;
-  INS.History.ZPosition[7] = 0;
-  INS.History.ZPosition[8] = 0;
-  INS.History.ZPosition[9] = 0;
+  for (uint8_t IndexCount = 0; IndexCount < 10; IndexCount++)
+  {
+    INS.History.ZPosition[IndexCount] = 0;
+  }
 }

@@ -151,7 +151,7 @@ void UpdateWindEstimator() //50Hz
     else if (WindEstimator.Time.Now - WindEstimator.Time.LastUpdate > 2000 && //0.5HZ
              Get_AirSpeed_Enabled())                                          //TUBO DE PITOT ATIVADO?SIM...
     {
-        //AO VOAR DIRETO,USE A VELOCIDADE DO TUDO DE PITOT PARA OBTER UMA ESTIMATIVA DO VENTO
+        //AO VOAR DIRETO,USE A VELOCIDADE DO TUDO DE PITOT PARA OBTER A ESTIMATIVA DO VENTO
         float AirSpeedVector[3];
         AirSpeedVector[ROLL] = WindEstimator.Fuselage.Direction[ROLL] * AirSpeed.Raw.IASPressure;
         AirSpeedVector[PITCH] = WindEstimator.Fuselage.Direction[PITCH] * AirSpeed.Raw.IASPressure;

@@ -223,7 +223,7 @@ float PIDXYZClass::DerivativeTermProcessYaw(int16_t ActualGyro, float PreviousRa
     NewDTermCalced = BIQUADFILTER.ApplyAndGet(&Derivative_Yaw_Smooth, GyroDifference);
   }
 
-  NewDTermCalced = GyroDifference * ((GET_SET[YAW].DerivativeVector / 1905.0f * 1.0f) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostPitch(IMU.Gyroscope.Read[YAW], PreviousRateGyro, PIDXYZ.CalcedRateTargetYaw, PreviousRateTarget, DeltaTime);
+  NewDTermCalced = GyroDifference * ((GET_SET[PID_YAW].DerivativeVector / 1905.0f * 1.0f) / DeltaTime) * PIDXYZ.ApplyDerivativeBoostPitch(IMU.Gyroscope.Read[YAW], PreviousRateGyro, PIDXYZ.CalcedRateTargetYaw, PreviousRateTarget, DeltaTime);
 
   return NewDTermCalced;
 }

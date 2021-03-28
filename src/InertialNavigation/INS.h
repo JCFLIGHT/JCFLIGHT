@@ -24,8 +24,8 @@ class InertialNavigationClass
 {
 public:
   void Calculate_AccelerationXYZ_To_EarthFrame();
-  void Calculate_AccelerationXY();
-  void Calculate_AccelerationZ();
+  void Calculate_AccelerationXY(float DeltaTime);
+  void Calculate_AccelerationZ(float DeltaTime);
 
 private:
   void UpdateAccelerationEarthFrame_Filtered(uint8_t ArrayCount);

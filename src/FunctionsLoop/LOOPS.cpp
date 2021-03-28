@@ -43,6 +43,8 @@ void Medium_Loop()
         AUXFLIGHT.SelectMode();
         AUXFLIGHT.FlightModesAuxSelect();
         FlightModesUpdate();
+        INERTIALNAVIGATION.Calculate_AccelerationXY(ThisDeltaTime);
+        INERTIALNAVIGATION.Calculate_AccelerationZ(ThisDeltaTime);
         BATTERY.Update_Voltage();
         BATTERY.Update_Current();
         PRINTF.ParamsToConsole();
@@ -72,8 +74,6 @@ void Super_Fast_Loop()
         SBUSRC.Update();
         IBUSRC.Update();
         INERTIALNAVIGATION.Calculate_AccelerationXYZ_To_EarthFrame();
-        INERTIALNAVIGATION.Calculate_AccelerationXY();
-        INERTIALNAVIGATION.Calculate_AccelerationZ();
         AIRSPEED.Update();
         Switch_Flag();
         BATTERY.Calculate_Total_Current_In_Mah();

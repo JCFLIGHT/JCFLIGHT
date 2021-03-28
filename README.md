@@ -24,11 +24,18 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 
 - Por Favor leia a [Wiki](https://github.com/JCFLIGHT/JCFLIGHT/wiki) da JCFLIGHT.
 
+## Documentação e Aprendizado
+
+- [Videos por JCLab](https://www.youtube.com/channel/UC6kk7H1CiaPVv4iKVGS9GsA)
+- [Guia para Multirotores](https://github.com/JCFLIGHT/JCFLIGHT/wiki/Guia-para-Multirotores)
+- [Guia para Aeros e Asa-Fixa](https://github.com/JCFLIGHT/JCFLIGHT/wiki/Guia-para-Aeros-e-Asa-Fixa)
+- [Guia dos modos de voo](https://github.com/JCFLIGHT/JCFLIGHT/wiki/Modos-de-Voo)
+
 ## Contribuidor
 
 [Julio Cesar Matias](https://github.com/JuliooCesarMDM)                                                        
 **Veículo**: Multirotores,Aeros & Asa-Fixa.                                                                    
-**Plataformas**: JCFLIGHT-CLASSIC,JCFLIGHT-PASCAL & JCFLIGHT-EXTREME
+**Plataformas**: JCFLIGHT-CLASSIC,JCFLIGHT-PASCAL e JCFLIGHT-EXTREME
 
 ## Como construir
 

@@ -43,12 +43,12 @@
 void GeneralSettingsInitialization()
 {
   PARAM.Initialization();
+  AUXFLIGHT.LoadEEPROM();
   CurvesRC_SetValues();
   TPA_Initialization();
   CurvesRC_CalculeValue();
   DECODE.Initialization();
   UART2Mode_Initialization();
-  AUXFLIGHT.LoadEEPROM();
   CHECKSUM.UpdateChannelsReverse();
   RTH_Altitude_EEPROM();
   LoadPID();

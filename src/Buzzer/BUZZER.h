@@ -25,10 +25,8 @@ public:
   void Run();
   void Play(Beeper_Mode Mode);
   void Silence();
-  bool GetSafeStateToOthersBeeps();
 
 private:
-  uint8_t SafeToOthersBeepsCounter;
   void Update();
   void ProcessCommand();
 };

@@ -34,7 +34,7 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 ## Contribuidor
 
 [Julio Cesar Matias](https://github.com/JuliooCesarMDM)                                                        
-**Veículo**: Multirotores,Aeros & Asa-Fixa.                                                                    
+**Veículo**: Multirotores,Aeros e Asa-Fixa.                                                                    
 **Plataformas**: JCFLIGHT-CLASSIC,JCFLIGHT-PASCAL e JCFLIGHT-EXTREME
 
 ## Como construir

@@ -30,7 +30,6 @@ BEEPERCLASS BEEPER;
 #define BEEPER_COMMAND_STOP 0xFF
 
 bool BuzzerInit = false;
-bool SafeToOthersBeeps = false;
 static uint8_t BeeperState = 0;
 static uint16_t BeeperPositionArray = 0;
 static uint32_t BeeperNextNote = 0;
@@ -195,7 +194,6 @@ void BEEPERCLASS::Silence()
   BeeperNextNote = 0;
   BeeperPositionArray = 0;
   BeeperEntry = NULL;
-  SafeToOthersBeeps = true;
 }
 
 void BEEPERCLASS::Update()
@@ -259,19 +257,9 @@ void BEEPERCLASS::Run()
   {
     BEEPER.Play(BEEPER_ALGORITHM_INIT);
   }
-  //NÃO FAÇA A MUDANÇA DO SOM TÃO RAPIDO PARA NÃO EMBOLAR COM O BEEP DA BATERIA SE A MESMA ESTIVER COM BAIXA TENSÃO
-  if (SafeToOthersBeeps && BEEPER.SafeToOthersBeepsCounter < 254)
-  {
-    BEEPER.SafeToOthersBeepsCounter++;
-  }
   BEEPER.Update();
   if (!BuzzerInit)
   {
     BuzzerInit = true;
   }
-}
-
-bool BEEPERCLASS::GetSafeStateToOthersBeeps()
-{
-  return BEEPER.SafeToOthersBeepsCounter > 200;
 }

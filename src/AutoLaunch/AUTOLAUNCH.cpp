@@ -48,40 +48,39 @@ bool StateLaunched = false;
 bool LaunchedDetect = false;
 bool IgnoreFirstPeak = false;
 bool IgnoreFirstPeakOverFlow = false;
-uint8_t PlaneType = 0;
 uint16_t ThrottleIteration = 1000;
 uint32_t ThrottleStart = 0;
 uint32_t AutoLaunchDetectorPreviousTime = 0;
 uint32_t AutoLaunchDetectorSum = 0;
 uint32_t AbortAutoLaunch = 0;
 
-const float GetPitchAccelerationInMSS()
+const float GetPitchAccelerationInMSS(void)
 {
   return BodyFrameAcceleration.Pitch;
 }
 
-const float GetRollAccelerationInMSS()
+const float GetRollAccelerationInMSS(void)
 {
   return BodyFrameAcceleration.Roll;
 }
 
-const float GetYawRotationInRadians()
+const float GetYawRotationInRadians(void)
 {
   return BodyFrameRotation.Yaw;
 }
 
-const bool AutoLaunchClass::GetSwingVelocityState()
+const bool AutoLaunchClass::GetSwingVelocityState(void)
 {
   const float SwingVelocity = (ABS(GetYawRotationInRadians()) > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / GetYawRotationInRadians()) : 0;
   return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (GetPitchAccelerationInMSS() > 0);
 }
 
-const bool AutoLaunchClass::GetForwardState()
+const bool AutoLaunchClass::GetForwardState(void)
 {
   return GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH);
 }
 
-void AutoLaunchClass::AutoLaunchDetector()
+void AutoLaunchClass::AutomaticDetector()
 {
   if (AUTOLAUNCH.GetIMUAngleBanked(GetPitchAccelerationInMSS(), AHRS.CheckAnglesInclination(AHRS_BANKED_ANGLE)) ||
       AUTOLAUNCH.GetSwingVelocityState() ||
@@ -101,26 +100,25 @@ void AutoLaunchClass::AutoLaunchDetector()
   }
 }
 
-void AutoLaunchClass::Update()
+void AutoLaunchClass::Update(void)
 {
   if (!GetFrameStateOfAirPlane())
   {
     return;
   }
-  AUTOLAUNCH.SetPlaneType();
   if (IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE))
   {
     if (AUTOLAUNCH.GetValidStateToRunLaunch() && !LaunchedDetect)
     {
       if (!AutoLaunchState)
       {
-        BEEPER.Play(BEEPER_AUTOLAUNCH);
+        BEEPER.Play(BEEPER_AUTO_LAUNCH);
       }
       else
       {
         BEEPER.Play(BEEPER_LAUNCHED);
       }
-      if (PlaneType == WITH_WHEELS)
+      if (AUTOLAUNCH.GetPlaneType() == WITH_WHEELS)
       {
         AutoLaunchState = true;
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
@@ -131,32 +129,29 @@ void AutoLaunchClass::Update()
       }
       if (AutoLaunchState)
       {
-        if (PlaneType == WITHOUT_WHEELS)
+        if (AUTOLAUNCH.GetPlaneType() == WITHOUT_WHEELS)
         {
           AUTOLAUNCH.RCControllerThrottle_Apply_Logic(false); //FALSE PARA PLANES SEM TREM DE POUSO
         }
-        if (PlaneType == WITH_WHEELS)
-        {
-          AUTOLAUNCH.RCControllerYawPitchRoll_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
-        }
+        AUTOLAUNCH.RCControllerYawPitchRoll_Apply_Logic();
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
           ENABLE_STATE(PRIMARY_ARM_DISARM);
         }
-        if (AUTOLAUNCH.AutoLaunchCompleted())
+        if (AUTOLAUNCH.Completed())
         {
           LaunchedDetect = true;
           AutoLaunchState = false;
         }
         StateLaunched = true;
       }
-      else if (!StateLaunched && PlaneType == WITHOUT_WHEELS) //NÃO VAMOS USAR A IMU PARA ATIVAR O AUTO-LAUCH EM AEROMODELOS COM RODAS
+      else if (!StateLaunched && AUTOLAUNCH.GetPlaneType() == WITHOUT_WHEELS) //NÃO VAMOS USAR A IMU PARA ATIVAR O AUTO-LAUCH EM AEROMODELOS COM RODAS
       {
-        AUTOLAUNCH.AutoLaunchDetector();
+        AUTOLAUNCH.AutomaticDetector();
       }
-      if (PlaneType == WITHOUT_WHEELS && !LaunchedDetect)
+      if (!LaunchedDetect)
       {
-        AUTOLAUNCH.RCControllerYawPitchRoll_Apply_Logic(false); //A FUNÇÃO FICA SEMPRE ATIVA PARA PLANES SEM TREM DE POUSO
+        AUTOLAUNCH.RCControllerYawPitchRoll_Apply_Logic(); //A FUNÇÃO FICA SEMPRE ATIVA PARA PLANES SEM TREM DE POUSO
       }
     }
   }
@@ -219,9 +214,9 @@ int16_t AutoLaunchClass::CalculeControllToPitch(float AngleInDegrees, int16_t In
   return ((CalcValueA / CalcValueB) + (-500.0f));
 }
 
-void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
+void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(void)
 {
-  if (SlowControll)
+  if (AUTOLAUNCH.GetPlaneType() == WITH_WHEELS)
   {
     if (AUTOLAUNCH.GetStateOfThrottle())
     {
@@ -240,12 +235,12 @@ void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(bool SlowControll)
   }
 }
 
-bool AutoLaunchClass::GetStateOfThrottle()
+bool AutoLaunchClass::GetStateOfThrottle(void)
 {
   return (DECODE.GetRxChannelOutput(THROTTLE) >= 1400) && AutoLaunchState;
 }
 
-bool AutoLaunchClass::GetValidStateToRunLaunch()
+bool AutoLaunchClass::GetValidStateToRunLaunch(void)
 {
   return GetActualThrottleStatus(THROTTLE_MIDDLE);
 }
@@ -255,7 +250,7 @@ bool AutoLaunchClass::GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclinat
   return ((VectorPitch < (IMU_BANKED_ANGLE)) && CheckIMUInclination);
 }
 
-bool AutoLaunchClass::AutoLaunchTimerOverFlow()
+bool AutoLaunchClass::TimerOverFlow(void)
 {
   if (SCHEDULERTIME.GetMillis() - AbortAutoLaunch >= AUTO_LAUCH_EXIT_FUNCTION)
   {
@@ -272,39 +267,40 @@ bool AutoLaunchClass::AutoLaunchTimerOverFlow()
   return false;
 }
 
-bool AutoLaunchClass::AutoLaunchMaxAltitudeReached(void)
+bool AutoLaunchClass::MaxAltitudeReached(void)
 {
   return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (Barometer.INS.Altitude.Estimated >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
 }
 
-bool AutoLaunchClass::AutoLaunchCompleted()
+bool AutoLaunchClass::Completed(void)
 {
   //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
   if (AUTO_LAUCH_EXIT_FUNCTION == NONE)
   {
-    return (SticksDeflected(15)) || (AUTOLAUNCH.AutoLaunchMaxAltitudeReached());
+    return (SticksDeflected(15)) || (AUTOLAUNCH.MaxAltitudeReached());
   }
   //FAÇA A MESMA VERIFICAÇÃO DE CIMA,PORÉM COM O ESTOURO DO TEMPO MAXIMO DE LAUNCH
-  return (AUTOLAUNCH.AutoLaunchTimerOverFlow()) || (SticksDeflected(15)) || (AUTOLAUNCH.AutoLaunchMaxAltitudeReached());
+  return (AUTOLAUNCH.TimerOverFlow()) || (SticksDeflected(15)) || (AUTOLAUNCH.MaxAltitudeReached());
 }
 
-void AutoLaunchClass::SetPlaneType()
+uint8_t AutoLaunchClass::GetPlaneType(void)
 {
   if (GetActualFrameState(FIXED_WING))
   {
-    PlaneType = WITHOUT_WHEELS;
+    return WITHOUT_WHEELS;
   }
   else if (GetActualFrameState(PLANE_VTAIL))
   {
-    PlaneType = WITHOUT_WHEELS;
+    return WITHOUT_WHEELS;
   }
   else if (GetActualFrameState(AIR_PLANE))
   {
-    PlaneType = WITH_WHEELS;
+    return WITH_WHEELS;
   }
+  return 0;
 }
 
-void AutoLaunchClass::ResetParameters()
+void AutoLaunchClass::ResetParameters(void)
 {
   //RESETA OS PARAMETROS QUANDO ESTIVER DESARMADO
   StateLaunched = false;

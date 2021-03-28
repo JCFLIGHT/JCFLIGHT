@@ -139,7 +139,7 @@ const BeeperEntry_Struct BeeperTable[] = {
     {BEEPER_ACTION_FAIL, 4, Fail_Beep},
     {BEEPER_ARM, 5, Arm_Beep},
     {BEEPER_ALGORITHM_INIT, 6, AlgorithmInit_Beep},
-    {BEEPER_AUTOLAUNCH, 7, AutoLaunch_Beep},
+    {BEEPER_AUTO_LAUNCH, 7, AutoLaunch_Beep},
     {BEEPER_LAUNCHED, 8, Launched_Beep},
     {BEEPER_FMU_INIT, 9, FMU_Init_Beep},
     {BEEPER_FMU_SAFE_TO_ARM, 10, FMU_Safe_Beep},

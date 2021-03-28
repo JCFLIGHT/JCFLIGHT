@@ -21,23 +21,23 @@
 class AutoLaunchClass
 {
 public:
-  void Update();
+  void Update(void);
 
 private:
-  const bool GetSwingVelocityState();
-  const bool GetForwardState();
-  void AutoLaunchDetector();
+  const bool GetSwingVelocityState(void);
+  const bool GetForwardState(void);
+  void AutomaticDetector(void);
   void RCControllerThrottle_Apply_Logic(bool SlowThr);
   int16_t CalculeControllToPitch(float AngleInDegrees, int16_t InclinationMaxOfStabilize);
-  void RCControllerYawPitchRoll_Apply_Logic(bool SlowControll);
-  bool GetStateOfThrottle();
-  bool GetValidStateToRunLaunch();
+  void RCControllerYawPitchRoll_Apply_Logic(void);
+  bool GetStateOfThrottle(void);
+  bool GetValidStateToRunLaunch(void);
   bool GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclination);
-  bool AutoLaunchTimerOverFlow();
-  bool AutoLaunchMaxAltitudeReached(void);
-  bool AutoLaunchCompleted();
-  void SetPlaneType();
-  void ResetParameters();
+  bool TimerOverFlow(void);
+  bool MaxAltitudeReached(void);
+  bool Completed(void);
+  uint8_t GetPlaneType(void);
+  void ResetParameters(void);
 };
 extern AutoLaunchClass AUTOLAUNCH;
 #endif

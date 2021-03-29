@@ -40,7 +40,7 @@ void ClassESC::Calibration(void)
     return; //FAÇA UMA RAPIDA SAIDA DA FUNÇÃO CASO O USUARIO NÃO QUEIRA CALIBRAR OS ESC'S
   }
   LOG("Etapa de calib dos escs inicializada!");
-  ConfigureRegisters(true); //INICIA OS REGISTRADORES DE CONFIGURAÇÃO DE SAIDA DOS PINOS PWM
+  ConfigureRegisters(true); //INICIA OS REGISTRADORES DE CONFIGURAÇÃO DOS PINOS PWM
   while (true)              //FICA TRAVADO AQUI NO WHILE ATÉ QUE A CONTROLADORA SEJA REINICIADA MANUALMENTE
   {
     BEEPER.Run();                                                                                                //TOCA A MÚSICA DE INICIALIZAÇÃO

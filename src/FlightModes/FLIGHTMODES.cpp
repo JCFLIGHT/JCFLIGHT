@@ -34,6 +34,7 @@
 #include "Barometer/BAROBACKEND.h"
 
 bool Do_AltitudeHold_Mode;
+bool GPSHold_CallBaro = false;
 bool Do_GPS_Altitude;
 
 bool Multirotor_GPS_FlightModes_Once()

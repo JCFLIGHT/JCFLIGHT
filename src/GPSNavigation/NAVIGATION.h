@@ -18,7 +18,6 @@
 #ifndef NAVIGATION_H_
 #define NAVIGATION_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern bool GPSHold_CallBaro;
 extern bool Home_Point;
 extern float ScaleDownOfLongitude;
 extern uint8_t GPS_Flight_Mode;

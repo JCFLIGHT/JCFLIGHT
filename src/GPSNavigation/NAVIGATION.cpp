@@ -45,7 +45,6 @@ static void GPS_Update_CrossTrackError(void);
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput);
 
 bool DeclinationPushed = false;
-bool GPSHold_CallBaro = false;
 bool Home_Point;
 
 uint8_t DeclinationPushedCount = 0;

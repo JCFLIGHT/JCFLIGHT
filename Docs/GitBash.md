@@ -6,22 +6,22 @@ Documento apenas para desenvolvedores.
 
 - A primeira coisa que você deve fazer é `forkar (Garfo)` o repositório para o seu GitHub,acesse o [repositório da JCFLIGHT](https://github.com/JCFLIGHT/JCFLIGHT) e faça o Fork.
 
-![JCFLIGHT](Docs/Fork.png)
+![JCFLIGHT](Fork.png)
 
 - Após o fork,o repositório irá aparecer na sua conta de usuario do GitHub,onde você irá usar para Clonar e fazer alterações para o Pull-Request (tomando cuidado com a licença sob a qual ele foi liberado).
 
 
-![JCFLIGHT](Docs/Forked.png)
+![JCFLIGHT](Forked.png)
 
 ## Clonando o repositório
 
 - Agora você precisa baixar os arquivos do repositório para que você possa alterar.A primeira coisa a fazer é copiar a URL do repositório.
 
-![JCFLIGHT](Docs/Clone.png)
+![JCFLIGHT](Clone.png)
 
 - Após copiar a URL,abra o terminal do GitBash,crie um diretório onde você vai guardar o projeto,e digite `git clone` e após esse comando coloque o link do seu fork e aperte enter.Pronto agora temos o projeto da JCFLIGHT clonado dentro da nossa maquina local.
 
-![JCFLIGHT](Docs/Clonado.png)
+![JCFLIGHT](Clonado.png)
 
 ## Criando a Branch para codar
 

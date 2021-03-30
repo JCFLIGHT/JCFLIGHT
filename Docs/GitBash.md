@@ -4,7 +4,7 @@ Documento apenas para desenvolvedores.
 
 ## Forkando o repositório
 
-- A primeira coisa que você deve fazer é `forkar (Garfo)` o repositório para o seu GitHub,acesse o [repositório da JCFLIGHT](https://github.com/JCFLIGHT/JCFLIGHT) e faça o Fork.
+- A primeira coisa que você deve fazer é `forkar(Garfo)` o repositório para o seu GitHub,acesse o [repositório da JCFLIGHT](https://github.com/JCFLIGHT/JCFLIGHT) e faça o Fork.
 
 ![JCFLIGHT](Fork.png)
 
@@ -30,7 +30,7 @@ Documento apenas para desenvolvedores.
 1. Vá até o local que você clonou o repositório da JCFLIGHT e abra o terminal do GitBash.
 2. Verifique primeiro se você está na Branch Master,digitando o comando `git branch`,o terminal tem que te retornar `* master`.
 3. Agora vamos criar a Branch,usando o comando `git checkout -b`,após o `-b` você deve colocar um nome para a sua Branch,por exemplo:`git checkout -b inertial sensor`.
-4. Agora é a hora de enviar suas alterações,usando os comandos `git add --all` e `git commit -m "Coloque aqui sua mensagem"`,após esses dois comandos,vamos dar o último comando para subir as alterações para o seu repositório Forkado,usando o comando `git push origin` após o `origin` você deve colocar o nome o nome da sua Brach,que no meu exemplo foi `inertial sensor`.
+4. Agora é a hora de enviar suas alterações,usando os comandos `git add --all` e `git commit -m "Coloque aqui sua mensagem"`,após esses dois comandos,vamos dar o último comando para subir as alterações para o seu repositório Forkado,usando o comando `git push origin` após o `origin` você deve colocar o nome o nome da sua Brach,que nesse exemplo eu nomeiei de `inertial sensor`.
 
 ## Comparando e Pull-Request
 

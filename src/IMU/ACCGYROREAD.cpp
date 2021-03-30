@@ -35,10 +35,10 @@ FILE_COMPILE_FOR_SPEED
 
 IMU_Struct IMU;
 
+#ifndef __AVR_ATmega2560__
 //INSTANCIAS PARA O LPF
 static BiquadFilter_Struct BiquadAccLPF[3];
 static BiquadFilter_Struct BiquadGyroLPF[3];
-#ifndef __AVR_ATmega2560__
 //INSTANCIAS PARA O NOTCH
 static BiquadFilter_Struct BiquadAccNotch[3];
 static BiquadFilter_Struct BiquadGyroNotch[3];
@@ -46,9 +46,9 @@ static BiquadFilter_Struct BiquadGyroNotch[3];
 
 bool ActiveKalman = false;
 
+#ifndef __AVR_ATmega2560__
 int16_t Biquad_Acc_LPF = 0;
 int16_t Biquad_Gyro_LPF = 0;
-#ifndef __AVR_ATmega2560__
 int16_t Biquad_Acc_Notch = 0;
 int16_t Biquad_Gyro_Notch = 0;
 #endif
@@ -64,6 +64,7 @@ void IMU_Filters_Initialization()
   {
     ActiveKalman = true;
   }
+#ifndef __AVR_ATmega2560__
   //CARREGA OS VALORES GUARDADOS DO LPF
   Biquad_Acc_LPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Biquad_Gyro_LPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
@@ -75,7 +76,6 @@ void IMU_Filters_Initialization()
   BIQUADFILTER.Settings(&BiquadGyroLPF[ROLL], Biquad_Gyro_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&BiquadGyroLPF[PITCH], Biquad_Gyro_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&BiquadGyroLPF[YAW], Biquad_Gyro_LPF, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
-#ifndef __AVR_ATmega2560__
   //CARREGA OS VALORES GUARDADOS DO NOTCH
   Biquad_Acc_Notch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
   Biquad_Gyro_Notch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
@@ -169,10 +169,12 @@ void Acc_ReadBufferData()
   //APLICA O AJUSTE DO ACELEROMETRO
   ApplySensorAlignment(IMU.Accelerometer.Read);
 
+#ifndef __AVR_ATmega2560__
   //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS
   IMU.Accelerometer.ReadNotFiltered[ROLL] = IMU.Accelerometer.Read[ROLL];
   IMU.Accelerometer.ReadNotFiltered[PITCH] = IMU.Accelerometer.Read[PITCH];
   IMU.Accelerometer.ReadNotFiltered[YAW] = IMU.Accelerometer.Read[YAW];
+#endif
 
   //KALMAN
   if (ActiveKalman)
@@ -180,6 +182,7 @@ void Acc_ReadBufferData()
     KALMAN.Apply_In_Acc(IMU.Accelerometer.Read);
   }
 
+#ifndef __AVR_ATmega2560__
   //LPF
   if (Biquad_Acc_LPF > 0)
   {
@@ -189,7 +192,6 @@ void Acc_ReadBufferData()
     IMU.Accelerometer.Read[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadAccLPF[YAW], IMU.Accelerometer.Read[YAW]);
   }
 
-#ifndef __AVR_ATmega2560__
   //NOTCH
   if (Biquad_Acc_Notch > 0)
   {
@@ -212,10 +214,12 @@ void Gyro_ReadBufferData()
 
   Gyroscope_Calibration();
 
+#ifndef __AVR_ATmega2560__
   //OBTÉM OS VALORES DO GYROSCOPIO ANTES DOS FILTROS
   IMU.Gyroscope.ReadNotFiltered[ROLL] = IMU.Gyroscope.Read[ROLL];
   IMU.Gyroscope.ReadNotFiltered[PITCH] = IMU.Gyroscope.Read[PITCH];
   IMU.Gyroscope.ReadNotFiltered[YAW] = IMU.Gyroscope.Read[YAW];
+#endif
 
   //KALMAN
   if (ActiveKalman)
@@ -223,6 +227,7 @@ void Gyro_ReadBufferData()
     KALMAN.Apply_In_Gyro(IMU.Gyroscope.Read);
   }
 
+#ifndef __AVR_ATmega2560__
   //LPF
   if (Biquad_Gyro_LPF > 0)
   {
@@ -232,7 +237,6 @@ void Gyro_ReadBufferData()
     IMU.Gyroscope.Read[YAW] = BIQUADFILTER.ApplyAndGet(&BiquadGyroLPF[YAW], IMU.Gyroscope.Read[YAW]);
   }
 
-#ifndef __AVR_ATmega2560__
   //NOTCH
   if (Biquad_Gyro_Notch > 0)
   {

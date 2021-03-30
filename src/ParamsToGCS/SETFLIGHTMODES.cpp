@@ -18,6 +18,7 @@
 #include "SETFLIGHTMODES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "GPSNavigation/NAVIGATION.h"
+#include "Common/ENUM.h"
 
 void SetFlightModeToGCS()
 {

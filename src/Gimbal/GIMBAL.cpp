@@ -20,6 +20,7 @@
 #include "RadioControl/DECODE.h"
 #include "MotorsControl/MOTORS.h"
 #include "Common/RCDEFINES.h"
+#include "Common/ENUM.h"
 
 void Gimbal_Controll()
 {

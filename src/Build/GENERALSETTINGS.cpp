@@ -43,7 +43,7 @@
 void GeneralSettingsInitialization()
 {
   PARAM.Initialization();
-  AUXFLIGHT.LoadEEPROM();
+  AUXFLIGHT.Initialization();
   CurvesRC_SetValues();
   TPA_Initialization();
   CurvesRC_CalculeValue();

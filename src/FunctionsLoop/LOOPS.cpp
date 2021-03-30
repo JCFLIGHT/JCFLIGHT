@@ -40,8 +40,7 @@ void Medium_Loop()
         Barometer_Update();
         GPS_Serial_Read();
         GPS_Process_FlightModes(ThisDeltaTime);
-        AUXFLIGHT.SelectMode();
-        AUXFLIGHT.FlightModesAuxSelect();
+        AUXFLIGHT.Update();
         FlightModesUpdate();
         INERTIALNAVIGATION.Calculate_AccelerationXY(ThisDeltaTime);
         INERTIALNAVIGATION.Calculate_AccelerationZ(ThisDeltaTime);

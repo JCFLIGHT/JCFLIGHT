@@ -64,7 +64,7 @@ bool ApplyAltitudeHoldControl()
   {
     static bool BaroModeActivated = false;
     static bool HoveringState = false;
-    if ((Do_AltitudeHold_Mode || Do_GPS_Altitude) && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
+    if ((Do_Altitude_Hold || Do_RTH_Or_Land_Call_Alt_Hold) && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (!BaroModeActivated)
       {
@@ -75,7 +75,7 @@ bool ApplyAltitudeHoldControl()
         ResetLandDetector();
       }
       RunLandDetector();
-      if (Do_GPS_Altitude)
+      if (Do_RTH_Or_Land_Call_Alt_Hold)
       {
         if (TakeOffInProgress)
         {

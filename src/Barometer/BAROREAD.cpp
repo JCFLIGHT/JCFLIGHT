@@ -59,7 +59,7 @@ float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t Bar
   return Result;
 }
 
-void CalculateBaroAltitudeForFlight()
+void CalculateBarometerAltitude()
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {

@@ -31,9 +31,6 @@
 
 AUXFLIGHTCLASS AUXFLIGHT;
 
-//ATIVAÇÃO E DASATIVAÇÃO DOS MODOS DE VOO
-uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
-
 //VARIAVEIS DE CARREGAMENTO DA EEPROM
 uint8_t GPSHoldConfig,
     RTHConfig,
@@ -62,7 +59,7 @@ int16_t AltitudeHoldControlAux,
     ArmDisarmControlAux,
     AutoLandControlAux;
 
-void AUXFLIGHTCLASS::LoadEEPROM(void)
+void AUXFLIGHTCLASS::Initialization(void)
 {
   SimpleConfig = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);              //CHAVE AUX ATRIBUIDA PARA O MODO SIMPLES
   AltitudeHoldConfig = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR);      //CHAVE AUX ATRIBUIDA PARA O MODO ALT-HOLD
@@ -1193,4 +1190,10 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
   {
     DISABLE_THIS_FLIGHT_MODE(WAYPOINT_MODE);
   }
+}
+
+void AUXFLIGHTCLASS::Update(void)
+{
+  AUXFLIGHT.SelectMode();
+  AUXFLIGHT.FlightModesAuxSelect();
 }

@@ -20,6 +20,7 @@
 #include "MS5611.h"
 #include "BMP280.h"
 #include "I2C/I2C.h"
+#include "BAROREAD.h"
 
 Barometer_Struct Barometer;
 
@@ -59,6 +60,8 @@ void Barometer_Update()
     {
         return;
     }
+
+    CalculateBarometerAltitude();
 
     switch (BaroType)
     {

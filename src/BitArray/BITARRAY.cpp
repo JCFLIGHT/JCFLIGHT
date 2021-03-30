@@ -17,12 +17,15 @@
 
 #include "BITARRAY.h"
 #include "FlightModes/AUXFLIGHT.h"
+#include "Common/ENUM.h"
 
 //ESSE BIT ARRAY ESTÁ EM uint8_t (BYTE -> 0 - 255)
 
 #define BITARRAY_BIT_OP(Array, Bit, Operator) ((Array)[(Bit) / (sizeof((Array)[0]) * 8)] Operator(1 << ((Bit) % (sizeof((Array)[0]) * 8))))
 
 typedef uint8_t BitArrayElement8Bits;
+
+uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
 
 bool BitArrayGet(const BitArrayElement8Bits *Array, unsigned Bit)
 {

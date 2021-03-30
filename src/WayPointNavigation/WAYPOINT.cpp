@@ -41,7 +41,7 @@ struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 #define THROTTLE_INCREMENT_TIME 1       //INCREMENTA A CADA 0.10 SEGUNDOS
 
 bool WPTakeOffNomalized = false;
-bool Mission_BaroMode = false;
+bool Do_WayPoint_Call_Alt_Hold = false;
 bool WPSucess = false;
 bool ClearEEPROM = false;
 bool StoreEEPROM = false;
@@ -240,7 +240,7 @@ void WayPointRun()
     Mission_Timed_Count = 0;
     ThrottleIncrement = 1000;
     ThrottleIncrementCount = 0;
-    Mission_BaroMode = false;
+    Do_WayPoint_Call_Alt_Hold = false;
     WPTakeOffNomalized = false;
     return;
   }
@@ -255,7 +255,7 @@ void WayPointRun()
 
   case WP_MISSION_INIT:
     //ATIVA O MODO ALTITUDE-HOLD
-    Mission_BaroMode = true;
+    Do_WayPoint_Call_Alt_Hold = true;
     //TAKEOFF
     if (WayPointFlightMode[0] == WP_TAKEOFF || WayPointFlightMode[1] == WP_TAKEOFF || WayPointFlightMode[2] == WP_TAKEOFF ||
         WayPointFlightMode[3] == WP_TAKEOFF || WayPointFlightMode[4] == WP_TAKEOFF || WayPointFlightMode[5] == WP_TAKEOFF ||
@@ -383,7 +383,7 @@ void WayPointRun()
         {
           Mission_Timed_Count++; //10 ITERAÇÕES = 1 SEGUNDO
         }
-        Do_GPS_Altitude = false;
+        Do_RTH_Or_Land_Call_Alt_Hold = false;
         GPS_Flight_Mode = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
         GPS_Navigation_Mode = DO_POSITION_HOLD;

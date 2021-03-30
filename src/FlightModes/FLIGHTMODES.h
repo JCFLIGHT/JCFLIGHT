@@ -18,7 +18,7 @@
 #ifndef FLIGHTMODES_H_
 #define FLIGHTMODES_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern bool Do_AltitudeHold_Mode;
-extern bool Do_GPS_Altitude;
+extern bool Do_Altitude_Hold;
+extern bool Do_RTH_Or_Land_Call_Alt_Hold;
 void FlightModesUpdate();
 #endif

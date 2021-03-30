@@ -29,7 +29,7 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
         .TaskName = "SLOW_LOOP",
         .TaskFunction = Slow_Loop,
         .DesiredPeriod = SCHEDULER_SET_FREQUENCY(10, "Hz"),
-        .StaticPriority = TASK_PRIORITY_LOW,
+        .StaticPriority = TASK_PRIORITY_MEDIUM,
     },
 
     [TASK_MEDIUM_LOOP] = {

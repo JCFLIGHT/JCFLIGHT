@@ -18,8 +18,7 @@
 #ifndef AUXFLIGHT_H_
 #define AUXFLIGHT_H_
 #include "Build/LIBDEPENDENCIES.h"
-#include "Common/ENUM.h"
-extern uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
+
 extern uint8_t GPSHoldConfig,
     RTHConfig,
     SimpleConfig,
@@ -48,7 +47,10 @@ extern int16_t AltitudeHoldControlAux,
 class AUXFLIGHTCLASS
 {
 public:
-  void LoadEEPROM(void);
+  void Initialization(void);
+  void Update(void);
+
+private:
   void SelectMode(void);
   void FlightModesAuxSelect(void);
 };

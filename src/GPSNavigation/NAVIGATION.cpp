@@ -113,7 +113,7 @@ void GPS_Process_FlightModes(float DeltaTime)
   }
   DeltaTimeGPSNavigation = DeltaTime;
   DeltaTimeGPSNavigation = MIN(DeltaTimeGPSNavigation, 1.0f);
-  GPS_Calcule_Bearing(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1], &CalculateDirection);
+  GPS_Calcule_Bearing(&Stored_Coordinates_Home_Point[COORD_LATITUDE], &Stored_Coordinates_Home_Point[COORD_LONGITUDE], &CalculateDirection);
   DirectionToHome = CalculateDirection / 100; //FUTURAMENTE PARA O GCS
   GPS_Calcule_Distance_To_Home(&CalculateDistance);
   DistanceToHome = CalculateDistance / 100;
@@ -152,7 +152,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       }
       else if (GetAltitudeReached())
       {
-        Set_Next_Point_To_Navigation(&Stored_Coordinates_Home_Point[0], &Stored_Coordinates_Home_Point[1]);
+        Set_Next_Point_To_Navigation(&Stored_Coordinates_Home_Point[COORD_LATITUDE], &Stored_Coordinates_Home_Point[COORD_LONGITUDE]);
         GPS_Navigation_Mode = DO_RTH_ENROUTE;
       }
       break;
@@ -172,7 +172,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       break;
 
     case DO_LAND_INIT:
-      Do_GPS_Altitude = true;
+      Do_RTH_Or_Land_Call_Alt_Hold = true;
       SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
       Time_To_Start_The_Land = SCHEDULERTIME.GetMillis() + 100;
       GPS_Navigation_Mode = DO_LAND_SETTLE;
@@ -205,7 +205,7 @@ void GPS_Process_FlightModes(float DeltaTime)
 
     case DO_LANDED:
       DISABLE_STATE(PRIMARY_ARM_DISARM);
-      Do_GPS_Altitude = false;
+      Do_RTH_Or_Land_Call_Alt_Hold = false;
       BEEPER.Play(BEEPER_ACTION_SUCCESS);
       GPS_Reset_Navigation();
       break;
@@ -231,8 +231,8 @@ void Set_Next_Point_To_Navigation(int32_t *Latitude_Destiny, int32_t *Longitude_
   Circle_Mode_Update();
   GPS_Calcule_Bearing(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Target_Bearing);
   GPS_Calcule_Distance_In_CM(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Two_Points_Distance);
-  INS.Position.Hold[COORD_LATITUDE] = (Coordinates_To_Navigation[COORD_LATITUDE] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
-  INS.Position.Hold[COORD_LONGITUDE] = (Coordinates_To_Navigation[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
+  INS.Position.Hold[COORD_LATITUDE] = (Coordinates_To_Navigation[COORD_LATITUDE] - Stored_Coordinates_Home_Point[COORD_LATITUDE]) * 1.11318845f;
+  INS.Position.Hold[COORD_LONGITUDE] = (Coordinates_To_Navigation[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[COORD_LONGITUDE]) * 1.11318845f * ScaleDownOfLongitude;
   Coordinates_Navigation_Speed = 100;
   Original_Target_Bearing = Target_Bearing;
 }
@@ -265,8 +265,8 @@ void GPS_Calcule_Distance_In_CM(int32_t *InputLatitude, int32_t *InputLongitude,
 
 void GPS_Calcule_Distance_To_Home(uint32_t *CalculateDistance)
 {
-  GPSDistanceToHome[COORD_LATITUDE] = (GPS_Coordinates_Vector[COORD_LATITUDE] - Stored_Coordinates_Home_Point[0]) * 1.11318845f;
-  GPSDistanceToHome[COORD_LONGITUDE] = (GPS_Coordinates_Vector[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[1]) * 1.11318845f * ScaleDownOfLongitude;
+  GPSDistanceToHome[COORD_LATITUDE] = (GPS_Coordinates_Vector[COORD_LATITUDE] - Stored_Coordinates_Home_Point[COORD_LATITUDE]) * 1.11318845f;
+  GPSDistanceToHome[COORD_LONGITUDE] = (GPS_Coordinates_Vector[COORD_LONGITUDE] - Stored_Coordinates_Home_Point[COORD_LONGITUDE]) * 1.11318845f * ScaleDownOfLongitude;
   *CalculateDistance = SquareRootU32Bits(Square32Bits(GPSDistanceToHome[COORD_LATITUDE]) + Square32Bits(GPSDistanceToHome[COORD_LONGITUDE]));
 }
 
@@ -409,8 +409,6 @@ int16_t Calculate_Navigation_Speed(int16_t Maximum_Velocity)
 
 void Do_Mode_RTH_Now()
 {
-  GPS_Flight_Mode = GPS_MODE_RTH;
-  Do_GPS_Altitude = true;
   if (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(RTH_Altitude))
   {
     SetAltitudeToHold(ConvertCMToMeters(RTH_Altitude));
@@ -420,13 +418,12 @@ void Do_Mode_RTH_Now()
     SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
   }
   SetThisPointToPositionHold();
-  GPS_Navigation_Mode = DO_START_RTH;
 }
 
 void Reset_Home_Point(void)
 {
-  Stored_Coordinates_Home_Point[0] = GPS_Coordinates_Vector[COORD_LATITUDE];
-  Stored_Coordinates_Home_Point[1] = GPS_Coordinates_Vector[COORD_LONGITUDE];
+  Stored_Coordinates_Home_Point[COORD_LATITUDE] = GPS_Coordinates_Vector[COORD_LATITUDE];
+  Stored_Coordinates_Home_Point[COORD_LONGITUDE] = GPS_Coordinates_Vector[COORD_LONGITUDE];
   GPS_Calcule_Longitude_Scaling(GPS_Coordinates_Vector[COORD_LATITUDE]);
   Navigation_Bearing_RTH = ATTITUDE.AngleOut[YAW];
   GPS_Altitude_For_Plane = GPS_Altitude;

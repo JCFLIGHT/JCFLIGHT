@@ -19,7 +19,6 @@
 #include "I2C/I2C.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
-#include "Barometer/BAROREAD.h"
 #include "Math/MATHSUPPORT.h"
 #include "GPS/GPSSTATES.h"
 #include "AHRS/AHRS.h"
@@ -178,7 +177,6 @@ void InertialNavigationClass::ResetXYState()
 
 void InertialNavigationClass::Calculate_AccelerationZ(float DeltaTime)
 {
-  CalculateBaroAltitudeForFlight();
   INERTIALNAVIGATION.UpdateAccelerationEarthFrame_Filtered(INS_VERTICAL_Z);
   if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {

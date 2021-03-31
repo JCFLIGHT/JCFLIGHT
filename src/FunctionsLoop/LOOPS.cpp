@@ -78,9 +78,9 @@ void Super_Fast_Loop()
         BATTERY.Calculate_Total_Current_In_Mah();
 }
 
-#ifdef VARPARAM_TEST
 #include "Param/PARAMETERS.h"
 
+#ifdef VARPARAM_TEST
 bool initt = false;
 #endif
 

@@ -53,6 +53,9 @@ enum VarParam_Enum
     Param_Proportional_AutoLevel,
     Param_Integral_AutoLevel,
     Param_Proportional_AltHold,
+    Param_Proportional_Pos_Hold,
+    Param_Integral_Pos_Hold,
+    Param_Derivative_Pos_Hold,
 }; //255 KEYS NO MAXIMO
 
 class ParametersClass
@@ -82,6 +85,9 @@ public:
     JC_UInt8 Proportional_AutoLevel;
     JC_UInt8 Integral_AutoLevel;
     JC_UInt8 Proportional_AltHold;
+    JC_UInt8 Proportional_Pos_Hold;
+    JC_UInt8 Integral_Pos_Hold;
+    JC_UInt8 Derivative_Pos_Hold;
 
     uint8_t SafeArea;
 
@@ -105,6 +111,9 @@ public:
                         Proportional_AutoLevel   (20,                         Param_Proportional_AutoLevel,    ProgramMemoryString("P_AL")),
                         Integral_AutoLevel       (15,                         Param_Integral_AutoLevel,        ProgramMemoryString("I_AL")),
                         Proportional_AltHold     (50,                         Param_Proportional_AltHold,      ProgramMemoryString("P_AH")),
+                        Proportional_Pos_Hold    (100,                        Param_Proportional_Pos_Hold,     ProgramMemoryString("P_PH")),
+                        Integral_Pos_Hold        (90,                         Param_Integral_Pos_Hold,         ProgramMemoryString("I_PH")),
+                        Derivative_Pos_Hold      (0,                          Param_Derivative_Pos_Hold,       ProgramMemoryString("D_PH")),
                         
                         SafeArea(0) //ISSO SERVE PRA VOCÊ NÃO SE PREOCUPAR COM A VIRGULA FINAL
     {
@@ -115,6 +124,7 @@ public:
 //#define VARPARAM_TEST
 
 #ifdef VARPARAM_TEST
+#include "FastSerial/PRINTF.h"
 static ParametersClass Parameters;
 #endif
 

@@ -78,12 +78,6 @@ void Super_Fast_Loop()
         BATTERY.Calculate_Total_Current_In_Mah();
 }
 
-#include "Param/PARAMETERS.h"
-
-#ifdef VARPARAM_TEST
-bool initt = false;
-#endif
-
 void Integral_Loop()
 {
         int32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
@@ -109,13 +103,4 @@ void Integral_Loop()
         ApplyPWMControlForMotorsAndServos();
         //EM DESENVOLVIMENTO
         //PARAM.SerialProcess();
-#ifdef VARPARAM_TEST
-        if (!initt)
-        {
-                Parameters.Initialization();
-                //Parameters.Throttle_Min.Set_And_Save(1050);
-                initt = true;
-        }
-        DEBUG("Throttle_Min:%d", Parameters.Throttle_Min.Get());
-#endif
 }

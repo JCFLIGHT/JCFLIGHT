@@ -724,7 +724,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
         break;
 
     case 12:
-        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2C.CompassFound)
         {
             IMU.Compass.Calibrating = true;
         }
@@ -1089,7 +1089,7 @@ void GCSClass::BiDirectionalCommunication(uint8_t TaskOrderGCS)
     case 12:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2C.CompassFound)
         {
-            COMPASS.Calibrating = true;
+            IMU.Compass.Calibrating = true;
         }
         break;
 

@@ -39,16 +39,20 @@ NÃO INDENTE ESSA EXTENSÃO
 
 ParamClass PARAM;
 
+#ifdef __AVR_ATmega2560__
+#define OPTIMIZE_LIST
+#endif
+
 //#define OPERATOR_CHECK_EEPROM
 //#define ERASE_ALL_EEPROM
 
 typedef struct JCF_Param_Adjustable
 {
+#ifndef OPTIMIZE_LIST
   uint8_t kP_Acc_AHRS;
   uint8_t kI_Acc_AHRS;
   uint8_t kP_Mag_AHRS;
   uint8_t kI_Mag_AHRS;
-  /* REMOVER O QUE NÃO ESTÁ EM USO ECONOMIZA MEMORIA RAM
   uint8_t AutoLaunch_AHRS_BankAngle;
   uint16_t AutoLaunch_IMU_BankAngle;
   uint8_t AutoLaunch_IMU_Swing;
@@ -59,8 +63,10 @@ typedef struct JCF_Param_Adjustable
   uint16_t AutoLaunch_MaxThrottle;
   uint16_t AutoLaunch_Exit;
   uint8_t AutoLaunch_Altitude;
+#endif
   uint32_t Batt_Voltage_Factor;
   uint16_t Amps_Per_Volt;
+#ifndef OPTIMIZE_LIST
   uint16_t Amps_OffSet;
   uint8_t CrashCheck_BankAngle;
   uint8_t CrashCheck_Time;
@@ -74,14 +80,19 @@ typedef struct JCF_Param_Adjustable
   uint16_t AutoDisarm_Throttle_Min;
   uint16_t AutoDisarm_YPR_Min;
   uint16_t AutoDisarm_YPR_Max;
+#endif
   uint8_t AirPlane_Wheels;
+#ifndef OPTIMIZE_LIST
   uint8_t GPS_Baud_Rate;
+#endif
   uint16_t Navigation_Vel;
   uint8_t GPS_WP_Radius;
   uint8_t GPS_RTH_Land;
+#ifndef OPTIMIZE_LIST
   uint8_t GPS_TiltCompensation;
   uint8_t AirSpeed_Samples;
-  uint16_t AirSpeed_Factor;*/
+#endif
+  uint16_t AirSpeed_Factor;
 } Struct_JCF_Param_Adjustable;
 
 Struct_JCF_Param_Adjustable JCF_Param;
@@ -99,52 +110,62 @@ typedef struct
 
 const Requesited_Values_Of_Param Params_Table[] = {
     //NOME                                 ENDEREÇO NA EEPROM                    TIPO                    VARIAVEL                                    MIN            MAX              VALOR PADRÃO
-    {"kP_Acc_AHRS",                        KP_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Acc_AHRS,                     0,             255,             0},
-    {"kI_Acc_AHRS",                        KI_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Acc_AHRS,                     0,             255,             0},
-    {"kP_Mag_AHRS",                        KP_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Mag_AHRS,                     0,             255,             0},
+#ifndef OPTIMIZE_LIST
+    {"kP_Acc_AHRS",                        KP_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Acc_AHRS,                     0,             255,             25},
+    {"kI_Acc_AHRS",                        KI_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Acc_AHRS,                     0,             255,             50},
+    {"kP_Mag_AHRS",                        KP_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Mag_AHRS,                     0,             255,             10},
     {"kI_Mag_AHRS",                        KI_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Mag_AHRS,                     0,             255,             0},
-    /* REMOVER O QUE NÃO ESTÁ EM USO ECONOMIZA MEMORIA RAM
-    {"AutoLaunch_AHRS_BankAngle",          AL_AHRS_BA_ADDR,                      VAR_8BITS,              &JCF_Param.AutoLaunch_AHRS_BankAngle,       0,             255,             0},
-    {"AutoLaunch_IMU_BankAngle",           AL_IMU_BA_ADDR,                       VAR_16BITS,             &JCF_Param.AutoLaunch_IMU_BankAngle,        0,             1000,            0},
-    {"AutoLaunch_IMU_Swing",               AL_IMU_SWING_ADDR,                    VAR_8BITS,              &JCF_Param.AutoLaunch_IMU_Swing,            0,             255,             0},
-    {"AutoLaunch_Trigger_Motor_Delay",     AL_TRIGGER_MOTOR_DELAY_ADDR,          VAR_16BITS,             &JCF_Param.AutoLaunch_Trigger_Motor_Delay,  0,             10000,           0},
-    {"AutoLaunch_Elevator",                AL_ELEVATOR_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Elevator,             0,             255,             0},
-    {"AutoLaunch_SpinUp",                  AL_SPINUP_ADDR,                       VAR_16BITS,             &JCF_Param.AutoLaunch_SpinUp,               0,             2000,            0},
-    {"AutoLaunch_SpinUp_Time",             AL_SPINUP_TIME_ADDR,                  VAR_16BITS,             &JCF_Param.AutoLaunch_SpinUp_Time,          0,             5000,            0},
-    {"AutoLaunch_MaxThrottle",             AL_MAX_THROTTLE_ADDR,                 VAR_16BITS,             &JCF_Param.AutoLaunch_MaxThrottle,          1000,          2200,            0},
-    {"AutoLaunch_Exit",                    AL_EXIT_ADDR,                         VAR_16BITS,             &JCF_Param.AutoLaunch_Exit,                 0,             30000,           0},
+    {"AutoLaunch_AHRS_BankAngle",          AL_AHRS_BA_ADDR,                      VAR_8BITS,              &JCF_Param.AutoLaunch_AHRS_BankAngle,       0,             255,             25},
+    {"AutoLaunch_IMU_BankAngle",           AL_IMU_BA_ADDR,                       VAR_16BITS,             &JCF_Param.AutoLaunch_IMU_BankAngle,        0,             1000,            450},
+    {"AutoLaunch_IMU_Swing",               AL_IMU_SWING_ADDR,                    VAR_8BITS,              &JCF_Param.AutoLaunch_IMU_Swing,            0,             255,             100},
+    {"AutoLaunch_Trigger_Motor_Delay",     AL_TRIGGER_MOTOR_DELAY_ADDR,          VAR_16BITS,             &JCF_Param.AutoLaunch_Trigger_Motor_Delay,  0,             10000,           1500},
+    {"AutoLaunch_Elevator",                AL_ELEVATOR_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Elevator,             0,             255,             18},
+    {"AutoLaunch_SpinUp",                  AL_SPINUP_ADDR,                       VAR_16BITS,             &JCF_Param.AutoLaunch_SpinUp,               0,             2000,            100},
+    {"AutoLaunch_SpinUp_Time",             AL_SPINUP_TIME_ADDR,                  VAR_16BITS,             &JCF_Param.AutoLaunch_SpinUp_Time,          0,             5000,            300},
+    {"AutoLaunch_MaxThrottle",             AL_MAX_THROTTLE_ADDR,                 VAR_16BITS,             &JCF_Param.AutoLaunch_MaxThrottle,          1000,          2200,            1700},
+    {"AutoLaunch_Exit",                    AL_EXIT_ADDR,                         VAR_16BITS,             &JCF_Param.AutoLaunch_Exit,                 0,             30000,           5000},
     {"AutoLaunch_Altitude",                AL_ALTITUDE_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Altitude,             0,             255,             0},
-    {"AutoLaunch_Batt_Voltage_Factor",     BATT_VOLTAGE_FACTOR_ADDR,             VAR_32BITS,             &JCF_Param.Batt_Voltage_Factor,             0,             400000,          0},
-    {"AutoLaunch_Batt_Amps_Volt",          BATT_AMPS_VOLT_ADDR,                  VAR_16BITS,             &JCF_Param.Amps_Per_Volt,                   0,             1000,            0},
-    {"AutoLaunch_Batt_Amps_OffSet",        BATT_AMPS_OFFSET_ADDR,                VAR_16BITS,             &JCF_Param.Amps_OffSet,                     0,             1000,            0},
-    {"CrashCheck_BankAngle",               CC_BANKANGLE_ADDR,                    VAR_8BITS,              &JCF_Param.CrashCheck_BankAngle,            0,             255,             0},
-    {"CrashCheck_Time",                    CC_TIME_ADDR,                         VAR_8BITS,              &JCF_Param.CrashCheck_Time,                 0,             255,             0},
-    {"GimbalMinValue",                     GIMBAL_MIN_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMinValue,                  800,           2200,            0},
-    {"GimbalMiddleValue",                  GIMBAL_MID_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMiddleValue,               800,           2200,            0},
-    {"GimbalMaxValue",                     GIMBAL_MAX_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMaxValue,                  800,           2200,            0},
-    {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             255,             0},
-    {"Land_LPF",                           LAND_LPF_ADDR,                        VAR_8BITS,              &JCF_Param.Land_LPF,                        0,             255,             0},
-    {"ThrottleFactor",                     THROTTLE_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.Throttle_Factor,                 0,             255,             0},
-    {"AutoDisarm",                         AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             0},
-    {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            0},
-    {"AutoDisarm_YPR_Min",                 AUTODISARM_YPR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Min,              800,           1500,            0},
-    {"AutoDisarm_YPR_Max",                 AUTODISARM_YPR_MAX_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Max,              800,           2200,            0},
+#endif
+    {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_32BITS,             &JCF_Param.Batt_Voltage_Factor,             0,             400000,          259489},
+    {"Batt_Amps_Volt",                     BATT_AMPS_VOLT_ADDR,                  VAR_16BITS,             &JCF_Param.Amps_Per_Volt,                   0,             1000,            620},
+#ifndef OPTIMIZE_LIST   
+    {"Batt_Amps_OffSet",                   BATT_AMPS_OFFSET_ADDR,                VAR_16BITS,             &JCF_Param.Amps_OffSet,                     0,             1000,            0},
+    {"CrashCheck_BankAngle",               CC_BANKANGLE_ADDR,                    VAR_8BITS,              &JCF_Param.CrashCheck_BankAngle,            0,             255,             30},
+    {"CrashCheck_Time",                    CC_TIME_ADDR,                         VAR_8BITS,              &JCF_Param.CrashCheck_Time,                 0,             255,             2},
+    {"GimbalMinValue",                     GIMBAL_MIN_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMinValue,                  800,           2200,            1000},
+    {"GimbalMiddleValue",                  GIMBAL_MID_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMiddleValue,               800,           2200,            1500},
+    {"GimbalMaxValue",                     GIMBAL_MAX_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMaxValue,                  800,           2200,            2000},
+    {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             255,             3},
+    {"Land_LPF",                           LAND_LPF_ADDR,                        VAR_8BITS,              &JCF_Param.Land_LPF,                        0,             255,             1},
+    {"ThrottleFactor",                     THROTTLE_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.Throttle_Factor,                 0,             255,             1},
+    {"AutoDisarm",                         AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             5},
+    {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            1100},
+    {"AutoDisarm_YPR_Min",                 AUTODISARM_YPR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Min,              800,           1500,            1450},
+    {"AutoDisarm_YPR_Max",                 AUTODISARM_YPR_MAX_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Max,              800,           2200,            1550},
+#endif
     {"AirPlane_Wheels",                    WHEELS_ADDR,                          VAR_8BITS,              &JCF_Param.AirPlane_Wheels,                 0,             255,             0},
+#ifndef OPTIMIZE_LIST
     {"GPS_Baud_Rate",                      GPS_BAUDRATE_ADDR,                    VAR_8BITS,              &JCF_Param.GPS_Baud_Rate,                   0,             4,               0},
-    {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             0},
-    {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             0},
-    {"GPS_RTH_Land",                       RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             0},
-    {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             0},
+#endif
+    {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             400},
+    {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             2},
+    {"GPS_RTH_Land",                       RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             10},
+#ifndef OPTIMIZE_LIST   
+    {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             0},
-    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.AirSpeed_Factor,                 0,             5000,            0},*/
+#endif
+    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.AirSpeed_Factor,                 0,             5000,            1},
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Requesited_Values_Of_Param))
 
 static char SerialBuffer[48];
+
+uint8_t Actual_Format_Version = 10; //1.0
+
 static uint32_t SerialBufferIndex = 0;
 
-void ParamClass::Initialization()
+void ParamClass::Initialization(void)
 {
 
   //PASSA OS VALORES DA EEPROM PARA OS PARAMETROS,ISSO DEVE FICAR SEMPRE ATIVO NA VERSÃO FINAL,ATÉ MESMO EM TESTES DE DESENVOLVIMENTO
@@ -160,20 +181,59 @@ void ParamClass::Initialization()
 
   //PARAM.Set_And_Save("relatorio"); //TESTE DE RELATORIO ATUAL DOS PARAMETROS
 
-  //DEBUG("%d", JCF_Param.kP_Acc_AHRS); //VERFICAÇÃO DO FUNCIONAMENTO DO Load_Sketch()
+  //DEBUG("%d", JCF_Param.Navigation_Vel); //VERFICAÇÃO DO FUNCIONAMENTO DO Load_Sketch()
 
 #ifdef OPERATOR_CHECK_EEPROM
   Operator_Check_Values_In_Address(SIZE_OF_EEPROM);
 #endif
 
 #ifdef ERASE_ALL_EEPROM
-  EraseEEPROM(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR, SIZE_OF_EEPROM);
+  STORAGEMANAGER.Erase(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR);
 #endif
 }
 
-void ParamClass::Load_Sketch()
+static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
 {
+  for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
+  {
+    ParamValue = &Params_Table[Table_Counter];
+
+    switch (ParamValue->Variable_Type)
+    {
+
+    case VAR_8BITS:
+      *(uint8_t *)ParamValue->Ptr = ParamValue->DefaultValue;
+      STORAGEMANAGER.Write_8Bits(ParamValue->Address ,ParamValue->DefaultValue);
+      break;
+
+    case VAR_16BITS:
+      *(int16_t *)ParamValue->Ptr = ParamValue->DefaultValue;
+      STORAGEMANAGER.Write_16Bits(ParamValue->Address, ParamValue->DefaultValue);
+      break;
+
+    case VAR_32BITS:
+      *(int32_t *)ParamValue->Ptr = ParamValue->DefaultValue;
+      STORAGEMANAGER.Write_32Bits(ParamValue->Address, ParamValue->DefaultValue);
+      break;
+    }
+  }
+}
+
+void ParamClass::Load_Sketch(void)
+{
+  static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(1800);
   const Requesited_Values_Of_Param *ParamValue;
+
+  if (Actual_Format_Version != System_Version)
+  {
+    LOG("Restaurando os valores de fabrica dos parametros...");
+    DefaultParams(ParamValue);
+    LOG("Ok...Parametros reconfigurados!");
+    STORAGEMANAGER.Write_8Bits(1800, Actual_Format_Version);
+    return;
+  }
+  else
+  {
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
     ParamValue = &Params_Table[Table_Counter];
@@ -194,6 +254,7 @@ void ParamClass::Load_Sketch()
       break;
     }
   }
+}
 }
 
 static void Param_Set_Value(const Requesited_Values_Of_Param *VariablePointer, const int32_t New_Value)
@@ -306,7 +367,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   }
 }
 
-void ParamClass::SerialProcess()
+void ParamClass::SerialProcess(void)
 {
   //ESSE WHILE IRÁ CONFLITAR COM O WHILE DO GCS.Serial_Parse_Protocol(),É NECESSARIO ADICIONAR UM "CHAVEADOR" ENTRE O CLI E O PROTOCOLO
   while (FASTSERIAL.Available(UART_NUMB_0))

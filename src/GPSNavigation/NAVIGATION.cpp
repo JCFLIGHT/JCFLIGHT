@@ -161,7 +161,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       CalculateNavigationSpeed = Calculate_Navigation_Speed(400);
       GPSCalculateNavigationRate(CalculateNavigationSpeed);
       GPS_Adjust_Heading();
-      if ((Two_Points_Distance <= 200) || Point_Reached())
+      if ((Two_Points_Distance <= 2 * 100) || Point_Reached())
       {
         if (GetFrameStateOfMultirotor())
         {

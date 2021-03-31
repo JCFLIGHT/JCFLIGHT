@@ -494,8 +494,8 @@ static void Communication_Passed(bool Error, uint8_t Buffer)
 {
 #ifdef __AVR_ATmega2560__
 
-    FASTSERIAL.StoreTX(UART_NUMB_0, 0x4a);
-    SerialCheckSum ^= 0x4a;
+    FASTSERIAL.StoreTX(UART_NUMB_0, 0x4A);
+    SerialCheckSum ^= 0x4A;
     FASTSERIAL.StoreTX(UART_NUMB_0, 0x43);
     SerialCheckSum ^= 0x43;
     FASTSERIAL.StoreTX(UART_NUMB_0, Error ? 0x21 : 0x46);
@@ -508,8 +508,8 @@ static void Communication_Passed(bool Error, uint8_t Buffer)
 
 #elif defined ESP32 || defined __arm__
 
-    SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x4a;
-    SerialCheckSum ^= 0x4a;
+    SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x4A;
+    SerialCheckSum ^= 0x4A;
     SerialOutputBuffer[SerialOutputBufferSizeCount++] = 0x43;
     SerialCheckSum ^= 0x43;
     SerialOutputBuffer[SerialOutputBufferSizeCount++] = Error ? 0x21 : 0x46;
@@ -572,6 +572,11 @@ void GCSClass::SendStringToGCS(const char *String)
 
 void GCSClass::Serial_Parse_Protocol()
 {
+    if (GCS.CliMode)
+    {
+        return;
+    }
+
     SerialAvailableGuard = FASTSERIAL.Available(UART_NUMB_0);
     while (SerialAvailableGuard--)
     {
@@ -588,6 +593,10 @@ void GCSClass::Serial_Parse_Protocol()
             if (SerialBuffer == 0x4A)
             {
                 ProtocolTaskOrder = 1;
+            }
+            if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && SerialBuffer == 0x23)
+            {
+                GCS.CliMode = true;
             }
             break;
 

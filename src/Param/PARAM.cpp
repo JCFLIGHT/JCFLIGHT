@@ -34,6 +34,7 @@ NÃO INDENTE ESSA EXTENSÃO
 #include "StorageManager/EEPROMCHECK.h"
 #include "Common/ENUM.h"
 #include "Build/BOARDDEFS.h"
+#include "IOMCU/IOMCU.h"
 #include "FastSerial/PRINTF.h"
 #include "FastSerial/FASTSERIAL.h"
 
@@ -167,22 +168,6 @@ static uint32_t SerialBufferIndex = 0;
 
 void ParamClass::Initialization(void)
 {
-
-  //PASSA OS VALORES DA EEPROM PARA OS PARAMETROS,ISSO DEVE FICAR SEMPRE ATIVO NA VERSÃO FINAL,ATÉ MESMO EM TESTES DE DESENVOLVIMENTO
-  //PARAM.Load_Sketch();
-
-  //PARAM.Set_And_Save("dagasdg = 54"); //TESTE DE PARAMETRO INEXISTENTE
-
-  //PARAM.Set_And_Save("kP_Acc_AHRS = 12"); //TESTE DE PARAMETRO EXISTENTE
-
-  //PARAM.Set_And_Save("kP_Acc_AHRS = 300"); //TESTE DE LIMITE MAXIMO DO PARAMETRO
-
-  //PARAM.Set_And_Save("kP_Acc_AHRS = -10"); //TESTE DE LIMITE MINIMO DO PARAMETRO
-
-  //PARAM.Set_And_Save("relatorio"); //TESTE DE RELATORIO ATUAL DOS PARAMETROS
-
-  //DEBUG("%d", JCF_Param.Navigation_Vel); //VERFICAÇÃO DO FUNCIONAMENTO DO Load_Sketch()
-
 #ifdef OPERATOR_CHECK_EEPROM
   Operator_Check_Values_In_Address(SIZE_OF_EEPROM);
 #endif
@@ -190,6 +175,8 @@ void ParamClass::Initialization(void)
 #ifdef ERASE_ALL_EEPROM
   STORAGEMANAGER.Erase(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR);
 #endif
+
+  //PARAM.Load_Sketch();
 }
 
 static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
@@ -361,6 +348,10 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {
   }
+  else if (strncasecmp(ParamCommandLine, "sair", 4) == 0)
+  {
+    GCS.CliMode = false;
+  }
   else
   {
     LOG_PARAM_ERROR("Comando invalido!");
@@ -369,7 +360,11 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
 
 void ParamClass::SerialProcess(void)
 {
-  //ESSE WHILE IRÁ CONFLITAR COM O WHILE DO GCS.Serial_Parse_Protocol(),É NECESSARIO ADICIONAR UM "CHAVEADOR" ENTRE O CLI E O PROTOCOLO
+  if (!GCS.CliMode)
+  {
+    return;
+  }
+
   while (FASTSERIAL.Available(UART_NUMB_0))
   {
     uint8_t SerialReadCommand = FASTSERIAL.Read(UART_NUMB_0);

@@ -59,6 +59,8 @@ void Fast_Medium_Loop()
         PARACHUTE.Manual_Do_Now();
         IMU_GForce_Update();
         GCS.Serial_Parse_Protocol();
+        //EM DESENVOLVIMENTO
+        //PARAM.SerialProcess();
 }
 
 void Fast_Loop()
@@ -101,6 +103,4 @@ void Integral_Loop()
         SERVOSMASTER.Update();
         ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();
-        //EM DESENVOLVIMENTO
-        //PARAM.SerialProcess();
 }

@@ -108,7 +108,7 @@ void Integral_Loop()
         ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();
         //EM DESENVOLVIMENTO
-        //ParamSerialProcess();
+        //PARAM.SerialProcess();
 #ifdef VARPARAM_TEST
         if (!initt)
         {

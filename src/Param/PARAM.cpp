@@ -148,7 +148,7 @@ void ParamClass::Initialization()
 {
 
   //PASSA OS VALORES DA EEPROM PARA OS PARAMETROS,ISSO DEVE FICAR SEMPRE ATIVO NA VERSÃO FINAL,ATÉ MESMO EM TESTES DE DESENVOLVIMENTO
-  //PARAM.LoadSketch();
+  //PARAM.Load_Sketch();
 
   //PARAM.Set_And_Save("dagasdg = 54"); //TESTE DE PARAMETRO INEXISTENTE
 
@@ -160,7 +160,7 @@ void ParamClass::Initialization()
 
   //PARAM.Set_And_Save("relatorio"); //TESTE DE RELATORIO ATUAL DOS PARAMETROS
 
-  //DEBUG("%d", JCF_Param.kP_Acc_AHRS); //VERFICAÇÃO DO FUNCIONAMENTO DO LoadSketch()
+  //DEBUG("%d", JCF_Param.kP_Acc_AHRS); //VERFICAÇÃO DO FUNCIONAMENTO DO Load_Sketch()
 
 #ifdef OPERATOR_CHECK_EEPROM
   Operator_Check_Values_In_Address(SIZE_OF_EEPROM);
@@ -171,7 +171,7 @@ void ParamClass::Initialization()
 #endif
 }
 
-void ParamClass::LoadSketch()
+void ParamClass::Load_Sketch()
 {
   const Requesited_Values_Of_Param *ParamValue;
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
@@ -196,7 +196,7 @@ void ParamClass::LoadSketch()
   }
 }
 
-static void ParamSetValue(const Requesited_Values_Of_Param *VariablePointer, const int32_t New_Value)
+static void Param_Set_Value(const Requesited_Values_Of_Param *VariablePointer, const int32_t New_Value)
 {
   switch (VariablePointer->Variable_Type)
   {
@@ -218,7 +218,7 @@ static void ParamSetValue(const Requesited_Values_Of_Param *VariablePointer, con
   }
 }
 
-static void ParamPrintValue(const Requesited_Values_Of_Param *VariablePointer)
+static void Param_Print_Value(const Requesited_Values_Of_Param *VariablePointer)
 {
   int32_t New_Value = 0;
 
@@ -267,9 +267,9 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
       {
         if (New_Value >= Params_Table[Table_Counter].Value_Min && New_Value <= Params_Table[Table_Counter].Value_Max)
         {
-          ParamSetValue(ParamValue, New_Value);
+          Param_Set_Value(ParamValue, New_Value);
           DEBUG_WITHOUT_NEW_LINE("%s setado para ", Params_Table[Table_Counter].Param_Name);
-          ParamPrintValue(ParamValue);
+          Param_Print_Value(ParamValue);
         }
         else if (New_Value < Params_Table[Table_Counter].Value_Min)
         {
@@ -290,7 +290,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
     {
       ParamValue = &Params_Table[Table_Counter];
       DEBUG_WITHOUT_NEW_LINE("%s = ", Params_Table[Table_Counter].Param_Name);
-      ParamPrintValue(ParamValue);
+      Param_Print_Value(ParamValue);
     }
     DEBUG("\r");
   }
@@ -306,7 +306,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   }
 }
 
-void ParamSerialProcess()
+void ParamClass::SerialProcess()
 {
   //ESSE WHILE IRÁ CONFLITAR COM O WHILE DO GCS.Serial_Parse_Protocol(),É NECESSARIO ADICIONAR UM "CHAVEADOR" ENTRE O CLI E O PROTOCOLO
   while (FASTSERIAL.Available(UART_NUMB_0))

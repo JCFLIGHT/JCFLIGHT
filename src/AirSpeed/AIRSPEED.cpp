@@ -24,6 +24,8 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Filters/PT1.h"
+#include "Build/BOARDDEFS.h"
+#include "Scheduler/SCHEDULER.h"
 
 AirSpeedClass AIRSPEED;
 
@@ -44,7 +46,7 @@ void AirSpeedClass::Initialization()
 
   AirSpeed.Healthy = true;
 
-  PT1FilterInit(&Pitot_Smooth, PITOT_LPF_CUTOFF, 1000.0f * 1e-6f);
+  PT1FilterInit(&Pitot_Smooth, PITOT_LPF_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
 }
 
 bool AirSpeedClass::Calibrate()

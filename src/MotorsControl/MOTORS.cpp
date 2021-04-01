@@ -52,10 +52,6 @@ int16_t MotorControl[8];
 
 int16_t MixerThrottleCommand = 1000;
 
-//MAXIMO = 499
-//PARA DESATIVAR:COLOQUE O VALOR EM 500
-int16_t Yaw_Jump_Prevention = 200;
-
 void ConfigureRegisters(bool Run_Calibrate_ESC)
 {
 #ifdef __AVR_ATmega2560__
@@ -187,17 +183,12 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
   MixerThrottleCommand = RCController[THROTTLE];
   MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
 
+#ifndef __AVR_ATmega2560__
   if (STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR) > 0)
   {
     MixerThrottleCommand = MIN(AttitudeThrottleMin + (MixerThrottleCommand - AttitudeThrottleMin) * CalculateThrottleCompensationFactor(DeltaTime), AttitudeThrottleMax);
   }
-
-  if (NumberOfMotors >= 4 && Yaw_Jump_Prevention < 500)
-  {
-    PIDXYZ.PIDControllerApply[YAW] = Constrain_16Bits(PIDXYZ.PIDControllerApply[YAW],
-                                                      -Yaw_Jump_Prevention - ABS(RCController[YAW]),
-                                                      Yaw_Jump_Prevention + ABS(RCController[YAW]));
-  }
+#endif
 
   MixingApplyControl();
   Throttle_Clipping_Update(NumberOfMotors, MixerThrottleCommand);

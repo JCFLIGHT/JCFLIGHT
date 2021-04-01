@@ -42,11 +42,6 @@ static uint16_t PowerSupplyImpedance = 0;   //IMPEDANCIA DA BATERIA CALCULADA EM
 
 void SaggingCompensatedUpdate(float DeltaTime)
 {
-
-#ifdef __AVR_ATmega2560__
-  DeltaTime = 1000 * 1e-6f;
-#endif
-
   static PT1_Filter_Struct ImpedanceFilterState;
   static PT1_Filter_Struct SaggingCompVBatFilterState;
 

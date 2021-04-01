@@ -119,7 +119,7 @@ void RC_PID_Update()
       FixedWingTPAFilter.State = AttitudeThrottleMin;
       FixedWingTPAFilterInitalized = true;
     }
-    int16_t FilteredThrottle = PT1FilterApply2(&FixedWingTPAFilter, RCController[THROTTLE], SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz") * 1e-6f);
+    int16_t FilteredThrottle = PT1FilterApply2(&FixedWingTPAFilter, RCController[THROTTLE], SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
     if (FilteredThrottle != TPA_Parameters.PreviousThrottle)
     {
       TPA_Parameters.PreviousThrottle = FilteredThrottle;

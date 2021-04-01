@@ -29,6 +29,7 @@
 //DEBUG
 //#define PRINTLN_RC_INTERPOLATION
 
+#ifndef __AVR_ATmega2560__
 static BiquadFilter_Struct Smooth_RC_Throttle;
 static BiquadFilter_Struct Smooth_RC_Yaw;
 static BiquadFilter_Struct Smooth_RC_Roll;
@@ -37,19 +38,22 @@ static BiquadFilter_Struct Smooth_RC_Pitch;
 int16_t RC_LPF_CutOff;
 int16_t RCControllerUnFiltered[4];
 int16_t RCAttitudeFiltered[4];
+#endif
 
 void RCInterpolationInit()
 {
+#ifndef __AVR_ATmega2560__
   RC_LPF_CutOff = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
   BIQUADFILTER.Settings(&Smooth_RC_Throttle, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&Smooth_RC_Yaw, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&Smooth_RC_Roll, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&Smooth_RC_Pitch, RC_LPF_CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+#endif
 }
 
 void RCInterpolationApply()
 {
-
+#ifndef __AVR_ATmega2560__
   if (RC_LPF_CutOff > 0)
   {
     //GUARDA OS VALORES ANTERIOR
@@ -71,6 +75,7 @@ void RCInterpolationApply()
     RCController[ROLL] = RCAttitudeFiltered[ROLL];
   }
   else
+#endif
   {
     RCController[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
   }

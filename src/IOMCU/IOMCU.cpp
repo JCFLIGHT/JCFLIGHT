@@ -584,8 +584,10 @@ void GCSClass::Serial_Parse_Protocol()
         {
             return;
         }
+
         SerialBuffer = FASTSERIAL.Read(UART_NUMB_0);
         ProtocolTaskOrder = PreviousProtocolTaskOrder;
+
         switch (ProtocolTaskOrder)
         {
 

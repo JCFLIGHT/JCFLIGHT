@@ -150,7 +150,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
 #endif
     {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             400},
     {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             2},
-    {"GPS_RTH_Land",                       RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             10},
+    {"GPS_RTH_Land_Radius",                RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             10},
 #ifndef OPTIMIZE_LIST   
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
@@ -159,12 +159,6 @@ const Requesited_Values_Of_Param Params_Table[] = {
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Requesited_Values_Of_Param))
-
-static char SerialBuffer[48];
-
-uint8_t Actual_Format_Version = 10; //1.0
-
-static uint32_t SerialBufferIndex = 0;
 
 void ParamClass::Initialization(void)
 {
@@ -208,15 +202,15 @@ static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
 
 void ParamClass::Load_Sketch(void)
 {
-  static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(1800);
+  static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(PARAM_LINK_ADDR);
   const Requesited_Values_Of_Param *ParamValue;
 
-  if (Actual_Format_Version != System_Version)
+  if (PARAM.Actual_Format_Version != System_Version)
   {
     LOG("Restaurando os valores de fabrica dos parametros...");
     DefaultParams(ParamValue);
     LOG("Ok...Parametros reconfigurados!");
-    STORAGEMANAGER.Write_8Bits(1800, Actual_Format_Version);
+    STORAGEMANAGER.Write_8Bits(PARAM_LINK_ADDR, PARAM.Actual_Format_Version);
     return;
   }
   else
@@ -310,7 +304,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
       ParamValue = &Params_Table[Table_Counter];
       DEBUG("%s", Params_Table[Table_Counter].Param_Name);
     }
-    DEBUG("\r");
+    LINE_SPACE;
   }
   else if ((PtrInput = strstr(ParamCommandLine, "=")) != NULL)
   {
@@ -331,15 +325,18 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
         else if (New_Value < Params_Table[Table_Counter].Value_Min)
         {
           LOG_PARAM_ERROR("O valor setado esta fora do limite minimo!");
+          LINE_SPACE;
         }
         else if (New_Value > Params_Table[Table_Counter].Value_Max)
         {
           LOG_PARAM_ERROR("O valor setado esta fora do limite maximo!");
+          LINE_SPACE;
         }
         return;
       }
     }
     LOG_PARAM_ERROR("Parametro nao encontrado na lista");
+    LINE_SPACE;
   }
   else if (strncasecmp(ParamCommandLine, "relatorio", 9) == 0)
   {
@@ -349,23 +346,28 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
       DEBUG_WITHOUT_NEW_LINE("%s = ", Params_Table[Table_Counter].Param_Name);
       Param_Print_Value(ParamValue);
     }
-    DEBUG("\r");
   }
   else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {
+    DEBUG("Restaurando os valores de fabrica dos parametros...");
     DefaultParams(ParamValue);
+    DEBUG("Ok...Parametros reconfigurados!");
+    LINE_SPACE;
   }
   else if (strncasecmp(ParamCommandLine, "reiniciar", 9) == 0)
   {
   }
   else if (strncasecmp(ParamCommandLine, "sair", 4) == 0)
   {
+    LINE_SPACE;
+    DEBUG("Modo CLI desativado.")
     PARAM.PrintMessage = false;
     GCS.CliMode = false;
   }
   else
   {
     LOG_PARAM_ERROR("Comando invalido!");
+    LINE_SPACE;
   }
 }
 
@@ -378,14 +380,16 @@ void ParamClass::SerialProcess(void)
 
   if (!PARAM.PrintMessage)
   {
+    LINE_SPACE;
     DEBUG("Modo CLI ativado!");
+    LINE_SPACE;
     DEBUG("Comandos:");
     DEBUG("Ajuda; para listar os parametros disponiveis.");
     DEBUG("Relatorio; para listar todos os parametros com os valores atuais.");
     DEBUG("Formatar; para voltar todos os parametros ao padrao de fabrica.");
     DEBUG("Reiniciar; para reiniciar o sistema da JCFLIGHT.");
     DEBUG("Sair; para sair do modo CLI.");
-    DEBUG("\r");
+    LINE_SPACE;
     PARAM.PrintMessage = true;
   }
 
@@ -393,16 +397,16 @@ void ParamClass::SerialProcess(void)
   {
     uint8_t SerialReadCommand = FASTSERIAL.Read(UART_NUMB_0);
 
-    SerialBuffer[SerialBufferIndex++] = SerialReadCommand;
+    PARAM.SerialBuffer[PARAM.SerialBufferIndex++] = SerialReadCommand;
 
-    if (SerialBufferIndex && ((strstr(SerialBuffer, ";")) != NULL))
+    if (PARAM.SerialBufferIndex && ((strstr(PARAM.SerialBuffer, ";")) != NULL))
     {
-      SerialBuffer[SerialBufferIndex] = 0;
-      PARAM.Set_And_Save(SerialBuffer);
+      PARAM.SerialBuffer[PARAM.SerialBufferIndex] = 0;
+      PARAM.Set_And_Save(PARAM.SerialBuffer);
     }
   }
-  if (SerialBufferIndex > 0)
+  if (PARAM.SerialBufferIndex > 0)
   {
-    SerialBuffer[SerialBufferIndex--] = 0;
+    PARAM.SerialBuffer[PARAM.SerialBufferIndex--] = 0;
   }
 }

@@ -28,14 +28,14 @@
 | Land_LPF   | 1         | "Valor da frequêcnia de corte da aceleração da IMU (Por Favor,não altere) [Hz] |
 | ThrottleFactor   | 1         | Valor do ganho do Thottle para o mix de PID |
 | AutoDisarm_Time   | 5         | Estouro de tempo para desarmar a controladora em nivel baixo de Throttle [Segundos] |
-| AutoDisarm_Throttle_Min   | 1100         | Valor maximo do pulso do Throttle para iniciar a contagem do Auto-Desarm [uS] |
-| AutoDisarm_YPR_Min   | 1450         | Valor minimo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarm [uS] |
-| AutoDisarm_YPR_Max   | 1550         | Valor maximo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarm [uS] |
-| AirPlane_Wheels   | 0         | 0 - Aeromodelo sem trem de pouso / 1 - Aeromodelo com trem de pouso (Apenas para o AutoLaunch) |
-| GPS_Baud_Rate   | 0         | 0 - 9600KBPS / 1 - 19200KBPS / 2 - 38400KBPS / 3 - 57600KBPS / 4 - 115200KBPS |
+| AutoDisarm_Throttle_Min   | 1100         | Valor maximo do Throttle tolerado para iniciar a contagem do Auto-Desarmamento [uS] |
+| AutoDisarm_YPR_Min   | 1450         | Valor minimo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarmamento [uS] |
+| AutoDisarm_YPR_Max   | 1550         | Valor maximo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarmamento [uS] |
+| AirPlane_Wheels   | 0         | 0 - Sem trem de pouso / 1 - Com trem de pouso (Apenas para o AutoLaunch) |
+| GPS_Baud_Rate   | 4         | 0 - 9600KBPS / 1 - 19200KBPS / 2 - 38400KBPS / 3 - 57600KBPS / 4 - 115200KBPS |
 | Navigation_Vel   | 400        | Velocidade maxima de navegação em modos de voo que utilizam o GPS [Centimetos/Segundo] |
 | GPS_WP_Radius   | 2         | Raio do ponto para validar que o mesmo foi alcançado em modo WayPoint e RTH [Metros] |
-| GPS_RTH_Land   | 10         | Em modo RTH,inicia o Land se o UAV estiver dentro do tamanho desse raio definido aqui,caso contrario,o UAV irá subir até a altitude definido em 'RTH Altitude' nas configurações basicas,voltar ao Home-Point,e fazer o Land [Metros] |
+| GPS_RTH_Land_Radius   | 10         | Em modo RTH,inicia o Land se o UAV estiver dentro do tamanho desse raio definido aqui,caso contrario,o UAV irá subir até a altitude definido em 'RTH Altitude' nas configurações basicas,voltar ao Home-Point,e fazer o Land [Metros] |
 | GPS_TiltCompensation   | 20         | Parâmetro para compensar o rate de navegação em modo WayPoint e RTH |
 | AirSpeed_Samples   | 15         | Número de amostras para calibrar o Tubo de Pitot |
 | AirSpeed_Factor   | 1         | Escala dinâmica do Tubo de Pitot |

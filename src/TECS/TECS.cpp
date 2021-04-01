@@ -26,6 +26,7 @@
 #include "BitArray/BITARRAY.h"
 #include "PID/PIDPARAMS.h"
 #include "GenericPI/GENERICPI.h"
+#include "Math/MATHSUPPORT.h"
 
 TecsClass TECS;
 
@@ -82,6 +83,24 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
         AutoThrottlePI.Reset_Integrator();
 #endif
     }
+}
+
+static bool AirPlaneNavigationIsControllingThrottle()
+{
+    return GetFrameStateOfAirPlane() &&
+           !IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE) &&
+           !IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE) &&
+           !IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) &&
+           !IS_FLIGHT_MODE_ACTIVE(RTH_MODE);
+}
+
+float TecsClass::AutoPitchDown(int16_t InCruise_Throttle, int16_t InMinThrottleDownPitchAngle)
+{
+    if (AirPlaneNavigationIsControllingThrottle())
+    {
+        return ScaleRange16Bits(MAX(0, InCruise_Throttle - RCController[THROTTLE]), 0, InCruise_Throttle - MIN_STICKS_PULSE, 0, InMinThrottleDownPitchAngle);
+    }
+    return 0;
 }
 
 void TecsClass::Update(float DeltaTime)

@@ -21,7 +21,8 @@
 class TecsClass
 {
 public:
-    void Update(float DeltaTime);
+  void Update(float DeltaTime);
+  float AutoPitchDown(int16_t InCruise_Throttle, int16_t InMinThrottleDownPitchAngle);
 };
 extern TecsClass TECS;
 #endif

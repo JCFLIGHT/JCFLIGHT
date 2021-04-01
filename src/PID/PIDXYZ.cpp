@@ -40,9 +40,9 @@
 #include "FlightModes/FLIGHTMODES.h"
 #include "AHRS/AHRS.h"
 #include "AHRS/QUATERNION.h"
-#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDPARAMS.h"
+#include "TECS/TECS.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -357,10 +357,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
     RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValueVector));
   }
 
-  if (AirPlaneNavigationIsControllingThrottle())
-  {
-    RcControllerAngle += ScaleRange16Bits(MAX(0, Cruise_Throttle - RCController[THROTTLE]), 0, Cruise_Throttle - MIN_STICKS_PULSE, 0, MinThrottleDownPitchAngle);
-  }
+  RcControllerAngle += TECS.AutoPitchDown(Cruise_Throttle, MinThrottleDownPitchAngle);
 
   if (GetFrameStateOfAirPlane())
   {

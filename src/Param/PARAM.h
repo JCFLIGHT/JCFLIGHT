@@ -25,6 +25,7 @@ public:
   void SerialProcess(void);
 
 private:
+  bool PrintMessage = false;
   void Load_Sketch(void);
   void Set_And_Save(char *TerminalCommandLine);
 };

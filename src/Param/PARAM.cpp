@@ -176,7 +176,7 @@ void ParamClass::Initialization(void)
   STORAGEMANAGER.Erase(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR);
 #endif
 
-  //PARAM.Load_Sketch();
+  PARAM.Load_Sketch();
 }
 
 static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
@@ -353,12 +353,14 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   }
   else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {
+    DefaultParams(ParamValue);
   }
   else if (strncasecmp(ParamCommandLine, "reiniciar", 9) == 0)
   {
   }
   else if (strncasecmp(ParamCommandLine, "sair", 4) == 0)
   {
+    PARAM.PrintMessage = false;
     GCS.CliMode = false;
   }
   else
@@ -372,6 +374,19 @@ void ParamClass::SerialProcess(void)
   if (!GCS.CliMode)
   {
     return;
+  }
+
+  if (!PARAM.PrintMessage)
+  {
+    DEBUG("Modo CLI ativado!");
+    DEBUG("Comandos:");
+    DEBUG("Ajuda; para listar os parametros disponiveis.");
+    DEBUG("Relatorio; para listar todos os parametros com os valores atuais.");
+    DEBUG("Formatar; para voltar todos os parametros ao padrao de fabrica.");
+    DEBUG("Reiniciar; para reiniciar o sistema da JCFLIGHT.");
+    DEBUG("Sair; para sair do modo CLI.");
+    DEBUG("\r");
+    PARAM.PrintMessage = true;
   }
 
   while (FASTSERIAL.Available(UART_NUMB_0))

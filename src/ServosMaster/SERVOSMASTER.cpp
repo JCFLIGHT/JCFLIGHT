@@ -36,10 +36,12 @@ FILE_COMPILE_FOR_SPEED
 ServosMasterClass SERVOSMASTER;
 Servo_Struct Servo;
 
+#ifndef __AVR_ATmega2560__
 static BiquadFilter_Struct Smooth_Servo1_Aileron;
 static BiquadFilter_Struct Smooth_Servo2_Aileron;
 static BiquadFilter_Struct Smooth_Servo_Rudder;
 static BiquadFilter_Struct Smooth_Servo_Elevator;
+#endif
 
 void ServosMasterClass::Initialization(void)
 {
@@ -58,12 +60,14 @@ bool ServosMasterClass::LoadBiquadSettings(void)
   {
     return false;
   }
+#ifndef __AVR_ATmega2560__
   //ATUALIZA A FREQUENCIA DE CORTE DO LPF DOS SERVOS
   Servo.Filter.CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
   BIQUADFILTER.Settings(&Smooth_Servo1_Aileron, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&Smooth_Servo2_Aileron, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&Smooth_Servo_Rudder, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
   BIQUADFILTER.Settings(&Smooth_Servo_Elevator, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+#endif
   return true;
 }
 
@@ -132,7 +136,9 @@ void ServosMasterClass::Update(void)
 
   SERVOSMASTER.Rate_Apply();
 
+#ifndef __AVR_ATmega2560__
   if (Servo.Filter.CutOff == NONE)
+#endif
   {
     //PULSO MINIMO E MAXIMO PARA OS SERVOS
     MotorControl[MOTOR2] = Constrain_16Bits(Servo.Signal.UnFiltered[SERVO1], Servo.Pulse.Min[SERVO1], Servo.Pulse.Max[SERVO1]); //SERVO 1
@@ -140,6 +146,7 @@ void ServosMasterClass::Update(void)
     MotorControl[MOTOR4] = Constrain_16Bits(Servo.Signal.UnFiltered[SERVO3], Servo.Pulse.Min[SERVO3], Servo.Pulse.Max[SERVO3]); //SERVO 3
     MotorControl[MOTOR5] = Constrain_16Bits(Servo.Signal.UnFiltered[SERVO4], Servo.Pulse.Min[SERVO4], Servo.Pulse.Max[SERVO4]); //SERVO 4
   }
+#ifndef __AVR_ATmega2560__
   else
   {
     //APLICA O LOW PASS FILTER NO SINAL DOS SERVOS
@@ -154,5 +161,6 @@ void ServosMasterClass::Update(void)
     MotorControl[MOTOR4] = Constrain_16Bits(Servo.Signal.Filtered[SERVO3], Servo.Pulse.Min[SERVO3], Servo.Pulse.Max[SERVO3]); //SERVO 3
     MotorControl[MOTOR5] = Constrain_16Bits(Servo.Signal.Filtered[SERVO4], Servo.Pulse.Min[SERVO4], Servo.Pulse.Max[SERVO4]); //SERVO 4
   }
+#endif
   ServoAutoTrimRun();
 }

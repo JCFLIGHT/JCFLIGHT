@@ -139,7 +139,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             255,             3},
     {"Land_LPF",                           LAND_LPF_ADDR,                        VAR_8BITS,              &JCF_Param.Land_LPF,                        0,             255,             1},
     {"ThrottleFactor",                     THROTTLE_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.Throttle_Factor,                 0,             255,             1},
-    {"AutoDisarm",                         AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             5},
+    {"AutoDisarm_Time",                    AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             5},
     {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            1100},
     {"AutoDisarm_YPR_Min",                 AUTODISARM_YPR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Min,              800,           1500,            1450},
     {"AutoDisarm_YPR_Max",                 AUTODISARM_YPR_MAX_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Max,              800,           2200,            1550},
@@ -153,7 +153,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GPS_RTH_Land",                       RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             10},
 #ifndef OPTIMIZE_LIST   
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
-    {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             0},
+    {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif
     {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.AirSpeed_Factor,                 0,             5000,            1},
 };
@@ -303,6 +303,15 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   {
     return;
   }
+   else if (strncasecmp(ParamCommandLine, "ajuda", 5) == 0)
+  {
+    for (Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
+    {
+      ParamValue = &Params_Table[Table_Counter];
+      DEBUG("%s", Params_Table[Table_Counter].Param_Name);
+    }
+    DEBUG("\r");
+  }
   else if ((PtrInput = strstr(ParamCommandLine, "=")) != NULL)
   {
     PtrInput++;
@@ -342,10 +351,10 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
     }
     DEBUG("\r");
   }
-  else if (strncasecmp(ParamCommandLine, "reiniciar", 9) == 0)
+  else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {
   }
-  else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
+  else if (strncasecmp(ParamCommandLine, "reiniciar", 9) == 0)
   {
   }
   else if (strncasecmp(ParamCommandLine, "sair", 4) == 0)

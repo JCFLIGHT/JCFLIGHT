@@ -28,12 +28,11 @@
 #include "Yaw/HEADINGHOLD.h"
 #include "PID/RCPID.h"
 #include "FlightModes/FLIGHTMODES.h"
+#include "Param/PARAM.h"
 
 struct _GetWayPointGCSParameters GetWayPointGCSParameters;
 struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 
-#define WP_NAVIGATION_SPEED 400         //VELOCIDADE DE NAVEGAÇÃO NO RTH E WAYPOINT (400 CM/SEGUNDO)
-#define WAYPOINT_RADIUS 2               //RAIO PARA VERIFICAR SE A CONTROLADORA CHEGOU PERTO DO WP E INICIAR A IDA PARA O PROXIMO (RAIO EM METROS)
 #define THROTTLE_TAKEOFF_ASCENT 1600    //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF ATÉ CHEGAR NA ALTITUDE SETADA PELO GCS
 #define THROTTLE_TAKEOFF_NORMALIZE 1500 //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF AO CHEGAR NA ALTITUDE SETADA PELO GCS
 #define THROTTLE_CANCEL_TAKEOFF 1450    //VALOR DO THROTTLE LIDO DO RECEPTOR PARA CANCELAR O AUTO-TAKEOFF E VOLTAR AO CONTROLE NORMAL
@@ -316,10 +315,10 @@ void WayPointRun()
     break;
 
   case WP_EN_ROUTE:
-    Navigation_Speed_Result = Calculate_Navigation_Speed(WP_NAVIGATION_SPEED);
+    Navigation_Speed_Result = Calculate_Navigation_Speed(JCF_Param.Navigation_Vel);
     GPSCalculateNavigationRate(Navigation_Speed_Result);
     HeadingHoldTarget = WRap_18000(Target_Bearing) / 100;
-    if ((Two_Points_Distance <= WAYPOINT_RADIUS * 100) || Point_Reached())
+    if ((Two_Points_Distance <= (JCF_Param.GPS_WP_Radius * 100)) || Point_Reached())
     {
       if (WPSucess && MissionNumber == 0 && WayPointLatitude[1] != 0 && WayPointLongitude[1] != 0)
       {

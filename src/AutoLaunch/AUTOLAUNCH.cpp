@@ -28,6 +28,7 @@
 #include "Barometer/BAROBACKEND.h"
 #include "GPS/GPSUBLOX.h"
 #include "GPS/GPSSTATES.h"
+#include "Param/PARAM.h"
 
 AutoLaunchClass AUTOLAUNCH;
 
@@ -285,19 +286,11 @@ bool AutoLaunchClass::Completed(void)
 
 uint8_t AutoLaunchClass::GetPlaneType(void)
 {
-  if (GetActualFrameState(FIXED_WING))
+  if (JCF_Param.AirPlane_Wheels == 0)
   {
     return WITHOUT_WHEELS;
   }
-  else if (GetActualFrameState(PLANE_VTAIL))
-  {
-    return WITHOUT_WHEELS;
-  }
-  else if (GetActualFrameState(AIR_PLANE))
-  {
-    return WITH_WHEELS;
-  }
-  return 0;
+  return WITH_WHEELS;
 }
 
 void AutoLaunchClass::ResetParameters(void)

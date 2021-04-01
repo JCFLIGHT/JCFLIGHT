@@ -421,4 +421,53 @@ typedef struct
 
 } Servo_Struct;
 
+typedef struct JCF_Param_Adjustable
+{
+#ifndef __AVR_ATmega2560__
+  uint8_t kP_Acc_AHRS;
+  uint8_t kI_Acc_AHRS;
+  uint8_t kP_Mag_AHRS;
+  uint8_t kI_Mag_AHRS;
+  uint8_t AutoLaunch_AHRS_BankAngle;
+  uint16_t AutoLaunch_IMU_BankAngle;
+  uint8_t AutoLaunch_IMU_Swing;
+  uint16_t AutoLaunch_Trigger_Motor_Delay;
+  uint8_t AutoLaunch_Elevator;
+  uint16_t AutoLaunch_SpinUp;
+  uint16_t AutoLaunch_SpinUp_Time;
+  uint16_t AutoLaunch_MaxThrottle;
+  uint16_t AutoLaunch_Exit;
+  uint8_t AutoLaunch_Altitude;
+#endif
+  uint32_t Batt_Voltage_Factor;
+  uint16_t Amps_Per_Volt;
+#ifndef __AVR_ATmega2560__
+  uint16_t Amps_OffSet;
+  uint8_t CrashCheck_BankAngle;
+  uint8_t CrashCheck_Time;
+  uint16_t GimbalMinValue;
+  uint16_t GimbalMiddleValue;
+  uint16_t GimbalMaxValue;
+  uint8_t Land_Check_Acc;
+  uint8_t Land_LPF;
+  uint8_t Throttle_Factor;
+  uint8_t AutoDisarm_Time;
+  uint16_t AutoDisarm_Throttle_Min;
+  uint16_t AutoDisarm_YPR_Min;
+  uint16_t AutoDisarm_YPR_Max;
+#endif
+  uint8_t AirPlane_Wheels;
+#ifndef __AVR_ATmega2560__
+  uint8_t GPS_Baud_Rate;
+#endif
+  uint16_t Navigation_Vel;
+  uint8_t GPS_WP_Radius;
+  uint8_t GPS_RTH_Land;
+#ifndef __AVR_ATmega2560__
+  uint8_t GPS_TiltCompensation;
+  uint8_t AirSpeed_Samples;
+#endif
+  uint16_t AirSpeed_Factor;
+} Struct_JCF_Param_Adjustable;
+
 #endif

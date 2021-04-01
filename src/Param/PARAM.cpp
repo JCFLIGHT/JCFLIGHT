@@ -40,61 +40,8 @@ NÃO INDENTE ESSA EXTENSÃO
 
 ParamClass PARAM;
 
-#ifdef __AVR_ATmega2560__
-#define OPTIMIZE_LIST
-#endif
-
 //#define OPERATOR_CHECK_EEPROM
 //#define ERASE_ALL_EEPROM
-
-typedef struct JCF_Param_Adjustable
-{
-#ifndef OPTIMIZE_LIST
-  uint8_t kP_Acc_AHRS;
-  uint8_t kI_Acc_AHRS;
-  uint8_t kP_Mag_AHRS;
-  uint8_t kI_Mag_AHRS;
-  uint8_t AutoLaunch_AHRS_BankAngle;
-  uint16_t AutoLaunch_IMU_BankAngle;
-  uint8_t AutoLaunch_IMU_Swing;
-  uint16_t AutoLaunch_Trigger_Motor_Delay;
-  uint8_t AutoLaunch_Elevator;
-  uint16_t AutoLaunch_SpinUp;
-  uint16_t AutoLaunch_SpinUp_Time;
-  uint16_t AutoLaunch_MaxThrottle;
-  uint16_t AutoLaunch_Exit;
-  uint8_t AutoLaunch_Altitude;
-#endif
-  uint32_t Batt_Voltage_Factor;
-  uint16_t Amps_Per_Volt;
-#ifndef OPTIMIZE_LIST
-  uint16_t Amps_OffSet;
-  uint8_t CrashCheck_BankAngle;
-  uint8_t CrashCheck_Time;
-  uint16_t GimbalMinValue;
-  uint16_t GimbalMiddleValue;
-  uint16_t GimbalMaxValue;
-  uint8_t Land_Check_Acc;
-  uint8_t Land_LPF;
-  uint8_t Throttle_Factor;
-  uint8_t AutoDisarm_Time;
-  uint16_t AutoDisarm_Throttle_Min;
-  uint16_t AutoDisarm_YPR_Min;
-  uint16_t AutoDisarm_YPR_Max;
-#endif
-  uint8_t AirPlane_Wheels;
-#ifndef OPTIMIZE_LIST
-  uint8_t GPS_Baud_Rate;
-#endif
-  uint16_t Navigation_Vel;
-  uint8_t GPS_WP_Radius;
-  uint8_t GPS_RTH_Land;
-#ifndef OPTIMIZE_LIST
-  uint8_t GPS_TiltCompensation;
-  uint8_t AirSpeed_Samples;
-#endif
-  uint16_t AirSpeed_Factor;
-} Struct_JCF_Param_Adjustable;
 
 Struct_JCF_Param_Adjustable JCF_Param;
 
@@ -111,7 +58,7 @@ typedef struct
 
 const Requesited_Values_Of_Param Params_Table[] = {
     //NOME                                 ENDEREÇO NA EEPROM                    TIPO                    VARIAVEL                                    MIN            MAX              VALOR PADRÃO
-#ifndef OPTIMIZE_LIST
+#ifndef __AVR_ATmega2560__
     {"kP_Acc_AHRS",                        KP_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Acc_AHRS,                     0,             255,             25},
     {"kI_Acc_AHRS",                        KI_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Acc_AHRS,                     0,             255,             50},
     {"kP_Mag_AHRS",                        KP_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Mag_AHRS,                     0,             255,             10},
@@ -129,7 +76,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
 #endif
     {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_32BITS,             &JCF_Param.Batt_Voltage_Factor,             0,             400000,          259489},
     {"Batt_Amps_Volt",                     BATT_AMPS_VOLT_ADDR,                  VAR_16BITS,             &JCF_Param.Amps_Per_Volt,                   0,             1000,            620},
-#ifndef OPTIMIZE_LIST   
+#ifndef __AVR_ATmega2560__   
     {"Batt_Amps_OffSet",                   BATT_AMPS_OFFSET_ADDR,                VAR_16BITS,             &JCF_Param.Amps_OffSet,                     0,             1000,            0},
     {"CrashCheck_BankAngle",               CC_BANKANGLE_ADDR,                    VAR_8BITS,              &JCF_Param.CrashCheck_BankAngle,            0,             255,             30},
     {"CrashCheck_Time",                    CC_TIME_ADDR,                         VAR_8BITS,              &JCF_Param.CrashCheck_Time,                 0,             255,             2},
@@ -145,13 +92,13 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"AutoDisarm_YPR_Max",                 AUTODISARM_YPR_MAX_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Max,              800,           2200,            1550},
 #endif
     {"AirPlane_Wheels",                    WHEELS_ADDR,                          VAR_8BITS,              &JCF_Param.AirPlane_Wheels,                 0,             255,             0},
-#ifndef OPTIMIZE_LIST
+#ifndef __AVR_ATmega2560__
     {"GPS_Baud_Rate",                      GPS_BAUDRATE_ADDR,                    VAR_8BITS,              &JCF_Param.GPS_Baud_Rate,                   0,             4,               0},
 #endif
     {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             400},
     {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             2},
     {"GPS_RTH_Land_Radius",                RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             10},
-#ifndef OPTIMIZE_LIST   
+#ifndef __AVR_ATmega2560__   
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif

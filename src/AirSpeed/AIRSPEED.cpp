@@ -26,6 +26,7 @@
 #include "Filters/PT1.h"
 #include "Build/BOARDDEFS.h"
 #include "Scheduler/SCHEDULER.h"
+#include "Param/PARAM.h"
 
 AirSpeedClass AIRSPEED;
 
@@ -34,8 +35,6 @@ PT1_Filter_Struct Pitot_Smooth;
 
 #define AIR_DENSITY_SEA_LEVEL_15C 1.225f //DENSIDADE DO AR ACIMA DO NIVEL DO MAR COM A TEMPERATURA DE 15 GRAUS °C
 #define PITOT_LPF_CUTOFF 350 / 1000.0f   //EM MILLIHZ
-
-float AirSpeedRatio = 1.0f; //AJUSUTAVEL PELO USUARIO
 
 void AirSpeedClass::Initialization()
 {
@@ -106,7 +105,7 @@ float AirSpeedClass::Get_Raw_Pressure()
 void AirSpeedClass::Get_Bernoulli_IAS_Pressure(float &Pressure)
 {
   //https://en.wikipedia.org/wiki/Indicated_airspeed
-  Pressure = AirSpeedRatio * Fast_SquareRoot(2.0f * ABS(AirSpeed.Raw.Pressure - AirSpeed.Calibration.OffSet) / AIR_DENSITY_SEA_LEVEL_15C);
+  Pressure = JCF_Param.AirSpeed_Factor * Fast_SquareRoot(2.0f * ABS(AirSpeed.Raw.Pressure - AirSpeed.Calibration.OffSet) / AIR_DENSITY_SEA_LEVEL_15C);
   Pressure = PT1FilterApply3(&Pitot_Smooth, Pressure);
 }
 

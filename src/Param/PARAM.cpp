@@ -86,7 +86,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GimbalMaxValue",                     GIMBAL_MAX_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMaxValue,                  800,           2200,            2000},
     {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             255,             3},
     {"Land_LPF",                           LAND_LPF_ADDR,                        VAR_8BITS,              &JCF_Param.Land_LPF,                        0,             255,             1},
-    {"ThrottleFactor",                     THROTTLE_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.Throttle_Factor,                 0,             255,             1.0f},
+    {"ThrottleFactor",                     THROTTLE_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.Throttle_Factor,                 0,             1,               1.0f},
     {"AutoDisarm_Time",                    AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             5},
     {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            1100},
     {"AutoDisarm_YPR_Min",                 AUTODISARM_YPR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Min,              800,           1500,            1450},
@@ -103,7 +103,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif
-    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             5000,            1.0f},
+    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             100,             1.0f},
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Requesited_Values_Of_Param))

@@ -450,7 +450,7 @@ typedef struct JCF_Param_Adjustable
   uint16_t GimbalMaxValue;
   uint8_t Land_Check_Acc;
   uint8_t Land_LPF;
-  uint8_t Throttle_Factor;
+  float Throttle_Factor;
   uint8_t AutoDisarm_Time;
   uint16_t AutoDisarm_Throttle_Min;
   uint16_t AutoDisarm_YPR_Min;

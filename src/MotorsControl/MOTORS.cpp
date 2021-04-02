@@ -44,8 +44,6 @@ FILE_COMPILE_FOR_SPEED
 //DEBUG
 //#define PRINTLN_MOTORS
 
-//#define PWM_PINS_IN_ORDER //JCFLIGHT PCB
-
 float ThrottleScale = 1.0f;
 
 int16_t MotorControl[8];
@@ -279,25 +277,12 @@ void ApplyPWMControlForMotorsAndServos()
 
 #ifdef __AVR_ATmega2560__
 
-#ifndef PWM_PINS_IN_ORDER
-
-  OCR3C = MotorControl[MOTOR4] << 3; //PINO DIGITAL 3 (MOTOR 4 NO FRAME)
-  OCR3A = MotorControl[MOTOR3] << 3; //PINO DIGITAL 5 (MOTOR 3 NO FRAME)
-  OCR4A = MotorControl[MOTOR2] << 3; //PINO DIGITAL 6 (MOTOR 2 NO FRAME)
-  OCR3B = MotorControl[MOTOR1] << 3; //PINO DIGITAL 2 (MOTOR 1 NO FRAME)
-  OCR4B = MotorControl[MOTOR6] << 3; //PINO DIGITAL 7 (MOTOR 6 NO FRAME)
-  OCR4C = MotorControl[MOTOR5] << 3; //PINO DIGITAL 8 (MOTOR 5 NO FRAME)
-
-#else
-
   OCR3B = MotorControl[MOTOR1] << 3; //PINO DIGITAL 2 (MOTOR 1 NO FRAME)
   OCR3C = MotorControl[MOTOR2] << 3; //PINO DIGITAL 3 (MOTOR 2 NO FRAME)
   OCR3A = MotorControl[MOTOR3] << 3; //PINO DIGITAL 5 (MOTOR 3 NO FRAME)
   OCR4A = MotorControl[MOTOR4] << 3; //PINO DIGITAL 6 (MOTOR 4 NO FRAME)
   OCR4B = MotorControl[MOTOR5] << 3; //PINO DIGITAL 7 (MOTOR 5 NO FRAME)
   OCR4C = MotorControl[MOTOR6] << 3; //PINO DIGITAL 8 (MOTOR 6 NO FRAME)
-
-#endif
 
   OCR5A = MotorControl[GIMBAL] << 3;         //PINO DIGITAL 46
   OCR5B = MotorControl[PARACHUTESERVO] << 3; //PINO DIGITAL 45

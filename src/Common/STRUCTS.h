@@ -429,7 +429,7 @@ typedef struct JCF_Param_Adjustable
   uint8_t kP_Mag_AHRS;
   uint8_t kI_Mag_AHRS;
   uint8_t AutoLaunch_AHRS_BankAngle;
-  uint16_t AutoLaunch_IMU_BankAngle;
+  int16_t AutoLaunch_IMU_BankAngle;
   uint8_t AutoLaunch_IMU_Swing;
   uint16_t AutoLaunch_Trigger_Motor_Delay;
   uint8_t AutoLaunch_Elevator;

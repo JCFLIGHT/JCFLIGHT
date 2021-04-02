@@ -25,7 +25,7 @@
 | GimbalMiddleValue   | 1500         | Valor médio do pulso a ser aplicado no Gimbal [uS] |
 | GimbalMaxValue   | 2000         | Valor maximo do pulso a ser aplicado no Gimbal [uS] |
 | Land_CheckAcc   | 3         | Valor da aceleração da IMU [Metros/Segundo^2] |
-| Land_LPF   | 1         | "Valor da frequêcnia de corte da aceleração da IMU (Por Favor,não altere) [Hz] |
+| Land_LPF   | 1         | Valor da frequêcnia de corte da aceleração da IMU (Por Favor,não altere) [Hz] |
 | ThrottleFactor   | 1.0         | Valor do ganho do Thottle para o mix de PID |
 | AutoDisarm_Time   | 5         | Estouro de tempo para desarmar a controladora em nivel baixo de Throttle [Segundos] |
 | AutoDisarm_Throttle_Min   | 1100         | Valor maximo do Throttle tolerado para iniciar a contagem do Auto-Desarmamento [uS] |

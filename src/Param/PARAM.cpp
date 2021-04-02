@@ -35,7 +35,7 @@ NÃO INDENTE ESSA EXTENSÃO
 #include "Common/ENUM.h"
 #include "Build/BOARDDEFS.h"
 #include "IOMCU/IOMCU.h"
-#include "ATOF.h"
+#include "ATO.h"
 #include "FastSerial/PRINTF.h"
 #include "FastSerial/FASTSERIAL.h"
 
@@ -65,7 +65,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"kP_Mag_AHRS",                        KP_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Mag_AHRS,                     0,             255,             10},
     {"kI_Mag_AHRS",                        KI_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Mag_AHRS,                     0,             255,             0},
     {"AutoLaunch_AHRS_BankAngle",          AL_AHRS_BA_ADDR,                      VAR_8BITS,              &JCF_Param.AutoLaunch_AHRS_BankAngle,       0,             255,             25},
-    {"AutoLaunch_IMU_BankAngle",           AL_IMU_BA_ADDR,                       VAR_16BITS,             &JCF_Param.AutoLaunch_IMU_BankAngle,        0,             1000,            450},
+    {"AutoLaunch_IMU_BankAngle",           AL_IMU_BA_ADDR,                       VAR_16BITS,             &JCF_Param.AutoLaunch_IMU_BankAngle,        -1000,         1000,            -450},
     {"AutoLaunch_IMU_Swing",               AL_IMU_SWING_ADDR,                    VAR_8BITS,              &JCF_Param.AutoLaunch_IMU_Swing,            0,             255,             100},
     {"AutoLaunch_Trigger_Motor_Delay",     AL_TRIGGER_MOTOR_DELAY_ADDR,          VAR_16BITS,             &JCF_Param.AutoLaunch_Trigger_Motor_Delay,  0,             10000,           1500},
     {"AutoLaunch_Elevator",                AL_ELEVATOR_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Elevator,             0,             255,             18},
@@ -258,6 +258,11 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   uint32_t Table_Counter;
   uint32_t StringLength;
 
+  while (*ParamCommandLine == ' ')
+  {
+    ++ParamCommandLine;
+  }
+
   StringLength = strlen(ParamCommandLine);
 
   if (StringLength == 0)
@@ -276,9 +281,8 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   else if ((PtrInput = strstr(ParamCommandLine, "=")) != NULL)
   {
     PtrInput++;
-    StringLength--;
-    New_Value = atoi(PtrInput);
-    New_Value_Float = _atof(PtrInput);
+    New_Value = ATO_Int(PtrInput);
+    New_Value_Float = ATO_Float(PtrInput);
     for (Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
     {
       ParamValue = &Params_Table[Table_Counter];
@@ -296,6 +300,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
           }
           DEBUG_WITHOUT_NEW_LINE("%s setado para ", Params_Table[Table_Counter].Param_Name);
           Param_Print_Value(ParamValue);
+          LINE_SPACE;
         }
         else if (New_Value < Params_Table[Table_Counter].Value_Min)
         {
@@ -321,6 +326,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
       DEBUG_WITHOUT_NEW_LINE("%s = ", Params_Table[Table_Counter].Param_Name);
       Param_Print_Value(ParamValue);
     }
+    LINE_SPACE;
   }
   else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {

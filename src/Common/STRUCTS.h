@@ -421,6 +421,17 @@ typedef struct
 
 } Servo_Struct;
 
+typedef struct
+{
+  const char *Param_Name;
+  const uint16_t Address;
+  const uint8_t Variable_Type;
+  void *Ptr;
+  const int32_t Value_Min;
+  const int32_t Value_Max;
+  const float DefaultValue;
+} Resources_Of_Param;
+
 typedef struct JCF_Param_Adjustable
 {
 #ifndef __AVR_ATmega2560__

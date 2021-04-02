@@ -46,18 +46,7 @@ ParamClass PARAM;
 
 Struct_JCF_Param_Adjustable JCF_Param;
 
-typedef struct
-{
-  const char *Param_Name;
-  const uint16_t Address;
-  const uint8_t Variable_Type;
-  void *Ptr;
-  const int32_t Value_Min;
-  const int32_t Value_Max;
-  const float DefaultValue;
-} Requesited_Values_Of_Param;
-
-const Requesited_Values_Of_Param Params_Table[] = {
+const Resources_Of_Param Params_Table[] = {
     //NOME                                 ENDEREÇO NA EEPROM                    TIPO                    VARIAVEL                                    MIN            MAX              VALOR PADRÃO
 #ifndef __AVR_ATmega2560__
     {"kP_Acc_AHRS",                        KP_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Acc_AHRS,                     0,             255,             25},
@@ -106,7 +95,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             100,             1.0f},
 };
 
-#define TABLE_COUNT (sizeof(Params_Table) / sizeof(Requesited_Values_Of_Param))
+#define TABLE_COUNT (sizeof(Params_Table) / sizeof(Resources_Of_Param))
 
 void ParamClass::Initialization(void)
 {
@@ -121,7 +110,7 @@ void ParamClass::Initialization(void)
   PARAM.Load_Sketch();
 }
 
-static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
+static void DefaultParams(const Resources_Of_Param *ParamValue)
 {
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
@@ -156,7 +145,7 @@ static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
 void ParamClass::Load_Sketch(void)
 {
   static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(PARAM_LINK_ADDR);
-  const Requesited_Values_Of_Param *ParamValue;
+  const Resources_Of_Param *ParamValue;
 
   if (PARAM.Actual_Format_Version != System_Version)
   {
@@ -195,7 +184,7 @@ void ParamClass::Load_Sketch(void)
   }
 }
 
-static void Param_Set_Value(const Requesited_Values_Of_Param *VariablePointer, const int32_t New_Value, const float New_Value_Float)
+static void Param_Set_Value(const Resources_Of_Param *VariablePointer, const int32_t New_Value, const float New_Value_Float)
 {
   switch (VariablePointer->Variable_Type)
   {
@@ -222,7 +211,7 @@ static void Param_Set_Value(const Requesited_Values_Of_Param *VariablePointer, c
   }
 }
 
-static void Param_Print_Value(const Requesited_Values_Of_Param *VariablePointer)
+static void Param_Print_Value(const Resources_Of_Param *VariablePointer)
 {
   int32_t New_Value = 0;
 
@@ -251,7 +240,7 @@ static void Param_Print_Value(const Requesited_Values_Of_Param *VariablePointer)
 
 void ParamClass::Set_And_Save(char *ParamCommandLine)
 {
-  const Requesited_Values_Of_Param *ParamValue;
+  const Resources_Of_Param *ParamValue;
   char *PtrInput = NULL;
   float New_Value_Float = 0;
   int32_t New_Value = 0;

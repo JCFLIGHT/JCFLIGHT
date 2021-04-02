@@ -439,10 +439,10 @@ typedef struct JCF_Param_Adjustable
   uint16_t AutoLaunch_Exit;
   uint8_t AutoLaunch_Altitude;
 #endif
-  uint32_t Batt_Voltage_Factor;
-  uint16_t Amps_Per_Volt;
+  float Batt_Voltage_Factor;
+  float Amps_Per_Volt;
 #ifndef __AVR_ATmega2560__
-  uint16_t Amps_OffSet;
+  float Amps_OffSet;
   uint8_t CrashCheck_BankAngle;
   uint8_t CrashCheck_Time;
   uint16_t GimbalMinValue;
@@ -467,7 +467,7 @@ typedef struct JCF_Param_Adjustable
   uint8_t GPS_TiltCompensation;
   uint8_t AirSpeed_Samples;
 #endif
-  uint16_t AirSpeed_Factor;
+  float AirSpeed_Factor;
 } Struct_JCF_Param_Adjustable;
 
 #endif

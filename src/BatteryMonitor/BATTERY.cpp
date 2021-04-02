@@ -25,6 +25,7 @@
 #include "Build/BOARDDEFS.h"
 #include "Math/MATHSUPPORT.h"
 #include "FailSafe/FAILSAFE.h"
+#include "Param/PARAM.h"
 #include "FastSerial/PRINTF.h"
 
 BatteryClass BATTERY;
@@ -42,11 +43,6 @@ PT1_Filter_Struct CurrentFilter_LPF;
 #define VOLTAGE_CUTOFF 15            //HZ
 #define CURRENT_CUTOFF 15            //HZ
 
-//VALORES DE CALIBRAÇÃO PARA O MODULO DA 3DR
-float BattVoltageFactor = 259.489f; //VALOR DE CALIBRAÇÃO PARA O DIVISOR RESISTIVO COM R1 DE 13.7K E R2 DE 1.5K
-float Amps_Per_Volt = 62.0f;        //FATOR DE MULTIPLICAÇÃO DA TENSÃO DO PINO ANALOGICO PARA CONVERTER EM CORRENTE (AMPERES)
-float Amps_OffSet = 0.00f;          //TENSÃO DE OFFSET (AJUSTE FINO DA CORRENTE)
-
 void BatteryClass::Initialization(void)
 {
   PT1FilterInit(&VoltageFilter_LPF, VOLTAGE_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
@@ -56,7 +52,7 @@ void BatteryClass::Initialization(void)
 void BatteryClass::Update_Voltage(void)
 {
   //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  BATTERY.Calced_Voltage = PT1FilterApply3(&VoltageFilter_LPF, BATTERY.Calced_Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / BattVoltageFactor));
+  BATTERY.Calced_Voltage = PT1FilterApply3(&VoltageFilter_LPF, BATTERY.Calced_Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / JCF_Param.Batt_Voltage_Factor));
   BATTERY.Exhausted();
   FailSafe_Do_RTH_With_Low_Batt(BATTERY.LowBattPreventArm);
 }
@@ -214,7 +210,11 @@ uint8_t BatteryClass::GetPercentage(void)
 void BatteryClass::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-  BATTERY.Calced_Current = PT1FilterApply3(&CurrentFilter_LPF, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - Amps_OffSet) * Amps_Per_Volt);
+#ifndef __AVR_ATmega2560__
+  BATTERY.Calced_Current = PT1FilterApply3(&CurrentFilter_LPF, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - JCF_Param.Amps_OffSet) * JCF_Param.Amps_Per_Volt);
+#else
+  BATTERY.Calced_Current = PT1FilterApply3(&CurrentFilter_LPF, ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) * JCF_Param.Amps_Per_Volt);
+#endif
   BATTERY.Calced_Current = MAX(BATTERY.Calced_Current, 0);
 }
 

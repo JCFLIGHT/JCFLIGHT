@@ -35,6 +35,7 @@ NÃO INDENTE ESSA EXTENSÃO
 #include "Common/ENUM.h"
 #include "Build/BOARDDEFS.h"
 #include "IOMCU/IOMCU.h"
+#include "ATOF.h"
 #include "FastSerial/PRINTF.h"
 #include "FastSerial/FASTSERIAL.h"
 
@@ -53,7 +54,7 @@ typedef struct
   void *Ptr;
   const int32_t Value_Min;
   const int32_t Value_Max;
-  const int32_t DefaultValue;
+  const float DefaultValue;
 } Requesited_Values_Of_Param;
 
 const Requesited_Values_Of_Param Params_Table[] = {
@@ -74,10 +75,10 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"AutoLaunch_Exit",                    AL_EXIT_ADDR,                         VAR_16BITS,             &JCF_Param.AutoLaunch_Exit,                 0,             30000,           5000},
     {"AutoLaunch_Altitude",                AL_ALTITUDE_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Altitude,             0,             255,             0},
 #endif
-    {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_32BITS,             &JCF_Param.Batt_Voltage_Factor,             0,             400000,          259489},
-    {"Batt_Amps_Volt",                     BATT_AMPS_VOLT_ADDR,                  VAR_16BITS,             &JCF_Param.Amps_Per_Volt,                   0,             1000,            620},
+    {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_FLOAT,              &JCF_Param.Batt_Voltage_Factor,             0,             1000,            259.489f},
+    {"Batt_Amps_Volt",                     BATT_AMPS_VOLT_ADDR,                  VAR_FLOAT,              &JCF_Param.Amps_Per_Volt,                   0,             1000,            62.0f},
 #ifndef __AVR_ATmega2560__   
-    {"Batt_Amps_OffSet",                   BATT_AMPS_OFFSET_ADDR,                VAR_16BITS,             &JCF_Param.Amps_OffSet,                     0,             1000,            0},
+    {"Batt_Amps_OffSet",                   BATT_AMPS_OFFSET_ADDR,                VAR_FLOAT,              &JCF_Param.Amps_OffSet,                     0,             1000,            0},
     {"CrashCheck_BankAngle",               CC_BANKANGLE_ADDR,                    VAR_8BITS,              &JCF_Param.CrashCheck_BankAngle,            0,             255,             30},
     {"CrashCheck_Time",                    CC_TIME_ADDR,                         VAR_8BITS,              &JCF_Param.CrashCheck_Time,                 0,             255,             2},
     {"GimbalMinValue",                     GIMBAL_MIN_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMinValue,                  800,           2200,            1000},
@@ -85,7 +86,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GimbalMaxValue",                     GIMBAL_MAX_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMaxValue,                  800,           2200,            2000},
     {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             255,             3},
     {"Land_LPF",                           LAND_LPF_ADDR,                        VAR_8BITS,              &JCF_Param.Land_LPF,                        0,             255,             1},
-    {"ThrottleFactor",                     THROTTLE_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.Throttle_Factor,                 0,             255,             1},
+    {"ThrottleFactor",                     THROTTLE_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.Throttle_Factor,                 0,             255,             1.0f},
     {"AutoDisarm_Time",                    AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             5},
     {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            1100},
     {"AutoDisarm_YPR_Min",                 AUTODISARM_YPR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Min,              800,           1500,            1450},
@@ -102,7 +103,7 @@ const Requesited_Values_Of_Param Params_Table[] = {
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif
-    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_16BITS,             &JCF_Param.AirSpeed_Factor,                 0,             5000,            1},
+    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             5000,            1.0f},
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Requesited_Values_Of_Param))
@@ -131,7 +132,7 @@ static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
 
     case VAR_8BITS:
       *(uint8_t *)ParamValue->Ptr = ParamValue->DefaultValue;
-      STORAGEMANAGER.Write_8Bits(ParamValue->Address ,ParamValue->DefaultValue);
+      STORAGEMANAGER.Write_8Bits(ParamValue->Address, ParamValue->DefaultValue);
       break;
 
     case VAR_16BITS:
@@ -142,6 +143,11 @@ static void DefaultParams(const Requesited_Values_Of_Param *ParamValue)
     case VAR_32BITS:
       *(int32_t *)ParamValue->Ptr = ParamValue->DefaultValue;
       STORAGEMANAGER.Write_32Bits(ParamValue->Address, ParamValue->DefaultValue);
+      break;
+
+    case VAR_FLOAT:
+      *(float *)ParamValue->Ptr = ParamValue->DefaultValue;
+      STORAGEMANAGER.Write_Float(ParamValue->Address, ParamValue->DefaultValue);
       break;
     }
   }
@@ -162,30 +168,34 @@ void ParamClass::Load_Sketch(void)
   }
   else
   {
-  for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
-  {
-    ParamValue = &Params_Table[Table_Counter];
-
-    switch (ParamValue->Variable_Type)
+    for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
     {
+      ParamValue = &Params_Table[Table_Counter];
 
-    case VAR_8BITS:
-      *(uint8_t *)ParamValue->Ptr = STORAGEMANAGER.Read_8Bits(ParamValue->Address);
-      break;
+      switch (ParamValue->Variable_Type)
+      {
 
-    case VAR_16BITS:
-      *(int16_t *)ParamValue->Ptr = STORAGEMANAGER.Read_16Bits(ParamValue->Address);
-      break;
+      case VAR_8BITS:
+        *(uint8_t *)ParamValue->Ptr = STORAGEMANAGER.Read_8Bits(ParamValue->Address);
+        break;
 
-    case VAR_32BITS:
-      *(int32_t *)ParamValue->Ptr = STORAGEMANAGER.Read_32Bits(ParamValue->Address);
-      break;
+      case VAR_16BITS:
+        *(int16_t *)ParamValue->Ptr = STORAGEMANAGER.Read_16Bits(ParamValue->Address);
+        break;
+
+      case VAR_32BITS:
+        *(int32_t *)ParamValue->Ptr = STORAGEMANAGER.Read_32Bits(ParamValue->Address);
+        break;
+
+      case VAR_FLOAT:
+        *(float *)ParamValue->Ptr = STORAGEMANAGER.Read_Float(ParamValue->Address);
+        break;
+      }
     }
   }
 }
-}
 
-static void Param_Set_Value(const Requesited_Values_Of_Param *VariablePointer, const int32_t New_Value)
+static void Param_Set_Value(const Requesited_Values_Of_Param *VariablePointer, const int32_t New_Value, const float New_Value_Float)
 {
   switch (VariablePointer->Variable_Type)
   {
@@ -203,6 +213,11 @@ static void Param_Set_Value(const Requesited_Values_Of_Param *VariablePointer, c
   case VAR_32BITS:
     *(int32_t *)VariablePointer->Ptr = (int32_t)New_Value;
     STORAGEMANAGER.Write_32Bits(VariablePointer->Address, New_Value);
+    break;
+
+  case VAR_FLOAT:
+    *(float *)VariablePointer->Ptr = (float)New_Value_Float;
+    STORAGEMANAGER.Write_Float(VariablePointer->Address, New_Value_Float);
     break;
   }
 }
@@ -226,6 +241,10 @@ static void Param_Print_Value(const Requesited_Values_Of_Param *VariablePointer)
     New_Value = STORAGEMANAGER.Read_32Bits(VariablePointer->Address);
     DEBUG("%ld", New_Value);
     return;
+
+  case VAR_FLOAT:
+    DEBUG("%.4f", STORAGEMANAGER.Read_Float(VariablePointer->Address));
+    return;
   }
   DEBUG("%d", New_Value);
 }
@@ -234,6 +253,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
 {
   const Requesited_Values_Of_Param *ParamValue;
   char *PtrInput = NULL;
+  float New_Value_Float = 0;
   int32_t New_Value = 0;
   uint32_t Table_Counter;
   uint32_t StringLength;
@@ -244,7 +264,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   {
     return;
   }
-   else if (strncasecmp(ParamCommandLine, "ajuda", 5) == 0)
+  else if (strncasecmp(ParamCommandLine, "ajuda", 5) == 0)
   {
     for (Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
     {
@@ -258,6 +278,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
     PtrInput++;
     StringLength--;
     New_Value = atoi(PtrInput);
+    New_Value_Float = _atof(PtrInput);
     for (Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
     {
       ParamValue = &Params_Table[Table_Counter];
@@ -265,7 +286,14 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
       {
         if (New_Value >= Params_Table[Table_Counter].Value_Min && New_Value <= Params_Table[Table_Counter].Value_Max)
         {
-          Param_Set_Value(ParamValue, New_Value);
+          if (Params_Table[Table_Counter].Variable_Type == VAR_FLOAT)
+          {
+            Param_Set_Value(ParamValue, 0, New_Value_Float);
+          }
+          else
+          {
+            Param_Set_Value(ParamValue, New_Value, 0);
+          }
           DEBUG_WITHOUT_NEW_LINE("%s setado para ", Params_Table[Table_Counter].Param_Name);
           Param_Print_Value(ParamValue);
         }

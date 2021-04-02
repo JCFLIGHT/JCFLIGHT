@@ -65,7 +65,7 @@ const Resources_Of_Param Params_Table[] = {
     {"AutoLaunch_Altitude",                AL_ALTITUDE_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Altitude,             0,             255,             0},
 #endif
     {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_FLOAT,              &JCF_Param.Batt_Voltage_Factor,             0,             1000,            259.489f},
-    {"Batt_Amps_Volt",                     BATT_AMPS_VOLT_ADDR,                  VAR_FLOAT,              &JCF_Param.Amps_Per_Volt,                   0,             1000,            62.0f},
+    {"Batt_Amps_Per_Volt",                 BATT_AMPS_VOLT_ADDR,                  VAR_FLOAT,              &JCF_Param.Amps_Per_Volt,                   0,             1000,            62.0f},
 #ifndef __AVR_ATmega2560__   
     {"Batt_Amps_OffSet",                   BATT_AMPS_OFFSET_ADDR,                VAR_FLOAT,              &JCF_Param.Amps_OffSet,                     0,             1000,            0},
     {"CrashCheck_BankAngle",               CC_BANKANGLE_ADDR,                    VAR_8BITS,              &JCF_Param.CrashCheck_BankAngle,            0,             255,             30},

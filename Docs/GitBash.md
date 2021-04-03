@@ -4,7 +4,7 @@ Documento apenas para desenvolvedores.
 
 ## Forkando o repositório
 
-- A primeira coisa que você deve fazer é `forkar(Garfo)` o repositório para o seu GitHub,acesse o [repositório da JCFLIGHT](https://github.com/JCFLIGHT/JCFLIGHT) e faça o Fork.
+- A primeira coisa que você deve fazer é `Forkar(Garfo)` o repositório para o seu GitHub,acesse o [repositório da JCFLIGHT](https://github.com/JCFLIGHT/JCFLIGHT) e faça o Fork.
 
 ![JCFLIGHT](Fork.png)
 

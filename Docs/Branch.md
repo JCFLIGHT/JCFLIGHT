@@ -14,10 +14,12 @@ Documento apenas para desenvolvedores.
 
 - A primeira coisa é ir no local da sua máquina onde você clonou o repositório e abrir a pasta,e dentro da mesma,abrir o terminal do GitBash e digitar os comando abaixo:
 
-`git checkout master`
-`git fetch upstream`
-`git rebase upstream/master`
-`git push origin master`
+- `git checkout master`
+- `git fetch upstream`
+- `git rebase upstream/master`
+- `git push origin master`
+
+![JCFLIGHT](BranchTerminal.png)
 
 - Exemplo da Brach Atualizada:
 

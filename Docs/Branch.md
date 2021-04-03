@@ -21,6 +21,6 @@ Documento apenas para desenvolvedores.
 
 ![JCFLIGHT](BranchTerminal.png)
 
-- Exemplo da Brach Atualizada:
+- Exemplo da Branch atualizada:
 
 ![JCFLIGHT](BranchSynchronized.png)

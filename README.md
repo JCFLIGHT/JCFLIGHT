@@ -49,7 +49,7 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 - Clique [aqui](https://github.com/JCFLIGHT/JCFLIGHT/blob/master/Docs/Development.md) para ler a orientação de desenvolvimento.
 - Caso você encontre algum bug,abra um Issue clicando [aqui](https://github.com/JCFLIGHT/JCFLIGHT/issues).
 - Caso você deseja enviar alguma melhoria feita para o algoritimo,faça um Pull-Request.
-- Clique [aqui](https://github.com/JCFLIGHT/JCFLIGHT/blob/master/Docs/GitBash.md) para aprender a fazer um Pull-Request.
+- Clique [aqui](https://github.com/JCFLIGHT/JCFLIGHT/blob/master/Docs/GitBash.md) para aprender a clonar o repositório e abrir Pull-Request.
 - Clique [aqui](https://github.com/JCFLIGHT/JCFLIGHT/blob/master/Docs/Branch.md) para aprender a deixar sua Branch atualizada com o Master.
 
 ## Fotos

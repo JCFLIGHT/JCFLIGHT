@@ -4,9 +4,9 @@ Documento apenas para desenvolvedores.
 
 ## Sincronizando a sua Branch
 
-- Após fazer o `Fork` do repositório da JCFLIGHT,você notará que o GitHub não sincroniza a sua Branch automáticamente,e para fazer Pull-Requests é necessário deixar sua Brach atualizada,para fazer isso nós vamos utilizar o Terminal do GitBash e alguns poucos comandos.
+- Após fazer o `Fork` do repositório da JCFLIGHT,você notará que o GitHub não sincroniza a sua Branch automáticamente,e para fazer Pull-Requests é necessário deixar sua Branch atualizada,para fazer isso nós vamos utilizar o Terminal do GitBash e alguns poucos comandos.
 
-- Exemplo da Brach desatualizada:
+- Exemplo da Branch desatualizada:
 
 ![JCFLIGHT](BranchNotSynchronized.png)
 

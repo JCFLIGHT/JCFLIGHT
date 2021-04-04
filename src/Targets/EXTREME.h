@@ -22,13 +22,13 @@
 #include "HAL_ESP32/ESP32PWM.h"
 #define USE_NAZA_GPS
 #define USE_DERIVATIVE_BOOST_PID
-#define THIS_LOOP_FREQUENCY 2000                                     //RATE PARA O FILTRO BIQUAD E TASK
+#define THIS_LOOP_FREQUENCY 1000                                     //RATE PARA O FILTRO BIQUAD E TASK
 #define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0                            //ENDEREÇO INICIAL PARA ERASE
 #define FINAL_ADDRESS_EEPROM_TO_CLEAR 2000                           //ENDEREÇO FINAL PARA ERASE
 #define SIZE_OF_EEPROM 2000                                          //TAMANHO TOTAL DA EEPROM
 #define ADC_BATTERY_VOLTAGE ADC_NUM_0                                //GPIO34
 #define ADC_BATTERY_CURRENT ADC_NUM_1                                //GPIO35
-#define ADC_ANALOG_AIR_SPEED ADC_NUM_2                                //GPIO32
+#define ADC_ANALOG_AIR_SPEED ADC_NUM_2                               //GPIO32
 #define SAFETY_BUTTON_PIN_READ_STATE ADC_NUM_3                       //GPIO33
 #define SAFETY_BUTTON_LED_PINOUT pinMode(GPIO_NUM_5, OUTPUT)         //GPIO5
 #define SAFETY_BUTTON_LED_ON AnalogWriteApplyPulse(GPIO_NUM_5, 4095) //ATIVA O LED DO SAFE BUTTON

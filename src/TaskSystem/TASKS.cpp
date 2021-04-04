@@ -68,7 +68,7 @@ Task_Resources_Struct Task_Resources[TASK_COUNT] = {
         .TaskName = "INTEGRAL_LOOP",
         .TaskFunction = Integral_Loop,
 #ifndef __AVR_ATmega2560__
-        .DesiredPeriod = THIS_LOOP_FREQUENCY,
+        .DesiredPeriod = SCHEDULER_SET_FREQUENCY(THIS_LOOP_FREQUENCY, "KHz"),
 #else
         .DesiredPeriod = SCHEDULER_SET_FREQUENCY(60, "Hz"),
 #endif

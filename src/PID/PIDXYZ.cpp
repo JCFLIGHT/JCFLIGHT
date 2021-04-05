@@ -43,6 +43,7 @@
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDPARAMS.h"
 #include "TECS/TECS.h"
+#include "Param/PARAM.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -324,7 +325,11 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
 
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -200, 200);
+#ifdef __AVR_ATmega2560__
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -300, 300);
+#else
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Roll), ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Roll));
+#endif
 
   if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {
@@ -366,7 +371,11 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
 
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -200, 200);
+#ifdef __AVR_ATmega2560__
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -300, 300);
+#else
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Pitch), ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Pitch));
+#endif
 
   if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {

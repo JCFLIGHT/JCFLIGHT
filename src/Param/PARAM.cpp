@@ -96,6 +96,8 @@ const Resources_Of_Param Params_Table[] = {
 #ifndef __AVR_ATmega2560__  
     {"Arm_Time_Safety",                    ARM_TIME_SAFETY_ADDR,                 VAR_8BITS,              &JCF_Param.Arm_Time_Safety,                 0,             255,             2},
     {"Disarm_Time_Safety",                 DISARM_TIME_SAFETY_ADDR,              VAR_8BITS,              &JCF_Param.Disarm_Time_Safety,              0,             255,             2},
+    {"Max_Level_Inclination_Pitch",        MAX_PITCH_LEVEL_ADDR,                 VAR_16BITS,             &JCF_Param.Max_Level_Inclination_Pitch,     0,             80,              30},
+    {"Max_Level_Inclination_Roll",         MAX_ROLL_LEVEL_ADDR,                  VAR_16BITS,             &JCF_Param.Max_Level_Inclination_Roll,      0,             80,              30},
 #endif
 };
 

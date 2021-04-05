@@ -25,15 +25,15 @@ public:
   bool CliMode = false;
   void Serial_Parse_Protocol();
   void UpdateParametersToGCS();
-  void SendStringToGCS(const char *String);
+  void Send_String_To_GCS(const char *String);
   void Default_All_Configs();
 
 private:
-  void BiDirectionalCommunication(uint8_t TaskOrderGCS);
-  void GCS_Request_Parameters();
-  void GCS_Request_Parameters_Two();
+  void Update_BiDirect_Protocol(uint8_t TaskOrderGCS);
+  void First_Packet_Request_Parameters();
+  void Second_Packet_Request_Parameters();
   void WayPoint_Request_Coordinates_Parameters();
-  void WayPoint_Request_Others_Parameters();
+  void WayPoint_Request_Misc_Parameters();
   void Save_Basic_Configuration();
   void Save_Radio_Control_Configuration();
   void Save_Medium_Configuration();

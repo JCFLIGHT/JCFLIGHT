@@ -66,47 +66,47 @@ void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
     {
 
     case IMU_ERROR:
-        GCS.SendStringToGCS(Message_0);
+        GCS.Send_String_To_GCS(Message_0);
         break;
 
     case FLIGHT_MODES_ERROR:
-        GCS.SendStringToGCS(Message_1);
+        GCS.Send_String_To_GCS(Message_1);
         break;
 
     case GPS_ERROR:
-        GCS.SendStringToGCS(Message_2);
+        GCS.Send_String_To_GCS(Message_2);
         break;
 
     case FAIL_SAFE_ERROR:
-        GCS.SendStringToGCS(Message_3);
+        GCS.Send_String_To_GCS(Message_3);
         break;
 
     case GYRO_EEROR:
-        GCS.SendStringToGCS(Message_4);
+        GCS.Send_String_To_GCS(Message_4);
         break;
 
     case INCLINATION_ERROR:
-        GCS.SendStringToGCS(Message_5);
+        GCS.Send_String_To_GCS(Message_5);
         break;
 
     case BUTTON_ERROR:
-        GCS.SendStringToGCS(Message_6);
+        GCS.Send_String_To_GCS(Message_6);
         break;
 
     case BATTERY_ERROR:
-        GCS.SendStringToGCS(Message_7);
+        GCS.Send_String_To_GCS(Message_7);
         break;
 
     case COMPASS_ERROR:
-        GCS.SendStringToGCS(Message_9);
+        GCS.Send_String_To_GCS(Message_9);
         break;
 
     case BAROMETER_ERROR:
-        GCS.SendStringToGCS(Message_10);
+        GCS.Send_String_To_GCS(Message_10);
         break;
 
     case NONE_ERROR:
-        GCS.SendStringToGCS(Message_8);
+        GCS.Send_String_To_GCS(Message_8);
         break;
     }
 }

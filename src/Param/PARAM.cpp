@@ -371,7 +371,7 @@ void ParamClass::SerialProcess(void)
   {
     uint8_t SerialReadCommand = FASTSERIAL.Read(UART_NUMB_0);
 
-    PARAM.SerialBuffer[PARAM.SerialBufferIndex++] = SerialReadCommand;
+    PARAM.SerialBuffer[PARAM.SerialBufferIndex++] = SerialReadCommand; //BUFFER
 
     if (PARAM.SerialBufferIndex && ((strstr(PARAM.SerialBuffer, ";")) != NULL))
     {

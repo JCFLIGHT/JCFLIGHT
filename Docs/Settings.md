@@ -39,3 +39,5 @@
 | GPS_TiltCompensation   | 20         | Valor para compensar o rate de navegação em modo WayPoint e RTH |
 | AirSpeed_Samples   | 15         | Número de amostras para calibrar o Tubo de Pitot |
 | AirSpeed_Factor   | 1.0         | Escala dinâmica para o Tubo de Pitot |
+| Arm_Time_Safety   | 2         | Tempo seguro para armar com os sticks em posição de armamento [Segundos] |
+| Disarm_Time_Safety   | 2         | Tempo seguro para desarmar com os sticks em posição de desarmamento [Segundos] |

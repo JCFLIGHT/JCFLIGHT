@@ -20,8 +20,8 @@
 #include "Build/LIBDEPENDENCIES.h"
 bool CheckInclinationForArm(void);
 bool ArmDelayedState(void);
-void ResetArmDelayed(void);
 bool DisarmDelayedState(void);
+void ResetArmDelayed(void);
 void ResetDisarmDelayed(void);
 bool SticksStateToArm(void);
 bool SticksStateToDisarm(void);

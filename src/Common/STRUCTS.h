@@ -479,6 +479,8 @@ typedef struct JCF_Param_Adjustable
   uint8_t AirSpeed_Samples;
 #endif
   float AirSpeed_Factor;
+  uint8_t Arm_Time_Safety;
+  uint8_t Disarm_Time_Safety;
 } Struct_JCF_Param_Adjustable;
 
 #endif

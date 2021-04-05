@@ -93,6 +93,10 @@ const Resources_Of_Param Params_Table[] = {
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif
     {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             100,             1.0f},
+#ifndef __AVR_ATmega2560__  
+    {"Arm_Time_Safety",                    ARM_TIME_SAFETY_ADDR,                 VAR_8BITS,              &JCF_Param.Arm_Time_Safety,                 0,             255,             2},
+    {"Disarm_Time_Safety",                 DISARM_TIME_SAFETY_ADDR,              VAR_8BITS,              &JCF_Param.Disarm_Time_Safety,              0,             255,             2},
+#endif
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Resources_Of_Param))

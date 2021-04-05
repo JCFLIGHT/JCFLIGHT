@@ -23,6 +23,7 @@
 #include "Common/RCDEFINES.h"
 #include "RadioControl/DECODE.h"
 #include "PID/RCPID.h"
+#include "Param/PARAM.h"
 
 #define THIS_LOOP_RATE 50 //STICKS.Update()
 #define ARM_TIME_MAX 2    //SEGUNDOS
@@ -46,7 +47,11 @@ bool CheckInclinationForArm(void)
 
 bool ArmDelayedState(void)
 {
+#ifdef __AVR_ATmega2560__
     if (ArmDelayedCount >= (THIS_LOOP_RATE * ARM_TIME_MAX))
+#else
+    if (ArmDelayedCount >= (THIS_LOOP_RATE * JCF_Param.Arm_Time_Safety))
+#endif
     {
         return true;
     }
@@ -57,14 +62,13 @@ bool ArmDelayedState(void)
     return false;
 }
 
-void ResetArmDelayed(void)
-{
-    ArmDelayedCount = 0;
-}
-
 bool DisarmDelayedState(void)
 {
+#ifdef __AVR_ATmega2560__
     if (DisarmDelayedCount >= (THIS_LOOP_RATE * DISARM_TIME_MAX))
+#else
+    if (DisarmDelayedCount >= (THIS_LOOP_RATE * JCF_Param.Disarm_Time_Safety))
+#endif
     {
         return true;
     }
@@ -73,6 +77,11 @@ bool DisarmDelayedState(void)
         DisarmDelayedCount++;
     }
     return false;
+}
+
+void ResetArmDelayed(void)
+{
+    ArmDelayedCount = 0;
 }
 
 void ResetDisarmDelayed(void)

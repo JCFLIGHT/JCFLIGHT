@@ -37,7 +37,7 @@ AutoLaunchClass AUTOLAUNCH;
 #define LAUNCH_MOTOR_IDLE_SPINUP_TIME 1500                   //ARMA O MOTOR DEPOIS DE 1.5 SEGUNDO APÓS DETECTAR O AUTO-LAUNCH
 #define AUTO_LAUNCH_ANGLE 18                                 //VALOR DO PITCH (ELEVATOR) AO FAZER O AUTO-LAUNCH (VALOR EM GRAUS)
 #define SWING_LAUNCH_MIN_ROTATION_RATE ConvertToRadians(100) //NO MINIMO UM RATE DE 100DPS NO GYRO
-#define LAUNCH_VELOCITY_THRESH 300                           //3 METROS/S
+#define LAUNCH_VELOCITY_THRESH 3                             //METROS/S
 #define MOTOR_SPINUP_VALUE 100                               //VALOR DA INCREMENTAÇÃO DO THROTTLE PARA PLANES COM RODAS
 #define MOTOR_SPINUP_TIME 300                                //VAI SUBINDO O THROTTLE AOS POUCOS,BOM PARA AERO COM RODAS (TEMPO EM MS)
 #define AUTO_LAUCH_EXIT_FUNCTION 5000                        //TEMPO DE PARA SAIR DO MODO AUTO-LAUCH APÓS A DETECÇÃO (TEMPO EM MS)
@@ -73,12 +73,12 @@ const float GetYawRotationInRadians(void)
 const bool AutoLaunchClass::GetSwingVelocityState(void)
 {
   const float SwingVelocity = (ABS(GetYawRotationInRadians()) > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / GetYawRotationInRadians()) : 0;
-  return (SwingVelocity > LAUNCH_VELOCITY_THRESH) && (GetPitchAccelerationInMSS() > 0);
+  return (SwingVelocity > LAUNCH_VELOCITY_THRESH * 100) && (GetPitchAccelerationInMSS() > 0);
 }
 
 const bool AutoLaunchClass::GetForwardState(void)
 {
-  return GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH);
+  return GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH * 100);
 }
 
 void AutoLaunchClass::AutomaticDetector()

@@ -8,7 +8,7 @@
 | kI_Mag_AHRS   | 0          | Ganho Integral para correção da estimativa de direção do Yaw  |
 | AutoLaunch_AHRS_BankAngle   | 25          | Ângulo no AHRS para considerar que o Auto-Launch deve iniciar [Graus] |
 | AutoLaunch_IMU_BankAngle   | -450          | Ângulo na IMU para considerar que o Auto-Launch deve iniciar [Graus*10] |
-| AutoLaunch_IMU_Swing   | 100          | Velocidade da IMU para validar o Auto-Launch [DPS] |
+| AutoLaunch_Velocity_Thresh   | 3          | Velocidade da IMU ou GPS para validar o Auto-Launch [Metros/Segundo] |
 | AutoLaunch_Trigger_Motor_Delay   | 1500          | Tempo para iniciar o motor após o status de lançado [MillisSegundos] |
 | AutoLaunch_Elevator   | 18          | Inclinação no Pitch (Elevator) ao fazer o Auto-Launch [Graus]  |
 | AutoLaunch_SpinUp   | 100          | Valor de incrimentação no Throttle para Aeros com rodas [uS]  |

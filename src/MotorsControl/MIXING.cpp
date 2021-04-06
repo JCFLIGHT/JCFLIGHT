@@ -25,7 +25,7 @@
 
 uint8_t NumberOfMotors = 4;
 
-void MixingApplyControl()
+void Mixing_Update()
 {
     switch (FrameType)
     {

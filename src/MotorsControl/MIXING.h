@@ -19,5 +19,5 @@
 #define MIXING_H_
 #include "Build/LIBDEPENDENCIES.h"
 extern uint8_t NumberOfMotors;
-void MixingApplyControl();
+void Mixing_Update();
 #endif

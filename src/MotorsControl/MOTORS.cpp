@@ -188,7 +188,10 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
   }
 #endif
 
-  MixingApplyControl();
+  //ATUALIZA O MIX DO PID
+  Mixing_Update();
+
+  //ATUALIZA O THROTTLE CLIPPING
   Throttle_Clipping_Update(NumberOfMotors, MixerThrottleCommand);
 
   if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))

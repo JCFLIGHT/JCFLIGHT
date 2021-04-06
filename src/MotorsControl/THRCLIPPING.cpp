@@ -28,7 +28,7 @@ static float MotorMixRange;
 
 void Throttle_Clipping_Update(uint8_t MotorCount, int16_t MixerThrottleCommand)
 {
-    if (GetFrameStateOfMultirotor())
+    if (MotorCount >= 4)
     {
         int16_t ThrottleRange = 0;
         int16_t ThrottleMin = 0;
@@ -57,6 +57,7 @@ void Throttle_Clipping_Update(uint8_t MotorCount, int16_t MixerThrottleCommand)
         ThrottleRange = ThrottleMax - ThrottleMin;
 
         MotorMixRange = (float)MotorControlRange / (float)ThrottleRange;
+
         if (MotorMixRange > 1.0f)
         {
             for (uint8_t MotorIndex = 0; MotorIndex < MotorCount; MotorIndex++)
@@ -78,7 +79,7 @@ void Throttle_Clipping_Update(uint8_t MotorCount, int16_t MixerThrottleCommand)
             MotorControl[MotorIndex] = MotorControl[MotorIndex] + Constrain_16Bits(MixerThrottleCommand, ThrottleMin, ThrottleMax);
         }
     }
-    else if (GetFrameStateOfAirPlane())
+    else
     {
         MotorControl[MOTOR1] = Constrain_16Bits(MixerThrottleCommand, AttitudeThrottleMin, AttitudeThrottleMax);
     }

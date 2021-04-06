@@ -423,6 +423,32 @@ typedef struct
 
 typedef struct
 {
+  struct Auto_Struct
+  {
+    uint8_t MinVoltageType = 0;
+    uint8_t MaxVoltageType = 0;
+    uint16_t MinCount = 0;
+    uint16_t MaxCount = 0;
+  } Auto;
+
+  struct Calced_Struct
+  {
+    float Voltage = 0;
+    float Current = 0;
+    float CurrentInMah = 0;
+    float Percentage = 0;
+  } Calced;
+
+  struct Exhausted_Struct
+  {
+    bool LowPercentPreventArm = false;
+    uint8_t LowBatteryCount = 0;
+  } Exhausted;
+
+} Battery_Struct;
+
+typedef struct
+{
   const char *Param_Name;
   const uint16_t Address;
   const uint8_t Variable_Type;

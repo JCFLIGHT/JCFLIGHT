@@ -37,7 +37,7 @@ void SticksClass::Update()
   {
     if ((ArmDisarmConfig == 0) && (SticksStateToArm()))
     {
-      if (!BATTERY.LowBattPreventArm)
+      if (!Battery.Exhausted.LowPercentPreventArm)
       {
         if (ArmDelayedState())
         {

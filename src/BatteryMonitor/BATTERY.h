@@ -18,11 +18,12 @@
 #ifndef BATTERY_H_
 #define BATTERY_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern Battery_Struct Battery;
 class BatteryClass
 {
 public:
-  bool LowBattPreventArm;
-  uint8_t GetPercentage();
+  uint8_t GetPercentage(void);
   float Get_Current_In_Mah(void);
   float Get_Max_Voltage_Calced(void);
   void Initialization(void);
@@ -31,19 +32,10 @@ public:
   float Get_Actual_Voltage(void);
   float Get_Actual_Current(void);
   void Calculate_Total_Current_In_Mah(void);
-  uint32_t GetWatts();
-  void Exhausted();
+  uint32_t GetWatts(void);
+  void Exhausted(void);
 
 private:
-  uint8_t LowBatteryCount;
-  uint8_t BattMinVoltageSelect;
-  uint8_t BattMaxVoltageSelect;
-  float Calced_Voltage;
-  float Calced_Current;
-  float TotalCurrentInMah;
-  float Percentage;
-  uint16_t BattMinCount;
-  uint16_t BattMaxCount;
   uint8_t CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt);
   float AutoBatteryMin(float BattVoltage);
   float AutoBatteryMax(float BattVoltage);

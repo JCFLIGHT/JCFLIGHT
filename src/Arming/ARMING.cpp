@@ -143,7 +143,7 @@ uint8_t PreArmClass::Checking(void)
         return BUTTON_ERROR;
     }
 
-    if (BATTERY.LowBattPreventArm) //BATERIA COM BAIXA TENSÃO
+    if (Battery.Exhausted.LowPercentPreventArm) //BATERIA COM BAIXA TENSÃO
     {
         return BATTERY_ERROR;
     }

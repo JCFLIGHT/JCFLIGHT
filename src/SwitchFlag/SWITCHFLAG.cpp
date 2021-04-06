@@ -120,6 +120,11 @@ void Switch_Flag(void)
     {
       GuardValue = 0;
     }
+    //LIMPA A FLAG SE O USUARIO REJEITAR OS VALORES DO SERVO-AUTOTRIM
+    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && ServoAutoTrimEnabled)
+    {
+      GuardValue = 0;
+    }
     //ATIVA O SERVO-TRIM
     if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && !ServoAutoTrimEnabled)
     {
@@ -129,12 +134,6 @@ void Switch_Flag(void)
     if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && !ServoAutoTrimEnabled)
     {
       OkToTrimServo = false;
-      GuardValue = 0;
-    }
-    //O VALOR GUARDADO É IGUAL A 6?E A DECREMENTAÇÃO ACABOU?SIM...DESATIVA O SERVO AUTO-TRIM
-    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && ServoAutoTrimEnabled)
-    {
-      ServoAutoTrimEnabled = false;
       GuardValue = 0;
     }
   }

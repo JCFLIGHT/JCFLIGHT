@@ -24,6 +24,7 @@
 #include "BitArray/BITARRAY.h"
 #include "AHRS/AHRS.h"
 #include "PerformanceCalibration/PERFORMACC.h"
+#include "I2C/I2C.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -34,7 +35,7 @@ FILE_COMPILE_FOR_SPEED
 
 void Simple_Mode_Update()
 {
-  if (IS_FLIGHT_MODE_ACTIVE(SIMPLE_MODE) && GetFrameStateOfMultirotor())
+  if (IS_FLIGHT_MODE_ACTIVE(SIMPLE_MODE) && GetFrameStateOfMultirotor() && I2C.CompassFound)
   {
     const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - Calibration.Magnetometer.SimpleMode_Initial_Value);
     const float CosineDifference = Fast_Cosine(HeadingDifference);

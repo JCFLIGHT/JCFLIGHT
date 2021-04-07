@@ -23,9 +23,7 @@
 //MODO AUTOMATICO PARA OBTER A DECLINAÇÃO MAGNETICA COM BASE NA LATITUDE E LONGITUDE DO GPS
 //********************************************************************************************
 
-float ReturnDeclination;
-
-float GetDeclinationCalced(float GPSLatitude, float GPSLongitude);
+AutoDeclinationClass AUTODECLINATION;
 
 //TABELA PARA DECLINAÇÃO MAGNETICA AUTOMATICA
 #ifdef __AVR_ATmega2560__
@@ -73,7 +71,7 @@ const int16_t Table_Declination[37][73] =
         {168, 173, 178, 176, 171, 166, 161, 156, 151, 146, 141, 136, 131, 126, 121, 116, 111, 106, 101, -96, -91, -86, -81, -76, -71, -66, -61, -56, -51, -46, -41, -36, -31, -26, -21, -16, -11, -6, -1, 3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58, 63, 68, 73, 78, 83, 88, 93, 98, 103, 108, 113, 118, 123, 128, 133, 138, 143, 148, 153, 158, 163, 168},
 };
 
-float GetDeclinationCalced(float GPSLatitude, float GPSLongitude)
+float AutoDeclinationClass::GetDeclinationCalced(float GPSLatitude, float GPSLongitude)
 {
   int16_t DeclinationSW, DeclinationSE, DeclinationNW, DeclinationNE, LongitudeMin, LatitudeMin;
   float DeclinationMin, DeclinationMax;
@@ -101,13 +99,13 @@ float GetDeclinationCalced(float GPSLatitude, float GPSLongitude)
   return (GPSLatitude - LatitudeMin) / 5 * (DeclinationMax - DeclinationMin) + DeclinationMin;
 }
 
-void Set_Initial_Location(int32_t LocationLatitude, int32_t LocationLongitude)
+void AutoDeclinationClass::Set_Initial_Location(int32_t LocationLatitude, int32_t LocationLongitude)
 {
   //CALCULA A DECLINAÇÃO MAGNETICA COM BASE NA LATITUDE E LONGITUDE DADA PELO GPS
-  ReturnDeclination = GetDeclinationCalced((float)LocationLatitude / 10000000, (float)LocationLongitude / 10000000);
+  AUTODECLINATION.ReturnDeclination = AUTODECLINATION.GetDeclinationCalced((float)LocationLatitude / 10000000, (float)LocationLongitude / 10000000);
 }
 
-float Declination()
+float AutoDeclinationClass::GetDeclination()
 {
-  return ReturnDeclination;
+  return AUTODECLINATION.ReturnDeclination;
 }

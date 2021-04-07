@@ -99,17 +99,17 @@ void GPS_Process_FlightModes(float DeltaTime)
   //OBTÉM A DECLINAÇÃO MAGNETICA AUTOMATICAMENTE
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !DeclinationPushed)
   {
-    Set_Initial_Location(GPS_Coordinates_Vector[COORD_LATITUDE], GPS_Coordinates_Vector[COORD_LONGITUDE]);
+    AUTODECLINATION.Set_Initial_Location(GPS_Coordinates_Vector[COORD_LATITUDE], GPS_Coordinates_Vector[COORD_LONGITUDE]);
     DeclinationPushedCount++;
   }
   //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
-  if (Declination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) && //VERIFICA SE O VALOR É DIFERENTE
-      !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&                         //CHECA SE ESTÁ DESARMADO
-      Declination() != 0 &&                                           //CHECA SE O VALOR É DIFERENTE DE ZERO
-      !DeclinationPushed &&                                           //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
-      DeclinationPushedCount > 250)                                   //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
+  if (AUTODECLINATION.GetDeclination() != STORAGEMANAGER.Read_Float(DECLINATION_ADDR) && //VERIFICA SE O VALOR É DIFERENTE
+      !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&                                            //CHECA SE ESTÁ DESARMADO
+      AUTODECLINATION.GetDeclination() != 0 &&                                           //CHECA SE O VALOR É DIFERENTE DE ZERO
+      !DeclinationPushed &&                                                              //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
+      DeclinationPushedCount > 250)                                                      //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
   {
-    STORAGEMANAGER.Write_Float(DECLINATION_ADDR, Declination());
+    STORAGEMANAGER.Write_Float(DECLINATION_ADDR, AUTODECLINATION.GetDeclination());
     DeclinationPushed = true;
   }
   DeltaTimeGPSNavigation = DeltaTime;

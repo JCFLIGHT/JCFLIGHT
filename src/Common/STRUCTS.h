@@ -20,6 +20,7 @@
 
 #include "ENUM.h"
 #include "RCDEFINES.h"
+#include "IMU/IMUDEFS.h"
 
 typedef struct
 {
@@ -151,6 +152,14 @@ typedef struct
     uint16_t Scale[3] = {0, 0, 0};
     int32_t Samples[6][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
   } Accelerometer;
+
+  struct Gyroscope_Struct
+  {
+    float Deviation[3] = {0, 0, 0};
+    int16_t Counter = ACC_1G;
+    int16_t PreviousValue[3] = {0, 0, 0};
+    int32_t Sum[3] = {0, 0, 0};
+  } Gyroscope;
 
   struct Magnetometer_Struct
   {

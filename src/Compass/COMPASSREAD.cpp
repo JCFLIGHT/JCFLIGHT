@@ -63,9 +63,9 @@ void CompassReadClass::Initialization()
     SCHEDULERTIME.Sleep(100);
     COMPASS.InitialReadBufferData();
     SCHEDULERTIME.Sleep(10);
-    CALIBRATION.Magnetometer.Gain[ROLL] = 1000.0 / ABS(IMU.Compass.Read[ROLL]);
-    CALIBRATION.Magnetometer.Gain[PITCH] = 1000.0 / ABS(IMU.Compass.Read[PITCH]);
-    CALIBRATION.Magnetometer.Gain[YAW] = 1000.0 / ABS(IMU.Compass.Read[YAW]);
+    Calibration.Magnetometer.Gain[ROLL] = 1000.0 / ABS(IMU.Compass.Read[ROLL]);
+    Calibration.Magnetometer.Gain[PITCH] = 1000.0 / ABS(IMU.Compass.Read[PITCH]);
+    Calibration.Magnetometer.Gain[YAW] = 1000.0 / ABS(IMU.Compass.Read[YAW]);
     I2C.WriteRegister(COMPASS.Address, 0x00, 0x70);
     I2C.WriteRegister(COMPASS.Address, 0x01, 0x20);
     I2C.WriteRegister(COMPASS.Address, 0x02, 0x00);
@@ -89,9 +89,9 @@ void CompassReadClass::Initialization()
     if (BiasOk)
     {
       //CALCULA O GANHO PARA CADA EIXO DO COMPASS
-      CALIBRATION.Magnetometer.Gain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
-      CALIBRATION.Magnetometer.Gain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
-      CALIBRATION.Magnetometer.Gain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
+      Calibration.Magnetometer.Gain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
+      Calibration.Magnetometer.Gain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
+      Calibration.Magnetometer.Gain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
     }
     I2C.WriteRegister(COMPASS.Address, 0, 0x70);
     I2C.WriteRegister(COMPASS.Address, 1, 0x20);

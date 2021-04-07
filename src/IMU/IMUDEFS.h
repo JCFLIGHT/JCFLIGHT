@@ -15,15 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ACCGYROREAD_H_
-#define ACCGYROREAD_H_
-#include "Build/LIBDEPENDENCIES.h"
-#include "Common/STRUCTS.h"
-#include "IMUDEFS.h"
-extern IMU_Struct IMU;
-void IMU_Filters_Initialization();
-void Acc_Initialization();
-void Gyro_Initialization();
-void Acc_ReadBufferData();
-void Gyro_ReadBufferData();
-#endif
+#define ACC_1G 512                 //1G NA IMU - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
+#define GYRO_SCALE (1.0f / 16.4f)  //16.4 - RETIRADO DO DATASHEET E COM BASE NA CONFIGURAÇÃO APLICADA
+#define CALIBRATING_ACC_CYCLES 200 //NÚMERO DE CICLOS PARA CALIBRAR O ACELEROMETRO
+#define GRAVITY_CMSS 980.665f      //VALOR DA GRAVIDADE EM CM/S^2

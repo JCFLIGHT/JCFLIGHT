@@ -36,7 +36,7 @@ void Simple_Mode_Update()
 {
   if (IS_FLIGHT_MODE_ACTIVE(SIMPLE_MODE) && GetFrameStateOfMultirotor())
   {
-    const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - CALIBRATION.Magnetometer.SimpleMode_Initial_Value);
+    const float HeadingDifference = ConvertToRadians(ATTITUDE.AngleOut[YAW] - Calibration.Magnetometer.SimpleMode_Initial_Value);
     const float CosineDifference = Fast_Cosine(HeadingDifference);
     const float SineDifference = Fast_Sine(HeadingDifference);
     const int16_t CalcedRCControllerPITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;

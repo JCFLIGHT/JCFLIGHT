@@ -36,6 +36,7 @@ private:
   void Pre_Arm_Initializing(void);
   void Pre_Arm_Sucess(void);
   void Pre_Arm_Fail(void);
+  void CalibGyroLed(void);
 };
 extern LEDRGB RGB;
 #endif

@@ -17,7 +17,7 @@
 
 #ifndef PERFORMGYRO_H_
 #define PERFORMGYRO_H_
-void StartGyroCalibration();
-bool GyroCalibrationRunning();
-void Gyroscope_Calibration();
+void StartGyroCalibration(void);
+bool GyroCalibrationRunning(void);
+void Gyroscope_Calibration(void);
 #endif

@@ -18,7 +18,7 @@
 #ifndef PERFORMACC_H_
 #define PERFORMACC_H_
 #include "Common/STRUCTS.h"
-extern Calibration_Struct CALIBRATION;
+extern Calibration_Struct Calibration;
 void StartAccCalibration(void);
 bool AccCalibrationRunning(void);
 void Accelerometer_Calibration(void);

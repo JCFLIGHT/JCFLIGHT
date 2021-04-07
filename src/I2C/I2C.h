@@ -18,16 +18,15 @@
 #ifndef I2C_H_
 #define I2C_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern I2C_Resources_Struct I2CResources;
 class I2CPROTOCOL
 {
 public:
-  bool CompassFound = false;
-  bool BarometerFound = false;
-  int16_t Errors;
-  uint8_t ReadACK();
-  uint8_t ReadNAK();
+  uint8_t ReadACK(void);
+  uint8_t ReadNAK(void);
   void Initialization(void);
-  void All_Initialization();
+  void All_Initialization(void);
   void Restart(uint8_t Address);
   void Write(uint8_t SendData);
   void Stop(void);
@@ -36,10 +35,9 @@ public:
   void RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size);
 
 private:
-  void SearchDevicesInBarrament();
-  uint8_t StartToSearchDevices();
+  void SearchDevicesInBarrament(void);
+  uint8_t StartToSearchDevices(void);
   uint8_t SendHexadecimalValues(uint8_t Address);
 };
-extern uint8_t BufferData[6];
 extern I2CPROTOCOL I2C;
 #endif

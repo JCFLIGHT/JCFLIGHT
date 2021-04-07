@@ -56,7 +56,7 @@ void Baro_Initialization()
 
 void Barometer_Update()
 {
-    if (!I2C.BarometerFound)
+    if (!I2CResources.Found.Barometer)
     {
         return;
     }

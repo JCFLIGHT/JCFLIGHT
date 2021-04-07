@@ -93,7 +93,7 @@ void IMU_Filters_Initialization()
 void Acc_Initialization()
 {
   I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1C, 0x10);
-  if (COMPASS.Type == COMPASS_HMC5883 && I2C.CompassFound)
+  if (COMPASS.Type == COMPASS_HMC5883 && I2CResources.Found.Compass)
   {
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x6A, 0b00100000);
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x37, 0x00);
@@ -133,7 +133,7 @@ void Gyro_Initialization()
     break;
   }
   I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x1B, 0x18);
-  if (I2C.CompassFound)
+  if (I2CResources.Found.Compass)
   {
     I2C.WriteRegister(ADDRESS_IMU_MPU6050, 0x37, 0x02);
   }
@@ -157,9 +157,9 @@ void Acc_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x3B);
-  IMU.Accelerometer.Read[ROLL] = -(((BufferData[0] << 8) | BufferData[1]) >> 3);
-  IMU.Accelerometer.Read[PITCH] = -(((BufferData[2] << 8) | BufferData[3]) >> 3);
-  IMU.Accelerometer.Read[YAW] = ((BufferData[4] << 8) | BufferData[5]) >> 3;
+  IMU.Accelerometer.Read[ROLL] = -(((I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1]) >> 3);
+  IMU.Accelerometer.Read[PITCH] = -(((I2CResources.Buffer.Data[2] << 8) | I2CResources.Buffer.Data[3]) >> 3);
+  IMU.Accelerometer.Read[YAW] = ((I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5]) >> 3;
 #elif defined ESP32
   IMU_Get_Data();
 #endif
@@ -207,9 +207,9 @@ void Gyro_ReadBufferData()
 {
 #ifdef __AVR_ATmega2560__
   I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x43);
-  IMU.Gyroscope.Read[PITCH] = -(((BufferData[0] << 8) | BufferData[1]) >> 2);
-  IMU.Gyroscope.Read[ROLL] = ((BufferData[2] << 8) | BufferData[3]) >> 2;
-  IMU.Gyroscope.Read[YAW] = -(((BufferData[4] << 8) | BufferData[5]) >> 2);
+  IMU.Gyroscope.Read[PITCH] = -(((I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1]) >> 2);
+  IMU.Gyroscope.Read[ROLL] = ((I2CResources.Buffer.Data[2] << 8) | I2CResources.Buffer.Data[3]) >> 2;
+  IMU.Gyroscope.Read[YAW] = -(((I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5]) >> 2);
 #endif
 
   Gyroscope_Calibration();

@@ -520,4 +520,24 @@ typedef struct JCF_Param_Adjustable
   int16_t Max_Level_Inclination_Roll;
 } Struct_JCF_Param_Adjustable;
 
+typedef struct
+{
+  struct Buffer_Struct
+  {
+    uint8_t Data[6] = {0, 0, 0, 0, 0, 0};
+  } Buffer;
+
+  struct Found_Struct
+  {
+    bool Compass = false;
+    bool Barometer = false;
+  } Found;
+
+  struct ErrorStruct
+  {
+    int16_t Count = 0;
+  } Error;
+
+} I2C_Resources_Struct;
+
 #endif

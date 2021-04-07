@@ -39,7 +39,7 @@ static int32_t XYZ_CompassBias[3] = {0, 0, 0};
 void CompassReadClass::Initialization()
 {
   //SAIA DA FUNÇÃO SE NÃO FOR ENCONTRADO NENHUM COMPASS NO BARRAMENTO I2C
-  if (!I2C.CompassFound)
+  if (!I2CResources.Found.Compass)
   {
     return;
   }
@@ -179,7 +179,7 @@ void CompassReadClass::ReadBufferData()
 void CompassReadClass::Constant_Read()
 {
   //SAIA DA FUNÇÃO SE NÃO FOR ENCONTRADO NENHUM COMPASS NO BARRAMENTO I2C
-  if (!I2C.CompassFound && Get_GPS_Type(GPS_UBLOX))
+  if (!I2CResources.Found.Compass && Get_GPS_Type(GPS_UBLOX))
   {
     return;
   }

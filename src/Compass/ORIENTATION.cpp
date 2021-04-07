@@ -33,9 +33,9 @@ void ClassCompassOrientation::SetOrientation(uint8_t _CompassType)
 
     case COMPASS_AK8975:
         //ORIENTAÇÃO PARA O COMPASS AK8975
-        IMU.Compass.Read[ROLL] = (BufferData[1] << 8) | BufferData[0];
-        IMU.Compass.Read[PITCH] = (BufferData[3] << 8) | BufferData[2];
-        IMU.Compass.Read[YAW] = (BufferData[5] << 8) | BufferData[4];
+        IMU.Compass.Read[ROLL] = (I2CResources.Buffer.Data[1] << 8) | I2CResources.Buffer.Data[0];
+        IMU.Compass.Read[PITCH] = (I2CResources.Buffer.Data[3] << 8) | I2CResources.Buffer.Data[2];
+        IMU.Compass.Read[YAW] = (I2CResources.Buffer.Data[5] << 8) | I2CResources.Buffer.Data[4];
         break;
 
         //POR ENQUANTO A JCFLIGHT IRÁ FUNCIONAR APENAS COM O HMC5883
@@ -45,22 +45,22 @@ void ClassCompassOrientation::SetOrientation(uint8_t _CompassType)
     case COMPASS_HMC5883:
         /*
         //ORIENTAÇÃO PARA O COMPASS HMC5843
-        IMU.Compass.Read[ROLL] = (BufferData[0] << 8) | BufferData[1];
-        IMU.Compass.Read[PITCH] = (BufferData[2] << 8) | BufferData[3];
-        IMU.Compass.Read[YAW] = (BufferData[4] << 8) | BufferData[5];
+        IMU.Compass.Read[ROLL] = (I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1];
+        IMU.Compass.Read[PITCH] = (I2CResources.Buffer.Data[2] << 8) | I2CResources.Buffer.Data[3];
+        IMU.Compass.Read[YAW] = (I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5];
 */
 
         //ORIENTAÇÃO PARA O COMPASS HMC5883
-        IMU.Compass.Read[ROLL] = (BufferData[0] << 8) | BufferData[1];
-        IMU.Compass.Read[PITCH] = (BufferData[4] << 8) | BufferData[5];
-        IMU.Compass.Read[YAW] = (BufferData[2] << 8) | BufferData[3];
+        IMU.Compass.Read[ROLL] = (I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1];
+        IMU.Compass.Read[PITCH] = (I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5];
+        IMU.Compass.Read[YAW] = (I2CResources.Buffer.Data[2] << 8) | I2CResources.Buffer.Data[3];
         break;
 
     case COMPASS_QMC5883:
         //ORIENTAÇÃO PARA O COMPASS QMC5883
-        IMU.Compass.Read[ROLL] = (BufferData[1] << 8) | BufferData[0];
-        IMU.Compass.Read[PITCH] = (BufferData[3] << 8) | BufferData[2];
-        IMU.Compass.Read[YAW] = (BufferData[5] << 8) | BufferData[4];
+        IMU.Compass.Read[ROLL] = (I2CResources.Buffer.Data[1] << 8) | I2CResources.Buffer.Data[0];
+        IMU.Compass.Read[PITCH] = (I2CResources.Buffer.Data[3] << 8) | I2CResources.Buffer.Data[2];
+        IMU.Compass.Read[YAW] = (I2CResources.Buffer.Data[5] << 8) | I2CResources.Buffer.Data[4];
         break;
 
     case COMPASS_DJI_NAZA:

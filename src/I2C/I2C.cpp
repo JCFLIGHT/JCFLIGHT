@@ -16,7 +16,6 @@
 */
 
 #include "I2C.h"
-#include "Common/STRUCTS.h"
 #include "Barometer/BAROBACKEND.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "Compass/COMPASSREAD.h"
@@ -26,11 +25,10 @@
 #include "FastSerial/PRINTF.h"
 
 I2CPROTOCOL I2C;
+I2C_Resources_Struct I2CResources;
 
 //DEBUG
 #define PRINTLN_I2C
-
-uint8_t BufferData[6];
 
 #ifdef __AVR_ATmega2560__
 
@@ -70,7 +68,7 @@ void __attribute__((noinline)) WaitTransmission(uint8_t _TWCR)
     if (CheckTWCRTWINTState == 0)
     {
       TWCR = 0;
-      I2C.Errors++;
+      I2CResources.Error.Count++;
       break;
     }
   }
@@ -94,13 +92,13 @@ void I2CPROTOCOL::Write(uint8_t SendData)
   WaitTransmission((1 << TWINT) | (1 << TWEN));
 }
 
-uint8_t I2CPROTOCOL::ReadACK()
+uint8_t I2CPROTOCOL::ReadACK(void)
 {
   WaitTransmission((1 << TWINT) | (1 << TWEN) | (1 << TWEA));
   return TWDR;
 }
 
-uint8_t I2CPROTOCOL::ReadNAK()
+uint8_t I2CPROTOCOL::ReadNAK(void)
 {
   WaitTransmission((1 << TWINT) | (1 << TWEN));
   uint8_t _TWDR = TWDR;
@@ -126,7 +124,7 @@ void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buf
 
 void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
 {
-  I2C.RegisterBuffer(Address, Register, BufferData, 6);
+  I2C.RegisterBuffer(Address, Register, I2CResources.Buffer.Data, 6);
 }
 
 void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
@@ -137,7 +135,7 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
   I2C.Stop();
 }
 
-void I2CPROTOCOL::SearchDevicesInBarrament()
+void I2CPROTOCOL::SearchDevicesInBarrament(void)
 {
   static uint8_t Status;
   uint8_t Devices = 0;
@@ -216,7 +214,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
       if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
       {
-        I2C.CompassFound = true;
+        I2CResources.Found.Compass = true;
       }
 
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
@@ -231,7 +229,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
       if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
       {
-        I2C.BarometerFound = true;
+        I2CResources.Found.Barometer = true;
       }
 
       Devices++;
@@ -251,7 +249,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 #endif
 }
 
-uint8_t I2CPROTOCOL::StartToSearchDevices()
+uint8_t I2CPROTOCOL::StartToSearchDevices(void)
 {
   uint32_t I2COldTime = SCHEDULERTIME.GetMillis();
   TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
@@ -350,12 +348,12 @@ void I2CPROTOCOL::Write(uint8_t SendData)
 {
 }
 
-uint8_t I2CPROTOCOL::ReadACK()
+uint8_t I2CPROTOCOL::ReadACK(void)
 {
   return 0;
 }
 
-uint8_t I2CPROTOCOL::ReadNAK()
+uint8_t I2CPROTOCOL::ReadNAK(void)
 {
   return 0;
 }
@@ -385,7 +383,7 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
   Wire.endTransmission();
 }
 
-void I2CPROTOCOL::SearchDevicesInBarrament()
+void I2CPROTOCOL::SearchDevicesInBarrament(void)
 {
   Serial.println("ESCANEANDO O BARRAMENTO I2C,AGUARDE...");
   Serial.println("\n");
@@ -432,12 +430,12 @@ void I2CPROTOCOL::SearchDevicesInBarrament()
 
       if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
       {
-        I2C.CompassFound = true;
+        I2CResources.Found.Compass = true;
       }
 
       if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
       {
-        I2C.BarometerFound = true;
+        I2CResources.Found.Barometer = true;
       }
     }
   }
@@ -461,12 +459,12 @@ void I2CPROTOCOL::Write(uint8_t SendData)
 {
 }
 
-uint8_t I2CPROTOCOL::ReadACK()
+uint8_t I2CPROTOCOL::ReadACK(void)
 {
   return 0;
 }
 
-uint8_t I2CPROTOCOL::ReadNAK()
+uint8_t I2CPROTOCOL::ReadNAK(void)
 {
   return 0;
 }
@@ -485,7 +483,7 @@ void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value
 
 #endif
 
-void I2CPROTOCOL::All_Initialization()
+void I2CPROTOCOL::All_Initialization(void)
 {
   uint8_t ForceInitialization = 5;
   SCHEDULERTIME.Sleep(200);
@@ -493,11 +491,11 @@ void I2CPROTOCOL::All_Initialization()
   while (ForceInitialization--)
   {
     Gyro_Initialization();
-    if (I2C.BarometerFound)
+    if (I2CResources.Found.Barometer)
     {
       Baro_Initialization();
     }
-    if (I2C.CompassFound)
+    if (I2CResources.Found.Compass)
     {
       COMPASS.Initialization();
     }

@@ -33,7 +33,7 @@ bool GlitchClass::CheckGPS(void)
 bool GlitchClass::CheckBarometer(void)
 {
     //BAROMETRO NÃO ENCONTRADO NO BARRAMENTO I2C
-    if (!I2C.BarometerFound)
+    if (!I2CResources.Found.Barometer)
     {
         return false;
     }
@@ -43,7 +43,7 @@ bool GlitchClass::CheckBarometer(void)
 bool GlitchClass::CheckCompass(void)
 {
     //COMPASS NÃO ENCONTRADO NO BARRAMENTO I2C
-    if (!I2C.CompassFound)
+    if (!I2CResources.Found.Compass)
     {
         return false;
     }

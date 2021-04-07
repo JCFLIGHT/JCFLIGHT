@@ -390,7 +390,7 @@ void AHRSClass::Update(float DeltaTime)
   {
     const bool SafeToUseCOG = GPS_Heading_Is_Valid();
 
-    if (I2C.CompassFound)
+    if (I2CResources.Found.Compass)
     {
       SafeToUseCompass = true;
       GPSHeadingInitialized = true;
@@ -411,7 +411,7 @@ void AHRSClass::Update(float DeltaTime)
   }
   else
   {
-    if (I2C.CompassFound)
+    if (I2CResources.Found.Compass)
     {
       SafeToUseCompass = true;
     }

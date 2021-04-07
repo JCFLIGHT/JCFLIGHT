@@ -99,7 +99,7 @@ void Circle_Mode_Update()
     return;
   }
 
-  if (!I2C.CompassFound)
+  if (!I2CResources.Found.Compass)
   {
     HeadingToCircle = WRap_18000(GPS_Ground_Course * 10) / 100;
   }
@@ -132,7 +132,7 @@ void AirPlaneUpdateNavigation(void)
     GPS_AltitudeHold_For_Plane = GPS_Altitude_For_Plane + RTH_AltitudeOfPlane;
   }
 
-  if (!I2C.CompassFound)
+  if (!I2CResources.Found.Compass)
   {
     GPS_Heading = WRap_18000(GPS_Ground_Course * 10) / 10;
     AttitudeHeading = GPS_Heading / 10;
@@ -145,7 +145,7 @@ void AirPlaneUpdateNavigation(void)
 
   GPS_Heading = WRap_18000(GPS_Heading * 10) / 10;
 
-  if (I2C.CompassFound)
+  if (I2CResources.Found.Compass)
   {
     if (ABS(AttitudeHeading - (GPS_Heading / 10)) > 10 && GPS_Ground_Speed > 200)
     {

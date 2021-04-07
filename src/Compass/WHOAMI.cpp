@@ -40,15 +40,15 @@ bool Check_Whoami() //WHO A MI? -> QUEM SOU EU?
     //4 = 4 - 0x04
     //3 = 3 - 0x03
     DEBUG("BufferData[0]:%d BufferData[1]:%d BufferData[2]:%d",
-          BufferData[0],
-          BufferData[1],
-          BufferData[2]);
+          I2CResources.Buffer.Data[0],
+          I2CResources.Buffer.Data[1],
+          I2CResources.Buffer.Data[2]);
 
 #endif
 
-    if (BufferData[0] != 'H' ||
-        BufferData[1] != '4' ||
-        BufferData[2] != '3')
+    if (I2CResources.Buffer.Data[0] != 'H' ||
+        I2CResources.Buffer.Data[1] != '4' ||
+        I2CResources.Buffer.Data[2] != '3')
     {
         //NÃO É UM DISPOSITIVO HMC5x43
         return false;

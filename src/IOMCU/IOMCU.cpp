@@ -735,7 +735,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         break;
 
     case 12:
-        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2C.CompassFound)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2CResources.Found.Compass)
         {
             IMU.Compass.Calibrating = true;
         }
@@ -1098,7 +1098,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         break;
 
     case 12:
-        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2C.CompassFound)
+        if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2CResources.Found.Compass)
         {
             IMU.Compass.Calibrating = true;
         }
@@ -1256,7 +1256,7 @@ void GCSClass::First_Packet_Request_Parameters()
     //ENVIA OS PARAMETROS FUNDAMENTAIS PARA O GCS
     Essential_First_Packet_Parameters.SendAttitudePitch = Constrain_16Bits(ATTITUDE.AngleOut[PITCH], -900, 900);
     Essential_First_Packet_Parameters.SendAttitudeRoll = Constrain_16Bits(ATTITUDE.AngleOut[ROLL], -900, 900);
-    if (I2C.CompassFound)
+    if (I2CResources.Found.Compass)
     {
         Essential_First_Packet_Parameters.SendAttitudeYaw = ATTITUDE.AngleOut[YAW];
     }
@@ -1282,7 +1282,7 @@ void GCSClass::First_Packet_Request_Parameters()
     Essential_First_Packet_Parameters.SendGPSLongitude = GPS_Coordinates_Vector[COORD_LONGITUDE];
     Essential_First_Packet_Parameters.SendHomePointLatitude = Stored_Coordinates_Home_Point[COORD_LATITUDE];
     Essential_First_Packet_Parameters.SendHomePointLongitude = Stored_Coordinates_Home_Point[COORD_LONGITUDE];
-    if (I2C.BarometerFound)
+    if (I2CResources.Found.Barometer)
     {
         Essential_First_Packet_Parameters.SendBarometerValue = GetAltitudeForGCS();
     }
@@ -1350,7 +1350,7 @@ void GCSClass::Second_Packet_Request_Parameters()
     Essential_Second_Packet_Parameters.SendGyroYFiltered = IMU.Gyroscope.Read[PITCH];
     Essential_Second_Packet_Parameters.SendGyroZFiltered = IMU.Gyroscope.Read[YAW];
     Essential_Second_Packet_Parameters.SendGPSGroundSpeed = GPS_Ground_Speed;
-    Essential_Second_Packet_Parameters.SendI2CError = I2C.Errors;
+    Essential_Second_Packet_Parameters.SendI2CError = I2CResources.Error.Count;
     Essential_Second_Packet_Parameters.SendAirSpeedValue = AirSpeed.Raw.IASPressureInCM;
     Essential_Second_Packet_Parameters.SendCPULoad = SystemLoadPercent;
 }

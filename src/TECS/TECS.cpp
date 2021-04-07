@@ -27,6 +27,8 @@
 #include "PID/PIDPARAMS.h"
 #include "GenericPI/GENERICPI.h"
 #include "Math/MATHSUPPORT.h"
+#include "RadioControl/RCSTATES.h"
+#include "FastSerial/PRINTF.h"
 
 TecsClass TECS;
 
@@ -54,9 +56,10 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
         }
     }
 
-    if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) && (RCController[THROTTLE] > 1200))
+    if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) && !GetActualThrottleStatus(THROTTLE_LOW))
     {
         int16_t CalculateError = PreviousValueOfAirSpeed - ConvertCentimeterPerSecondsToKmPerHour(AirSpeed.Raw.IASPressureInCM);
+
         int16_t CalculateProportional = (CalculateError * GET_SET[PID_ALTITUDE].ProportionalVector >> 3);
         CalculateIntegral += (CalculateError * GET_SET[PID_ALTITUDE].IntegralVector >> 5);
         CalculateIntegral = Constrain_16Bits(CalculateIntegral, -24000, 24000);
@@ -67,20 +70,24 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
         //FUTURAMENTE NÃO UTILIZAR MAIS KP E O KI DO AJUSTE DE ALTITUDE PARA SETAR VALORES,
         //E SIM USAR O KI E O KD PARA SETAR O KP E KI.DESSA FORMA O KP DO AJUSTE DE ALTITUDE
         //FICARÁ POR CONTA APENAS DO AJUSTE DO ALTITUDE-HOLD
-        AutoThrottlePI.SetkP(GET_SET[PID_ALTITUDE].ProportionalVector / 8); //AINDA FALTA VERIFICAR SE ISSO ESTÁ CORRETO
-        AutoThrottlePI.SetkI(GET_SET[PID_ALTITUDE].IntegralVector / 32);    //AINDA FALTA VERIFICAR SE ISSO ESTÁ CORRETO
-        AutoThrottlePI.SetIntegratorMax(24000);
-        AutoThrottlePI.SetOutputMin(MIN_PULSE);
-        AutoThrottlePI.SetOutputMax(MAX_PULSE);
+        AutoThrottlePI.Set_kP(GET_SET[PID_ALTITUDE].ProportionalVector);
+        AutoThrottlePI.Set_kI(GET_SET[PID_ALTITUDE].IntegralVector);
+        AutoThrottlePI.Set_kP_Scale(8);
+        AutoThrottlePI.Set_kI_Scale(32);
+        AutoThrottlePI.Set_Integral_Max(24000);
+        AutoThrottlePI.Set_Integral_Scale(128);
+        AutoThrottlePI.Set_Output_Min(AttitudeThrottleMin);
+        AutoThrottlePI.Set_Output_Max(AttitudeThrottleMax);
         /////////////////////////////////////////////////////////////////////////
-        RCController[THROTTLE] = AutoThrottlePI.Get_PI_Calced(CalculateError, DeltaTime); //AINDA FALTA PUXAR O DELTA TIME
+        float GetPICalced = AutoThrottlePI.Get_PI_Calced(CalculateError, 1); //USANDO O DELTATIME O VALOR FICA INCORRETO - GERAR CORREÇÃO PRA ISSO
+        RCController[THROTTLE] = AutoThrottlePI.GetPICalcedWithDataConstrained(GetPICalced, RCController[THROTTLE]);
 #endif
     }
     else
     {
         CalculateIntegral = 0;
 #ifdef APPLY_NEW_PI
-        AutoThrottlePI.Reset_Integrator();
+        AutoThrottlePI.Reset_Integral();
 #endif
     }
 }

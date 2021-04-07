@@ -18,22 +18,19 @@
 #include "GENERICPI.h"
 #include "Math/MATHSUPPORT.h"
 
-int32_t GenericPIClass::Get_PI_Calced(int32_t Error, float DeltaTime)
+float GenericPIClass::Get_PI_Calced(int16_t Error, float DeltaTime)
 {
-	Integrator_Sum += ((float)Error * kI) * DeltaTime;
-
-	if (Integrator_Sum < -Integrator_Max)
-	{
-		Integrator_Sum = -Integrator_Max;
-	}
-	else if (Integrator_Sum > Integrator_Max)
-	{
-		Integrator_Sum = Integrator_Max;
-	}
-	return Constrain_32Bits((float)Error * kP + Integrator_Sum, OutputMin, OutputMax);
+  Integral_Sum += ((float)Error * kI / kI_Scale) * DeltaTime;
+  Integral_Sum = Constrain_Float(Integral_Sum, -Integral_Max, Integral_Max);
+  return (float)(Error * kP / kP_Scale) + (Integral_Sum / Integral_Scale);
 }
 
-void GenericPIClass::Reset_Integrator()
+int16_t GenericPIClass::GetPICalcedWithDataConstrained(float Input_PI_Calced, float Input_To_Sum)
 {
-	Integrator_Sum = 0;
+  return Constrain_16Bits(Input_PI_Calced + Input_To_Sum, OutputMin, OutputMax);
+}
+
+void GenericPIClass::Reset_Integral()
+{
+  Integral_Sum = 0;
 }

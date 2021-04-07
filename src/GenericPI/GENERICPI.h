@@ -23,31 +23,46 @@
 class GenericPIClass
 {
 public:
-	int32_t Get_PI_Calced(int32_t Error, float DeltaTime);
+	float Get_PI_Calced(int16_t Error, float DeltaTime);
+	int16_t GetPICalcedWithDataConstrained(float Input_PI_Calced, float Input_To_Sum);
+	void Reset_Integral();
 
-	void Reset_Integrator();
-
-	void SetkP(const float Value)
+	void Set_kP(const float Value)
 	{
 		kP = Value;
 	}
 
-	void SetkI(const float Value)
+	void Set_kI(const float Value)
 	{
 		kI = Value;
 	}
 
-	void SetIntegratorMax(const int16_t Value)
+	void Set_kP_Scale(const float Value)
 	{
-		Integrator_Max = Value;
+		kP_Scale = Value;
 	}
 
-	void SetOutputMin(const int16_t Value)
+	void Set_kI_Scale(const float Value)
+	{
+		kI_Scale = Value;
+	}
+
+	void Set_Integral_Max(const int16_t Value)
+	{
+		Integral_Max = Value;
+	}
+
+	void Set_Integral_Scale(const int16_t Value = 1)
+	{
+		Integral_Scale = Value;
+	}
+
+	void Set_Output_Min(const int16_t Value)
 	{
 		OutputMin = Value;
 	}
 
-	void SetOutputMax(const int16_t Value)
+	void Set_Output_Max(const int16_t Value)
 	{
 		OutputMax = Value;
 	}
@@ -55,8 +70,11 @@ public:
 private:
 	float kP;
 	float kI;
-	float Integrator_Sum;
-	int16_t Integrator_Max;
+	float kP_Scale;
+	float kI_Scale;
+	float Integral_Sum;
+	float Integral_Scale;
+	int16_t Integral_Max;
 	int32_t OutputMin;
 	int32_t OutputMax;
 };

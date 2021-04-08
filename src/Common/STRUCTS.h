@@ -514,10 +514,13 @@ typedef struct JCF_Param_Adjustable
   uint8_t AirSpeed_Samples;
 #endif
   float AirSpeed_Factor;
+#ifndef __AVR_ATmega2560__
   uint8_t Arm_Time_Safety;
   uint8_t Disarm_Time_Safety;
   int16_t Max_Level_Inclination_Pitch;
   int16_t Max_Level_Inclination_Roll;
+  uint8_t Compass_Cal_Timer;
+#endif
 } Struct_JCF_Param_Adjustable;
 
 typedef struct

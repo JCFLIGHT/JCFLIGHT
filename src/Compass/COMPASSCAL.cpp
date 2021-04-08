@@ -24,11 +24,16 @@
 #include "Common/STRUCTS.h"
 #include "PerformanceCalibration/PERFORMACC.h"
 #include "IMU/ACCGYROREAD.h"
+#include "Param/PARAM.h"
 
 CompassCalClass COMPASSCAL;
 
+#ifdef __AVR_ATmega2560__
 //TEMPO MAXIMO DE CALIBRAÇÃO DO COMPASS
 #define CALIBRATION_COUNT 60 //SEGUNDOS
+#else
+#define CALIBRATION_COUNT JCF_Param.Compass_Cal_Timer
+#endif
 
 void CompassCalClass::ApplyGain()
 {
@@ -58,7 +63,7 @@ void CompassCalClass::RunningCalibration()
     else
     {
         Calibration.Magnetometer.Count++;
-        if (Calibration.Magnetometer.Count < ((CALIBRATION_COUNT * 10) - 30))
+        if (Calibration.Magnetometer.Count < (CALIBRATION_COUNT * 10))
         {
             RGB.Function(CALL_LED_MAG_CALIBRATION);
             if (Calibration.Magnetometer.Count == 1)

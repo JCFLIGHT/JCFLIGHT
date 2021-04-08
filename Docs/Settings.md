@@ -43,3 +43,4 @@
 | Disarm_Time_Safety   | 2         | Tempo seguro para desarmar com os sticks em posição de desarmamento [Segundos] |
 | Max_Level_Inclination_Pitch   | 30         | Inclinação maxima de Pitch em Auto-nível [Graus] |
 | Max_Level_Inclination_Roll   | 30        | Inclinação maxima de Roll em Auto-nível [Graus] |
+| Compass_Cal_Timer   | 60        | Tempo maximo de calibração do Compass [Segundos] |

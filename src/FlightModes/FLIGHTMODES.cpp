@@ -187,7 +187,7 @@ void ProcessFlightModesToAirPlane()
     {
       if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
       {
-        Set_Next_Point_To_Navigation(&Stored_Coordinates_Home_Point[COORD_LATITUDE], &Stored_Coordinates_Home_Point[COORD_LONGITUDE]);
+        Set_Next_Point_To_Navigation(Stored_Coordinates_Home_Point[COORD_LATITUDE], Stored_Coordinates_Home_Point[COORD_LONGITUDE]);
         GPS_Flight_Mode = DO_RTH_ENROUTE;
         GPS_AltitudeHold_For_Plane = GPS_Altitude;
         ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
@@ -199,7 +199,7 @@ void ProcessFlightModesToAirPlane()
           GPS_Flight_Mode = GPS_MODE_HOLD;
           GPS_Navigation_Mode = DO_POSITION_HOLD;
           GPS_AltitudeHold_For_Plane = GPS_Altitude;
-          Set_Next_Point_To_Navigation(&GPS_Coordinates_Vector[COORD_LATITUDE], &GPS_Coordinates_Vector[COORD_LONGITUDE]);
+          Set_Next_Point_To_Navigation(GPS_Coordinates_Vector[COORD_LATITUDE], GPS_Coordinates_Vector[COORD_LONGITUDE]);
           DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
         }
         else

@@ -309,7 +309,7 @@ void WayPointRun()
     break;
 
   case WP_START_MISSION:
-    Set_Next_Point_To_Navigation(&WayPointLatitude[MissionNumber], &WayPointLongitude[MissionNumber]);
+    Set_Next_Point_To_Navigation(WayPointLatitude[MissionNumber], WayPointLongitude[MissionNumber]);
     WPSucess = true;
     WayPointMode = WP_EN_ROUTE;
     break;

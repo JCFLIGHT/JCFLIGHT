@@ -40,7 +40,7 @@
 //SERVO AUTO-TRIM SÓ FUNCIONA COM A CONTROLADORA ARMADA E EM VOO COM O PERFIL DE AERO
 //***********************************************************************************************
 
-bool OkToTrimServo = false; //REMOVIDO DO ALGORITIMO
+bool ServoManualTrimEnabled = false; //REMOVIDO DO ALGORITIMO
 
 uint8_t FlagParameterFunction;
 uint8_t GuardValue;
@@ -50,8 +50,49 @@ float CloseReset;
 uint32_t TimerFunction;
 uint32_t CR_Clear;
 
+static void Switch_Flag_Clear(void)
+{
+  if (GuardValue == 1 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 2 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 3 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 5 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 7 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 9 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 10 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 11 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+  else if (GuardValue == 13 && CloseReset == 0)
+  {
+    GuardValue = 0;
+  }
+}
+
 void Switch_Flag(void)
 {
+  const bool InAirPlaneMode = GetFrameStateOfAirPlane();
   //INICIA A CONTAGEM DA FLAG PRINCIPAL
   if (SimpleControlAux)
   {
@@ -99,12 +140,12 @@ void Switch_Flag(void)
   if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM)) //CONTROLADORA ARMADA?SIM...
   {
     //O VALOR GUARDADO É IGUAL A 4?E A DECREMENTAÇÃO ACABOU?SIM...INICIA O SERVO AUTO-TRIM
-    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
+    if (GuardValue == 4 && CloseReset < 2.51f && InAirPlaneMode)
     {
       ServoAutoTrimEnabled = true;
     }
     //O VALOR GUARDADO É IGUAL A 6?E A DECREMENTAÇÃO ACABOU?SIM...DESATIVA O SERVO AUTO-TRIM
-    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane())
+    if (GuardValue == 6 && CloseReset < 2.51f && InAirPlaneMode)
     {
       ServoAutoTrimEnabled = false;
       GuardValue = 0;
@@ -112,35 +153,35 @@ void Switch_Flag(void)
   }
   else //CONTROLADORA DESARMADA?SIM...
   {
-    if (GuardValue == 8 && CloseReset > 2 && CloseReset < 4)
+    if (GuardValue == 8 && CloseReset > 2.0f && CloseReset < 4.0f)
     {
       IMU.Compass.Calibrating = true; //O VALOR GUARDADO É IGUAL A 8?E A DECREMENTAÇÃO ACABOU?SIM...INICIA A CALIBRAÇÃO DO COMPASS
     }
-    if (GuardValue == 8 && CloseReset == 2)
+    if (GuardValue == 8 && CloseReset == 2.0f)
     {
       GuardValue = 0;
     }
-    //LIMPA A FLAG SE O USUARIO REJEITAR OS VALORES DO SERVO-AUTOTRIM
-    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && ServoAutoTrimEnabled)
+    //LIMPA A FLAG SE O USUARIO REJEITAR OS VALORES DO SERVO AUTO-TRIM
+    if (GuardValue == 4 && CloseReset < 2.51f && InAirPlaneMode && ServoAutoTrimEnabled)
     {
       GuardValue = 0;
     }
-    //ATIVA O SERVO-TRIM
-    if (GuardValue == 4 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && !ServoAutoTrimEnabled)
+    //ATIVA O MANUAL SERVO-TRIM
+    if (GuardValue == 4 && CloseReset < 2.51f)
     {
-      OkToTrimServo = true;
+      ServoManualTrimEnabled = true;
     }
-    //DESATIVA O SERVO-TRIM
-    if (GuardValue == 6 && CloseReset < 2.51f && GetFrameStateOfAirPlane() && !ServoAutoTrimEnabled)
+    //DESATIVA O MANUAL SERVO-TRIM
+    if (GuardValue == 6 && CloseReset < 2.51f)
     {
-      OkToTrimServo = false;
+      ServoManualTrimEnabled = false;
       GuardValue = 0;
     }
   }
   //O VALOR GUARDADO É IGUAL A 12?E A DECREMENTAÇÃO ACABOU?SIM...SE O SERVO AUTO-TRIM ESTIVER ATIVADO NÃO LIMPA A FLAG,CASO CONTRARIO LIMPA
   if (GuardValue == 12 && CloseReset == 0)
   {
-    if (ServoAutoTrimEnabled == true || OkToTrimServo)
+    if (ServoAutoTrimEnabled || ServoManualTrimEnabled)
     {
       GuardValue = 4;
     }
@@ -149,30 +190,5 @@ void Switch_Flag(void)
       GuardValue = 0;
     }
   }
-  ////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////LIMPEZA DE FLAG///////////////////////////////////
-  if (GuardValue == 5 && CloseReset == 0)
-  {
-    GuardValue = 0;
-  }
-  else if (GuardValue == 7 && CloseReset == 0)
-  {
-    GuardValue = 0;
-  }
-  else if (GuardValue == 9 && CloseReset == 0)
-  {
-    GuardValue = 0;
-  }
-  else if (GuardValue == 10 && CloseReset == 0)
-  {
-    GuardValue = 0;
-  }
-  else if (GuardValue == 11 && CloseReset == 0)
-  {
-    GuardValue = 0;
-  }
-  else if (GuardValue == 13 && CloseReset == 0)
-  {
-    GuardValue = 0;
-  }
+  Switch_Flag_Clear();
 }

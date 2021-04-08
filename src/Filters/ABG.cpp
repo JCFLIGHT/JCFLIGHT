@@ -48,13 +48,17 @@ float AlphaBetaGammaApply(AlphaBetaGammaFilter_Struct *Filter_Pointer, float Inp
 
     //ATUALZIA O ESTADO ESTIMADO DO SISTEMA
     Filter_Pointer->xK += Filter_Pointer->DeltaTime * Filter_Pointer->vK + (1.0f / 2.0f) * Filter_Pointer->DeltaTime2 * Filter_Pointer->aK + (1.0f / 6.0f) * Filter_Pointer->DeltaTime3 * Filter_Pointer->jK;
+
     //ATUALIZA A VELOCIDADE ESTIMADA
     Filter_Pointer->vK += Filter_Pointer->DeltaTime * Filter_Pointer->aK + 0.5f * Filter_Pointer->DeltaTime2 * Filter_Pointer->jK;
     Filter_Pointer->aK += Filter_Pointer->DeltaTime * Filter_Pointer->jK;
+
     //CALCULA O ERRO RESIDUAL
     rK = Input - Filter_Pointer->xK;
+
     //AUMENTA ARTIFICIALMENTE O ERRO PARA AUMENTAR A RESPOSTA DO FILTRO
     rK += (ABS(rK) * rK * Filter_Pointer->Boost);
+
     //ATUALIZA A ESTIMATIVA DE ERRO RESIDUAL
     Filter_Pointer->xK += Filter_Pointer->a * rK;
     Filter_Pointer->vK += Filter_Pointer->b / Filter_Pointer->DeltaTime * rK;

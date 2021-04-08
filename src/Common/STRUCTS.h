@@ -529,6 +529,7 @@ typedef struct
 
   struct Found_Struct
   {
+    bool Junk = false; //SE TIRAR ESSA BOOL,A BOOL DO COMPASS (A PROXIMA) PASSA A NÃO FUNCIONAR,POR QUE ISSO ACONTECE???
     bool Compass = false;
     bool Barometer = false;
   } Found;

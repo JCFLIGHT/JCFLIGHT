@@ -60,3 +60,13 @@ void GPSResetPID(struct _GPS_PID *PID)
     PID->Last_Input = 0;
     PID->Last_Derivative = 0;
 }
+
+void ResetAllGPSPID(void)
+{
+    GPSResetPID(&PositionHoldPIDArray[COORD_LATITUDE]);
+    GPSResetPID(&PositionHoldPIDArray[COORD_LONGITUDE]);
+    GPSResetPID(&PositionHoldRatePIDArray[COORD_LATITUDE]);
+    GPSResetPID(&PositionHoldRatePIDArray[COORD_LONGITUDE]);
+    GPSResetPID(&NavigationPIDArray[COORD_LATITUDE]);
+    GPSResetPID(&NavigationPIDArray[COORD_LONGITUDE]);
+}

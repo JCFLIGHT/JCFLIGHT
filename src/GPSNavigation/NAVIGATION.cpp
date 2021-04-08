@@ -214,6 +214,19 @@ void GPS_Process_FlightModes(float DeltaTime)
   }
 }
 
+void Do_Mode_RTH_Now()
+{
+  if (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(RTH_Altitude))
+  {
+    SetAltitudeToHold(ConvertCMToMeters(RTH_Altitude));
+  }
+  else
+  {
+    SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
+  }
+  SetThisPointToPositionHold();
+}
+
 void GPS_Adjust_Heading()
 {
   HeadingHoldTarget = WRap_18000(Target_Bearing) / 100;
@@ -337,12 +350,12 @@ void ApplyPosHoldPIDControl(float *DeltaTime)
   {
     GPS_Navigation_Array[COORD_LATITUDE] = 0;
     GPS_Navigation_Array[COORD_LONGITUDE] = 0;
-    GPSResetPID(&PositionHoldRatePIDArray[0]);
-    GPSResetPID(&PositionHoldRatePIDArray[1]);
+    GPSResetPID(&PositionHoldRatePIDArray[COORD_LATITUDE]);
+    GPSResetPID(&PositionHoldRatePIDArray[COORD_LONGITUDE]);
   }
 }
 
-bool NavStateForPosHold()
+bool NavStateForPosHold(void)
 {
   return GPS_Navigation_Mode == DO_LAND_INIT || GPS_Navigation_Mode == DO_LAND_SETTLE ||
          GPS_Navigation_Mode == DO_LAND_IN_PROGRESS || GPS_Navigation_Mode == DO_POSITION_HOLD ||
@@ -408,19 +421,6 @@ int16_t Calculate_Navigation_Speed(int16_t Maximum_Velocity)
   return Maximum_Velocity;
 }
 
-void Do_Mode_RTH_Now()
-{
-  if (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(RTH_Altitude))
-  {
-    SetAltitudeToHold(ConvertCMToMeters(RTH_Altitude));
-  }
-  else
-  {
-    SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
-  }
-  SetThisPointToPositionHold();
-}
-
 void Reset_Home_Point(void)
 {
   Stored_Coordinates_Home_Point[COORD_LATITUDE] = GPS_Coordinates_Vector[COORD_LATITUDE];
@@ -436,130 +436,36 @@ void GPS_Reset_Navigation(void)
   GPS_Navigation_Mode = DO_NONE;
   GPS_Navigation_Array[COORD_LATITUDE] = 0;
   GPS_Navigation_Array[COORD_LONGITUDE] = 0;
-  GPSResetPID(&PositionHoldPIDArray[0]);
-  GPSResetPID(&PositionHoldRatePIDArray[0]);
-  GPSResetPID(&NavigationPIDArray[0]);
-  GPSResetPID(&PositionHoldPIDArray[1]);
-  GPSResetPID(&PositionHoldRatePIDArray[1]);
-  GPSResetPID(&NavigationPIDArray[1]);
+  ResetAllGPSPID();
   if (GetFrameStateOfAirPlane())
   {
     PlaneResetNavigation();
   }
 }
 
+void Load_RTH_Altitude(void)
+{
+  if (RTH_Altitude != STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR))
+  {
+    RTH_Altitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
+  }
+}
+
 void LoadGPSParameters(void)
 {
+  Load_RTH_Altitude();
+
   PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].ProportionalVector / 100.0;
   PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].IntegralVector / 100.0;
   PositionHoldPID.IntegralMax = 20 * 100;
+
   PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].ProportionalVector / 10.0;
   PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].IntegralVector / 100.0;
   PositionHoldRatePID.kD = (float)GET_SET[PID_GPS_POSITION_RATE].DerivativeVector / 100.0;
   PositionHoldRatePID.IntegralMax = 20 * 100;
+
   NavigationPID.kP = (float)GET_SET[PID_GPS_NAVIGATION_RATE].ProportionalVector / 10.0;
   NavigationPID.kI = (float)GET_SET[PID_GPS_NAVIGATION_RATE].IntegralVector / 100.0;
   NavigationPID.kD = (float)GET_SET[PID_GPS_NAVIGATION_RATE].DerivativeVector / 1000.0;
   NavigationPID.IntegralMax = 20 * 100;
-}
-
-void RTH_Altitude_EEPROM()
-{
-  static uint8_t RTHNumberCount;
-  static uint8_t AltitudeSum;
-
-  if (RTHNumberCount != STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR))
-  {
-    if (RTHNumberCount < STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR))
-    {
-      RTHNumberCount++;
-      AltitudeSum += 5;
-    }
-    else
-    {
-      RTHNumberCount--;
-      AltitudeSum -= 5;
-    }
-  }
-
-  RTH_Altitude = 10 + AltitudeSum;
-
-  /*
-  if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 0)
-  {
-    RTH_Altitude = 10;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 1)
-  {
-    RTH_Altitude = 15;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 2)
-  {
-    RTH_Altitude = 20;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 3)
-  {
-    RTH_Altitude = 25;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 4)
-  {
-    RTH_Altitude = 30;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 5)
-  {
-    RTH_Altitude = 35;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 6)
-  {
-    RTH_Altitude = 40;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 7)
-  {
-    RTH_Altitude = 45;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 8)
-  {
-    RTH_Altitude = 50;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 9)
-  {
-    RTH_Altitude = 55;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 10)
-  {
-    RTH_Altitude = 60;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 11)
-  {
-    RTH_Altitude = 65;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 12)
-  {
-    RTH_Altitude = 70;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 13)
-  {
-    RTH_Altitude = 75;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 14)
-  {
-    RTH_Altitude = 80;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 15)
-  {
-    RTH_Altitude = 85;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 16)
-  {
-    RTH_Altitude = 90;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 17)
-  {
-    RTH_Altitude = 95;
-  }
-  else if (STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR) == 18)
-  {
-    RTH_Altitude = 100;
-  }
-  */
 }

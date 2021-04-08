@@ -50,7 +50,6 @@ void GeneralSettingsInitialization()
   DECODE.Initialization();
   UART2Mode_Initialization();
   CHECKSUM.UpdateChannelsReverse();
-  RTH_Altitude_EEPROM();
   LoadPID();
   LoadGPSParameters();
   PIDXYZ.Initialization();

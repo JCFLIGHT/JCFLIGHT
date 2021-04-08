@@ -26,8 +26,8 @@ extern GPS_PID PositionHoldPIDArray[2];
 extern GPS_PID PositionHoldRatePIDArray[2];
 extern GPS_PID NavigationPIDArray[2];
 int32_t GPSGetProportional(int32_t Error, struct _PID_PARAM *PID);
-int32_t GPSGetIntegral(int32_t Error, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);
-int32_t GPSGetDerivative(int32_t Input, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);
+int32_t GPSGetIntegral(int32_t Error, float DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);
+int32_t GPSGetDerivative(int32_t Input, float DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);
 void GPSResetPID(struct _GPS_PID *PID);
 void ResetAllGPSPID(void);
 #endif

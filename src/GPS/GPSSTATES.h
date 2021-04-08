@@ -18,10 +18,12 @@
 #ifndef GPSSTATES_H_
 #define GPSSTATES_H_
 #include "Build/LIBDEPENDENCIES.h"
-bool Get_State_Armed_With_GPS();
-bool Get_GPS_In_Good_Condition();
-bool Get_GPS_In_Bad_Condition();
-bool Get_GPS_In_Eight_Or_Plus_Satellites();
+bool Get_State_Armed_With_GPS(void);
+bool Get_GPS_In_Good_Condition(void);
+bool Get_GPS_In_Bad_Condition(void);
+bool Get_GPS_In_Eight_Or_Plus_Satellites(void);
 bool Get_GPS_Type(uint8_t GPS_Type);
-bool GPS_Heading_Is_Valid();
+bool Get_GPS_Heading_Is_Valid(void);
+bool Get_GPS_Flight_Modes_And_Navigation_In_Use(void);
+bool Get_GPS_Only_Flight_Modes_In_Use(void);
 #endif

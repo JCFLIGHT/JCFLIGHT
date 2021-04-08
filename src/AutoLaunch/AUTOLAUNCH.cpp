@@ -78,7 +78,7 @@ const bool AutoLaunchClass::GetSwingVelocityState(void)
 
 const bool AutoLaunchClass::GetForwardState(void)
 {
-  return GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH * 100);
+  return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH * 100);
 }
 
 void AutoLaunchClass::AutomaticDetector()

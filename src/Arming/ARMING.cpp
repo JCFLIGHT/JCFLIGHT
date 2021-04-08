@@ -27,6 +27,7 @@
 #include "Common/STRUCTS.h"
 #include "PerformanceCalibration/PERFORMGYRO.h"
 #include "ParamsToGCS/IMUCALGCS.h"
+#include "GPS/GPSSTATES.h"
 
 PreArmClass PREARM;
 
@@ -118,7 +119,7 @@ uint8_t PreArmClass::Checking(void)
         return IMU_ERROR;
     }
 
-    if (GPS_Flight_Mode != GPS_MODE_NONE) //MODOS DE VOO ATIVOS
+    if (Get_GPS_Only_Flight_Modes_In_Use()) //MODOS DE VOO ATIVOS
     {
         return FLIGHT_MODES_ERROR;
     }

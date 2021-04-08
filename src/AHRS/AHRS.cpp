@@ -388,7 +388,7 @@ void AHRSClass::Update(float DeltaTime)
 
   if (GetFrameStateOfAirPlane())
   {
-    const bool SafeToUseCOG = GPS_Heading_Is_Valid();
+    const bool SafeToUseCOG = Get_GPS_Heading_Is_Valid();
 
     if (I2CResources.Found.Compass)
     {

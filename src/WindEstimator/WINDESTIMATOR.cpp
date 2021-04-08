@@ -62,7 +62,7 @@ void UpdateWindEstimator() //50Hz
 {
     WindEstimator.Time.Now = SCHEDULERTIME.GetMillis();
 
-    if (!GetFrameStateOfAirPlane() || !GPS_Heading_Is_Valid() || !ValidNED)
+    if (!GetFrameStateOfAirPlane() || !Get_GPS_Heading_Is_Valid() || !ValidNED)
     {
         return;
     }

@@ -22,26 +22,30 @@
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "InertialNavigation/INS.h"
+#include "GPS/GPSSTATES.h"
+#include "Math/MATHSUPPORT.h"
 
 int16_t GPS_Angle[3];
 
 void GPS_Orientation_Update()
 {
+  bool InGPSFlightMode = Get_GPS_Flight_Modes_And_Navigation_In_Use();
+
   if (GetFrameStateOfMultirotor())
   {
     bool AltHoldControlApplied = ApplyAltitudeHoldControl();
     static Scheduler_Struct GPSControlTimer;
     if (!AltHoldControlApplied && Scheduler(&GPSControlTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
     {
-      if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (GPS_Navigation_Mode != DO_NONE))
+      if (InGPSFlightMode)
       {
-        if (NavStateForPosHold())
+        if (Get_Safe_State_For_Pos_Hold())
         {
           float DeltaTime = GPSControlTimer.ActualTime * 1e-6f;
-          ApplyPosHoldPIDControl(&DeltaTime);
+          ApplyPosHoldPIDControl(DeltaTime);
         }
-        GPS_Angle[ROLL] = (GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Cosine_Yaw - GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Sine_Yaw) / 10;
-        GPS_Angle[PITCH] = (GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Sine_Yaw + GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Cosine_Yaw) / 10;
+        GPS_Angle[ROLL] = ConvertDeciDegreesToDegrees(GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Cosine_Yaw - GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Sine_Yaw);
+        GPS_Angle[PITCH] = ConvertDeciDegreesToDegrees(GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Sine_Yaw + GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Cosine_Yaw);
       }
       else
       {
@@ -53,10 +57,9 @@ void GPS_Orientation_Update()
   }
   else
   {
-    if ((GPS_Flight_Mode != GPS_MODE_NONE) && Home_Point && (GPS_Navigation_Mode != DO_NONE))
+    if (InGPSFlightMode)
     {
       AirPlaneUpdateNavigation();
-      //ApplyAltitudeHoldControl(); //É REALMENTE CORRETO USAR ESSA FUNÇÃO PARA O ALT-HOLD EM AEROS???
     }
     else
     {

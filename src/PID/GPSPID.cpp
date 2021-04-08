@@ -33,9 +33,9 @@ int32_t GPSGetProportional(int32_t Error, struct _PID_PARAM *PID)
     return (float)Error * PID->kP;
 }
 
-int32_t GPSGetIntegral(int32_t Error, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param)
+int32_t GPSGetIntegral(int32_t Error, float DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param)
 {
-    PID->Integral += ((float)Error * GPS_PID_Param->kI) * *DeltaTime;
+    PID->Integral += ((float)Error * GPS_PID_Param->kI) * DeltaTime;
     PID->Integral = Constrain_Float(PID->Integral, -GPS_PID_Param->IntegralMax, GPS_PID_Param->IntegralMax);
     return PID->Integral;
 }
@@ -45,10 +45,10 @@ float Get_Derivative_LPF_Coefficient(float CutOff)
     return (1.0f / (6.283185482f * (float)CutOff));
 }
 
-int32_t GPSGetDerivative(int32_t Input, float *DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param)
+int32_t GPSGetDerivative(int32_t Input, float DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param)
 {
-    PID->Derivative = (Input - PID->Last_Input) / *DeltaTime;
-    PID->Derivative = PID->Last_Derivative + (*DeltaTime / (Get_Derivative_LPF_Coefficient(GPS_DERIVATIVE_CUTOFF) + *DeltaTime)) * (PID->Derivative - PID->Last_Derivative);
+    PID->Derivative = (Input - PID->Last_Input) / DeltaTime;
+    PID->Derivative = PID->Last_Derivative + (DeltaTime / (Get_Derivative_LPF_Coefficient(GPS_DERIVATIVE_CUTOFF) + DeltaTime)) * (PID->Derivative - PID->Last_Derivative);
     PID->Last_Input = Input;
     PID->Last_Derivative = PID->Derivative;
     return GPS_PID_Param->kD * PID->Derivative;

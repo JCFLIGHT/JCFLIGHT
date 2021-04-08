@@ -32,12 +32,13 @@
 #include "BitArray/BITARRAY.h"
 #include "AHRS/AHRS.h"
 #include "Barometer/BAROBACKEND.h"
+#include "GPS/GPSSTATES.h"
 
 bool Do_Altitude_Hold = false;
 bool Do_RTH_Or_Land_Call_Alt_Hold = false;
 bool Do_Pos_Hold_Call_Alt_Hold = false;
 
-bool Multirotor_GPS_FlightModes_Once()
+bool Get_Multirotor_GPS_FlightModes_Once()
 {
   static uint8_t Previous_Mode = 0;
   uint8_t Check_Actual_State = ((IS_FLIGHT_MODE_ACTIVE(LAND_MODE) << 2) +
@@ -51,7 +52,7 @@ bool Multirotor_GPS_FlightModes_Once()
   return false;
 }
 
-bool AirPlane_GPS_FlightModes_Once()
+bool Get_AirPlane_GPS_FlightModes_Once()
 {
   static uint8_t Previous_Mode = 0;
   uint8_t Check_Actual_State = ((IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) << 1) +
@@ -86,7 +87,7 @@ void ProcessFlightModesToMultirotor()
           ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, SticksInAutoPilotPosition(20));
         }
       }
-      if (Multirotor_GPS_FlightModes_Once())
+      if (Get_Multirotor_GPS_FlightModes_Once())
       {
         if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
         {
@@ -127,7 +128,7 @@ void ProcessFlightModesToMultirotor()
     }
     else
     {
-      if (GPS_Flight_Mode != GPS_MODE_NONE)
+      if (Get_GPS_Only_Flight_Modes_In_Use())
       {
         if (Do_RTH_Or_Land_Call_Alt_Hold)
         {
@@ -172,7 +173,7 @@ void ProcessFlightModesToAirPlane()
 
   if (Get_State_Armed_With_GPS())
   {
-    if (GPS_Flight_Mode != GPS_MODE_NONE && !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
+    if (Get_GPS_Only_Flight_Modes_In_Use() && !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
     {
       ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE); //FORÇA O MODO STABILIZE EM MODO NAVEGAÇÃO POR GPS
     }
@@ -182,7 +183,7 @@ void ProcessFlightModesToAirPlane()
       ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(CIRCLE_MODE, SticksInAutoPilotPosition(20));
     }
 
-    if (AirPlane_GPS_FlightModes_Once())
+    if (Get_AirPlane_GPS_FlightModes_Once())
     {
       if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
       {

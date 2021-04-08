@@ -23,7 +23,7 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 
-bool Get_State_Armed_With_GPS()
+bool Get_State_Armed_With_GPS(void)
 {
     if (GPS_NumberOfSatellites >= 5 && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && Home_Point)
     {
@@ -32,7 +32,7 @@ bool Get_State_Armed_With_GPS()
     return false;
 }
 
-bool Get_GPS_In_Good_Condition()
+bool Get_GPS_In_Good_Condition(void)
 {
     if (GPS_NumberOfSatellites >= 5)
     {
@@ -41,7 +41,7 @@ bool Get_GPS_In_Good_Condition()
     return false;
 }
 
-bool Get_GPS_In_Bad_Condition()
+bool Get_GPS_In_Bad_Condition(void)
 {
     if (GPS_NumberOfSatellites < 5)
     {
@@ -50,7 +50,7 @@ bool Get_GPS_In_Bad_Condition()
     return false;
 }
 
-bool Get_GPS_In_Eight_Or_Plus_Satellites()
+bool Get_GPS_In_Eight_Or_Plus_Satellites(void)
 {
     if (GPS_NumberOfSatellites >= 8)
     {
@@ -70,7 +70,17 @@ bool Get_GPS_Type(uint8_t GPS_Type)
     return false;
 }
 
-bool GPS_Heading_Is_Valid()
+bool Get_GPS_Heading_Is_Valid(void)
 {
     return GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300;
+}
+
+bool Get_GPS_Flight_Modes_And_Navigation_In_Use(void)
+{
+    return (GPS_Flight_Mode != GPS_MODE_NONE) && (GPS_Navigation_Mode != DO_NONE);
+}
+
+bool Get_GPS_Only_Flight_Modes_In_Use(void)
+{
+    return (GPS_Flight_Mode != GPS_MODE_NONE);
 }

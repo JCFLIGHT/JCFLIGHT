@@ -124,7 +124,7 @@ void GPS_Process_FlightModes(float DeltaTime)
     DirectionToHome = 0;
   }
   GPS_Calcule_Velocity();
-  if (GPS_Flight_Mode != GPS_MODE_NONE)
+  if (Get_GPS_Only_Flight_Modes_In_Use())
   {
     GPS_Calcule_Bearing(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Target_Bearing);
     GPS_Calcule_Distance_In_CM(&Coordinates_To_Navigation[COORD_LATITUDE], &Coordinates_To_Navigation[COORD_LONGITUDE], &Two_Points_Distance);
@@ -323,7 +323,7 @@ void SetThisPointToPositionHold()
   INS.Position.Hold[COORD_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + INS.EarthFrame.Velocity[INS_LONGITUDE] * PositionHoldPID.kI;
 }
 
-static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
+static void ApplyINSPositionHoldPIDControl(float DeltaTime)
 {
   uint8_t axis;
   for (axis = 0; axis < 2; axis++)
@@ -340,7 +340,7 @@ static void ApplyINSPositionHoldPIDControl(float *DeltaTime)
   }
 }
 
-void ApplyPosHoldPIDControl(float *DeltaTime)
+void ApplyPosHoldPIDControl(float DeltaTime)
 {
   if (!GetTakeOffInProgress() && !GetGroundDetectedFor100ms())
   {
@@ -355,7 +355,7 @@ void ApplyPosHoldPIDControl(float *DeltaTime)
   }
 }
 
-bool NavStateForPosHold(void)
+bool Get_Safe_State_For_Pos_Hold(void)
 {
   return GPS_Navigation_Mode == DO_LAND_INIT || GPS_Navigation_Mode == DO_LAND_SETTLE ||
          GPS_Navigation_Mode == DO_LAND_IN_PROGRESS || GPS_Navigation_Mode == DO_POSITION_HOLD ||
@@ -374,17 +374,17 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
   Cross_Speed = Constrain_16Bits(Cross_Speed, -200, 200);
   Cross_Speed = -Cross_Speed;
   float TargetCalculed = (9000L - Target_Bearing) * 0.000174532925f;
-  Trigonometry[0] = Fast_Sine(TargetCalculed);
-  Trigonometry[1] = Fast_Cosine(TargetCalculed);
-  Target_Speed[0] = Cross_Speed * Trigonometry[1] + Maximum_Velocity * Trigonometry[0];
-  Target_Speed[1] = Maximum_Velocity * Trigonometry[1] - Cross_Speed * Trigonometry[0];
+  Trigonometry[COORD_LATITUDE] = Fast_Sine(TargetCalculed);
+  Trigonometry[COORD_LONGITUDE] = Fast_Cosine(TargetCalculed);
+  Target_Speed[COORD_LATITUDE] = Cross_Speed * Trigonometry[COORD_LONGITUDE] + Maximum_Velocity * Trigonometry[COORD_LATITUDE];
+  Target_Speed[COORD_LONGITUDE] = Maximum_Velocity * Trigonometry[COORD_LONGITUDE] - Cross_Speed * Trigonometry[COORD_LATITUDE];
   for (axis = 0; axis < 2; axis++)
   {
     GPS_Rate_Error[axis] = Target_Speed[axis] - GPSActualSpeed[axis];
     GPS_Rate_Error[axis] = Constrain_16Bits(GPS_Rate_Error[axis], -1000, 1000);
     GPS_Navigation_Array[axis] = GPSGetProportional(GPS_Rate_Error[axis], &NavigationPID) +
-                                 GPSGetIntegral(GPS_Rate_Error[axis], &DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID) +
-                                 GPSGetDerivative(GPS_Rate_Error[axis], &DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID);
+                                 GPSGetIntegral(GPS_Rate_Error[axis], DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID) +
+                                 GPSGetDerivative(GPS_Rate_Error[axis], DeltaTimeGPSNavigation, &NavigationPIDArray[axis], &NavigationPID);
 
     if (NAVTILTCOMPENSATION != 0)
     {

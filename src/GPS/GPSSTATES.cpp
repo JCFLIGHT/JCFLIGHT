@@ -62,8 +62,8 @@ bool Get_GPS_In_Eight_Or_Plus_Satellites(void)
 
 bool Get_GPS_Type(uint8_t GPS_Type)
 {
-    static uint8_t Get_GPS_Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
-    if (Get_GPS_Type == GPS_Type)
+    static uint8_t _GPS_Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
+    if (_GPS_Type == GPS_Type)
     {
         return true;
     }

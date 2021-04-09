@@ -236,7 +236,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       CalculateNavigationSpeed = Calculate_Navigation_Speed(JCF_Param.Navigation_Vel);
       GPSCalculateNavigationRate(CalculateNavigationSpeed);
       GPS_Adjust_Heading();
-      if ((Two_Points_Distance <= (JCF_Param.GPS_WP_Radius * 100)) || Point_Reached())
+      if ((Two_Points_Distance <= ConvertCMToMeters(JCF_Param.GPS_WP_Radius)) || Point_Reached())
       {
         if (GetFrameStateOfMultirotor())
         {

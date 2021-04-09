@@ -29,6 +29,7 @@
 #include "GPS/GPSUBLOX.h"
 #include "GPS/GPSSTATES.h"
 #include "Param/PARAM.h"
+#include "I2C/I2C.h"
 
 AutoLaunchClass AUTOLAUNCH;
 
@@ -70,13 +71,13 @@ const float GetYawRotationInRadians(void)
   return BodyFrameRotation.Yaw;
 }
 
-const bool AutoLaunchClass::GetSwingVelocityState(void)
+bool AutoLaunchClass::GetSwingVelocityState(void)
 {
   const float SwingVelocity = (ABS(GetYawRotationInRadians()) > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / GetYawRotationInRadians()) : 0;
   return (SwingVelocity > LAUNCH_VELOCITY_THRESH * 100) && (GetPitchAccelerationInMSS() > 0);
 }
 
-const bool AutoLaunchClass::GetForwardState(void)
+bool AutoLaunchClass::GetForwardState(void)
 {
   return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH * 100);
 }
@@ -139,7 +140,7 @@ void AutoLaunchClass::Update(void)
         {
           ENABLE_STATE(PRIMARY_ARM_DISARM);
         }
-        if (AUTOLAUNCH.Completed())
+        if (AUTOLAUNCH.GetStatusCompleted())
         {
           LaunchedDetect = true;
           AutoLaunchState = false;
@@ -251,7 +252,7 @@ bool AutoLaunchClass::GetIMUAngleBanked(float VectorPitch, bool CheckIMUInclinat
   return ((VectorPitch < (IMU_BANKED_ANGLE)) && CheckIMUInclination);
 }
 
-bool AutoLaunchClass::TimerOverFlow(void)
+bool AutoLaunchClass::GetTimerOverFlow(void)
 {
   if (SCHEDULERTIME.GetMillis() - AbortAutoLaunch >= AUTO_LAUCH_EXIT_FUNCTION)
   {
@@ -268,20 +269,24 @@ bool AutoLaunchClass::TimerOverFlow(void)
   return false;
 }
 
-bool AutoLaunchClass::MaxAltitudeReached(void)
+bool AutoLaunchClass::GetMaxAltitudeReached(void)
 {
+  if (!I2CResources.Found.Barometer)
+  {
+    return false;
+  }
   return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (Barometer.INS.Altitude.Estimated >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
 }
 
-bool AutoLaunchClass::Completed(void)
+bool AutoLaunchClass::GetStatusCompleted(void)
 {
   //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
   if (AUTO_LAUCH_EXIT_FUNCTION == NONE)
   {
-    return (SticksDeflected(15)) || (AUTOLAUNCH.MaxAltitudeReached());
+    return (SticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
   }
   //FAÇA A MESMA VERIFICAÇÃO DE CIMA,PORÉM COM O ESTOURO DO TEMPO MAXIMO DE LAUNCH
-  return (AUTOLAUNCH.TimerOverFlow()) || (SticksDeflected(15)) || (AUTOLAUNCH.MaxAltitudeReached());
+  return (AUTOLAUNCH.GetTimerOverFlow()) || (SticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
 }
 
 uint8_t AutoLaunchClass::GetPlaneType(void)

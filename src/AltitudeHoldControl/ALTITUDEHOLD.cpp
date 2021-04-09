@@ -89,9 +89,9 @@ bool ApplyAltitudeHoldControl()
           }
           SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
           TargetVariometer = Constrain_8Bits(MinVariometer, 30, 100);
-          if (Barometer.INS.Altitude.Estimated > (SafeAltitude * 100))
+          if (Barometer.INS.Altitude.Estimated > ConvertCMToMeters(SafeAltitude))
           {
-            TargetVariometer += (int32_t)(250 - MinVariometer) * (Barometer.INS.Altitude.Estimated - (SafeAltitude * 100)) / (RTH_Altitude * 100 - (SafeAltitude * 100));
+            TargetVariometer += (int32_t)(250 - MinVariometer) * (Barometer.INS.Altitude.Estimated - ConvertCMToMeters(SafeAltitude)) / (ConvertCMToMeters(RTH_Altitude) - ConvertCMToMeters(SafeAltitude));
           }
           TargetVariometer = -TargetVariometer;
         }
@@ -102,7 +102,7 @@ bool ApplyAltitudeHoldControl()
             HoveringState = true;
           }
           TargetVariometer = ((AltitudeToHold - Barometer.INS.Altitude.Estimated) * 3) / 2;
-          if (Barometer.INS.Altitude.Estimated > (SafeAltitude * 100))
+          if (Barometer.INS.Altitude.Estimated > ConvertCMToMeters(SafeAltitude))
           {
             TargetVariometer = Constrain_32Bits(TargetVariometer, -250, 250);
           }
@@ -278,7 +278,7 @@ void ResetLandDetector()
 
 bool GetGroundDetected()
 {
-  return (ABS(Barometer.INS.Velocity.Vertical) < 15) && (VariometerErrorIPart <= -185) && (Barometer.INS.Altitude.Estimated < (SafeAltitude * 100));
+  return (ABS(Barometer.INS.Velocity.Vertical) < 15) && (VariometerErrorIPart <= -185) && (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(SafeAltitude));
 }
 
 bool GetGroundDetectedFor100ms()

@@ -607,8 +607,6 @@ typedef struct JCF_Param_Adjustable
 #ifndef __AVR_ATmega2560__
   uint8_t Arm_Time_Safety;
   uint8_t Disarm_Time_Safety;
-  int16_t Max_Level_Inclination_Pitch;
-  int16_t Max_Level_Inclination_Roll;
   uint8_t Compass_Cal_Timer;
 #endif
 } Struct_JCF_Param_Adjustable;

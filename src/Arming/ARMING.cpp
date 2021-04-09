@@ -114,14 +114,14 @@ void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 
 uint8_t PreArmClass::Checking(void)
 {
+    if (GyroCalibrationRunning()) //GYROSCOPIO EM CALIBRAÇÃO
+    {
+        return GYRO_EEROR;
+    }
+
     if (GetImageToGCS() != 63) //IMU NÃO CALIBRADA
     {
         return IMU_ERROR;
-    }
-
-    if (Get_GPS_Only_Flight_Modes_In_Use()) //MODOS DE VOO ATIVOS
-    {
-        return FLIGHT_MODES_ERROR;
     }
 
     if (SystemInFailSafe()) //MODO FAIL-SAFE ATIVO
@@ -129,9 +129,9 @@ uint8_t PreArmClass::Checking(void)
         return FAIL_SAFE_ERROR;
     }
 
-    if (GyroCalibrationRunning()) //GYROSCOPIO EM CALIBRAÇÃO
+    if (Get_GPS_Only_Flight_Modes_In_Use()) //MODOS DE VOO ATIVOS
     {
-        return GYRO_EEROR;
+        return FLIGHT_MODES_ERROR;
     }
 
     if (CheckInclinationForArm()) //INCLINAÇÃO DE 25 GRAUS DETECTADA

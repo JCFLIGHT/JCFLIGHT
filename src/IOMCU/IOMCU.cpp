@@ -255,6 +255,8 @@ struct _Send_Radio_Control_Parameters
     int16_t SendServo3Max;
     int16_t SendServo4Max;
     int16_t SendFailSafeValue;
+    uint8_t SendMaxBankPitch;
+    uint8_t SendMaxBankRoll;
 } Send_Radio_Control_Parameters;
 
 struct _Get_Radio_Control_Parameters
@@ -283,6 +285,8 @@ struct _Get_Radio_Control_Parameters
     uint8_t GetRollDeadZone;
     uint8_t GetChannelsReverse;
     int16_t GetFailSafeValue;
+    uint8_t GetMaxBankPitch;
+    uint8_t GetMaxBankRoll;
 } Get_Radio_Control_Parameters;
 
 struct _Get_Servos_Parameters
@@ -1186,7 +1190,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 14) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 27)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleMiddle, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleExpo, VAR_8BITS);
@@ -1229,6 +1233,8 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendServo3Max, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendServo4Max, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendFailSafeValue, VAR_16BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendMaxBankPitch, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendMaxBankRoll, VAR_8BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1487,6 +1493,8 @@ void GCSClass::Save_Radio_Control_Configuration()
     STORAGEMANAGER.Write_16Bits(SERVO3_MAX_ADDR, Get_Servos_Parameters.GetServo3Max);
     STORAGEMANAGER.Write_16Bits(SERVO4_MAX_ADDR, Get_Servos_Parameters.GetServo4Max);
     STORAGEMANAGER.Write_16Bits(FAILSAFE_VAL_ADDR, Get_Radio_Control_Parameters.GetFailSafeValue);
+    STORAGEMANAGER.Write_8Bits(MAX_PITCH_LEVEL_ADDR, Get_Radio_Control_Parameters.GetMaxBankPitch);
+    STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, Get_Radio_Control_Parameters.GetMaxBankRoll);
 }
 
 void GCSClass::Save_Medium_Configuration()
@@ -1604,6 +1612,8 @@ void GCSClass::Default_RadioControl_Configuration()
     STORAGEMANAGER.Write_16Bits(SERVO3_RATE_ADDR, 100);
     STORAGEMANAGER.Write_16Bits(SERVO4_RATE_ADDR, 100);
     STORAGEMANAGER.Write_16Bits(FAILSAFE_VAL_ADDR, 975);
+    STORAGEMANAGER.Write_8Bits(MAX_PITCH_LEVEL_ADDR, 30);
+    STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, 30);
 }
 
 void GCSClass::Default_Medium_Configuration()
@@ -1777,6 +1787,8 @@ void GCSClass::UpdateParametersToGCS()
     Send_Radio_Control_Parameters.SendServo3Max = STORAGEMANAGER.Read_16Bits(SERVO3_MAX_ADDR);
     Send_Radio_Control_Parameters.SendServo4Max = STORAGEMANAGER.Read_16Bits(SERVO4_MAX_ADDR);
     Send_Radio_Control_Parameters.SendFailSafeValue = STORAGEMANAGER.Read_16Bits(FAILSAFE_VAL_ADDR);
+    Send_Radio_Control_Parameters.SendMaxBankPitch = STORAGEMANAGER.Read_8Bits(MAX_PITCH_LEVEL_ADDR);
+    Send_Radio_Control_Parameters.SendMaxBankRoll = STORAGEMANAGER.Read_8Bits(MAX_ROLL_LEVEL_ADDR);
 
     //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     Send_User_Medium_Parameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);

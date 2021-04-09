@@ -43,7 +43,6 @@
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDPARAMS.h"
 #include "TECS/TECS.h"
-#include "Param/PARAM.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -307,29 +306,20 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 {
   float RcControllerAngle = 0;
 
-  if (GetFrameStateOfMultirotor())
-  {
-    if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
-    {
-      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector));
-    }
-    else
-    {
-      RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector));
-    }
-  }
-  else
-  {
-    RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector));
-  }
+  RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[MAX_ROLL_LEVEL].MinMaxValueVector));
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
 
-#ifdef __AVR_ATmega2560__
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -300, 300);
-#else
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Roll), ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Roll));
-#endif
+  float AngleRateTarget = 0;
+
+  if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
+  {
+    AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector));
+  }
+  else
+  {
+    AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector));
+  }
 
   if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {
@@ -346,21 +336,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 {
   float RcControllerAngle = 0;
 
-  if (GetFrameStateOfMultirotor())
-  {
-    if (IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
-    {
-      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector));
-    }
-    else
-    {
-      RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector));
-    }
-  }
-  else
-  {
-    RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValueVector));
-  }
+  RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[MAX_PITCH_LEVEL].MinMaxValueVector));
 
   RcControllerAngle += TECS.AutoPitchDown(Cruise_Throttle, MinThrottleDownPitchAngle);
 
@@ -371,11 +347,16 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
 
-#ifdef __AVR_ATmega2560__
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -300, 300);
-#else
-  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Pitch), ConvertDegreesToDecidegrees(JCF_Param.Max_Level_Inclination_Pitch));
-#endif
+  float AngleRateTarget = 0;
+
+  if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
+  {
+    AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValueVector));
+  }
+  else
+  {
+    RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValueVector), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValueVector));
+  }
 
   if (GET_SET[PI_AUTO_LEVEL].IntegralVector > 0)
   {

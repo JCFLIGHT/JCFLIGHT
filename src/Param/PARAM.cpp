@@ -81,9 +81,9 @@ const Resources_Of_Param Params_Table[] = {
     {"AutoDisarm_YPR_Min",                 AUTODISARM_YPR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Min,              800,           1500,            1450},
     {"AutoDisarm_YPR_Max",                 AUTODISARM_YPR_MAX_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Max,              800,           2200,            1550},
 #endif
-    {"AirPlane_Wheels",                    WHEELS_ADDR,                          VAR_8BITS,              &JCF_Param.AirPlane_Wheels,                 0,             255,             0},
+    {"AirPlane_Wheels",                    WHEELS_ADDR,                          VAR_8BITS,              &JCF_Param.AirPlane_Wheels,                 0,             1,               0},
 #ifndef __AVR_ATmega2560__
-    {"GPS_Baud_Rate",                      GPS_BAUDRATE_ADDR,                    VAR_8BITS,              &JCF_Param.GPS_Baud_Rate,                   0,             4,               0},
+    {"GPS_Baud_Rate",                      GPS_BAUDRATE_ADDR,                    VAR_8BITS,              &JCF_Param.GPS_Baud_Rate,                   0,             4,               4},
 #endif
     {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             400},
     {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             2},

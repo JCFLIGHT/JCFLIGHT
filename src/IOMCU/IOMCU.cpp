@@ -1720,7 +1720,7 @@ void GCSClass::Default_All_Configs()
 void GCSClass::UpdateParametersToGCS()
 {
     //ATUALIZA OS PARAMETROS BASICOS AJUSTAVEIS PELO USUARIO
-    Send_User_Basic_Parameters.SendFrameType = FrameType;
+    Send_User_Basic_Parameters.SendFrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR);
     Send_User_Basic_Parameters.SendReceiverType = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);
     Send_User_Basic_Parameters.SendGimbalType = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);
     Send_User_Basic_Parameters.SendParachuteType = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR);

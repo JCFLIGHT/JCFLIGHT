@@ -22,10 +22,11 @@
 #include "Common/ENUM.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "GPSNavigation/NAVIGATION.h"
 
 bool Get_State_Armed_With_GPS(void)
 {
-    if (GPS_NumberOfSatellites >= 5 && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && Home_Point)
+    if (GPS_Parameters.Navigation.Misc.Get.Satellites >= 5 && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && GPS_Parameters.Home.Marked)
     {
         return true;
     }
@@ -34,7 +35,7 @@ bool Get_State_Armed_With_GPS(void)
 
 bool Get_GPS_In_Good_Condition(void)
 {
-    if (GPS_NumberOfSatellites >= 5)
+    if (GPS_Parameters.Navigation.Misc.Get.Satellites >= 5)
     {
         return true;
     }
@@ -43,7 +44,7 @@ bool Get_GPS_In_Good_Condition(void)
 
 bool Get_GPS_In_Bad_Condition(void)
 {
-    if (GPS_NumberOfSatellites < 5)
+    if (GPS_Parameters.Navigation.Misc.Get.Satellites < 5)
     {
         return true;
     }
@@ -52,7 +53,7 @@ bool Get_GPS_In_Bad_Condition(void)
 
 bool Get_GPS_In_Eight_Or_Plus_Satellites(void)
 {
-    if (GPS_NumberOfSatellites >= 8)
+    if (GPS_Parameters.Navigation.Misc.Get.Satellites >= 8)
     {
         return true;
     }
@@ -62,8 +63,7 @@ bool Get_GPS_In_Eight_Or_Plus_Satellites(void)
 bool Get_GPS_Type(uint8_t GPS_Type)
 {
     static uint8_t Get_GPS_Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
-    if ((Get_GPS_Type == GPS_UBLOX && GPS_Type == GPS_UBLOX) ||
-        (Get_GPS_Type == GPS_DJI_NAZA && GPS_Type == GPS_DJI_NAZA))
+    if (Get_GPS_Type == GPS_Type)
     {
         return true;
     }
@@ -72,15 +72,15 @@ bool Get_GPS_Type(uint8_t GPS_Type)
 
 bool Get_GPS_Heading_Is_Valid(void)
 {
-    return GPS_NumberOfSatellites >= 6 && GPS_Ground_Speed >= 300;
+    return GPS_Parameters.Navigation.Misc.Get.Satellites >= 6 && GPS_Parameters.Navigation.Misc.Get.GroundSpeed >= 300;
 }
 
 bool Get_GPS_Flight_Modes_And_Navigation_In_Use(void)
 {
-    return (GPS_Flight_Mode != GPS_MODE_NONE) && (GPS_Navigation_Mode != DO_NONE);
+    return (GPS_Parameters.Mode.Flight != GPS_MODE_NONE) && (GPS_Parameters.Mode.Navigation != DO_NONE);
 }
 
 bool Get_GPS_Only_Flight_Modes_In_Use(void)
 {
-    return (GPS_Flight_Mode != GPS_MODE_NONE);
+    return (GPS_Parameters.Mode.Flight != GPS_MODE_NONE);
 }

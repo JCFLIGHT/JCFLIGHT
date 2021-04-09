@@ -26,6 +26,7 @@
 #include "AirSpeed/AIRSPEED.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "Barometer/BAROFRONTEND.h"
+#include "GPSNavigation/NAVIGATION.h"
 
 //O PDF ESTÁ NA PASTA 'DOCS' COM O NOME 'WindEstimation.pdf'
 
@@ -62,15 +63,15 @@ void UpdateWindEstimator() //50Hz
 {
     WindEstimator.Time.Now = SCHEDULERTIME.GetMillis();
 
-    if (!GetFrameStateOfAirPlane() || !Get_GPS_Heading_Is_Valid() || !ValidNED)
+    if (!GetFrameStateOfAirPlane() || !Get_GPS_Heading_Is_Valid() || !GPS_Parameters.Navigation.Misc.Velocity.NEDStatus)
     {
         return;
     }
 
     //OBTÉM A VELOCIDADE 3D DO GPS EM CM/S
-    WindEstimator.Ground.Velocity[ROLL] = GPSVelNED[ROLL];
-    WindEstimator.Ground.Velocity[PITCH] = GPSVelNED[PITCH];
-    WindEstimator.Ground.Velocity[YAW] = GPSVelNED[YAW];
+    WindEstimator.Ground.Velocity[ROLL] = GPS_Parameters.Navigation.Misc.Velocity.Get[ROLL];
+    WindEstimator.Ground.Velocity[PITCH] = GPS_Parameters.Navigation.Misc.Velocity.Get[PITCH];
+    WindEstimator.Ground.Velocity[YAW] = GPS_Parameters.Navigation.Misc.Velocity.Get[YAW];
 
     //OBTÉM A DIREÇÃO DA FUSELAGEM NO EARTH FRAME (SACADO DO AHRS)
     WindEstimator.Fuselage.Direction[ROLL] = RotationMatrix[0][0];

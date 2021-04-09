@@ -28,6 +28,7 @@
 #include "GPS/GPSSTATES.h"
 #include "GPS/GPSUBLOX.h"
 #include "IMU/ACCGYROREAD.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -399,12 +400,12 @@ void AHRSClass::Update(float DeltaTime)
     {
       if (GPSHeadingInitialized)
       {
-        CourseOverGround = ConvertDeciDegreesToRadians(GPS_Ground_Course);
+        CourseOverGround = ConvertDeciDegreesToRadians(GPS_Parameters.Navigation.Misc.Get.GroundCourse);
         GPS_HeadingState = true;
       }
       else
       {
-        ComputeQuaternionFromRPY(ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[PITCH], GPS_Ground_Course);
+        ComputeQuaternionFromRPY(ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[PITCH], GPS_Parameters.Navigation.Misc.Get.GroundCourse);
         GPSHeadingInitialized = true;
       }
     }

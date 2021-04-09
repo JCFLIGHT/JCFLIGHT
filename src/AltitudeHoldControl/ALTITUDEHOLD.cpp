@@ -81,7 +81,7 @@ bool ApplyAltitudeHoldControl()
         {
           TakeOffInProgress = false;
         }
-        if (GPS_Navigation_Mode == DO_LAND_IN_PROGRESS || GPS_Navigation_Mode == DO_LAND_DETECTED || GPS_Navigation_Mode == DO_LANDED)
+        if (GPS_Parameters.Mode.Navigation == DO_LAND_IN_PROGRESS || GPS_Parameters.Mode.Navigation == DO_LAND_DETECTED || GPS_Parameters.Mode.Navigation == DO_LANDED)
         {
           if (HoveringState)
           {
@@ -91,7 +91,7 @@ bool ApplyAltitudeHoldControl()
           TargetVariometer = Constrain_8Bits(MinVariometer, 30, 100);
           if (Barometer.INS.Altitude.Estimated > ConvertCMToMeters(SafeAltitude))
           {
-            TargetVariometer += (int32_t)(250 - MinVariometer) * (Barometer.INS.Altitude.Estimated - ConvertCMToMeters(SafeAltitude)) / (ConvertCMToMeters(RTH_Altitude) - ConvertCMToMeters(SafeAltitude));
+            TargetVariometer += (int32_t)(250 - MinVariometer) * (Barometer.INS.Altitude.Estimated - ConvertCMToMeters(SafeAltitude)) / (ConvertCMToMeters(GPS_Parameters.Home.Altitude) - ConvertCMToMeters(SafeAltitude));
           }
           TargetVariometer = -TargetVariometer;
         }

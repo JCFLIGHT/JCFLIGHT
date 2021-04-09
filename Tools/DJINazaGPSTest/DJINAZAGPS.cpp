@@ -113,7 +113,7 @@ typedef struct
   int16_t VelocityNE[3];
   int16_t GroundSpeed;
   int16_t GroundCourse;
-  uint16_t GPS_HDOP_State;
+  uint16_t GPS_Parameters.Navigation.Misc.Get.HDOP_State;
 } Struct_SolutionData;
 
 Struct_SolutionData GPSSolutionData; //INSTANCIA
@@ -253,7 +253,7 @@ static void NazaGPS_Check_Valid_Data()
 
     //DECODE DO PDOP QUE AGORA VAI SER HDOP
     uint16_t Position_DOP = Decode16BitsValues(NazaGPS_Buffer_Read.NazaGPS_GPS_Data.Position_DOP, Data_Mask);
-    GPSSolutionData.GPS_HDOP_State = HDOPMaxError(Position_DOP);
+    GPSSolutionData.GPS_Parameters.Navigation.Misc.Get.HDOP_State = HDOPMaxError(Position_DOP);
 
     //DECODE O NÚMERO DE SATELITES
     GPSSolutionData.GPS_NumSat = NazaGPS_Buffer_Read.NazaGPS_GPS_Data.Satellites;
@@ -371,7 +371,7 @@ void DjiNazaGpsNewFrame(uint8_t SerialReceiverBuffer)
   }
   DJINaza_Num_Sat = GPSSolutionData.GPS_NumSat;
   DJINaza_Fix_State = GPSSolutionData.FixType;
-  DJINaza_HDOP = GPSSolutionData.GPS_HDOP_State;
+  DJINaza_HDOP = GPSSolutionData.GPS_Parameters.Navigation.Misc.Get.HDOP_State;
   DJINaza_Compass_Roll = GPSSolutionData.GPS_Read_Compass[0];
   DJINaza_Compass_Pitch = GPSSolutionData.GPS_Read_Compass[1];
   DJINaza_Compass_Yaw = GPSSolutionData.GPS_Read_Compass[2];

@@ -128,8 +128,8 @@ void InertialNavigationClass::Calculate_AccelerationXY(float DeltaTime)
 void InertialNavigationClass::CorrectXYStateWithGPS(float DeltaTime)
 {
   float PositionError[2];
-  PositionError[INS_LATITUDE] = GPSDistanceToHome[INS_LATITUDE] - INS.History.XYPosition[INS_LATITUDE][INS.History.XYCount];
-  PositionError[INS_LONGITUDE] = GPSDistanceToHome[INS_LONGITUDE] - INS.History.XYPosition[INS_LONGITUDE][INS.History.XYCount];
+  PositionError[INS_LATITUDE] = GPS_Parameters.Home.INS.Distance[INS_LATITUDE] - INS.History.XYPosition[INS_LATITUDE][INS.History.XYCount];
+  PositionError[INS_LONGITUDE] = GPS_Parameters.Home.INS.Distance[INS_LONGITUDE] - INS.History.XYPosition[INS_LONGITUDE][INS.History.XYCount];
   PositionError[INS_LATITUDE] = Constrain_Float(PositionError[INS_LATITUDE], -MAX_INS_POSITION_ERROR, MAX_INS_POSITION_ERROR);
   PositionError[INS_LONGITUDE] = Constrain_Float(PositionError[INS_LONGITUDE], -MAX_INS_POSITION_ERROR, MAX_INS_POSITION_ERROR);
   INS.EarthFrame.Velocity[INS_LATITUDE] += PositionError[INS_LATITUDE] * (DeltaTime * 0.48f);
@@ -165,12 +165,11 @@ void InertialNavigationClass::ResetXYState()
   INS.History.XYCount = 0;
   for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
   {
-    INS.EarthFrame.Velocity[IndexCount] = (ABS(GPSActualSpeed[IndexCount]) > 50) ? GPSActualSpeed[IndexCount] : 0.0f;
-    INS.EarthFrame.Position[IndexCount] = GPSDistanceToHome[IndexCount];
-
+    INS.EarthFrame.Velocity[IndexCount] = (ABS(GPS_Parameters.Navigation.Speed[IndexCount]) > 50) ? GPS_Parameters.Navigation.Speed[IndexCount] : 0.0f;
+    INS.EarthFrame.Position[IndexCount] = GPS_Parameters.Home.INS.Distance[IndexCount];
     for (uint8_t SecondIndexCount = 0; SecondIndexCount < 10; SecondIndexCount++)
     {
-      INS.History.XYPosition[IndexCount][SecondIndexCount] = GPSDistanceToHome[IndexCount];
+      INS.History.XYPosition[IndexCount][SecondIndexCount] = GPS_Parameters.Home.INS.Distance[IndexCount];
     }
   }
 }

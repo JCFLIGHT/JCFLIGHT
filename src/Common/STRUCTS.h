@@ -196,6 +196,96 @@ typedef struct
 
 typedef struct
 {
+  float ScaleDownOfLongitude = 1.0f;
+
+  struct Declination_Struct
+  {
+    bool Pushed = false;
+    uint8_t PushedCount = 0;
+  } Declination;
+
+  struct DeltaTime_Struct
+  {
+    float Navigation = 0.0f;
+    uint32_t InitLand = 0;
+  } DeltaTime;
+
+  struct Mode_Struct
+  {
+    uint8_t Flight = 0;
+    uint8_t Navigation = 0;
+  } Mode;
+
+  struct Home_Struct
+  {
+    bool Marked;
+    uint8_t Altitude = 0;
+    int16_t Direction = 0;
+    uint16_t Distance = 0;
+    int32_t Coordinates[2] = {0, 0};
+    struct INS_Struct
+    {
+      int32_t Distance[2] = {0, 0};
+    } INS;
+  } Home;
+
+  struct Navigation_Struct
+  {
+    int16_t Speed[2] = {0, 0};
+    int16_t RateError[2] = {0, 0};
+
+    struct AutoPilot_Struct
+    {
+      struct INS_Struct
+      {
+        int16_t Angle[2] = {0, 0};
+      } INS;
+
+      struct Control_Struct
+      {
+        int16_t Angle[3] = {0, 0, 0};
+      } Control;
+    } AutoPilot;
+
+    struct Coordinates_Struct
+    {
+      int32_t Actual[2] = {0, 0};
+      int32_t Destiny[2] = {0, 0};
+      int32_t Distance = 0;
+    } Coordinates;
+
+    struct Misc_Struct
+    {
+      struct Velocity_Struct
+      {
+        bool NEDStatus = false;
+        int16_t Get[3] = {0, 0, 0};
+      } Velocity;
+
+      struct Get_Struct
+      {
+        bool Marked3DFix = false;
+        uint8_t Satellites = 0;
+        uint16_t GroundCourse = 0;
+        uint16_t Altitude = 0;
+        uint16_t GroundSpeed = 0;
+        uint16_t HDOP = 0;
+      } Get;
+    } Misc;
+
+    struct Bearing_Struct
+    {
+      int16_t InitalTarget = 0;
+      int32_t ActualTarget = 0;
+      int32_t TargetPrev = 0;
+    } Bearing;
+
+  } Navigation;
+
+} GPS_Parameters_Struct;
+
+typedef struct
+{
   float OldMeasure;
   float NewMeasure;
   float OldValue;

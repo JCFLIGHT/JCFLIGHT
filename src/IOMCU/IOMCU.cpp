@@ -1262,7 +1262,7 @@ void GCSClass::First_Packet_Request_Parameters()
     }
     else
     {
-        Essential_First_Packet_Parameters.SendAttitudeYaw = WRap_18000(GPS_Ground_Course * 10) / 10;
+        Essential_First_Packet_Parameters.SendAttitudeYaw = WRap_18000(GPS_Parameters.Navigation.Misc.Get.GroundCourse * 10) / 10;
     }
     Essential_First_Packet_Parameters.DevicesOnBoard = CHECKSUM.GetDevicesActived();
     Essential_First_Packet_Parameters.SendThrottleValue = Throttle.Output;
@@ -1277,39 +1277,39 @@ void GCSClass::First_Packet_Request_Parameters()
     Essential_First_Packet_Parameters.SendAuxSixValue = AuxiliarSix.Output;
     Essential_First_Packet_Parameters.SendAuxSevenValue = AuxiliarSeven.Output;
     Essential_First_Packet_Parameters.SendAuxEightValue = AuxiliarEight.Output;
-    Essential_First_Packet_Parameters.SendGPSNumberOfSat = GPS_NumberOfSatellites;
-    Essential_First_Packet_Parameters.SendGPSLatitude = GPS_Coordinates_Vector[COORD_LATITUDE];
-    Essential_First_Packet_Parameters.SendGPSLongitude = GPS_Coordinates_Vector[COORD_LONGITUDE];
-    Essential_First_Packet_Parameters.SendHomePointLatitude = Stored_Coordinates_Home_Point[COORD_LATITUDE];
-    Essential_First_Packet_Parameters.SendHomePointLongitude = Stored_Coordinates_Home_Point[COORD_LONGITUDE];
+    Essential_First_Packet_Parameters.SendGPSNumberOfSat = GPS_Parameters.Navigation.Misc.Get.Satellites;
+    Essential_First_Packet_Parameters.SendGPSLatitude = GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE];
+    Essential_First_Packet_Parameters.SendGPSLongitude = GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE];
+    Essential_First_Packet_Parameters.SendHomePointLatitude = GPS_Parameters.Home.Coordinates[COORD_LATITUDE];
+    Essential_First_Packet_Parameters.SendHomePointLongitude = GPS_Parameters.Home.Coordinates[COORD_LONGITUDE];
     if (I2CResources.Found.Barometer)
     {
         Essential_First_Packet_Parameters.SendBarometerValue = GetAltitudeForGCS();
     }
     else
     {
-        Essential_First_Packet_Parameters.SendBarometerValue = (GPS_Altitude - GPS_Altitude_For_Plane) * 100;
+        Essential_First_Packet_Parameters.SendBarometerValue = ConvertCMToMeters(GPS_Parameters.Navigation.Misc.Get.Altitude - Altitude_For_Plane);
     }
     Essential_First_Packet_Parameters.SendFailSafeState = SystemInFailSafe();
     Essential_First_Packet_Parameters.SendBatteryVoltageValue = BATTERY.Get_Actual_Voltage() * 100;
     Essential_First_Packet_Parameters.SendBatteryPercentageValue = BATTERY.GetPercentage();
     Essential_First_Packet_Parameters.SendArmDisarmState = IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
-    Essential_First_Packet_Parameters.SendHDOPValue = GPS_HDOP;
+    Essential_First_Packet_Parameters.SendHDOPValue = GPS_Parameters.Navigation.Misc.Get.HDOP;
     Essential_First_Packet_Parameters.SendCurrentValue = BATTERY.Get_Actual_Current();
     Essential_First_Packet_Parameters.SendWattsValue = BATTERY.GetWatts();
     Essential_First_Packet_Parameters.SendDeclinationValue = (int16_t)(STORAGEMANAGER.Read_Float(DECLINATION_ADDR) * 100);
     Essential_First_Packet_Parameters.SendActualFlightMode = FlightMode;
     Essential_First_Packet_Parameters.SendFrameType = FrameType;
-    Essential_First_Packet_Parameters.SendHomePointState = Home_Point;
+    Essential_First_Packet_Parameters.SendHomePointState = GPS_Parameters.Home.Marked;
     Essential_First_Packet_Parameters.SendTemperature = Barometer.Raw.Temperature / 100;
-    Essential_First_Packet_Parameters.SendHomePointDistance = DistanceToHome;
+    Essential_First_Packet_Parameters.SendHomePointDistance = GPS_Parameters.Home.Distance;
     Essential_First_Packet_Parameters.SendCurrentInMah = BATTERY.Get_Current_In_Mah();
 #ifndef MACHINE_CYCLE
-    Essential_First_Packet_Parameters.SendCourseOverGround = GPS_Ground_Course;
+    Essential_First_Packet_Parameters.SendCourseOverGround = GPS_Parameters.Navigation.Misc.Get.GroundCourse;
 #else
     Essential_First_Packet_Parameters.SendCourseOverGround = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
 #endif
-    Essential_First_Packet_Parameters.SendBearing = Target_Bearing;
+    Essential_First_Packet_Parameters.SendBearing = GPS_Parameters.Navigation.Bearing.ActualTarget;
     Essential_First_Packet_Parameters.SendAccGForce = IMU.Accelerometer.GravityForce.Value;
     Essential_First_Packet_Parameters.SendAccImageBitMap = GetImageToGCS();
     Essential_First_Packet_Parameters.SendCompassRoll = IMU.Compass.Read[ROLL];
@@ -1349,7 +1349,7 @@ void GCSClass::Second_Packet_Request_Parameters()
     Essential_Second_Packet_Parameters.SendGyroXFiltered = IMU.Gyroscope.Read[ROLL];
     Essential_Second_Packet_Parameters.SendGyroYFiltered = IMU.Gyroscope.Read[PITCH];
     Essential_Second_Packet_Parameters.SendGyroZFiltered = IMU.Gyroscope.Read[YAW];
-    Essential_Second_Packet_Parameters.SendGPSGroundSpeed = GPS_Ground_Speed;
+    Essential_Second_Packet_Parameters.SendGPSGroundSpeed = GPS_Parameters.Navigation.Misc.Get.GroundSpeed;
     Essential_Second_Packet_Parameters.SendI2CError = I2CResources.Error.Count;
     Essential_Second_Packet_Parameters.SendAirSpeedValue = AirSpeed.Raw.IASPressureInCM;
     Essential_Second_Packet_Parameters.SendCPULoad = SystemLoadPercent;

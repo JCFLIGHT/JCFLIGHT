@@ -91,14 +91,12 @@ void ResetDisarmDelayed(void)
 
 bool SticksStateToArm(void)
 {
-    return (Throttle.Output < MIN_PULSE) && (Yaw.Output > MAX_PULSE) &&
-           (Pitch.Output < MIN_PULSE) && (Roll.Output) < MIN_PULSE;
+    return (Throttle.Output < MIN_PULSE) && (Yaw.Output > MAX_PULSE) && (Pitch.Output < MIN_PULSE) && (Roll.Output) < MIN_PULSE;
 }
 
 bool SticksStateToDisarm(void)
 {
-    return (Throttle.Output) < MIN_PULSE && (Yaw.Output < MIN_PULSE) &&
-           (Pitch.Output < MIN_PULSE) && (Roll.Output > MAX_PULSE);
+    return (Throttle.Output) < MIN_PULSE && (Yaw.Output < MIN_PULSE) && (Pitch.Output < MIN_PULSE) && (Roll.Output > MAX_PULSE);
 }
 
 bool SticksInAutoPilotPosition(int16_t AutoPilotValue)

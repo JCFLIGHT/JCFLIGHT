@@ -18,14 +18,6 @@
 #ifndef GPSUBLOX_H_
 #define GPSUBLOX_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern bool ValidNED;
-extern uint8_t GPS_NumberOfSatellites;
-extern int16_t GPSVelNED[3];
-extern uint16_t GPS_Ground_Course;
-extern uint16_t GPS_Altitude;
-extern uint16_t GPS_Ground_Speed;
-extern uint16_t GPS_HDOP;
-extern int32_t GPS_Coordinates_Vector[2];
 void GPS_SerialInit(uint32_t Get_BaudRate);
 void GPS_SerialRead(uint8_t ReadData);
 void UBLOX_GetAllGPSData(void);

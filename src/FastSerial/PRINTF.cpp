@@ -132,9 +132,9 @@ void SerialPrint::ParamsToConsole()
 
 #if defined(PRINTLN_GPS)
   PRINTF.SendToConsole(ProgramMemoryString("NúmSat:%u Latitude:%ld Longitude:%ld Declinação:%.2f EEPROM:%.2f HDOP:%.2f\n"),
-                       GPS_NumberOfSatellites, GPS_Coordinates_Vector[COORD_LATITUDE], GPS_Coordinates_Vector[COORD_LONGITUDE],
+                       GPS_Parameters.Navigation.Misc.Get.Satellites, GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE], GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE],
                        Declination(), STORAGEMANAGER.Read_Float(DECLINATION_ADDR),
-                       (float)GPS_HDOP / 100);
+                       (float)GPS_Parameters.Navigation.Misc.Get.HDOP / 100);
 #endif
 
 #if defined(PRINTLN_ATTITUDE)

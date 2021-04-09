@@ -18,8 +18,8 @@
 #ifndef AIRPLANENAVIGATION_H_
 #define AIRPLANENAVIGATION_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern int32_t GPS_Altitude_For_Plane;
-extern int32_t GPS_AltitudeHold_For_Plane;
+extern int32_t Altitude_For_Plane;
+extern int32_t AltitudeHold_For_Plane;
 void Circle_Mode_Update();
 void AirPlaneUpdateNavigation(void);
 void PlaneResetNavigation(void);

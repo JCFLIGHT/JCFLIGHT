@@ -18,20 +18,8 @@
 #ifndef NAVIGATION_H_
 #define NAVIGATION_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern bool Home_Point;
-extern float ScaleDownOfLongitude;
-extern uint8_t GPS_Flight_Mode;
-extern uint8_t GPS_Navigation_Mode;
-extern uint8_t RTH_Altitude;
-extern int16_t GPSActualSpeed[2];
-extern int16_t GPS_Navigation_Array[2];
-extern uint16_t DistanceToHome;
-extern int32_t Stored_Coordinates_Home_Point[2];
-extern int32_t Two_Points_Distance;
-extern int32_t Target_Bearing;
-extern int32_t GPSDistanceToHome[2];
-extern int32_t Original_Target_Bearing;
-extern int32_t Coordinates_To_Navigation[2];
+#include "Common/STRUCTS.h"
+extern GPS_Parameters_Struct GPS_Parameters;
 int16_t Calculate_Navigation_Speed(int16_t Maximum_Velocity);
 void GPS_Process_FlightModes(float DeltaTime);
 void Do_Mode_RTH_Now(void);

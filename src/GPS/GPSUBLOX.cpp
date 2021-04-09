@@ -82,29 +82,15 @@ static union
   uint8_t Bytes_Array[464];
 } Buffer;
 
-bool GPS_3DFIX;
-bool ValidNED = false;
-
 //VERIFICAÇÃO DOS PACOTES DE DADOS
 static uint8_t Check_Packet_A;
 static uint8_t Check_Packet_B;
-
-uint8_t GPS_NumberOfSatellites;
 
 //ESTADO DE MAQUINA
 static uint8_t Step_Counter;
 static uint8_t Get_GPS_Message_ID;
 static uint16_t Payload_Length;
 static uint16_t Payload_Counter;
-
-int16_t GPSVelNED[3];
-
-uint16_t GPS_Ground_Course;
-uint16_t GPS_Altitude;
-uint16_t GPS_Ground_Speed;
-uint16_t GPS_HDOP;
-
-int32_t GPS_Coordinates_Vector[2];
 
 #ifdef __AVR_ATmega2560__
 const uint8_t Ublox_Set_Configuration[] __attribute__((__progmem__)) = {
@@ -380,28 +366,28 @@ void UBLOX_GetAllGPSData(void)
   {
 
   case MSG_POSLLH:
-    GPS_Coordinates_Vector[COORD_LATITUDE] = Buffer.PositionLLH.Latitude;
-    GPS_Coordinates_Vector[COORD_LONGITUDE] = Buffer.PositionLLH.Longitude;
-    GPS_Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
+    GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE] = Buffer.PositionLLH.Latitude;
+    GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE] = Buffer.PositionLLH.Longitude;
+    GPS_Parameters.Navigation.Misc.Get.Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
     break;
 
   case MSG_STATUS:
-    GPS_3DFIX = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
+    GPS_Parameters.Navigation.Misc.Get.Marked3DFix = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
     break;
 
   case MSG_SOL:
-    GPS_3DFIX = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
-    GPS_NumberOfSatellites = Buffer.Solution.Satellites;
-    GPS_HDOP = Buffer.Solution.Position_DOP;
+    GPS_Parameters.Navigation.Misc.Get.Marked3DFix = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
+    GPS_Parameters.Navigation.Misc.Get.Satellites = Buffer.Solution.Satellites;
+    GPS_Parameters.Navigation.Misc.Get.HDOP = Buffer.Solution.Position_DOP;
     break;
 
   case MSG_VELNED:
-    GPS_Ground_Speed = Buffer.VelocityNED.Speed_2D;
-    GPS_Ground_Course = (uint16_t)(Buffer.VelocityNED.Heading_2D / 10000);
-    GPSVelNED[NORTH] = Buffer.VelocityNED.North;
-    GPSVelNED[EAST] = Buffer.VelocityNED.East;
-    GPSVelNED[DOWN] = Buffer.VelocityNED.Down;
-    ValidNED = true;
+    GPS_Parameters.Navigation.Misc.Get.GroundSpeed = Buffer.VelocityNED.Speed_2D;
+    GPS_Parameters.Navigation.Misc.Get.GroundCourse = (uint16_t)(Buffer.VelocityNED.Heading_2D / 10000);
+    GPS_Parameters.Navigation.Misc.Velocity.Get[NORTH] = Buffer.VelocityNED.North;
+    GPS_Parameters.Navigation.Misc.Velocity.Get[EAST] = Buffer.VelocityNED.East;
+    GPS_Parameters.Navigation.Misc.Velocity.Get[DOWN] = Buffer.VelocityNED.Down;
+    GPS_Parameters.Navigation.Misc.Velocity.NEDStatus = true;
     break;
   }
 }

@@ -91,8 +91,8 @@ void ProcessFlightModesToMultirotor()
       {
         if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
         {
-          GPS_Flight_Mode = GPS_MODE_RTH;
-          GPS_Navigation_Mode = DO_START_RTH;
+          GPS_Parameters.Mode.Flight = GPS_MODE_RTH;
+          GPS_Parameters.Mode.Navigation = DO_START_RTH;
           Do_RTH_Or_Land_Call_Alt_Hold = true;
           Do_Pos_Hold_Call_Alt_Hold = false;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
@@ -100,8 +100,8 @@ void ProcessFlightModesToMultirotor()
         }
         else if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
         {
-          GPS_Flight_Mode = GPS_MODE_HOLD;
-          GPS_Navigation_Mode = DO_POSITION_HOLD;
+          GPS_Parameters.Mode.Flight = GPS_MODE_HOLD;
+          GPS_Parameters.Mode.Navigation = DO_POSITION_HOLD;
           Do_RTH_Or_Land_Call_Alt_Hold = false;
           Do_Pos_Hold_Call_Alt_Hold = true;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
@@ -109,8 +109,8 @@ void ProcessFlightModesToMultirotor()
         }
         else if (IS_FLIGHT_MODE_ACTIVE(LAND_MODE))
         {
-          GPS_Flight_Mode = GPS_MODE_HOLD;
-          GPS_Navigation_Mode = DO_LAND_INIT;
+          GPS_Parameters.Mode.Flight = GPS_MODE_HOLD;
+          GPS_Parameters.Mode.Navigation = DO_LAND_INIT;
           Do_Pos_Hold_Call_Alt_Hold = false;
           Do_RTH_Or_Land_Call_Alt_Hold = true;
           SetThisPointToPositionHold();
@@ -118,7 +118,7 @@ void ProcessFlightModesToMultirotor()
         }
         else
         {
-          GPS_Flight_Mode = GPS_MODE_NONE;
+          GPS_Parameters.Mode.Flight = GPS_MODE_NONE;
           Do_Pos_Hold_Call_Alt_Hold = false;
           Do_RTH_Or_Land_Call_Alt_Hold = false;
           DISABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
@@ -134,7 +134,7 @@ void ProcessFlightModesToMultirotor()
         {
           SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
         }
-        GPS_Flight_Mode = GPS_MODE_NONE;
+        GPS_Parameters.Mode.Flight = GPS_MODE_NONE;
       }
       GPS_Reset_Navigation();
     }
@@ -142,7 +142,7 @@ void ProcessFlightModesToMultirotor()
   else
   {
     Do_RTH_Or_Land_Call_Alt_Hold = false;
-    GPS_Flight_Mode = GPS_MODE_NONE;
+    GPS_Parameters.Mode.Flight = GPS_MODE_NONE;
     GPS_Reset_Navigation();
   }
 
@@ -187,25 +187,25 @@ void ProcessFlightModesToAirPlane()
     {
       if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
       {
-        Set_Next_Point_To_Navigation(Stored_Coordinates_Home_Point[COORD_LATITUDE], Stored_Coordinates_Home_Point[COORD_LONGITUDE]);
-        GPS_Flight_Mode = DO_RTH_ENROUTE;
-        GPS_AltitudeHold_For_Plane = GPS_Altitude;
+        Set_Next_Point_To_Navigation(GPS_Parameters.Home.Coordinates[COORD_LATITUDE], GPS_Parameters.Home.Coordinates[COORD_LONGITUDE]);
+        GPS_Parameters.Mode.Flight = DO_RTH_ENROUTE;
+        AltitudeHold_For_Plane = GPS_Parameters.Navigation.Misc.Get.Altitude;
         ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
       }
       else
       {
         if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
         {
-          GPS_Flight_Mode = GPS_MODE_HOLD;
-          GPS_Navigation_Mode = DO_POSITION_HOLD;
-          GPS_AltitudeHold_For_Plane = GPS_Altitude;
-          Set_Next_Point_To_Navigation(GPS_Coordinates_Vector[COORD_LATITUDE], GPS_Coordinates_Vector[COORD_LONGITUDE]);
+          GPS_Parameters.Mode.Flight = GPS_MODE_HOLD;
+          GPS_Parameters.Mode.Navigation = DO_POSITION_HOLD;
+          AltitudeHold_For_Plane = GPS_Parameters.Navigation.Misc.Get.Altitude;
+          Set_Next_Point_To_Navigation(GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE], GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE]);
           DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
         }
         else
         {
-          GPS_Flight_Mode = GPS_MODE_NONE;
-          GPS_Navigation_Mode = DO_NONE;
+          GPS_Parameters.Mode.Flight = GPS_MODE_NONE;
+          GPS_Parameters.Mode.Navigation = DO_NONE;
           GPS_Reset_Navigation();
           DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
         }
@@ -214,8 +214,8 @@ void ProcessFlightModesToAirPlane()
   }
   else
   {
-    GPS_Flight_Mode = GPS_MODE_NONE;
-    GPS_Navigation_Mode = DO_NONE;
+    GPS_Parameters.Mode.Flight = GPS_MODE_NONE;
+    GPS_Parameters.Mode.Navigation = DO_NONE;
   }
 
   if (IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))

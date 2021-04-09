@@ -25,8 +25,6 @@
 #include "GPS/GPSSTATES.h"
 #include "Math/MATHSUPPORT.h"
 
-int16_t GPS_Angle[3];
-
 void GPS_Orientation_Update()
 {
   bool InGPSFlightMode = Get_GPS_Flight_Modes_And_Navigation_In_Use();
@@ -44,14 +42,14 @@ void GPS_Orientation_Update()
           float DeltaTime = GPSControlTimer.ActualTime * 1e-6f;
           ApplyPosHoldPIDControl(DeltaTime);
         }
-        GPS_Angle[ROLL] = ConvertDeciDegreesToDegrees(GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Cosine_Yaw - GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Sine_Yaw);
-        GPS_Angle[PITCH] = ConvertDeciDegreesToDegrees(GPS_Navigation_Array[COORD_LONGITUDE] * INS.Math.Sine_Yaw + GPS_Navigation_Array[COORD_LATITUDE] * INS.Math.Cosine_Yaw);
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL] = ConvertDeciDegreesToDegrees(GPS_Parameters.Navigation.AutoPilot.INS.Angle[COORD_LONGITUDE] * INS.Math.Cosine_Yaw - GPS_Parameters.Navigation.AutoPilot.INS.Angle[COORD_LATITUDE] * INS.Math.Sine_Yaw);
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] = ConvertDeciDegreesToDegrees(GPS_Parameters.Navigation.AutoPilot.INS.Angle[COORD_LONGITUDE] * INS.Math.Sine_Yaw + GPS_Parameters.Navigation.AutoPilot.INS.Angle[COORD_LATITUDE] * INS.Math.Cosine_Yaw);
       }
       else
       {
-        GPS_Angle[ROLL] = 0;
-        GPS_Angle[PITCH] = 0;
-        GPS_Angle[YAW] = 0;
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL] = 0;
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[YAW] = 0;
       }
     }
   }
@@ -63,9 +61,9 @@ void GPS_Orientation_Update()
     }
     else
     {
-      GPS_Angle[ROLL] = 0;
-      GPS_Angle[PITCH] = 0;
-      GPS_Angle[YAW] = 0;
+      GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL] = 0;
+      GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
+      GPS_Parameters.Navigation.AutoPilot.Control.Angle[YAW] = 0;
     }
   }
 }

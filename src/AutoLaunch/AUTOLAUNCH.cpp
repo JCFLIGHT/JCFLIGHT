@@ -30,6 +30,7 @@
 #include "GPS/GPSSTATES.h"
 #include "Param/PARAM.h"
 #include "I2C/I2C.h"
+#include "GPSNavigation/NAVIGATION.h"
 
 AutoLaunchClass AUTOLAUNCH;
 
@@ -74,12 +75,12 @@ const float GetYawRotationInRadians(void)
 bool AutoLaunchClass::GetSwingVelocityState(void)
 {
   const float SwingVelocity = (ABS(GetYawRotationInRadians()) > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / GetYawRotationInRadians()) : 0;
-  return (SwingVelocity > LAUNCH_VELOCITY_THRESH * 100) && (GetPitchAccelerationInMSS() > 0);
+  return (SwingVelocity > ConvertCMToMeters(LAUNCH_VELOCITY_THRESH)) && (GetPitchAccelerationInMSS() > 0);
 }
 
 bool AutoLaunchClass::GetForwardState(void)
 {
-  return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Ground_Speed > LAUNCH_VELOCITY_THRESH * 100);
+  return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Parameters.Navigation.Misc.Get.GroundSpeed > ConvertCMToMeters(LAUNCH_VELOCITY_THRESH));
 }
 
 void AutoLaunchClass::AutomaticDetector()

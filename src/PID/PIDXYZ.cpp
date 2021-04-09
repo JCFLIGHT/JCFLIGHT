@@ -36,7 +36,7 @@
 #include "TPA.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Build/BOARDDEFS.h"
-#include "GPS/GPSORIENTATION.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "FlightModes/FLIGHTMODES.h"
 #include "AHRS/AHRS.h"
 #include "AHRS/QUATERNION.h"
@@ -323,7 +323,7 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
     RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValueVector));
   }
 
-  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
+  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
 
 #ifdef __AVR_ATmega2560__
   float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -300, 300);
@@ -369,7 +369,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
     RcControllerAngle -= ConvertDegreesToDecidegrees(PitchLevelTrim);
   }
 
-  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
+  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
 
 #ifdef __AVR_ATmega2560__
   float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].ProportionalVector / 6.56f), -300, 300);

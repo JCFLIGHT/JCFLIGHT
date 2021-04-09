@@ -19,6 +19,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "GPSUBLOX.h"
 #include "Common/ENUM.h"
+#include "GPSNavigation/NAVIGATION.h"
 
 typedef struct
 {
@@ -105,7 +106,7 @@ typedef struct
   int16_t VelocityNED[3];
   int16_t GroundSpeed;
   int16_t GroundCourse;
-  uint16_t GPS_HDOP_State;
+  uint16_t HDOP_State;
 } Struct_SolutionData;
 
 Struct_SolutionData GPSSolutionData; //INSTANCIA
@@ -198,7 +199,7 @@ static void NazaGPS_Check_Valid_Data()
 
     //DECODE DO PDOP QUE AGORA VAI SER HDOP
     uint16_t Position_DOP = Decode16BitsValues(NazaGPS_Buffer_Read.NazaGPS_GPS_Data.Position_DOP, Data_Mask);
-    GPSSolutionData.GPS_HDOP_State = HDOPMaxError(Position_DOP);
+    GPSSolutionData.HDOP_State = HDOPMaxError(Position_DOP);
 
     //DECODE O NÚMERO DE SATELITES
     GPSSolutionData.GPS_NumSat = NazaGPS_Buffer_Read.NazaGPS_GPS_Data.Satellites;
@@ -209,7 +210,7 @@ static void NazaGPS_Check_Valid_Data()
     //CALCULA O GROUND COURSE DADO PELO GPS A PARTIR DAS VELOCIDADES NORTH & EASTH
     GPSSolutionData.GroundCourse = (uint16_t)(fmodf((Fast_Atan2(GPSSolutionData.VelocityNED[EAST], GPSSolutionData.VelocityNED[NORTH]) * 57.295779513082320876798154814105f) + 3600.0f, 3600.0f));
 
-    ValidNED = true;
+    GPS_Parameters.Navigation.Misc.Velocity.NEDStatus = true;
 
     //NOVAS INFORMAÇÕES
     GPS_New_Information = true;
@@ -316,17 +317,17 @@ void DjiNazaGpsNewFrame(uint8_t SerialReceiverBuffer)
     }
     NazaGPS_Check_Valid_Data();
   }
-  GPS_NumberOfSatellites = GPSSolutionData.GPS_NumSat;
-  GPS_HDOP = GPSSolutionData.GPS_HDOP_State;
+  GPS_Parameters.Navigation.Misc.Get.Satellites = GPSSolutionData.GPS_NumSat;
+  GPS_Parameters.Navigation.Misc.Get.HDOP = GPSSolutionData.HDOP_State;
   DJINaza_Compass_Roll = GPSSolutionData.GPS_Read_Compass[ROLL];
   DJINaza_Compass_Pitch = GPSSolutionData.GPS_Read_Compass[PITCH];
   DJINaza_Compass_Yaw = GPSSolutionData.GPS_Read_Compass[YAW];
-  GPS_Coordinates_Vector[COORD_LATITUDE] = GPSSolutionData.GPS_Location_Data.Latitude;
-  GPS_Coordinates_Vector[COORD_LONGITUDE] = GPSSolutionData.GPS_Location_Data.Longitude;
-  GPS_Altitude = (uint16_t)GPSSolutionData.GPS_Location_Data.Altitude;
-  GPS_Ground_Course = (uint16_t)GPSSolutionData.GroundCourse;
-  GPS_Ground_Speed = (uint16_t)GPSSolutionData.GroundSpeed;
-  GPSVelNED[NORTH] = GPSSolutionData.VelocityNED[NORTH];
-  GPSVelNED[EAST] = GPSSolutionData.VelocityNED[EAST];
-  GPSVelNED[DOWN] = GPSSolutionData.VelocityNED[DOWN];
+  GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE] = GPSSolutionData.GPS_Location_Data.Latitude;
+  GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE] = GPSSolutionData.GPS_Location_Data.Longitude;
+  GPS_Parameters.Navigation.Misc.Get.Altitude = (uint16_t)GPSSolutionData.GPS_Location_Data.Altitude;
+  GPS_Parameters.Navigation.Misc.Get.GroundCourse = (uint16_t)GPSSolutionData.GroundCourse;
+  GPS_Parameters.Navigation.Misc.Get.GroundSpeed = (uint16_t)GPSSolutionData.GroundSpeed;
+  GPS_Parameters.Navigation.Misc.Velocity.Get[NORTH] = GPSSolutionData.VelocityNED[NORTH];
+  GPS_Parameters.Navigation.Misc.Velocity.Get[EAST] = GPSSolutionData.VelocityNED[EAST];
+  GPS_Parameters.Navigation.Misc.Velocity.Get[DOWN] = GPSSolutionData.VelocityNED[DOWN];
 }

@@ -154,7 +154,7 @@ enum GPS_Modes_Enum
     GPS_MODE_RTH
 };
 
-enum GPS_Flight_Modes_Enum
+enum GPSFlightModes_Enum
 {
     DO_NONE = 0,
     DO_START_RTH,

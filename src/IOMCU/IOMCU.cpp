@@ -348,6 +348,8 @@ struct _Send_User_Medium_Parameters
     uint8_t SendPitchBankMax;
     uint8_t SendAttackBank;
     uint8_t SendGPSBank;
+    uint8_t SendIntegralLPF;
+    uint8_t SendkCDLPF;
 } Send_User_Medium_Parameters;
 
 struct _Get_User_Medium_Parameters
@@ -388,6 +390,8 @@ struct _Get_User_Medium_Parameters
     uint8_t GetPitchBankMax;
     uint8_t GetAttackBank;
     uint8_t GetGPSBank;
+    int16_t GetIntegralLPF;
+    int16_t GetkCDLPF;
 } Get_User_Medium_Parameters;
 
 struct _Send_WayPoint_Coordinates
@@ -1535,6 +1539,8 @@ void GCSClass::Save_Medium_Configuration()
     STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, Get_User_Medium_Parameters.GetPitchBankMax);
     STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, Get_User_Medium_Parameters.GetAttackBank);
     STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, Get_User_Medium_Parameters.GetGPSBank);
+    STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, Get_User_Medium_Parameters.GetIntegralLPF);
+    STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, Get_User_Medium_Parameters.GetkCDLPF);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1619,18 +1625,20 @@ void GCSClass::Default_RadioControl_Configuration()
 void GCSClass::Default_Medium_Configuration()
 {
     //LIMPA AS CONFIGURAÇÕES SALVAS
-    STORAGEMANAGER.Write_16Bits(BREAKPOINT_ADDR, 1500);   //VOLTA O BREAK-POINT AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_8Bits(TPA_PERCENT_ADDR, 0);      //VOLTA O DYNAMICPID AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_8Bits(GYRO_LPF_ADDR, 0);         //VOLTA O GYROLPF AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_16Bits(DERIVATIVE_LPF_ADDR, 40); //VOLTA O DERIVATIVELPF AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_16Bits(RC_LPF_ADDR, 50);         //VOLTA O RCSMOOTH AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_8Bits(KALMAN_ADDR, 0);           //VOLTA O KALMANSTATE AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_16Bits(BI_ACC_LPF_ADDR, 15);     //VOLTA O ACCLPF AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_16Bits(BI_GYRO_LPF_ADDR, 60);    //VOLTA O GYROLPF AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_16Bits(BI_ACC_NOTCH_ADDR, 0);    //VOLTA O ACCNOTCH AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_16Bits(BI_GYRO_NOTCH_ADDR, 0);   //VOLTA O GYRONOTCH AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_8Bits(MOTCOMP_STATE_ADDR, 0);    //VOLTA O COMPENSATION SPEED AO PADRÃO DE FABRICA
-    STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, 50);     //VOLTA O FILTRO LPF DOS SERVOS AO PADRÃO DE FABRICA
+    STORAGEMANAGER.Write_16Bits(BREAKPOINT_ADDR, 1500);
+    STORAGEMANAGER.Write_8Bits(TPA_PERCENT_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(GYRO_LPF_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(DERIVATIVE_LPF_ADDR, 40);
+    STORAGEMANAGER.Write_16Bits(RC_LPF_ADDR, 50);
+    STORAGEMANAGER.Write_8Bits(KALMAN_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(BI_ACC_LPF_ADDR, 15);
+    STORAGEMANAGER.Write_16Bits(BI_GYRO_LPF_ADDR, 60);
+    STORAGEMANAGER.Write_16Bits(BI_ACC_NOTCH_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(BI_GYRO_NOTCH_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(MOTCOMP_STATE_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, 50);
+    STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, 15);
+    STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, 30);
 
     if (GetFrameStateOfMultirotor())
     {
@@ -1827,4 +1835,6 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Medium_Parameters.SendPitchBankMax = STORAGEMANAGER.Read_8Bits(PITCH_BANK_MAX_ADDR);
     Send_User_Medium_Parameters.SendAttackBank = STORAGEMANAGER.Read_8Bits(ATTACK_BANK_ADDR);
     Send_User_Medium_Parameters.SendGPSBank = STORAGEMANAGER.Read_8Bits(GPS_BANK_ADDR);
+    Send_User_Medium_Parameters.SendIntegralLPF = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);
+    Send_User_Medium_Parameters.SendkCDLPF = STORAGEMANAGER.Read_16Bits(KCD_OR_FF_LPF_ADDR);
 }

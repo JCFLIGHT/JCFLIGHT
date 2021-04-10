@@ -31,6 +31,8 @@ public:
 
 private:
   int16_t Get_LPF_Derivative_Value = 0;
+  int16_t Get_LPF_Integral_Relax_Value = 0;
+  int16_t Get_LPF_Control_Derivative_Value = 0;
   int16_t CalcedRateTargetRoll;
   int16_t CalcedRateTargetPitch;
   int16_t CalcedRateTargetYaw;

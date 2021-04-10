@@ -620,16 +620,52 @@ typedef struct
 
   struct Found_Struct
   {
-    bool Junk = false; //SE TIRAR ESSA BOOL,A BOOL DO COMPASS (A PROXIMA) PASSA A NÃO FUNCIONAR,POR QUE ISSO ACONTECE???
+    bool Junk = false; //SE TIRAR ESSA BOOL,A BOOL DO COMPASS (A PROXIMA) PASSA A NÃO FUNCIONAR,POR QUE ISSO ACONTECE??GCC??
     bool Compass = false;
     bool Barometer = false;
   } Found;
 
-  struct ErrorStruct
+  struct Error_Struct
   {
     int16_t Count = 0;
   } Error;
 
 } I2C_Resources_Struct;
+
+typedef struct
+{
+  struct Filter_Struct
+  {
+    int16_t DerivativeCutOff = 0;
+    int16_t IntegralRelaxCutOff = 0;
+    int16_t ControlDerivativeCutOff = 0;
+  } Filter;
+
+  struct RcRateTarget_Struct
+  {
+    int16_t Roll = 0;
+    int16_t Pitch = 0;
+    int16_t Yaw = 0;
+
+    struct GCS_Struct
+    {
+      int16_t Roll = 0;
+      int16_t Pitch = 0;
+      int16_t Yaw = 0;
+    } GCS;
+
+  } RcRateTarget;
+
+  struct Controller_Struct
+  {
+
+    struct Output_Struct
+    {
+      int16_t Calced[3] = {0, 0, 0};
+    } Output;
+
+  } Controller;
+
+} PID_Resources_Struct;
 
 #endif

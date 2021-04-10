@@ -18,24 +18,16 @@
 #ifndef PIDXYZ_H_
 #define PIDXYZ_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/STRUCTS.h"
+extern PID_Resources_Struct PID_Resources;
 class PIDXYZClass
 {
 public:
-  int16_t CalcedRateTargetRollToGCS;
-  int16_t CalcedRateTargetPitchToGCS;
-  int16_t CalcedRateTargetYawToGCS;
-  int16_t PIDControllerApply[3];
   void Initialization();
   void Update(float DeltaTime);
   void Reset_Integral_Accumulators();
 
 private:
-  int16_t Get_LPF_Derivative_Value = 0;
-  int16_t Get_LPF_Integral_Relax_Value = 0;
-  int16_t Get_LPF_Control_Derivative_Value = 0;
-  int16_t CalcedRateTargetRoll;
-  int16_t CalcedRateTargetPitch;
-  int16_t CalcedRateTargetYaw;
   float ProportionalTermProcess(uint8_t kP, float RateError);
   float DerivativeTermProcessRoll(int16_t ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);
   float DerivativeTermProcessPitch(int16_t ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);

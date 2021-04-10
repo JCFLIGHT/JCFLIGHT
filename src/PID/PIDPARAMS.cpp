@@ -97,8 +97,8 @@ void LoadPID()
     GET_SET[PID_GPS_NAVIGATION_RATE].Derivative = 83;
 
     //HEADING-HOLD RATE
-    GET_SET[P_YAW_RATE].Proportional = 60;
-    GET_SET[P_YAW_RATE_LIMIT].MinMaxValue = 90;
+    //GET_SET[P_YAW_RATE].Proportional = 60;
+    //GET_SET[P_YAW_RATE_LIMIT].MinMaxValue = 90;
 }
 
 void UpdateValuesOfPID()

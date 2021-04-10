@@ -33,17 +33,17 @@ PreArmClass PREARM;
 
 #ifdef __AVR_ATmega2560__
 
-const char Message_0[] __attribute__((__progmem__)) = "Erro:Acelerometro ruim;";
-const char Message_1[] __attribute__((__progmem__)) = "Erro:Modo de voo ativo;";
-const char Message_2[] __attribute__((__progmem__)) = "Erro:GPS Glitch;";
-const char Message_3[] __attribute__((__progmem__)) = "Erro:Fail-Safe ativo;";
-const char Message_4[] __attribute__((__progmem__)) = "Erro:Giroscopio ruim;";
-const char Message_5[] __attribute__((__progmem__)) = "Erro:Controladora muito inclinada;";
-const char Message_6[] __attribute__((__progmem__)) = "Erro:O switch nao foi ativado para o modo safe;";
-const char Message_7[] __attribute__((__progmem__)) = "Erro:Bateria ruim;";
-const char Message_8[] __attribute__((__progmem__)) = "Nenhum erro,seguro para armar;";
-const char Message_9[] __attribute__((__progmem__)) = "Erro:Compass ruim;";
-const char Message_10[] __attribute__((__progmem__)) = "Erro:Barometro ruim;";
+const char Message_0[] FLASH_MEMORY_ATTRIBUTE = "Erro:Acelerometro ruim;";
+const char Message_1[] FLASH_MEMORY_ATTRIBUTE = "Erro:Modo de voo ativo;";
+const char Message_2[] FLASH_MEMORY_ATTRIBUTE = "Erro:GPS Glitch;";
+const char Message_3[] FLASH_MEMORY_ATTRIBUTE = "Erro:Fail-Safe ativo;";
+const char Message_4[] FLASH_MEMORY_ATTRIBUTE = "Erro:Giroscopio ruim;";
+const char Message_5[] FLASH_MEMORY_ATTRIBUTE = "Erro:Controladora muito inclinada;";
+const char Message_6[] FLASH_MEMORY_ATTRIBUTE = "Erro:O switch nao foi ativado para o modo safe;";
+const char Message_7[] FLASH_MEMORY_ATTRIBUTE = "Erro:Bateria ruim;";
+const char Message_8[] FLASH_MEMORY_ATTRIBUTE = "Nenhum erro,seguro para armar;";
+const char Message_9[] FLASH_MEMORY_ATTRIBUTE = "Erro:Compass ruim;";
+const char Message_10[] FLASH_MEMORY_ATTRIBUTE = "Erro:Barometro ruim;";
 
 #elif defined __arm__ || defined ESP32
 

@@ -16,6 +16,7 @@
 */
 
 #include "VERSION.h"
+#include "ProgMem/PROGMEM.h"
 
 #ifdef __AVR_ATmega2560__
 #define FC_FIRMWARE_NAME "JCFLIGHT-CLASSIC"
@@ -46,12 +47,12 @@
 #define SEPARATOR ";"
 
 #ifdef __AVR_ATmega2560__
-const char PlatformName[] __attribute__((__progmem__)) = "AVR" SEPARATOR;
-const char FirwareName[] __attribute__((__progmem__)) = FC_FIRMWARE_NAME SEPARATOR;
-const char FirmwareVersion[] __attribute__((__progmem__)) = FC_VERSION_STRING SEPARATOR;
-const char CompilerVersion[] __attribute__((__progmem__)) = __VERSION__ SEPARATOR;
-const char BuildDate[] __attribute__((__progmem__)) = __DATE__ SEPARATOR;
-const char BuildTime[] __attribute__((__progmem__)) = __TIME__ SEPARATOR;
+const char PlatformName[] FLASH_MEMORY_ATTRIBUTE = "AVR" SEPARATOR;
+const char FirwareName[] FLASH_MEMORY_ATTRIBUTE = FC_FIRMWARE_NAME SEPARATOR;
+const char FirmwareVersion[] FLASH_MEMORY_ATTRIBUTE = FC_VERSION_STRING SEPARATOR;
+const char CompilerVersion[] FLASH_MEMORY_ATTRIBUTE = __VERSION__ SEPARATOR;
+const char BuildDate[] FLASH_MEMORY_ATTRIBUTE = __DATE__ SEPARATOR;
+const char BuildTime[] FLASH_MEMORY_ATTRIBUTE = __TIME__ SEPARATOR;
 #elif defined __arm__ || defined ESP32
 #ifdef __arm__
 const char *const PlatformName = "STM32" SEPARATOR;

@@ -20,6 +20,8 @@
 
 #ifdef __AVR_ATmega2560__
 
+#define FLASH_MEMORY_ATTRIBUTE __attribute__((__progmem__))
+
 #define ProgMemReadByte(Address) (__extension__({   \
     uint16_t __Address16Bits = (uint16_t)(Address); \
     uint8_t __Result;                               \
@@ -75,6 +77,8 @@
 }))
 
 #elif defined __arm__ || defined ESP32
+
+#define FLASH_MEMORY_ATTRIBUTE
 
 #define ProgMemReadByte(Address) (*(const unsigned char *)(Address))
 

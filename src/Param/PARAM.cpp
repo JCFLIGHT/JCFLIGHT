@@ -44,7 +44,7 @@ ParamClass PARAM;
 //#define OPERATOR_CHECK_EEPROM
 //#define ERASE_ALL_EEPROM
 
-JCF_Param_Adjustable JCF_Param;
+JCF_Param_Adjustable_Struct JCF_Param;
 
 const Resources_Of_Param Params_Table[] = {
     //NOME                                 ENDEREÇO NA EEPROM                    TIPO                    VARIAVEL                                    MIN            MAX              VALOR PADRÃO

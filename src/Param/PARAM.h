@@ -19,7 +19,7 @@
 #define PARAM_H_
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
-extern JCF_Param_Adjustable JCF_Param;
+extern JCF_Param_Adjustable_Struct JCF_Param;
 class ParamClass
 {
 public:

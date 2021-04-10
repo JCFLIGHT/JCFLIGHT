@@ -36,6 +36,8 @@
 #include "THRCOMPENSATION.h"
 #include "PID/RCPID.h"
 #include "PID/PIDXYZ.h"
+#include "MIXTABLE.h"
+#include "ProgMem/PROGMEM.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -178,14 +180,18 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
     return;
   }
 
+  const uint8_t NumberOfMotors = ProgMemReadByte(&Motors_Count[FrameType].FrameMotorsCount);
+
   MixerThrottleCommand = RCController[THROTTLE];
   MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
 
 #ifndef __AVR_ATmega2560__
+
   if (STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR) > 0)
   {
     MixerThrottleCommand = MIN(AttitudeThrottleMin + (MixerThrottleCommand - AttitudeThrottleMin) * CalculateThrottleCompensationFactor(DeltaTime), AttitudeThrottleMax);
   }
+
 #endif
 
   //ATUALIZA O MIX DO PID
@@ -249,7 +255,9 @@ void PulseInAllMotors(int16_t Pulse)
 void ShutDownAllMotorsAndServos()
 {
   WATCHDOG.InShutDown = true;
+
 #ifdef __AVR_ATmega2560__
+
   OCR3A = 0;
   OCR3B = 0;
   OCR3C = 0;

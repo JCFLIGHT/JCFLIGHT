@@ -18,8 +18,8 @@
 #include "ESP32PWM.h"
 #include "Math/MATHSUPPORT.h"
 
-#define MIN_PULSE 205 //4095 / 20
-#define MAX_PULSE 410 //4095 / 10
+#define PWM_MIN_PULSE 205 //4095 / 20
+#define PWM_MAX_PULSE 410 //4095 / 10
 
 void AnalogWriteSetSettings(uint8_t Pin, double Frequency, uint8_t Resolution)
 {
@@ -97,42 +97,42 @@ void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
 #ifdef ESP32
   if (Pin == GPIO_NUM_25)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(12, Pulse);
   }
   else if (Pin == GPIO_NUM_26)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(1, Pulse);
   }
   else if (Pin == GPIO_NUM_27)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(2, Pulse);
   }
   else if (Pin == GPIO_NUM_14)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(3, Pulse);
   }
   else if (Pin == GPIO_NUM_12)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(4, Pulse);
   }
   else if (Pin == GPIO_NUM_13)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(5, Pulse);
   }
   else if (Pin == GPIO_NUM_23)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(6, Pulse);
   }
   else if (Pin == GPIO_NUM_19)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(7, Pulse);
   }
   else if (Pin == GPIO_NUM_4)
@@ -149,7 +149,7 @@ void AnalogWriteApplyPulse(uint8_t Pin, int16_t Pulse)
   }
   else if (Pin == GPIO_NUM_18)
   {
-    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, MIN_PULSE, MAX_PULSE);
+    Pulse = ScaleRange16Bits(Pulse, 1000, 2000, PWM_MIN_PULSE, PWM_MAX_PULSE);
     ledcWrite(11, Pulse);
   }
   else if (Pin == GPIO_NUM_5)

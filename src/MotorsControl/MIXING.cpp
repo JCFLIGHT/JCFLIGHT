@@ -23,8 +23,6 @@
 #include "PID/PIDXYZ.h"
 #include "MotorsControl/MOTORS.h"
 
-uint8_t NumberOfMotors = 4;
-
 void Mixing_Update()
 {
     switch (FrameType)
@@ -48,8 +46,6 @@ void Mixing_Update()
         MotorControl[MOTOR4] = PID_Resources.Controller.Output.Calced[ROLL] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Roll) +
                                PID_Resources.Controller.Output.Calced[PITCH] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Pitch) +
                                1 * PID_Resources.Controller.Output.Calced[YAW] * ProgMemReadFloat(&Pid_Mixer_Quad_X[3].Yaw);
-
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[QUAD_X].FrameMotorsCount);
         return;
     }
 
@@ -79,8 +75,6 @@ void Mixing_Update()
         MotorControl[MOTOR6] = PID_Resources.Controller.Output.Calced[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Roll) +
                                PID_Resources.Controller.Output.Calced[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Pitch) +
                                1 * PID_Resources.Controller.Output.Calced[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_X[5].Yaw);
-
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[HEXA_X].FrameMotorsCount);
         return;
     }
 
@@ -110,8 +104,6 @@ void Mixing_Update()
         MotorControl[MOTOR6] = PID_Resources.Controller.Output.Calced[ROLL] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Roll) +
                                PID_Resources.Controller.Output.Calced[PITCH] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Pitch) +
                                1 * PID_Resources.Controller.Output.Calced[YAW] * ProgMemReadFloat(&Pid_Mixer_Hexa_I[5].Yaw);
-
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[HEXA_I].FrameMotorsCount);
         return;
     }
 
@@ -119,7 +111,6 @@ void Mixing_Update()
     {
         //AEROMODELO
         MotorControl[MOTOR6] = 1000;
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[AIR_PLANE].FrameMotorsCount);
         return;
     }
 
@@ -129,7 +120,6 @@ void Mixing_Update()
         MotorControl[MOTOR4] = 1000;
         MotorControl[MOTOR5] = 1000;
         MotorControl[MOTOR6] = 1000;
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[FIXED_WING].FrameMotorsCount);
         return;
     }
 
@@ -137,7 +127,6 @@ void Mixing_Update()
     {
         //AERO TIPO V-TAIL
         MotorControl[MOTOR6] = 1000;
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[PLANE_VTAIL].FrameMotorsCount);
         return;
     }
 
@@ -159,8 +148,6 @@ void Mixing_Update()
         MotorControl[MOTOR4] = PID_Resources.Controller.Output.Calced[ROLL] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Roll) +
                                PID_Resources.Controller.Output.Calced[PITCH] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Pitch) +
                                1 * PID_Resources.Controller.Output.Calced[YAW] * ProgMemReadFloat(&Pid_Mixer_ZMR250[3].Yaw);
-
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[ZMR_250].FrameMotorsCount);
         return;
     }
 
@@ -182,8 +169,6 @@ void Mixing_Update()
         MotorControl[MOTOR4] = PID_Resources.Controller.Output.Calced[ROLL] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Roll) +
                                PID_Resources.Controller.Output.Calced[PITCH] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Pitch) +
                                1 * PID_Resources.Controller.Output.Calced[YAW] * ProgMemReadFloat(&Pid_Mixer_TBS[3].Yaw);
-
-        NumberOfMotors = ProgMemReadByte(&Motors_Count[TBS].FrameMotorsCount);
         return;
     }
     }

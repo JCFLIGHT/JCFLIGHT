@@ -306,8 +306,8 @@ typedef struct
 {
   float kP_Accelerometer = 0.25f;
   float kI_Accelerometer = 0.0050f;
-  float kP_Magnetometer = 1;
-  float kI_Magnetometer = 0;
+  float kP_Magnetometer = 1.0f;
+  float kI_Magnetometer = 0.0f;
 } AHRS_Configuration_Struct;
 
 typedef struct
@@ -374,7 +374,6 @@ typedef struct
   float kP;
   float kI;
   float kD;
-  float kFF;
 
   struct GPS_Struct
   {
@@ -393,7 +392,7 @@ typedef struct
   uint32_t StoredTime;
 } Scheduler_Struct;
 
-typedef struct PT1Filter
+typedef struct
 {
   float State;
   float RC;
@@ -559,7 +558,7 @@ typedef struct
   const float DefaultValue;
 } Resources_Of_Param;
 
-typedef struct JCF_Param_Adjustable
+typedef struct
 {
 #ifndef __AVR_ATmega2560__
   uint8_t kP_Acc_AHRS;
@@ -611,7 +610,7 @@ typedef struct JCF_Param_Adjustable
   uint8_t Disarm_Time_Safety;
   uint8_t Compass_Cal_Timer;
 #endif
-} Struct_JCF_Param_Adjustable;
+} JCF_Param_Adjustable;
 
 typedef struct
 {

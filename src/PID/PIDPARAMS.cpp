@@ -29,75 +29,75 @@ void LoadPID()
     if (GetFrameStateOfMultirotor()) //MULTIROTORES
     {
         //PID ROLL
-        GET_SET[PID_ROLL].Proportional = 40;
-        GET_SET[PID_ROLL].Integral = 30;
-        GET_SET[PID_ROLL].Derivative = 23;
-        GET_SET[PID_ROLL].FeedForward = 60;
+        GET_SET[PID_ROLL].kP = 40;
+        GET_SET[PID_ROLL].kI = 30;
+        GET_SET[PID_ROLL].kD = 23;
+        GET_SET[PID_ROLL].kFF = 60;
 
         //PID PITCH
-        GET_SET[PID_PITCH].Proportional = 40;
-        GET_SET[PID_PITCH].Integral = 30;
-        GET_SET[PID_PITCH].Derivative = 23;
-        GET_SET[PID_PITCH].FeedForward = 60;
+        GET_SET[PID_PITCH].kP = 40;
+        GET_SET[PID_PITCH].kI = 30;
+        GET_SET[PID_PITCH].kD = 23;
+        GET_SET[PID_PITCH].kFF = 60;
 
         //PID YAW
-        GET_SET[PID_YAW].Proportional = 85;
-        GET_SET[PID_YAW].Integral = 45;
-        GET_SET[PID_YAW].Derivative = 0;
-        GET_SET[PID_YAW].FeedForward = 60;
+        GET_SET[PID_YAW].kP = 85;
+        GET_SET[PID_YAW].kI = 45;
+        GET_SET[PID_YAW].kD = 0;
+        GET_SET[PID_YAW].kFF = 60;
 
         //PI DO MODO AUTO-NIVEL
-        GET_SET[PI_AUTO_LEVEL].Proportional = 20;
-        GET_SET[PI_AUTO_LEVEL].Integral = 15;
+        GET_SET[PI_AUTO_LEVEL].kP = 20;
+        GET_SET[PI_AUTO_LEVEL].kI = 15;
     }
     else if (GetFrameStateOfAirPlane()) //AEROS
     {
         //PID ROLL
-        GET_SET[PID_ROLL].Proportional = 5;
-        GET_SET[PID_ROLL].Integral = 7;
-        GET_SET[PID_ROLL].Derivative = 0;
-        GET_SET[PID_ROLL].FeedForward = 50;
+        GET_SET[PID_ROLL].kP = 5;
+        GET_SET[PID_ROLL].kI = 7;
+        GET_SET[PID_ROLL].kD = 0;
+        GET_SET[PID_ROLL].kFF = 50;
 
         //PID PITCH
-        GET_SET[PID_PITCH].Proportional = 5;
-        GET_SET[PID_PITCH].Integral = 7;
-        GET_SET[PID_PITCH].Derivative = 0;
-        GET_SET[PID_PITCH].FeedForward = 50;
+        GET_SET[PID_PITCH].kP = 5;
+        GET_SET[PID_PITCH].kI = 7;
+        GET_SET[PID_PITCH].kD = 0;
+        GET_SET[PID_PITCH].kFF = 50;
 
         //PID YAW
-        GET_SET[PID_YAW].Proportional = 6;
-        GET_SET[PID_YAW].Integral = 10;
-        GET_SET[PID_YAW].Derivative = 0;
-        GET_SET[PID_YAW].FeedForward = 60;
+        GET_SET[PID_YAW].kP = 6;
+        GET_SET[PID_YAW].kI = 10;
+        GET_SET[PID_YAW].kD = 0;
+        GET_SET[PID_YAW].kFF = 60;
 
         //PID DO MODO AUTO-NIVEL
-        GET_SET[PI_AUTO_LEVEL].Proportional = 20;
-        GET_SET[PI_AUTO_LEVEL].Integral = 5;
+        GET_SET[PI_AUTO_LEVEL].kP = 20;
+        GET_SET[PI_AUTO_LEVEL].kI = 5;
     }
 */
 
     //PID PARA A RETENÇÃO DE ALTITUDE (ALTITUDE-HOLD)
-    //GET_SET[PID_ALTITUDE].Proportional = 50;
-    GET_SET[PID_ALTITUDE].Integral = 20;
-    GET_SET[PID_ALTITUDE].Derivative = 16;
+    //GET_SET[PID_ALTITUDE].kP = 50;
+    GET_SET[PID_ALTITUDE].kI = 20;
+    GET_SET[PID_ALTITUDE].kD = 16;
 
     //PID DA RETENÇÃO DE POSIÇÃO (GPS-HOLD)
-    //GET_SET[PID_GPS_POSITION].Proportional = 100;
-    //GET_SET[PID_GPS_POSITION].Integral = 90;
-    //GET_SET[PID_GPS_POSITION].Derivative = 0;
+    //GET_SET[PID_GPS_POSITION].kP = 100;
+    //GET_SET[PID_GPS_POSITION].kI = 90;
+    //GET_SET[PID_GPS_POSITION].kD = 0;
 
     //RATE DO PID DA RETENÇÃO DE POSIÇÃO (GPS-HOLD)
-    GET_SET[PID_GPS_POSITION_RATE].Proportional = 70;
-    GET_SET[PID_GPS_POSITION_RATE].Integral = 20;
-    GET_SET[PID_GPS_POSITION_RATE].Derivative = 20;
+    GET_SET[PID_GPS_POSITION_RATE].kP = 70;
+    GET_SET[PID_GPS_POSITION_RATE].kI = 20;
+    GET_SET[PID_GPS_POSITION_RATE].kD = 20;
 
     //RATE DE NAVEGAÇÃO (RTH E MISSÃO)
-    GET_SET[PID_GPS_NAVIGATION_RATE].Proportional = 25;
-    GET_SET[PID_GPS_NAVIGATION_RATE].Integral = 33;
-    GET_SET[PID_GPS_NAVIGATION_RATE].Derivative = 83;
+    GET_SET[PID_GPS_NAVIGATION_RATE].kP = 25;
+    GET_SET[PID_GPS_NAVIGATION_RATE].kI = 33;
+    GET_SET[PID_GPS_NAVIGATION_RATE].kD = 83;
 
     //HEADING-HOLD RATE
-    //GET_SET[P_YAW_RATE].Proportional = 60;
+    //GET_SET[P_YAW_RATE].kP = 60;
     //GET_SET[P_YAW_RATE_LIMIT].MinMaxValue = 90;
 }
 
@@ -212,30 +212,30 @@ void UpdateValuesOfPID()
         PreviousFrameType = ActualFrameType;
     }
 
-    GET_SET[PID_ROLL].Proportional = STORAGEMANAGER.Read_8Bits(KP_ROLL_ADDR);
-    GET_SET[PID_ROLL].Integral = STORAGEMANAGER.Read_8Bits(KI_ROLL_ADDR);
-    GET_SET[PID_ROLL].Derivative = STORAGEMANAGER.Read_8Bits(KD_ROLL_ADDR);
-    GET_SET[PID_ROLL].FeedForward = STORAGEMANAGER.Read_8Bits(FF_OR_CD_ROLL_ADDR);
+    GET_SET[PID_ROLL].kP = STORAGEMANAGER.Read_8Bits(KP_ROLL_ADDR);
+    GET_SET[PID_ROLL].kI = STORAGEMANAGER.Read_8Bits(KI_ROLL_ADDR);
+    GET_SET[PID_ROLL].kD = STORAGEMANAGER.Read_8Bits(KD_ROLL_ADDR);
+    GET_SET[PID_ROLL].kFF = STORAGEMANAGER.Read_8Bits(FF_OR_CD_ROLL_ADDR);
 
-    GET_SET[PID_PITCH].Proportional = STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR);
-    GET_SET[PID_PITCH].Integral = STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR);
-    GET_SET[PID_PITCH].Derivative = STORAGEMANAGER.Read_8Bits(KD_PITCH_ADDR);
-    GET_SET[PID_PITCH].FeedForward = STORAGEMANAGER.Read_8Bits(FF_OR_CD_PITCH_ADDR);
+    GET_SET[PID_PITCH].kP = STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR);
+    GET_SET[PID_PITCH].kI = STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR);
+    GET_SET[PID_PITCH].kD = STORAGEMANAGER.Read_8Bits(KD_PITCH_ADDR);
+    GET_SET[PID_PITCH].kFF = STORAGEMANAGER.Read_8Bits(FF_OR_CD_PITCH_ADDR);
 
-    GET_SET[PID_YAW].Proportional = STORAGEMANAGER.Read_8Bits(KP_YAW_ADDR);
-    GET_SET[PID_YAW].Integral = STORAGEMANAGER.Read_8Bits(KI_YAW_ADDR);
-    GET_SET[PID_YAW].Derivative = STORAGEMANAGER.Read_8Bits(KD_YAW_ADDR);
-    GET_SET[PID_YAW].FeedForward = STORAGEMANAGER.Read_8Bits(FF_OR_CD_YAW_ADDR);
+    GET_SET[PID_YAW].kP = STORAGEMANAGER.Read_8Bits(KP_YAW_ADDR);
+    GET_SET[PID_YAW].kI = STORAGEMANAGER.Read_8Bits(KI_YAW_ADDR);
+    GET_SET[PID_YAW].kD = STORAGEMANAGER.Read_8Bits(KD_YAW_ADDR);
+    GET_SET[PID_YAW].kFF = STORAGEMANAGER.Read_8Bits(FF_OR_CD_YAW_ADDR);
 
-    GET_SET[PI_AUTO_LEVEL].Proportional = STORAGEMANAGER.Read_8Bits(KP_AUTOLEVEL_ADDR);
-    GET_SET[PI_AUTO_LEVEL].Integral = STORAGEMANAGER.Read_8Bits(KI_AUTOLEVEL_ADDR);
+    GET_SET[PI_AUTO_LEVEL].kP = STORAGEMANAGER.Read_8Bits(KP_AUTOLEVEL_ADDR);
+    GET_SET[PI_AUTO_LEVEL].kI = STORAGEMANAGER.Read_8Bits(KI_AUTOLEVEL_ADDR);
 
-    GET_SET[PID_ALTITUDE].Proportional = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
+    GET_SET[PID_ALTITUDE].kP = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
 
-    GET_SET[PID_GPS_POSITION].Proportional = STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR);
-    GET_SET[PID_GPS_POSITION].Integral = STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR);
+    GET_SET[PID_GPS_POSITION].kP = STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR);
+    GET_SET[PID_GPS_POSITION].kI = STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR);
 
-    GET_SET[P_YAW_RATE].Proportional = STORAGEMANAGER.Read_8Bits(KP_HEADING_HOLD_ADDR);
+    GET_SET[P_YAW_RATE].kP = STORAGEMANAGER.Read_8Bits(KP_HEADING_HOLD_ADDR);
     GET_SET[P_YAW_RATE_LIMIT].MinMaxValue = STORAGEMANAGER.Read_8Bits(HEADING_HOLD_RATE_LIMIT_ADDR);
 
     GET_SET[ROLL_BANK_MAX].MinMaxValue = STORAGEMANAGER.Read_8Bits(ROLL_BANK_ADDR);

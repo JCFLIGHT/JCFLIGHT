@@ -19,15 +19,15 @@
 #define GPSPID_H_
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
-extern PID_PARAM PositionHoldPID;
-extern PID_PARAM PositionHoldRatePID;
-extern PID_PARAM NavigationPID;
-extern GPS_PID PositionHoldPIDArray[2];
-extern GPS_PID PositionHoldRatePIDArray[2];
-extern GPS_PID NavigationPIDArray[2];
-int32_t GPSGetProportional(int32_t Error, struct _PID_PARAM *PID);
-int32_t GPSGetIntegral(int32_t Error, float DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);
-int32_t GPSGetDerivative(int32_t Input, float DeltaTime, struct _GPS_PID *PID, struct _PID_PARAM *GPS_PID_Param);
-void GPSResetPID(struct _GPS_PID *PID);
+extern PID_Terms_Float_Struct PositionHoldPID;
+extern PID_Terms_Float_Struct PositionHoldRatePID;
+extern PID_Terms_Float_Struct NavigationPID;
+extern PID_Terms_Float_Struct PositionHoldPIDArray[2];
+extern PID_Terms_Float_Struct PositionHoldRatePIDArray[2];
+extern PID_Terms_Float_Struct NavigationPIDArray[2];
+int32_t GPSGetProportional(int32_t Error, PID_Terms_Float_Struct *PID);
+int32_t GPSGetIntegral(int32_t Error, float DeltaTime, PID_Terms_Float_Struct *PID, PID_Terms_Float_Struct *GPS_PID_Param);
+int32_t GPSGetDerivative(int32_t Input, float DeltaTime, PID_Terms_Float_Struct *PID, PID_Terms_Float_Struct *GPS_PID_Param);
+void GPSResetPID(PID_Terms_Float_Struct *PID);
 void ResetAllGPSPID(void);
 #endif

@@ -173,16 +173,6 @@ typedef struct
 
 } Calibration_Struct;
 
-struct PID_Terms_Struct
-{
-  bool State;
-  uint8_t Proportional;
-  uint8_t Integral;
-  uint8_t Derivative;
-  uint8_t FeedForward;
-  uint8_t MinMaxValue;
-};
-
 typedef struct
 {
   bool UpdateRequired = false;
@@ -369,21 +359,33 @@ typedef union
   };
 } Struct_Vector3x3;
 
-typedef struct _PID_PARAM
+typedef struct
+{
+  bool State;
+  uint8_t kP;
+  uint8_t kI;
+  uint8_t kD;
+  uint8_t kFF;
+  uint8_t MinMaxValue;
+} PID_Terms_Struct;
+
+typedef struct
 {
   float kP;
   float kI;
   float kD;
-  float IntegralMax;
-} PID_PARAM;
+  float kFF;
 
-typedef struct _GPS_PID
-{
-  float Integral;
-  float Last_Derivative;
-  float Derivative;
-  int32_t Last_Input;
-} GPS_PID;
+  struct GPS_Struct
+  {
+    float IntegralSum;
+    float IntegralMax;
+    float LastDerivative;
+    float DerivativeCalced;
+    int32_t LastInput;
+  } GPS;
+
+} PID_Terms_Float_Struct;
 
 typedef struct
 {

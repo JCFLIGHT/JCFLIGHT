@@ -60,8 +60,8 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
     {
         int16_t CalculateError = PreviousValueOfAirSpeed - ConvertCentimeterPerSecondsToKmPerHour(AirSpeed.Raw.IASPressureInCM);
 
-        int16_t CalculateProportional = (CalculateError * GET_SET[PID_ALTITUDE].Proportional >> 3);
-        CalculateIntegral += (CalculateError * GET_SET[PID_ALTITUDE].Integral >> 5);
+        int16_t CalculateProportional = (CalculateError * GET_SET[PID_ALTITUDE].kP >> 3);
+        CalculateIntegral += (CalculateError * GET_SET[PID_ALTITUDE].kI >> 5);
         CalculateIntegral = Constrain_16Bits(CalculateIntegral, -24000, 24000);
         RCController[THROTTLE] = Constrain_16Bits(RCController[THROTTLE] + CalculateProportional + (CalculateIntegral >> 7), 1100, 1900);
 
@@ -70,7 +70,7 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
         //FUTURAMENTE NÃO UTILIZAR MAIS KP E O KI DO AJUSTE DE ALTITUDE PARA SETAR VALORES,
         //E SIM USAR O KI E O KD PARA SETAR O KP E KI.DESSA FORMA O KP DO AJUSTE DE ALTITUDE
         //FICARÁ POR CONTA APENAS DO AJUSTE DO ALTITUDE-HOLD
-        AutoThrottlePI.Set_kP(GET_SET[PID_ALTITUDE].Proportional);
+        AutoThrottlePI.Set_kP(GET_SET[PID_ALTITUDE].kP);
         AutoThrottlePI.Set_kI(GET_SET[PID_ALTITUDE].Integral);
         AutoThrottlePI.Set_kP_Scale(8);
         AutoThrottlePI.Set_kI_Scale(32);

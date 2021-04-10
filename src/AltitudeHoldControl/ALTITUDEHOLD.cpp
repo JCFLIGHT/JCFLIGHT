@@ -199,12 +199,12 @@ void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   TargetVariometer = Constrain_32Bits(TargetVariometer, -350, 350);
   int32_t VariometerError = TargetVariometer - Barometer.INS.Velocity.Vertical;
   VariometerError = Constrain_32Bits(VariometerError, -600, 600);
-  VariometerErrorISum += ((VariometerError * GET_SET[PID_ALTITUDE].Integral * DeltaTime) >> 7) / ((HoveringState && ABS(TargetVariometer) < 100) ? 2 : 1);
+  VariometerErrorISum += ((VariometerError * GET_SET[PID_ALTITUDE].kI * DeltaTime) >> 7) / ((HoveringState && ABS(TargetVariometer) < 100) ? 2 : 1);
   VariometerErrorISum = Constrain_32Bits(VariometerErrorISum, -16384000, 16384000);
   VariometerErrorIPart = (VariometerErrorISum >> 16);
   VariometerErrorIPart = Constrain_16Bits(VariometerErrorIPart, -250, 250);
-  int16_t VarioPIDControl = ((VariometerError * GET_SET[PID_ALTITUDE].Proportional) >> 5) + VariometerErrorIPart -
-                            (((int32_t)INS.AccelerationEarthFrame_Filtered[2] * GET_SET[PID_ALTITUDE].Derivative) >> 6);
+  int16_t VarioPIDControl = ((VariometerError * GET_SET[PID_ALTITUDE].kP) >> 5) + VariometerErrorIPart -
+                            (((int32_t)INS.AccelerationEarthFrame_Filtered[2] * GET_SET[PID_ALTITUDE].kD) >> 6);
 
   if (GetFrameStateOfMultirotor())
   {

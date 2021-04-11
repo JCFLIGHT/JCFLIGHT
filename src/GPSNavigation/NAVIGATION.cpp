@@ -111,7 +111,7 @@ static void GPS_Calcule_Velocity(void)
     {
       DeltaTimeStored = GPS_Parameters.DeltaTime.Navigation;
     }
-    DeltaTimeStored = 1.0 / DeltaTimeStored;
+    DeltaTimeStored = 1.0f / DeltaTimeStored;
     GPS_Parameters.Navigation.Speed[COORD_LATITUDE] = (float)(GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE] - Last_CoordinatesOfGPS[COORD_LATITUDE]) * DeltaTimeStored;
     GPS_Parameters.Navigation.Speed[COORD_LONGITUDE] = (float)(GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE] - Last_CoordinatesOfGPS[COORD_LONGITUDE]) * GPS_Parameters.ScaleDownOfLongitude * DeltaTimeStored;
     GPS_Parameters.Navigation.Speed[COORD_LATITUDE] = (GPS_Parameters.Navigation.Speed[COORD_LATITUDE] + Previous_Velocity[COORD_LATITUDE]) / 2;
@@ -122,6 +122,14 @@ static void GPS_Calcule_Velocity(void)
   IgnoreFirstPeak = true;
   Last_CoordinatesOfGPS[COORD_LATITUDE] = GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE];
   Last_CoordinatesOfGPS[COORD_LONGITUDE] = GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE];
+}
+
+bool Point_Reached(void)
+{
+  int32_t TargetCalculed;
+  TargetCalculed = GPS_Parameters.Navigation.Bearing.ActualTarget - GPS_Parameters.Navigation.Bearing.TargetPrev;
+  TargetCalculed = WRap_18000(TargetCalculed);
+  return (ABS(TargetCalculed) > 10000);
 }
 
 void GPS_Process_FlightModes(float DeltaTime)
@@ -152,10 +160,10 @@ void GPS_Process_FlightModes(float DeltaTime)
   }
   //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
   if (AUTODECLINATION.GetDeclination() != STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) && //VERIFICA SE O VALOR É DIFERENTE
-      !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&                                            //CHECA SE ESTÁ DESARMADO
-      AUTODECLINATION.GetDeclination() != 0 &&                                           //CHECA SE O VALOR É DIFERENTE DE ZERO
-      !GPS_Parameters.Declination.Pushed &&                                              //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
-      GPS_Parameters.Declination.PushedCount > 250)                                      //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
+      !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&                                                //CHECA SE ESTÁ DESARMADO
+      AUTODECLINATION.GetDeclination() != 0 &&                                               //CHECA SE O VALOR É DIFERENTE DE ZERO
+      !GPS_Parameters.Declination.Pushed &&                                                  //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
+      GPS_Parameters.Declination.PushedCount > 250)                                          //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
   {
     STORAGEMANAGER.Write_Float(MAG_DECLINATION_ADDR, AUTODECLINATION.GetDeclination());
     GPS_Parameters.Declination.Pushed = true;
@@ -280,7 +288,7 @@ void Do_Mode_RTH_Now()
 
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput)
 {
-  GPS_Parameters.ScaleDownOfLongitude = Fast_Cosine(ConvertToRadians((ConvertCoordinateToFloatingPoint(LatitudeVectorInput))));
+  GPS_Parameters.ScaleDownOfLongitude = Constrain_Float(Fast_Cosine(ConvertToRadians((ConvertCoordinateToFloatingPoint(LatitudeVectorInput)))), 0.01f, 1.0f);
 }
 
 void Set_Next_Point_To_Navigation(int32_t Latitude_Destiny, int32_t Longitude_Destiny)
@@ -296,14 +304,6 @@ void Set_Next_Point_To_Navigation(int32_t Latitude_Destiny, int32_t Longitude_De
   GPS_Parameters.Navigation.Bearing.TargetPrev = GPS_Parameters.Navigation.Bearing.ActualTarget;
 }
 
-bool Point_Reached(void)
-{
-  int32_t TargetCalculed;
-  TargetCalculed = GPS_Parameters.Navigation.Bearing.ActualTarget - GPS_Parameters.Navigation.Bearing.TargetPrev;
-  TargetCalculed = WRap_18000(TargetCalculed);
-  return (ABS(TargetCalculed) > 10000);
-}
-
 void SetThisPointToPositionHold()
 {
   INS.Position.Hold[COORD_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + INS.EarthFrame.Velocity[INS_LATITUDE] * PositionHoldPID.kI;
@@ -312,18 +312,18 @@ void SetThisPointToPositionHold()
 
 static void ApplyINSPositionHoldPIDControl(float DeltaTime)
 {
-  uint8_t axis;
-  for (axis = 0; axis < 2; axis++)
+  uint8_t IndexCount;
+  for (IndexCount = 0; IndexCount < 2; IndexCount++)
   {
-    int32_t INSPositionError = INS.Position.Hold[axis] - INS.EarthFrame.Position[axis];
+    int32_t INSPositionError = INS.Position.Hold[IndexCount] - INS.EarthFrame.Position[IndexCount];
     int32_t GPSTargetSpeed = GPSGetProportional(INSPositionError, &PositionHoldPID);
     GPSTargetSpeed = Constrain_32Bits(GPSTargetSpeed, -1000, 1000);
-    int32_t RateError = GPSTargetSpeed - INS.EarthFrame.Velocity[axis];
+    int32_t RateError = GPSTargetSpeed - INS.EarthFrame.Velocity[IndexCount];
     RateError = Constrain_32Bits(RateError, -1000, 1000);
-    GPS_Parameters.Navigation.AutoPilot.INS.Angle[axis] = GPSGetProportional(RateError, &PositionHoldRatePID) + GPSGetIntegral(RateError, DeltaTime, &PositionHoldRatePIDArray[axis], &PositionHoldRatePID);
-    GPS_Parameters.Navigation.AutoPilot.INS.Angle[axis] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[axis] * PositionHoldRatePID.kD), -2000, 2000);
-    GPS_Parameters.Navigation.AutoPilot.INS.Angle[axis] = Constrain_16Bits(GPS_Parameters.Navigation.AutoPilot.INS.Angle[axis], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue));
-    NavigationPIDArray[axis].GPS.IntegralSum = PositionHoldRatePIDArray[axis].GPS.IntegralSum;
+    GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] = GPSGetProportional(RateError, &PositionHoldRatePID) + GPSGetIntegral(RateError, DeltaTime, &PositionHoldRatePIDArray[IndexCount], &PositionHoldRatePID);
+    GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[IndexCount] * PositionHoldRatePID.kD), -2000, 2000);
+    GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue));
+    NavigationPIDArray[IndexCount].GPS.IntegralSum = PositionHoldRatePIDArray[IndexCount].GPS.IntegralSum;
   }
 }
 
@@ -357,7 +357,7 @@ int16_t GPS_Update_CrossTrackError(void)
 
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
 {
-  uint8_t axis;
+  uint8_t IndexCount;
   float Trigonometry[2];
   float NavCompensation;
   int32_t Target_Speed[2];
@@ -369,18 +369,18 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
   Trigonometry[COORD_LONGITUDE] = Fast_Cosine(TargetCalculed);
   Target_Speed[COORD_LATITUDE] = Cross_Speed * Trigonometry[COORD_LONGITUDE] + Maximum_Velocity * Trigonometry[COORD_LATITUDE];
   Target_Speed[COORD_LONGITUDE] = Maximum_Velocity * Trigonometry[COORD_LONGITUDE] - Cross_Speed * Trigonometry[COORD_LATITUDE];
-  for (axis = 0; axis < 2; axis++)
+  for (IndexCount = 0; IndexCount < 2; IndexCount++)
   {
-    GPS_Parameters.Navigation.RateError[axis] = Target_Speed[axis] - GPS_Parameters.Navigation.Speed[axis];
-    GPS_Parameters.Navigation.RateError[axis] = Constrain_16Bits(GPS_Parameters.Navigation.RateError[axis], -1000, 1000);
-    GPS_Parameters.Navigation.AutoPilot.INS.Angle[axis] = GPSGetProportional(GPS_Parameters.Navigation.RateError[axis], &NavigationPID) +
-                                                          GPSGetIntegral(GPS_Parameters.Navigation.RateError[axis], GPS_Parameters.DeltaTime.Navigation, &NavigationPIDArray[axis], &NavigationPID) +
-                                                          GPSGetDerivative(GPS_Parameters.Navigation.RateError[axis], GPS_Parameters.DeltaTime.Navigation, &NavigationPIDArray[axis], &NavigationPID);
+    GPS_Parameters.Navigation.RateError[IndexCount] = Target_Speed[IndexCount] - GPS_Parameters.Navigation.Speed[IndexCount];
+    GPS_Parameters.Navigation.RateError[IndexCount] = Constrain_16Bits(GPS_Parameters.Navigation.RateError[IndexCount], -1000, 1000);
+    GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] = GPSGetProportional(GPS_Parameters.Navigation.RateError[IndexCount], &NavigationPID) +
+                                                                GPSGetIntegral(GPS_Parameters.Navigation.RateError[IndexCount], GPS_Parameters.DeltaTime.Navigation, &NavigationPIDArray[IndexCount], &NavigationPID) +
+                                                                GPSGetDerivative(GPS_Parameters.Navigation.RateError[IndexCount], GPS_Parameters.DeltaTime.Navigation, &NavigationPIDArray[IndexCount], &NavigationPID);
 
     if (NAVTILTCOMPENSATION != 0)
     {
-      NavCompensation = Target_Speed[axis] * Target_Speed[axis] * ((float)NAVTILTCOMPENSATION * 0.0001f);
-      if (Target_Speed[axis] < 0)
+      NavCompensation = Target_Speed[IndexCount] * Target_Speed[IndexCount] * ((float)NAVTILTCOMPENSATION * 0.0001f);
+      if (Target_Speed[IndexCount] < 0)
       {
         NavCompensation = -NavCompensation;
       }
@@ -389,8 +389,8 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
     {
       NavCompensation = 0;
     }
-    GPS_Parameters.Navigation.AutoPilot.INS.Angle[axis] = Constrain_16Bits(GPS_Parameters.Navigation.AutoPilot.INS.Angle[axis] + NavCompensation, -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue));
-    PositionHoldRatePIDArray[axis].GPS.IntegralSum = NavigationPIDArray[axis].GPS.IntegralSum;
+    GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] + NavCompensation, -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue));
+    PositionHoldRatePIDArray[IndexCount].GPS.IntegralSum = NavigationPIDArray[IndexCount].GPS.IntegralSum;
   }
 }
 

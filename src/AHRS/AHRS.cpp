@@ -182,6 +182,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
       }
     }
+
     //CALCULA O GANHO DE kP E APLICA O FEEDBACK PROPORCIONAL
     VectorScale(&VectorError, &VectorError, IMURuntimeConfiguration.kP_Accelerometer * AccelerometerWeightScaler);
     VectorAdd(&RotationRate, &RotationRate, &VectorError);

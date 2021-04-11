@@ -23,7 +23,6 @@
 extern Attitude_Struct Attitude;
 extern Vector3x3_Struct BodyFrameAcceleration;
 extern Vector3x3_Struct BodyFrameRotation;
-extern Quaternion_Struct Orientation;
 extern Matrix3x3_Struct Rotation;
 class AHRSClass
 {
@@ -31,6 +30,7 @@ public:
   void Initialization();
   void Update(float DeltaTime);
   bool CheckAnglesInclination(int16_t Angle);
+  void TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *Vector);
   float GetSineRoll();
   float GetCosineRoll();
   float GetSinePitch();

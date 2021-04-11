@@ -462,6 +462,12 @@ bool AHRSClass::CheckAnglesInclination(int16_t Angle)
   return false;
 }
 
+void AHRSClass::TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *Vector)
+{
+  Vector->Pitch = -Vector->Pitch;
+  QuaternionRotateVector(Vector, Vector, &Orientation);
+}
+
 float AHRSClass::GetSineRoll()
 {
   return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Roll));

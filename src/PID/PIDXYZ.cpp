@@ -618,12 +618,6 @@ bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
   return ABS(StickPosition) > 0.5f; //MAIS DE 50% DE DEFLEXÃO
 }
 
-static void TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *Vector)
-{
-  Vector->Pitch = -Vector->Pitch;
-  QuaternionRotateVector(Vector, Vector, &Orientation);
-}
-
 void PIDXYZClass::GetNewControllerForPlaneWithTurn()
 {
   Vector3x3_Struct TurnControllerRates;
@@ -656,7 +650,7 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
   }
 
   //CONVERTE DE EARTH-FRAME PARA BODY-FRAME
-  TransformVectorEarthFrameToBodyFrame(&TurnControllerRates);
+  AHRS.TransformVectorEarthFrameToBodyFrame(&TurnControllerRates);
 
   //LIMITA O VALOR MINIMO E MAXIMO DE SAÍDA A PARTIR DOS VALOR DE RATE DEFINIDO PELO USUARIO NO GCS
   PID_Resources.RcRateTarget.Roll = Constrain_16Bits(PID_Resources.RcRateTarget.Roll + TurnControllerRates.Roll, -ConvertDegreesToDecidegrees(RCRate), ConvertDegreesToDecidegrees(RCRate));

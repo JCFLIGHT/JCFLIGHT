@@ -20,7 +20,7 @@
 #include "Build/LIBDEPENDENCIES.h"
 #include "VECTOR.h"
 #include "Common/STRUCTS.h"
-extern Attitude_Struct ATTITUDE;
+extern Attitude_Struct Attitude;
 extern Vector3x3_Struct BodyFrameAcceleration;
 extern Vector3x3_Struct BodyFrameRotation;
 extern Quaternion_Struct Orientation;

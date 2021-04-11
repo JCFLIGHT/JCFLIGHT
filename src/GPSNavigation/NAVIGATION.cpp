@@ -399,7 +399,7 @@ void Reset_Home_Point(void)
   GPS_Parameters.Home.Coordinates[COORD_LATITUDE] = GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE];
   GPS_Parameters.Home.Coordinates[COORD_LONGITUDE] = GPS_Parameters.Navigation.Coordinates.Actual[COORD_LONGITUDE];
   GPS_Calcule_Longitude_Scaling(GPS_Parameters.Navigation.Coordinates.Actual[COORD_LATITUDE]);
-  GPS_Parameters.Navigation.Bearing.InitalTarget = ATTITUDE.AngleOut[YAW];
+  GPS_Parameters.Navigation.Bearing.InitalTarget = Attitude.EulerAngles.Yaw;
   Altitude_For_Plane = GPS_Parameters.Navigation.Misc.Get.Altitude;
   GPS_Parameters.Home.Marked = true;
 }

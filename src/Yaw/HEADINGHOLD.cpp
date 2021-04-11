@@ -42,7 +42,7 @@ void UpdateStateOfHeadingHold(void)
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     HeadingHoldRateFilter.State = 0.0f;         //RESETA O FILTRO
-    HeadingHoldTarget = ATTITUDE.AngleOut[YAW]; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
+    HeadingHoldTarget = Attitude.EulerAngles.Yaw; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
   }
 }
 
@@ -75,7 +75,7 @@ float GetHeadingHoldValue(float DeltaTime)
 {
   float HeadingHoldRate;
 
-  int16_t YawError = ATTITUDE.AngleOut[YAW] - HeadingHoldTarget; //CALCULA O ERRO / DIFERENÇA
+  int16_t YawError = Attitude.EulerAngles.Yaw - HeadingHoldTarget; //CALCULA O ERRO / DIFERENÇA
 
   //CALCULA O VALOR RELATIVO DO ERRO/DIFERENÇA E CONVERTE PARA UM VALOR ACEITAVEL POR HEADING
   if (YawError <= -180)

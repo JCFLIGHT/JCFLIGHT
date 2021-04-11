@@ -240,7 +240,7 @@ void FlightModesUpdate()
   {
     if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
     {
-      HeadingHoldTarget = ATTITUDE.AngleOut[YAW];
+      HeadingHoldTarget = Attitude.EulerAngles.Yaw;
     }
   }
 }

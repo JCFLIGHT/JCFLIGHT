@@ -1267,11 +1267,11 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
 void GCSClass::First_Packet_Request_Parameters()
 {
     //ENVIA OS PARAMETROS FUNDAMENTAIS PARA O GCS
-    Essential_First_Packet_Parameters.SendAttitudePitch = Constrain_16Bits(ATTITUDE.AngleOut[PITCH], -900, 900);
-    Essential_First_Packet_Parameters.SendAttitudeRoll = Constrain_16Bits(ATTITUDE.AngleOut[ROLL], -900, 900);
+    Essential_First_Packet_Parameters.SendAttitudePitch = Constrain_16Bits(Attitude.Raw[PITCH], -900, 900);
+    Essential_First_Packet_Parameters.SendAttitudeRoll = Constrain_16Bits(Attitude.Raw[ROLL], -900, 900);
     if (I2CResources.Found.Compass)
     {
-        Essential_First_Packet_Parameters.SendAttitudeYaw = ATTITUDE.AngleOut[YAW];
+        Essential_First_Packet_Parameters.SendAttitudeYaw = Attitude.EulerAngles.Yaw;
     }
     else
     {

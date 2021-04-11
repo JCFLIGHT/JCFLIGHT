@@ -136,10 +136,18 @@ typedef struct
 
 } Barometer_Struct;
 
-typedef struct
+typedef union
 {
-  int16_t AngleOut[3];
-  int16_t CompassHeading;
+  int16_t Raw[3];
+
+  struct
+  {
+    int16_t Roll;
+    int16_t Pitch;
+    int16_t Yaw;
+    int16_t YawDecidegrees;
+  } EulerAngles;
+
 } Attitude_Struct;
 
 typedef struct

@@ -79,7 +79,7 @@ void SticksClass::Update()
             if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
               ENABLE_STATE(PRIMARY_ARM_DISARM);
-              Calibration.Magnetometer.SimpleMode_Initial_Value = ATTITUDE.AngleOut[YAW];
+              Calibration.Magnetometer.SimpleMode_Initial_Value = Attitude.EulerAngles.Yaw;
             }
           }
         }
@@ -111,7 +111,7 @@ void SticksClass::Pre_Arm(void)
       else //IMU CALIBRADA?SIM...ARMA OS MOTORES
       {
         ENABLE_STATE(PRIMARY_ARM_DISARM);
-        Calibration.Magnetometer.SimpleMode_Initial_Value = ATTITUDE.AngleOut[YAW];
+        Calibration.Magnetometer.SimpleMode_Initial_Value = Attitude.EulerAngles.Yaw;
       }
       STICKS.PreArm_Run = false;
       STICKS.PreArm_Run_Count = 0;

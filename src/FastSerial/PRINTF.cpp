@@ -139,7 +139,7 @@ void SerialPrint::ParamsToConsole()
 
 #if defined(PRINTLN_ATTITUDE)
   PRINTF.SendToConsole(ProgramMemoryString("Pitch:%d Roll:%d Yaw:%d\n"),
-                       ATTITUDE.AngleOut[PITCH], ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[YAW]);
+                       Attitude.EulerAngles.Pitch, Attitude.EulerAngles.Roll, Attitude.EulerAngles.Yaw);
 #endif
 
 #if defined(PRINTLN_BATTERY)
@@ -696,11 +696,11 @@ void SerialPrint::ParamsToConsole()
   */
 
   /*
-  Serial.print(ATTITUDE.AngleOut[ROLL]);
+  Serial.print(Attitude.EulerAngles.Roll);
   Serial.print("  ");
-  Serial.print(ATTITUDE.AngleOut[PITCH]);
+  Serial.print(Attitude.EulerAngles.Pitch);
   Serial.print("  ");
-  Serial.println(ATTITUDE.AngleOut[YAW]);
+  Serial.println(Attitude.EulerAngles.Yaw);
   */
 
   //Serial.println(STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR));

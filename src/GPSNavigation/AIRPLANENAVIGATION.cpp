@@ -139,7 +139,7 @@ void AirPlaneUpdateNavigation(void)
   else
   {
     GPS_Heading = GPS_Parameters.Navigation.Misc.Get.GroundCourse;
-    AttitudeHeading = ATTITUDE.AngleOut[YAW];
+    AttitudeHeading = Attitude.EulerAngles.Yaw;
   }
 
   GPS_Heading = WRap_18000(GPS_Heading * 10) / 10;
@@ -294,10 +294,10 @@ void AirPlaneUpdateNavigation(void)
 
     if (!IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
     {
-      GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] -= (ABS(ATTITUDE.AngleOut[ROLL]));
+      GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] -= (ABS(Attitude.EulerAngles.Roll));
     }
 
-    GetThrottleToNavigation -= Constrain_16Bits(ATTITUDE.AngleOut[PITCH] * PITCH_COMP, 0, 450);
+    GetThrottleToNavigation -= Constrain_16Bits(Attitude.EulerAngles.Pitch * PITCH_COMP, 0, 450);
     SpeedDifference = (GPS_MINSPEED - GPS_Parameters.Navigation.Misc.Get.GroundSpeed) * I_TERM;
 
     if (GPS_Parameters.Navigation.Misc.Get.GroundSpeed < GPS_MINSPEED - 50 || GPS_Parameters.Navigation.Misc.Get.GroundSpeed > GPS_MINSPEED + 50)

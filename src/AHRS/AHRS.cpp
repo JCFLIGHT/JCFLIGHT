@@ -43,7 +43,7 @@ AHRSClass AHRS;
 #define NEARNESS 1.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #endif
 
-Attitude_Struct ATTITUDE;
+Attitude_Struct Attitude;
 Vector3x3_Struct BodyFrameAcceleration;
 Vector3x3_Struct BodyFrameRotation;
 Quaternion_Struct Orientation;
@@ -81,9 +81,9 @@ void AHRSClass::Initialization(void)
   //CALCULA A DECLINAÇÃO MAGNETICA
   const int16_t Degrees = ((int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100)) / 100;
   const int16_t Remainder = ((int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100)) % 100;
-  const float CalcedvalueInRadians = -ConvertToRadians(Degrees + Remainder / 60.0f);
-  CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedvalueInRadians);
-  CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedvalueInRadians);
+  const float CalcedValueInRadians = -ConvertToRadians(Degrees + Remainder / 60.0f);
+  CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedValueInRadians);
+  CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedValueInRadians);
   CorrectedMagneticFieldNorth.Yaw = 0;
   //RESETA O QUATERNION E A MATRIX
   QuaternionInit(&Orientation);
@@ -142,7 +142,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
                              const Vector3x3_Struct *RotationBodyFrame,
                              const Vector3x3_Struct *AccelerationBodyFrame,
                              const Vector3x3_Struct *MagnetometerBodyFrame,
-                             bool GPS_HeadingState, float CourseOverGround,
+                             bool SafeToUseGPSHeading, float CourseOverGround,
                              float AccelerometerWeightScaler,
                              float MagnetometerWeightScaler)
 {
@@ -177,18 +177,18 @@ static void MahonyAHRSUpdate(float DeltaTime,
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Vector3x3_Struct OldVector;
-        //CALCULA O ERRO ESCALADO POR Ki
+        //CALCULA O ERRO ESCALADO POR kI
         VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.kI_Accelerometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
       }
     }
-    //CALCULA O GANHO DE Kp E APLICA O FEEDBACK PROPORCIONAL
+    //CALCULA O GANHO DE kP E APLICA O FEEDBACK PROPORCIONAL
     VectorScale(&VectorError, &VectorError, IMURuntimeConfiguration.kP_Accelerometer * AccelerometerWeightScaler);
     VectorAdd(&RotationRate, &RotationRate, &VectorError);
   }
 
   //CORREÇÃO DO YAW
-  if (MagnetometerBodyFrame || GPS_HeadingState)
+  if (MagnetometerBodyFrame || SafeToUseGPSHeading)
   {
     static const Vector3x3_Struct Forward = {.Vector = {1.0f, 0.0f, 0.0f}};
 
@@ -217,7 +217,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
         QuaternionRotateVector(&VectorError, &VectorError, &Orientation);
       }
     }
-    else if (GPS_HeadingState)
+    else if (SafeToUseGPSHeading)
     {
       Vector3x3_Struct HeadingEarthFrame;
 
@@ -260,13 +260,13 @@ static void MahonyAHRSUpdate(float DeltaTime,
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Vector3x3_Struct OldVector;
-        //CALCULA O ERRO INTEGRAL ESCALADO POR Ki
+        //CALCULA O ERRO INTEGRAL ESCALADO POR kI
         VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.kI_Magnetometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
       }
     }
 
-    //CALCULA O GANHO DE Kp E APLICA O FEEDBACK DO PROPORCIONAL
+    //CALCULA O GANHO DE kP E APLICA O FEEDBACK DO PROPORCIONAL
     VectorScale(&VectorError, &VectorError, IMURuntimeConfiguration.kP_Magnetometer * MagnetometerWeightScaler);
     VectorAdd(&RotationRate, &RotationRate, &VectorError);
   }
@@ -309,7 +309,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
   //CHECA SE O NOVO VALOR DO QUATERNION É VALIDO,SE SIM RESETA O VALOR ANTIGO
   CheckAndResetOrientationQuaternion(&PreviousOrientation, AccelerationBodyFrame);
 
-  //CALCULA A MATRIX ROTATIVA PARA O QUATERNION
+  //CALCULA O QUATERNION PARA A MATRIX ROTATIVA
   ComputeRotationMatrix();
 }
 
@@ -379,7 +379,7 @@ void GetMeasuredRotationRate(Vector3x3_Struct *MeasureRotation)
 void AHRSClass::Update(float DeltaTime)
 {
   bool SafeToUseCompass = false;
-  bool GPS_HeadingState = false;
+  bool SafeToUseGPSHeading = false;
   float CourseOverGround = 0;
 
   GetMeasuredAcceleration(&BodyFrameAcceleration); //CALCULA A ACELERAÇÃO DA IMU EM CM/S^2
@@ -399,11 +399,11 @@ void AHRSClass::Update(float DeltaTime)
       if (GPSHeadingInitialized)
       {
         CourseOverGround = ConvertDeciDegreesToRadians(GPS_Parameters.Navigation.Misc.Get.GroundCourse);
-        GPS_HeadingState = true;
+        SafeToUseGPSHeading = true;
       }
       else
       {
-        ComputeQuaternionFromRPY(ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[PITCH], GPS_Parameters.Navigation.Misc.Get.GroundCourse);
+        ComputeQuaternionFromRPY(Attitude.EulerAngles.Roll, Attitude.EulerAngles.Pitch, GPS_Parameters.Navigation.Misc.Get.GroundCourse);
         GPSHeadingInitialized = true;
       }
     }
@@ -428,23 +428,23 @@ void AHRSClass::Update(float DeltaTime)
   MahonyAHRSUpdate(DeltaTime, &BodyFrameRotation,
                    SafeToUseAccelerometer ? &BodyFrameAcceleration : NULL,
                    SafeToUseCompass ? &MagnetometerBodyFrame : NULL,
-                   GPS_HeadingState, CourseOverGround,
+                   SafeToUseGPSHeading, CourseOverGround,
                    CalcedAccelerometerWeight,
                    CalcedCompassWeight);
 
   //SAÍDA DOS EIXOS DO APÓS O AHRS
   //PITCH
-  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(-Fast_Atan2(Rotation.Matrix3x3[2][1], Rotation.Matrix3x3[2][2]));
+  Attitude.EulerAngles.Pitch = ConvertRadiansToDeciDegrees(-Fast_Atan2(Rotation.Matrix3x3[2][1], Rotation.Matrix3x3[2][2]));
   //ROLL
-  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-Rotation.Matrix3x3[2][0]));
+  Attitude.EulerAngles.Roll = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-Rotation.Matrix3x3[2][0]));
   //YAW
-  ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(Rotation.Matrix3x3[1][0], Rotation.Matrix3x3[0][0]));
+  Attitude.EulerAngles.YawDecidegrees = ConvertRadiansToDeciDegrees(-Fast_Atan2(Rotation.Matrix3x3[1][0], Rotation.Matrix3x3[0][0]));
   //CONVERTE O VALOR DE COMPASS HEADING PARA O VALOR ACEITAVEL
-  if (ATTITUDE.CompassHeading < 0)
+  if (Attitude.EulerAngles.YawDecidegrees < 0)
   {
-    ATTITUDE.CompassHeading += 3600;
+    Attitude.EulerAngles.YawDecidegrees += 3600;
   }
-  ATTITUDE.AngleOut[YAW] = ConvertDeciDegreesToDegrees(ATTITUDE.CompassHeading);
+  Attitude.EulerAngles.Yaw = ConvertDeciDegreesToDegrees(Attitude.EulerAngles.YawDecidegrees);
 }
 
 float AHRSClass::CosineTiltAngle(void)
@@ -463,30 +463,30 @@ bool AHRSClass::CheckAnglesInclination(int16_t Angle)
 
 float AHRSClass::GetSineRoll()
 {
-  return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
+  return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Roll));
 }
 
 float AHRSClass::GetCosineRoll()
 {
-  return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[ROLL]));
+  return Fast_Cosine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Roll));
 }
 
 float AHRSClass::GetSinePitch()
 {
-  return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[PITCH]));
+  return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Pitch));
 }
 
 float AHRSClass::GetCosinePitch()
 {
-  return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.AngleOut[PITCH]));
+  return Fast_Cosine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Pitch));
 }
 
 float AHRSClass::GetSineYaw()
 {
-  return Fast_Sine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
+  return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.YawDecidegrees));
 }
 
 float AHRSClass::GetCosineYaw()
 {
-  return Fast_Cosine(ConvertDeciDegreesToRadians(ATTITUDE.CompassHeading));
+  return Fast_Cosine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.YawDecidegrees));
 }

@@ -32,7 +32,7 @@ int16_t Get_Angle_Boost(int16_t Throttle_Value)
 {
     float AHRS_Angles_Cosine = AHRS.GetCosinePitch() * AHRS.GetCosineRoll();
     AHRS_Angles_Cosine = Constrain_Float(AHRS_Angles_Cosine, 0.5f, 1.0f);
-    AHRS_Angles_Cosine = Constrain_Float(9000 - MAX(labs(ATTITUDE.AngleOut[ROLL]), labs(ATTITUDE.AngleOut[PITCH])), 0, 3000) / (3000 * AHRS_Angles_Cosine);
+    AHRS_Angles_Cosine = Constrain_Float(9000 - MAX(labs(Attitude.EulerAngles.Roll), labs(Attitude.EulerAngles.Pitch)), 0, 3000) / (3000 * AHRS_Angles_Cosine);
     return Constrain_Float((float)(Throttle_Value - AttitudeThrottleMin) * AHRS_Angles_Cosine + AttitudeThrottleMin, AttitudeThrottleMin, MAX_STICKS_PULSE);
 }
 

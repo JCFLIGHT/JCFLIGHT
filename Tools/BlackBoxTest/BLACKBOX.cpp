@@ -129,7 +129,7 @@ void BlackBox::IMU(int16_t AngleRoll, int16_t AnglePitch, int16_t Heading)
 {
 
   String DirectoryCreate(Directory);
-  DirectoryCreate.concat("/ATTITUDE.csv");
+  DirectoryCreate.concat("/Attitude.csv");
   char CharDirection[DirectoryCreate.length() + 1];
   DirectoryCreate.toCharArray(CharDirection, sizeof(CharDirection));
 

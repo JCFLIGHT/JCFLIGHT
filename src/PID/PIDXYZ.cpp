@@ -304,7 +304,7 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 
   RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[MAX_ROLL_LEVEL].MinMaxValue));
 
-  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL]) - ATTITUDE.AngleOut[ROLL]);
+  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL]) - Attitude.Raw[ROLL]);
 
   float AngleRateTarget = 0;
 
@@ -341,7 +341,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
     RcControllerAngle -= ConvertDegreesToDecidegrees(PitchLevelTrim);
   }
 
-  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH]) - ATTITUDE.AngleOut[PITCH]);
+  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH]) - Attitude.Raw[PITCH]);
 
   float AngleRateTarget = 0;
 

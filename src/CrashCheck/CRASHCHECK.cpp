@@ -79,7 +79,7 @@ void CrashCheck()
 #endif
 
   //VERIFICA SE HÁ CRASH NO CONTROLADOR DE ATTITUDE
-  if (!CrashCheck2D(ATTITUDE.AngleOut[ROLL], ATTITUDE.AngleOut[PITCH], ATTITUDE_CHECK_THRESH_ROLL_PITCH))
+  if (!CrashCheck2D(Attitude.EulerAngles.Roll, Attitude.EulerAngles.Pitch, ATTITUDE_CHECK_THRESH_ROLL_PITCH))
   {
     Crash_Counter = 0;
     return;

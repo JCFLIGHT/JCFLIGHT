@@ -73,10 +73,10 @@ void UpdateWindEstimator() //50Hz
     WindEstimator.Ground.Velocity[PITCH] = GPS_Parameters.Navigation.Misc.Velocity.Get[PITCH];
     WindEstimator.Ground.Velocity[YAW] = GPS_Parameters.Navigation.Misc.Velocity.Get[YAW];
 
-    //OBTÉM A DIREÇÃO DA FUSELAGEM NO EARTH FRAME (SACADO DO AHRS)
-    WindEstimator.Fuselage.Direction[ROLL] = RotationMatrix[0][0];
-    WindEstimator.Fuselage.Direction[PITCH] = RotationMatrix[1][0];
-    WindEstimator.Fuselage.Direction[YAW] = RotationMatrix[2][0];
+    //OBTÉM A DIREÇÃO DA FUSELAGEM NO EARTH-FRAME (SACADO DO AHRS)
+    WindEstimator.Fuselage.Direction[ROLL] = Rotation.Matrix3x3[0][0];
+    WindEstimator.Fuselage.Direction[PITCH] = Rotation.Matrix3x3[1][0];
+    WindEstimator.Fuselage.Direction[YAW] = Rotation.Matrix3x3[2][0];
 
     //RENOVA TODOS OS VALORES SE A MUDANÇA DE DIREÇÃO ESTIVER DEMORANDO MUITO
     if (WindEstimator.Time.LastUpdate == 0 || (WindEstimator.Time.Now - WindEstimator.Time.LastUpdate) > 10000) //0.1Hz

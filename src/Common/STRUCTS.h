@@ -331,6 +331,11 @@ typedef union
 
 typedef struct
 {
+  float Matrix3x3[3][3];
+} Matrix3x3_Struct;
+
+typedef struct
+{
   bool State;
   uint8_t kP;
   uint8_t kI;

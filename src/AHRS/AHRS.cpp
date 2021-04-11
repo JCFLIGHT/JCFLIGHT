@@ -43,17 +43,16 @@ AHRSClass AHRS;
 #define NEARNESS 1.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #endif
 
+Attitude_Struct ATTITUDE;
 Vector3x3_Struct BodyFrameAcceleration;
 Vector3x3_Struct BodyFrameRotation;
 Quaternion_Struct Orientation;
-Attitude_Struct ATTITUDE;
+Matrix3x3_Struct Rotation;
 
 static Vector3x3_Struct CorrectedMagneticFieldNorth;
 static AHRS_Configuration_Struct IMURuntimeConfiguration;
 
 static bool GPSHeadingInitialized = false;
-
-float RotationMatrix[3][3];
 
 static void ComputeRotationMatrix(void)
 {
@@ -66,22 +65,22 @@ static void ComputeRotationMatrix(void)
   float q1q2 = Orientation.q1 * Orientation.q2;
   float q1q3 = Orientation.q1 * Orientation.q3;
   float q2q3 = Orientation.q2 * Orientation.q3;
-  RotationMatrix[0][0] = 1.0f - 2.0f * q2q2 - 2.0f * q3q3;
-  RotationMatrix[0][1] = 2.0f * (q1q2 + -q0q3);
-  RotationMatrix[0][2] = 2.0f * (q1q3 - -q0q2);
-  RotationMatrix[1][0] = 2.0f * (q1q2 - -q0q3);
-  RotationMatrix[1][1] = 1.0f - 2.0f * q1q1 - 2.0f * q3q3;
-  RotationMatrix[1][2] = 2.0f * (q2q3 + -q0q1);
-  RotationMatrix[2][0] = 2.0f * (q1q3 + -q0q2);
-  RotationMatrix[2][1] = 2.0f * (q2q3 - -q0q1);
-  RotationMatrix[2][2] = 1.0f - 2.0f * q1q1 - 2.0f * q2q2;
+  Rotation.Matrix3x3[0][0] = 1.0f - 2.0f * q2q2 - 2.0f * q3q3;
+  Rotation.Matrix3x3[0][1] = 2.0f * (q1q2 + -q0q3);
+  Rotation.Matrix3x3[0][2] = 2.0f * (q1q3 - -q0q2);
+  Rotation.Matrix3x3[1][0] = 2.0f * (q1q2 - -q0q3);
+  Rotation.Matrix3x3[1][1] = 1.0f - 2.0f * q1q1 - 2.0f * q3q3;
+  Rotation.Matrix3x3[1][2] = 2.0f * (q2q3 + -q0q1);
+  Rotation.Matrix3x3[2][0] = 2.0f * (q1q3 + -q0q2);
+  Rotation.Matrix3x3[2][1] = 2.0f * (q2q3 - -q0q1);
+  Rotation.Matrix3x3[2][2] = 1.0f - 2.0f * q1q1 - 2.0f * q2q2;
 }
 
 void AHRSClass::Initialization(void)
 {
   //CALCULA A DECLINAÇÃO MAGNETICA
-  const int16_t Degrees = ((int16_t)(STORAGEMANAGER.Read_Float(DECLINATION_ADDR) * 100)) / 100;
-  const int16_t Remainder = ((int16_t)(STORAGEMANAGER.Read_Float(DECLINATION_ADDR) * 100)) % 100;
+  const int16_t Degrees = ((int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100)) / 100;
+  const int16_t Remainder = ((int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100)) % 100;
   const float CalcedvalueInRadians = -ConvertToRadians(Degrees + Remainder / 60.0f);
   CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedvalueInRadians);
   CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedvalueInRadians);
@@ -435,11 +434,11 @@ void AHRSClass::Update(float DeltaTime)
 
   //SAÍDA DOS EIXOS DO APÓS O AHRS
   //PITCH
-  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMatrix[2][1], RotationMatrix[2][2]));
+  ATTITUDE.AngleOut[PITCH] = ConvertRadiansToDeciDegrees(-Fast_Atan2(Rotation.Matrix3x3[2][1], Rotation.Matrix3x3[2][2]));
   //ROLL
-  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-RotationMatrix[2][0]));
+  ATTITUDE.AngleOut[ROLL] = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-Rotation.Matrix3x3[2][0]));
   //YAW
-  ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(RotationMatrix[1][0], RotationMatrix[0][0]));
+  ATTITUDE.CompassHeading = ConvertRadiansToDeciDegrees(-Fast_Atan2(Rotation.Matrix3x3[1][0], Rotation.Matrix3x3[0][0]));
   //CONVERTE O VALOR DE COMPASS HEADING PARA O VALOR ACEITAVEL
   if (ATTITUDE.CompassHeading < 0)
   {

@@ -24,7 +24,7 @@ extern Attitude_Struct ATTITUDE;
 extern Vector3x3_Struct BodyFrameAcceleration;
 extern Vector3x3_Struct BodyFrameRotation;
 extern Quaternion_Struct Orientation;
-extern float RotationMatrix[3][3];
+extern Matrix3x3_Struct Rotation;
 class AHRSClass
 {
 public:

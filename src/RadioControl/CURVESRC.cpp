@@ -35,8 +35,8 @@ void CurvesRC_SetValues()
   RCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
   RCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
   YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
-  AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
-  AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
+  AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MIN_ADDR);
+  AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MAX_ADDR);
 }
 
 void CurvesRC_CalculeValue()

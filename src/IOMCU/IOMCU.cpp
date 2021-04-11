@@ -1461,8 +1461,8 @@ void GCSClass::Save_Radio_Control_Configuration()
     STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, Get_Radio_Control_Parameters.GetRCRate);
     STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, Get_Radio_Control_Parameters.GetRCExpo);
     STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, Get_Radio_Control_Parameters.GetYawRate);
-    STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, Get_Radio_Control_Parameters.GetRCPulseMin);
-    STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, Get_Radio_Control_Parameters.GetRCPulseMax);
+    STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MIN_ADDR, Get_Radio_Control_Parameters.GetRCPulseMin);
+    STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MAX_ADDR, Get_Radio_Control_Parameters.GetRCPulseMax);
     STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, Get_Radio_Control_Parameters.GetAHDeadZone);
     STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, Get_Radio_Control_Parameters.GetAHSafeAltitude);
     STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, Get_Radio_Control_Parameters.GetAHMinVelVertical);
@@ -1583,8 +1583,8 @@ void GCSClass::Default_RadioControl_Configuration()
     STORAGEMANAGER.Write_8Bits(RC_EXPO_ADDR, 65);
     STORAGEMANAGER.Write_8Bits(RC_RATE_ADDR, 90);
     STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 20);
-    STORAGEMANAGER.Write_16Bits(RC_PULSE_MIN_ADDR, 1000);
-    STORAGEMANAGER.Write_16Bits(RC_PULSE_MAX_ADDR, 1850);
+    STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MIN_ADDR, 1000);
+    STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MAX_ADDR, 1850);
     STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, 70);
     STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, 5);
     STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, 50);
@@ -1759,8 +1759,8 @@ void GCSClass::UpdateParametersToGCS()
     Send_Radio_Control_Parameters.SendRCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
     Send_Radio_Control_Parameters.SendRCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
     Send_Radio_Control_Parameters.SendYawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
-    Send_Radio_Control_Parameters.SendRCPulseMin = STORAGEMANAGER.Read_16Bits(RC_PULSE_MIN_ADDR);
-    Send_Radio_Control_Parameters.SendRCPulseMax = STORAGEMANAGER.Read_16Bits(RC_PULSE_MAX_ADDR);
+    Send_Radio_Control_Parameters.SendRCPulseMin = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MIN_ADDR);
+    Send_Radio_Control_Parameters.SendRCPulseMax = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MAX_ADDR);
     Send_Radio_Control_Parameters.SendAHDeadZone = STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR);
     Send_Radio_Control_Parameters.SendAHSafeAltitude = STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR);
     Send_Radio_Control_Parameters.SendAHMinVelVertical = STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR);

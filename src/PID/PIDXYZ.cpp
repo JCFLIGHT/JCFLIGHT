@@ -98,7 +98,6 @@ float DerivativeBoostMaxAceleration = 7500.0f; //AJUSTAVEL PELO USUARIO -> (1000
 ///////////////////////////////////////////////////////////////
 
 float PitchLevelTrim = 0;
-float FixedWingIntegralTermLimitOnStickPosition = 0.5f;
 float MotorIntegralTermWindUpPoint;
 float AntiWindUpScaler;
 float CoordinatedTurnRateEarthFrame;
@@ -611,12 +610,12 @@ void PIDXYZClass::ApplyFixedWingRateControllerYaw(float DeltaTime)
 
 bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
 {
-  float StickPosition = (float)Constrain_16Bits(DECODE.GetRxChannelOutput(Axis) - MIDDLE_STICKS_PULSE, -500, 500) / 500.0f;
   if (IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
     return false;
   }
-  return ABS(StickPosition) > FixedWingIntegralTermLimitOnStickPosition;
+  float StickPosition = (float)Constrain_16Bits(DECODE.GetRxChannelOutput(Axis) - MIDDLE_STICKS_PULSE, -500, 500) / 500.0f;
+  return ABS(StickPosition) > 0.5f; //MAIS DE 50% DE DEFLEXÃO
 }
 
 static void TransformVectorEarthFrameToBodyFrame(Struct_Vector3x3 *Vector)

@@ -182,6 +182,7 @@ struct _Send_User_Basic_Parameters
     int16_t SendAccRollAdjust;
     int16_t SendAccPitchAdjust;
     int16_t SendAccYawAdjust;
+    int16_t SendPitchLevelTrim;
 } Send_User_Basic_Parameters;
 
 struct _Get_User_Basic_Parameters
@@ -210,6 +211,7 @@ struct _Get_User_Basic_Parameters
     int16_t GetAccRollAdjust;
     int16_t GetAccPitchAdjust;
     int16_t GetAccYawAdjust;
+    int16_t GetPitchLevelTrim;
 } Get_User_Basic_Parameters;
 
 struct _Send_Radio_Control_Parameters
@@ -974,7 +976,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         VectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 21) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 22) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 3)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendFrameType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendReceiverType, VAR_8BITS);
@@ -1000,6 +1002,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAccRollAdjust, VAR_16BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAccPitchAdjust, VAR_16BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAccYawAdjust, VAR_16BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendPitchLevelTrim, VAR_16BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1449,6 +1452,7 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADJUST_ADDR, Get_User_Basic_Parameters.GetAccRollAdjust);
     STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADJUST_ADDR, Get_User_Basic_Parameters.GetAccPitchAdjust);
     STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, Get_User_Basic_Parameters.GetAccYawAdjust);
+    STORAGEMANAGER.Write_16Bits(PITCH_LEVEL_TRIM_ADDR, Get_User_Basic_Parameters.GetPitchLevelTrim);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1549,30 +1553,31 @@ void GCSClass::Save_Medium_Configuration()
 void GCSClass::Default_Basic_Configuration()
 {
     //LIMPA TODAS AS CONFIGURAÇÕES SALVAS
-    STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DO MODO SIMPLES
-    STORAGEMANAGER.Write_8Bits(ALT_HOLD_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODO ALTITUDE-HOLD
-    STORAGEMANAGER.Write_8Bits(GPS_HOLD_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODO GPS-HOLD
-    STORAGEMANAGER.Write_8Bits(RTH_ADDR, 0);               //LIMPA A CONFIGURAÇÃO DO MODO RTH
-    STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO PARACHUTE
-    STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, 0);            //LIMPA A CONFIGURAÇÃO DO CONTROLE DO GIMBAL
-    STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO TIPO DE FRAME
-    STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODULO RECEPTOR
-    STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA UART_NUMB_2
-    STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, 0);  //LIMPA A CONFIGURAÇÃO DE ROTAÇÃO DO COMPASS
-    STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA UART_NUMB_1
-    STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 0);      //LIMPA A CONFIGURAÇÃO DA ALTITUDE AO FAZER O RTH
-    STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DA SPI
-    STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODO ACRO
-    STORAGEMANAGER.Write_8Bits(ATACK_ADDR, 0);             //LIMPA A CONFIGURAÇÃO DO MODO ATAQUE
-    STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO MODO AUTO-FLIP
-    STORAGEMANAGER.Write_8Bits(AUTOMISSION_ADDR, 0);       //LIMPA A CONFIGURAÇÃO DO MODO AUTO
-    STORAGEMANAGER.Write_8Bits(ARMDISARM_ADDR, 0);         //LIMPA A CONFIGURAÇÃO DO ARMDISARM VIA CHAVE AUX
-    STORAGEMANAGER.Write_8Bits(AUTOLAND_ADDR, 0);          //LIMPA A CONFIGURAÇÃO DO AUTO LAND
-    STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, 0);     //LIMPA A CONFIGURAÇÃO DO SAFE BUTTON
-    STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, 0);     //LIMPA A CONFIGURAÇÃO DO AIR-SPEED
-    STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADJUST_ADDR, 0);  //LIMPA A CONFIGURAÇÃO DO AJUSTE DO ACC NO ROLL
-    STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADJUST_ADDR, 0); //LIMPA A CONFIGURAÇÃO DO AJUSTE DO ACC NO PITCH
-    STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, 0);   //LIMPA A CONFIGURAÇÃO DO AJUSTE DO ACC NO YAW
+    STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(ALT_HOLD_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(GPS_HOLD_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(RTH_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(ATACK_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(AUTOMISSION_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(ARMDISARM_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(AUTOLAND_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADJUST_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADJUST_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(PITCH_LEVEL_TRIM_ADDR, 0);
 }
 
 void GCSClass::Default_RadioControl_Configuration()
@@ -1752,6 +1757,7 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Basic_Parameters.SendAccRollAdjust = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADJUST_ADDR);
     Send_User_Basic_Parameters.SendAccPitchAdjust = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADJUST_ADDR);
     Send_User_Basic_Parameters.SendAccYawAdjust = STORAGEMANAGER.Read_16Bits(ACC_YAW_ADJUST_ADDR);
+    Send_User_Basic_Parameters.SendPitchLevelTrim = STORAGEMANAGER.Read_16Bits(PITCH_LEVEL_TRIM_ADDR);
 
     //ATUALIZA OS PARAMETROS DO RADIO CONTROLE
     Send_Radio_Control_Parameters.SendThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);

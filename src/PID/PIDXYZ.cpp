@@ -90,7 +90,6 @@ int16_t ReferenceAirSpeed = 1000;              //AJUSTAVEL PELO USUARIO - VALOR 
 int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO -> (0 a 500)
 int16_t Cruise_Throttle = 1400;                //AJUSTAVEL PELO USUARIO -> (1000 a 2000)
 int16_t MinThrottleDownPitchAngle = 0;         //AJUSTAVEL PELO USUARIO -> (0 a 450)
-float PitchLevelTrim = 0;                      //AJUSTAVEL PELO USUARIO -> (-10 a +10)
 float CoordinatedPitchGain = 1.0f;             //AJUSTAVEL PELO USUARIO -> (0.0 a 2.0 (float))
 float CoordinatedYawGain = 1.0f;               //AJUSTAVEL PELO USUARIO -> (0.0 a 2.0 (float))
 float DerivativeBoostFactor = 1.25f;           //AJUSTAVEL PELO USUARIO -> (-1.0 a 3.0 (float))
@@ -98,6 +97,7 @@ float DerivativeBoostMaxAceleration = 7500.0f; //AJUSTAVEL PELO USUARIO -> (1000
 
 ///////////////////////////////////////////////////////////////
 
+float PitchLevelTrim = 0;
 float FixedWingIntegralTermLimitOnStickPosition = 0.5f;
 float MotorIntegralTermWindUpPoint;
 float AntiWindUpScaler;
@@ -107,6 +107,7 @@ float ErrorGyroIntegralLimit[3];
 
 void PIDXYZClass::Initialization()
 {
+  PitchLevelTrim = STORAGEMANAGER.Read_16Bits(PITCH_LEVEL_TRIM_ADDR);
   PID_Resources.Filter.DerivativeCutOff = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
   PID_Resources.Filter.IntegralRelaxCutOff = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);
   PID_Resources.Filter.ControlDerivativeCutOff = STORAGEMANAGER.Read_16Bits(KCD_OR_FF_LPF_ADDR);
@@ -243,8 +244,7 @@ float PIDXYZClass::ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float I
 
 float PIDXYZClass::ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral)
 {
-  if ((MixerIsOutputSaturated() && GetFrameStateOfMultirotor()) ||
-      (GetFrameStateOfAirPlane() && PIDXYZ.FixedWingIntegralTermLimitActive(Axis)))
+  if ((MixerIsOutputSaturated() && GetFrameStateOfMultirotor()) || (GetFrameStateOfAirPlane() && PIDXYZ.FixedWingIntegralTermLimitActive(Axis)))
   {
     ErrorGyroIntegral = Constrain_Float(ErrorGyroIntegral, -ErrorGyroIntegralLimit[Axis], ErrorGyroIntegralLimit[Axis]);
   }

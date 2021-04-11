@@ -41,7 +41,9 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 
 - Baixe e instale o VSCode clicando [aqui](https://visualstudio.microsoft.com/pt-br/downloads/).
 - Baixe e instale a extensão do PlatformIO clicando [aqui](https://platformio.org/platformio-ide) ou através do gerenciador de extensões do próprio VSCode.
-- Baixe e abra o projeto da JCLIGHT.
+- Baixe esse projeto da JCFLIGHT,você pode baixar direto aqui do GitHub,ou clonar pelo terminal do GitBash,eu recomendo clonar,clique [aqui](https://github.com/JCFLIGHT/JCFLIGHT/blob/master/Docs/GitBash.md) para aprender a clonar o repositório.
+- Abra o VSCode.
+- Abra a pasta do projeto da JCFLIGHT com o VSCode.
 - Abra o "platformio.ini" e altere a porta COM para sua respectiva,afim de compilar.
 
 ## Como contribuir

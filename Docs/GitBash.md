@@ -23,6 +23,8 @@ Documento apenas para desenvolvedores.
 
 ![JCFLIGHT](Clonado.png)
 
+# Pull-Request
+
 ## Criando a Branch para codar
 
 - Quando você fizer alguma alteração,seja ela por correção de bug ou melhoria,você deverá criar uma branch para enviar o seu projeto modificado para que ele seja mesclado com o projeto do repositório oficial da JCFLIGHT.

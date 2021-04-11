@@ -365,9 +365,9 @@ static void ComputeQuaternionFromRPY(int16_t InitialRoll, int16_t InitialPitch, 
 
 void GetMeasuredAcceleration(Vector3x3_Struct *MeasureAcceleration)
 {
-  MeasureAcceleration->Vector[ROLL] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[ROLL]);
-  MeasureAcceleration->Vector[PITCH] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[PITCH]);
-  MeasureAcceleration->Vector[YAW] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[YAW]);
+  MeasureAcceleration->Vector[ROLL] = ConvertAccelerationToCMSS((float)IMU.Accelerometer.Read[ROLL]);
+  MeasureAcceleration->Vector[PITCH] = ConvertAccelerationToCMSS((float)IMU.Accelerometer.Read[PITCH]);
+  MeasureAcceleration->Vector[YAW] = ConvertAccelerationToCMSS((float)IMU.Accelerometer.Read[YAW]);
 }
 
 void GetMeasuredRotationRate(Vector3x3_Struct *MeasureRotation)

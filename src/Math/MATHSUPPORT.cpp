@@ -117,7 +117,7 @@ float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput)
     return CoordinateInput * 1.0e-7f;
 }
 
-float ConvertAccelerationEarthFrameToCMSS(float InputAcc)
+float ConvertAccelerationToCMSS(float InputAcc)
 {
     return InputAcc * (GRAVITY_CMSS / ACC_1G);
 }

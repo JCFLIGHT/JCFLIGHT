@@ -24,6 +24,10 @@
 #include "AHRS/AHRS.h"
 #include "IMU/ACCGYROREAD.h"
 #include "Barometer/BAROBACKEND.h"
+#include "FastSerial/PRINTF.h"
+
+//DEBUG
+//#define PRINTLN_INS
 
 InertialNavigationClass INERTIALNAVIGATION;
 INS_Struct INS;
@@ -33,10 +37,10 @@ INS_Struct INS;
 void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame()
 {
   //OBTÉM O SENO E COSSENO DE CADA EIXO DADO PELO AHRS
-  INS.Math.Cosine_Roll = AHRS.GetCosineRoll();
-  INS.Math.Sine_Roll = AHRS.GetSineRoll();
-  INS.Math.Cosine_Pitch = -AHRS.GetCosinePitch();
-  INS.Math.Sine_Pitch = -AHRS.GetSinePitch();
+  INS.Math.Cosine_Roll = -AHRS.GetCosineRoll();
+  INS.Math.Sine_Roll = -AHRS.GetSineRoll();
+  INS.Math.Cosine_Pitch = AHRS.GetCosinePitch();
+  INS.Math.Sine_Pitch = AHRS.GetSinePitch();
   INS.Math.Cosine_Yaw = AHRS.GetCosineYaw();
   INS.Math.Sine_Yaw = AHRS.GetSineYaw();
 
@@ -45,61 +49,71 @@ void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame()
   INS.Math.Sine_Pitch_Sine_Yaw_Fusion = INS.Math.Sine_Pitch * INS.Math.Sine_Yaw;
 
   //ROLL
-  INS.EarthFrame.Acceleration[ROLL] = -((INS.Math.Cosine_Pitch * INS.Math.Cosine_Yaw) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Sine_Roll * INS.Math.Sine_Pitch_Cosine_Yaw_Fusion - INS.Math.Cosine_Roll * INS.Math.Sine_Yaw) * IMU.Accelerometer.Read[ROLL] + (INS.Math.Sine_Roll * INS.Math.Sine_Yaw + INS.Math.Cosine_Roll * INS.Math.Sine_Pitch_Cosine_Yaw_Fusion) * IMU.Accelerometer.Read[YAW]);
+  INS.EarthFrame.AccelerationNEU[ROLL] = ConvertAccelerationToCMSS(-((INS.Math.Cosine_Pitch * INS.Math.Cosine_Yaw) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Sine_Roll * INS.Math.Sine_Pitch_Cosine_Yaw_Fusion - INS.Math.Cosine_Roll * INS.Math.Sine_Yaw) * IMU.Accelerometer.Read[ROLL] + (INS.Math.Sine_Roll * INS.Math.Sine_Yaw + INS.Math.Cosine_Roll * INS.Math.Sine_Pitch_Cosine_Yaw_Fusion) * IMU.Accelerometer.Read[YAW]));
 
   //PITCH
-  INS.EarthFrame.Acceleration[PITCH] = -((INS.Math.Cosine_Pitch * INS.Math.Sine_Yaw) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Cosine_Roll * INS.Math.Cosine_Yaw + INS.Math.Sine_Roll * INS.Math.Sine_Pitch_Sine_Yaw_Fusion) * IMU.Accelerometer.Read[ROLL] + (-INS.Math.Sine_Roll * INS.Math.Cosine_Yaw + INS.Math.Cosine_Roll * INS.Math.Sine_Pitch_Sine_Yaw_Fusion) * IMU.Accelerometer.Read[YAW]);
+  INS.EarthFrame.AccelerationNEU[PITCH] = ConvertAccelerationToCMSS(-((INS.Math.Cosine_Pitch * INS.Math.Sine_Yaw) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Cosine_Roll * INS.Math.Cosine_Yaw + INS.Math.Sine_Roll * INS.Math.Sine_Pitch_Sine_Yaw_Fusion) * IMU.Accelerometer.Read[ROLL] + (-INS.Math.Sine_Roll * INS.Math.Cosine_Yaw + INS.Math.Cosine_Roll * INS.Math.Sine_Pitch_Sine_Yaw_Fusion) * IMU.Accelerometer.Read[YAW]));
 
   //YAW
-  INS.EarthFrame.Acceleration[YAW] = ((-INS.Math.Sine_Pitch) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Sine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[ROLL] + (INS.Math.Cosine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[YAW]) - ACC_1G;
+  INS.EarthFrame.AccelerationNEU[YAW] = ConvertAccelerationToCMSS(((-INS.Math.Sine_Pitch) * IMU.Accelerometer.Read[PITCH] + (INS.Math.Sine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[ROLL] + (INS.Math.Cosine_Roll * INS.Math.Cosine_Pitch) * IMU.Accelerometer.Read[YAW]) - ACC_1G);
 
   //ROLL
-  INS.EarthFrame.Acceleration[ROLL] = ConvertAccelerationEarthFrameToCMSS(INS.EarthFrame.Acceleration[ROLL]);
-  INS.Bias.Difference[ROLL] = INS.EarthFrame.Acceleration[ROLL] - INS.Bias.Adjust[ROLL];
+  INS.Bias.Difference[ROLL] = INS.EarthFrame.AccelerationNEU[ROLL] - INS.Bias.Adjust[ROLL];
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    INS.Bias.Adjust[ROLL] = INS.Bias.Adjust[ROLL] * 0.985f + INS.EarthFrame.Acceleration[ROLL] * 0.015f; //2HZ LPF
+    INS.Bias.Adjust[ROLL] = INS.Bias.Adjust[ROLL] * 0.985f + INS.EarthFrame.AccelerationNEU[ROLL] * 0.015f; //2HZ LPF
   }
   else if (ABS(INS.Bias.Difference[ROLL]) <= 80.0f)
   {
-    INS.Bias.Adjust[ROLL] = INS.Bias.Adjust[ROLL] * 0.9987f + INS.EarthFrame.Acceleration[ROLL] * 0.0013f; //1HZ LPF
+    INS.Bias.Adjust[ROLL] = INS.Bias.Adjust[ROLL] * 0.9987f + INS.EarthFrame.AccelerationNEU[ROLL] * 0.0013f; //1HZ LPF
   }
-  INS.EarthFrame.Acceleration[ROLL] = INS.Bias.Difference[ROLL];
-  INS.AccelerationEarthFrame_LPF[ROLL] = INS.AccelerationEarthFrame_LPF[ROLL] * 0.85714285714285714285714285714286f + INS.EarthFrame.Acceleration[ROLL] * 0.14285714285714285714285714285714f; //25HZ LPF
+  INS.EarthFrame.AccelerationNEU[ROLL] = INS.Bias.Difference[ROLL];
+  INS.AccelerationEarthFrame_LPF[ROLL] = INS.AccelerationEarthFrame_LPF[ROLL] * 0.85714285714285714285714285714286f + INS.EarthFrame.AccelerationNEU[ROLL] * 0.14285714285714285714285714285714f; //25HZ LPF
   INS.AccelerationEarthFrame_Sum[ROLL] += INS.AccelerationEarthFrame_LPF[ROLL];
   INS.AccelerationEarthFrame_Sum_Count[ROLL]++;
 
   //PITCH
-  INS.EarthFrame.Acceleration[PITCH] = ConvertAccelerationEarthFrameToCMSS(INS.EarthFrame.Acceleration[PITCH]);
-  INS.Bias.Difference[PITCH] = INS.EarthFrame.Acceleration[PITCH] - INS.Bias.Adjust[PITCH];
+  INS.Bias.Difference[PITCH] = INS.EarthFrame.AccelerationNEU[PITCH] - INS.Bias.Adjust[PITCH];
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    INS.Bias.Adjust[PITCH] = INS.Bias.Adjust[PITCH] * 0.985f + INS.EarthFrame.Acceleration[PITCH] * 0.015f; //2HZ LPF
+    INS.Bias.Adjust[PITCH] = INS.Bias.Adjust[PITCH] * 0.985f + INS.EarthFrame.AccelerationNEU[PITCH] * 0.015f; //2HZ LPF
   }
   else if (ABS(INS.Bias.Difference[PITCH]) <= 80.0f)
   {
-    INS.Bias.Adjust[PITCH] = INS.Bias.Adjust[PITCH] * 0.9987f + INS.EarthFrame.Acceleration[PITCH] * 0.0013f; //1HZ LPF
+    INS.Bias.Adjust[PITCH] = INS.Bias.Adjust[PITCH] * 0.9987f + INS.EarthFrame.AccelerationNEU[PITCH] * 0.0013f; //1HZ LPF
   }
-  INS.EarthFrame.Acceleration[PITCH] = INS.Bias.Difference[PITCH];
-  INS.AccelerationEarthFrame_LPF[PITCH] = INS.AccelerationEarthFrame_LPF[PITCH] * 0.85714285714285714285714285714286f + INS.EarthFrame.Acceleration[PITCH] * 0.14285714285714285714285714285714f; //25HZ LPF
+  INS.EarthFrame.AccelerationNEU[PITCH] = INS.Bias.Difference[PITCH];
+  INS.AccelerationEarthFrame_LPF[PITCH] = INS.AccelerationEarthFrame_LPF[PITCH] * 0.85714285714285714285714285714286f + INS.EarthFrame.AccelerationNEU[PITCH] * 0.14285714285714285714285714285714f; //25HZ LPF
   INS.AccelerationEarthFrame_Sum[PITCH] += INS.AccelerationEarthFrame_LPF[PITCH];
   INS.AccelerationEarthFrame_Sum_Count[PITCH]++;
 
   //YAW
-  INS.EarthFrame.Acceleration[YAW] = ConvertAccelerationEarthFrameToCMSS(INS.EarthFrame.Acceleration[YAW]);
-  INS.Bias.Difference[YAW] = INS.EarthFrame.Acceleration[YAW] - INS.Bias.Adjust[YAW];
+  INS.Bias.Difference[YAW] = INS.EarthFrame.AccelerationNEU[YAW] - INS.Bias.Adjust[YAW];
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    INS.Bias.Adjust[YAW] = INS.Bias.Adjust[YAW] * 0.985f + INS.EarthFrame.Acceleration[YAW] * 0.015f; //2HZ LPF
+    INS.Bias.Adjust[YAW] = INS.Bias.Adjust[YAW] * 0.985f + INS.EarthFrame.AccelerationNEU[YAW] * 0.015f; //2HZ LPF
   }
   else if (ABS(INS.Bias.Difference[YAW]) <= 80.0f)
   {
-    INS.Bias.Adjust[YAW] = INS.Bias.Adjust[YAW] * 0.9987f + INS.EarthFrame.Acceleration[YAW] * 0.0013f; //1HZ LPF
+    INS.Bias.Adjust[YAW] = INS.Bias.Adjust[YAW] * 0.9987f + INS.EarthFrame.AccelerationNEU[YAW] * 0.0013f; //1HZ LPF
   }
-  INS.EarthFrame.Acceleration[YAW] = INS.Bias.Difference[YAW];
-  INS.AccelerationEarthFrame_LPF[YAW] = INS.AccelerationEarthFrame_LPF[YAW] * 0.85714285714285714285714285714286f + INS.EarthFrame.Acceleration[YAW] * 0.14285714285714285714285714285714f; //25HZ LPF
+  INS.EarthFrame.AccelerationNEU[YAW] = INS.Bias.Difference[YAW];
+  INS.AccelerationEarthFrame_LPF[YAW] = INS.AccelerationEarthFrame_LPF[YAW] * 0.85714285714285714285714285714286f + INS.EarthFrame.AccelerationNEU[YAW] * 0.14285714285714285714285714285714f; //25HZ LPF
   INS.AccelerationEarthFrame_Sum[YAW] += INS.AccelerationEarthFrame_LPF[YAW];
   INS.AccelerationEarthFrame_Sum_Count[YAW]++;
+
+#ifdef PRINTLN_INS
+
+  DEBUG("Acceleration[ROLL]:%.4f Acceleration[PITCH]:%.4f Acceleration[YAW]:%.4f",
+        INS.EarthFrame.AccelerationNEU[ROLL],
+        INS.EarthFrame.AccelerationNEU[PITCH],
+        INS.EarthFrame.AccelerationNEU[YAW]);
+
+  //INS.EarthFrame.AccelerationNEU[ROLL]  -> POSITIVO MOVENDO PARA O OESTE
+  //INS.EarthFrame.AccelerationNEU[PITCH] -> POSITIVO MOVENDO PARA O NORTE
+  //INS.EarthFrame.AccelerationNEU[YAW]   -> POSITIVO MOVENDO PARA CIMA
+
+#endif
 }
 
 void InertialNavigationClass::UpdateAccelerationEarthFrame_Filtered(uint8_t ArrayCount)

@@ -82,7 +82,7 @@ typedef struct
 
   struct EarthFrame_Struct
   {
-    float Acceleration[3] = {0, 0, 0};
+    float AccelerationNEU[3] = {0, 0, 0};
     float Velocity[3] = {0, 0, 0};
     float Position[3] = {0, 0, 0};
   } EarthFrame;

@@ -40,9 +40,9 @@ LowPassFilterEarthFrame AccelerationEarthFrameFilteredYaw;
 
 void Update_PrecisionLand()
 {
-  AccelerationEarthFrameFilteredRoll.Apply(INS.EarthFrame.Acceleration[ROLL], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
-  AccelerationEarthFrameFilteredPitch.Apply(INS.EarthFrame.Acceleration[PITCH], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
-  AccelerationEarthFrameFilteredYaw.Apply(INS.EarthFrame.Acceleration[YAW], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  AccelerationEarthFrameFilteredRoll.Apply(INS.EarthFrame.AccelerationNEU[ROLL], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  AccelerationEarthFrameFilteredPitch.Apply(INS.EarthFrame.AccelerationNEU[PITCH], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  AccelerationEarthFrameFilteredYaw.Apply(INS.EarthFrame.AccelerationNEU[YAW], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
 
 #ifdef PRINTLN_PRECISIONLAND
 

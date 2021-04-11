@@ -618,7 +618,7 @@ bool PIDXYZClass::FixedWingIntegralTermLimitActive(uint8_t Axis)
   return ABS(StickPosition) > 0.5f; //MAIS DE 50% DE DEFLEXÃO
 }
 
-static void TransformVectorEarthFrameToBodyFrame(Struct_Vector3x3 *Vector)
+static void TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *Vector)
 {
   Vector->Pitch = -Vector->Pitch;
   QuaternionRotateVector(Vector, Vector, &Orientation);
@@ -626,7 +626,7 @@ static void TransformVectorEarthFrameToBodyFrame(Struct_Vector3x3 *Vector)
 
 void PIDXYZClass::GetNewControllerForPlaneWithTurn()
 {
-  Struct_Vector3x3 TurnControllerRates;
+  Vector3x3_Struct TurnControllerRates;
   TurnControllerRates.Roll = 0;
   TurnControllerRates.Pitch = 0;
 

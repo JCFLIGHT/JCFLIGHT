@@ -25,7 +25,6 @@
 #include "Scheduler/SCHEDULER.h"
 #include "Compass/COMPASSREAD.h"
 #include "BAR/BAR.h"
-#include "SensorAlignment/ALIGNMENT.h"
 #include "Build/BOARDDEFS.h"
 #include "PerformanceCalibration/PERFORMACC.h"
 #include "PerformanceCalibration/PERFORMGYRO.h"
@@ -165,9 +164,6 @@ void Acc_ReadBufferData()
 #endif
 
   Accelerometer_Calibration();
-
-  //APLICA O AJUSTE DO ACELEROMETRO
-  ApplySensorAlignment(IMU.Accelerometer.Read);
 
 #ifndef __AVR_ATmega2560__
   //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS

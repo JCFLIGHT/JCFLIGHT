@@ -43,12 +43,12 @@ AHRSClass AHRS;
 #define NEARNESS 1.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #endif
 
-Struct_Vector3x3 BodyFrameAcceleration;
-Struct_Vector3x3 BodyFrameRotation;
+Vector3x3_Struct BodyFrameAcceleration;
+Vector3x3_Struct BodyFrameRotation;
 Quaternion_Struct Orientation;
 Attitude_Struct ATTITUDE;
 
-static Struct_Vector3x3 CorrectedMagneticFieldNorth;
+static Vector3x3_Struct CorrectedMagneticFieldNorth;
 static AHRS_Configuration_Struct IMURuntimeConfiguration;
 
 static bool GPSHeadingInitialized = false;
@@ -87,7 +87,7 @@ void AHRSClass::Initialization(void)
   CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedvalueInRadians);
   CorrectedMagneticFieldNorth.Yaw = 0;
   //RESETA O QUATERNION E A MATRIX
-  QuaternionInitUnit(&Orientation);
+  QuaternionInit(&Orientation);
   ComputeRotationMatrix();
 }
 
@@ -109,7 +109,7 @@ static bool ValidateQuaternion(const Quaternion_Struct *Quaternion)
   return false;
 }
 
-static void ResetOrientationQuaternion(const Struct_Vector3x3 *AccelerationBodyFrame)
+static void ResetOrientationQuaternion(const Vector3x3_Struct *AccelerationBodyFrame)
 {
   const float AccVectorSquared = Fast_SquareRoot(VectorNormSquared(AccelerationBodyFrame));
   Orientation.q0 = AccelerationBodyFrame->Yaw + AccVectorSquared;
@@ -119,8 +119,7 @@ static void ResetOrientationQuaternion(const Struct_Vector3x3 *AccelerationBodyF
   QuaternionNormalize(&Orientation, &Orientation);
 }
 
-static void CheckAndResetOrientationQuaternion(const Quaternion_Struct *Quaternion,
-                                               const Struct_Vector3x3 *AccelerationBodyFrame)
+static void CheckAndResetOrientationQuaternion(const Quaternion_Struct *Quaternion, const Vector3x3_Struct *AccelerationBodyFrame)
 {
   //CHECA SE O QUATERNION ESTÁ NORMAL
   if (ValidateQuaternion(&Orientation))
@@ -141,17 +140,17 @@ static void CheckAndResetOrientationQuaternion(const Quaternion_Struct *Quaterni
 }
 
 static void MahonyAHRSUpdate(float DeltaTime,
-                             const Struct_Vector3x3 *RotationBodyFrame,
-                             const Struct_Vector3x3 *AccelerationBodyFrame,
-                             const Struct_Vector3x3 *MagnetometerBodyFrame,
+                             const Vector3x3_Struct *RotationBodyFrame,
+                             const Vector3x3_Struct *AccelerationBodyFrame,
+                             const Vector3x3_Struct *MagnetometerBodyFrame,
                              bool GPS_HeadingState, float CourseOverGround,
                              float AccelerometerWeightScaler,
                              float MagnetometerWeightScaler)
 {
-  static Struct_Vector3x3 GyroDriftEstimate = {0};
+  static Vector3x3_Struct GyroDriftEstimate = {0};
 
   Quaternion_Struct PreviousOrientation = Orientation;
-  Struct_Vector3x3 RotationRate = *RotationBodyFrame;
+  Vector3x3_Struct RotationRate = *RotationBodyFrame;
 
   //CALCULA O VALOR DO SPIN RATE EM RADIANOS/S
   const float Spin_Rate_Square = VectorNormSquared(&RotationRate);
@@ -159,11 +158,11 @@ static void MahonyAHRSUpdate(float DeltaTime,
   //CORREÇÃO DO ROLL E PITCH USANDO O VETOR DO ACELEROMETRO
   if (AccelerationBodyFrame)
   {
-    static const Struct_Vector3x3 Gravity = {.Vector = {0.0f, 0.0f, 1.0f}};
+    static const Vector3x3_Struct Gravity = {.Vector = {0.0f, 0.0f, 1.0f}};
 
-    Struct_Vector3x3 EstimatedGravity;
-    Struct_Vector3x3 AccelerationVector;
-    Struct_Vector3x3 VectorError;
+    Vector3x3_Struct EstimatedGravity;
+    Vector3x3_Struct AccelerationVector;
+    Vector3x3_Struct VectorError;
 
     //ESTIMA A GRAVIDADE NO BODY FRAME
     QuaternionRotateVector(&EstimatedGravity, &Gravity, &Orientation);
@@ -178,7 +177,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
       //DESATIVA A INTEGRAÇÃO SE O SPIN RATE ULTRAPASSAR UM CERTO VALOR
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
-        Struct_Vector3x3 OldVector;
+        Vector3x3_Struct OldVector;
         //CALCULA O ERRO ESCALADO POR Ki
         VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.kI_Accelerometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
@@ -192,13 +191,13 @@ static void MahonyAHRSUpdate(float DeltaTime,
   //CORREÇÃO DO YAW
   if (MagnetometerBodyFrame || GPS_HeadingState)
   {
-    static const Struct_Vector3x3 Forward = {.Vector = {1.0f, 0.0f, 0.0f}};
+    static const Vector3x3_Struct Forward = {.Vector = {1.0f, 0.0f, 0.0f}};
 
-    Struct_Vector3x3 VectorError = {.Vector = {0.0f, 0.0f, 0.0f}};
+    Vector3x3_Struct VectorError = {.Vector = {0.0f, 0.0f, 0.0f}};
 
     if (MagnetometerBodyFrame && VectorNormSquared(MagnetometerBodyFrame) > 0.01f)
     {
-      Struct_Vector3x3 MagnetormeterVector;
+      Vector3x3_Struct MagnetormeterVector;
 
       //CALCULA O NORTE MAGNETICO
       QuaternionRotateVectorInverse(&MagnetormeterVector, MagnetometerBodyFrame, &Orientation);
@@ -221,7 +220,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
     }
     else if (GPS_HeadingState)
     {
-      Struct_Vector3x3 HeadingEarthFrame;
+      Vector3x3_Struct HeadingEarthFrame;
 
       //USE O COG DO GPS PARA CALCULAR O HEADING
       while (CourseOverGround > 3.14159265358979323846f)
@@ -235,7 +234,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
       }
 
       //CALCULA O VALOR DE HEADING COM BASE NO COG
-      Struct_Vector3x3 CourseOverGroundVector = {.Vector = {-Fast_Cosine(CourseOverGround), Fast_Sine(CourseOverGround), 0.0f}};
+      Vector3x3_Struct CourseOverGroundVector = {.Vector = {-Fast_Cosine(CourseOverGround), Fast_Sine(CourseOverGround), 0.0f}};
 
       //ROTACIONA O VETOR DO BODY FRAME PARA EARTH FRAME
       QuaternionRotateVectorInverse(&HeadingEarthFrame, &Forward, &Orientation);
@@ -261,7 +260,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
       //PARE A INTEGRAÇÃO SE O SPIN RATE FOR MAIOR QUE O LIMITE
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
-        Struct_Vector3x3 OldVector;
+        Vector3x3_Struct OldVector;
         //CALCULA O ERRO INTEGRAL ESCALADO POR Ki
         VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.kI_Magnetometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
@@ -277,7 +276,7 @@ static void MahonyAHRSUpdate(float DeltaTime,
   VectorAdd(&RotationRate, &RotationRate, &GyroDriftEstimate);
 
   //TAXA DE MUDANÇA DO QUATERNION
-  Struct_Vector3x3 Theta; //THETA É A ROTAÇÃO DE EIXO/ÂNGULO.
+  Vector3x3_Struct Theta; //THETA É A ROTAÇÃO DE EIXO/ÂNGULO.
   Quaternion_Struct QuaternionDelta;
 
   VectorScale(&Theta, &RotationRate, 0.5f * DeltaTime);
@@ -319,7 +318,7 @@ static float CalculateAccelerometerWeight()
 {
   float AccelerometerMagnitudeSquare = 0;
 
-  //CALCULA A RAIZ QUADRADA DE TODOS OS EIXOS DO ACELEROMETRO PARA EXTRAIR A MAGNITUDE
+  //CALCULA O SQUARE DE TODOS OS EIXOS DO ACELEROMETRO PARA EXTRAIR A MAGNITUDE
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[ROLL] / ACC_1G);
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[PITCH] / ACC_1G);
   AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[YAW] / ACC_1G);
@@ -364,14 +363,14 @@ static void ComputeQuaternionFromRPY(int16_t InitialRoll, int16_t InitialPitch, 
   ComputeRotationMatrix();
 }
 
-void GetMeasuredAcceleration(Struct_Vector3x3 *MeasureAcceleration)
+void GetMeasuredAcceleration(Vector3x3_Struct *MeasureAcceleration)
 {
   MeasureAcceleration->Vector[ROLL] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[ROLL]);
   MeasureAcceleration->Vector[PITCH] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[PITCH]);
   MeasureAcceleration->Vector[YAW] = ConvertAccelerationEarthFrameToCMSS((float)IMU.Accelerometer.Read[YAW]);
 }
 
-void GetMeasuredRotationRate(Struct_Vector3x3 *MeasureRotation)
+void GetMeasuredRotationRate(Vector3x3_Struct *MeasureRotation)
 {
   MeasureRotation->Vector[ROLL] = ConvertToRadians(((float)IMU.Gyroscope.Read[ROLL]));
   MeasureRotation->Vector[PITCH] = ConvertToRadians(((float)IMU.Gyroscope.Read[PITCH]));
@@ -418,7 +417,7 @@ void AHRSClass::Update(float DeltaTime)
     }
   }
 
-  Struct_Vector3x3 MagnetometerBodyFrame = {.Vector = {(float)IMU.Compass.Read[ROLL],
+  Vector3x3_Struct MagnetometerBodyFrame = {.Vector = {(float)IMU.Compass.Read[ROLL],
                                                        (float)IMU.Compass.Read[PITCH],
                                                        (float)IMU.Compass.Read[YAW]}};
 

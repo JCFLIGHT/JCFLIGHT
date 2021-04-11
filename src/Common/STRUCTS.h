@@ -318,36 +318,6 @@ typedef struct
   float q3;
 } Quaternion_Struct;
 
-typedef struct
-{
-  float Roll;
-  float Pitch;
-  float Yaw;
-} Angles_Struct;
-
-typedef union
-{
-  float RawAngles[3];
-  Angles_Struct Angles;
-} Union_Angles_Struct;
-
-typedef struct
-{
-  float Matrix3x3[3][3];
-} Matrix3x3_Struct;
-
-//VETOR EM INT,PARA EVITAR AVISO DE COMPILAÇÃO DO GCC
-typedef union
-{
-  int16_t Vector[3];
-  struct
-  {
-    int16_t Roll;
-    int16_t Pitch;
-    int16_t Yaw;
-  };
-} Vector3x3_Struct;
-
 typedef union
 {
   float Vector[3];
@@ -357,7 +327,7 @@ typedef union
     float Pitch;
     float Yaw;
   };
-} Struct_Vector3x3;
+} Vector3x3_Struct;
 
 typedef struct
 {

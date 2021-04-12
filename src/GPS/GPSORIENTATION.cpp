@@ -22,7 +22,6 @@
 #include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "InertialNavigation/INS.h"
-#include "GPS/GPSSTATES.h"
 #include "Math/MATHSUPPORT.h"
 
 void GPS_Orientation_Update()

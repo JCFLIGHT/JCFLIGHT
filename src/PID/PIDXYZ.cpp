@@ -43,7 +43,6 @@
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDPARAMS.h"
 #include "TECS/TECS.h"
-#include "GPS/GPSSTATES.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

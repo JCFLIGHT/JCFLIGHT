@@ -306,16 +306,14 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL]) - Attitude.Raw[ROLL]);
 
-  float AngleRateTarget = 0;
+  int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue);
 
   if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
   {
-    AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].kP / 6.56f), -ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue));
+    ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue);
   }
-  else
-  {
-    AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].kP / 6.56f), -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue));
-  }
+
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].kP / 6.56f), -ThisBankAngleMax, ThisBankAngleMax);
 
   if (GET_SET[PI_AUTO_LEVEL].kI > 0)
   {
@@ -343,16 +341,14 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH]) - Attitude.Raw[PITCH]);
 
-  float AngleRateTarget = 0;
+  int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue);
 
   if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
   {
-    AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].kP / 6.56f), -ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue));
+    ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue);
   }
-  else
-  {
-    RcControllerAngle = RcControllerToAngleWithMinMax(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MIN].MinMaxValue));
-  }
+
+  float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].kP / 6.56f), -ThisBankAngleMax, ThisBankAngleMax);
 
   if (GET_SET[PI_AUTO_LEVEL].kI > 0)
   {

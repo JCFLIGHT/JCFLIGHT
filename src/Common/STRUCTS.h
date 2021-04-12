@@ -367,7 +367,7 @@ typedef struct
     float LastDerivative;
     float DerivativeCalced;
     int32_t LastInput;
-  } GPS;
+  } GPSFilter;
 
 } PID_Terms_Float_Struct;
 

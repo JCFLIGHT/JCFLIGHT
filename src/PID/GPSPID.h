@@ -22,12 +22,11 @@
 extern PID_Terms_Float_Struct PositionHoldPID;
 extern PID_Terms_Float_Struct PositionHoldRatePID;
 extern PID_Terms_Float_Struct NavigationPID;
-extern PID_Terms_Float_Struct PositionHoldPIDArray[2];
 extern PID_Terms_Float_Struct PositionHoldRatePIDArray[2];
 extern PID_Terms_Float_Struct NavigationPIDArray[2];
-int32_t GPSGetProportional(int32_t Error, PID_Terms_Float_Struct *PID);
-int32_t GPSGetIntegral(int32_t Error, float DeltaTime, PID_Terms_Float_Struct *PID, PID_Terms_Float_Struct *GPS_PID_Param);
-int32_t GPSGetDerivative(int32_t Input, float DeltaTime, PID_Terms_Float_Struct *PID, PID_Terms_Float_Struct *GPS_PID_Param);
-void GPSResetPID(PID_Terms_Float_Struct *PID);
+int32_t GPSGetProportional(int32_t Error, PID_Terms_Float_Struct *FilterPointer);
+int32_t GPSGetIntegral(int32_t Error, float DeltaTime, PID_Terms_Float_Struct *FilterPointer, PID_Terms_Float_Struct *PID_Param_Pointer);
+int32_t GPSGetDerivative(int32_t Input, float DeltaTime, PID_Terms_Float_Struct *FilterPointer, PID_Terms_Float_Struct *PID_Param_Pointer);
+void GPSResetPID(PID_Terms_Float_Struct *FilterPointer);
 void ResetAllGPSPID(void);
 #endif

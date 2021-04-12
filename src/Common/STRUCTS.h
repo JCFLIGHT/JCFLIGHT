@@ -241,8 +241,10 @@ typedef struct
 
       struct Control_Struct
       {
+        bool Enabled = false;
         int16_t Angle[3] = {0, 0, 0};
       } Control;
+
     } AutoPilot;
 
     struct Coordinates_Struct

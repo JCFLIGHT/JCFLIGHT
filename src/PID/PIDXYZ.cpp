@@ -43,6 +43,7 @@
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDPARAMS.h"
 #include "TECS/TECS.h"
+#include "GPS/GPSSTATES.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -304,7 +305,12 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 
   RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[MAX_ROLL_LEVEL].MinMaxValue));
 
-  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL]) - Attitude.Raw[ROLL]);
+  float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[ROLL]);
+
+  if (Get_GPS_Flight_Modes_And_Navigation_In_Use())
+  {
+    AngleErrorInDegrees = GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL];
+  }
 
   int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue);
 
@@ -339,7 +345,12 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
     RcControllerAngle -= ConvertDegreesToDecidegrees(PitchLevelTrim);
   }
 
-  const float AngleErrorInDegrees = ConvertDeciDegreesToDegrees((RcControllerAngle + GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH]) - Attitude.Raw[PITCH]);
+  float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[PITCH]);
+
+  if (Get_GPS_Flight_Modes_And_Navigation_In_Use())
+  {
+    AngleErrorInDegrees = GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH];
+  }
 
   int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue);
 

@@ -312,8 +312,7 @@ void SetThisPointToPositionHold()
 
 static void ApplyINSPositionHoldPIDControl(float DeltaTime)
 {
-  uint8_t IndexCount;
-  for (IndexCount = 0; IndexCount < 2; IndexCount++)
+  for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
   {
     int32_t INSPositionError = INS.Position.Hold[IndexCount] - INS.EarthFrame.Position[IndexCount];
     int32_t GPSTargetSpeed = GPSGetProportional(INSPositionError, &PositionHoldPID);
@@ -357,7 +356,6 @@ int16_t GPS_Update_CrossTrackError(void)
 
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
 {
-  uint8_t IndexCount;
   float Trigonometry[2];
   float NavCompensation;
   int32_t Target_Speed[2];
@@ -369,7 +367,7 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
   Trigonometry[COORD_LONGITUDE] = Fast_Cosine(TargetCalculed);
   Target_Speed[COORD_LATITUDE] = Cross_Speed * Trigonometry[COORD_LONGITUDE] + Maximum_Velocity * Trigonometry[COORD_LATITUDE];
   Target_Speed[COORD_LONGITUDE] = Maximum_Velocity * Trigonometry[COORD_LONGITUDE] - Cross_Speed * Trigonometry[COORD_LATITUDE];
-  for (IndexCount = 0; IndexCount < 2; IndexCount++)
+  for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
   {
     GPS_Parameters.Navigation.RateError[IndexCount] = Target_Speed[IndexCount] - GPS_Parameters.Navigation.Speed[IndexCount];
     GPS_Parameters.Navigation.RateError[IndexCount] = Constrain_16Bits(GPS_Parameters.Navigation.RateError[IndexCount], -1000, 1000);

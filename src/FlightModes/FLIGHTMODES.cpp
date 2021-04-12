@@ -243,4 +243,6 @@ void FlightModesUpdate()
       HeadingHoldTarget = Attitude.EulerAngles.Yaw;
     }
   }
+
+  GPS_Parameters.Navigation.AutoPilot.Control.Enabled = Get_GPS_Flight_Modes_And_Navigation_In_Use();
 }

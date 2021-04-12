@@ -27,15 +27,13 @@
 
 void GPS_Orientation_Update()
 {
-  bool InGPSFlightMode = Get_GPS_Flight_Modes_And_Navigation_In_Use();
-
   if (GetFrameStateOfMultirotor())
   {
     bool AltHoldControlApplied = ApplyAltitudeHoldControl();
     static Scheduler_Struct GPSControlTimer;
     if (!AltHoldControlApplied && Scheduler(&GPSControlTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
     {
-      if (InGPSFlightMode)
+      if (GPS_Parameters.Navigation.AutoPilot.Control.Enabled)
       {
         if (Get_Safe_State_For_Pos_Hold())
         {
@@ -55,7 +53,7 @@ void GPS_Orientation_Update()
   }
   else
   {
-    if (InGPSFlightMode)
+    if (GPS_Parameters.Navigation.AutoPilot.Control.Enabled)
     {
       AirPlaneUpdateNavigation();
     }

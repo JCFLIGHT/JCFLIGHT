@@ -307,7 +307,7 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 
   float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[ROLL]);
 
-  if (Get_GPS_Flight_Modes_And_Navigation_In_Use())
+  if (GPS_Parameters.Navigation.AutoPilot.Control.Enabled)
   {
     AngleErrorInDegrees = GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL];
   }
@@ -347,7 +347,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[PITCH]);
 
-  if (Get_GPS_Flight_Modes_And_Navigation_In_Use())
+  if (GPS_Parameters.Navigation.AutoPilot.Control.Enabled)
   {
     AngleErrorInDegrees = GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH];
   }

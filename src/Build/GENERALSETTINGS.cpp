@@ -50,7 +50,7 @@ void GeneralSettingsInitialization()
   DECODE.Initialization();
   UART2Mode_Initialization();
   CHECKSUM.UpdateChannelsReverse();
-  LoadPID();
+  Load_All_PID_Params();
   LoadGPSParameters();
   PIDXYZ.Initialization();
   KALMAN.Init();

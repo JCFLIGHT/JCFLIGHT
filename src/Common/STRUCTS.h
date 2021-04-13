@@ -132,13 +132,14 @@ typedef struct
     {
       int32_t Estimated = 0;
     } Altitude;
+
   } INS;
 
 } Barometer_Struct;
 
 typedef union
 {
-  int16_t Raw[3];
+  int16_t Raw[3] = {0, 0, 0};
 
   struct
   {
@@ -189,7 +190,7 @@ typedef struct
   int16_t PreviousThrottle;
   int16_t BreakPointer = 1500;
   uint16_t ThrottlePercent = 0;
-  uint16_t FixedWingTauMS;
+  uint16_t FixedWingTauMS = 0;
 } TPA_Parameters_Struct;
 
 typedef struct
@@ -286,11 +287,11 @@ typedef struct
 
 typedef struct
 {
-  float OldMeasure;
-  float NewMeasure;
-  float OldValue;
-  float NewValue;
-  int16_t MeasureCount;
+  float OldMeasure = 0.0f;
+  float NewMeasure = 0.0f;
+  float OldValue = 0.0f;
+  float NewValue = 0.0f;
+  int16_t MeasureCount = 0;
 } Device_Struct;
 
 typedef struct
@@ -322,73 +323,75 @@ typedef struct
 
 typedef struct
 {
-  float q0;
-  float q1;
-  float q2;
-  float q3;
+  float q0 = 0.0f;
+  float q1 = 0.0f;
+  float q2 = 0.0f;
+  float q3 = 0.0f;
 } Quaternion_Struct;
 
 typedef union
 {
   float Vector[3];
+
   struct
   {
     float Roll;
     float Pitch;
     float Yaw;
   };
+
 } Vector3x3_Struct;
 
 typedef struct
 {
-  float Matrix3x3[3][3];
+  float Matrix3x3[3][3] = {{0, 0, 0}, {0, 0, 0}};
 } Matrix3x3_Struct;
 
 typedef struct
 {
   bool State;
-  uint8_t kP;
-  uint8_t kI;
-  uint8_t kD;
-  uint8_t kFF;
-  uint8_t MinMaxValue;
+  uint8_t kP = 0;
+  uint8_t kI = 0;
+  uint8_t kD = 0;
+  uint8_t kFF = 0;
+  uint8_t MinMaxValue = 0;
 } PID_Terms_Struct;
 
 typedef struct
 {
-  float kP;
-  float kI;
-  float kD;
+  float kP = 0.0f;
+  float kI = 0.0f;
+  float kD = 0.0f;
 
   struct GPS_Struct
   {
-    float IntegralSum;
-    float IntegralMax;
-    float LastDerivative;
-    float DerivativeCalced;
-    int32_t LastInput;
+    float IntegralSum = 0.0f;
+    float IntegralMax = 0.0f;
+    float LastDerivative = 0.0f;
+    float DerivativeCalced = 0.0f;
+    int32_t LastInput = 0;
   } GPSFilter;
 
 } PID_Terms_Float_Struct;
 
 typedef struct
 {
-  uint32_t ActualTime;
-  uint32_t StoredTime;
+  uint32_t ActualTime = 0;
+  uint32_t StoredTime = 0;
 } Scheduler_Struct;
 
 typedef struct
 {
-  float State;
-  float RC;
-  float DeltaTime;
+  float State = 0.0f;
+  float RC = 0.0f;
+  float DeltaTime = 0.0f;
 } PT1_Filter_Struct;
 
 typedef struct
 {
-  uint32_t ActualTime;
-  uint32_t PreviousTime;
-  uint32_t TotalTime;
+  uint32_t ActualTime = 0;
+  uint32_t PreviousTime = 0;
+  uint32_t TotalTime = 0;
 } MachineInitTime_Struct;
 
 typedef struct

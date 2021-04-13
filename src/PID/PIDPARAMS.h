@@ -20,6 +20,6 @@
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 extern PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
-void LoadPID();
+void Load_All_PID_Params(void);
 void UpdateValuesOfPID();
 #endif

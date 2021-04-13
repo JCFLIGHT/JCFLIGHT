@@ -98,6 +98,7 @@ const Resources_Of_Param Params_Table[] = {
     {"Disarm_Time_Safety",                 DISARM_TIME_SAFETY_ADDR,              VAR_8BITS,              &JCF_Param.Disarm_Time_Safety,              0,             255,             2},
     {"Compass_Cal_Timer",                  COMPASS_CAL_TIME_ADDR,                VAR_8BITS,              &JCF_Param.Compass_Cal_Timer,               0,             120,             60},
 #endif
+    {"AutoPilotControlMode",               AUTO_PILOT_MODE_ADDR,                 VAR_8BITS,              &JCF_Param.AutoPilotMode,                   0,             1,               0},
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Resources_Of_Param))

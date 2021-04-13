@@ -316,8 +316,6 @@ void SetThisPointToPositionHold()
 static void ApplyINSPositionHoldPIDControl(float DeltaTime)
 {
 
-#ifdef USE_POS_HOLD_TYPE_TOTAL_AUTO_PILOT
-
   /*
    O ATUAL CONTROLE DE POSIÇÃO DA JCFLIGHT MANTÉM A POSIÇÃO POR GPS APENAS QUANDO O PILOTO NÃO MANIPULA OS STICKS,CASO CONTRARIO O GPS-HOLD É CORTADO.
    AGORA COM ESSA NOVA IMPLEMENTAÇÃO A JCFLIGHT MANTÉM CONSTANTEMENTE A POSIÇÃO,MESMO COM O PILOTO MANIPULANDO OS STICKS.
@@ -333,9 +331,9 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
   float NEUVelocityRoll = 0;
   float NEUVelocityPitch = 0;
 
-  if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE)) //CHECA SE O MODO WAYPOINT ESTÁ ATIVO,IGNORA ISSO SE ESTIVER ATIVO
+  if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && (JCF_Param.AutoPilotMode == AUTOPILOT_MODE_CRUISE))
   {
-    if (RCController[PITCH] || RCController[ROLL]) //CHECA SE OS STICKS FORAM MANIPULADOS
+    if (RCController[PITCH] || RCController[ROLL]) //CHECA SE OS STICKS DO RÁDIO FORAM MANIPULADOS
     {
       const float RadioControllVelocityRoll = RCController[PITCH] * MaxManualSpeed / (float)(500 - PosHoldDeadBand);
       const float RadioControllVelocityPitch = RCController[ROLL] * MaxManualSpeed / (float)(500 - PosHoldDeadBand);
@@ -359,8 +357,6 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
       }
     }
   }
-
-#endif
 
   for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
   {

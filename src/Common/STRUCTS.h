@@ -598,6 +598,7 @@ typedef struct
   uint8_t Disarm_Time_Safety;
   uint8_t Compass_Cal_Timer;
 #endif
+  uint8_t AutoPilotMode;
 } JCF_Param_Adjustable_Struct;
 
 typedef struct

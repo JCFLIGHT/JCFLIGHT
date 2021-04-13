@@ -35,6 +35,7 @@
 #include "AHRS/AHRS.h"
 #include "Barometer/BAROBACKEND.h"
 #include "Param/PARAM.h"
+#include "PID/RCPID.h"
 
 GPS_Parameters_Struct GPS_Parameters;
 
@@ -310,10 +311,55 @@ void SetThisPointToPositionHold()
   INS.Position.Hold[COORD_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + INS.EarthFrame.Velocity[INS_LONGITUDE] * PositionHoldPID.kI;
 }
 
+#include "FastSerial/PRINTF.h"
+
 static void ApplyINSPositionHoldPIDControl(float DeltaTime)
 {
-  uint8_t IndexCount;
-  for (IndexCount = 0; IndexCount < 2; IndexCount++)
+
+#ifdef USE_POS_HOLD_TYPE_TOTAL_AUTO_PILOT
+
+  /*
+   O ATUAL CONTROLE DE POSIÇÃO DA JCFLIGHT MANTÉM A POSIÇÃO POR GPS APENAS QUANDO O PILOTO NÃO MANIPULA OS STICKS,CASO CONTRARIO O GPS-HOLD É CORTADO.
+   AGORA COM ESSA NOVA IMPLEMENTAÇÃO A JCFLIGHT MANTÉM CONSTANTEMENTE A POSIÇÃO,MESMO COM O PILOTO MANIPULANDO OS STICKS.
+*/
+
+  static bool NewPointToHold = false;
+  float MaxManualSpeed = 500; //CM/S
+  float PosHoldDeadBand = 20;
+
+  float NEUVelocityRoll = 0;
+  float NEUVelocityPitch = 0;
+
+  if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE)) //CHECA SE O MODO WAYPOINT ESTÁ ATIVO,IGNORA ISSO SE ESTIVER ATIVO
+  {
+    if (RCController[PITCH] || RCController[ROLL]) //CHECA SE OS STICKS FORAM MANIPULADOS
+    {
+      const float RadioControllVelocityRoll = RCController[PITCH] * MaxManualSpeed / (float)(500 - PosHoldDeadBand);
+      const float RadioControllVelocityPitch = RCController[ROLL] * MaxManualSpeed / (float)(500 - PosHoldDeadBand);
+
+      //ROTACIONA AS VELOCIDADES DO BODY-FRAME PARA EARTH-FRAME
+      NEUVelocityRoll = RadioControllVelocityRoll * INS.Math.Cosine_Yaw - RadioControllVelocityPitch * INS.Math.Sine_Yaw;
+      NEUVelocityPitch = RadioControllVelocityRoll * INS.Math.Sine_Yaw + RadioControllVelocityPitch * INS.Math.Cosine_Yaw;
+
+      //CALCULA UMA NOVA POSIÇÃO
+      INS.Position.Hold[INS_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + (NEUVelocityRoll / PositionHoldPID.kP);
+      INS.Position.Hold[INS_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + (NEUVelocityPitch / PositionHoldPID.kP);
+
+      NewPointToHold = true;
+    }
+    else
+    {
+      if (NewPointToHold)
+      {
+        SetThisPointToPositionHold();
+        NewPointToHold = false;
+      }
+    }
+  }
+
+#endif
+
+  for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
   {
     int32_t INSPositionError = INS.Position.Hold[IndexCount] - INS.EarthFrame.Position[IndexCount];
     int32_t GPSTargetSpeed = GPSGetProportional(INSPositionError, &PositionHoldPID);
@@ -325,6 +371,14 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
     GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue));
     NavigationPIDArray[IndexCount].GPS.IntegralSum = PositionHoldRatePIDArray[IndexCount].GPS.IntegralSum;
   }
+
+  DEBUG("Angle[ROLL]:%d Angle[PITCH]:%d NEUVelocityRoll:%.3f NEUVelocityPitch:%.3f Hold[LAT]:%ld Hold[LON]:%ld",
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL],
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH],
+        NEUVelocityRoll / PositionHoldPID.kP,
+        NEUVelocityPitch / PositionHoldPID.kP,
+        INS.Position.Hold[INS_LATITUDE],
+        INS.Position.Hold[INS_LONGITUDE]);
 }
 
 void ApplyPosHoldPIDControl(float DeltaTime)
@@ -357,7 +411,6 @@ int16_t GPS_Update_CrossTrackError(void)
 
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
 {
-  uint8_t IndexCount;
   float Trigonometry[2];
   float NavCompensation;
   int32_t Target_Speed[2];
@@ -369,7 +422,7 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
   Trigonometry[COORD_LONGITUDE] = Fast_Cosine(TargetCalculed);
   Target_Speed[COORD_LATITUDE] = Cross_Speed * Trigonometry[COORD_LONGITUDE] + Maximum_Velocity * Trigonometry[COORD_LATITUDE];
   Target_Speed[COORD_LONGITUDE] = Maximum_Velocity * Trigonometry[COORD_LONGITUDE] - Cross_Speed * Trigonometry[COORD_LATITUDE];
-  for (IndexCount = 0; IndexCount < 2; IndexCount++)
+  for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
   {
     GPS_Parameters.Navigation.RateError[IndexCount] = Target_Speed[IndexCount] - GPS_Parameters.Navigation.Speed[IndexCount];
     GPS_Parameters.Navigation.RateError[IndexCount] = Constrain_16Bits(GPS_Parameters.Navigation.RateError[IndexCount], -1000, 1000);
@@ -428,17 +481,17 @@ void LoadGPSParameters(void)
 {
   Load_RTH_Altitude();
 
-  PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].kP / 100.0;
-  PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].kI / 100.0;
+  PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].kP / 100.0f;
+  PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].kI / 100.0f;
   PositionHoldPID.GPS.LastInput = 20 * 100;
 
-  PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].kP / 10.0;
-  PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].kI / 100.0;
-  PositionHoldRatePID.kD = (float)GET_SET[PID_GPS_POSITION_RATE].kD / 100.0;
+  PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].kP / 10.0f;
+  PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].kI / 100.0f;
+  PositionHoldRatePID.kD = (float)GET_SET[PID_GPS_POSITION_RATE].kD / 100.0f;
   PositionHoldRatePID.GPS.IntegralMax = 20 * 100;
 
-  NavigationPID.kP = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kP / 10.0;
-  NavigationPID.kI = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kI / 100.0;
-  NavigationPID.kD = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kD / 1000.0;
+  NavigationPID.kP = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kP / 10.0f;
+  NavigationPID.kI = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kI / 100.0f;
+  NavigationPID.kD = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kD / 1000.0f;
   NavigationPID.GPS.IntegralMax = 20 * 100;
 }

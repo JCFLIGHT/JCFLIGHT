@@ -22,7 +22,6 @@ PID_Terms_Float_Struct PositionHoldPID;
 PID_Terms_Float_Struct PositionHoldRatePID;
 PID_Terms_Float_Struct NavigationPID;
 
-PID_Terms_Float_Struct PositionHoldPIDArray[2];
 PID_Terms_Float_Struct PositionHoldRatePIDArray[2];
 PID_Terms_Float_Struct NavigationPIDArray[2];
 
@@ -63,8 +62,6 @@ void GPSResetPID(PID_Terms_Float_Struct *PID)
 
 void ResetAllGPSPID(void)
 {
-    GPSResetPID(&PositionHoldPIDArray[COORD_LATITUDE]);
-    GPSResetPID(&PositionHoldPIDArray[COORD_LONGITUDE]);
     GPSResetPID(&PositionHoldRatePIDArray[COORD_LATITUDE]);
     GPSResetPID(&PositionHoldRatePIDArray[COORD_LONGITUDE]);
     GPSResetPID(&NavigationPIDArray[COORD_LATITUDE]);

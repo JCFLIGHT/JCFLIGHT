@@ -82,10 +82,12 @@ void ProcessFlightModesToMultirotor()
       }
       else
       {
+#ifndef USE_POS_HOLD_TYPE_TOTAL_AUTO_PILOT
         if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
         {
           ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, SticksInAutoPilotPosition(20));
         }
+#endif
       }
       if (Get_Multirotor_GPS_FlightModes_Once())
       {

@@ -22,7 +22,6 @@
 extern PID_Terms_Float_Struct PositionHoldPID;
 extern PID_Terms_Float_Struct PositionHoldRatePID;
 extern PID_Terms_Float_Struct NavigationPID;
-extern PID_Terms_Float_Struct PositionHoldPIDArray[2];
 extern PID_Terms_Float_Struct PositionHoldRatePIDArray[2];
 extern PID_Terms_Float_Struct NavigationPIDArray[2];
 int32_t GPSGetProportional(int32_t Error, PID_Terms_Float_Struct *PID);

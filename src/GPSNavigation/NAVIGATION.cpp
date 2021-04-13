@@ -35,6 +35,7 @@
 #include "AHRS/AHRS.h"
 #include "Barometer/BAROBACKEND.h"
 #include "Param/PARAM.h"
+#include "PID/RCPID.h"
 
 GPS_Parameters_Struct GPS_Parameters;
 
@@ -310,8 +311,57 @@ void SetThisPointToPositionHold()
   INS.Position.Hold[COORD_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + INS.EarthFrame.Velocity[INS_LONGITUDE] * PositionHoldPID.kI;
 }
 
+#include "FastSerial/PRINTF.h"
+
 static void ApplyINSPositionHoldPIDControl(float DeltaTime)
 {
+
+#ifdef USE_POS_HOLD_TYPE_TOTAL_AUTO_PILOT
+
+  /*
+   O ATUAL CONTROLE DE POSIÇÃO DA JCFLIGHT MANTÉM A POSIÇÃO POR GPS APENAS QUANDO O PILOTO NÃO MANIPULA OS STICKS,CASO CONTRARIO O GPS-HOLD É CORTADO.
+   AGORA COM ESSA NOVA IMPLEMENTAÇÃO A JCFLIGHT MANTÉM CONSTANTEMENTE A POSIÇÃO,MESMO COM O PILOTO MANIPULANDO OS STICKS.
+*/
+
+  static bool NewPointToHold = false;
+
+  //--------PARAMETROS DE CONFIG PARA O USUARIO--------//
+  float MaxManualSpeed = 500; //CM/S
+  float PosHoldDeadBand = 20;
+  //--------------------------------------------------//
+
+  float NEUVelocityRoll = 0;
+  float NEUVelocityPitch = 0;
+
+  if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE)) //CHECA SE O MODO WAYPOINT ESTÁ ATIVO,IGNORA ISSO SE ESTIVER ATIVO
+  {
+    if (RCController[PITCH] || RCController[ROLL]) //CHECA SE OS STICKS FORAM MANIPULADOS
+    {
+      const float RadioControllVelocityRoll = RCController[PITCH] * MaxManualSpeed / (float)(500 - PosHoldDeadBand);
+      const float RadioControllVelocityPitch = RCController[ROLL] * MaxManualSpeed / (float)(500 - PosHoldDeadBand);
+
+      //ROTACIONA AS VELOCIDADES DO BODY-FRAME PARA EARTH-FRAME
+      NEUVelocityRoll = RadioControllVelocityRoll * INS.Math.Cosine_Yaw - RadioControllVelocityPitch * INS.Math.Sine_Yaw;
+      NEUVelocityPitch = RadioControllVelocityRoll * INS.Math.Sine_Yaw + RadioControllVelocityPitch * INS.Math.Cosine_Yaw;
+
+      //CALCULA UMA NOVA POSIÇÃO
+      INS.Position.Hold[INS_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + (NEUVelocityRoll / PositionHoldPID.kP);
+      INS.Position.Hold[INS_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + (NEUVelocityPitch / PositionHoldPID.kP);
+
+      NewPointToHold = true;
+    }
+    else
+    {
+      if (NewPointToHold)
+      {
+        SetThisPointToPositionHold();
+        NewPointToHold = false;
+      }
+    }
+  }
+
+#endif
+
   for (uint8_t IndexCount = 0; IndexCount < 2; IndexCount++)
   {
     int32_t INSPositionError = INS.Position.Hold[IndexCount] - INS.EarthFrame.Position[IndexCount];
@@ -324,6 +374,14 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
     GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPS_Parameters.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue));
     NavigationPIDArray[IndexCount].GPSFilter.IntegralSum = PositionHoldRatePIDArray[IndexCount].GPSFilter.IntegralSum;
   }
+
+  DEBUG("Angle[ROLL]:%d Angle[PITCH]:%d NEUVelocityRoll:%.3f NEUVelocityPitch:%.3f Hold[LAT]:%ld Hold[LON]:%ld",
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL],
+        GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH],
+        NEUVelocityRoll / PositionHoldPID.kP,
+        NEUVelocityPitch / PositionHoldPID.kP,
+        INS.Position.Hold[INS_LATITUDE],
+        INS.Position.Hold[INS_LONGITUDE]);
 }
 
 void ApplyPosHoldPIDControl(float DeltaTime)

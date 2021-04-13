@@ -113,8 +113,8 @@ void ProcessFlightModesToMultirotor()
           GPS_Parameters.Mode.Navigation = DO_LAND_INIT;
           Do_Pos_Hold_Call_Alt_Hold = false;
           Do_RTH_Or_Land_Call_Alt_Hold = true;
-          SetThisPointToPositionHold();
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+          SetThisPointToPositionHold();
         }
         else
         {

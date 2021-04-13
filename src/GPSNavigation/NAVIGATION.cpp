@@ -414,29 +414,24 @@ void GPS_Reset_Navigation(void)
   }
 }
 
-void Load_RTH_Altitude(void)
+void LoadGPSParameters(void)
 {
   if (GPS_Parameters.Home.Altitude != STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR))
   {
     GPS_Parameters.Home.Altitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
   }
-}
 
-void LoadGPSParameters(void)
-{
-  Load_RTH_Altitude();
-
-  PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].kP / 100.0;
-  PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].kI / 100.0;
+  PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].kP / 100.0f;
+  PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].kI / 100.0f;
   PositionHoldPID.GPSFilter.LastInput = 20 * 100;
 
-  PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].kP / 10.0;
-  PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].kI / 100.0;
-  PositionHoldRatePID.kD = (float)GET_SET[PID_GPS_POSITION_RATE].kD / 100.0;
+  PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].kP / 10.0f;
+  PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].kI / 100.0f;
+  PositionHoldRatePID.kD = (float)GET_SET[PID_GPS_POSITION_RATE].kD / 100.0f;
   PositionHoldRatePID.GPSFilter.IntegralMax = 20 * 100;
 
-  NavigationPID.kP = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kP / 10.0;
-  NavigationPID.kI = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kI / 100.0;
-  NavigationPID.kD = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kD / 1000.0;
+  NavigationPID.kP = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kP / 10.0f;
+  NavigationPID.kI = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kI / 100.0f;
+  NavigationPID.kD = (float)GET_SET[PID_GPS_NAVIGATION_RATE].kD / 1000.0f;
   NavigationPID.GPSFilter.IntegralMax = 20 * 100;
 }

@@ -236,12 +236,9 @@ void FlightModesUpdate()
   ProcessFlightModesToMultirotor();
   ProcessFlightModesToAirPlane();
 
-  if (IS_FLIGHT_MODE_ACTIVE(HEADING_HOLD_MODE))
+  if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
   {
-    if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
-    {
-      HeadingHoldTarget = Attitude.EulerAngles.Yaw;
-    }
+    HeadingHoldTarget = Attitude.EulerAngles.Yaw;
   }
 
   GPS_Parameters.Navigation.AutoPilot.Control.Enabled = Get_GPS_Flight_Modes_And_Navigation_In_Use();

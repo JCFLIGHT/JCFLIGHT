@@ -48,12 +48,9 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
         return;
     }
 
-    if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE))
+    if (IS_FLIGHT_MODE_ACTIVE_ONCE(AUTO_THROTTLE_MODE))
     {
-        if (IS_FLIGHT_MODE_ACTIVE_ONCE(AUTO_THROTTLE_MODE))
-        {
-            PreviousValueOfAirSpeed = ConvertCentimeterPerSecondsToKmPerHour(AirSpeed.Raw.IASPressureInCM);
-        }
+        PreviousValueOfAirSpeed = ConvertCentimeterPerSecondsToKmPerHour(AirSpeed.Raw.IASPressureInCM);
     }
 
     if (IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) && !GetActualThrottleStatus(THROTTLE_LOW))

@@ -423,7 +423,7 @@ void LoadGPSParameters(void)
 
   PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].kP / 100.0f;
   PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].kI / 100.0f;
-  PositionHoldPID.GPSFilter.LastInput = 20 * 100;
+  PositionHoldPID.GPSFilter.IntegralMax = 20 * 100;
 
   PositionHoldRatePID.kP = (float)GET_SET[PID_GPS_POSITION_RATE].kP / 10.0f;
   PositionHoldRatePID.kI = (float)GET_SET[PID_GPS_POSITION_RATE].kI / 100.0f;

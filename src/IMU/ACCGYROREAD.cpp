@@ -165,12 +165,10 @@ void Acc_ReadBufferData()
 
   Accelerometer_Calibration();
 
-#ifndef __AVR_ATmega2560__
   //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS
   IMU.Accelerometer.ReadNotFiltered[ROLL] = IMU.Accelerometer.Read[ROLL];
   IMU.Accelerometer.ReadNotFiltered[PITCH] = IMU.Accelerometer.Read[PITCH];
   IMU.Accelerometer.ReadNotFiltered[YAW] = IMU.Accelerometer.Read[YAW];
-#endif
 
   //KALMAN
   if (ActiveKalman)
@@ -210,12 +208,10 @@ void Gyro_ReadBufferData()
 
   Gyroscope_Calibration();
 
-#ifndef __AVR_ATmega2560__
   //OBTÉM OS VALORES DO GYROSCOPIO ANTES DOS FILTROS
   IMU.Gyroscope.ReadNotFiltered[ROLL] = IMU.Gyroscope.Read[ROLL];
   IMU.Gyroscope.ReadNotFiltered[PITCH] = IMU.Gyroscope.Read[PITCH];
   IMU.Gyroscope.ReadNotFiltered[YAW] = IMU.Gyroscope.Read[YAW];
-#endif
 
   //KALMAN
   if (ActiveKalman)

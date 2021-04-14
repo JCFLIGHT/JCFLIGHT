@@ -343,8 +343,8 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
       NEUVelocityPitch = RadioControllVelocityRoll * INS.Math.Sine_Yaw + RadioControllVelocityPitch * INS.Math.Cosine_Yaw;
 
       //CALCULA UMA NOVA POSIÇÃO
-      INS.Position.Hold[INS_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + (NEUVelocityRoll / PositionHoldPID.kP);
-      INS.Position.Hold[INS_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + (NEUVelocityPitch / PositionHoldPID.kP);
+      INS.Position.Hold[INS_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + (NEUVelocityRoll * PositionHoldPID.kI);
+      INS.Position.Hold[INS_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + (NEUVelocityPitch * PositionHoldPID.kI);
 
       NewPointToHold = true;
     }
@@ -374,8 +374,8 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
   DEBUG("Angle[ROLL]:%d Angle[PITCH]:%d NEUVelocityRoll:%.3f NEUVelocityPitch:%.3f Hold[LAT]:%ld Hold[LON]:%ld",
         GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL],
         GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH],
-        NEUVelocityRoll / PositionHoldPID.kP,
-        NEUVelocityPitch / PositionHoldPID.kP,
+        NEUVelocityRoll * PositionHoldPID.kI,
+        NEUVelocityPitch * PositionHoldPID.kI,
         INS.Position.Hold[INS_LATITUDE],
         INS.Position.Hold[INS_LONGITUDE]);
 }

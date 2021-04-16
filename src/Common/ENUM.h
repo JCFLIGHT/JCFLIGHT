@@ -156,6 +156,12 @@ enum GPS_Modes_Enum
     GPS_MODE_RTH
 };
 
+enum GPS_AutoPilotWithUser_Enum
+{
+    AUTOPILOT_MODE_ATTI = 0,
+    AUTOPILOT_MODE_CRUISE
+};
+
 enum GPSFlightModes_Enum
 {
     DO_NONE = 0,

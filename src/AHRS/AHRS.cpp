@@ -399,12 +399,12 @@ void AHRSClass::Update(float DeltaTime)
     {
       if (GPSHeadingInitialized)
       {
-        CourseOverGround = ConvertDeciDegreesToRadians(GPS_Parameters.Navigation.Misc.Get.GroundCourse);
+        CourseOverGround = ConvertDeciDegreesToRadians(GPSParameters.Navigation.Misc.Get.GroundCourse);
         SafeToUseGPSHeading = true;
       }
       else
       {
-        ComputeQuaternionFromRPY(Attitude.EulerAngles.Roll, Attitude.EulerAngles.Pitch, GPS_Parameters.Navigation.Misc.Get.GroundCourse);
+        ComputeQuaternionFromRPY(Attitude.EulerAngles.Roll, Attitude.EulerAngles.Pitch, GPSParameters.Navigation.Misc.Get.GroundCourse);
         GPSHeadingInitialized = true;
       }
     }

@@ -60,7 +60,7 @@ void GPSResetPID(PID_Terms_Float_Struct *FilterPointer)
     FilterPointer->GPSFilter.LastDerivative = 0;
 }
 
-void ResetAllGPSPID(void)
+void ResetAllPIDOfGPS(void)
 {
     GPSResetPID(&PositionHoldRatePIDArray[COORD_LATITUDE]);
     GPSResetPID(&PositionHoldRatePIDArray[COORD_LONGITUDE]);

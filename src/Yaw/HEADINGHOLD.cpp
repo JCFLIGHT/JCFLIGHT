@@ -58,7 +58,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (GPS_Parameters.Mode.Flight == DO_NONE) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
+  if (GPSParameters.Mode.Flight == DO_NONE) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
   {
     return false;
   }

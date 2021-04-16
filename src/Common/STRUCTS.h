@@ -141,7 +141,7 @@ typedef union
 {
   int16_t Raw[3] = {0, 0, 0};
 
-  struct
+  struct EulerAngles_Struct
   {
     int16_t Roll;
     int16_t Pitch;

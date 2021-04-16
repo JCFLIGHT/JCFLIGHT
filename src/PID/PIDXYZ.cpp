@@ -306,9 +306,9 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 
   float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[ROLL]);
 
-  if (GPS_Parameters.Navigation.AutoPilot.Control.Enabled)
+  if (GPSParameters.Navigation.AutoPilot.Control.Enabled)
   {
-    AngleErrorInDegrees = GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL];
+    AngleErrorInDegrees = GPSParameters.Navigation.AutoPilot.Control.Angle[ROLL];
   }
 
   int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue);
@@ -346,9 +346,9 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[PITCH]);
 
-  if (GPS_Parameters.Navigation.AutoPilot.Control.Enabled)
+  if (GPSParameters.Navigation.AutoPilot.Control.Enabled)
   {
-    AngleErrorInDegrees = GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH];
+    AngleErrorInDegrees = GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH];
   }
 
   int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue);

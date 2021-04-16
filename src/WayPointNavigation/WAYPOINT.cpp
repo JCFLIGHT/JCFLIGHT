@@ -29,6 +29,8 @@
 #include "PID/RCPID.h"
 #include "FlightModes/FLIGHTMODES.h"
 #include "Param/PARAM.h"
+#include "GPSNavigation/NAVIGATIONGEO.h"
+#include "GPSNavigation/INSNAVIGATION.h"
 
 struct _GetWayPointGCSParameters GetWayPointGCSParameters;
 struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
@@ -272,9 +274,9 @@ void WayPointRun()
   case GET_ALTITUDE_TAKEOFF:
     Mission_Timed_Count = 0;
     Get_Altitude();
-    GPS_Parameters.Mode.Flight = GPS_MODE_HOLD;
+    GPSParameters.Mode.Flight = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
-    GPS_Parameters.Mode.Navigation = DO_POSITION_HOLD;
+    GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
     if (GetAltitudeReached() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
@@ -299,9 +301,9 @@ void WayPointRun()
   case GET_ALTITUDE:
     Mission_Timed_Count = 0;
     Get_Altitude();
-    GPS_Parameters.Mode.Flight = GPS_MODE_HOLD;
+    GPSParameters.Mode.Flight = GPS_MODE_HOLD;
     SetThisPointToPositionHold();
-    GPS_Parameters.Mode.Navigation = DO_POSITION_HOLD;
+    GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
     if (GetAltitudeReached())
     {
       WayPointMode = WP_START_MISSION;
@@ -317,8 +319,8 @@ void WayPointRun()
   case WP_EN_ROUTE:
     Navigation_Speed_Result = Calculate_Navigation_Speed(JCF_Param.Navigation_Vel);
     GPSCalculateNavigationRate(Navigation_Speed_Result);
-    HeadingHoldTarget = WRap_18000(GPS_Parameters.Navigation.Bearing.ActualTarget) / 100;
-    if ((GPS_Parameters.Navigation.Coordinates.Distance <= ConvertCMToMeters(JCF_Param.GPS_WP_Radius)) || Point_Reached())
+    HeadingHoldTarget = WRap_18000(GPSParameters.Navigation.Bearing.ActualTarget) / 100;
+    if ((GPSParameters.Navigation.Coordinates.Distance <= ConvertCMToMeters(JCF_Param.GPS_WP_Radius)) || Point_Reached())
     {
       if (WPSucess && MissionNumber == 0 && WayPointLatitude[1] != 0 && WayPointLongitude[1] != 0)
       {
@@ -383,9 +385,9 @@ void WayPointRun()
           Mission_Timed_Count++; //10 ITERAÇÕES = 1 SEGUNDO
         }
         Do_RTH_Or_Land_Call_Alt_Hold = false;
-        GPS_Parameters.Mode.Flight = GPS_MODE_HOLD;
+        GPSParameters.Mode.Flight = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
-        GPS_Parameters.Mode.Navigation = DO_POSITION_HOLD;
+        GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
         if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber])) //MULT POR 10 PARA OBTÉR O VALOR EM SEGUNDOS PARA TRABALHAR EM CONJUNTO COM A FUNÇÃO WayPointSync10Hz()
         {
           WayPointMode = GET_ALTITUDE;
@@ -394,10 +396,10 @@ void WayPointRun()
       //LAND
       if (WayPointFlightMode[MissionNumber] == WP_LAND)
       {
-        GPS_Parameters.Mode.Flight = GPS_MODE_HOLD;
+        GPSParameters.Mode.Flight = GPS_MODE_HOLD;
         SetThisPointToPositionHold();
-        GPS_Parameters.Mode.Navigation = DO_POSITION_HOLD;
-        GPS_Parameters.Mode.Navigation = DO_LAND_INIT;
+        GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
+        GPSParameters.Mode.Navigation = DO_LAND_INIT;
       }
       //RTH
       if (WayPointFlightMode[MissionNumber] == WP_RTH)

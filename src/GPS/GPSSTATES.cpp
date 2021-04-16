@@ -26,7 +26,7 @@
 
 bool Get_State_Armed_With_GPS(void)
 {
-    if (GPS_Parameters.Navigation.Misc.Get.Satellites >= 5 && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && GPS_Parameters.Home.Marked)
+    if (GPSParameters.Navigation.Misc.Get.Satellites >= 5 && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && GPSParameters.Home.Marked)
     {
         return true;
     }
@@ -35,7 +35,7 @@ bool Get_State_Armed_With_GPS(void)
 
 bool Get_GPS_In_Good_Condition(void)
 {
-    if (GPS_Parameters.Navigation.Misc.Get.Satellites >= 5)
+    if (GPSParameters.Navigation.Misc.Get.Satellites >= 5)
     {
         return true;
     }
@@ -44,7 +44,7 @@ bool Get_GPS_In_Good_Condition(void)
 
 bool Get_GPS_In_Bad_Condition(void)
 {
-    if (GPS_Parameters.Navigation.Misc.Get.Satellites < 5)
+    if (GPSParameters.Navigation.Misc.Get.Satellites < 5)
     {
         return true;
     }
@@ -53,7 +53,7 @@ bool Get_GPS_In_Bad_Condition(void)
 
 bool Get_GPS_In_Eight_Or_Plus_Satellites(void)
 {
-    if (GPS_Parameters.Navigation.Misc.Get.Satellites >= 8)
+    if (GPSParameters.Navigation.Misc.Get.Satellites >= 8)
     {
         return true;
     }
@@ -72,15 +72,15 @@ bool Get_GPS_Type(uint8_t GPS_Type)
 
 bool Get_GPS_Heading_Is_Valid(void)
 {
-    return GPS_Parameters.Navigation.Misc.Get.Satellites >= 6 && GPS_Parameters.Navigation.Misc.Get.GroundSpeed >= 300;
+    return GPSParameters.Navigation.Misc.Get.Satellites >= 6 && GPSParameters.Navigation.Misc.Get.GroundSpeed >= 300;
 }
 
 bool Get_GPS_Flight_Modes_And_Navigation_In_Use(void)
 {
-    return (GPS_Parameters.Mode.Flight != GPS_MODE_NONE) && (GPS_Parameters.Mode.Navigation != DO_NONE);
+    return (GPSParameters.Mode.Flight != GPS_MODE_NONE) && (GPSParameters.Mode.Navigation != DO_NONE);
 }
 
 bool Get_GPS_Only_Flight_Modes_In_Use(void)
 {
-    return (GPS_Parameters.Mode.Flight != GPS_MODE_NONE);
+    return (GPSParameters.Mode.Flight != GPS_MODE_NONE);
 }

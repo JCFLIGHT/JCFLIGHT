@@ -100,11 +100,11 @@ void Circle_Mode_Update()
 
   if (!I2CResources.Found.Compass)
   {
-    HeadingToCircle = WRap_18000(GPS_Parameters.Navigation.Misc.Get.GroundCourse * 10) / 100;
+    HeadingToCircle = WRap_18000(GPSParameters.Navigation.Misc.Get.GroundCourse * 10) / 100;
   }
   else
   {
-    HeadingToCircle = GPS_Parameters.Navigation.Misc.Get.GroundCourse;
+    HeadingToCircle = GPSParameters.Navigation.Misc.Get.GroundCourse;
   }
 
   if (HeadingToCircle > 180)
@@ -112,18 +112,18 @@ void Circle_Mode_Update()
     HeadingToCircle -= 360;
   }
 
-  Scale_Of_Circle = (89.832f / GPS_Parameters.ScaleDownOfLongitude) * CRUISE_DISTANCE;
+  Scale_Of_Circle = (89.832f / GPSParameters.ScaleDownOfLongitude) * CRUISE_DISTANCE;
   Latitude_To_Circle = Fast_Cosine(ConvertToRadians(HeadingToCircle));
-  Longitude_To_Circle = Fast_Sine(ConvertToRadians(HeadingToCircle)) * GPS_Parameters.ScaleDownOfLongitude;
-  GPS_Parameters.Navigation.Coordinates.Destiny[COORD_LATITUDE] += Latitude_To_Circle * Scale_Of_Circle;
-  GPS_Parameters.Navigation.Coordinates.Destiny[COORD_LONGITUDE] += Longitude_To_Circle * Scale_Of_Circle;
+  Longitude_To_Circle = Fast_Sine(ConvertToRadians(HeadingToCircle)) * GPSParameters.ScaleDownOfLongitude;
+  GPSParameters.Navigation.Coordinates.Destiny[COORD_LATITUDE] += Latitude_To_Circle * Scale_Of_Circle;
+  GPSParameters.Navigation.Coordinates.Destiny[COORD_LONGITUDE] += Longitude_To_Circle * Scale_Of_Circle;
 }
 
 void AirPlaneUpdateNavigation(void)
 {
-  RTH_AltitudeOfPlane = GPS_Parameters.Home.Altitude;
+  RTH_AltitudeOfPlane = GPSParameters.Home.Altitude;
   Read_Throttle = DECODE.GetRxChannelOutput(THROTTLE);
-  CurrentAltitude = GPS_Parameters.Navigation.Misc.Get.Altitude - Altitude_For_Plane;
+  CurrentAltitude = GPSParameters.Navigation.Misc.Get.Altitude - Altitude_For_Plane;
   TargetAltitude = AltitudeHold_For_Plane - Altitude_For_Plane;
 
   if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE) && CurrentAltitude < RTH_AltitudeOfPlane)
@@ -133,12 +133,12 @@ void AirPlaneUpdateNavigation(void)
 
   if (!I2CResources.Found.Compass)
   {
-    GPS_Heading = WRap_18000(GPS_Parameters.Navigation.Misc.Get.GroundCourse * 10) / 10;
+    GPS_Heading = WRap_18000(GPSParameters.Navigation.Misc.Get.GroundCourse * 10) / 10;
     AttitudeHeading = GPS_Heading / 10;
   }
   else
   {
-    GPS_Heading = GPS_Parameters.Navigation.Misc.Get.GroundCourse;
+    GPS_Heading = GPSParameters.Navigation.Misc.Get.GroundCourse;
     AttitudeHeading = Attitude.EulerAngles.Yaw;
   }
 
@@ -146,7 +146,7 @@ void AirPlaneUpdateNavigation(void)
 
   if (I2CResources.Found.Compass)
   {
-    if (ABS(AttitudeHeading - (GPS_Heading / 10)) > 10 && GPS_Parameters.Navigation.Misc.Get.GroundSpeed > 200)
+    if (ABS(AttitudeHeading - (GPS_Heading / 10)) > 10 && GPSParameters.Navigation.Misc.Get.GroundSpeed > 200)
     {
       Current_Heading = GPS_Heading / 10;
     }
@@ -160,7 +160,7 @@ void AirPlaneUpdateNavigation(void)
     Current_Heading = GPS_Heading / 10;
   }
 
-  GPSTargetBearing = GPS_Parameters.Navigation.Bearing.TargetPrev / 100;
+  GPSTargetBearing = GPSParameters.Navigation.Bearing.TargetPrev / 100;
   HeadingDifference = GPSTargetBearing - Current_Heading;
   AltitudeError = CurrentAltitude - TargetAltitude;
 
@@ -195,20 +195,20 @@ void AirPlaneUpdateNavigation(void)
           HeadingDifference = 0; //FORÇA UMA SUBIDA ATÉ UM VALOR MAIOR OU IGUAL A SAFE_NAV_ALT
         }
       }
-      if ((GPS_Parameters.Home.Distance < SAFE_DECSCEND_ZONE) && CurrentAltitude > RTH_AltitudeOfPlane)
+      if ((GPSParameters.Home.Distance < SAFE_DECSCEND_ZONE) && CurrentAltitude > RTH_AltitudeOfPlane)
       {
         AltitudeHold_For_Plane = Altitude_For_Plane + RTH_AltitudeOfPlane;
       }
     }
 
-    if (SystemInFailSafe() && (GPS_Parameters.Home.Distance < 10))
+    if (SystemInFailSafe() && (GPSParameters.Home.Distance < 10))
     {
       DISABLE_STATE(PRIMARY_ARM_DISARM);
       DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
       AltitudeHold_For_Plane = Altitude_For_Plane + 5;
     }
 
-    if (GPS_Parameters.Home.Distance < 10)
+    if (GPSParameters.Home.Distance < 10)
     {
       HeadingDifference *= 0.1f;
     }
@@ -283,24 +283,24 @@ void AirPlaneUpdateNavigation(void)
     NavigationDeltaSumPID = (NavigationDeltaSumPID * Nav_kD) / DeltaTime_Navigation_PID;
     HeadingDifference *= Nav_kP;
     HeadingDifference += IntegralErrorOfNavigation;
-    GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(AltitudeDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue)) + AltitudeDeltaSumPID;
-    GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue)) + NavigationDeltaSumPID;
-    GPS_Parameters.Navigation.AutoPilot.Control.Angle[YAW] = Constrain_16Bits(HeadingDifference / 10, -MAX_YAW_BANKANGLE * 10, MAX_YAW_BANKANGLE * 10) + NavigationDeltaSumPID;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(AltitudeDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue)) + AltitudeDeltaSumPID;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue)) + NavigationDeltaSumPID;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[YAW] = Constrain_16Bits(HeadingDifference / 10, -MAX_YAW_BANKANGLE * 10, MAX_YAW_BANKANGLE * 10) + NavigationDeltaSumPID;
 
     if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
-      GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH], 0, ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue));
+      GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH], 0, ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue));
     }
 
     if (!IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
     {
-      GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] -= (ABS(Attitude.EulerAngles.Roll));
+      GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] -= (ABS(Attitude.EulerAngles.Roll));
     }
 
     GetThrottleToNavigation -= Constrain_16Bits(Attitude.EulerAngles.Pitch * PITCH_COMP, 0, 450);
-    SpeedDifference = (GPS_MINSPEED - GPS_Parameters.Navigation.Misc.Get.GroundSpeed) * I_TERM;
+    SpeedDifference = (GPS_MINSPEED - GPSParameters.Navigation.Misc.Get.GroundSpeed) * I_TERM;
 
-    if (GPS_Parameters.Navigation.Misc.Get.GroundSpeed < GPS_MINSPEED - 50 || GPS_Parameters.Navigation.Misc.Get.GroundSpeed > GPS_MINSPEED + 50)
+    if (GPSParameters.Navigation.Misc.Get.GroundSpeed < GPS_MINSPEED - 50 || GPSParameters.Navigation.Misc.Get.GroundSpeed > GPS_MINSPEED + 50)
     {
       ThrottleBoost += SpeedDifference;
     }
@@ -313,13 +313,13 @@ void AirPlaneUpdateNavigation(void)
   if ((!IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE)) || (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && !SystemInFailSafe()))
   {
     GetThrottleToNavigation = Read_Throttle;
-    GPS_Parameters.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
-    GPS_Parameters.Navigation.AutoPilot.Control.Angle[ROLL] = 0;
-    GPS_Parameters.Navigation.AutoPilot.Control.Angle[YAW] = 0;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[ROLL] = 0;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[YAW] = 0;
   }
 
   RCController[THROTTLE] = GetThrottleToNavigation;
-  RCController[YAW] += GPS_Parameters.Navigation.AutoPilot.Control.Angle[YAW];
+  RCController[YAW] += GPSParameters.Navigation.AutoPilot.Control.Angle[YAW];
 }
 
 void PlaneResetNavigation(void)

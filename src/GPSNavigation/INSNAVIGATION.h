@@ -15,15 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAVIGATION_H_
-#define NAVIGATION_H_
-#include "Build/LIBDEPENDENCIES.h"
-#include "Common/STRUCTS.h"
-extern GPS_Parameters_Struct GPSParameters;
-void LoadGPSParameters(void);
-void GPS_Reset_Navigation(void);
-void GPS_Process_FlightModes(float DeltaTime);
-void Do_Mode_RTH_Now(void);
-void Set_Next_Point_To_Navigation(int32_t Latitude_Destiny, int32_t Longitude_Destiny);
-bool Get_Safe_State_To_Apply_Position_Hold(void);
+#ifndef INSNAVIGATION_H_
+#define INSNAVIGATION_H_
+void SetThisPointToPositionHold(void);
+void ApplyPosHoldPIDControl(float DeltaTime);
 #endif

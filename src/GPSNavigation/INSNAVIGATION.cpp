@@ -25,8 +25,6 @@
 #include "Param/PARAM.h"
 #include "PID/RCPID.h"
 
-#include "FastSerial/PRINTF.h"
-
 #define POS_HOLD_DEADBAND 20
 
 void SetThisPointToPositionHold(void)
@@ -80,12 +78,6 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
         GPSParameters.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPSParameters.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MinMaxValue));
         NavigationPIDArray[IndexCount].GPSFilter.IntegralSum = PositionHoldRatePIDArray[IndexCount].GPSFilter.IntegralSum;
     }
-
-    DEBUG("Angle[ROLL]:%d Angle[PITCH]:%d Hold[LAT]:%ld Hold[LON]:%ld",
-          GPSParameters.Navigation.AutoPilot.Control.Angle[ROLL],
-          GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH],
-          INS.Position.Hold[INS_LATITUDE],
-          INS.Position.Hold[INS_LONGITUDE]);
 }
 
 void ApplyPosHoldPIDControl(float DeltaTime)

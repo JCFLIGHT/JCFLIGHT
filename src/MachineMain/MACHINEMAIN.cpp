@@ -23,15 +23,13 @@ FILE_COMPILE_FOR_SPEED
 void MachineInit()
 {
     //OBTÉM O VALOR INICIAL DE MILLIS PARA CALCULAR O TEMPO DE INICIALIZAÇÃO
-    SetInitialTimeToInitTheMachine(&MachineInitTime_StructNow);
+    SetInitialTimeToInitTheMachine(&MachineInitTime);
     //INICIALIZA A SERIAL
     FASTSERIAL.Initialization();
     //INICIALIZA O LED RGB
     RGB.Initialization();
     //CHECA SE É A PRIMEIRA VEZ QUE O FIRMWARE FOI CARREGADO
-    CheckFirstLinkOrganizeEEPROM();
-    //INICIALIZA OS PARAMETROS GERAIS
-    GeneralSettingsInitialization();
+    FirmwareOrganizeAllParams();
     //CALIBRAÇÃO DOS ESCS
     ESC.Calibration();
     //CARREGA OS VALORES DE CALIBRAÇÃO DA IMU
@@ -40,13 +38,13 @@ void MachineInit()
     COMPASS.UpdateCompassCalibration();
     //INICIALIZA OS DISPOSITIVOS I2C
     I2C.All_Initialization();
-    //DECLARA OS PINOS GERAIS DE SAÍDA
+    //INICIALIZA AS CONFIGURAÇÕES DOS PINOS IO
     ConfigureRegisters(false);
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
     //CALCULA E IMPRIME O TEMPO GASTO PELA INICIALIZAÇÃO
-    CalculeTheFinalTimeToInitTheMachine(&MachineInitTime_StructNow);
-    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos\n", GetTheFinalTimeToInitTheMachine(&MachineInitTime_StructNow));
+    CalculeTheFinalTimeToInitTheMachine(&MachineInitTime);
+    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos\n", GetTheFinalTimeToInitTheMachine(&MachineInitTime));
 }
 
 void MachineRun()

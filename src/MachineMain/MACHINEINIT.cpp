@@ -18,7 +18,7 @@
 #include "MACHINEINIT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 
-MachineInitTime_Struct MachineInitTime_StructNow;
+MachineInitTime_Struct MachineInitTime;
 
 void SetInitialTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer)
 {

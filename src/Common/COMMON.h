@@ -73,7 +73,6 @@
 #include "Build/DEFAULT.h"
 #include "TaskSystem/TASKSYSTEM.h"
 #include "ParamsToGCS/CHECKSUM.h"
-#include "Build/GENERALSETTINGS.h"
 #include "MachineMain/MACHINEINIT.h"
 #include "IMU/GFORCE.h"
 #include "TECS/TECS.h"

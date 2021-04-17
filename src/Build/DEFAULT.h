@@ -17,5 +17,5 @@
 
 #ifndef DEFAULT_H_
 #define DEFAULT_H_
-void CheckFirstLinkOrganizeEEPROM();
+void FirmwareOrganizeAllParams(void);
 #endif

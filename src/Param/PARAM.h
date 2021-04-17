@@ -24,12 +24,12 @@ class ParamClass
 {
 public:
   void Initialization(void);
+  void DefaultList(const Resources_Of_Param *ParamValue);
   void SerialProcess(void);
 
 private:
   bool PrintMessage = false;
   char SerialBuffer[48];
-  uint8_t Actual_Format_Version = 10; //1.0
   uint32_t SerialBufferIndex = 0;
   void Load_Sketch(void);
   void Set_And_Save(char *TerminalCommandLine);

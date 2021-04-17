@@ -20,32 +20,31 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "BOARDDEFS.h"
+#include "Param/PARAM.h"
+#include "FastSerial/PRINTF.h"
+#include "Build/GENERALSETTINGS.h"
 #ifdef ESP32
 #include "EEPROM.h"
 #endif
 
-#define HIGH_BYTE_CHECK 0x80
+uint8_t Actual_Format_Version = 10; //1.0
 
-bool StorageCheckPassed()
+bool CheckActualFormatVersion(void)
 {
-    if (STORAGEMANAGER.Read_8Bits(FIRST_LINK_ADDR) < HIGH_BYTE_CHECK)
+    static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(FIRMWARE_FIRST_USAGE_ADDR);
+    if (System_Version != Actual_Format_Version)
     {
         return false;
     }
     return true;
 }
 
-void SetHighByteInAddress()
+void SetNewActualFormatVersion(void)
 {
-    STORAGEMANAGER.Write_8Bits(FIRST_LINK_ADDR, HIGH_BYTE_CHECK);
+    STORAGEMANAGER.Write_8Bits(FIRMWARE_FIRST_USAGE_ADDR, Actual_Format_Version);
 }
 
-void RecallDefaultConfiguration()
-{
-    GCS.Default_All_Configs();
-}
-
-void EEPROMClearSensorsCalibration()
+void ClearSensorsCalibration(void)
 {
     //LIMPA TODOS OS ENDEREÇOS DA EEPROM QUE SÃO UTILIZADOS PARA ARMAZENAR A CALIBRAÇÃO DOS SENSORES
     STORAGEMANAGER.Write_16Bits(ACC_ROLL_OFFSET_ADDR, 0);
@@ -59,24 +58,35 @@ void EEPROMClearSensorsCalibration()
     STORAGEMANAGER.Write_16Bits(MAG_YAW_OFFSET_ADDR, 0);
 }
 
-void EEPROMClearWayPointStorage()
+void ClearWayPointsStorage(void)
 {
     STORAGEMANAGER.Erase(704, 813);
 }
 
-void CheckFirstLinkOrganizeEEPROM()
+void RecallAllParams(void)
+{
+    const Resources_Of_Param *ParamValue;
+    GCS.Default_All_Configs();
+    ClearSensorsCalibration();
+    ClearWayPointsStorage();
+    PARAM.DefaultList(ParamValue);
+    SetNewActualFormatVersion();
+}
+
+void FirmwareOrganizeAllParams(void)
 {
 #ifdef ESP32
     EEPROM.begin(SIZE_OF_EEPROM);
 #endif
-    if (!StorageCheckPassed())
+    if (!CheckActualFormatVersion())
     {
+        LOG("Restaurando os valores de fabrica dos parametros...");
         for (uint8_t i = 0; i < 5; i++) //FORÇA UMA REPETIÇÃO DE 5 VEZES
         {
-            RecallDefaultConfiguration();
-            EEPROMClearSensorsCalibration();
-            EEPROMClearWayPointStorage();
-            SetHighByteInAddress();
+            RecallAllParams();
         }
+        LOG("Ok...Parametros reconfigurados!");
+        LINE_SPACE;
     }
+    GeneralSettingsInitialization();
 }

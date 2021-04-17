@@ -116,7 +116,7 @@ void ParamClass::Initialization(void)
   PARAM.Load_Sketch();
 }
 
-static void DefaultParams(const Resources_Of_Param *ParamValue)
+void ParamClass::DefaultList(const Resources_Of_Param *ParamValue)
 {
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
@@ -150,42 +150,30 @@ static void DefaultParams(const Resources_Of_Param *ParamValue)
 
 void ParamClass::Load_Sketch(void)
 {
-  static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(PARAM_LINK_ADDR);
   const Resources_Of_Param *ParamValue;
 
-  if (PARAM.Actual_Format_Version != System_Version)
+  for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
-    LOG("Restaurando os valores de fabrica dos parametros...");
-    DefaultParams(ParamValue);
-    LOG("Ok...Parametros reconfigurados!");
-    STORAGEMANAGER.Write_8Bits(PARAM_LINK_ADDR, PARAM.Actual_Format_Version);
-    return;
-  }
-  else
-  {
-    for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
+    ParamValue = &Params_Table[Table_Counter];
+
+    switch (ParamValue->Variable_Type)
     {
-      ParamValue = &Params_Table[Table_Counter];
 
-      switch (ParamValue->Variable_Type)
-      {
+    case VAR_8BITS:
+      *(uint8_t *)ParamValue->Ptr = STORAGEMANAGER.Read_8Bits(ParamValue->Address);
+      break;
 
-      case VAR_8BITS:
-        *(uint8_t *)ParamValue->Ptr = STORAGEMANAGER.Read_8Bits(ParamValue->Address);
-        break;
+    case VAR_16BITS:
+      *(int16_t *)ParamValue->Ptr = STORAGEMANAGER.Read_16Bits(ParamValue->Address);
+      break;
 
-      case VAR_16BITS:
-        *(int16_t *)ParamValue->Ptr = STORAGEMANAGER.Read_16Bits(ParamValue->Address);
-        break;
+    case VAR_32BITS:
+      *(int32_t *)ParamValue->Ptr = STORAGEMANAGER.Read_32Bits(ParamValue->Address);
+      break;
 
-      case VAR_32BITS:
-        *(int32_t *)ParamValue->Ptr = STORAGEMANAGER.Read_32Bits(ParamValue->Address);
-        break;
-
-      case VAR_FLOAT:
-        *(float *)ParamValue->Ptr = STORAGEMANAGER.Read_Float(ParamValue->Address);
-        break;
-      }
+    case VAR_FLOAT:
+      *(float *)ParamValue->Ptr = STORAGEMANAGER.Read_Float(ParamValue->Address);
+      break;
     }
   }
 }
@@ -326,7 +314,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {
     DEBUG("Restaurando os valores de fabrica dos parametros...");
-    DefaultParams(ParamValue);
+    PARAM.DefaultList(ParamValue);
     DEBUG("Ok...Parametros reconfigurados!");
     LINE_SPACE;
   }

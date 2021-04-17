@@ -350,8 +350,8 @@ struct _Send_User_Medium_Parameters
     uint8_t SendPitchBankMax;
     uint8_t SendAttackBank;
     uint8_t SendGPSBank;
-    uint8_t SendIntegralLPF;
-    uint8_t SendkCDLPF;
+    uint16_t SendIntegralLPF;
+    uint16_t SendkCDLPF;
 } Send_User_Medium_Parameters;
 
 struct _Get_User_Medium_Parameters

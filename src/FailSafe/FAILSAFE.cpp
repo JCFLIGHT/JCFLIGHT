@@ -242,6 +242,7 @@ void FailSafeCheck()
   {
     AbortFailSafe();
   }
+  
   UpdateFailSafeSystem();
   FailSafeBuzzerNotification();
 }
@@ -253,8 +254,8 @@ void FailSafe_Do_RTH_With_Low_Batt(bool FailSafeBatt)
   static bool FailSafeBattDetect = false;
   if (FailSafeBatt)
   {
-    //EVITA COM QUE UMA TROCA RAPIDA DE TRUE PARA FALSE OCORRA
-    //A FIM DE NÃO INTERFERIR NO FUNCIONAMENTO DESSA FUNÇÃO
+    //EVITA COM QUE UMA TROCA DE TRUE PARA FALSE OCORRA
+    //AFIM DE NÃO INTERFERIR NO FUNCIONAMENTO DO RTH
     FailSafeBattDetect = true;
   }
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
@@ -266,4 +267,5 @@ void FailSafe_Do_RTH_With_Low_Batt(bool FailSafeBatt)
   {
     return;
   }
+  //CODIGO AINDA NÃO DESENVOLVIDO POR QUE É NECESSARIO TESTAR O REAL FUNCIONAMENTO
 }

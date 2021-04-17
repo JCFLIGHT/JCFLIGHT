@@ -24,7 +24,7 @@ class ParamClass
 {
 public:
   void Initialization(void);
-  void DefaultList(const Resources_Of_Param *ParamValue);
+  void DefaultList(void);
   void SerialProcess(void);
 
 private:

@@ -65,11 +65,10 @@ void ClearWayPointsStorage(void)
 
 void RecallAllParams(void)
 {
-    const Resources_Of_Param *ParamValue;
     GCS.Default_All_Configs();
     ClearSensorsCalibration();
     ClearWayPointsStorage();
-    PARAM.DefaultList(ParamValue);
+    PARAM.DefaultList();
     SetNewActualFormatVersion();
 }
 

@@ -116,33 +116,32 @@ void ParamClass::Initialization(void)
   PARAM.Load_Sketch();
 }
 
-void ParamClass::DefaultList(const Resources_Of_Param *ParamValue)
+void ParamClass::DefaultList()
 {
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
-    ParamValue = &Params_Table[Table_Counter];
 
-    switch (ParamValue->Variable_Type)
+    switch (Params_Table[Table_Counter].Variable_Type)
     {
 
     case VAR_8BITS:
-      *(uint8_t *)ParamValue->Ptr = ParamValue->DefaultValue;
-      STORAGEMANAGER.Write_8Bits(ParamValue->Address, ParamValue->DefaultValue);
+      *(uint8_t *)Params_Table[Table_Counter].Ptr = Params_Table[Table_Counter].DefaultValue;
+      STORAGEMANAGER.Write_8Bits(Params_Table[Table_Counter].Address, Params_Table[Table_Counter].DefaultValue);
       break;
 
     case VAR_16BITS:
-      *(int16_t *)ParamValue->Ptr = ParamValue->DefaultValue;
-      STORAGEMANAGER.Write_16Bits(ParamValue->Address, ParamValue->DefaultValue);
+      *(int16_t *)Params_Table[Table_Counter].Ptr = Params_Table[Table_Counter].DefaultValue;
+      STORAGEMANAGER.Write_16Bits(Params_Table[Table_Counter].Address, Params_Table[Table_Counter].DefaultValue);
       break;
 
     case VAR_32BITS:
-      *(int32_t *)ParamValue->Ptr = ParamValue->DefaultValue;
-      STORAGEMANAGER.Write_32Bits(ParamValue->Address, ParamValue->DefaultValue);
+      *(int32_t *)Params_Table[Table_Counter].Ptr = Params_Table[Table_Counter].DefaultValue;
+      STORAGEMANAGER.Write_32Bits(Params_Table[Table_Counter].Address, Params_Table[Table_Counter].DefaultValue);
       break;
 
     case VAR_FLOAT:
-      *(float *)ParamValue->Ptr = ParamValue->DefaultValue;
-      STORAGEMANAGER.Write_Float(ParamValue->Address, ParamValue->DefaultValue);
+      *(float *)Params_Table[Table_Counter].Ptr = Params_Table[Table_Counter].DefaultValue;
+      STORAGEMANAGER.Write_Float(Params_Table[Table_Counter].Address, Params_Table[Table_Counter].DefaultValue);
       break;
     }
   }
@@ -150,29 +149,26 @@ void ParamClass::DefaultList(const Resources_Of_Param *ParamValue)
 
 void ParamClass::Load_Sketch(void)
 {
-  const Resources_Of_Param *ParamValue;
-
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
-    ParamValue = &Params_Table[Table_Counter];
 
-    switch (ParamValue->Variable_Type)
+    switch (Params_Table[Table_Counter].Variable_Type)
     {
 
     case VAR_8BITS:
-      *(uint8_t *)ParamValue->Ptr = STORAGEMANAGER.Read_8Bits(ParamValue->Address);
+      *(uint8_t *)Params_Table[Table_Counter].Ptr = STORAGEMANAGER.Read_8Bits(Params_Table[Table_Counter].Address);
       break;
 
     case VAR_16BITS:
-      *(int16_t *)ParamValue->Ptr = STORAGEMANAGER.Read_16Bits(ParamValue->Address);
+      *(int16_t *)Params_Table[Table_Counter].Ptr = STORAGEMANAGER.Read_16Bits(Params_Table[Table_Counter].Address);
       break;
 
     case VAR_32BITS:
-      *(int32_t *)ParamValue->Ptr = STORAGEMANAGER.Read_32Bits(ParamValue->Address);
+      *(int32_t *)Params_Table[Table_Counter].Ptr = STORAGEMANAGER.Read_32Bits(Params_Table[Table_Counter].Address);
       break;
 
     case VAR_FLOAT:
-      *(float *)ParamValue->Ptr = STORAGEMANAGER.Read_Float(ParamValue->Address);
+      *(float *)Params_Table[Table_Counter].Ptr = STORAGEMANAGER.Read_Float(Params_Table[Table_Counter].Address);
       break;
     }
   }
@@ -314,7 +310,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {
     DEBUG("Restaurando os valores de fabrica dos parametros...");
-    PARAM.DefaultList(ParamValue);
+    PARAM.DefaultList();
     DEBUG("Ok...Parametros reconfigurados!");
     LINE_SPACE;
   }

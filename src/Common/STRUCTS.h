@@ -658,4 +658,10 @@ typedef struct
 
 } PID_Resources_Struct;
 
+typedef union
+{
+  float Type_Float;
+  int32_t Type_Int32;
+} Variable_Union;
+
 #endif

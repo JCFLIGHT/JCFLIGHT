@@ -174,29 +174,29 @@ void ParamClass::Load_Sketch(void)
   }
 }
 
-static void Param_Set_Value(const Resources_Of_Param *VariablePointer, const int32_t New_Value, const float New_Value_Float)
+static void Param_Set_Value(const Resources_Of_Param *VariablePointer, const Variable_Union Variable)
 {
   switch (VariablePointer->Variable_Type)
   {
 
   case VAR_8BITS:
-    *(uint8_t *)VariablePointer->Ptr = (uint8_t)New_Value;
-    STORAGEMANAGER.Write_8Bits(VariablePointer->Address, New_Value);
+    *(uint8_t *)VariablePointer->Ptr = (uint8_t)Variable.Type_Int32;
+    STORAGEMANAGER.Write_8Bits(VariablePointer->Address, Variable.Type_Int32);
     break;
 
   case VAR_16BITS:
-    *(int16_t *)VariablePointer->Ptr = (int16_t)New_Value;
-    STORAGEMANAGER.Write_16Bits(VariablePointer->Address, New_Value);
+    *(int16_t *)VariablePointer->Ptr = (int16_t)Variable.Type_Int32;
+    STORAGEMANAGER.Write_16Bits(VariablePointer->Address, Variable.Type_Int32);
     break;
 
   case VAR_32BITS:
-    *(int32_t *)VariablePointer->Ptr = (int32_t)New_Value;
-    STORAGEMANAGER.Write_32Bits(VariablePointer->Address, New_Value);
+    *(int32_t *)VariablePointer->Ptr = (int32_t)Variable.Type_Int32;
+    STORAGEMANAGER.Write_32Bits(VariablePointer->Address, Variable.Type_Int32);
     break;
 
   case VAR_FLOAT:
-    *(float *)VariablePointer->Ptr = (float)New_Value_Float;
-    STORAGEMANAGER.Write_Float(VariablePointer->Address, New_Value_Float);
+    *(float *)VariablePointer->Ptr = (float)Variable.Type_Float;
+    STORAGEMANAGER.Write_Float(VariablePointer->Address, Variable.Type_Float);
     break;
   }
 }
@@ -269,14 +269,16 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
       {
         if (New_Value >= Params_Table[Table_Counter].Value_Min && New_Value <= Params_Table[Table_Counter].Value_Max)
         {
+          Variable_Union Variable_Parse;
           if (Params_Table[Table_Counter].Variable_Type == VAR_FLOAT)
           {
-            Param_Set_Value(ParamValue, 0, New_Value_Float);
+            Variable_Parse.Type_Float = New_Value_Float;
           }
           else
           {
-            Param_Set_Value(ParamValue, New_Value, 0);
+            Variable_Parse.Type_Int32 = New_Value;
           }
+          Param_Set_Value(ParamValue, Variable_Parse);
           DEBUG_WITHOUT_NEW_LINE("%s setado para ", Params_Table[Table_Counter].Param_Name);
           Param_Print_Value(ParamValue);
           LINE_SPACE;

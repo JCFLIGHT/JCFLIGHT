@@ -107,9 +107,9 @@ void CompassCalClass::RunningCalibration()
         {
             IMU.Compass.Calibrating = false;
             Calibration.Magnetometer.Count = 0;
-            STORAGEMANAGER.Write_16Bits(MAG_ROLL_ADDR, Calibration.Magnetometer.OffSet[ROLL]);
-            STORAGEMANAGER.Write_16Bits(MAG_PITCH_ADDR, Calibration.Magnetometer.OffSet[PITCH]);
-            STORAGEMANAGER.Write_16Bits(MAG_YAW_ADDR, Calibration.Magnetometer.OffSet[YAW]);
+            STORAGEMANAGER.Write_16Bits(MAG_ROLL_OFFSET_ADDR, Calibration.Magnetometer.OffSet[ROLL]);
+            STORAGEMANAGER.Write_16Bits(MAG_PITCH_OFFSET_ADDR, Calibration.Magnetometer.OffSet[PITCH]);
+            STORAGEMANAGER.Write_16Bits(MAG_YAW_OFFSET_ADDR, Calibration.Magnetometer.OffSet[YAW]);
             UpdateCompassCalibration();
             BEEPER.Play(BEEPER_CALIBRATION_DONE);
         }
@@ -118,7 +118,7 @@ void CompassCalClass::RunningCalibration()
 
 void CompassCalClass::UpdateCompassCalibration()
 {
-    Calibration.Magnetometer.OffSet[ROLL] = STORAGEMANAGER.Read_16Bits(MAG_ROLL_ADDR);
-    Calibration.Magnetometer.OffSet[PITCH] = STORAGEMANAGER.Read_16Bits(MAG_PITCH_ADDR);
-    Calibration.Magnetometer.OffSet[YAW] = STORAGEMANAGER.Read_16Bits(MAG_YAW_ADDR);
+    Calibration.Magnetometer.OffSet[ROLL] = STORAGEMANAGER.Read_16Bits(MAG_ROLL_OFFSET_ADDR);
+    Calibration.Magnetometer.OffSet[PITCH] = STORAGEMANAGER.Read_16Bits(MAG_PITCH_OFFSET_ADDR);
+    Calibration.Magnetometer.OffSet[YAW] = STORAGEMANAGER.Read_16Bits(MAG_YAW_OFFSET_ADDR);
 }

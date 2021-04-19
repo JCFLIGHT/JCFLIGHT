@@ -63,6 +63,7 @@ uint8_t ProtocolCommand;
 uint8_t SerialInputBuffer[64];
 uint8_t SerialOutputBuffer[128];
 uint8_t SerialOutputBufferSizeCount;
+uint8_t OutputVectorCount;
 uint8_t VectorCount;
 uint8_t SerialBuffer;
 uint8_t SerialAvailableGuard;
@@ -663,7 +664,7 @@ void GCSClass::Serial_Parse_Protocol()
     while (SerialOutputBufferSizeCount > 0)
     {
         SerialOutputBufferSizeCount--;
-        FASTSERIAL.Write(UART_NUMB_0, SerialOutputBuffer[VectorCount++]);
+        FASTSERIAL.Write(UART_NUMB_0, SerialOutputBuffer[OutputVectorCount++]);
     }
 
 #endif
@@ -920,7 +921,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         GCS.First_Packet_Request_Parameters();
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
-        VectorCount = 0;
+        OutputVectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 10) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 27) + //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
                                         (sizeof(int32_t) * 6));  //NÚMERO TOTAL DE VARIAVEIS DE 32 BITS CONTIDO AQUI
@@ -975,7 +976,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     case 8:
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
-        VectorCount = 0;
+        OutputVectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 22) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 3)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendFrameType, VAR_8BITS);
@@ -1011,7 +1012,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     case 9:
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
-        VectorCount = 0;
+        OutputVectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 28) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 8)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendTPAInPercent, VAR_8BITS);
@@ -1059,7 +1060,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         GCS.Second_Packet_Request_Parameters();
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
-        VectorCount = 0;
+        OutputVectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 2) +      //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 32)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendActualThrottleValue, VAR_16BITS);
@@ -1196,7 +1197,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     case 30:
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
-        VectorCount = 0;
+        OutputVectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 27)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleMiddle, VAR_8BITS);

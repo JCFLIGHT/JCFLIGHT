@@ -75,17 +75,14 @@ bool Get_GPS_Heading_Is_Valid(void)
     return GPSParameters.Navigation.Misc.Get.Satellites >= 6 && GPSParameters.Navigation.Misc.Get.GroundSpeed >= 300;
 }
 
-bool Get_GPS_Flight_Modes_And_Navigation_In_Use(void)
+bool Get_GPS_Used_To_Navigation(void)
 {
-    return (GPSParameters.Mode.Flight != GPS_MODE_NONE) && (GPSParameters.Mode.Navigation != DO_NONE);
-}
-
-bool Get_GPS_Only_Flight_Modes_In_Use(void)
-{
-    return (GPSParameters.Mode.Flight != GPS_MODE_NONE);
+    return (GPSParameters.Mode.Navigation != DO_NONE);
 }
 
 bool Get_GPS_Used_To_Land(void)
 {
-    return GPSParameters.Mode.Navigation == DO_LAND_IN_PROGRESS || GPSParameters.Mode.Navigation == DO_LAND_DETECTED || GPSParameters.Mode.Navigation == DO_LANDED;
+    return GPSParameters.Mode.Navigation == DO_LAND_DESCENT ||
+           GPSParameters.Mode.Navigation == DO_LAND_DETECTED ||
+           GPSParameters.Mode.Navigation == DO_LANDED;
 }

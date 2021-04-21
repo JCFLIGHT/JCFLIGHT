@@ -92,7 +92,7 @@ static void Switch_Flag_Clear(void)
 
 void Switch_Flag(void)
 {
-  const bool InAirPlaneMode = GetFrameStateOfAirPlane();
+  const bool InAirPlaneMode = GetAirPlaneEnabled();
   //INICIA A CONTAGEM DA FLAG PRINCIPAL
   if (SimpleControlAux)
   {

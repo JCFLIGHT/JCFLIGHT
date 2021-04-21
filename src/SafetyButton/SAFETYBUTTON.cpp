@@ -75,11 +75,11 @@ void SAFETYBUTTONCLASS::FlashButton()
         if (SAFETYBUTTON.GetButtonState())
         {
             SAFETYBUTTON.WaitToNextProcess = true;
-            if (GetFrameStateOfMultirotor())
+            if (GetMultirotorEnabled())
             {
                 PulseInAllMotors(MIN_STICKS_PULSE);
             }
-            else if (GetFrameStateOfAirPlane())
+            else if (GetAirPlaneEnabled())
             {
                 MotorControl[MOTOR1] = MIN_STICKS_PULSE;
                 MotorControl[MOTOR2] = MIDDLE_STICKS_PULSE;
@@ -131,11 +131,11 @@ void SAFETYBUTTONCLASS::FlashButton()
             if (SAFETYBUTTON.GetButtonState())
             {
                 SAFETYBUTTON.DetectRise = 0;
-                if (GetFrameStateOfMultirotor())
+                if (GetMultirotorEnabled())
                 {
                     PulseInAllMotors(DISABLE_IO_PIN);
                 }
-                else if (GetFrameStateOfAirPlane())
+                else if (GetAirPlaneEnabled())
                 {
                     MotorControl[MOTOR1] = DISABLE_IO_PIN;
                     MotorControl[MOTOR2] = MIDDLE_STICKS_PULSE;

@@ -46,6 +46,8 @@ float ConvertRadiansToDeciDegrees(float Inputvalue);
 float ConvertDeciDegreesToRadians(float Inputvalue);
 float ConvertDeciDegreesToDegrees(float Inputvalue);
 float ConvertDegreesToDecidegrees(float Inputvalue);
+float ConvertDecidegreesToCentiDegrees(float Inputvalue);
+float ConvertCentiDegreesToRadians(float Inputvalue);
 float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput);
 float ConvertAccelerationToCMSS(float InputAcc);
 int32_t ConvertCMToMeters(float CM_Input);

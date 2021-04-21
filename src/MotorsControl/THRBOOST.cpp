@@ -50,7 +50,7 @@ void Set_Throttle_Out(int16_t Throttle_Out, bool Apply_Angle_Boost)
 
 void ApplyThrottleBoost()
 {
-    if (!GetFrameStateOfMultirotor()) //NÃO APLICA EM MODO AERO
+    if (!GetMultirotorEnabled()) //NÃO APLICA EM MODO AERO
     {
         return;
     }

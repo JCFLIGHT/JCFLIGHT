@@ -105,7 +105,7 @@ void AutoLaunchClass::AutomaticDetector()
 
 void AutoLaunchClass::Update(void)
 {
-  if (!GetFrameStateOfAirPlane())
+  if (!GetAirPlaneEnabled())
   {
     return;
   }

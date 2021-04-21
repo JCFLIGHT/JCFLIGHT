@@ -26,6 +26,7 @@
 #include "PID/RCPID.h"
 #include "FlightModes/FLIGHTMODES.h"
 #include "PID/PIDPARAMS.h"
+#include "GPS/GPSSTATES.h"
 #include "FastSerial/PRINTF.h"
 
 //DEBUG
@@ -41,7 +42,7 @@ void UpdateStateOfHeadingHold(void)
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    HeadingHoldRateFilter.State = 0.0f;         //RESETA O FILTRO
+    HeadingHoldRateFilter.State = 0.0f;           //RESETA O FILTRO
     HeadingHoldTarget = Attitude.EulerAngles.Yaw; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
   }
 }
@@ -58,7 +59,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (GPSParameters.Mode.Flight == DO_NONE) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO USANDO O GPS ESTIVER ATIVO
+  if (!Get_GPS_Used_To_Navigation()) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO POR GPS ESTIVER ATIVO
   {
     return false;
   }

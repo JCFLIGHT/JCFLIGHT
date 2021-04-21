@@ -31,7 +31,7 @@ AirPlaneClass AIRPLANE;
 
 void AirPlaneClass::Update_Conventional_AirPlane(void)
 {
-  if (!GetActualFrameState(AIR_PLANE))
+  if (!GetActualPlatformEnabledUsingName(AIR_PLANE))
   {
     return;
   }
@@ -55,7 +55,7 @@ void AirPlaneClass::Update_Conventional_AirPlane(void)
 
 void AirPlaneClass::Update_FixedWing(void)
 {
-  if (!GetActualFrameState(FIXED_WING))
+  if (!GetActualPlatformEnabledUsingName(FIXED_WING))
   {
     return;
   }
@@ -75,7 +75,7 @@ void AirPlaneClass::Update_FixedWing(void)
 
 void AirPlaneClass::Update_AirPlaneVTail(void)
 {
-  if (!GetActualFrameState(PLANE_VTAIL))
+  if (!GetActualPlatformEnabledUsingName(PLANE_VTAIL))
   {
     return;
   }

@@ -52,7 +52,7 @@ enum PID_Params_Enum
     PID_ROLL = 0,
     PID_PITCH,
     PID_YAW,
-    PID_ALTITUDE_HOLD,
+    PID_ALTITUDE,
     PID_VELOCITY_Z,
     PID_GPS_POSITION,
     PID_GPS_POSITION_RATE,
@@ -150,31 +150,23 @@ enum Servos_Enum
     SERVO4
 };
 
-enum GPS_Modes_Enum
+enum GPSFlightModes_Enum
 {
-    GPS_MODE_NONE = 0,
-    GPS_MODE_HOLD,
-    GPS_MODE_RTH
+    DO_NONE = 0,
+    DO_POSITION_HOLD,
+    DO_START_RTH,
+    DO_RTH_ENROUTE,
+    DO_LAND_INIT,
+    DO_LAND_SETTLE,
+    DO_LAND_DESCENT,
+    DO_LAND_DETECTED,
+    DO_LANDED
 };
 
 enum GPS_AutoPilotWithUser_Enum
 {
     AUTOPILOT_MODE_ATTI = 0,
     AUTOPILOT_MODE_CRUISE
-};
-
-enum GPSFlightModes_Enum
-{
-    DO_NONE = 0,
-    DO_START_RTH,
-    DO_RTH_ENROUTE,
-    DO_POSITION_HOLD,
-    DO_LAND_INIT,
-    DO_LAND_IN_PROGRESS,
-    DO_LANDED,
-    DO_LAND_SETTLE,
-    DO_LAND_DESCENT,
-    DO_LAND_DETECTED
 };
 
 enum AuxiliarChannels

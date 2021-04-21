@@ -83,7 +83,7 @@ bool AirSpeedCalibrationClass::Calibrate(void)
     return false;
 }
 
-static float Get_Ratio_Calibration(float True_AirSpeed, const Vector3x3Float &GPSVelocity)
+static float Get_Scale_Calibration(float True_AirSpeed, const Vector3x3Float &GPSVelocity)
 {
     CovariancePrediction.A.X += KF_PROCESS_NOISE;
     CovariancePrediction.B.Y += KF_PROCESS_NOISE;
@@ -177,7 +177,7 @@ void AirSpeedCalibrationClass::Scale_Update(void) //2HZ
 
     StateEstimate.Z = 1.0f / sqrtf(CurrentScale);
 
-    float EstimatedZScale = Get_Ratio_Calibration(True_AirSpeed, GPSVelocity);
+    float EstimatedZScale = Get_Scale_Calibration(True_AirSpeed, GPSVelocity);
 
     if (isnan(EstimatedZScale) || isinf(EstimatedZScale))
     {

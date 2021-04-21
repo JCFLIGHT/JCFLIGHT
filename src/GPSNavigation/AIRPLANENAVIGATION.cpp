@@ -93,7 +93,7 @@ int32_t HeadingToCircle;
 
 void Circle_Mode_Update()
 {
-  if (GetFrameStateOfMultirotor())
+  if (GetMultirotorEnabled())
   {
     return;
   }

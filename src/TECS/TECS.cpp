@@ -37,8 +37,8 @@ float AirSpeedTarget = 0;
 
 void TecsClass::Initialization(void)
 {
-    AutoThrottlePI.Set_kP(GET_SET[PID_ALTITUDE_HOLD].kI);
-    AutoThrottlePI.Set_kI(GET_SET[PID_ALTITUDE_HOLD].kD);
+    AutoThrottlePI.Set_kP(GET_SET[PID_ALTITUDE].kI);
+    AutoThrottlePI.Set_kI(GET_SET[PID_ALTITUDE].kD);
     AutoThrottlePI.Set_kP_Scale(8);
     AutoThrottlePI.Set_kI_Scale(32);
     AutoThrottlePI.Set_Integral_Max(24000);
@@ -49,7 +49,7 @@ void TecsClass::Initialization(void)
 
 static void Apply_Auto_Throttle_Control(float DeltaTime)
 {
-    if (GetFrameStateOfMultirotor())
+    if (GetMultirotorEnabled())
     {
         return;
     }
@@ -76,7 +76,7 @@ static void Apply_Auto_Throttle_Control(float DeltaTime)
 
 static bool GetNavigationInAutomaticThrottleMode()
 {
-    return GetFrameStateOfAirPlane() & (IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE) |
+    return GetAirPlaneEnabled() & (IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE) |
                                         IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE) |
                                         IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) |
                                         IS_FLIGHT_MODE_ACTIVE(AUTO_THROTTLE_MODE) |

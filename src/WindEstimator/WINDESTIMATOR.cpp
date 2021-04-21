@@ -26,43 +26,20 @@
 #include "AirSpeed/AIRSPEED.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "GPSNavigation/NAVIGATION.h"
+#include "Build/BOARDDEFS.h"
 
 //O PDF ESTÁ NA PASTA 'DOCS' COM O NOME 'WindEstimation.pdf'
 
 WindEstimatorClass WINDESTIMATOR;
 WindEstimator_Struct WindEstimator;
 
-bool EstimatedWindSpeedValid(void)
+void WindEstimatorClass::Update() //50Hz
 {
-    return WindEstimator.ValidWindEstimated;
-}
+#ifdef USE_WIND_ESTIMATOR
 
-float GetEstimatedWindSpeed(uint8_t ArrayCount)
-{
-    return WindEstimator.EarthFrame.EstimatedWindVelocity[ArrayCount];
-}
-
-float GetEstimatedHorizontalWindSpeed(uint16_t *Angle)
-{
-    float EstimatedRollWindSpeed = GetEstimatedWindSpeed(ROLL);
-    float EstimatedPitchWindSpeed = GetEstimatedWindSpeed(PITCH);
-    if (Angle)
-    {
-        float EstimatedHorizontalWindAngle = Fast_Atan2(EstimatedPitchWindSpeed, EstimatedRollWindSpeed);
-        if (EstimatedHorizontalWindAngle < 0)
-        {
-            EstimatedHorizontalWindAngle += 6.283185482f;
-        }
-        *Angle = ConvertRadiansToDeciDegrees(EstimatedHorizontalWindAngle);
-    }
-    return Fast_SquareRoot(SquareFloat(EstimatedRollWindSpeed) + SquareFloat(EstimatedPitchWindSpeed));
-}
-
-void UpdateWindEstimator() //50Hz
-{
     WindEstimator.Time.Now = SCHEDULERTIME.GetMillis();
 
-    if (!GetFrameStateOfAirPlane() || !Get_GPS_Heading_Is_Valid() || !GPSParameters.Navigation.Misc.Velocity.NEDStatus)
+    if (!GetAirPlaneEnabled() || !Get_GPS_Heading_Is_Valid() || !GPSParameters.Navigation.Misc.Velocity.NEDStatus)
     {
         return;
     }
@@ -145,11 +122,12 @@ void UpdateWindEstimator() //50Hz
             WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] = WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] * 0.95f + Wind[PITCH] * 0.05f;
             WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] = WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] * 0.95f + Wind[YAW] * 0.05f;
         }
+
         WindEstimator.Time.LastUpdate = WindEstimator.Time.Now;
         WindEstimator.ValidWindEstimated = true;
     }
-    else if (WindEstimator.Time.Now - WindEstimator.Time.LastUpdate > 2000 && //0.5HZ
-             Get_AirSpeed_Enabled())                                          //TUBO DE PITOT ATIVADO?SIM...
+    else if (WindEstimator.Time.Now - WindEstimator.Time.LastUpdate > 2000 &&    //0.5HZ
+             Get_AirSpeed_Enabled() && Get_AirSpeed_Type() != VIRTUAL_AIR_SPEED) //TUBO DE PITOT REAL ATIVADO?SIM...
     {
         //AO VOAR DIRETO,USE A VELOCIDADE DO TUDO DE PITOT PARA OBTER A ESTIMATIVA DO VENTO
         float AirSpeedVector[3];
@@ -167,5 +145,39 @@ void UpdateWindEstimator() //50Hz
         WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL] = WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL] * 0.92f + Wind[ROLL] * 0.08f;
         WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] = WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] * 0.92f + Wind[PITCH] * 0.08f;
         WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] = WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] * 0.92f + Wind[YAW] * 0.08f;
+
+        //NÃO SEI SE O CALCULO ESTÁ CORRETO,É NECESSARIO TESTAR,FOI BASEADO NA ARDUPILOT
+        float AirSpeedX = WindEstimator.Ground.Velocity[ROLL] - WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL];
+        float AirSpeedY = WindEstimator.Ground.Velocity[PITCH] - WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH];
+        float AirSpeedFinal = Fast_SquareRoot(SquareFloat(AirSpeedX) + SquareFloat(AirSpeedY)); //VELOCIDADE TOTAL EM LINHA RETA FUNDINDO O GPS COM O AIR-SPEED
     }
+#endif
+}
+
+float WindEstimatorClass::GetEstimatedValueHorizontal(uint16_t *Angle)
+{
+    //O PONTEIRO "Angle" É O ANGULO DO VENTO EM CENTIDEGREES
+    //O "return" É A VELOCIDADE TOTAL DO VENTO EM CM/S
+    float EstimatedRollWindSpeed = WINDESTIMATOR.GetEstimatedInAxis(ROLL);
+    float EstimatedPitchWindSpeed = WINDESTIMATOR.GetEstimatedInAxis(PITCH);
+    if (Angle)
+    {
+        float EstimatedHorizontalWindAngle = Fast_Atan2(EstimatedPitchWindSpeed, EstimatedRollWindSpeed);
+        if (EstimatedHorizontalWindAngle < 0)
+        {
+            EstimatedHorizontalWindAngle += 6.283185482f;
+        }
+        *Angle = ConvertRadiansToDeciDegrees(EstimatedHorizontalWindAngle);
+    }
+    return Fast_SquareRoot(SquareFloat(EstimatedRollWindSpeed) + SquareFloat(EstimatedPitchWindSpeed));
+}
+
+float WindEstimatorClass::GetEstimatedInAxis(uint8_t ArrayCount)
+{
+    return WindEstimator.EarthFrame.EstimatedWindVelocity[ArrayCount];
+}
+
+bool WindEstimatorClass::EstimatedValid(void)
+{
+    return WindEstimator.ValidWindEstimated;
 }

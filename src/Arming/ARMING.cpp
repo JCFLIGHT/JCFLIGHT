@@ -129,7 +129,7 @@ uint8_t PreArmClass::Checking(void)
         return FAIL_SAFE_ERROR;
     }
 
-    if (Get_GPS_Only_Flight_Modes_In_Use()) //MODOS DE VOO ATIVOS
+    if (Get_GPS_Used_To_Navigation()) //MODOS DE VOO ATIVOS
     {
         return FLIGHT_MODES_ERROR;
     }

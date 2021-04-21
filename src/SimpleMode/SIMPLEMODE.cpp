@@ -35,7 +35,7 @@ FILE_COMPILE_FOR_SPEED
 
 void Simple_Mode_Update()
 {
-  if (IS_FLIGHT_MODE_ACTIVE(SIMPLE_MODE) && GetFrameStateOfMultirotor() && I2CResources.Found.Compass)
+  if (IS_FLIGHT_MODE_ACTIVE(SIMPLE_MODE) && GetMultirotorEnabled() && I2CResources.Found.Compass)
   {
     const float HeadingDifference = ConvertToRadians(Attitude.EulerAngles.Yaw - Calibration.Magnetometer.SimpleMode_Initial_Value);
     const float CosineDifference = Fast_Cosine(HeadingDifference);

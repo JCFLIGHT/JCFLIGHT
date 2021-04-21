@@ -44,6 +44,7 @@ void Medium_Loop()
         FlightModesUpdate();
         INERTIALNAVIGATION.Calculate_AccelerationXY(ThisDeltaTime);
         INERTIALNAVIGATION.Calculate_AccelerationZ(ThisDeltaTime);
+        WINDESTIMATOR.Update();
         BATTERY.Update_Voltage();
         BATTERY.Update_Current();
         PRINTF.ParamsToConsole();

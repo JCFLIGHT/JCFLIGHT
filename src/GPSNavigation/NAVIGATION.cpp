@@ -70,7 +70,7 @@ void GPS_Reset_Navigation(void)
   GPSParameters.Navigation.AutoPilot.INS.Angle[COORD_LATITUDE] = 0;
   GPSParameters.Navigation.AutoPilot.INS.Angle[COORD_LONGITUDE] = 0;
   ResetAllPIDOfGPS();
-  if (GetFrameStateOfAirPlane())
+  if (GetAirPlaneEnabled())
   {
     PlaneResetNavigation();
   }
@@ -133,14 +133,14 @@ void GPS_Process_FlightModes(float DeltaTime)
     GPSParameters.Home.Distance = CalculateDistance / 100;
   }
   GPS_Calcule_Velocity();
-  if (Get_GPS_Only_Flight_Modes_In_Use())
+  if (Get_GPS_Used_To_Navigation())
   {
     GPS_Calcule_Bearing(GPSParameters.Navigation.Coordinates.Destiny[COORD_LATITUDE], GPSParameters.Navigation.Coordinates.Destiny[COORD_LONGITUDE], &GPSParameters.Navigation.Bearing.ActualTarget);
     GPS_Calcule_Distance_In_CM(GPSParameters.Navigation.Coordinates.Destiny[COORD_LATITUDE], GPSParameters.Navigation.Coordinates.Destiny[COORD_LONGITUDE], &GPSParameters.Navigation.Coordinates.Distance);
 
     int16_t CalculateNavigationSpeed = 0;
 
-    if (GetFrameStateOfAirPlane())
+    if (GetAirPlaneEnabled())
     {
       GPSParameters.Mode.Navigation = DO_RTH_ENROUTE;
     }
@@ -173,7 +173,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       GPS_Adjust_Heading();
       if ((GPSParameters.Navigation.Coordinates.Distance <= ConvertCMToMeters(JCF_Param.GPS_WP_Radius)) || Point_Reached())
       {
-        if (GetFrameStateOfMultirotor())
+        if (GetMultirotorEnabled())
         {
           GPSParameters.Mode.Navigation = DO_LAND_INIT;
         }
@@ -191,11 +191,11 @@ void GPS_Process_FlightModes(float DeltaTime)
     case DO_LAND_SETTLE:
       if (SCHEDULERTIME.GetMillis() >= GPSParameters.DeltaTime.InitLand)
       {
-        GPSParameters.Mode.Navigation = DO_LAND_IN_PROGRESS;
+        GPSParameters.Mode.Navigation = DO_LAND_DESCENT;
       }
       break;
 
-    case DO_LAND_IN_PROGRESS:
+    case DO_LAND_DESCENT:
       if (GetLanded())
       {
         GPSParameters.Mode.Navigation = DO_LANDED;
@@ -251,9 +251,9 @@ void Set_Next_Point_To_Navigation(int32_t Latitude_Destiny, int32_t Longitude_De
 
 bool Get_Safe_State_To_Apply_Position_Hold(void)
 {
-  return GPSParameters.Mode.Navigation == DO_LAND_INIT ||
+  return GPSParameters.Mode.Navigation == DO_POSITION_HOLD ||
+         GPSParameters.Mode.Navigation == DO_START_RTH ||
+         GPSParameters.Mode.Navigation == DO_LAND_INIT ||
          GPSParameters.Mode.Navigation == DO_LAND_SETTLE ||
-         GPSParameters.Mode.Navigation == DO_LAND_IN_PROGRESS ||
-         GPSParameters.Mode.Navigation == DO_POSITION_HOLD ||
-         GPSParameters.Mode.Navigation == DO_START_RTH;
+         GPSParameters.Mode.Navigation == DO_LAND_DESCENT;
 }

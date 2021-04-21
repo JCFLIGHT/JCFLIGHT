@@ -112,6 +112,16 @@ float ConvertDegreesToDecidegrees(float Inputvalue)
     return (Inputvalue * 10);
 }
 
+float ConvertDecidegreesToCentiDegrees(float Inputvalue)
+{
+    return (Inputvalue * 10);
+}
+
+float ConvertCentiDegreesToRadians(float Inputvalue)
+{
+    return ((Inputvalue / 100.0f) * 0.01745329251994329576923690768489f);
+}
+
 float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput)
 {
     return CoordinateInput * 1.0e-7f;

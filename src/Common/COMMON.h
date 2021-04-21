@@ -76,3 +76,4 @@
 #include "MachineMain/MACHINEINIT.h"
 #include "IMU/GFORCE.h"
 #include "TECS/TECS.h"
+#include "WindEstimator/WINDESTIMATOR.h"

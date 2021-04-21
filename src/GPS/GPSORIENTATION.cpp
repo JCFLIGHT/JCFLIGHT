@@ -27,7 +27,7 @@
 
 void GPS_Orientation_Update()
 {
-  if (GetFrameStateOfMultirotor())
+  if (GetMultirotorEnabled())
   {
     bool AltHoldControlApplied = ApplyAltitudeHoldControl();
     static Scheduler_Struct GPSControlTimer;

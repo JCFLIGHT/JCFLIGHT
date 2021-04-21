@@ -23,9 +23,9 @@
 #include "PID/PIDXYZ.h"
 #include "MotorsControl/MOTORS.h"
 
-void Mixing_Update()
+void Mixing_Update(uint8_t PlatformTypeEnabled)
 {
-    switch (FrameType)
+    switch (PlatformTypeEnabled)
     {
 
     case QUAD_X:

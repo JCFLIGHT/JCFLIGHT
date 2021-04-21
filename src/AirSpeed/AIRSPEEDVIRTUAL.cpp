@@ -16,13 +16,55 @@
 */
 
 #include "AIRSPEEDVIRTUAL.h"
+#include "WindEstimator/WINDESTIMATOR.h"
+#include "Math/MATHSUPPORT.h"
+#include "InertialNavigation/INS.h"
+#include "AHRS/AHRS.h"
+#include "GPSNavigation/NAVIGATION.h"
+#include "Build/BOARDDEFS.h"
 
-//ESTIMAÇÃO GENERICA DA VELOCIDADE DA FUSELAGEM COM BASE NOS DADOS DO GPS
-//GENERICA POR QUE OS DADOS DE VELOCIDADE NED DO GPS NÃO TEM MUITA PRECISÃO
-//O CORRETO É O USUARIO USAR UM TUBO DE PITOT REAL DO TIPO ANALOGICO OU DIGITAL
-//ISSO SERÁ CONSTRUIDO NO FUTURO,NÃO SEI QUANDO,POR QUE EU SOU PREGUIÇOSO
+#define AIR_DENSITY_SEA_LEVEL_15C 1.225f //DENSIDADE DO AR ACIMA DO MAR COM A TEMPERATURA EM 15 GRAUS
+#define P0 101325.0f                     //1 ATMOSFERAS EM PASCALS
+#define USE_INS_VEL_XY                   //USE A VELOCIDADE XY DO INS AO INVÉS DO GROUND-SPEED DADO PELO GPS
 
 float AirSpeed_Virtual_Get_Actual_Value(void)
 {
+
+#ifndef USE_WIND_ESTIMATOR
+
   return 0;
+
+#else
+
+  float AirSpeed = 0.0f;
+  float PressureRet = 0.0f;
+
+  if (WINDESTIMATOR.EstimatedValid())
+  {
+    uint16_t WindHeading;
+    float WindSpeed = WINDESTIMATOR.GetEstimatedValueHorizontal(&WindHeading);
+    float HorizontalWindSpeed = WindSpeed * Fast_Cosine(ConvertCentiDegreesToRadians(WindHeading - ConvertDecidegreesToCentiDegrees(Attitude.EulerAngles.YawDecidegrees)));
+
+#ifdef USE_INS_VEL_XY
+
+    float VelocityXY = sqrtf(SquareFloat(INS.AccelerationEarthFrame_LPF[ROLL]) + SquareFloat(INS.AccelerationEarthFrame_LPF[PITCH]));
+
+#else
+
+    float VelocityXY = GPSParameters.Navigation.Misc.Get.GroundSpeed
+
+#endif
+
+    AirSpeed = VelocityXY - HorizontalWindSpeed;
+  }
+  else
+  {
+    //AirSpeed = ReferenceAirSpeed; //ISSO DEVE SER ATUALIZADO QUANDO O "ReferenceAirSpeed" FOR PASSADO PARA A LISTA DE PARAMETROS
+  }
+
+  PressureRet = SquareFloat(AirSpeed) * AIR_DENSITY_SEA_LEVEL_15C / 20000.0f + P0;
+
+  return PressureRet;
+
+#endif
 }

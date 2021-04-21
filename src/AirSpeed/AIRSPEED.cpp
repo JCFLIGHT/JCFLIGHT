@@ -39,7 +39,7 @@ PT1_Filter_Struct Pitot_Smooth;
 
 void AirSpeedClass::Initialization(void)
 {
-  if (GetFrameStateOfMultirotor() || Get_AirSpeed_Type() == AIR_SPEED_DISABLED)
+  if (GetMultirotorEnabled() || Get_AirSpeed_Type() == AIR_SPEED_DISABLED)
   {
     return;
   }
@@ -48,7 +48,7 @@ void AirSpeedClass::Initialization(void)
 
   PT1FilterInit(&Pitot_Smooth, PITOT_LPF_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
 
-#ifdef USE_KF_RATIO_CALIBRATION
+#ifdef USE_AIRSPEED_AUTO_SCALE_CALIBRATION
   AIRSPEEDCALIBRATION.Initialization();
 #endif
 }
@@ -98,7 +98,7 @@ void AirSpeedClass::Update()
     return;
   }
 
-#ifdef USE_KF_RATIO_CALIBRATION
+#ifdef USE_AIRSPEED_AUTO_SCALE_CALIBRATION
   AIRSPEEDCALIBRATION.Scale_Update();
 #endif
 

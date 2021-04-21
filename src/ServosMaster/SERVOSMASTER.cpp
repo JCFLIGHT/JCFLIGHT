@@ -56,7 +56,7 @@ void ServosMasterClass::Initialization(void)
 
 bool ServosMasterClass::LoadBiquadSettings(void)
 {
-  if (GetFrameStateOfMultirotor())
+  if (GetMultirotorEnabled())
   {
     return false;
   }
@@ -125,7 +125,7 @@ void ServosMasterClass::Rate_Apply()
 
 void ServosMasterClass::Update(void)
 {
-  if (GetFrameStateOfMultirotor() || !SAFETYBUTTON.GetSafeStateToOutput())
+  if (GetMultirotorEnabled() || !SAFETYBUTTON.GetSafeStateToOutput())
   {
     return;
   }

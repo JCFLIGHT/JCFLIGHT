@@ -1313,7 +1313,7 @@ void GCSClass::First_Packet_Request_Parameters()
     Essential_First_Packet_Parameters.SendWattsValue = BATTERY.GetWatts();
     Essential_First_Packet_Parameters.SendDeclinationValue = (int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100);
     Essential_First_Packet_Parameters.SendActualFlightMode = FlightMode;
-    Essential_First_Packet_Parameters.SendFrameType = FrameType;
+    Essential_First_Packet_Parameters.SendFrameType = GetActualPlatformType();
     Essential_First_Packet_Parameters.SendHomePointState = GPSParameters.Home.Marked;
     Essential_First_Packet_Parameters.SendTemperature = Barometer.Raw.Temperature * 0.01f;
     Essential_First_Packet_Parameters.SendHomePointDistance = GPSParameters.Home.Distance;
@@ -1542,9 +1542,9 @@ void GCSClass::Save_Medium_Configuration()
     STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, Get_User_Medium_Parameters.GetGPSBank);
     STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, Get_User_Medium_Parameters.GetIntegralLPF);
     STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, Get_User_Medium_Parameters.GetkCDLPF);
-    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_HOLD_ADDR, Get_User_Medium_Parameters.GetProportionalAltitudeHold);
-    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_HOLD_ADDR, Get_User_Medium_Parameters.GetIntegralAltitudeHold);
-    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_HOLD_ADDR, Get_User_Medium_Parameters.GetDerivativeAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, Get_User_Medium_Parameters.GetProportionalAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, Get_User_Medium_Parameters.GetIntegralAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, Get_User_Medium_Parameters.GetDerivativeAltitudeHold);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1639,7 +1639,7 @@ void GCSClass::Default_Medium_Configuration()
     STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, 15);
     STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, 30);
 
-    if (GetFrameStateOfMultirotor())
+    if (GetMultirotorEnabled())
     {
         //PITCH
         STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 40);
@@ -1670,7 +1670,7 @@ void GCSClass::Default_Medium_Configuration()
         STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
         STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
     }
-    else if (GetFrameStateOfAirPlane())
+    else if (GetAirPlaneEnabled())
     {
         //PITCH
         STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 5);
@@ -1703,9 +1703,9 @@ void GCSClass::Default_Medium_Configuration()
     }
 
     //ALTITUDE-HOLD E AUTO-THROTTLE
-    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_HOLD_ADDR, 3);
-    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_HOLD_ADDR, 50);
-    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_HOLD_ADDR, 20);
+    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 3);
+    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 50);
+    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 20);
 
     //VELOCIDADE Z
     STORAGEMANAGER.Write_8Bits(KP_VEL_Z_ADDR, 50);
@@ -1840,7 +1840,7 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Medium_Parameters.SendGPSBank = STORAGEMANAGER.Read_8Bits(GPS_BANK_ADDR);
     Send_User_Medium_Parameters.SendIntegralLPF = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);
     Send_User_Medium_Parameters.SendkCDLPF = STORAGEMANAGER.Read_16Bits(KCD_OR_FF_LPF_ADDR);
-    Send_User_Medium_Parameters.SendProportionalAltitudeHold = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_HOLD_ADDR);
-    Send_User_Medium_Parameters.SendIntegralAltitudeHold = STORAGEMANAGER.Read_8Bits(KI_ALTITUDE_HOLD_ADDR);
-    Send_User_Medium_Parameters.SendDerivativeAltitudeHold = STORAGEMANAGER.Read_8Bits(KD_ALTITUDE_HOLD_ADDR);
+    Send_User_Medium_Parameters.SendProportionalAltitudeHold = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
+    Send_User_Medium_Parameters.SendIntegralAltitudeHold = STORAGEMANAGER.Read_8Bits(KI_ALTITUDE_ADDR);
+    Send_User_Medium_Parameters.SendDerivativeAltitudeHold = STORAGEMANAGER.Read_8Bits(KD_ALTITUDE_ADDR);
 }

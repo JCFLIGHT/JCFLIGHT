@@ -16,7 +16,26 @@
 */
 
 #pragma once
+
 #include "Common/ENUM.h"
 #include "Targets/PASCAL.h"
 #include "Targets/EXTREME.h"
 #include "Targets/CLASSIC.h"
+
+#ifdef __AVR_ATmega2560__
+
+//NÃO USA ALGUNS RECURSOS NA JCFLIGHT-CLASSIC POR MOTIVO DE FALTA DE MEMORIA RAM
+
+#undef USE_NAZA_GPS
+#undef USE_DERIVATIVE_BOOST_PID
+#undef USE_AIRSPEED_AUTO_SCALE_CALIBRATION
+#undef USE_WIND_ESTIMATOR
+
+#else
+
+#define USE_NAZA_GPS
+#define USE_DERIVATIVE_BOOST_PID
+#define USE_AIRSPEED_AUTO_SCALE_CALIBRATION
+#define USE_WIND_ESTIMATOR
+
+#endif

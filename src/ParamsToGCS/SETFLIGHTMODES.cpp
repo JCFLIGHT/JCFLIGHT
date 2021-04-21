@@ -23,7 +23,7 @@
 void SetFlightModeToGCS()
 {
   if ((GPSParameters.Mode.Navigation == DO_LAND_SETTLE) ||
-      (GPSParameters.Mode.Navigation == DO_LAND_IN_PROGRESS) ||
+      (GPSParameters.Mode.Navigation == DO_LAND_DESCENT) ||
       (GPSParameters.Mode.Navigation == DO_LAND_DETECTED) ||
       (GPSParameters.Mode.Navigation == DO_LANDED))
   {

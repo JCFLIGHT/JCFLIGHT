@@ -150,14 +150,14 @@ void PIDXYZClass::Update(float DeltaTime)
     PID_Resources.RcRateTarget.Pitch = PIDXYZ.LevelPitch(DeltaTime);
   }
 
-  if (GetFrameStateOfMultirotor())
+  if (GetMultirotorEnabled())
   {
     AntiWindUpScaler = Constrain_Float((1.0f - GetMotorMixRange()) / MotorIntegralTermWindUpPoint, 0.0f, 1.0f);
     PIDXYZ.ApplyMulticopterRateControllerRoll(DeltaTime);
     PIDXYZ.ApplyMulticopterRateControllerPitch(DeltaTime);
     PIDXYZ.ApplyMulticopterRateControllerYaw(DeltaTime);
   }
-  else if (GetFrameStateOfAirPlane())
+  else if (GetAirPlaneEnabled())
   {
     PIDXYZ.GetNewControllerForPlaneWithTurn();
     PIDXYZ.ApplyFixedWingRateControllerRoll(DeltaTime);
@@ -243,7 +243,7 @@ float PIDXYZClass::ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float I
 
 float PIDXYZClass::ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral)
 {
-  if ((MixerIsOutputSaturated() && GetFrameStateOfMultirotor()) || (GetFrameStateOfAirPlane() && PIDXYZ.FixedWingIntegralTermLimitActive(Axis)))
+  if ((MixerIsOutputSaturated() && GetMultirotorEnabled()) || (GetAirPlaneEnabled() && PIDXYZ.FixedWingIntegralTermLimitActive(Axis)))
   {
     ErrorGyroIntegral = Constrain_Float(ErrorGyroIntegral, -ErrorGyroIntegralLimit[Axis], ErrorGyroIntegralLimit[Axis]);
   }
@@ -313,7 +313,7 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 
   int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue);
 
-  if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
+  if (GetMultirotorEnabled() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
   {
     ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MaxValue);
   }
@@ -339,7 +339,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   RcControllerAngle += TECS.AutoPitchDown(Cruise_Throttle, MinThrottleDownPitchAngle);
 
-  if (GetFrameStateOfAirPlane())
+  if (GetAirPlaneEnabled())
   {
     RcControllerAngle -= ConvertDegreesToDecidegrees(PitchLevelTrim);
   }
@@ -353,7 +353,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MaxValue);
 
-  if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
+  if (GetMultirotorEnabled() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
   {
     ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MaxValue);
   }

@@ -386,7 +386,7 @@ void AHRSClass::Update(float DeltaTime)
   GetMeasuredAcceleration(&BodyFrameAcceleration); //CALCULA A ACELERAÇÃO DA IMU EM CM/S^2
   GetMeasuredRotationRate(&BodyFrameRotation);     //CALCULA A ROTAÇÃO DA IMU EM RADIANOS/S
 
-  if (GetFrameStateOfAirPlane())
+  if (GetAirPlaneEnabled())
   {
     const bool SafeToUseCOG = Get_GPS_Heading_Is_Valid();
 

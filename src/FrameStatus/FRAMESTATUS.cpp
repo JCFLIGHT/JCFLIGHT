@@ -21,7 +21,17 @@
 
 uint8_t FrameType;
 
-bool GetFrameStateOfMultirotor()
+void SetPlatformType(uint8_t _FrameType)
+{
+    FrameType = _FrameType;
+}
+
+uint8_t GetActualPlatformType(void)
+{
+    return FrameType;
+}
+
+bool GetMultirotorEnabled(void)
 {
     if (FrameType == QUAD_X ||
         FrameType == HEXA_X ||
@@ -34,7 +44,7 @@ bool GetFrameStateOfMultirotor()
     return false;
 }
 
-bool GetFrameStateOfAirPlane()
+bool GetAirPlaneEnabled(void)
 {
     if (FrameType == AIR_PLANE ||
         FrameType == FIXED_WING ||
@@ -45,7 +55,7 @@ bool GetFrameStateOfAirPlane()
     return false;
 }
 
-bool GetActualFrameState(uint8_t FrameName)
+bool GetActualPlatformEnabledUsingName(uint8_t FrameName)
 {
     if (FrameType == FrameName)
     {

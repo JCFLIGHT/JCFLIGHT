@@ -79,7 +79,7 @@ void ConfigureRegisters(bool Run_Calibrate_ESC)
   TCCR3A &= ~(1 << WGM30);
   TCCR3B |= (1 << WGM33);
   TCCR3B &= ~(1 << CS31);
-  if (GetFrameStateOfAirPlane())
+  if (GetAirPlaneEnabled())
   {
     ICR3 |= 40000; //50Hz
   }
@@ -98,7 +98,7 @@ void ConfigureRegisters(bool Run_Calibrate_ESC)
   TCCR4A &= ~(1 << WGM40);
   TCCR4B |= (1 << WGM43);
   TCCR4B &= ~(1 << CS41);
-  if (GetFrameStateOfAirPlane())
+  if (GetAirPlaneEnabled())
   {
     ICR4 |= 40000; //50Hz
   }
@@ -143,7 +143,7 @@ void ConfigureRegisters(bool Run_Calibrate_ESC)
   //A DECLARAÇÃO DE SAÍDA É FEITA NA EXTENSÃO DO BUZZER
   AnalogWriteSetSettings(GPIO_NUM_18, 490, 12);
 
-  if (GetFrameStateOfAirPlane())
+  if (GetAirPlaneEnabled())
   {
     AnalogWriteSetSettings(GPIO_NUM_25, 490, 12);
     AnalogWriteSetSettings(GPIO_NUM_26, 50, 12);
@@ -180,7 +180,9 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
     return;
   }
 
-  const uint8_t NumberOfMotors = ProgMemReadByte(&Motors_Count[FrameType].FrameMotorsCount);
+  const uint8_t PlatformTypeEnabled = GetActualPlatformType();
+
+  const uint8_t NumberOfMotors = ProgMemReadByte(&Motors_Count[PlatformTypeEnabled].FrameMotorsCount);
 
   MixerThrottleCommand = RCController[THROTTLE];
   MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
@@ -195,14 +197,14 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
 #endif
 
   //ATUALIZA O MIX DO PID
-  Mixing_Update();
+  Mixing_Update(PlatformTypeEnabled);
 
   //ATUALIZA O THROTTLE CLIPPING
   Throttle_Clipping_Update(NumberOfMotors, MixerThrottleCommand);
 
   if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    if (GetFrameStateOfMultirotor())
+    if (GetMultirotorEnabled())
     {
       for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
       {
@@ -216,14 +218,14 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
   }
   else
   {
-    if (GetFrameStateOfMultirotor())
+    if (GetMultirotorEnabled())
     {
       for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
       {
         MotorControl[MotorsCount] = 1000;
       }
     }
-    else if (GetFrameStateOfAirPlane())
+    else if (GetAirPlaneEnabled())
     {
       MotorControl[MOTOR1] = 1000;
     }

@@ -111,7 +111,7 @@ void RC_PID_Update()
   //APLICA O BOOST NO THROTTLE PARA O MODO STABILIZE
   ApplyThrottleBoost();
 
-  if (GetFrameStateOfAirPlane() && (TPA_Parameters.FixedWingTauMS > 0))
+  if (GetAirPlaneEnabled() && (TPA_Parameters.FixedWingTauMS > 0))
   {
     if (!FixedWingTPAFilterInitalized)
     {
@@ -139,11 +139,11 @@ void RC_PID_Update()
   //AJUSTE DINAMICO DE ACORDO COM O VALOR DO THROTTLE
   if (TPA_Parameters.UpdateRequired)
   {
-    if (GetFrameStateOfMultirotor()) //CONFIG PARA DRONES
+    if (GetMultirotorEnabled()) //CONFIG PARA DRONES
     {
       TPA_Parameters.CalcedValue = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
     }
-    else if (GetFrameStateOfAirPlane()) //CONFIG PARA AEROS E ASA-FIXA
+    else if (GetAirPlaneEnabled()) //CONFIG PARA AEROS E ASA-FIXA
     {
       TPA_Parameters.CalcedValue = CalculateFixedWingTPAFactor(RCController[THROTTLE]);
     }

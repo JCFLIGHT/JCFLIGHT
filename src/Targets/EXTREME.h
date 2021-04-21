@@ -20,9 +20,6 @@
 //ESP32
 #ifdef ESP32
 #include "HAL_ESP32/ESP32PWM.h"
-#define USE_NAZA_GPS
-#define USE_DERIVATIVE_BOOST_PID
-#define USE_KF_RATIO_CALIBRATION
 #define THIS_LOOP_FREQUENCY 1000                                     //RATE PARA O FILTRO BIQUAD E TASK
 #define INITIAL_ADDRESS_EEPROM_TO_CLEAR 0                            //ENDEREÇO INICIAL PARA ERASE
 #define FINAL_ADDRESS_EEPROM_TO_CLEAR 2000                           //ENDEREÇO FINAL PARA ERASE

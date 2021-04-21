@@ -21,6 +21,12 @@
 class WindEstimatorClass
 {
 public:
+  void Update();
+  float GetEstimatedValueHorizontal(uint16_t *Angle);
+  bool EstimatedValid(void);
+
+private:
+  float GetEstimatedInAxis(uint8_t ArrayCount);
 };
 extern WindEstimatorClass WINDESTIMATOR;
 #endif

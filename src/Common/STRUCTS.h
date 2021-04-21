@@ -211,7 +211,6 @@ typedef struct
 
   struct Mode_Struct
   {
-    uint8_t Flight = 0;
     uint8_t Navigation = 0;
   } Mode;
 
@@ -674,6 +673,7 @@ typedef struct
   {
     bool TakeOffInProgress = false;
     bool GroundAltitudeSet = false;
+    bool Hovering = false;
   } Flags;
 
   struct Time_Struct

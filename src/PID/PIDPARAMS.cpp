@@ -26,7 +26,7 @@ PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
 void Load_All_PID_Params(void)
 {
     /*
-    if (GetFrameStateOfMultirotor()) //MULTIROTORES
+    if (GetMultirotorEnabled()) //MULTIROTORES
     {
         //PID ROLL
         GET_SET[PID_ROLL].kP = 40;
@@ -50,7 +50,7 @@ void Load_All_PID_Params(void)
         GET_SET[PI_AUTO_LEVEL].kP = 20;
         GET_SET[PI_AUTO_LEVEL].kI = 15;
     }
-    else if (GetFrameStateOfAirPlane()) //AEROS
+    else if (GetAirPlaneEnabled()) //AEROS
     {
         //PID ROLL
         GET_SET[PID_ROLL].kP = 5;
@@ -118,9 +118,9 @@ void Load_All_PID_Params(void)
     GET_SET[PI_AUTO_LEVEL].kP = STORAGEMANAGER.Read_8Bits(KP_AUTOLEVEL_ADDR);
     GET_SET[PI_AUTO_LEVEL].kI = STORAGEMANAGER.Read_8Bits(KI_AUTOLEVEL_ADDR);
 
-    GET_SET[PID_ALTITUDE_HOLD].kP = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_HOLD_ADDR);
-    GET_SET[PID_ALTITUDE_HOLD].kI = STORAGEMANAGER.Read_8Bits(KI_ALTITUDE_HOLD_ADDR);
-    GET_SET[PID_ALTITUDE_HOLD].kD = STORAGEMANAGER.Read_8Bits(KD_ALTITUDE_HOLD_ADDR);
+    GET_SET[PID_ALTITUDE].kP = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
+    GET_SET[PID_ALTITUDE].kI = STORAGEMANAGER.Read_8Bits(KI_ALTITUDE_ADDR);
+    GET_SET[PID_ALTITUDE].kD = STORAGEMANAGER.Read_8Bits(KD_ALTITUDE_ADDR);
 
     GET_SET[PID_VELOCITY_Z].kP = STORAGEMANAGER.Read_8Bits(KP_VEL_Z_ADDR);
     GET_SET[PID_VELOCITY_Z].kI = STORAGEMANAGER.Read_8Bits(KI_VEL_Z_ADDR);
@@ -240,9 +240,9 @@ void UpdateValuesOfPID()
             }
 
             //ALTITUDE-HOLD E AUTO-THROTTLE
-            STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_HOLD_ADDR, 3);
-            STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_HOLD_ADDR, 50);
-            STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_HOLD_ADDR, 20);
+            STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 3);
+            STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 50);
+            STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 20);
 
             //VELOCIDADE Z
             STORAGEMANAGER.Write_8Bits(KP_VEL_Z_ADDR, 50);

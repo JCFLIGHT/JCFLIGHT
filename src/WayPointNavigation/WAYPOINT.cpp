@@ -42,7 +42,6 @@ struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 #define THROTTLE_INCREMENT_TIME 1       //INCREMENTA A CADA 0.10 SEGUNDOS
 
 bool WPTakeOffNomalized = false;
-bool Do_WayPoint_Call_Alt_Hold = false;
 bool WPSucess = false;
 bool ClearEEPROM = false;
 bool StoreEEPROM = false;
@@ -274,9 +273,8 @@ void WayPointRun()
   case GET_ALTITUDE_TAKEOFF:
     Mission_Timed_Count = 0;
     Get_Altitude();
-    GPSParameters.Mode.Flight = GPS_MODE_HOLD;
-    SetThisPointToPositionHold();
     GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
+    SetThisPointToPositionHold();
     if (GetAltitudeReached() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
@@ -301,9 +299,8 @@ void WayPointRun()
   case GET_ALTITUDE:
     Mission_Timed_Count = 0;
     Get_Altitude();
-    GPSParameters.Mode.Flight = GPS_MODE_HOLD;
-    SetThisPointToPositionHold();
     GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
+    SetThisPointToPositionHold();
     if (GetAltitudeReached())
     {
       WayPointMode = WP_START_MISSION;
@@ -385,9 +382,8 @@ void WayPointRun()
           Mission_Timed_Count++; //10 ITERAÇÕES = 1 SEGUNDO
         }
         Do_RTH_Or_Land_Call_Alt_Hold = false;
-        GPSParameters.Mode.Flight = GPS_MODE_HOLD;
-        SetThisPointToPositionHold();
         GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
+        SetThisPointToPositionHold();
         if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber])) //MULT POR 10 PARA OBTÉR O VALOR EM SEGUNDOS PARA TRABALHAR EM CONJUNTO COM A FUNÇÃO WayPointSync10Hz()
         {
           WayPointMode = GET_ALTITUDE;
@@ -396,16 +392,20 @@ void WayPointRun()
       //LAND
       if (WayPointFlightMode[MissionNumber] == WP_LAND)
       {
-        GPSParameters.Mode.Flight = GPS_MODE_HOLD;
-        SetThisPointToPositionHold();
-        GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
         GPSParameters.Mode.Navigation = DO_LAND_INIT;
+        Do_RTH_Or_Land_Call_Alt_Hold = true;
+        Do_Pos_Hold_Call_Alt_Hold = false;
+        ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+        SetThisPointToPositionHold();
       }
       //RTH
       if (WayPointFlightMode[MissionNumber] == WP_RTH)
       {
-        Do_Mode_RTH_Now();
+        GPSParameters.Mode.Navigation = DO_START_RTH;
+        Do_RTH_Or_Land_Call_Alt_Hold = true;
+        Do_Pos_Hold_Call_Alt_Hold = false;
         ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+        Do_Mode_RTH_Now();
       }
     }
     break;

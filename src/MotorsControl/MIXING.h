@@ -18,5 +18,5 @@
 #ifndef MIXING_H_
 #define MIXING_H_
 #include "Build/LIBDEPENDENCIES.h"
-void Mixing_Update();
+void Mixing_Update(uint8_t PlatformTypeEnabled);
 #endif

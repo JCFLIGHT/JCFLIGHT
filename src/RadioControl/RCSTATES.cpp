@@ -34,11 +34,11 @@ int16_t DisarmDelayedCount = 0;
 
 bool CheckInclinationForArm(void)
 {
-    if (GetFrameStateOfAirPlane())
+    if (GetAirPlaneEnabled())
     {
         return false; //PULA A CHECAGEM DE INCLINAÇÃO NO MODO PLANE
     }
-    if (GetFrameStateOfMultirotor() && AHRS.CheckAnglesInclination(25))
+    if (GetMultirotorEnabled() && AHRS.CheckAnglesInclination(25))
     {
         return true; //INVALIDA O ARMAMENTO DO SISTEMA SE HOUVER INCLINAÇÃO NOS EIXOS
     }

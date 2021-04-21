@@ -311,7 +311,7 @@ void LEDRGB::GPS_Led(void)
   //8 SATELITES OU MAIS = 4 PISCADAS
   static uint8_t BlinkCount;
   static uint32_t BlinkTime = SCHEDULERTIME.GetMillis();
-  if (GPSParameters.Mode.Flight != GPS_MODE_RTH)
+  if (GPSParameters.Mode.Navigation != DO_START_RTH)
   {
     if (SCHEDULERTIME.GetMillis() - BlinkTime >= 150)
     {
@@ -355,8 +355,7 @@ void LEDRGB::GPS_Led(void)
       RGB.Off_All_Leds();
     }
   }
-  //INDICAÇÃO DO MODO DE VOO RTH
-  if (GPSParameters.Mode.Flight == GPS_MODE_RTH)
+  else //INDICAÇÃO DO MODO DE VOO RTH
   {
     if (SCHEDULERTIME.GetMicros() % 100000 > 50000)
     {

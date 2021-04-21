@@ -59,7 +59,7 @@ bool Check_Others_Channels()
 void DesarmLowThrClass::Update()
 {
   //FAÇA UMA RAPIDA SAÍDA SE O MODO AERO OU ASA-FIXA ESTIVER ATIVADO
-  if (GetFrameStateOfAirPlane())
+  if (GetAirPlaneEnabled())
   {
     return;
   }

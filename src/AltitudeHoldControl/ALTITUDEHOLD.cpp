@@ -39,6 +39,7 @@ AH_Controller_Struct AHController;
 #define VALID_ALT_REACHED 50         //RESULTADO DA SUBTRAÇÃO ENTRE A ALTITUDE MARCADA COMO HOLD E A ALTIUDE ATUAL PARA VALIDAR QUE ALTITUDE FOI ALCANÇADA EM CM
 #define MIN_VEL_Z_TO_VALID_GROUND 15 //VELOCIDADE VERTICAL MINIMA PARA INDICAR QUE A VEL Z DO INS ESTÁ EM REPOUSO
 #define LANDED_TIME 4000             //ESTOURO DE TEMPO EM MS PARA INDICAR QUE REALMENTE O SOLO FOI DETECTADO
+#define MAX_ALTITUDE_SUPORTED 150    //ALTITUDE MAXIMA SUPORTADA PELO ALGORITIMO EM METROS,PODE SER INCREMENTADO,MAS É NECESSARIO TESTES DE FUNCIONAMENTO
 
 //-------------------------------------
 //PARAMS DO USUARIO
@@ -77,7 +78,7 @@ static void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
   AHController.Target.Position.Z = Constrain_32Bits(AHController.Target.Position.Z, -350, 350);
   AHController.Target.Velocity.Z = Constrain_32Bits(AHController.Target.Position.Z - Barometer.INS.Velocity.Vertical, -600, 600);
   AHController.PID.IntegratorSum += Constrain_32Bits(((AHController.Target.Velocity.Z * GET_SET[PID_VELOCITY_Z].kI * DeltaTime) / 128) / ((HoveringState && ABS(AHController.Target.Position.Z) < 100) ? 2 : 1), -16384000, 16384000);
-  AHController.PID.IntegratorError = Constrain_16Bits((AHController.PID.IntegratorSum / UINT16_MAX), -250, 250);
+  AHController.PID.IntegratorError = Constrain_16Bits((AHController.PID.IntegratorSum / 65536), -250, 250);
   AHController.PID.Control = ((AHController.Target.Velocity.Z * GET_SET[PID_VELOCITY_Z].kP) / 32) + AHController.PID.IntegratorError - (((int32_t)INS.AccelerationEarthFrame_Filtered[INS_VERTICAL_Z] * GET_SET[PID_VELOCITY_Z].kD) / 64);
 
   RCController[THROTTLE] = Constrain_16Bits(AHController.Throttle.Hovering + AHController.PID.Control, AttitudeThrottleMin + ALT_HOLD_DEADBAND, AttitudeThrottleMax - ALT_HOLD_DEADBAND);
@@ -114,13 +115,12 @@ bool ApplyAltitudeHoldControl()
   if (Scheduler(&AltitudeHoldControlTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
   {
     static bool BaroModeActivated = false;
-    static bool HoveringState = false;
     if ((Do_Altitude_Hold || Do_RTH_Or_Land_Call_Alt_Hold) && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
       if (!BaroModeActivated)
       {
         BaroModeActivated = true;
-        HoveringState = false;
+        AHController.Flags.Hovering = false;
         AHController.Flags.TakeOffInProgress = false;
         if ((AHController.Throttle.Hovering < (MIDDLE_STICKS_PULSE - 250)) ||
             (AHController.Throttle.Hovering > (MIDDLE_STICKS_PULSE + 250)))
@@ -132,16 +132,10 @@ bool ApplyAltitudeHoldControl()
       RunLandDetector();
       if (Do_RTH_Or_Land_Call_Alt_Hold)
       {
-        if (AHController.Flags.TakeOffInProgress)
-        {
-          AHController.Flags.TakeOffInProgress = false;
-        }
+        AHController.Flags.TakeOffInProgress = false;
         if (Get_GPS_Used_To_Land())
         {
-          if (HoveringState)
-          {
-            HoveringState = false;
-          }
+          AHController.Flags.Hovering = false;
           SetNewAltitudeToHold(Barometer.INS.Altitude.Estimated);
           if (Barometer.INS.Altitude.Estimated > ConvertCMToMeters(SAFE_ALTITUDE))
           {
@@ -151,11 +145,8 @@ bool ApplyAltitudeHoldControl()
         }
         else
         {
-          if (!HoveringState)
-          {
-            HoveringState = true;
-          }
-          AHController.Target.Position.Z = ((AHController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE_HOLD].kP) / 2;
+          AHController.Flags.Hovering = true;
+          AHController.Target.Position.Z = ((AHController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
           if (Barometer.INS.Altitude.Estimated > ConvertCMToMeters(SAFE_ALTITUDE))
           {
             AHController.Target.Position.Z = Constrain_32Bits(AHController.Target.Position.Z, -250, 250);
@@ -169,49 +160,40 @@ bool ApplyAltitudeHoldControl()
       else
       {
         AHController.Throttle.Difference = DECODE.GetRxChannelOutput(THROTTLE) - MIDDLE_STICKS_PULSE;
-        if (!AHController.Flags.TakeOffInProgress)
+        if (!AHController.Flags.TakeOffInProgress && GetActualThrottleStatus(THROTTLE_LOW) && GetGroundDetectedFor100ms())
         {
-          if (GetActualThrottleStatus(THROTTLE_LOW))
-          {
-            if (GetGroundDetectedFor100ms())
-            {
-              AHController.Flags.TakeOffInProgress = true;
-            }
-          }
+          AHController.Flags.TakeOffInProgress = true;
         }
         else
         {
-          if ((AHController.Throttle.Difference > AH_Percent_Complete_TakeOff) && (Barometer.INS.Velocity.Vertical >= 15))
+          if ((AHController.Throttle.Difference > AH_Percent_Complete_TakeOff) && (Barometer.INS.Velocity.Vertical >= MIN_VEL_Z_TO_VALID_GROUND))
           {
             AHController.Flags.TakeOffInProgress = false;
           }
         }
         if (AHController.Flags.TakeOffInProgress || (ABS(AHController.Throttle.Difference) > AH_Percent_Complete_TakeOff))
         {
-          if (HoveringState)
-          {
-            HoveringState = false;
-          }
+          AHController.Flags.Hovering = false;
           if (ABS(AHController.Throttle.Difference) <= AH_Percent_Complete_TakeOff)
           {
             AHController.Target.Position.Z = 0;
           }
           else
           {
-            AHController.Target.Position.Z = ((AHController.Throttle.Difference - ((AHController.Throttle.Difference > 0) ? AH_Percent_Complete_TakeOff : -AH_Percent_Complete_TakeOff)) * GET_SET[PID_ALTITUDE_HOLD].kP) / 4;
+            AHController.Target.Position.Z = ((AHController.Throttle.Difference - ((AHController.Throttle.Difference > 0) ? AH_Percent_Complete_TakeOff : -AH_Percent_Complete_TakeOff)) * GET_SET[PID_ALTITUDE].kP) / 4;
           }
         }
         else
         {
-          if (!HoveringState)
+          if (!AHController.Flags.Hovering)
           {
-            HoveringState = true;
+            AHController.Flags.Hovering = true;
             AHController.Target.Altitude = Barometer.INS.Altitude.Estimated;
           }
-          AHController.Target.Position.Z = ((AHController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE_HOLD].kP) / 2;
+          AHController.Target.Position.Z = ((AHController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
         }
       }
-      ApplyAltitudeHoldPIDControl(AltitudeHoldControlTimer.ActualTime, HoveringState);
+      ApplyAltitudeHoldPIDControl(AltitudeHoldControlTimer.ActualTime, AHController.Flags.Hovering);
       return true;
     }
     else
@@ -229,13 +211,14 @@ bool ApplyAltitudeHoldControl()
   return false;
 }
 
-void SetNewAltitudeToHold(int32_t ValueOfNewAltitudeHold)
+void SetNewAltitudeToHold(int32_t AltitudeSetPoint)
 {
-  if (ValueOfNewAltitudeHold > 15000)
+  float Max_Altitude_Suported = ConverMetersToCM(MAX_ALTITUDE_SUPORTED);
+  if (AltitudeSetPoint > Max_Altitude_Suported)
   {
-    ValueOfNewAltitudeHold = 15000;
+    AltitudeSetPoint = Max_Altitude_Suported;
   }
-  AHController.Target.Altitude = ValueOfNewAltitudeHold;
+  AHController.Target.Altitude = AltitudeSetPoint;
 }
 
 bool GetTakeOffInProgress()

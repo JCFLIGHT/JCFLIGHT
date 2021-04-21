@@ -21,10 +21,7 @@
 
 void Set_AirSpeed_Type(uint8_t AirSpeedType)
 {
-  if (Get_AirSpeed_Type() != AirSpeedType)
-  {
-    STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, AirSpeedType);
-  }
+  STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, AirSpeedType);
 }
 
 uint8_t Get_AirSpeed_Type(void)

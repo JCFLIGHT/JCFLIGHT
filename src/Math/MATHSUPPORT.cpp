@@ -122,9 +122,14 @@ float ConvertAccelerationToCMSS(float InputAcc)
     return InputAcc * (GRAVITY_CMSS / ACC_1G);
 }
 
-int32_t ConvertCMToMeters(int32_t CM_Input)
+int32_t ConvertCMToMeters(float CM_Input)
 {
     return CM_Input * 100;
+}
+
+float ConverMetersToCM(int32_t Meters_Input)
+{
+    return Meters_Input * 0.01f;
 }
 
 float Fast_SquareRoot(float ValueInput)

@@ -20,10 +20,10 @@
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
 #include "BAROBACKEND.h"
+#include "Math/MATHSUPPORT.h"
 
 #define BARO_SPIKES_SIZE 0x15
 
-AverageFilterInt32_Size5 Pressure_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A PRESSÃO BARO,TAMANHO = 5 ITERAÇÕES
 AverageFilterInt32_Size5 Altitude_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A ALTITUDE,TAMANHO = 5 ITERAÇÕES
 
 void RecalculateBaroTotalPressure()
@@ -35,24 +35,24 @@ void RecalculateBaroTotalPressure()
   {
     PressureIndexCount = 0;
   }
-  PressureVector[PressureIndex] = Pressure_Filter.Apply(Barometer.Raw.Pressure);
+  PressureVector[PressureIndex] = Barometer.Raw.Pressure;
   Barometer.Raw.PressureFiltered += PressureVector[PressureIndex];
   Barometer.Raw.PressureFiltered -= PressureVector[PressureIndexCount];
   PressureIndex = PressureIndexCount;
 }
 
-float Get_Altitude_Difference(float Base_Pressure, int32_t Pressure, int16_t BaroTemperature)
+float Get_Altitude_Difference(float Base_Pressure, float Pressure, float BaroTemperature)
 {
   float Result;
 #if __AVR_ATmega2560__
   //EM CPU MAIS LENTA USE UM CÁLCULO MENOS EXATO,PORÉM MAIS RÁPIDO
   float Scaling = Base_Pressure / Pressure;
-  int16_t CalcedTemperature = BaroTemperature + 27315;
+  float CalcedTemperature = BaroTemperature + 273.15f;
   Result = logf(Scaling) * CalcedTemperature * 29.271267f;
 #else
   //EM CPUs MAIS RÁPIDAS USE UM CÁLCULO MAIS EXATO
   float Scaling = Pressure / Base_Pressure;
-  int16_t CalcedTemperature = BaroTemperature + 27315;
+  float CalcedTemperature = BaroTemperature + 273.15f;
   //ESTE É UM CÁLCULO EXATO QUE ESTÁ DENTRO DE +/- 2.5M DAS TABELAS DE ATMOSFERA PADRÃO NA TROPOSFERA (ATÉ 11.000M AMSL)
   Result = 153.8462f * CalcedTemperature * (1.0f - expf(0.190259f * logf(Scaling)));
 #endif
@@ -63,23 +63,23 @@ void CalculateBarometerAltitude()
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    Barometer.Calibration.GroundPressure = Barometer.Raw.PressureFiltered;
-    Barometer.Calibration.GroundTemperature = Barometer.Raw.Temperature;
+    Barometer.Calibration.GroundPressure = Barometer.Raw.PressureFiltered * 0.01f;
+    Barometer.Calibration.GroundTemperature = Barometer.Raw.Temperature * 0.01f;
     Altitude_Filter.Reset();
   }
   else
   {
-    Barometer.Altitude.Actual = Altitude_Filter.Apply((int32_t)Get_Altitude_Difference(Barometer.Calibration.GroundPressure,
-                                                                                       Barometer.Raw.PressureFiltered,
-                                                                                       Barometer.Calibration.GroundTemperature));
+    Barometer.Altitude.Actual = Altitude_Filter.Apply(ConvertCMToMeters(Get_Altitude_Difference(Barometer.Calibration.GroundPressure,
+                                                                                                Barometer.Raw.PressureFiltered * 0.01f,
+                                                                                                Barometer.Calibration.GroundTemperature)));
   }
 }
 
 int32_t GetAltitudeForGCS()
 {
   static uint8_t InitialSamples = 0xC8;
-  static int16_t BarometerTemperatureScaleForGCS;
-  static int32_t BarometerGroundPressure;
+  static float BarometerTemperatureScaleForGCS;
+  static float BarometerGroundPressure;
 
   if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
@@ -89,11 +89,11 @@ int32_t GetAltitudeForGCS()
 
   if (InitialSamples > 0)
   {
-    BarometerGroundPressure = Barometer.Raw.PressureFiltered;
-    BarometerTemperatureScaleForGCS = Barometer.Raw.Temperature;
+    BarometerGroundPressure = Barometer.Raw.PressureFiltered * 0.01f;
+    BarometerTemperatureScaleForGCS = Barometer.Raw.Temperature * 0.01f;
     InitialSamples--;
     return 0;
   }
 
-  return (int32_t)Get_Altitude_Difference(BarometerGroundPressure, Barometer.Raw.PressureFiltered, BarometerTemperatureScaleForGCS);
+  return ConvertCMToMeters(Get_Altitude_Difference(BarometerGroundPressure, Barometer.Raw.PressureFiltered * 0.01f, BarometerTemperatureScaleForGCS));
 }

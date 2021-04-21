@@ -38,8 +38,9 @@
 | GPS_RTH_Land_Radius   | 10         | Em modo RTH,inicia o Land se o UAV estiver dentro do tamanho desse raio definido aqui,caso contrario,o UAV irá subir até a altitude definido em 'RTH Altitude' nas configurações basicas,voltar ao Home-Point,e fazer o Land [Metros] |
 | GPS_TiltCompensation   | 20         | Valor para compensar o rate de navegação em modo WayPoint e RTH |
 | AirSpeed_Samples   | 15         | Número de amostras para calibrar o Tubo de Pitot |
-| AirSpeed_Factor   | 1.0         | Escala dinâmica para o Tubo de Pitot |
+| AirSpeed_Factor   | 1.9936         | Escala dinâmica para o Tubo de Pitot |
 | Arm_Time_Safety   | 2         | Tempo seguro para armar com os sticks em posição de armamento [Segundos] |
 | Disarm_Time_Safety   | 2         | Tempo seguro para desarmar com os sticks em posição de desarmamento [Segundos] |
 | Compass_Cal_Timer   | 60        | Tempo maximo de calibração do Compass [Segundos] |
 | AutoPilotMode   | 1        | `0 - Piloto automático do tipo Attitude` ~ O usuário irá controlar o ângulo de inclinação do Roll e Pitch.Quando os sticks do Roll e Pitch do rádio são manipulados pelo piloto manual,o sistema de navegação inercial será ignorado,e os comandos irão passar diretamente no modo By-Pass.Assim que os sticks Roll e Pitch do rádio estiverem centralizados (1500uS),o sistema de navegação inercial irá retomar o piloto automático e manter a posição do multirotor. `1 - Piloto automático do tipo Cruise` ~ O sistema de navegação inercial estará sempre ativo e o usuário irá controlar a velocidade de navegação do Roll e Pitch,e o piloto automático irá calcular um novo controle de Attitude,assim mantendo a posição do multirotor constantemente. |
+| AirSpeedAutoCalScale   | 0        | `0 - Desativado` ~ `1 - Ativado` |

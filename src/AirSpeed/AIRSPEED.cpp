@@ -22,21 +22,22 @@
 #include "AIRSPEEDVIRTUAL.h"
 #include "AIRSPEEDBACKEND.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "Scheduler/SCHEDULERTIME.h"
+#include "CALIBRATION.h"
 #include "Filters/PT1.h"
 #include "Build/BOARDDEFS.h"
 #include "Scheduler/SCHEDULER.h"
 #include "Param/PARAM.h"
+#include "Barometer/BAROFRONTEND.h"
+#include "Build/BOARDDEFS.h"
 
 AirSpeedClass AIRSPEED;
 
 AirSpeed_Struct AirSpeed;
 PT1_Filter_Struct Pitot_Smooth;
 
-#define AIR_DENSITY_SEA_LEVEL_15C 1.225f //DENSIDADE DO AR ACIMA DO NIVEL DO MAR COM A TEMPERATURA DE 15 GRAUS °C
-#define PITOT_LPF_CUTOFF 350 / 1000.0f   //EM MILLIHZ
+#define PITOT_LPF_CUTOFF 350 / 1000.0f //EM MILLIHZ
 
-void AirSpeedClass::Initialization()
+void AirSpeedClass::Initialization(void)
 {
   if (GetFrameStateOfMultirotor() || Get_AirSpeed_Type() == AIR_SPEED_DISABLED)
   {
@@ -46,46 +47,19 @@ void AirSpeedClass::Initialization()
   AirSpeed.Healthy = true;
 
   PT1FilterInit(&Pitot_Smooth, PITOT_LPF_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+
+#ifdef USE_KF_RATIO_CALIBRATION
+  AIRSPEEDCALIBRATION.Initialization();
+#endif
 }
 
-bool AirSpeedClass::Calibrate()
-{
-  if (!AirSpeed.Calibration.Initialized)
-  {
-    AirSpeed.Calibration.Start_MS = SCHEDULERTIME.GetMillis();
-    AirSpeed.Calibration.Initialized = true;
-  }
-
-  if (AirSpeed.Calibration.Start_MS == 0)
-  {
-    return true;
-  }
-
-  if (SCHEDULERTIME.GetMillis() - AirSpeed.Calibration.Start_MS >= 1000 && AirSpeed.Calibration.Read_Count > 15)
-  {
-    if (AirSpeed.Calibration.Count > 0)
-    {
-      AirSpeed.Calibration.OffSet = AirSpeed.Calibration.Sum / AirSpeed.Calibration.Count;
-    }
-    AirSpeed.Calibration.Start_MS = 0;
-    return false;
-  }
-  //DESCARTA AS 5 PRIMEIRAS AMOSTRAS
-  if (AirSpeed.Calibration.Read_Count > 5)
-  {
-    AirSpeed.Calibration.Sum += AirSpeed.Raw.Pressure;
-    AirSpeed.Calibration.Count++;
-  }
-  AirSpeed.Calibration.Read_Count++;
-  return false;
-}
-
-float AirSpeedClass::Get_Raw_Pressure()
+float AirSpeedClass::Get_Raw_Pressure(void)
 {
   float RetValue = 0;
 
   switch (Get_AirSpeed_Type())
   {
+
   case ANALOG_AIR_SPEED:
     RetValue = AirSpeed_Analog_Get_Actual_Value();
     break;
@@ -102,10 +76,11 @@ float AirSpeedClass::Get_Raw_Pressure()
   return RetValue;
 }
 
-void AirSpeedClass::Get_Bernoulli_IAS_Pressure(float &Pressure)
+void AirSpeedClass::Parse_IAS_Pressure(float &Pressure)
 {
   //https://en.wikipedia.org/wiki/Indicated_airspeed
-  Pressure = JCF_Param.AirSpeed_Factor * Fast_SquareRoot(2.0f * ABS(AirSpeed.Raw.Pressure - AirSpeed.Calibration.OffSet) / AIR_DENSITY_SEA_LEVEL_15C);
+  AirSpeed.Raw.DifferentialPressure = ABS(AirSpeed.Raw.Pressure - AirSpeed.Calibration.OffSet);
+  Pressure = Fast_SquareRoot(AirSpeed.Raw.DifferentialPressure * JCF_Param.AirSpeed_Factor);
   Pressure = PT1FilterApply3(&Pitot_Smooth, Pressure);
 }
 
@@ -118,13 +93,35 @@ void AirSpeedClass::Update()
 
   AirSpeed.Raw.Pressure = AIRSPEED.Get_Raw_Pressure();
 
-  if (!AIRSPEED.Calibrate())
+  if (!AIRSPEEDCALIBRATION.Calibrate())
   {
     return;
   }
 
+#ifdef USE_KF_RATIO_CALIBRATION
+  AIRSPEEDCALIBRATION.Scale_Update();
+#endif
+
   AirSpeed.Raw.IASPressure = 0;
-  AIRSPEED.Get_Bernoulli_IAS_Pressure(AirSpeed.Raw.IASPressure);
+  AIRSPEED.Parse_IAS_Pressure(AirSpeed.Raw.IASPressure);
 
   AirSpeed.Raw.IASPressureInCM = AirSpeed.Raw.IASPressure * 100; //EM CM/S
+}
+
+float AirSpeedClass::Get_True_Value(const char *Type)
+{
+  if (!AirSpeed.Healthy)
+  {
+    return 1.0f;
+  }
+  float EAS2TAS = Get_EAS2TAS();
+  if (strncasecmp(Type, "In Centimeters", 14) == 0)
+  {
+    return AirSpeed.Raw.IASPressureInCM * EAS2TAS;
+  }
+  else if (strncasecmp(Type, "In Meters", 9) == 0)
+  {
+    return AirSpeed.Raw.IASPressure * EAS2TAS;
+  }
+  return 0;
 }

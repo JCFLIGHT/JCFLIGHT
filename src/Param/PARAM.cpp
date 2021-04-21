@@ -92,13 +92,16 @@ const Resources_Of_Param Params_Table[] = {
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif
-    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             100,             1.0f},
+    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             100,             1.9936f},
 #ifndef __AVR_ATmega2560__  
     {"Arm_Time_Safety",                    ARM_TIME_SAFETY_ADDR,                 VAR_8BITS,              &JCF_Param.Arm_Time_Safety,                 0,             255,             2},
     {"Disarm_Time_Safety",                 DISARM_TIME_SAFETY_ADDR,              VAR_8BITS,              &JCF_Param.Disarm_Time_Safety,              0,             255,             2},
     {"Compass_Cal_Timer",                  COMPASS_CAL_TIME_ADDR,                VAR_8BITS,              &JCF_Param.Compass_Cal_Timer,               0,             120,             60},
 #endif
     {"AutoPilotControlMode",               AUTO_PILOT_MODE_ADDR,                 VAR_8BITS,              &JCF_Param.AutoPilotMode,                   0,             1,               0},
+#ifndef __AVR_ATmega2560__ 
+    {"AirSpeedAutoCalScale",               AS_AUTO_CAL_SCALE_ADDR,               VAR_8BITS,              &JCF_Param.AirSpeedAutoCalScale,            0,             1,               0},
+#endif 
 };
 
 #define TABLE_COUNT (sizeof(Params_Table) / sizeof(Resources_Of_Param))
@@ -116,7 +119,7 @@ void ParamClass::Initialization(void)
   PARAM.Load_Sketch();
 }
 
-void ParamClass::DefaultList()
+void ParamClass::Default_List()
 {
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
@@ -174,7 +177,7 @@ void ParamClass::Load_Sketch(void)
   }
 }
 
-static void Param_Set_Value(const Resources_Of_Param *VariablePointer, const Variable_Union Variable)
+static void Param_Set_And_Save_Value(const Resources_Of_Param *VariablePointer, const Variable_Union Variable)
 {
   switch (VariablePointer->Variable_Type)
   {
@@ -228,7 +231,7 @@ static void Param_Print_Value(const Resources_Of_Param *VariablePointer)
   DEBUG("%d", New_Value);
 }
 
-void ParamClass::Set_And_Save(char *ParamCommandLine)
+void ParamClass::Process_Command(char *ParamCommandLine)
 {
   const Resources_Of_Param *ParamValue;
   char *PtrInput = NULL;
@@ -278,7 +281,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
           {
             Variable_Parse.Type_Int32 = New_Value;
           }
-          Param_Set_Value(ParamValue, Variable_Parse);
+          Param_Set_And_Save_Value(ParamValue, Variable_Parse);
           DEBUG_WITHOUT_NEW_LINE("%s setado para ", Params_Table[Table_Counter].Param_Name);
           Param_Print_Value(ParamValue);
           LINE_SPACE;
@@ -312,7 +315,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   else if (strncasecmp(ParamCommandLine, "formatar", 8) == 0)
   {
     DEBUG("Restaurando os valores de fabrica dos parametros...");
-    PARAM.DefaultList();
+    PARAM.Default_List();
     DEBUG("Ok...Parametros reconfigurados!");
     LINE_SPACE;
   }
@@ -333,7 +336,7 @@ void ParamClass::Set_And_Save(char *ParamCommandLine)
   }
 }
 
-void ParamClass::SerialProcess(void)
+void ParamClass::Update(void)
 {
   if (!GCS.CliMode)
   {
@@ -364,7 +367,7 @@ void ParamClass::SerialProcess(void)
     if (PARAM.SerialBufferIndex && ((strstr(PARAM.SerialBuffer, ";")) != NULL))
     {
       PARAM.SerialBuffer[PARAM.SerialBufferIndex] = 0;
-      PARAM.Set_And_Save(PARAM.SerialBuffer);
+      PARAM.Process_Command(PARAM.SerialBuffer);
     }
   }
   if (PARAM.SerialBufferIndex > 0)

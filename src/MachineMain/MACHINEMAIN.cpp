@@ -40,6 +40,8 @@ void MachineInit()
     I2C.All_Initialization();
     //INICIALIZA AS CONFIGURAÇÕES DOS PINOS IO
     ConfigureRegisters(false);
+    //INICIALIZA O TECS
+    TECS.Initialization();
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
     //CALCULA E IMPRIME O TEMPO GASTO PELA INICIALIZAÇÃO

@@ -59,7 +59,7 @@ void Fast_Medium_Loop()
         PARACHUTE.Manual_Do_Now();
         IMU_GForce_Update();
         GCS.Serial_Parse_Protocol();
-        PARAM.SerialProcess();
+        PARAM.Update();
 }
 
 void Fast_Loop()

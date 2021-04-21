@@ -21,6 +21,7 @@
 class TecsClass
 {
 public:
+  void Initialization(void);
   void Update(float DeltaTime);
   float AutoPitchDown(int16_t InCruise_Throttle, int16_t InMinThrottleDownPitchAngle);
 };

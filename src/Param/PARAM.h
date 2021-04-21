@@ -24,15 +24,15 @@ class ParamClass
 {
 public:
   void Initialization(void);
-  void DefaultList(void);
-  void SerialProcess(void);
+  void Default_List(void);
+  void Update(void);
 
 private:
   bool PrintMessage = false;
   char SerialBuffer[48];
   uint32_t SerialBufferIndex = 0;
   void Load_Sketch(void);
-  void Set_And_Save(char *TerminalCommandLine);
+  void Process_Command(char *TerminalCommandLine);
 };
 extern ParamClass PARAM;
 #endif

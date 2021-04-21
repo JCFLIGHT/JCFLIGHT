@@ -18,7 +18,7 @@
 #include "GENERICPI.h"
 #include "Math/MATHSUPPORT.h"
 
-float GenericPIClass::Get_PI_Calced(int16_t Error, float DeltaTime)
+float GenericPIClass::Get_PI_Calced(float Error, float DeltaTime)
 {
   Integral_Sum += ((float)Error * kI / kI_Scale) * DeltaTime;
   Integral_Sum = Constrain_Float(Integral_Sum, -Integral_Max, Integral_Max);

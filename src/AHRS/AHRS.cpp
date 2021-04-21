@@ -468,32 +468,32 @@ void AHRSClass::TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *Vector)
   QuaternionRotateVector(Vector, Vector, &Orientation);
 }
 
-float AHRSClass::GetSineRoll()
+float AHRSClass::GetSineRoll(void)
 {
   return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Roll));
 }
 
-float AHRSClass::GetCosineRoll()
+float AHRSClass::GetCosineRoll(void)
 {
   return Fast_Cosine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Roll));
 }
 
-float AHRSClass::GetSinePitch()
+float AHRSClass::GetSinePitch(void)
 {
   return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Pitch));
 }
 
-float AHRSClass::GetCosinePitch()
+float AHRSClass::GetCosinePitch(void)
 {
   return Fast_Cosine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.Pitch));
 }
 
-float AHRSClass::GetSineYaw()
+float AHRSClass::GetSineYaw(void)
 {
   return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.YawDecidegrees));
 }
 
-float AHRSClass::GetCosineYaw()
+float AHRSClass::GetCosineYaw(void)
 {
   return Fast_Cosine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.YawDecidegrees));
 }

@@ -180,9 +180,6 @@ struct _Send_User_Basic_Parameters
     uint8_t SendAutoLandType;
     uint8_t SendSafeBtnState;
     uint8_t SendAirSpeedState;
-    int16_t SendAccRollAdjust;
-    int16_t SendAccPitchAdjust;
-    int16_t SendAccYawAdjust;
     int16_t SendPitchLevelTrim;
 } Send_User_Basic_Parameters;
 
@@ -209,9 +206,6 @@ struct _Get_User_Basic_Parameters
     uint8_t GetAutoLandType;
     uint8_t GetSafeBtnState;
     uint8_t GetAirSpeedState;
-    int16_t GetAccRollAdjust;
-    int16_t GetAccPitchAdjust;
-    int16_t GetAccYawAdjust;
     int16_t GetPitchLevelTrim;
 } Get_User_Basic_Parameters;
 
@@ -224,9 +218,6 @@ struct _Send_Radio_Control_Parameters
     uint8_t SendYawRate;
     int16_t SendRCPulseMin;
     int16_t SendRCPulseMax;
-    uint8_t SendAHDeadZone;
-    uint8_t SendAHSafeAltitude;
-    uint8_t SendAHMinVelVertical;
     int16_t SendThrottleMin;
     int16_t SendYawMin;
     int16_t SendPitchMin;
@@ -271,9 +262,6 @@ struct _Get_Radio_Control_Parameters
     uint8_t GetYawRate;
     int16_t GetRCPulseMin;
     int16_t GetRCPulseMax;
-    uint8_t GetAHDeadZone;
-    uint8_t GetAHSafeAltitude;
-    uint8_t GetAHMinVelVertical;
     int16_t GetThrottleMin;
     int16_t GetYawMin;
     int16_t GetPitchMin;
@@ -335,7 +323,7 @@ struct _Send_User_Medium_Parameters
     uint8_t SendProportionalYaw;
     uint8_t SendIntegralYaw;
     uint8_t SendDerivativeYaw;
-    uint8_t SendProportionalAltitudeHold;
+    uint8_t SendProportionalVelZ;
     uint8_t SendProportionalGPSHold;
     uint8_t SendIntegralGPSHold;
     int16_t SendServosLPF;
@@ -353,6 +341,11 @@ struct _Send_User_Medium_Parameters
     uint8_t SendGPSBank;
     uint16_t SendIntegralLPF;
     uint16_t SendkCDLPF;
+    uint8_t SendIntegralVelZ;
+    uint8_t SendDerivativeVelZ;
+    uint8_t SendProportionalAltitudeHold;
+    uint8_t SendIntegralAltitudeHold;
+    uint8_t SendDerivativeAltitudeHold;
 } Send_User_Medium_Parameters;
 
 struct _Get_User_Medium_Parameters
@@ -377,7 +370,7 @@ struct _Get_User_Medium_Parameters
     uint8_t GetProportionalYaw;
     uint8_t GetIntegralYaw;
     uint8_t GetDerivativeYaw;
-    uint8_t GetProportionalAltitudeHold;
+    uint8_t GetProportionalVelZ;
     uint8_t GetProportionalGPSHold;
     uint8_t GetIntegralGPSHold;
     int16_t GetServosLPF;
@@ -395,6 +388,11 @@ struct _Get_User_Medium_Parameters
     uint8_t GetGPSBank;
     int16_t GetIntegralLPF;
     int16_t GetkCDLPF;
+    uint8_t GetIntegralVelZ;
+    uint8_t GetDerivativeVelZ;
+    uint8_t GetProportionalAltitudeHold;
+    uint8_t GetIntegralAltitudeHold;
+    uint8_t GetDerivativeAltitudeHold;
 } Get_User_Medium_Parameters;
 
 struct _Send_WayPoint_Coordinates
@@ -1013,7 +1011,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 28) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 33) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 8)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendTPAInPercent, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendBreakPointValue, VAR_16BITS);
@@ -1035,7 +1033,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalYaw, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralYaw, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativeYaw, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalAltitudeHold, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalVelZ, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalGPSHold, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralGPSHold, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendServosLPF, VAR_16BITS);
@@ -1051,6 +1049,11 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendPitchBankMax, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendAttackBank, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendGPSBank, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralVelZ, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativeVelZ, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendAltitudeHold, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendAltitudeHold, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendAltitudeHold, VAR_8BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1198,7 +1201,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 13) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 27)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleMiddle, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleExpo, VAR_8BITS);
@@ -1207,9 +1210,6 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendYawRate, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendRCPulseMin, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendRCPulseMax, VAR_16BITS);
-        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAHDeadZone, VAR_8BITS);
-        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAHSafeAltitude, VAR_8BITS);
-        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAHMinVelVertical, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleMin, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendYawMin, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendPitchMin, VAR_16BITS);
@@ -1315,7 +1315,7 @@ void GCSClass::First_Packet_Request_Parameters()
     Essential_First_Packet_Parameters.SendActualFlightMode = FlightMode;
     Essential_First_Packet_Parameters.SendFrameType = FrameType;
     Essential_First_Packet_Parameters.SendHomePointState = GPSParameters.Home.Marked;
-    Essential_First_Packet_Parameters.SendTemperature = Barometer.Raw.Temperature / 100;
+    Essential_First_Packet_Parameters.SendTemperature = Barometer.Raw.Temperature * 0.01f;
     Essential_First_Packet_Parameters.SendHomePointDistance = GPSParameters.Home.Distance;
     Essential_First_Packet_Parameters.SendCurrentInMah = BATTERY.Get_Current_In_Mah();
 #ifndef MACHINE_CYCLE
@@ -1450,9 +1450,6 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(AUTOLAND_ADDR, Get_User_Basic_Parameters.GetAutoLandType);
     STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, Get_User_Basic_Parameters.GetSafeBtnState);
     STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, Get_User_Basic_Parameters.GetAirSpeedState);
-    STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADJUST_ADDR, Get_User_Basic_Parameters.GetAccRollAdjust);
-    STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADJUST_ADDR, Get_User_Basic_Parameters.GetAccPitchAdjust);
-    STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, Get_User_Basic_Parameters.GetAccYawAdjust);
     STORAGEMANAGER.Write_16Bits(PITCH_LEVEL_TRIM_ADDR, Get_User_Basic_Parameters.GetPitchLevelTrim);
 
     //ATUALIZA OS PARAMETROS DO PID
@@ -1468,9 +1465,6 @@ void GCSClass::Save_Radio_Control_Configuration()
     STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, Get_Radio_Control_Parameters.GetYawRate);
     STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MIN_ADDR, Get_Radio_Control_Parameters.GetRCPulseMin);
     STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MAX_ADDR, Get_Radio_Control_Parameters.GetRCPulseMax);
-    STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, Get_Radio_Control_Parameters.GetAHDeadZone);
-    STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, Get_Radio_Control_Parameters.GetAHSafeAltitude);
-    STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, Get_Radio_Control_Parameters.GetAHMinVelVertical);
     STORAGEMANAGER.Write_16Bits(THROTTLE_MIN_ADDR, Get_Radio_Control_Parameters.GetThrottleMin);
     STORAGEMANAGER.Write_16Bits(YAW_MIN_ADDR, Get_Radio_Control_Parameters.GetYawMin);
     STORAGEMANAGER.Write_16Bits(PITCH_MIN_ADDR, Get_Radio_Control_Parameters.GetPitchMin);
@@ -1528,7 +1522,9 @@ void GCSClass::Save_Medium_Configuration()
     STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, Get_User_Medium_Parameters.GetProportionalYaw);
     STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, Get_User_Medium_Parameters.GetIntegralYaw);
     STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, Get_User_Medium_Parameters.GetDerivativeYaw);
-    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, Get_User_Medium_Parameters.GetProportionalAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KP_VEL_Z_ADDR, Get_User_Medium_Parameters.GetProportionalVelZ);
+    STORAGEMANAGER.Write_8Bits(KI_VEL_Z_ADDR, Get_User_Medium_Parameters.GetIntegralVelZ);
+    STORAGEMANAGER.Write_8Bits(KD_VEL_Z_ADDR, Get_User_Medium_Parameters.GetDerivativeVelZ);
     STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, Get_User_Medium_Parameters.GetProportionalGPSHold);
     STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, Get_User_Medium_Parameters.GetIntegralGPSHold);
     STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, Get_User_Medium_Parameters.GetServosLPF);
@@ -1546,6 +1542,9 @@ void GCSClass::Save_Medium_Configuration()
     STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, Get_User_Medium_Parameters.GetGPSBank);
     STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, Get_User_Medium_Parameters.GetIntegralLPF);
     STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, Get_User_Medium_Parameters.GetkCDLPF);
+    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_HOLD_ADDR, Get_User_Medium_Parameters.GetProportionalAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_HOLD_ADDR, Get_User_Medium_Parameters.GetIntegralAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_HOLD_ADDR, Get_User_Medium_Parameters.GetDerivativeAltitudeHold);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1575,9 +1574,6 @@ void GCSClass::Default_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(AUTOLAND_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, 0);
-    STORAGEMANAGER.Write_16Bits(ACC_ROLL_ADJUST_ADDR, 0);
-    STORAGEMANAGER.Write_16Bits(ACC_PITCH_ADJUST_ADDR, 0);
-    STORAGEMANAGER.Write_16Bits(ACC_YAW_ADJUST_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(PITCH_LEVEL_TRIM_ADDR, 0);
 }
 
@@ -1591,9 +1587,6 @@ void GCSClass::Default_RadioControl_Configuration()
     STORAGEMANAGER.Write_8Bits(YAW_RATE_ADDR, 20);
     STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MIN_ADDR, 1000);
     STORAGEMANAGER.Write_16Bits(THR_ATTITUDE_MAX_ADDR, 1850);
-    STORAGEMANAGER.Write_8Bits(AH_DEADZONE_ADDR, 70);
-    STORAGEMANAGER.Write_8Bits(AH_SAFE_ALT_ADDR, 5);
-    STORAGEMANAGER.Write_8Bits(AH_MIN_VEL_VERT_ADDR, 50);
     STORAGEMANAGER.Write_16Bits(THROTTLE_MIN_ADDR, 1050);
     STORAGEMANAGER.Write_16Bits(YAW_MIN_ADDR, 1050);
     STORAGEMANAGER.Write_16Bits(PITCH_MIN_ADDR, 1050);
@@ -1709,8 +1702,15 @@ void GCSClass::Default_Medium_Configuration()
         STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
     }
 
-    //ALTITUDE-HOLD
-    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 50);
+    //ALTITUDE-HOLD E AUTO-THROTTLE
+    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_HOLD_ADDR, 3);
+    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_HOLD_ADDR, 50);
+    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_HOLD_ADDR, 20);
+
+    //VELOCIDADE Z
+    STORAGEMANAGER.Write_8Bits(KP_VEL_Z_ADDR, 50);
+    STORAGEMANAGER.Write_8Bits(KI_VEL_Z_ADDR, 20);
+    STORAGEMANAGER.Write_8Bits(KD_VEL_Z_ADDR, 16);
 
     //GPS-HOLD
     STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 100);
@@ -1755,9 +1755,6 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Basic_Parameters.SendAutoLandType = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);
     Send_User_Basic_Parameters.SendSafeBtnState = STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR);
     Send_User_Basic_Parameters.SendAirSpeedState = STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR);
-    Send_User_Basic_Parameters.SendAccRollAdjust = STORAGEMANAGER.Read_16Bits(ACC_ROLL_ADJUST_ADDR);
-    Send_User_Basic_Parameters.SendAccPitchAdjust = STORAGEMANAGER.Read_16Bits(ACC_PITCH_ADJUST_ADDR);
-    Send_User_Basic_Parameters.SendAccYawAdjust = STORAGEMANAGER.Read_16Bits(ACC_YAW_ADJUST_ADDR);
     Send_User_Basic_Parameters.SendPitchLevelTrim = STORAGEMANAGER.Read_16Bits(PITCH_LEVEL_TRIM_ADDR);
 
     //ATUALIZA OS PARAMETROS DO RADIO CONTROLE
@@ -1768,9 +1765,6 @@ void GCSClass::UpdateParametersToGCS()
     Send_Radio_Control_Parameters.SendYawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
     Send_Radio_Control_Parameters.SendRCPulseMin = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MIN_ADDR);
     Send_Radio_Control_Parameters.SendRCPulseMax = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MAX_ADDR);
-    Send_Radio_Control_Parameters.SendAHDeadZone = STORAGEMANAGER.Read_8Bits(AH_DEADZONE_ADDR);
-    Send_Radio_Control_Parameters.SendAHSafeAltitude = STORAGEMANAGER.Read_8Bits(AH_SAFE_ALT_ADDR);
-    Send_Radio_Control_Parameters.SendAHMinVelVertical = STORAGEMANAGER.Read_8Bits(AH_MIN_VEL_VERT_ADDR);
     Send_Radio_Control_Parameters.SendThrottleMin = STORAGEMANAGER.Read_16Bits(THROTTLE_MIN_ADDR);
     Send_Radio_Control_Parameters.SendYawMin = STORAGEMANAGER.Read_16Bits(YAW_MIN_ADDR);
     Send_Radio_Control_Parameters.SendPitchMin = STORAGEMANAGER.Read_16Bits(PITCH_MIN_ADDR);
@@ -1826,7 +1820,9 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Medium_Parameters.SendProportionalYaw = STORAGEMANAGER.Read_8Bits(KP_YAW_ADDR);
     Send_User_Medium_Parameters.SendIntegralYaw = STORAGEMANAGER.Read_8Bits(KI_YAW_ADDR);
     Send_User_Medium_Parameters.SendDerivativeYaw = STORAGEMANAGER.Read_8Bits(KD_YAW_ADDR);
-    Send_User_Medium_Parameters.SendProportionalAltitudeHold = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
+    Send_User_Medium_Parameters.SendProportionalVelZ = STORAGEMANAGER.Read_8Bits(KP_VEL_Z_ADDR);
+    Send_User_Medium_Parameters.SendIntegralVelZ = STORAGEMANAGER.Read_8Bits(KI_VEL_Z_ADDR);
+    Send_User_Medium_Parameters.SendDerivativeVelZ = STORAGEMANAGER.Read_8Bits(KD_VEL_Z_ADDR);
     Send_User_Medium_Parameters.SendProportionalGPSHold = STORAGEMANAGER.Read_8Bits(KP_GPSPOS_ADDR);
     Send_User_Medium_Parameters.SendIntegralGPSHold = STORAGEMANAGER.Read_8Bits(KI_GPSPOS_ADDR);
     Send_User_Medium_Parameters.SendServosLPF = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
@@ -1844,4 +1840,7 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Medium_Parameters.SendGPSBank = STORAGEMANAGER.Read_8Bits(GPS_BANK_ADDR);
     Send_User_Medium_Parameters.SendIntegralLPF = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);
     Send_User_Medium_Parameters.SendkCDLPF = STORAGEMANAGER.Read_16Bits(KCD_OR_FF_LPF_ADDR);
+    Send_User_Medium_Parameters.SendProportionalAltitudeHold = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_HOLD_ADDR);
+    Send_User_Medium_Parameters.SendIntegralAltitudeHold = STORAGEMANAGER.Read_8Bits(KI_ALTITUDE_HOLD_ADDR);
+    Send_User_Medium_Parameters.SendDerivativeAltitudeHold = STORAGEMANAGER.Read_8Bits(KD_ALTITUDE_HOLD_ADDR);
 }

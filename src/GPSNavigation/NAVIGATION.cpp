@@ -183,7 +183,7 @@ void GPS_Process_FlightModes(float DeltaTime)
 
     case DO_LAND_INIT:
       Do_RTH_Or_Land_Call_Alt_Hold = true;
-      SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
+      SetNewAltitudeToHold(Barometer.INS.Altitude.Estimated);
       GPSParameters.DeltaTime.InitLand = SCHEDULERTIME.GetMillis() + TIME_TO_INIT_LAND;
       GPSParameters.Mode.Navigation = DO_LAND_SETTLE;
       break;
@@ -227,11 +227,11 @@ void Do_Mode_RTH_Now()
 {
   if (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(GPSParameters.Home.Altitude))
   {
-    SetAltitudeToHold(ConvertCMToMeters(GPSParameters.Home.Altitude));
+    SetNewAltitudeToHold(ConvertCMToMeters(GPSParameters.Home.Altitude));
   }
   else
   {
-    SetAltitudeToHold(Barometer.INS.Altitude.Estimated);
+    SetNewAltitudeToHold(Barometer.INS.Altitude.Estimated);
   }
   SetThisPointToPositionHold();
 }

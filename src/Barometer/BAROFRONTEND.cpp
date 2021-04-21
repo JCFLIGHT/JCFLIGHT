@@ -19,21 +19,32 @@
 #include "BAROBACKEND.h"
 #include "BAROREAD.h"
 #include "Math/MATHSUPPORT.h"
+#include "I2C/I2C.h"
 
 //https://en.wikipedia.org/wiki/Equivalent_airspeed
 
-int32_t EAS2TAS;
-int32_t Last_EAS2TAS;
+float EAS2TAS;
+float Last_EAS2TAS;
+
+static bool SafeToApplyEAS2TAS(void)
+{
+    return IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2CResources.Found.Barometer;
+}
 
 //FATOR DE ESCALA PARA CONVERTER A VELOCIDADE EQUIVALENTE DO TUBO DE PITOT EM VELOCIDADE REAL
-int32_t Get_EAS2TAS(void)
+float Get_EAS2TAS(void)
 {
-    if ((ABS(Barometer.Altitude.Actual - Last_EAS2TAS) < 100) && (EAS2TAS != 0))
+    if (!SafeToApplyEAS2TAS()) //EVITA DE OCORRER OVERFLOW
+    {
+        return 1.0f;
+    }
+    float ActualBaroAltitude = (float)Barometer.Altitude.Actual;
+    if ((ABS(ActualBaroAltitude - Last_EAS2TAS) < 100.0f) && (EAS2TAS != 0.0f))
     {
         return EAS2TAS;
     }
-    int32_t TempKelvin = ((float)Barometer.Calibration.GroundTemperature) + 27315 - 0.0065f * Barometer.Altitude.Actual;
-    EAS2TAS = Fast_SquareRoot(1.225f / ((float)Barometer.Raw.PressureFiltered / (287.26f * TempKelvin)));
-    Last_EAS2TAS = Barometer.Altitude.Actual;
+    float TempKelvin = ((float)Barometer.Calibration.GroundTemperature) + 273.15f - 0.0065f * ActualBaroAltitude;
+    EAS2TAS = Fast_SquareRoot(1.225f / ((float)Barometer.Raw.Pressure / (287.26f * TempKelvin)));
+    Last_EAS2TAS = ActualBaroAltitude;
     return EAS2TAS;
 }

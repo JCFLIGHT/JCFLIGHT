@@ -431,7 +431,7 @@ void Get_Altitude()
     }
   }
 
-  SetAltitudeToHold(ConvertCMToMeters(10 + AltitudeSum));
+  SetNewAltitudeToHold(ConvertCMToMeters(10 + AltitudeSum));
 }
 
 void Store_And_Clear_WayPoints()

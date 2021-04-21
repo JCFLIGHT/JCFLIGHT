@@ -18,17 +18,11 @@
 #ifndef ALTITUDEHOLD_H_
 #define ALTITUDEHOLD_H_
 #include "Build/LIBDEPENDENCIES.h"
-void AltitudeHold_Update_Params();
 bool ApplyAltitudeHoldControl();
-void SetAltitudeToHold(int32_t ValueOfNewAltitudeHold);
-bool GetAltitudeReached();
+void SetNewAltitudeToHold(int32_t ValueOfNewAltitudeHold);
 bool GetTakeOffInProgress();
-void ResetIntegralOfVariometerError();
-void RunLandDetector();
-void ResetLandDetector();
+bool GetAltitudeReached();
 bool GetGroundDetected();
 bool GetGroundDetectedFor100ms();
 bool GetLanded();
-void InitializeHoveringThrottle();
-void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState);
 #endif

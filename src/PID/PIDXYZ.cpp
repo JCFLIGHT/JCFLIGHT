@@ -302,7 +302,7 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
 {
   float RcControllerAngle = 0;
 
-  RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[MAX_ROLL_LEVEL].MinMaxValue));
+  RcControllerAngle = RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[MAX_ROLL_LEVEL].MaxValue));
 
   float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[ROLL]);
 
@@ -311,11 +311,11 @@ float PIDXYZClass::LevelRoll(float DeltaTime)
     AngleErrorInDegrees = GPSParameters.Navigation.AutoPilot.Control.Angle[ROLL];
   }
 
-  int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue);
+  int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue);
 
   if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
   {
-    ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue);
+    ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MaxValue);
   }
 
   float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].kP / 6.56f), -ThisBankAngleMax, ThisBankAngleMax);
@@ -335,7 +335,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 {
   float RcControllerAngle = 0;
 
-  RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[MAX_PITCH_LEVEL].MinMaxValue));
+  RcControllerAngle = RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[MAX_PITCH_LEVEL].MaxValue));
 
   RcControllerAngle += TECS.AutoPitchDown(Cruise_Throttle, MinThrottleDownPitchAngle);
 
@@ -351,11 +351,11 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
     AngleErrorInDegrees = GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH];
   }
 
-  int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue);
+  int16_t ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MaxValue);
 
   if (GetFrameStateOfMultirotor() && IS_FLIGHT_MODE_ACTIVE(ATTACK_MODE))
   {
-    ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MinMaxValue);
+    ThisBankAngleMax = ConvertDegreesToDecidegrees(GET_SET[ATTACK_BANK_MAX].MaxValue);
   }
 
   float AngleRateTarget = Constrain_Float(AngleErrorInDegrees * (GET_SET[PI_AUTO_LEVEL].kP / 6.56f), -ThisBankAngleMax, ThisBankAngleMax);
@@ -639,12 +639,12 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn()
     if (AHRS.CheckAnglesInclination(10)) //10 GRAUS DE INCLINAÇÃO
     {
       //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1000CM/S = 36KM/H
-      int16_t AirSpeedForCoordinatedTurn = Get_AirSpeed_Enabled() ? AirSpeed.Raw.IASPressureInCM : ReferenceAirSpeed;
+      float AirSpeedForCoordinatedTurn = Get_AirSpeed_Enabled() ? AIRSPEED.Get_True_Value("In Centimeters") : (float)ReferenceAirSpeed;
       //LIMITE DE 10KM/H - 216KM/H
-      AirSpeedForCoordinatedTurn = Constrain_16Bits(AirSpeedForCoordinatedTurn, 300, 6000);
-      float BankAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue)));
+      AirSpeedForCoordinatedTurn = Constrain_Float(AirSpeedForCoordinatedTurn, 300, 6000);
+      float BankAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue)));
       float FinalBankAngleTarget = Constrain_Float(BankAngleTarget, -ConvertToRadians(60), ConvertToRadians(60));
-      float PitchAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue)));
+      float PitchAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RCController[PITCH], ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MaxValue)));
       float TurnRatePitchAdjustmentFactor = Fast_Cosine(ABS(PitchAngleTarget));
       CoordinatedTurnRateEarthFrame = ConvertToDegrees(980.665f * Fast_Tangent(-FinalBankAngleTarget) / AirSpeedForCoordinatedTurn * TurnRatePitchAdjustmentFactor);
       TurnControllerRates.Yaw = CoordinatedTurnRateEarthFrame;

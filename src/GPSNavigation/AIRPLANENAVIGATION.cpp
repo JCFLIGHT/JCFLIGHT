@@ -188,7 +188,7 @@ void AirPlaneUpdateNavigation(void)
     {
       if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
       {
-        AltitudeError = -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue);
+        AltitudeError = -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MaxValue);
         GetThrottleToNavigation = AttitudeThrottleMax;
         if (CurrentAltitude < SAFE_NAV_ALT)
         {
@@ -283,13 +283,13 @@ void AirPlaneUpdateNavigation(void)
     NavigationDeltaSumPID = (NavigationDeltaSumPID * Nav_kD) / DeltaTime_Navigation_PID;
     HeadingDifference *= Nav_kP;
     HeadingDifference += IntegralErrorOfNavigation;
-    GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(AltitudeDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue)) + AltitudeDeltaSumPID;
-    GPSParameters.Navigation.AutoPilot.Control.Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MinMaxValue)) + NavigationDeltaSumPID;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(AltitudeDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MaxValue)) + AltitudeDeltaSumPID;
+    GPSParameters.Navigation.AutoPilot.Control.Angle[ROLL] = Constrain_16Bits(HeadingDifference / 10, -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue)) + NavigationDeltaSumPID;
     GPSParameters.Navigation.AutoPilot.Control.Angle[YAW] = Constrain_16Bits(HeadingDifference / 10, -MAX_YAW_BANKANGLE * 10, MAX_YAW_BANKANGLE * 10) + NavigationDeltaSumPID;
 
     if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
-      GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH], 0, ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MinMaxValue));
+      GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH] = Constrain_16Bits(GPSParameters.Navigation.AutoPilot.Control.Angle[PITCH], 0, ConvertDegreesToDecidegrees(GET_SET[PITCH_BANK_MAX].MaxValue));
     }
 
     if (!IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))

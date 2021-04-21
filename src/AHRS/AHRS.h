@@ -27,16 +27,16 @@ extern Matrix3x3_Struct Rotation;
 class AHRSClass
 {
 public:
-  void Initialization();
+  void Initialization(void);
   void Update(float DeltaTime);
   bool CheckAnglesInclination(int16_t Angle);
   void TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *Vector);
-  float GetSineRoll();
-  float GetCosineRoll();
-  float GetSinePitch();
-  float GetCosinePitch();
-  float GetSineYaw();
-  float GetCosineYaw();
+  float GetSineRoll(void);
+  float GetCosineRoll(void);
+  float GetSinePitch(void);
+  float GetCosinePitch(void);
+  float GetSineYaw(void);
+  float GetCosineYaw(void);
 
 private:
   float CosineTiltAngle(void);

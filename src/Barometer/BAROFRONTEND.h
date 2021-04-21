@@ -18,5 +18,5 @@
 #ifndef BAROFRONTEND_H_
 #define BAROFRONTEND_H_
 #include "inttypes.h"
-int32_t Get_EAS2TAS(void);
+float Get_EAS2TAS(void);
 #endif

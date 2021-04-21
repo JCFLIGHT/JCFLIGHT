@@ -354,7 +354,7 @@ typedef struct
   uint8_t kI = 0;
   uint8_t kD = 0;
   uint8_t kFF = 0;
-  uint8_t MinMaxValue = 0;
+  uint8_t MaxValue = 0;
 } PID_Terms_Struct;
 
 typedef struct
@@ -430,6 +430,7 @@ typedef struct
   {
     float Pressure = 0;
     float IASPressure = 0;
+    float DifferentialPressure = 0;
     uint16_t IASPressureInCM = 0;
   } Raw;
 
@@ -599,6 +600,9 @@ typedef struct
   uint8_t Compass_Cal_Timer;
 #endif
   uint8_t AutoPilotMode;
+#ifndef __AVR_ATmega2560__
+  uint8_t AirSpeedAutoCalScale;
+#endif
 } JCF_Param_Adjustable_Struct;
 
 typedef struct
@@ -663,5 +667,51 @@ typedef union
   float Type_Float;
   int32_t Type_Int32;
 } Variable_Union;
+
+typedef struct
+{
+  struct Flags_Struct
+  {
+    bool TakeOffInProgress = false;
+    bool GroundAltitudeSet = false;
+  } Flags;
+
+  struct Time_Struct
+  {
+    uint32_t LandDetectorStart = 0;
+    uint32_t OnLand = 0;
+  } Time;
+
+  struct Target_Struct
+  {
+
+    struct Velocity_Struct
+    {
+      int32_t Z = 0;
+    } Velocity;
+
+    struct Position_Struct
+    {
+      int32_t Z = 0;
+    } Position;
+
+    int32_t Altitude = 0;
+
+  } Target;
+
+  struct Throttle_Struct
+  {
+    int16_t Hovering = 0;
+    int16_t Difference = 0;
+  } Throttle;
+
+  struct PID_Struct
+  {
+    int16_t Control = 0;
+    int16_t IntegratorError = 0;
+    int32_t IntegratorSum = 0;
+  } PID;
+
+} AH_Controller_Struct;
 
 #endif

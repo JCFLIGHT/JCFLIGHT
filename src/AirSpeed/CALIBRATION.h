@@ -15,21 +15,19 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef AIRSPEED_H_
-#define AIRSPEED_H_
-#include "Build/LIBDEPENDENCIES.h"
-#include "Common/STRUCTS.h"
-extern AirSpeed_Struct AirSpeed;
-class AirSpeedClass
+#ifndef CALIBRATION_H_
+#define CALIBRATION_H_
+#include "inttypes.h"
+class AirSpeedCalibrationClass
 {
 public:
   void Initialization(void);
-  void Update(void);
-  float Get_True_Value(const char *Type);
+  bool Calibrate(void);
+  void Scale_Update(void);
 
 private:
-  float Get_Raw_Pressure(void);
-  void Parse_IAS_Pressure(float &Pressure);
+  uint8_t Scale_Counter = 0;
+  float Previous_Scale = 0;
 };
-extern AirSpeedClass AIRSPEED;
+extern AirSpeedCalibrationClass AIRSPEEDCALIBRATION;
 #endif

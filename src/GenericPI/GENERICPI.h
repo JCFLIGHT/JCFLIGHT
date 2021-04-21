@@ -17,13 +17,11 @@
 
 #ifndef GENERICPI_H_
 #define GENERICPI_H_
-
 #include "Build/LIBDEPENDENCIES.h"
-
 class GenericPIClass
 {
 public:
-	float Get_PI_Calced(int16_t Error, float DeltaTime);
+	float Get_PI_Calced(float Error, float DeltaTime);
 	int16_t GetPICalcedWithDataConstrained(float Input_PI_Calced, float Input_To_Sum);
 	void Reset_Integral();
 
@@ -78,5 +76,4 @@ private:
 	int32_t OutputMin;
 	int32_t OutputMax;
 };
-
 #endif

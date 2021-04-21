@@ -15,21 +15,14 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef AIRSPEED_H_
-#define AIRSPEED_H_
-#include "Build/LIBDEPENDENCIES.h"
-#include "Common/STRUCTS.h"
-extern AirSpeed_Struct AirSpeed;
-class AirSpeedClass
-{
-public:
-  void Initialization(void);
-  void Update(void);
-  float Get_True_Value(const char *Type);
+#include "MATRIXF.h"
 
-private:
-  float Get_Raw_Pressure(void);
-  void Parse_IAS_Pressure(float &Pressure);
-};
-extern AirSpeedClass AIRSPEED;
-#endif
+template <typename T>
+Vector3x3<T> Matrix3x3<T>::operator*(const Vector3x3<T> &Vector) const
+{
+    return Vector3x3<T>(A.X * Vector.X + A.Y * Vector.Y + A.Z * Vector.Z,
+                        B.X * Vector.X + B.Y * Vector.Y + B.Z * Vector.Z,
+                        C.X * Vector.X + C.Y * Vector.Y + C.Z * Vector.Z);
+}
+
+template Vector3x3<float> Matrix3x3<float>::operator*(const Vector3x3<float> &Vector) const;

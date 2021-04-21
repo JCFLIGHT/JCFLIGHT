@@ -84,3 +84,8 @@ bool Get_GPS_Only_Flight_Modes_In_Use(void)
 {
     return (GPSParameters.Mode.Flight != GPS_MODE_NONE);
 }
+
+bool Get_GPS_Used_To_Land(void)
+{
+    return GPSParameters.Mode.Navigation == DO_LAND_IN_PROGRESS || GPSParameters.Mode.Navigation == DO_LAND_DETECTED || GPSParameters.Mode.Navigation == DO_LANDED;
+}

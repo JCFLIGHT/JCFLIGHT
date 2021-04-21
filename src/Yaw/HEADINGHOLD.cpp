@@ -92,7 +92,7 @@ float GetHeadingHoldValue(float DeltaTime)
   HeadingHoldRate = YawError * GET_SET[P_YAW_RATE].kP / 30.0f;
 
   //APLICA LIMITES MIN E MAX NO RATE
-  HeadingHoldRate = Constrain_Float(HeadingHoldRate, -GET_SET[P_YAW_RATE_LIMIT].MinMaxValue, GET_SET[P_YAW_RATE_LIMIT].MinMaxValue);
+  HeadingHoldRate = Constrain_Float(HeadingHoldRate, -GET_SET[P_YAW_RATE_LIMIT].MaxValue, GET_SET[P_YAW_RATE_LIMIT].MaxValue);
 
 #ifdef PRINTLN_HEADING_HOLD
   float HeadingHoldRateNF = HeadingHoldRate;

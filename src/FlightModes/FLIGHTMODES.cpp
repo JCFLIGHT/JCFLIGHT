@@ -111,7 +111,6 @@ void ProcessFlightModesToMultirotor()
         }
         else
         {
-          GPSParameters.Mode.Navigation = DO_NONE;
           Do_Pos_Hold_Call_Alt_Hold = false;
           Do_RTH_Or_Land_Call_Alt_Hold = false;
           DISABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
@@ -127,7 +126,6 @@ void ProcessFlightModesToMultirotor()
         {
           SetNewAltitudeToHold(Barometer.INS.Altitude.Estimated);
         }
-        GPSParameters.Mode.Navigation = DO_NONE;
       }
       GPS_Reset_Navigation();
     }
@@ -135,7 +133,6 @@ void ProcessFlightModesToMultirotor()
   else
   {
     Do_RTH_Or_Land_Call_Alt_Hold = false;
-    GPSParameters.Mode.Navigation = DO_NONE;
     GPS_Reset_Navigation();
   }
 
@@ -180,9 +177,9 @@ void ProcessFlightModesToAirPlane()
     {
       if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
       {
-        Set_Next_Point_To_Navigation(GPSParameters.Home.Coordinates[COORD_LATITUDE], GPSParameters.Home.Coordinates[COORD_LONGITUDE]);
         GPSParameters.Mode.Navigation = DO_RTH_ENROUTE;
         AltitudeHold_For_Plane = GPSParameters.Navigation.Misc.Get.Altitude;
+        Set_Next_Point_To_Navigation(GPSParameters.Home.Coordinates[COORD_LATITUDE], GPSParameters.Home.Coordinates[COORD_LONGITUDE]);
         ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
       }
       else
@@ -196,7 +193,6 @@ void ProcessFlightModesToAirPlane()
         }
         else
         {
-          GPSParameters.Mode.Navigation = DO_NONE;
           DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
           GPS_Reset_Navigation();
         }
@@ -228,7 +224,7 @@ void FlightModesUpdate(void)
 
   if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
   {
-    HeadingHoldTarget = Attitude.EulerAngles.Yaw;
+    GPSParameters.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw;
   }
 
   GPSParameters.Navigation.AutoPilot.Control.Enabled = Get_GPS_Used_To_Navigation();

@@ -131,12 +131,15 @@ struct _GetWayPointGCSParametersTwo
     GPSHoldTimedTen = 0;
   }
 };
+
 extern struct _GetWayPointGCSParameters GetWayPointGCSParameters;
 extern struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 extern uint8_t EEPROM_Function;
-void WayPoint_Initialization();
-void PushWayPointParameters();
-void WayPointRun();
-void Get_Altitude();
-void Store_And_Clear_WayPoints();
+class WayPointClass
+{
+public:
+  void Initialization(void);
+  void Update(void);
+};
+extern WayPointClass WAYPOINT;
 #endif

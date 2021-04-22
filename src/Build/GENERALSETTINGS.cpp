@@ -56,7 +56,6 @@ void GeneralSettingsInitialization()
   KALMAN.Init();
   IMU_Filters_Initialization();
   RCCONFIG.Init();
-  WayPoint_Initialization();
   AIRSPEED.Initialization();
   GCS.UpdateParametersToGCS();
   AHRS.Initialization();

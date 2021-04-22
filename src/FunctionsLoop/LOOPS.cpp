@@ -22,7 +22,6 @@ void Slow_Loop()
 {
         STICKS.Pre_Arm();
         COMPASS.Constant_Read();
-        PushWayPointParameters();
         UpdateValuesOfPID();
 }
 
@@ -96,7 +95,7 @@ void Integral_Loop()
         AHRS.Update(ThisDeltaTime);
         RC_PID_Update();
         GPS_Orientation_Update();
-        WayPointRun();
+        WAYPOINT.Update();
         AUTOLAUNCH.Update();
         TECS.Update(ThisDeltaTime);
         PIDXYZ.Update(ThisDeltaTime);

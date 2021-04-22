@@ -42,6 +42,8 @@ void MachineInit()
     ConfigureRegisters(false);
     //INICIALIZA O TECS
     TECS.Initialization();
+    //INICIALIZA O WAYPOINT
+    WAYPOINT.Initialization();
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
     //CALCULA E IMPRIME O TEMPO GASTO PELA INICIALIZAÇÃO

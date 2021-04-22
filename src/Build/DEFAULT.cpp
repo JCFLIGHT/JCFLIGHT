@@ -60,7 +60,18 @@ void ClearSensorsCalibration(void)
 
 void ClearWayPointsStorage(void)
 {
-    STORAGEMANAGER.Erase(704, 813);
+    STORAGEMANAGER.Erase(704, 803);
+    //PADRÃO DE 10 METROS PARA AS ALTITUDES DE VOO POR WAYPOINT
+    STORAGEMANAGER.Write_8Bits(804, 10);
+    STORAGEMANAGER.Write_8Bits(805, 10);
+    STORAGEMANAGER.Write_8Bits(806, 10);
+    STORAGEMANAGER.Write_8Bits(807, 10);
+    STORAGEMANAGER.Write_8Bits(808, 10);
+    STORAGEMANAGER.Write_8Bits(809, 10);
+    STORAGEMANAGER.Write_8Bits(810, 10);
+    STORAGEMANAGER.Write_8Bits(811, 10);
+    STORAGEMANAGER.Write_8Bits(812, 10);
+    STORAGEMANAGER.Write_8Bits(813, 10);
 }
 
 void RecallAllParams(void)

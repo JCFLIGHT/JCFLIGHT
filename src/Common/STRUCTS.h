@@ -216,21 +216,24 @@ typedef struct
 
   struct Home_Struct
   {
-    bool Marked;
+    bool Marked = false;
     uint8_t Altitude = 0;
     int16_t Direction = 0;
     uint16_t Distance = 0;
     int32_t Coordinates[2] = {0, 0};
+
     struct INS_Struct
     {
       int32_t Distance[2] = {0, 0};
     } INS;
+
   } Home;
 
   struct Navigation_Struct
   {
     int16_t Speed[2] = {0, 0};
     int16_t RateError[2] = {0, 0};
+    int16_t HeadingHoldTarget = 0;
 
     struct AutoPilot_Struct
     {
@@ -271,6 +274,7 @@ typedef struct
         uint16_t GroundSpeed = 0;
         uint16_t HDOP = 0;
       } Get;
+
     } Misc;
 
     struct Bearing_Struct

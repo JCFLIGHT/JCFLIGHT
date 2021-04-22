@@ -34,7 +34,7 @@
 
 void GPS_Adjust_Heading()
 {
-    HeadingHoldTarget = WRap_18000(GPSParameters.Navigation.Bearing.ActualTarget) / 100;
+    GPSParameters.Navigation.HeadingHoldTarget = WRap_18000(GPSParameters.Navigation.Bearing.ActualTarget) / 100;
 }
 
 void GPS_Calcule_Bearing(int32_t InputLatitude, int32_t InputLongitude, int32_t *Bearing)
@@ -145,8 +145,8 @@ void GPSCalculateNavigationRate(uint16_t Maximum_Velocity)
         GPSParameters.Navigation.RateError[IndexCount] = Target_Speed[IndexCount] - GPSParameters.Navigation.Speed[IndexCount];
         GPSParameters.Navigation.RateError[IndexCount] = Constrain_16Bits(GPSParameters.Navigation.RateError[IndexCount], -1000, 1000);
         GPSParameters.Navigation.AutoPilot.INS.Angle[IndexCount] = GPSGetProportional(GPSParameters.Navigation.RateError[IndexCount], &NavigationPID) +
-                                                                    GPSGetIntegral(GPSParameters.Navigation.RateError[IndexCount], GPSParameters.DeltaTime.Navigation, &NavigationPIDArray[IndexCount], &NavigationPID) +
-                                                                    GPSGetDerivative(GPSParameters.Navigation.RateError[IndexCount], GPSParameters.DeltaTime.Navigation, &NavigationPIDArray[IndexCount], &NavigationPID);
+                                                                   GPSGetIntegral(GPSParameters.Navigation.RateError[IndexCount], GPSParameters.DeltaTime.Navigation, &NavigationPIDArray[IndexCount], &NavigationPID) +
+                                                                   GPSGetDerivative(GPSParameters.Navigation.RateError[IndexCount], GPSParameters.DeltaTime.Navigation, &NavigationPIDArray[IndexCount], &NavigationPID);
 
         if (NAVTILTCOMPENSATION != 0)
         {

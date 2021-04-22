@@ -109,7 +109,7 @@ void RC_Config::Set_Fail_Safe(bool FailSafe)
   RC_Config::_FailSafe = FailSafe;
 }
 
-int16_t RC_Config::Get_Channel_Range()
+int16_t RC_Config::Get_Channel_Range(void)
 {
   if (!RC_Config::_Fail_Safe)
   {
@@ -123,12 +123,9 @@ int16_t RC_Config::Get_Channel_Range()
   {
     RC_Config::RcConstrain = RC_Config::Max_Pulse - (RC_Config::RcConstrain - RC_Config::Min_Pulse);
   }
-  if (!RCCONFIG.CancelDeadZone)
+  if ((RC_Config::Input > 1450 + RC_Config::_DeadZone) && (RC_Config::Input < 1550 - RC_Config::_DeadZone) && (RC_Config::_DeadZone > 0))
   {
-    if ((RC_Config::Input > 1450 + RC_Config::_DeadZone) && (RC_Config::Input < 1550 - RC_Config::_DeadZone) && (RC_Config::_DeadZone > 0))
-    {
-      return MIDDLE_STICKS_PULSE;
-    }
+    return MIDDLE_STICKS_PULSE;
   }
   if (RC_Config::RcConstrain > RC_Config::Min_Pulse)
   {
@@ -144,7 +141,7 @@ int16_t RC_Config::Get_Channel_Range()
   }
 }
 
-void RCConfigClass::Init()
+void RCConfigClass::Init(void)
 {
   //PULSO MINIMO E MAXIMO PARA TODOS OS CANAIS RÁDIO
   Throttle.Min_Pulse = STORAGEMANAGER.Read_16Bits(THROTTLE_MIN_ADDR);
@@ -256,7 +253,7 @@ void RCConfigClass::Init()
   }
 }
 
-void RCConfigClass::Set_Pulse()
+void RCConfigClass::Set_Pulse(void)
 {
   Throttle.Set_Pulse(DECODE.DirectRadioControllRead[THROTTLE]);
   Yaw.Set_Pulse(DECODE.DirectRadioControllRead[YAW]);
@@ -272,7 +269,7 @@ void RCConfigClass::Set_Pulse()
   AuxiliarEight.Set_Pulse(DECODE.DirectRadioControllRead[AUX8]);
 }
 
-void RCConfigClass::Update_Channels()
+void RCConfigClass::Update_Channels(void)
 {
   DECODE.SetRxChannelInput(THROTTLE, Throttle.Output);
   DECODE.SetRxChannelInput(YAW, Yaw.Output);

@@ -25,8 +25,7 @@ public:
   int16_t Output;
   int16_t Min_Pulse;
   int16_t Max_Pulse;
-  int16_t Get_Channel_Range();
-  void Init();
+  int16_t Get_Channel_Range(void);
   void Set_Range(int16_t Min, int16_t Max);
   void Set_Filter(bool Filter);
   void Set_Pulse(int16_t ChannelInputValue);
@@ -48,10 +47,9 @@ private:
 class RCConfigClass
 {
 public:
-  bool CancelDeadZone;
-  void Init();
-  void Set_Pulse();
-  void Update_Channels();
+  void Init(void);
+  void Set_Pulse(void);
+  void Update_Channels(void);
 };
 extern RCConfigClass RCCONFIG;
 extern RC_Config Throttle;

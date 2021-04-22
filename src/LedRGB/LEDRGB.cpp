@@ -94,6 +94,10 @@ void LEDRGB::Function(uint8_t Mode)
     RGB.CalibAccLed();
     break;
 
+  case CALL_LED_GYRO_CALIBRATION:
+    RGB.CalibGyroLed();
+    break;
+
   case CALL_LED_MAG_CALIBRATION:
     RGB.CalibMagLed();
     break;
@@ -116,10 +120,6 @@ void LEDRGB::Function(uint8_t Mode)
 
   case CALL_LED_PRE_ARM_FAIL:
     RGB.Pre_Arm_Fail();
-    break;
-
-  case CALL_LED_GYRO_CALIBRATION:
-    RGB.CalibGyroLed();
     break;
   }
 }
@@ -311,7 +311,7 @@ void LEDRGB::GPS_Led(void)
   //8 SATELITES OU MAIS = 4 PISCADAS
   static uint8_t BlinkCount;
   static uint32_t BlinkTime = SCHEDULERTIME.GetMillis();
-  if (GPSParameters.Mode.Navigation != DO_START_RTH)
+  if (GPSParameters.Mode.Navigation <= DO_POSITION_HOLD)
   {
     if (SCHEDULERTIME.GetMillis() - BlinkTime >= 150)
     {
@@ -327,18 +327,20 @@ void LEDRGB::GPS_Led(void)
         else
         {
           if (BlinkCount++ > 2 * GPSParameters.Navigation.Misc.Get.Satellites)
+          {
             BlinkCount = 0;
+          }
         }
         if (BlinkCount >= 10 && ((BlinkCount % 2) == 0))
         {
-          //INDICA O NÚM. DE SAT.(VERDE)
+          //INDICA O NÚM. DE SAT. (VERDE)
           RGB.SetColorValue[RED] = 0;         //VERMELHO
           RGB.SetColorValue[GREEN] = MAX_PWM; //VERDE
           RGB.SetColorValue[BLUE] = 0;        //AZUL
         }
         if (BlinkCount == 6 && ((BlinkCount % 2) == 0))
         {
-          //INDICA O HOME POINT (AZUL)
+          //INDICA QUE O HOME POINT FOI MARCADO (AZUL)
           RGB.SetColorValue[RED] = 0;        //VERMELHO
           RGB.SetColorValue[GREEN] = 0;      //VERDE
           RGB.SetColorValue[BLUE] = MAX_PWM; //AZUL

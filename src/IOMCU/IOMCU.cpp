@@ -1433,9 +1433,9 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, Get_User_Basic_Parameters.GetReceiverType);
     STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, Get_User_Basic_Parameters.GetGimbalType);
     STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, Get_User_Basic_Parameters.GetParachuteType);
-    STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, Get_User_Basic_Parameters.GetSPIType);
-    STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, Get_User_Basic_Parameters.GetUART_NUMB_2Type);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, Get_User_Basic_Parameters.GetUartNumb1Type);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, Get_User_Basic_Parameters.GetUART_NUMB_2Type);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, Get_User_Basic_Parameters.GetSPIType);
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, Get_User_Basic_Parameters.GetCompassRotationType);
     STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, Get_User_Basic_Parameters.GetRTHAltitudeType);
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, Get_User_Basic_Parameters.GetAcroType);
@@ -1738,9 +1738,9 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Basic_Parameters.SendReceiverType = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);
     Send_User_Basic_Parameters.SendGimbalType = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);
     Send_User_Basic_Parameters.SendParachuteType = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR);
-    Send_User_Basic_Parameters.SendSPIType = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR);
-    Send_User_Basic_Parameters.SendUART_NUMB_2Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
     Send_User_Basic_Parameters.SendUartNumb1Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
+    Send_User_Basic_Parameters.SendUART_NUMB_2Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
+    Send_User_Basic_Parameters.SendSPIType = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR);
     Send_User_Basic_Parameters.SendCompassRotationType = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
     Send_User_Basic_Parameters.SendRTHAltitudeType = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
     Send_User_Basic_Parameters.SendAcroType = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);

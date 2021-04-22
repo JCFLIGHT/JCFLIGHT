@@ -44,10 +44,7 @@ GPS_Parameters_Struct GPSParameters;
 
 void LoadGPSParameters(void)
 {
-  if (GPSParameters.Home.Altitude != STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR))
-  {
-    GPSParameters.Home.Altitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
-  }
+  GPSParameters.Home.Altitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
 
   PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].kP / 100.0f;
   PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].kI / 100.0f;
@@ -76,16 +73,38 @@ void GPS_Reset_Navigation(void)
   }
 }
 
+static void UpdateMagneticDeclination(void)
+{
+  //OBTÉM A DECLINAÇÃO MAGNETICA AUTOMATICAMENTE
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !GPSParameters.Declination.Pushed)
+  {
+    AUTODECLINATION.Set_Initial_Location(GPSParameters.Navigation.Coordinates.Actual[COORD_LATITUDE], GPSParameters.Navigation.Coordinates.Actual[COORD_LONGITUDE]);
+    GPSParameters.Declination.PushedCount++;
+  }
+
+  //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
+  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&      //CHECA SE ESTÁ DESARMADO
+      AUTODECLINATION.GetDeclination() != 0 &&     //CHECA SE O VALOR É DIFERENTE DE ZERO
+      !GPSParameters.Declination.Pushed &&         //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
+      GPSParameters.Declination.PushedCount > 250) //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
+  {
+    STORAGEMANAGER.Write_Float(MAG_DECLINATION_ADDR, AUTODECLINATION.GetDeclination());
+    GPSParameters.Declination.Pushed = true;
+  }
+}
+
 void GPS_Process_FlightModes(float DeltaTime)
 {
   uint32_t CalculateDistance;
   int32_t CalculateDirection;
+
   //SAIA DA FUNÇÃO SE O GPS ESTIVER RUIM
   if (Get_GPS_In_Bad_Condition())
   {
     GPSParameters.Navigation.Misc.Velocity.NEDStatus = false;
     return;
   }
+
   //SAFE PARA RESETAR O HOME-POINT
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
@@ -103,25 +122,15 @@ void GPS_Process_FlightModes(float DeltaTime)
       GPSParameters.Home.Marked = true;
     }
   }
-  //OBTÉM A DECLINAÇÃO MAGNETICA AUTOMATICAMENTE
-  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && !GPSParameters.Declination.Pushed)
-  {
-    AUTODECLINATION.Set_Initial_Location(GPSParameters.Navigation.Coordinates.Actual[COORD_LATITUDE], GPSParameters.Navigation.Coordinates.Actual[COORD_LONGITUDE]);
-    GPSParameters.Declination.PushedCount++;
-  }
-  //SALVA O VALOR DA DECLINAÇÃO MAGNETICA NA EEPROM
-  if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&      //CHECA SE ESTÁ DESARMADO
-      AUTODECLINATION.GetDeclination() != 0 &&     //CHECA SE O VALOR É DIFERENTE DE ZERO
-      !GPSParameters.Declination.Pushed &&         //CHECA SE A DECLINAÇÃO NÃO FOI PUXADA
-      GPSParameters.Declination.PushedCount > 250) //UTILIZA 250 CICLOS DE MAQUINA PARA CALCULAR O VALOR
-  {
-    STORAGEMANAGER.Write_Float(MAG_DECLINATION_ADDR, AUTODECLINATION.GetDeclination());
-    GPSParameters.Declination.Pushed = true;
-  }
+
+  UpdateMagneticDeclination();
+
   GPSParameters.DeltaTime.Navigation = DeltaTime;
   GPSParameters.DeltaTime.Navigation = MIN(GPSParameters.DeltaTime.Navigation, 1.0f);
   GPS_Calcule_Bearing(GPSParameters.Home.Coordinates[COORD_LATITUDE], GPSParameters.Home.Coordinates[COORD_LONGITUDE], &CalculateDirection);
   GPS_Calcule_Distance_To_Home(&CalculateDistance);
+  GPS_Calcule_Velocity();
+
   if (!GPSParameters.Home.Marked)
   {
     GPSParameters.Home.Distance = 0;
@@ -132,9 +141,10 @@ void GPS_Process_FlightModes(float DeltaTime)
     GPSParameters.Home.Direction = CalculateDirection / 100; //FUTURAMENTE PARA O GCS E OSD
     GPSParameters.Home.Distance = CalculateDistance / 100;
   }
-  GPS_Calcule_Velocity();
+
   if (Get_GPS_Used_To_Navigation())
   {
+
     GPS_Calcule_Bearing(GPSParameters.Navigation.Coordinates.Destiny[COORD_LATITUDE], GPSParameters.Navigation.Coordinates.Destiny[COORD_LONGITUDE], &GPSParameters.Navigation.Bearing.ActualTarget);
     GPS_Calcule_Distance_In_CM(GPSParameters.Navigation.Coordinates.Destiny[COORD_LATITUDE], GPSParameters.Navigation.Coordinates.Destiny[COORD_LONGITUDE], &GPSParameters.Navigation.Coordinates.Distance);
 
@@ -158,7 +168,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       if (GPSParameters.Home.Distance <= JCF_Param.GPS_RTH_Land)
       {
         GPSParameters.Mode.Navigation = DO_LAND_INIT;
-        HeadingHoldTarget = GPSParameters.Navigation.Bearing.InitalTarget;
+        GPSParameters.Navigation.HeadingHoldTarget = GPSParameters.Navigation.Bearing.InitalTarget;
       }
       else if (GetAltitudeReached())
       {
@@ -177,7 +187,7 @@ void GPS_Process_FlightModes(float DeltaTime)
         {
           GPSParameters.Mode.Navigation = DO_LAND_INIT;
         }
-        HeadingHoldTarget = GPSParameters.Navigation.Bearing.InitalTarget;
+        GPSParameters.Navigation.HeadingHoldTarget = GPSParameters.Navigation.Bearing.InitalTarget;
       }
       break;
 
@@ -223,7 +233,7 @@ void GPS_Process_FlightModes(float DeltaTime)
   }
 }
 
-void Do_Mode_RTH_Now()
+void Do_Mode_RTH_Now(void)
 {
   if (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(GPSParameters.Home.Altitude))
   {

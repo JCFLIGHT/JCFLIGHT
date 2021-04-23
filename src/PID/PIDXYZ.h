@@ -19,13 +19,13 @@
 #define PIDXYZ_H_
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
-extern PID_Resources_Struct PID_Resources;
+extern PID_Resources_Struct PIDResources;
 class PIDXYZClass
 {
 public:
-  void Initialization();
+  void Initialization(void);
   void Update(float DeltaTime);
-  void Reset_Integral_Accumulators();
+  void Reset_Integral_Accumulators(void);
 
 private:
   float ProportionalTermProcess(uint8_t kP, float RateError);
@@ -46,7 +46,7 @@ private:
   void ApplyFixedWingRateControllerPitch(float DeltaTime);
   void ApplyFixedWingRateControllerYaw(float DeltaTime);
   bool FixedWingIntegralTermLimitActive(uint8_t Axis);
-  void GetNewControllerForPlaneWithTurn();
+  void GetNewControllerForPlaneWithTurn(void);
 };
 extern PIDXYZClass PIDXYZ;
 #endif

@@ -75,12 +75,12 @@ const float GetYawRotationInRadians(void)
 bool AutoLaunchClass::GetSwingVelocityState(void)
 {
   const float SwingVelocity = (ABS(GetYawRotationInRadians()) > SWING_LAUNCH_MIN_ROTATION_RATE) ? (GetRollAccelerationInMSS() / GetYawRotationInRadians()) : 0;
-  return (SwingVelocity > ConvertCMToMeters(LAUNCH_VELOCITY_THRESH)) && (GetPitchAccelerationInMSS() > 0);
+  return (SwingVelocity > ConverMetersToCM(LAUNCH_VELOCITY_THRESH)) && (GetPitchAccelerationInMSS() > 0);
 }
 
 bool AutoLaunchClass::GetForwardState(void)
 {
-  return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPSParameters.Navigation.Misc.Get.GroundSpeed > ConvertCMToMeters(LAUNCH_VELOCITY_THRESH));
+  return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPSParameters.Navigation.Misc.Get.GroundSpeed > ConverMetersToCM(LAUNCH_VELOCITY_THRESH));
 }
 
 void AutoLaunchClass::AutomaticDetector()

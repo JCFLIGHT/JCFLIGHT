@@ -64,14 +64,14 @@ void CalculateBarometerAltitude()
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     Barometer.Calibration.GroundPressure = Barometer.Raw.PressureFiltered * 0.01f;
-    Barometer.Calibration.GroundTemperature = Barometer.Raw.Temperature * 0.01f;
+    Barometer.Calibration.GroundTemperature = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);
     Altitude_Filter.Reset();
   }
   else
   {
-    Barometer.Altitude.Actual = Altitude_Filter.Apply(ConvertCMToMeters(Get_Altitude_Difference(Barometer.Calibration.GroundPressure,
-                                                                                                Barometer.Raw.PressureFiltered * 0.01f,
-                                                                                                Barometer.Calibration.GroundTemperature)));
+    Barometer.Altitude.Actual = Altitude_Filter.Apply(ConverMetersToCM(Get_Altitude_Difference(Barometer.Calibration.GroundPressure,
+                                                                                               Barometer.Raw.PressureFiltered * 0.01f,
+                                                                                               Barometer.Calibration.GroundTemperature)));
   }
 }
 
@@ -90,10 +90,12 @@ int32_t GetAltitudeForGCS()
   if (InitialSamples > 0)
   {
     BarometerGroundPressure = Barometer.Raw.PressureFiltered * 0.01f;
-    BarometerTemperatureScaleForGCS = Barometer.Raw.Temperature * 0.01f;
+    BarometerTemperatureScaleForGCS = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);
     InitialSamples--;
     return 0;
   }
 
-  return ConvertCMToMeters(Get_Altitude_Difference(BarometerGroundPressure, Barometer.Raw.PressureFiltered * 0.01f, BarometerTemperatureScaleForGCS));
+  return ConverMetersToCM(Get_Altitude_Difference(BarometerGroundPressure,
+                                                  Barometer.Raw.PressureFiltered * 0.01f,
+                                                  BarometerTemperatureScaleForGCS));
 }

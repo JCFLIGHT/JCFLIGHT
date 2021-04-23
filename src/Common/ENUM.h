@@ -379,20 +379,20 @@ enum Led_Pattern_Enum
 
 enum WayPoint_States_Enum
 {
-    WP_MISSION_INIT = 0,
-    GET_ALTITUDE,
-    GET_ALTITUDE_TAKEOFF,
-    WP_START_MISSION,
-    WP_EN_ROUTE
+    WAYPOINT_INIT = 0,
+    WAYPOINT_RUN_TAKEOFF,
+    WAYPOINT_SET_ALTITUDE,
+    WAYPOINT_START_MISSION,
+    WAYPOINT_MISSION_ENROUTE
 };
 
 enum WayPoint_FlightModes_Enum
 {
-    WP_ADVANCE = 1,
-    WP_TIMED,
-    WP_LAND,
-    WP_RTH,
-    WP_TAKEOFF
+    WAYPOINT_ADVANCE = 1,
+    WAYPOINT_TIMED,
+    WAYPOINT_LAND,
+    WAYPOINT_RTH,
+    WAYPOINT_TAKEOFF
 };
 
 enum AirPlane_Wheels_Enum

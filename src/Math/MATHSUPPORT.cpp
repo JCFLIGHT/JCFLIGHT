@@ -104,22 +104,27 @@ float ConvertDeciDegreesToRadians(float Inputvalue)
 
 float ConvertDeciDegreesToDegrees(float Inputvalue)
 {
-    return (Inputvalue / 10);
+    return Inputvalue / 10;
 }
 
 float ConvertDegreesToDecidegrees(float Inputvalue)
 {
-    return (Inputvalue * 10);
+    return Inputvalue * 10;
 }
 
 float ConvertDecidegreesToCentiDegrees(float Inputvalue)
 {
-    return (Inputvalue * 10);
+    return Inputvalue * 10;
 }
 
 float ConvertCentiDegreesToRadians(float Inputvalue)
 {
     return ((Inputvalue / 100.0f) * 0.01745329251994329576923690768489f);
+}
+
+float ConvertCentiDegreesToDegrees(float Inputvalue)
+{
+    return Inputvalue / 100.0f;
 }
 
 float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput)
@@ -132,14 +137,14 @@ float ConvertAccelerationToCMSS(float InputAcc)
     return InputAcc * (GRAVITY_CMSS / ACC_1G);
 }
 
-int32_t ConvertCMToMeters(float CM_Input)
+float ConvertCMToMeters(int32_t CM_Input)
 {
-    return CM_Input * 100;
+    return CM_Input / 100;
 }
 
-float ConverMetersToCM(int32_t Meters_Input)
+int32_t ConverMetersToCM(float Meters_Input)
 {
-    return Meters_Input * 0.01f;
+    return Meters_Input * 100;
 }
 
 float Fast_SquareRoot(float ValueInput)

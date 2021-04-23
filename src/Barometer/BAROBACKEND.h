@@ -20,7 +20,12 @@
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 extern Barometer_Struct Barometer;
-void SetBaroType(uint8_t _BaroType);
-void Baro_Initialization();
-void Barometer_Update();
+class BarometerClass
+{
+public:
+  void Initialization(void);
+  void SetType(uint8_t _BaroType);
+  void Update(void);
+};
+extern BarometerClass BAROMETER;
 #endif

@@ -21,6 +21,5 @@
 extern bool Do_Altitude_Hold;
 extern bool Do_RTH_Or_Land_Call_Alt_Hold;
 extern bool Do_Pos_Hold_Call_Alt_Hold;
-extern bool Do_WayPoint_Call_Alt_Hold;
 void FlightModesUpdate(void);
 #endif

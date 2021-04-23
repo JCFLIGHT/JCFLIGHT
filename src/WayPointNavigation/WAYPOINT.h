@@ -18,7 +18,7 @@
 #ifndef WAYPOINT_H_
 #define WAYPOINT_H_
 #include "Build/LIBDEPENDENCIES.h"
-struct _GetWayPointGCSParameters
+struct _GetWayPointPacketOne
 {
   int32_t LatitudeOne;
   int32_t LongitudeOne;
@@ -75,7 +75,7 @@ struct _GetWayPointGCSParameters
   }
 };
 
-struct _GetWayPointGCSParametersTwo
+struct _GetWayPointPacketTwo
 {
   int32_t LatitudeSix;
   int32_t LongitudeSix;
@@ -132,13 +132,35 @@ struct _GetWayPointGCSParametersTwo
   }
 };
 
-extern struct _GetWayPointGCSParameters GetWayPointGCSParameters;
-extern struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
+#define WAYPOINTS_MAXIMUM 10
+#define INITIAL_ADDR_OF_COORDINATES 704
+#define FINAL_ADDR_OF_COORDINATES 780
+#define INITIAL_ADDR_OF_OTHERS_PARAMS 784
+#define FINAL_ADDR_OF_OTHERS_PARAMS 813
+
+enum WayPointOnce_Enum
+{
+  WAYPOINT_PREDICT_POS_ALT = 0,
+  WAYPOINT_NORMAL_FLIGHT,
+  SIZE_OF_WAYPOINT_ONCE
+};
+
+enum WayPointMisc_Enum
+{
+  WAYPOINT_ENABLE_AUTO_TAKEOFF = 0,
+  WAYPOINT_DISABLE_AUTO_TAKEOFF,
+  WAYPOINT_NORMALIZE_TAKEOFF,
+  WAYPOINT_NORMALIZE_RESET
+};
+
+extern struct _GetWayPointPacketOne GetWayPointPacketOne;
+extern struct _GetWayPointPacketTwo GetWayPointPacketTwo;
 extern uint8_t EEPROM_Function;
 class WayPointClass
 {
 public:
   void Initialization(void);
+  void Erase(void);
   void Update(void);
 };
 extern WayPointClass WAYPOINT;

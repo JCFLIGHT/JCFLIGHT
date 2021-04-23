@@ -18,17 +18,28 @@
 #ifndef MATHSUPPORT_H_
 #define MATHSUPPORT_H_
 #include "Build/LIBDEPENDENCIES.h"
-#define MIN(a, b) \
-  __extension__({ __typeof__ (a) _a = (a); \
-  __typeof__ (b) _b = (b); \
-  _a < _b ? _a : _b; })
-#define MAX(a, b) \
-  __extension__({ __typeof__ (a) _a = (a); \
-  __typeof__ (b) _b = (b); \
-  _a > _b ? _a : _b; })
-#define ABS(x) \
-  __extension__({ __typeof__ (x) _x = (x); \
-  _x > 0 ? _x : -_x; })
+#define _CHOOSE2(binoper, lexpr, lvar, rexpr, rvar) \
+  (__extension__({                                  \
+    __typeof__(lexpr) lvar = (lexpr);               \
+    __typeof__(rexpr) rvar = (rexpr);               \
+    lvar binoper rvar ? lvar : rvar;                \
+  }))
+#define _CHOOSE_VAR2(prefix, unique) prefix##unique
+#define _CHOOSE_VAR(prefix, unique) _CHOOSE_VAR2(prefix, unique)
+#define _CHOOSE(binoper, lexpr, rexpr)        \
+  _CHOOSE2(                                   \
+      binoper,                                \
+      lexpr, _CHOOSE_VAR(_left, __COUNTER__), \
+      rexpr, _CHOOSE_VAR(_right, __COUNTER__))
+#define MIN(a, b) _CHOOSE(<, a, b)
+#define MAX(a, b) _CHOOSE(>, a, b)
+#define _ABS_II(x, var)      \
+  (__extension__({           \
+    __typeof__(x) var = (x); \
+    var < 0 ? -var : var;    \
+  }))
+#define _ABS_I(x, var) _ABS_II(x, var)
+#define ABS(x) _ABS_I(x, _CHOOSE_VAR(_abs, __COUNTER__))
 float Constrain_Float(float ValueInput, float ValueInputMin, float ValueInputMax);
 int8_t Constrain_8Bits(int8_t ValueInput, int8_t ValueInputMin, int8_t ValueInputMax);
 uint8_t Constrain_U8Bits(uint8_t ValueInput, uint8_t ValueInputMin, uint8_t ValueInputMax);
@@ -48,10 +59,11 @@ float ConvertDeciDegreesToDegrees(float Inputvalue);
 float ConvertDegreesToDecidegrees(float Inputvalue);
 float ConvertDecidegreesToCentiDegrees(float Inputvalue);
 float ConvertCentiDegreesToRadians(float Inputvalue);
+float ConvertCentiDegreesToDegrees(float Inputvalue);
 float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput);
 float ConvertAccelerationToCMSS(float InputAcc);
-int32_t ConvertCMToMeters(float CM_Input);
-float ConverMetersToCM(int32_t Meters_Input);
+float ConvertCMToMeters(int32_t CM_Input);
+int32_t ConverMetersToCM(float Meters_Input);
 float Fast_SquareRoot(float ValueInput);
 uint16_t SquareRootU16Bits(uint16_t ValueInput);
 uint32_t SquareRootU32Bits(uint32_t ValueInput);

@@ -181,7 +181,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       CalculateNavigationSpeed = Calculate_Navigation_Speed(JCF_Param.Navigation_Vel);
       GPSCalculateNavigationRate(CalculateNavigationSpeed);
       GPS_Adjust_Heading();
-      if ((GPSParameters.Navigation.Coordinates.Distance <= ConvertCMToMeters(JCF_Param.GPS_WP_Radius)) || Point_Reached())
+      if ((GPSParameters.Navigation.Coordinates.Distance <= ConverMetersToCM(JCF_Param.GPS_WP_Radius)) || Point_Reached())
       {
         if (GetMultirotorEnabled())
         {
@@ -235,9 +235,9 @@ void GPS_Process_FlightModes(float DeltaTime)
 
 void Do_Mode_RTH_Now(void)
 {
-  if (Barometer.INS.Altitude.Estimated < ConvertCMToMeters(GPSParameters.Home.Altitude))
+  if (Barometer.INS.Altitude.Estimated < ConverMetersToCM(GPSParameters.Home.Altitude))
   {
-    SetNewAltitudeToHold(ConvertCMToMeters(GPSParameters.Home.Altitude));
+    SetNewAltitudeToHold(ConverMetersToCM(GPSParameters.Home.Altitude));
   }
   else
   {

@@ -219,12 +219,12 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
 
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
       {
-        SetBaroType(ADDRESS_BAROMETER_MS5611);
+        BAROMETER.SetType(ADDRESS_BAROMETER_MS5611);
       }
 
       if (NumbGenerator == ADDRESS_BAROMETER_BMP280)
       {
-        SetBaroType(ADDRESS_BAROMETER_BMP280);
+        BAROMETER.SetType(ADDRESS_BAROMETER_BMP280);
       }
 
       if ((NumbGenerator == ADDRESS_BAROMETER_MS5611) || (NumbGenerator == ADDRESS_BAROMETER_BMP280))
@@ -418,13 +418,13 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
 
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
       {
-        SetBaroType(ADDRESS_BAROMETER_MS5611);
+        BAROMETER.SetType(ADDRESS_BAROMETER_MS5611);
         Serial.println("MS5611 ENCONTRADO!");
       }
 
       if (NumbGenerator == ADDRESS_BAROMETER_BMP280)
       {
-        SetBaroType(ADDRESS_BAROMETER_BMP280);
+        BAROMETER.SetType(ADDRESS_BAROMETER_BMP280);
         Serial.println("BMP280 ENCONTRADO!");
       }
 
@@ -493,7 +493,7 @@ void I2CPROTOCOL::All_Initialization(void)
     Gyro_Initialization();
     if (I2CResources.Found.Barometer)
     {
-      Baro_Initialization();
+      BAROMETER.Initialization();
     }
     if (I2CResources.Found.Compass)
     {

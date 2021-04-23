@@ -705,14 +705,14 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
         FASTSERIAL.UartSendData(UART_NUMB_0);
-        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointGCSParameters, sizeof(_GetWayPointGCSParameters));
+        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointPacketOne, sizeof(_GetWayPointPacketOne));
         break;
 
     case 6:
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
         FASTSERIAL.UartSendData(UART_NUMB_0);
-        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointGCSParametersTwo, sizeof(_GetWayPointGCSParametersTwo));
+        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointPacketTwo, sizeof(_GetWayPointPacketTwo));
         break;
 
     case 7:
@@ -908,11 +908,11 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         break;
 
     case 5:
-        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointGCSParameters, sizeof(_GetWayPointGCSParameters));
+        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointPacketOne, sizeof(_GetWayPointPacketOne));
         break;
 
     case 6:
-        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointGCSParametersTwo, sizeof(_GetWayPointGCSParametersTwo));
+        Get_Struct_Params_To_GCS((uint8_t *)&GetWayPointPacketTwo, sizeof(_GetWayPointPacketTwo));
         break;
 
     case 7:
@@ -1302,7 +1302,7 @@ void GCSClass::First_Packet_Request_Parameters()
     }
     else
     {
-        Essential_First_Packet_Parameters.SendBarometerValue = ConvertCMToMeters(GPSParameters.Navigation.Misc.Get.Altitude - Altitude_For_Plane);
+        Essential_First_Packet_Parameters.SendBarometerValue = ConverMetersToCM(GPSParameters.Navigation.Misc.Get.Altitude - Altitude_For_Plane);
     }
     Essential_First_Packet_Parameters.SendFailSafeState = SystemInFailSafe();
     Essential_First_Packet_Parameters.SendBatteryVoltageValue = BATTERY.Get_Actual_Voltage() * 100;
@@ -1315,7 +1315,7 @@ void GCSClass::First_Packet_Request_Parameters()
     Essential_First_Packet_Parameters.SendActualFlightMode = FlightMode;
     Essential_First_Packet_Parameters.SendFrameType = GetActualPlatformType();
     Essential_First_Packet_Parameters.SendHomePointState = GPSParameters.Home.Marked;
-    Essential_First_Packet_Parameters.SendTemperature = Barometer.Raw.Temperature * 0.01f;
+    Essential_First_Packet_Parameters.SendTemperature = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);
     Essential_First_Packet_Parameters.SendHomePointDistance = GPSParameters.Home.Distance;
     Essential_First_Packet_Parameters.SendCurrentInMah = BATTERY.Get_Current_In_Mah();
 #ifndef MACHINE_CYCLE

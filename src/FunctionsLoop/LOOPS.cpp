@@ -36,7 +36,7 @@ void Medium_Loop()
         DESARMLOWTHROTTLE.Update();
         FailSafeCheck();
         STICKS.Update();
-        Barometer_Update();
+        BAROMETER.Update();
         GPS_Serial_Read();
         GPS_Process_FlightModes(ThisDeltaTime);
         AUXFLIGHT.Update();

@@ -18,11 +18,11 @@
 #ifndef ALTITUDEHOLD_H_
 #define ALTITUDEHOLD_H_
 #include "Build/LIBDEPENDENCIES.h"
-bool ApplyAltitudeHoldControl();
+bool ApplyAltitudeHoldControl(void);
 void SetNewAltitudeToHold(int32_t AltitudeSetPoint);
-bool GetTakeOffInProgress();
-bool GetAltitudeReached();
-bool GetGroundDetected();
-bool GetGroundDetectedFor100ms();
-bool GetLanded();
+bool GetTakeOffInProgress(void);
+bool GetAltitudeReached(void);
+bool GetGroundDetected(void);
+bool GetGroundDetectedFor100ms(void);
+bool GetLanded(void);
 #endif

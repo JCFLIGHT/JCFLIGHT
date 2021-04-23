@@ -26,21 +26,7 @@ Barometer_Struct Barometer;
 
 uint8_t BaroType = 0; //DETECTA O BARÔMETRO AUTOMATICAMENTE
 
-void SetBaroType(uint8_t _BaroType)
-{
-    switch (_BaroType)
-    {
-    case ADDRESS_BAROMETER_MS5611:
-        BaroType = BAROMETER_MS5611;
-        break;
-
-    case ADDRESS_BAROMETER_BMP280:
-        BaroType = BAROMETER_BMP280;
-        break;
-    }
-}
-
-void Baro_Initialization()
+void BarometerClass::Initialization(void)
 {
     switch (BaroType)
     {
@@ -54,7 +40,21 @@ void Baro_Initialization()
     }
 }
 
-void Barometer_Update()
+void BarometerClass::SetType(uint8_t _BaroType)
+{
+    switch (_BaroType)
+    {
+    case ADDRESS_BAROMETER_MS5611:
+        BaroType = BAROMETER_MS5611;
+        break;
+
+    case ADDRESS_BAROMETER_BMP280:
+        BaroType = BAROMETER_BMP280;
+        break;
+    }
+}
+
+void BarometerClass::Update(void)
 {
     if (!I2CResources.Found.Barometer)
     {

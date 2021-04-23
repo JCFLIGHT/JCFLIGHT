@@ -31,11 +31,13 @@
 #include "Param/PARAM.h"
 #include "GPSNavigation/NAVIGATIONGEO.h"
 #include "GPSNavigation/INSNAVIGATION.h"
+#include "FrameStatus/FRAMESTATUS.h"
+#include "Barometer/BAROBACKEND.h"
 
 WayPointClass WAYPOINT;
 
-struct _GetWayPointGCSParameters GetWayPointGCSParameters;
-struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
+struct _GetWayPointPacketOne GetWayPointPacketOne;
+struct _GetWayPointPacketTwo GetWayPointPacketTwo;
 
 #define THROTTLE_TAKEOFF_ASCENT 1600    //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF ATÉ CHEGAR NA ALTITUDE SETADA PELO GCS
 #define THROTTLE_TAKEOFF_NORMALIZE 1500 //VALOR DO THROTTLE AO FAZER O AUTO-TAKEOFF AO CHEGAR NA ALTITUDE SETADA PELO GCS
@@ -43,146 +45,149 @@ struct _GetWayPointGCSParametersTwo GetWayPointGCSParametersTwo;
 #define THROTTLE_INCREMENT 100          //NÚMERO DE INCREMENTAÇÕES A CADA ESTOURO DE TEMPO DEFINIDO PELO PARAMETRO THROTTLE_INCREMENT_TIME
 #define THROTTLE_INCREMENT_TIME 1       //INCREMENTA A CADA 0.10 SEGUNDOS
 
-bool WPTakeOffNomalized = false;
-bool WPSucess = false;
-uint8_t WayPointFlightMode[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-uint8_t WayPointAltitude[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-uint8_t WayPointTimed[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+bool AutoTakeOffState = false;
+bool MultirotorAutoTakeOffNormalized = false;
+bool WayPointMissionReached = false;
+bool WayPointOnceFlight[SIZE_OF_WAYPOINT_ONCE] = {false, false};
+uint8_t WayPointFlightMode[WAYPOINTS_MAXIMUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t WayPointAltitude[WAYPOINTS_MAXIMUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t WayPointTimed[WAYPOINTS_MAXIMUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 uint8_t ThrottleIncrementCount = 0;
 uint8_t WayPointMode = 0;
 uint8_t MissionNumber = 0;
 uint8_t EEPROM_Function = 0;
-uint16_t ThrottleIncrement = 1000;
-int32_t WayPointLatitude[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int32_t WayPointLongitude[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int16_t ThrottleIncrement = 1000;
+int32_t WayPointLatitude[WAYPOINTS_MAXIMUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int32_t WayPointLongitude[WAYPOINTS_MAXIMUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 uint32_t Mission_Timed_Count = 0;
 
 void WayPointClass::Initialization(void)
 {
-  //CARREGA TODAS AS LATITUDES
-  WayPointLatitude[0] = STORAGEMANAGER.Read_32Bits(704);
-  WayPointLatitude[1] = STORAGEMANAGER.Read_32Bits(708);
-  WayPointLatitude[2] = STORAGEMANAGER.Read_32Bits(712);
-  WayPointLatitude[3] = STORAGEMANAGER.Read_32Bits(716);
-  WayPointLatitude[4] = STORAGEMANAGER.Read_32Bits(720);
-  WayPointLatitude[5] = STORAGEMANAGER.Read_32Bits(724);
-  WayPointLatitude[6] = STORAGEMANAGER.Read_32Bits(728);
-  WayPointLatitude[7] = STORAGEMANAGER.Read_32Bits(732);
-  WayPointLatitude[8] = STORAGEMANAGER.Read_32Bits(736);
-  WayPointLatitude[9] = STORAGEMANAGER.Read_32Bits(740);
-  //CARREGA TODAS AS LONGITUDES
-  WayPointLongitude[0] = STORAGEMANAGER.Read_32Bits(744);
-  WayPointLongitude[1] = STORAGEMANAGER.Read_32Bits(748);
-  WayPointLongitude[2] = STORAGEMANAGER.Read_32Bits(752);
-  WayPointLongitude[3] = STORAGEMANAGER.Read_32Bits(756);
-  WayPointLongitude[4] = STORAGEMANAGER.Read_32Bits(760);
-  WayPointLongitude[5] = STORAGEMANAGER.Read_32Bits(764);
-  WayPointLongitude[6] = STORAGEMANAGER.Read_32Bits(768);
-  WayPointLongitude[7] = STORAGEMANAGER.Read_32Bits(772);
-  WayPointLongitude[8] = STORAGEMANAGER.Read_32Bits(776);
-  WayPointLongitude[9] = STORAGEMANAGER.Read_32Bits(780);
-  //CARREGA O TIMER DAS MISSÕES COM GPS-HOLD
-  WayPointTimed[0] = STORAGEMANAGER.Read_8Bits(784);
-  WayPointTimed[1] = STORAGEMANAGER.Read_8Bits(785);
-  WayPointTimed[2] = STORAGEMANAGER.Read_8Bits(786);
-  WayPointTimed[3] = STORAGEMANAGER.Read_8Bits(787);
-  WayPointTimed[4] = STORAGEMANAGER.Read_8Bits(788);
-  WayPointTimed[5] = STORAGEMANAGER.Read_8Bits(789);
-  WayPointTimed[6] = STORAGEMANAGER.Read_8Bits(790);
-  WayPointTimed[7] = STORAGEMANAGER.Read_8Bits(791);
-  WayPointTimed[8] = STORAGEMANAGER.Read_8Bits(792);
-  WayPointTimed[9] = STORAGEMANAGER.Read_8Bits(793);
-  //CARREGA O MODO DE VOO DAS MISSÕES
-  WayPointFlightMode[0] = STORAGEMANAGER.Read_8Bits(794);
-  WayPointFlightMode[1] = STORAGEMANAGER.Read_8Bits(795);
-  WayPointFlightMode[2] = STORAGEMANAGER.Read_8Bits(796);
-  WayPointFlightMode[3] = STORAGEMANAGER.Read_8Bits(797);
-  WayPointFlightMode[4] = STORAGEMANAGER.Read_8Bits(798);
-  WayPointFlightMode[5] = STORAGEMANAGER.Read_8Bits(799);
-  WayPointFlightMode[6] = STORAGEMANAGER.Read_8Bits(800);
-  WayPointFlightMode[7] = STORAGEMANAGER.Read_8Bits(801);
-  WayPointFlightMode[8] = STORAGEMANAGER.Read_8Bits(802);
-  WayPointFlightMode[9] = STORAGEMANAGER.Read_8Bits(803);
-  //CARREGA A ALTITUDE DAS MISSÕES
-  WayPointAltitude[0] = STORAGEMANAGER.Read_8Bits(804);
-  WayPointAltitude[1] = STORAGEMANAGER.Read_8Bits(805);
-  WayPointAltitude[2] = STORAGEMANAGER.Read_8Bits(806);
-  WayPointAltitude[3] = STORAGEMANAGER.Read_8Bits(807);
-  WayPointAltitude[4] = STORAGEMANAGER.Read_8Bits(808);
-  WayPointAltitude[5] = STORAGEMANAGER.Read_8Bits(809);
-  WayPointAltitude[6] = STORAGEMANAGER.Read_8Bits(810);
-  WayPointAltitude[7] = STORAGEMANAGER.Read_8Bits(811);
-  WayPointAltitude[8] = STORAGEMANAGER.Read_8Bits(812);
-  WayPointAltitude[9] = STORAGEMANAGER.Read_8Bits(813);
+  uint8_t ArrayCount = 0;
+
+  for (uint16_t AddressCount = INITIAL_ADDR_OF_COORDINATES; AddressCount <= FINAL_ADDR_OF_COORDINATES; AddressCount += sizeof(int32_t))
+  {
+
+    if (AddressCount < ((INITIAL_ADDR_OF_COORDINATES + FINAL_ADDR_OF_COORDINATES + 2) / 2))
+    {
+      WayPointLatitude[ArrayCount] = STORAGEMANAGER.Read_32Bits(AddressCount);
+    }
+    else
+    {
+      WayPointLongitude[ArrayCount] = STORAGEMANAGER.Read_32Bits(AddressCount);
+    }
+
+    ArrayCount++;
+    if (ArrayCount >= WAYPOINTS_MAXIMUM)
+    {
+      ArrayCount = 0;
+    }
+  }
+
+  ArrayCount = 0;
+
+  for (uint16_t AddressCount = INITIAL_ADDR_OF_OTHERS_PARAMS; AddressCount <= FINAL_ADDR_OF_OTHERS_PARAMS; AddressCount += sizeof(uint8_t))
+  {
+
+    if (AddressCount < (INITIAL_ADDR_OF_OTHERS_PARAMS + WAYPOINTS_MAXIMUM - 1))
+    {
+      WayPointTimed[ArrayCount] = STORAGEMANAGER.Read_8Bits(AddressCount);
+    }
+    else if (AddressCount >= (INITIAL_ADDR_OF_OTHERS_PARAMS + WAYPOINTS_MAXIMUM - 1) && AddressCount < ((WAYPOINTS_MAXIMUM * 2 - 1) + INITIAL_ADDR_OF_OTHERS_PARAMS))
+    {
+      WayPointFlightMode[ArrayCount] = STORAGEMANAGER.Read_8Bits(AddressCount);
+    }
+    else if (AddressCount >= ((WAYPOINTS_MAXIMUM * 2) + INITIAL_ADDR_OF_OTHERS_PARAMS) && AddressCount < ((WAYPOINTS_MAXIMUM * 3 - 1) + INITIAL_ADDR_OF_OTHERS_PARAMS))
+    {
+      WayPointAltitude[ArrayCount] = STORAGEMANAGER.Read_8Bits(AddressCount);
+    }
+
+    ArrayCount++;
+    if (ArrayCount >= WAYPOINTS_MAXIMUM)
+    {
+      ArrayCount = 0;
+    }
+  }
 }
 
-static void PushWayPointParameters(void)
+static void Push_WayPoint_Parameters(void)
 {
   //NÃO VAMOS ZERAR AS VARIAVEIS,TALVEZ CONTÉM ALGO NA EEPROM
-  if (GetWayPointGCSParameters.LatitudeOne == 0 || GetWayPointGCSParameters.LongitudeOne == 0)
+  if (GetWayPointPacketOne.LatitudeOne == 0 || GetWayPointPacketOne.LongitudeOne == 0)
   {
     return;
   }
 
   //OBTÉM TODAS AS LATITUDES DE CADA WAYPOINT
-  WayPointLatitude[0] = GetWayPointGCSParameters.LatitudeOne;
-  WayPointLatitude[1] = GetWayPointGCSParameters.LatitudeTwo;
-  WayPointLatitude[2] = GetWayPointGCSParameters.LatitudeThree;
-  WayPointLatitude[3] = GetWayPointGCSParameters.LatitudeFour;
-  WayPointLatitude[4] = GetWayPointGCSParameters.LatitudeFive;
-  WayPointLatitude[5] = GetWayPointGCSParametersTwo.LatitudeSix;
-  WayPointLatitude[6] = GetWayPointGCSParametersTwo.LatitudeSeven;
-  WayPointLatitude[7] = GetWayPointGCSParametersTwo.LatitudeEight;
-  WayPointLatitude[8] = GetWayPointGCSParametersTwo.LatitudeNine;
-  WayPointLatitude[9] = GetWayPointGCSParametersTwo.LatitudeTen;
+  WayPointLatitude[0] = GetWayPointPacketOne.LatitudeOne;
+  WayPointLatitude[1] = GetWayPointPacketOne.LatitudeTwo;
+  WayPointLatitude[2] = GetWayPointPacketOne.LatitudeThree;
+  WayPointLatitude[3] = GetWayPointPacketOne.LatitudeFour;
+  WayPointLatitude[4] = GetWayPointPacketOne.LatitudeFive;
+  WayPointLatitude[5] = GetWayPointPacketTwo.LatitudeSix;
+  WayPointLatitude[6] = GetWayPointPacketTwo.LatitudeSeven;
+  WayPointLatitude[7] = GetWayPointPacketTwo.LatitudeEight;
+  WayPointLatitude[8] = GetWayPointPacketTwo.LatitudeNine;
+  WayPointLatitude[9] = GetWayPointPacketTwo.LatitudeTen;
 
   //OBTÉM TODAS AS LONGITUDES DE CADA WAYPOINT
-  WayPointLongitude[0] = GetWayPointGCSParameters.LongitudeOne;
-  WayPointLongitude[1] = GetWayPointGCSParameters.LongitudeTwo;
-  WayPointLongitude[2] = GetWayPointGCSParameters.LongitudeThree;
-  WayPointLongitude[3] = GetWayPointGCSParameters.LongitudeFour;
-  WayPointLongitude[4] = GetWayPointGCSParameters.LongitudeFive;
-  WayPointLongitude[5] = GetWayPointGCSParametersTwo.LongitudeSix;
-  WayPointLongitude[6] = GetWayPointGCSParametersTwo.LongitudeSeven;
-  WayPointLongitude[7] = GetWayPointGCSParametersTwo.LongitudeEight;
-  WayPointLongitude[8] = GetWayPointGCSParametersTwo.LongitudeNine;
-  WayPointLongitude[9] = GetWayPointGCSParametersTwo.LongitudeTen;
+  WayPointLongitude[0] = GetWayPointPacketOne.LongitudeOne;
+  WayPointLongitude[1] = GetWayPointPacketOne.LongitudeTwo;
+  WayPointLongitude[2] = GetWayPointPacketOne.LongitudeThree;
+  WayPointLongitude[3] = GetWayPointPacketOne.LongitudeFour;
+  WayPointLongitude[4] = GetWayPointPacketOne.LongitudeFive;
+  WayPointLongitude[5] = GetWayPointPacketTwo.LongitudeSix;
+  WayPointLongitude[6] = GetWayPointPacketTwo.LongitudeSeven;
+  WayPointLongitude[7] = GetWayPointPacketTwo.LongitudeEight;
+  WayPointLongitude[8] = GetWayPointPacketTwo.LongitudeNine;
+  WayPointLongitude[9] = GetWayPointPacketTwo.LongitudeTen;
 
   //OBTÉM A ALTITUDE DE SUBIDA DE CADA WAYPOINT
-  WayPointAltitude[0] = GetWayPointGCSParameters.AltitudeOne;
-  WayPointAltitude[1] = GetWayPointGCSParameters.AltitudeTwo;
-  WayPointAltitude[2] = GetWayPointGCSParameters.AltitudeThree;
-  WayPointAltitude[3] = GetWayPointGCSParameters.AltitudeFour;
-  WayPointAltitude[4] = GetWayPointGCSParameters.AltitudeFive;
-  WayPointAltitude[5] = GetWayPointGCSParametersTwo.AltitudeSix;
-  WayPointAltitude[6] = GetWayPointGCSParametersTwo.AltitudeSeven;
-  WayPointAltitude[7] = GetWayPointGCSParametersTwo.AltitudeEight;
-  WayPointAltitude[8] = GetWayPointGCSParametersTwo.AltitudeNine;
-  WayPointAltitude[9] = GetWayPointGCSParametersTwo.AltitudeTen;
+  WayPointAltitude[0] = GetWayPointPacketOne.AltitudeOne;
+  WayPointAltitude[1] = GetWayPointPacketOne.AltitudeTwo;
+  WayPointAltitude[2] = GetWayPointPacketOne.AltitudeThree;
+  WayPointAltitude[3] = GetWayPointPacketOne.AltitudeFour;
+  WayPointAltitude[4] = GetWayPointPacketOne.AltitudeFive;
+  WayPointAltitude[5] = GetWayPointPacketTwo.AltitudeSix;
+  WayPointAltitude[6] = GetWayPointPacketTwo.AltitudeSeven;
+  WayPointAltitude[7] = GetWayPointPacketTwo.AltitudeEight;
+  WayPointAltitude[8] = GetWayPointPacketTwo.AltitudeNine;
+  WayPointAltitude[9] = GetWayPointPacketTwo.AltitudeTen;
 
   //OBTÉM OS MODOS DE VOO DE CADA WAYPOINT
-  WayPointFlightMode[0] = GetWayPointGCSParameters.FlightModeOne;
-  WayPointFlightMode[1] = GetWayPointGCSParameters.FlightModeTwo;
-  WayPointFlightMode[2] = GetWayPointGCSParameters.FlightModeThree;
-  WayPointFlightMode[3] = GetWayPointGCSParameters.FlightModeFour;
-  WayPointFlightMode[4] = GetWayPointGCSParameters.FlightModeFive;
-  WayPointFlightMode[5] = GetWayPointGCSParametersTwo.FlightModeSix;
-  WayPointFlightMode[6] = GetWayPointGCSParametersTwo.FlightModeSeven;
-  WayPointFlightMode[7] = GetWayPointGCSParametersTwo.FlightModeEight;
-  WayPointFlightMode[8] = GetWayPointGCSParametersTwo.FlightModeNine;
-  WayPointFlightMode[9] = GetWayPointGCSParametersTwo.FlightModeTen;
+  WayPointFlightMode[0] = GetWayPointPacketOne.FlightModeOne;
+  WayPointFlightMode[1] = GetWayPointPacketOne.FlightModeTwo;
+  WayPointFlightMode[2] = GetWayPointPacketOne.FlightModeThree;
+  WayPointFlightMode[3] = GetWayPointPacketOne.FlightModeFour;
+  WayPointFlightMode[4] = GetWayPointPacketOne.FlightModeFive;
+  WayPointFlightMode[5] = GetWayPointPacketTwo.FlightModeSix;
+  WayPointFlightMode[6] = GetWayPointPacketTwo.FlightModeSeven;
+  WayPointFlightMode[7] = GetWayPointPacketTwo.FlightModeEight;
+  WayPointFlightMode[8] = GetWayPointPacketTwo.FlightModeNine;
+  WayPointFlightMode[9] = GetWayPointPacketTwo.FlightModeTen;
 
   //OBTÉM O TEMPO DE VOO DO GPS-HOLD DE CADA WP
-  WayPointTimed[0] = GetWayPointGCSParameters.GPSHoldTimedOne;
-  WayPointTimed[1] = GetWayPointGCSParameters.GPSHoldTimedTwo;
-  WayPointTimed[2] = GetWayPointGCSParameters.GPSHoldTimedThree;
-  WayPointTimed[3] = GetWayPointGCSParameters.GPSHoldTimedFour;
-  WayPointTimed[4] = GetWayPointGCSParameters.GPSHoldTimedFive;
-  WayPointTimed[5] = GetWayPointGCSParametersTwo.GPSHoldTimedSix;
-  WayPointTimed[6] = GetWayPointGCSParametersTwo.GPSHoldTimedSeven;
-  WayPointTimed[7] = GetWayPointGCSParametersTwo.GPSHoldTimedEight;
-  WayPointTimed[8] = GetWayPointGCSParametersTwo.GPSHoldTimedNine;
-  WayPointTimed[9] = GetWayPointGCSParametersTwo.GPSHoldTimedTen;
+  WayPointTimed[0] = GetWayPointPacketOne.GPSHoldTimedOne;
+  WayPointTimed[1] = GetWayPointPacketOne.GPSHoldTimedTwo;
+  WayPointTimed[2] = GetWayPointPacketOne.GPSHoldTimedThree;
+  WayPointTimed[3] = GetWayPointPacketOne.GPSHoldTimedFour;
+  WayPointTimed[4] = GetWayPointPacketOne.GPSHoldTimedFive;
+  WayPointTimed[5] = GetWayPointPacketTwo.GPSHoldTimedSix;
+  WayPointTimed[6] = GetWayPointPacketTwo.GPSHoldTimedSeven;
+  WayPointTimed[7] = GetWayPointPacketTwo.GPSHoldTimedEight;
+  WayPointTimed[8] = GetWayPointPacketTwo.GPSHoldTimedNine;
+  WayPointTimed[9] = GetWayPointPacketTwo.GPSHoldTimedTen;
+}
+
+void WayPointClass::Erase(void)
+{
+  //OS ÚLTIMOS ENDEREÇOS SÃO OS DE ARMAZENAMENTO DAS ALTITUDES DE SUBIDA DE CADA MISSÃO
+  STORAGEMANAGER.Erase(INITIAL_ADDR_OF_COORDINATES, (FINAL_ADDR_OF_OTHERS_PARAMS - WAYPOINTS_MAXIMUM));
+  for (uint16_t AddressCount = (FINAL_ADDR_OF_OTHERS_PARAMS - WAYPOINTS_MAXIMUM + 1); AddressCount <= FINAL_ADDR_OF_OTHERS_PARAMS; AddressCount++)
+  {
+    //PADRÃO DE 10 METROS PARA AS ALTITUDES DE VOO POR WAYPOINT
+    STORAGEMANAGER.Write_8Bits(AddressCount, 10);
+  }
 }
 
 static void Store_And_Clear_WayPoints(void)
@@ -196,20 +201,9 @@ static void Store_And_Clear_WayPoints(void)
       WayPointFlightMode[CountVector] = 0;
       WayPointAltitude[CountVector] = 0;
       WayPointTimed[CountVector] = 0;
-      GetWayPointGCSParameters.Reset();
-      GetWayPointGCSParametersTwo.Reset();
-      STORAGEMANAGER.Erase(704, 803);
-      //PADRÃO DE 10 METROS PARA AS ALTITUDES DE VOO POR WAYPOINT
-      STORAGEMANAGER.Write_8Bits(804, 10);
-      STORAGEMANAGER.Write_8Bits(805, 10);
-      STORAGEMANAGER.Write_8Bits(806, 10);
-      STORAGEMANAGER.Write_8Bits(807, 10);
-      STORAGEMANAGER.Write_8Bits(808, 10);
-      STORAGEMANAGER.Write_8Bits(809, 10);
-      STORAGEMANAGER.Write_8Bits(810, 10);
-      STORAGEMANAGER.Write_8Bits(811, 10);
-      STORAGEMANAGER.Write_8Bits(812, 10);
-      STORAGEMANAGER.Write_8Bits(813, 10);
+      GetWayPointPacketOne.Reset();
+      GetWayPointPacketTwo.Reset();
+      WAYPOINT.Erase();
     }
     EEPROM_Function = 0;
   }
@@ -218,118 +212,164 @@ static void Store_And_Clear_WayPoints(void)
   {
     for (uint8_t IndexCount = 0; IndexCount < 5; IndexCount++)
     {
-      //SALVA TODAS AS LATITUDES
-      STORAGEMANAGER.Write_32Bits(704, WayPointLatitude[0]);
-      STORAGEMANAGER.Write_32Bits(708, WayPointLatitude[1]);
-      STORAGEMANAGER.Write_32Bits(712, WayPointLatitude[2]);
-      STORAGEMANAGER.Write_32Bits(716, WayPointLatitude[3]);
-      STORAGEMANAGER.Write_32Bits(720, WayPointLatitude[4]);
-      STORAGEMANAGER.Write_32Bits(724, WayPointLatitude[5]);
-      STORAGEMANAGER.Write_32Bits(728, WayPointLatitude[6]);
-      STORAGEMANAGER.Write_32Bits(732, WayPointLatitude[7]);
-      STORAGEMANAGER.Write_32Bits(736, WayPointLatitude[8]);
-      STORAGEMANAGER.Write_32Bits(740, WayPointLatitude[9]);
-      //SALVA TODAS AS LONGITUDES
-      STORAGEMANAGER.Write_32Bits(744, WayPointLongitude[0]);
-      STORAGEMANAGER.Write_32Bits(748, WayPointLongitude[1]);
-      STORAGEMANAGER.Write_32Bits(752, WayPointLongitude[2]);
-      STORAGEMANAGER.Write_32Bits(756, WayPointLongitude[3]);
-      STORAGEMANAGER.Write_32Bits(760, WayPointLongitude[4]);
-      STORAGEMANAGER.Write_32Bits(764, WayPointLongitude[5]);
-      STORAGEMANAGER.Write_32Bits(768, WayPointLongitude[6]);
-      STORAGEMANAGER.Write_32Bits(772, WayPointLongitude[7]);
-      STORAGEMANAGER.Write_32Bits(776, WayPointLongitude[8]);
-      STORAGEMANAGER.Write_32Bits(780, WayPointLongitude[9]);
-      //SALVA O TIMER DAS MISSÕES COM GPS-HOLD
-      STORAGEMANAGER.Write_8Bits(784, WayPointTimed[0]);
-      STORAGEMANAGER.Write_8Bits(785, WayPointTimed[1]);
-      STORAGEMANAGER.Write_8Bits(786, WayPointTimed[2]);
-      STORAGEMANAGER.Write_8Bits(787, WayPointTimed[3]);
-      STORAGEMANAGER.Write_8Bits(788, WayPointTimed[4]);
-      STORAGEMANAGER.Write_8Bits(789, WayPointTimed[5]);
-      STORAGEMANAGER.Write_8Bits(790, WayPointTimed[6]);
-      STORAGEMANAGER.Write_8Bits(791, WayPointTimed[7]);
-      STORAGEMANAGER.Write_8Bits(792, WayPointTimed[8]);
-      STORAGEMANAGER.Write_8Bits(793, WayPointTimed[9]);
-      //SALVA O MODO DE VOO DAS MISSÕES
-      STORAGEMANAGER.Write_8Bits(794, WayPointFlightMode[0]);
-      STORAGEMANAGER.Write_8Bits(795, WayPointFlightMode[1]);
-      STORAGEMANAGER.Write_8Bits(796, WayPointFlightMode[2]);
-      STORAGEMANAGER.Write_8Bits(797, WayPointFlightMode[3]);
-      STORAGEMANAGER.Write_8Bits(798, WayPointFlightMode[4]);
-      STORAGEMANAGER.Write_8Bits(799, WayPointFlightMode[5]);
-      STORAGEMANAGER.Write_8Bits(800, WayPointFlightMode[6]);
-      STORAGEMANAGER.Write_8Bits(801, WayPointFlightMode[7]);
-      STORAGEMANAGER.Write_8Bits(802, WayPointFlightMode[8]);
-      STORAGEMANAGER.Write_8Bits(803, WayPointFlightMode[9]);
-      //SALVA A ALTITUDE DAS MISSÕES
-      STORAGEMANAGER.Write_8Bits(804, WayPointAltitude[0]);
-      STORAGEMANAGER.Write_8Bits(805, WayPointAltitude[1]);
-      STORAGEMANAGER.Write_8Bits(806, WayPointAltitude[2]);
-      STORAGEMANAGER.Write_8Bits(807, WayPointAltitude[3]);
-      STORAGEMANAGER.Write_8Bits(808, WayPointAltitude[4]);
-      STORAGEMANAGER.Write_8Bits(809, WayPointAltitude[5]);
-      STORAGEMANAGER.Write_8Bits(810, WayPointAltitude[6]);
-      STORAGEMANAGER.Write_8Bits(811, WayPointAltitude[7]);
-      STORAGEMANAGER.Write_8Bits(812, WayPointAltitude[8]);
-      STORAGEMANAGER.Write_8Bits(813, WayPointAltitude[9]);
+
+      uint8_t ArrayCount = 0;
+
+      for (uint16_t AddressCount = INITIAL_ADDR_OF_COORDINATES; AddressCount <= FINAL_ADDR_OF_COORDINATES; AddressCount += sizeof(int32_t))
+      {
+
+        if (AddressCount < ((INITIAL_ADDR_OF_COORDINATES + FINAL_ADDR_OF_COORDINATES + 2) / 2))
+        {
+          STORAGEMANAGER.Write_32Bits(AddressCount, WayPointLatitude[ArrayCount]);
+        }
+        else
+        {
+          STORAGEMANAGER.Write_32Bits(AddressCount, WayPointLongitude[ArrayCount]);
+        }
+
+        ArrayCount++;
+        if (ArrayCount >= WAYPOINTS_MAXIMUM)
+        {
+          ArrayCount = 0;
+        }
+      }
+
+      ArrayCount = 0;
+
+      for (uint16_t AddressCount = INITIAL_ADDR_OF_OTHERS_PARAMS; AddressCount <= FINAL_ADDR_OF_OTHERS_PARAMS; AddressCount += sizeof(uint8_t))
+      {
+
+        if (AddressCount < (INITIAL_ADDR_OF_OTHERS_PARAMS + WAYPOINTS_MAXIMUM - 1))
+        {
+          STORAGEMANAGER.Write_8Bits(AddressCount, WayPointTimed[ArrayCount]);
+        }
+        else if (AddressCount >= (INITIAL_ADDR_OF_OTHERS_PARAMS + WAYPOINTS_MAXIMUM - 1) && AddressCount < ((WAYPOINTS_MAXIMUM * 2 - 1) + INITIAL_ADDR_OF_OTHERS_PARAMS))
+        {
+          STORAGEMANAGER.Write_8Bits(AddressCount, WayPointFlightMode[ArrayCount]);
+        }
+        else if (AddressCount >= ((WAYPOINTS_MAXIMUM * 2) + INITIAL_ADDR_OF_OTHERS_PARAMS) && AddressCount < ((WAYPOINTS_MAXIMUM * 3 - 1) + INITIAL_ADDR_OF_OTHERS_PARAMS))
+        {
+          STORAGEMANAGER.Write_8Bits(AddressCount, WayPointAltitude[ArrayCount]);
+        }
+
+        ArrayCount++;
+        if (ArrayCount >= WAYPOINTS_MAXIMUM)
+        {
+          ArrayCount = 0;
+        }
+      }
     }
     EEPROM_Function = 0;
   }
 }
 
-bool WayPointSync10Hz()
+static bool WayPointSync10Hz()
 {
   static Scheduler_Struct WayPointSyncTimer;
   return (Scheduler(&WayPointSyncTimer, SCHEDULER_SET_FREQUENCY(10, "Hz")));
 }
 
-void MulticopterAutoTakeOff(bool MulticopterAutoTakeOff)
+static void SetWayPointAutoTakeOffState(uint8_t _AutoTakeOffState)
 {
-  if (!MulticopterAutoTakeOff)
+  if (_AutoTakeOffState == WAYPOINT_ENABLE_AUTO_TAKEOFF)
+  {
+    AutoTakeOffState = true;
+  }
+  if (_AutoTakeOffState == WAYPOINT_DISABLE_AUTO_TAKEOFF)
+  {
+    AutoTakeOffState = false;
+  }
+  else if (_AutoTakeOffState == WAYPOINT_NORMALIZE_TAKEOFF)
+  {
+    MultirotorAutoTakeOffNormalized = true;
+  }
+  else if (_AutoTakeOffState == WAYPOINT_NORMALIZE_RESET)
+  {
+    MultirotorAutoTakeOffNormalized = false;
+  }
+}
+
+static bool GetWayPointAutoTakeOffState(void)
+{
+  return AutoTakeOffState;
+}
+
+static bool GetWayPointAutoTakeOffNormalized(void)
+{
+  return MultirotorAutoTakeOffNormalized;
+}
+
+static void WayPointAutoTakeOffUpdate(void)
+{
+  if (!GetWayPointAutoTakeOffState())
   {
     return;
   }
-  if (WayPointSync10Hz())
+
+  if (GetMultirotorEnabled())
   {
-    if (ThrottleIncrement < THROTTLE_TAKEOFF_ASCENT && !WPTakeOffNomalized)
+    if (WayPointSync10Hz())
     {
-      if (ThrottleIncrementCount >= THROTTLE_INCREMENT_TIME)
+      if (ThrottleIncrement < THROTTLE_TAKEOFF_ASCENT)
       {
-        ThrottleIncrement += THROTTLE_INCREMENT;
-        ThrottleIncrementCount = 0;
+        if (ThrottleIncrementCount >= THROTTLE_INCREMENT_TIME)
+        {
+          ThrottleIncrement += THROTTLE_INCREMENT;
+          ThrottleIncrementCount = 0;
+        }
+        else
+        {
+          ThrottleIncrementCount++;
+        }
       }
-      else
+      if (GetWayPointAutoTakeOffNormalized())
       {
-        ThrottleIncrementCount++;
+        ThrottleIncrement = THROTTLE_TAKEOFF_NORMALIZE;
       }
     }
-    else
-    {
-      WPTakeOffNomalized = true;
-      ThrottleIncrement = THROTTLE_TAKEOFF_NORMALIZE;
-    }
+    DECODE.SetRxChannelInput(THROTTLE, ThrottleIncrement);
+    RCController[THROTTLE] = Constrain_16Bits(ThrottleIncrement, AttitudeThrottleMin, AttitudeThrottleMax);
   }
-  DECODE.SetRxChannelInput(THROTTLE, ThrottleIncrement);
-  RCController[THROTTLE] = Constrain_16Bits(ThrottleIncrement, AttitudeThrottleMin, AttitudeThrottleMax);
+  else if (GetAirPlaneEnabled())
+  {
+    ENABLE_THIS_FLIGHT_MODE(LAUNCH_MODE);
+  }
+}
+
+static void ResetAutoTakeOff(void)
+{
+  ThrottleIncrement = 1000;
+  ThrottleIncrementCount = 0;
+  SetWayPointAutoTakeOffState(WAYPOINT_DISABLE_AUTO_TAKEOFF);
+  SetWayPointAutoTakeOffState(WAYPOINT_NORMALIZE_RESET);
+}
+
+static void WayPointPredictPositionAndSetAltitude(void)
+{
+  if (!WayPointOnceFlight[WAYPOINT_PREDICT_POS_ALT])
+  {
+    GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
+    Do_Pos_Hold_Call_Alt_Hold = true;
+    SetNewAltitudeToHold(ConverMetersToCM(WayPointAltitude[MissionNumber]));
+    SetThisPointToPositionHold();
+    WayPointOnceFlight[WAYPOINT_PREDICT_POS_ALT] = true;
+  }
 }
 
 void WayPointClass::Update()
 {
-
+  Push_WayPoint_Parameters();
   Store_And_Clear_WayPoints();
-  PushWayPointParameters();
 
   if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE))
   {
-    WayPointMode = WP_MISSION_INIT;
-    WPSucess = false;
+    WayPointMode = WAYPOINT_INIT;
+    WayPointMissionReached = false;
     MissionNumber = 0;
     Mission_Timed_Count = 0;
-    ThrottleIncrement = 1000;
-    ThrottleIncrementCount = 0;
-    Do_WayPoint_Call_Alt_Hold = false;
-    WPTakeOffNomalized = false;
+    WayPointOnceFlight[WAYPOINT_PREDICT_POS_ALT] = false;
+    WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT] = false;
+    ResetAutoTakeOff();
     return;
   }
 
@@ -340,162 +380,153 @@ void WayPointClass::Update()
 
   int16_t Navigation_Speed_Result = 0;
 
+  WayPointAutoTakeOffUpdate();
+
   switch (WayPointMode)
   {
 
-  case WP_MISSION_INIT:
-    //ATIVA O MODO ALTITUDE-HOLD
-    Do_WayPoint_Call_Alt_Hold = true;
-    //TAKEOFF
-    if (WayPointFlightMode[0] == WP_TAKEOFF || WayPointFlightMode[1] == WP_TAKEOFF || WayPointFlightMode[2] == WP_TAKEOFF ||
-        WayPointFlightMode[3] == WP_TAKEOFF || WayPointFlightMode[4] == WP_TAKEOFF || WayPointFlightMode[5] == WP_TAKEOFF ||
-        WayPointFlightMode[6] == WP_TAKEOFF || WayPointFlightMode[7] == WP_TAKEOFF || WayPointFlightMode[8] == WP_TAKEOFF ||
-        WayPointFlightMode[9] == WP_TAKEOFF)
+  case WAYPOINT_INIT:
+    for (uint8_t IndexCount = 0; IndexCount < WAYPOINTS_MAXIMUM; IndexCount++)
     {
-      WayPointMode = GET_ALTITUDE_TAKEOFF;
-    }
-    else
-    {
-      WayPointMode = GET_ALTITUDE;
-    }
-    break;
-
-  case GET_ALTITUDE_TAKEOFF:
-    Mission_Timed_Count = 0;
-    GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
-    SetNewAltitudeToHold(ConvertCMToMeters(WayPointAltitude[MissionNumber]));
-    SetThisPointToPositionHold();
-    if (GetAltitudeReached() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-    {
-      if (ThrottleIncrement >= THROTTLE_TAKEOFF_ASCENT)
+      if (WayPointFlightMode[IndexCount] == WAYPOINT_TAKEOFF)
       {
-        STICKS.PreArm_Run = false;
-        WayPointMode = WP_START_MISSION;
-      }
-    }
-    else
-    {
-      if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-      {
-        MulticopterAutoTakeOff(true);
+        WayPointMode = WAYPOINT_RUN_TAKEOFF;
+        return;
       }
       else
       {
-        STICKS.PreArm_Run = true;
+        WayPointMode = WAYPOINT_SET_ALTITUDE;
       }
     }
     break;
 
-  case GET_ALTITUDE:
-    Mission_Timed_Count = 0;
-    GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
-    SetNewAltitudeToHold(ConvertCMToMeters(WayPointAltitude[MissionNumber]));
-    SetThisPointToPositionHold();
+  case WAYPOINT_RUN_TAKEOFF:
+    WayPointPredictPositionAndSetAltitude();
     if (GetAltitudeReached())
     {
-      WayPointMode = WP_START_MISSION;
+      if (GetMultirotorEnabled())
+      {
+        SetWayPointAutoTakeOffState(WAYPOINT_NORMALIZE_TAKEOFF);
+      }
+      else if (GetAirPlaneEnabled())
+      {
+        SetWayPointAutoTakeOffState(WAYPOINT_DISABLE_AUTO_TAKEOFF);
+        DISABLE_THIS_FLIGHT_MODE(LAUNCH_MODE);
+      }
+      WayPointMode = WAYPOINT_START_MISSION;
+    }
+    else
+    {
+      if (GetMultirotorEnabled())
+      {
+        if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
+        {
+          SetWayPointAutoTakeOffState(WAYPOINT_ENABLE_AUTO_TAKEOFF);
+        }
+        else
+        {
+          STICKS.PreArm_Run = true;
+        }
+      }
+      else if (GetAirPlaneEnabled())
+      {
+        SetWayPointAutoTakeOffState(WAYPOINT_ENABLE_AUTO_TAKEOFF);
+      }
     }
     break;
 
-  case WP_START_MISSION:
-    Set_Next_Point_To_Navigation(WayPointLatitude[MissionNumber], WayPointLongitude[MissionNumber]);
-    WPSucess = true;
-    WayPointMode = WP_EN_ROUTE;
+  case WAYPOINT_SET_ALTITUDE:
+    WayPointPredictPositionAndSetAltitude();
+    if (GetAltitudeReached())
+    {
+      WayPointMode = WAYPOINT_START_MISSION;
+    }
     break;
 
-  case WP_EN_ROUTE:
+  case WAYPOINT_START_MISSION:
+    Mission_Timed_Count = 0;
+    WayPointOnceFlight[WAYPOINT_PREDICT_POS_ALT] = false;
+    WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT] = false;
+    Set_Next_Point_To_Navigation(WayPointLatitude[MissionNumber], WayPointLongitude[MissionNumber]);
+    WayPointMissionReached = true;
+    WayPointMode = WAYPOINT_MISSION_ENROUTE;
+    break;
+
+  case WAYPOINT_MISSION_ENROUTE:
     Navigation_Speed_Result = Calculate_Navigation_Speed(JCF_Param.Navigation_Vel);
     GPSCalculateNavigationRate(Navigation_Speed_Result);
     GPSParameters.Navigation.HeadingHoldTarget = WRap_18000(GPSParameters.Navigation.Bearing.ActualTarget) / 100;
-    if ((GPSParameters.Navigation.Coordinates.Distance <= ConvertCMToMeters(JCF_Param.GPS_WP_Radius)) || Point_Reached())
+    if ((GPSParameters.Navigation.Coordinates.Distance <= ConverMetersToCM(JCF_Param.GPS_WP_Radius)) || Point_Reached())
     {
-      if (WPSucess && MissionNumber == 0 && WayPointLatitude[1] != 0 && WayPointLongitude[1] != 0)
+      for (uint8_t MissionCount = 0; MissionCount < WAYPOINTS_MAXIMUM; MissionCount++)
       {
-        MissionNumber = 1;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 1 && WayPointLatitude[2] != 0 && WayPointLongitude[2] != 0)
-      {
-        MissionNumber = 2;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 2 && WayPointLatitude[3] != 0 && WayPointLongitude[3] != 0)
-      {
-        MissionNumber = 3;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 3 && WayPointLatitude[4] != 0 && WayPointLongitude[4] != 0)
-      {
-        MissionNumber = 4;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 4 && WayPointLatitude[5] != 0 && WayPointLongitude[5] != 0)
-      {
-        MissionNumber = 5;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 5 && WayPointLatitude[6] != 0 && WayPointLongitude[6] != 0)
-      {
-        MissionNumber = 6;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 6 && WayPointLatitude[7] != 0 && WayPointLongitude[7] != 0)
-      {
-        MissionNumber = 7;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 7 && WayPointLatitude[8] != 0 && WayPointLongitude[8] != 0)
-      {
-        MissionNumber = 8;
-        WPSucess = false;
-      }
-      else if (WPSucess && MissionNumber == 8 && WayPointLatitude[9] != 0 && WayPointLongitude[9] != 0)
-      {
-        MissionNumber = 9;
-        WPSucess = false;
+        if (WayPointMissionReached &&
+            MissionNumber == MissionCount &&
+            WayPointLatitude[MissionCount + 1] != 0 &&
+            WayPointLongitude[MissionCount + 1] != 0)
+        {
+          MissionNumber = MissionCount + 1;
+          WayPointMissionReached = false;
+          return;
+        }
       }
       //DESATIVA O TAKEOFF SE A MISSÃO NÃO ESTIVER CONFIGURADA PARA O MESMO E SE O THROTTLE ESTIVER ACIMA DE UM CERTO NIVEL
-      if (WayPointFlightMode[MissionNumber] != WP_TAKEOFF && Throttle.Output >= THROTTLE_CANCEL_TAKEOFF)
+      if (WayPointFlightMode[MissionNumber] != WAYPOINT_TAKEOFF && Throttle.Output >= THROTTLE_CANCEL_TAKEOFF && GetMultirotorEnabled())
       {
-        MulticopterAutoTakeOff(false);
+        SetWayPointAutoTakeOffState(WAYPOINT_DISABLE_AUTO_TAKEOFF);
       }
       //AVANÇA O WAYPOINT
-      if (WayPointFlightMode[MissionNumber] == WP_ADVANCE)
+      if (WayPointFlightMode[MissionNumber] == WAYPOINT_ADVANCE)
       {
-        WayPointMode = GET_ALTITUDE;
+        WayPointMode = WAYPOINT_SET_ALTITUDE;
+        Do_RTH_Or_Land_Call_Alt_Hold = false;
+        Do_Pos_Hold_Call_Alt_Hold = false;
       }
       //GPS-HOLD TIMERIZADO
-      if (WayPointFlightMode[MissionNumber] == WP_TIMED)
+      if (WayPointFlightMode[MissionNumber] == WAYPOINT_TIMED)
       {
         if (WayPointSync10Hz())
         {
           Mission_Timed_Count++; //10 ITERAÇÕES = 1 SEGUNDO
         }
-        Do_RTH_Or_Land_Call_Alt_Hold = false;
-        GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
-        SetThisPointToPositionHold();
-        if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber])) //MULT POR 10 PARA OBTÉR O VALOR EM SEGUNDOS PARA TRABALHAR EM CONJUNTO COM A FUNÇÃO WayPointSync10Hz()
+        if (!WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT])
         {
-          WayPointMode = GET_ALTITUDE;
+          GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
+          Do_RTH_Or_Land_Call_Alt_Hold = false;
+          Do_Pos_Hold_Call_Alt_Hold = false;
+          SetThisPointToPositionHold();
+          WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT] = true;
+        }
+        if (Mission_Timed_Count >= ConvertDegreesToDecidegrees(WayPointTimed[MissionNumber]))
+        {
+          WayPointMode = WAYPOINT_SET_ALTITUDE;
         }
       }
       //LAND
-      if (WayPointFlightMode[MissionNumber] == WP_LAND)
+      if (WayPointFlightMode[MissionNumber] == WAYPOINT_LAND)
       {
-        GPSParameters.Mode.Navigation = DO_LAND_INIT;
-        Do_RTH_Or_Land_Call_Alt_Hold = true;
-        Do_Pos_Hold_Call_Alt_Hold = false;
-        ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
-        SetThisPointToPositionHold();
+        if (!WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT])
+        {
+          GPSParameters.Mode.Navigation = DO_LAND_INIT;
+          Do_RTH_Or_Land_Call_Alt_Hold = true;
+          Do_Pos_Hold_Call_Alt_Hold = false;
+          ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+          SetThisPointToPositionHold();
+          WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT] = true;
+        }
       }
       //RTH
-      if (WayPointFlightMode[MissionNumber] == WP_RTH)
+      if (WayPointFlightMode[MissionNumber] == WAYPOINT_RTH)
       {
-        GPSParameters.Mode.Navigation = DO_START_RTH;
-        Do_RTH_Or_Land_Call_Alt_Hold = true;
-        Do_Pos_Hold_Call_Alt_Hold = false;
-        ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
-        Do_Mode_RTH_Now();
+        if (!WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT])
+        {
+          GPSParameters.Mode.Navigation = DO_START_RTH;
+          Do_RTH_Or_Land_Call_Alt_Hold = true;
+          Do_Pos_Hold_Call_Alt_Hold = false;
+          ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+          Do_Mode_RTH_Now();
+          WayPointOnceFlight[WAYPOINT_NORMAL_FLIGHT] = true;
+        }
       }
     }
     break;

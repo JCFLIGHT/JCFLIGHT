@@ -32,7 +32,6 @@
 bool Do_Altitude_Hold = false;
 bool Do_RTH_Or_Land_Call_Alt_Hold = false;
 bool Do_Pos_Hold_Call_Alt_Hold = false;
-bool Do_WayPoint_Call_Alt_Hold = false;
 
 bool Get_Multirotor_GPS_FlightModes_Once()
 {
@@ -136,7 +135,7 @@ void ProcessFlightModesToMultirotor()
     GPS_Reset_Navigation();
   }
 
-  if (IS_FLIGHT_MODE_ACTIVE(ALTITUDE_HOLD_MODE) || Do_Pos_Hold_Call_Alt_Hold || Do_WayPoint_Call_Alt_Hold || Do_RTH_Or_Land_Call_Alt_Hold)
+  if (IS_FLIGHT_MODE_ACTIVE(ALTITUDE_HOLD_MODE) || Do_Pos_Hold_Call_Alt_Hold || Do_RTH_Or_Land_Call_Alt_Hold)
   {
     if (!Do_Altitude_Hold)
     {

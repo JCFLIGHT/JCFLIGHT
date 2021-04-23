@@ -23,6 +23,7 @@
 #include "Param/PARAM.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GENERALSETTINGS.h"
+#include "WayPointNavigation/WAYPOINT.h"
 #ifdef ESP32
 #include "EEPROM.h"
 #endif
@@ -58,27 +59,11 @@ void ClearSensorsCalibration(void)
     STORAGEMANAGER.Write_16Bits(MAG_YAW_OFFSET_ADDR, 0);
 }
 
-void ClearWayPointsStorage(void)
-{
-    STORAGEMANAGER.Erase(704, 803);
-    //PADRÃO DE 10 METROS PARA AS ALTITUDES DE VOO POR WAYPOINT
-    STORAGEMANAGER.Write_8Bits(804, 10);
-    STORAGEMANAGER.Write_8Bits(805, 10);
-    STORAGEMANAGER.Write_8Bits(806, 10);
-    STORAGEMANAGER.Write_8Bits(807, 10);
-    STORAGEMANAGER.Write_8Bits(808, 10);
-    STORAGEMANAGER.Write_8Bits(809, 10);
-    STORAGEMANAGER.Write_8Bits(810, 10);
-    STORAGEMANAGER.Write_8Bits(811, 10);
-    STORAGEMANAGER.Write_8Bits(812, 10);
-    STORAGEMANAGER.Write_8Bits(813, 10);
-}
-
 void RecallAllParams(void)
 {
     GCS.Default_All_Configs();
     ClearSensorsCalibration();
-    ClearWayPointsStorage();
+    WAYPOINT.Erase();
     PARAM.Default_List();
     SetNewActualFormatVersion();
 }

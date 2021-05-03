@@ -22,14 +22,14 @@
 class SAFETYBUTTONCLASS
 {
 public:
-  void Initialization();
-  void UpdateRoutine();
-  bool SafeButtonEnabled();
-  bool GetSafeStateToOutput();
+  void Initialization(void);
+  void UpdateRoutine(void);
+  bool SafeButtonEnabled(void);
+  bool GetSafeStateToOutput(void);
 
 private:
-  bool GetButtonInterval();
-  bool GetButtonState();
+  bool GetButtonInterval(void);
+  bool GetButtonState(void);
   bool WaitToNextProcess = false;
   bool SafeStateToApplyPulse = false;
   uint8_t DetectRise = 0;
@@ -37,7 +37,7 @@ private:
   uint32_t LastDebounceTime = 0;
   void UpdateLedStatus(enum Led_Pattern_Enum Instance);
   void SetStateToLed(bool State);
-  void FlashButton();
+  void FlashButton(void);
 };
 extern SAFETYBUTTONCLASS SAFETYBUTTON;
 #endif

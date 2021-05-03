@@ -20,16 +20,16 @@
 
 FILE_COMPILE_FOR_SPEED
 
-void MachineInit()
+void MachineInit(void)
 {
-    //OBTÉM O VALOR INICIAL DE MILLIS PARA CALCULAR O TEMPO DE INICIALIZAÇÃO
-    SetInitialTimeToInitTheMachine(&MachineInitTime);
+    //CHECA SE É A PRIMEIRA VEZ QUE O FIRMWARE FOI CARREGADO
+    FirmwareOrganizeAllParams();
     //INICIALIZA A SERIAL
     FASTSERIAL.Initialization();
     //INICIALIZA O LED RGB
     RGB.Initialization();
-    //CHECA SE É A PRIMEIRA VEZ QUE O FIRMWARE FOI CARREGADO
-    FirmwareOrganizeAllParams();
+    //INICIALIZA O AHRS
+    AHRS.Initialization();
     //CALIBRAÇÃO DOS ESCS
     ESC.Calibration();
     //CARREGA OS VALORES DE CALIBRAÇÃO DA IMU
@@ -46,12 +46,9 @@ void MachineInit()
     WAYPOINT.Initialization();
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
-    //CALCULA E IMPRIME O TEMPO GASTO PELA INICIALIZAÇÃO
-    CalculeTheFinalTimeToInitTheMachine(&MachineInitTime);
-    DEBUG("LOG: Sistema Inicializado! Tempo Gasto:%ld Segundos\n", GetTheFinalTimeToInitTheMachine(&MachineInitTime));
 }
 
-void MachineRun()
+void MachineRun(void)
 {
     //SISTEMA DE TASK EM LOOP INFINITO
     TaskSystemRun();

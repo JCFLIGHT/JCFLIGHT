@@ -18,7 +18,6 @@
 #ifndef BAROREAD_H_
 #define BAROREAD_H_
 #include "Build/LIBDEPENDENCIES.h"
-void RecalculateBaroTotalPressure();
-void CalculateBarometerAltitude();
-int32_t GetAltitudeForGCS();
+void Remove_Barometer_Spikes(void);
+void Calculate_Barometer_Altitude(void);
 #endif

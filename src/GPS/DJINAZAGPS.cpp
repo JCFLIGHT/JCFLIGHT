@@ -210,7 +210,7 @@ static void NazaGPS_Check_Valid_Data()
     //CALCULA O GROUND COURSE DADO PELO GPS A PARTIR DAS VELOCIDADES NORTH & EASTH
     GPSSolutionData.GroundCourse = (uint16_t)(fmodf((Fast_Atan2(GPSSolutionData.VelocityNED[EAST], GPSSolutionData.VelocityNED[NORTH]) * 57.295779513082320876798154814105f) + 3600.0f, 3600.0f));
 
-    GPSParameters.Navigation.Misc.Velocity.NEDStatus = true;
+    GPS_Resources.Navigation.Misc.Velocity.NEDStatus = true;
 
     //NOVAS INFORMAÇÕES
     GPS_New_Information = true;
@@ -317,17 +317,17 @@ void DjiNazaGpsNewFrame(uint8_t SerialReceiverBuffer)
     }
     NazaGPS_Check_Valid_Data();
   }
-  GPSParameters.Navigation.Misc.Get.Satellites = GPSSolutionData.GPS_NumSat;
-  GPSParameters.Navigation.Misc.Get.HDOP = GPSSolutionData.HDOP_State;
+  GPS_Resources.Navigation.Misc.Get.Satellites = GPSSolutionData.GPS_NumSat;
+  GPS_Resources.Navigation.Misc.Get.HDOP = GPSSolutionData.HDOP_State;
   DJINaza_Compass_Roll = GPSSolutionData.GPS_Read_Compass[ROLL];
   DJINaza_Compass_Pitch = GPSSolutionData.GPS_Read_Compass[PITCH];
   DJINaza_Compass_Yaw = GPSSolutionData.GPS_Read_Compass[YAW];
-  GPSParameters.Navigation.Coordinates.Actual[COORD_LATITUDE] = GPSSolutionData.GPS_Location_Data.Latitude;
-  GPSParameters.Navigation.Coordinates.Actual[COORD_LONGITUDE] = GPSSolutionData.GPS_Location_Data.Longitude;
-  GPSParameters.Navigation.Misc.Get.Altitude = (uint16_t)GPSSolutionData.GPS_Location_Data.Altitude;
-  GPSParameters.Navigation.Misc.Get.GroundCourse = (uint16_t)GPSSolutionData.GroundCourse;
-  GPSParameters.Navigation.Misc.Get.GroundSpeed = (uint16_t)GPSSolutionData.GroundSpeed;
-  GPSParameters.Navigation.Misc.Velocity.Get[NORTH] = GPSSolutionData.VelocityNED[NORTH];
-  GPSParameters.Navigation.Misc.Velocity.Get[EAST] = GPSSolutionData.VelocityNED[EAST];
-  GPSParameters.Navigation.Misc.Velocity.Get[DOWN] = GPSSolutionData.VelocityNED[DOWN];
+  GPS_Resources.Navigation.Coordinates.Actual[COORD_LATITUDE] = GPSSolutionData.GPS_Location_Data.Latitude;
+  GPS_Resources.Navigation.Coordinates.Actual[COORD_LONGITUDE] = GPSSolutionData.GPS_Location_Data.Longitude;
+  GPS_Resources.Navigation.Misc.Get.Altitude = (uint16_t)GPSSolutionData.GPS_Location_Data.Altitude;
+  GPS_Resources.Navigation.Misc.Get.GroundCourse = (uint16_t)GPSSolutionData.GroundCourse;
+  GPS_Resources.Navigation.Misc.Get.GroundSpeed = (uint16_t)GPSSolutionData.GroundSpeed;
+  GPS_Resources.Navigation.Misc.Velocity.Get[NORTH] = GPSSolutionData.VelocityNED[NORTH];
+  GPS_Resources.Navigation.Misc.Velocity.Get[EAST] = GPSSolutionData.VelocityNED[EAST];
+  GPS_Resources.Navigation.Misc.Velocity.Get[DOWN] = GPSSolutionData.VelocityNED[DOWN];
 }

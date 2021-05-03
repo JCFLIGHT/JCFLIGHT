@@ -35,13 +35,13 @@ FILE_COMPILE_FOR_SPEED
 
 AHRSClass AHRS;
 
-#define SPIN_RATE_LIMIT 20    //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
-#define MAX_ACC_NEARNESS 0.33 //33% (0.67G - 1.33G)
 #ifdef __AVR_ATmega2560__
 #define NEARNESS 100.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #else
 #define NEARNESS 1.0f //FATOR DE GANHO DE CORREÇÃO DO ACELEROMETRO NO AHRS
 #endif
+#define SPIN_RATE_LIMIT 20     //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
+#define MAX_ACC_NEARNESS 0.33f //33% (0.67G - 1.33G)
 
 Attitude_Struct Attitude;
 Vector3x3_Struct BodyFrameAcceleration;
@@ -314,17 +314,17 @@ static void MahonyAHRSUpdate(float DeltaTime,
   ComputeRotationMatrix();
 }
 
-static float CalculateAccelerometerWeight()
+static float CalculateAccelerometerWeight(void)
 {
   float AccelerometerMagnitudeSquare = 0;
 
   //CALCULA O SQUARE DE TODOS OS EIXOS DO ACELEROMETRO PARA EXTRAIR A MAGNITUDE
-  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[ROLL] / ACC_1G);
-  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[PITCH] / ACC_1G);
-  AccelerometerMagnitudeSquare += SquareFloat((float)IMU.Accelerometer.Read[YAW] / ACC_1G);
+  AccelerometerMagnitudeSquare += SquareFloat(IMU.Accelerometer.ReadFloat[ROLL]);
+  AccelerometerMagnitudeSquare += SquareFloat(IMU.Accelerometer.ReadFloat[PITCH]);
+  AccelerometerMagnitudeSquare += SquareFloat(IMU.Accelerometer.ReadFloat[YAW]);
 
   //CALCULA A CURVA DE SENO DA MAGNITUDE DO ACELEROMETRO
-  const float AccWeight_Nearness = Sine_Curve(Fast_SquareRoot(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS) * NEARNESS;
+  const float AccWeight_Nearness = Sine_Curve(Fast_SquareRoot(AccelerometerMagnitudeSquare) - 1.0f, MAX_ACC_NEARNESS);
 
   return AccWeight_Nearness;
 }
@@ -365,16 +365,16 @@ static void ComputeQuaternionFromRPY(int16_t InitialRoll, int16_t InitialPitch, 
 
 void GetMeasuredAcceleration(Vector3x3_Struct *MeasureAcceleration)
 {
-  MeasureAcceleration->Vector[ROLL] = ConvertAccelerationToCMSS((float)IMU.Accelerometer.Read[ROLL]);
-  MeasureAcceleration->Vector[PITCH] = ConvertAccelerationToCMSS((float)IMU.Accelerometer.Read[PITCH]);
-  MeasureAcceleration->Vector[YAW] = ConvertAccelerationToCMSS((float)IMU.Accelerometer.Read[YAW]);
+  MeasureAcceleration->Vector[ROLL] = IMU.Accelerometer.ReadFloat[ROLL] * GRAVITY_CMSS;
+  MeasureAcceleration->Vector[PITCH] = IMU.Accelerometer.ReadFloat[PITCH] * GRAVITY_CMSS;
+  MeasureAcceleration->Vector[YAW] = IMU.Accelerometer.ReadFloat[YAW] * GRAVITY_CMSS;
 }
 
 void GetMeasuredRotationRate(Vector3x3_Struct *MeasureRotation)
 {
-  MeasureRotation->Vector[ROLL] = ConvertToRadians(((float)IMU.Gyroscope.Read[ROLL]));
-  MeasureRotation->Vector[PITCH] = ConvertToRadians(((float)IMU.Gyroscope.Read[PITCH]));
-  MeasureRotation->Vector[YAW] = ConvertToRadians(((float)IMU.Gyroscope.Read[YAW]));
+  MeasureRotation->Vector[ROLL] = ConvertToRadians(IMU.Gyroscope.ReadFloat[ROLL]);
+  MeasureRotation->Vector[PITCH] = ConvertToRadians(IMU.Gyroscope.ReadFloat[PITCH]);
+  MeasureRotation->Vector[YAW] = ConvertToRadians(IMU.Gyroscope.ReadFloat[YAW]);
 }
 
 void AHRSClass::Update(float DeltaTime)
@@ -399,12 +399,12 @@ void AHRSClass::Update(float DeltaTime)
     {
       if (GPSHeadingInitialized)
       {
-        CourseOverGround = ConvertDeciDegreesToRadians(GPSParameters.Navigation.Misc.Get.GroundCourse);
+        CourseOverGround = ConvertDeciDegreesToRadians(GPS_Resources.Navigation.Misc.Get.GroundCourse);
         SafeToUseGPSHeading = true;
       }
       else
       {
-        ComputeQuaternionFromRPY(Attitude.EulerAngles.Roll, Attitude.EulerAngles.Pitch, GPSParameters.Navigation.Misc.Get.GroundCourse);
+        ComputeQuaternionFromRPY(Attitude.EulerAngles.Roll, Attitude.EulerAngles.Pitch, GPS_Resources.Navigation.Misc.Get.GroundCourse);
         GPSHeadingInitialized = true;
       }
     }
@@ -422,7 +422,7 @@ void AHRSClass::Update(float DeltaTime)
                                                        (float)IMU.Compass.Read[YAW]}};
 
   const float CalcedCompassWeight = 10.0f;
-  const float CalcedAccelerometerWeight = CalculateAccelerometerWeight();
+  const float CalcedAccelerometerWeight = NEARNESS * CalculateAccelerometerWeight();
   const bool SafeToUseAccelerometer = (CalcedAccelerometerWeight > 0.001f);
 
   //ATUALIZA O AHRS
@@ -435,7 +435,7 @@ void AHRSClass::Update(float DeltaTime)
 
   //SAÍDA DOS EIXOS DO APÓS O AHRS
   //PITCH
-  Attitude.EulerAngles.Pitch = ConvertRadiansToDeciDegrees(-Fast_Atan2(Rotation.Matrix3x3[2][1], Rotation.Matrix3x3[2][2]));
+  Attitude.EulerAngles.Pitch = ConvertRadiansToDeciDegrees(Fast_Atan2(Rotation.Matrix3x3[2][1], Rotation.Matrix3x3[2][2]));
   //ROLL
   Attitude.EulerAngles.Roll = ConvertRadiansToDeciDegrees((0.5f * 3.14159265358979323846f) - Fast_AtanCosine(-Rotation.Matrix3x3[2][0]));
   //YAW
@@ -462,10 +462,16 @@ bool AHRSClass::CheckAnglesInclination(int16_t Angle)
   return false;
 }
 
-void AHRSClass::TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *Vector)
+void AHRSClass::TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *VectorPointer)
 {
-  Vector->Pitch = -Vector->Pitch;
-  QuaternionRotateVector(Vector, Vector, &Orientation);
+  VectorPointer->Pitch = -VectorPointer->Pitch;
+  QuaternionRotateVector(VectorPointer, VectorPointer, &Orientation);
+}
+
+void AHRSClass::TransformVectorBodyFrameToEarthFrame(Vector3x3_Struct *VectorPointer)
+{
+  QuaternionRotateVectorInverse(VectorPointer, VectorPointer, &Orientation);
+  VectorPointer->Pitch = -VectorPointer->Pitch;
 }
 
 float AHRSClass::GetSineRoll(void)
@@ -490,10 +496,10 @@ float AHRSClass::GetCosinePitch(void)
 
 float AHRSClass::GetSineYaw(void)
 {
-  return Fast_Sine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.YawDecidegrees));
+  return Fast_Sine(ConvertCentiDegreesToRadians(ConvertDecidegreesToCentiDegrees(Attitude.EulerAngles.YawDecidegrees)));
 }
 
 float AHRSClass::GetCosineYaw(void)
 {
-  return Fast_Cosine(ConvertDeciDegreesToRadians(Attitude.EulerAngles.YawDecidegrees));
+  return Fast_Cosine(ConvertCentiDegreesToRadians(ConvertDecidegreesToCentiDegrees(Attitude.EulerAngles.YawDecidegrees)));
 }

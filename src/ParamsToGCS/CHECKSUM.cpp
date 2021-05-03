@@ -30,22 +30,21 @@ FILE_COMPILE_FOR_SPEED
 
 CheckSumClass CHECKSUM;
 
-uint8_t CheckSumClass::GetDevicesActived()
+#define GET_RC_DIRECTION(Bit) (((Bit) > 0) ? true : false)
+
+uint8_t CheckSumClass::GetDevicesActived(void)
 {
     const bool Compass_Detect = I2CResources.Found.Compass;
     const bool Parachute_Detect = ParachuteDetectTrigger > 0 ? true : false;
     const bool Matek_Lidar_OptFlowDetect = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR) == 1 ? true : false;
     const bool Pitot_Detect = Get_AirSpeed_Enabled();
-    uint8_t CheckDevices = Compass_Detect |
-                           Parachute_Detect << 1 |
-                           Matek_Lidar_OptFlowDetect << 2 |
-                           Pitot_Detect << 3;
+    uint8_t CheckDevices = Compass_Detect | Parachute_Detect << 1 | Matek_Lidar_OptFlowDetect << 2 | Pitot_Detect << 3;
     return CheckDevices;
 }
 
-void CheckSumClass::UpdateServosReverse()
+void CheckSumClass::UpdateServosReverse(void)
 {
-    uint8_t ServosReverse = STORAGEMANAGER.Read_8Bits(SERVOS_REVERSE_ADDR);
+    const uint8_t ServosReverse = STORAGEMANAGER.Read_8Bits(SERVOS_REVERSE_ADDR);
 
     //ASA
     Servo.Direction.GetAndSet[SERVO1] = GET_SERVO_DIRECTION(ServosReverse & 1);
@@ -60,48 +59,20 @@ void CheckSumClass::UpdateServosReverse()
     Servo.Direction.GetAndSet[SERVO4] = GET_SERVO_DIRECTION(ServosReverse & 8);
 }
 
-void CheckSumClass::UpdateChannelsReverse()
+void CheckSumClass::UpdateChannelsReverse(void)
 {
-    uint8_t ChannelsReverse = STORAGEMANAGER.Read_8Bits(CH_REVERSE_ADDR);
+    const uint8_t ChannelsReverse = STORAGEMANAGER.Read_8Bits(CH_REVERSE_ADDR);
     CHECKSUM.GetFailSafeValue = STORAGEMANAGER.Read_16Bits(FAILSAFE_VAL_ADDR);
 
     //THROTTLE
-    if ((ChannelsReverse & 1) > 0)
-    {
-        Throttle.Set_Reverse(true);
-    }
-    else
-    {
-        Throttle.Set_Reverse(false);
-    }
+    Throttle.Set_Reverse(GET_RC_DIRECTION(ChannelsReverse & 1));
 
     //YAW
-    if ((ChannelsReverse & 2) > 0)
-    {
-        Yaw.Set_Reverse(true);
-    }
-    else
-    {
-        Yaw.Set_Reverse(false);
-    }
+    Yaw.Set_Reverse(GET_RC_DIRECTION(ChannelsReverse & 2));
 
     //PITCH
-    if ((ChannelsReverse & 4) > 0)
-    {
-        Pitch.Set_Reverse(true);
-    }
-    else
-    {
-        Pitch.Set_Reverse(false);
-    }
+    Pitch.Set_Reverse(GET_RC_DIRECTION(ChannelsReverse & 4));
 
     //ROLL
-    if ((ChannelsReverse & 8) > 0)
-    {
-        Roll.Set_Reverse(true);
-    }
-    else
-    {
-        Roll.Set_Reverse(false);
-    }
+    Roll.Set_Reverse(GET_RC_DIRECTION(ChannelsReverse & 8));
 }

@@ -17,7 +17,8 @@
 
 #ifndef ALTITUDEHOLD_H_
 #define ALTITUDEHOLD_H_
-#include "Build/LIBDEPENDENCIES.h"
+#include "InertialNavigation/INS.h"
+extern AltitudeHold_Controller_Struct AltitudeHoldController;
 bool ApplyAltitudeHoldControl(void);
 void SetNewAltitudeToHold(int32_t AltitudeSetPoint);
 bool GetTakeOffInProgress(void);

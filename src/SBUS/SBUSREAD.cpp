@@ -32,10 +32,12 @@ SBUS SBUSRC;
 //DEBUG
 //#define PRINTLN_MODE
 
-bool LostFrame = false;
-uint16_t SBUSReadChannels[12];
+#define SBUS_TIMEOUT_US 7000
 
-void SBUS::Update()
+bool LostFrame = false;
+uint16_t SBUSReadChannels[SBUS_MAX_CHANNELS];
+
+void SBUS::Update(void)
 {
   if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER)
   {
@@ -72,10 +74,12 @@ void SBUS::Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame)
       ChannelsRead[9] = (uint16_t)((SBUSRC.PayLoadArray[12] >> 3 | SBUSRC.PayLoadArray[13] << 5) & 0x07FF) / 2 + 988;
       ChannelsRead[10] = (uint16_t)((PayLoadArray[13] >> 6 | SBUSRC.PayLoadArray[14] << 2 | SBUSRC.PayLoadArray[15] << 10) & 0x07FF) / 2 + 988;
       ChannelsRead[11] = (uint16_t)((SBUSRC.PayLoadArray[15] >> 1 | SBUSRC.PayLoadArray[16] << 7) & 0x07FF) / 2 + 988;
+#ifdef USE_SBUS_EXTENDED
       ChannelsRead[12] = (uint16_t)((SBUSRC.PayLoadArray[16] >> 4 | SBUSRC.PayLoadArray[17] << 4) & 0x07FF) / 2 + 988;
       ChannelsRead[13] = (uint16_t)((SBUSRC.PayLoadArray[17] >> 7 | SBUSRC.PayLoadArray[18] << 1 | SBUSRC.PayLoadArray[19] << 9) & 0x07FF) / 2 + 988;
       ChannelsRead[14] = (uint16_t)((SBUSRC.PayLoadArray[19] >> 2 | SBUSRC.PayLoadArray[20] << 6) & 0x07FF) / 2 + 988;
       ChannelsRead[15] = (uint16_t)((SBUSRC.PayLoadArray[20] >> 5 | SBUSRC.PayLoadArray[21] << 3) & 0x07FF) / 2 + 988;
+#endif
     }
     if (LostFrame)
     {
@@ -110,7 +114,7 @@ void SBUS::Read(uint16_t *ChannelsRead, bool *FailSafe, bool *LostFrame)
   }
 }
 
-bool SBUS::SerialParse()
+bool SBUS::SerialParse(void)
 {
   static uint32_t SBUS_Stored_Time = 0;
   if (SCHEDULERTIME.GetMillis() - SBUS_Stored_Time > SBUS_TIMEOUT_US)

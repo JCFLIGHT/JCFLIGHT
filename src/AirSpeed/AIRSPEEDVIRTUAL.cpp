@@ -21,6 +21,7 @@
 #include "InertialNavigation/INS.h"
 #include "AHRS/AHRS.h"
 #include "GPSNavigation/NAVIGATION.h"
+#include "TECS/TECS.h"
 #include "Build/BOARDDEFS.h"
 
 #define AIR_DENSITY_SEA_LEVEL_15C 1.225f //DENSIDADE DO AR ACIMA DO MAR COM A TEMPERATURA EM 15 GRAUS
@@ -47,11 +48,11 @@ float AirSpeed_Virtual_Get_Actual_Value(void)
 
 #ifdef USE_INS_VEL_XY
 
-    float VelocityXY = sqrtf(SquareFloat(INS.AccelerationEarthFrame_LPF[ROLL]) + SquareFloat(INS.AccelerationEarthFrame_LPF[PITCH]));
+    float VelocityXY = TECS.GetFuselageVelocity();
 
 #else
 
-    float VelocityXY = GPSParameters.Navigation.Misc.Get.GroundSpeed
+    float VelocityXY = GPS_Resources.Navigation.Misc.Get.GroundSpeed
 
 #endif
 

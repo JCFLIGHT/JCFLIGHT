@@ -96,7 +96,7 @@ void SaggingCompensatedUpdate(float DeltaTime)
 
 #ifdef PRINTLN_SAGGING
 
-  DEBUG("PowerSupplyImpedance:%u SaggingCompensatedVBat:%u ActualBatteryVoltage:%.2f ActualBatteryCurrent:%.2f",
+  DEBUG("BatImpedancia:%u TensaoCompensada:%u TensaoAtual:%.2f CorrenteAtual:%.2f",
         PowerSupplyImpedance,
         SaggingCompensatedVBat,
         ActualBatteryVoltage,

@@ -114,7 +114,7 @@ void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
 
 uint8_t PreArmClass::Checking(void)
 {
-    if (GyroCalibrationRunning()) //GYROSCOPIO EM CALIBRAÇÃO
+    if (GYROCALIBRATION.GetRunning()) //GYROSCOPIO EM CALIBRAÇÃO
     {
         return GYRO_EEROR;
     }
@@ -129,7 +129,7 @@ uint8_t PreArmClass::Checking(void)
         return FAIL_SAFE_ERROR;
     }
 
-    if (Get_GPS_Used_To_Navigation()) //MODOS DE VOO POR GPS ATIVO
+    if (GPS_Resources.Navigation.AutoPilot.Control.Enabled) //MODOS DE VOO POR GPS ATIVO
     {
         return FLIGHT_MODES_ERROR;
     }
@@ -164,7 +164,7 @@ uint8_t PreArmClass::Checking(void)
         return GPS_ERROR;
     }
 
-    //TUDO ESTÁ OK,A CONTROLADORA ESTÁ PRONTA PARA ARMAR
+    //TUDO ESTÁ OK,O SISTEMA ESTÁ PRONTO PARA ARMAR
     return NONE_ERROR;
 }
 

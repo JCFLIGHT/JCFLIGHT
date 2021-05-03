@@ -31,29 +31,28 @@
 BatteryClass BATTERY;
 Battery_Struct Battery;
 
-PT1_Filter_Struct VoltageFilter_LPF;
-PT1_Filter_Struct CurrentFilter_LPF;
+PT1_Filter_Struct BattVoltage_Smooth;
+PT1_Filter_Struct BattCurrent_Smooth;
 
 //DEBUG
 //#define PRINTLN_BATT
 
 #define THIS_LOOP_RATE 50            //HZ
-#define TIMER_TO_AUTO_DETECT_BATT 15 //TEMPO EM SEGUNDOS PARA AUTO DETECTAR O NÚMERO DE CELULAS DA BATERIA DO USUARIO
+#define TIMER_TO_AUTO_DETECT_BATT 15 //TEMPO EM SEGUNDOS PARA AUTO DETECTAR O NÚMERO DE CELULAS DA BATERIA
 #define LOW_BATT_DETECT_EXHAUSTED 10 //VALIDA QUE REALMENTE A BATERIA ESTÁ ABAIXO DA CAPACIDADE MINIMA POR 'N' SEGUNDOS
-#define LOW_BATT_CRITIC_PERCENT 20   //PREVINE A CONTROLADORA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 'N%' DA CAPACIDADE
-#define VOLTAGE_CUTOFF 15            //HZ
-#define CURRENT_CUTOFF 15            //HZ
+#define LOW_BATT_CRITIC_PERCENT 20   //PREVINE O SISTEMA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 'N%' DA CAPACIDADE
+#define VOLTAGE_CUTOFF 1             //FREQUENCIA DE CORTE DO FILTRO LPF DA LEITURA DA TENSÃO EM HZ
+#define CURRENT_CUTOFF 1             //FREQUENCIA DE CORTE DO FILTRO LPF DA LEITURA DA CORRENTE EM HZ
 
 void BatteryClass::Initialization(void)
 {
-  PT1FilterInit(&VoltageFilter_LPF, VOLTAGE_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
-  PT1FilterInit(&CurrentFilter_LPF, CURRENT_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+  PT1FilterInit(&BattVoltage_Smooth, VOLTAGE_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
+  PT1FilterInit(&BattCurrent_Smooth, CURRENT_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
 }
 
 void BatteryClass::Update_Voltage(void)
 {
-  //FILTRO COMPLEMENTAR PARA REDUÇÃO DE NOISE NA LEITURA DA TENSÃO (10 BITS ADC É TERRIVEL)
-  Battery.Calced.Voltage = PT1FilterApply3(&VoltageFilter_LPF, Battery.Calced.Voltage * 0.92f + (float)(ANALOGSOURCE.Read(ADC_BATTERY_VOLTAGE) / JCF_Param.Batt_Voltage_Factor));
+  Battery.Calced.Voltage = PT1FilterApply3(&BattVoltage_Smooth, (float)(ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_BATTERY_VOLTAGE) * JCF_Param.Batt_Voltage_Factor));
   BATTERY.Exhausted();
   FailSafe_Do_RTH_With_Low_Batt(Battery.Exhausted.LowPercentPreventArm);
 }
@@ -61,6 +60,7 @@ void BatteryClass::Update_Voltage(void)
 uint8_t BatteryClass::CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt)
 {
   Battery.Calced.Percentage = (BattVoltage - BattMinVolt) / (BattMaxVolt - BattMinVolt);
+
   if (Battery.Calced.Percentage < 0)
   {
     Battery.Calced.Percentage = 0;
@@ -71,12 +71,14 @@ uint8_t BatteryClass::CalculatePercentage(float BattVoltage, float BattMinVolt, 
   }
 
 #ifdef PRINTLN_BATT
-  PRINTF.SendToConsole(ProgramMemoryString("volt:%0.2f min:%0.2f max:%0.2f mincount:%d maxcount:%d\n"),
-                       BattVoltage,
-                       BattMinVolt,
-                       BattMaxVolt,
-                       Battery.Auto.MinCount,
-                       BATTERY.Battery.Auto.MaxCount);
+
+  DEBUG("Volts:%.2f Min:%.2f Max:%.2f MinCount:%u MaxCount:%u",
+        BattVoltage,
+        BattMinVolt,
+        BattMaxVolt,
+        Battery.Auto.MinCount,
+        Battery.Auto.MaxCount);
+
 #endif
 
   return 100 * Battery.Calced.Percentage;
@@ -205,16 +207,18 @@ float BatteryClass::Get_Max_Voltage_Calced(void)
 
 uint8_t BatteryClass::GetPercentage(void)
 {
-  return BATTERY.CalculatePercentage(Battery.Calced.Voltage, BATTERY.AutoBatteryMin(Battery.Calced.Voltage), BATTERY.AutoBatteryMax(Battery.Calced.Voltage));
+  return BATTERY.CalculatePercentage(Battery.Calced.Voltage,
+                                     BATTERY.AutoBatteryMin(Battery.Calced.Voltage),
+                                     BATTERY.AutoBatteryMax(Battery.Calced.Voltage));
 }
 
 void BatteryClass::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
 #ifndef __AVR_ATmega2560__
-  Battery.Calced.Current = PT1FilterApply3(&CurrentFilter_LPF, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - JCF_Param.Amps_OffSet) * JCF_Param.Amps_Per_Volt);
+  Battery.Calced.Current = PT1FilterApply3(&BattCurrent_Smooth, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - JCF_Param.Amps_OffSet) * JCF_Param.Amps_Per_Volt);
 #else
-  Battery.Calced.Current = PT1FilterApply3(&CurrentFilter_LPF, ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) * JCF_Param.Amps_Per_Volt);
+  Battery.Calced.Current = PT1FilterApply3(&BattCurrent_Smooth, ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_BATTERY_CURRENT) * JCF_Param.Amps_Per_Volt);
 #endif
   Battery.Calced.Current = MAX(Battery.Calced.Current, 0);
 }

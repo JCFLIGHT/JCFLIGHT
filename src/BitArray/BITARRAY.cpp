@@ -16,7 +16,6 @@
 */
 
 #include "BITARRAY.h"
-#include "FlightModes/AUXFLIGHT.h"
 #include "Common/ENUM.h"
 
 //ESSE BIT ARRAY ESTÁ EM uint8_t (BYTE -> 0 - 255)
@@ -88,29 +87,29 @@ void ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(uint8_t FlightModeName, bool Dep
     }
 }
 
-bool IS_STATE_ACTIVE(uint8_t FlightModeName)
+bool IS_STATE_ACTIVE(uint8_t StateName)
 {
-    return BitArrayGet(SetFlightMode, FlightModeName);
+    return BitArrayGet(SetFlightMode, StateName);
 }
 
-void ENABLE_STATE(uint8_t FlightModeName)
+void ENABLE_STATE(uint8_t StateName)
 {
-    BitArraySet(SetFlightMode, FlightModeName);
+    BitArraySet(SetFlightMode, StateName);
 }
 
-void DISABLE_STATE(uint8_t FlightModeName)
+void DISABLE_STATE(uint8_t StateName)
 {
-    BitArrayClear(SetFlightMode, FlightModeName);
+    BitArrayClear(SetFlightMode, StateName);
 }
 
-void ENABLE_DISABLE_STATE_WITH_DEPENDENCY(uint8_t FlightModeName, bool Dependency)
+void ENABLE_DISABLE_STATE_WITH_DEPENDENCY(uint8_t StateName, bool Dependency)
 {
     if (Dependency)
     {
-        BitArraySet(SetFlightMode, FlightModeName);
+        BitArraySet(SetFlightMode, StateName);
     }
     else
     {
-        BitArrayClear(SetFlightMode, FlightModeName);
+        BitArrayClear(SetFlightMode, StateName);
     }
 }

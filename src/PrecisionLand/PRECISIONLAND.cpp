@@ -16,7 +16,7 @@
 */
 
 #include "PRECISIONLAND.h"
-#include "Filters/LPFACCEF.h"
+#include "Filters/PT1.h"
 #include "Math/MATHSUPPORT.h"
 #include "Common/STRUCTS.h"
 #include "InertialNavigation/INS.h"
@@ -25,50 +25,39 @@
 #ifndef __AVR_ATmega2560__
 #define LOOP_RATE_IN_HZ 400 //HZ
 #else
-#define LOOP_RATE_IN_HZ 1000 //HZ - O LOOP É 100HZ,MAS O FILTRO SÓ FUNCIONA CORRETAMENTE COM ESSE VALOR EM 1KHZ
+#define LOOP_RATE_IN_HZ 1000 //HZ - O FILTRO SÓ FUNCIONA CORRETAMENTE COM ESSE VALOR EM 1KHZ NA VERSÃO CLASSIC
 #endif
 #define LAND_CHECK_ACCEL_MOVING 3.0f //M/S^2
 #define LPF_CUTOFF_IN_HZ 1.0f        //HZ
 
 //DEBUG
-//#define PRINTLN_PRECISIONLAND
-//#define PRINTLN_LPFINROLL
+//#define PRINTLN_PRECISION_LAND
 
-LowPassFilterEarthFrame AccelerationEarthFrameFilteredRoll;
-LowPassFilterEarthFrame AccelerationEarthFrameFilteredPitch;
-LowPassFilterEarthFrame AccelerationEarthFrameFilteredYaw;
+PT1_Filter_Struct AccelerationEarthFrame_Smooth[3];
 
-void Update_PrecisionLand()
+void Update_PrecisionLand(void)
 {
-  AccelerationEarthFrameFilteredRoll.Apply(INS.EarthFrame.AccelerationNEU[ROLL], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
-  AccelerationEarthFrameFilteredPitch.Apply(INS.EarthFrame.AccelerationNEU[PITCH], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
-  AccelerationEarthFrameFilteredYaw.Apply(INS.EarthFrame.AccelerationNEU[YAW], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  PT1FilterApply(&AccelerationEarthFrame_Smooth[NORTH], INS.EarthFrame.AccelerationNEU[NORTH], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  PT1FilterApply(&AccelerationEarthFrame_Smooth[EAST], INS.EarthFrame.AccelerationNEU[EAST], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
+  PT1FilterApply(&AccelerationEarthFrame_Smooth[UP], INS.EarthFrame.AccelerationNEU[UP], LPF_CUTOFF_IN_HZ, 1.0f / LOOP_RATE_IN_HZ);
 
-#ifdef PRINTLN_PRECISIONLAND
+#ifdef PRINTLN_PRECISION_LAND
 
-  PRINTF.SendToConsole(ProgramMemoryString("GetAccelerationTotal:%f GetLandSuccess:%d\n"),
-                       GetAccelerationTotal(), GetLandSuccess());
-
-#endif
-
-#ifdef PRINTLN_LPFINROLL
-
-  PRINTF.SendToConsole(ProgramMemoryString("INS.EarthFrame.Acceleration[ROLL]:%f AccelerationEarthFrameFilteredRoll.GetOutputFiltered():%f\n"),
-                       INS.EarthFrame.Acceleration[ROLL], AccelerationEarthFrameFilteredRoll.GetOutputFiltered());
+  DEBUG("GetAccelerationTotal:%.4f GetLandSuccess:%d", GetAccelerationTotal(), GetLandSuccess());
 
 #endif
 }
 
 //CALCULA A RAIZ QUADRADA DE TODAS AS ACELERAÇÕES PRESENTES NO EARTH FRAME COM 1G SUBTRAIDO NO EIXO Z
-float GetAccelerationTotal()
+float GetAccelerationTotal(void)
 {
-  return Fast_SquareRoot(SquareFloat(AccelerationEarthFrameFilteredRoll.GetOutputFiltered()) +
-                         SquareFloat(AccelerationEarthFrameFilteredPitch.GetOutputFiltered()) +
-                         SquareFloat(AccelerationEarthFrameFilteredYaw.GetOutputFiltered()));
+  return Fast_SquareRoot(SquareFloat(AccelerationEarthFrame_Smooth[NORTH].State) +
+                         SquareFloat(AccelerationEarthFrame_Smooth[EAST].State) +
+                         SquareFloat(AccelerationEarthFrame_Smooth[UP].State));
 }
 
 //SE A VELOCIDADE FOR MAIOR OU IGUAL AO PARAMETRO "LAND_CHECK_ACCEL_MOVING" ISSO QUER DIZER QUE O UAV NÃO ESTÁ NO CHÃO
-bool GetLandSuccess()
+bool GetLandSuccess(void)
 {
   if (GetAccelerationTotal() >= LAND_CHECK_ACCEL_MOVING)
   {

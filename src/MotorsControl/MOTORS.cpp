@@ -38,6 +38,7 @@
 #include "PID/PIDXYZ.h"
 #include "MIXTABLE.h"
 #include "ProgMem/PROGMEM.h"
+#include "Build/BOARDDEFS.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -187,7 +188,7 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
   MixerThrottleCommand = RCController[THROTTLE];
   MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
 
-#ifndef __AVR_ATmega2560__
+#ifdef USE_THROTTLE_COMPESATION
 
   if (STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR) > 0)
   {

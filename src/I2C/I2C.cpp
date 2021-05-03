@@ -127,11 +127,11 @@ void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
   I2C.RegisterBuffer(Address, Register, I2CResources.Buffer.Data, 6);
 }
 
-void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
+void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Data)
 {
   I2C.Restart(Address << 1);
   I2C.Write(Register);
-  I2C.Write(Value);
+  I2C.Write(Data);
   I2C.Stop();
 }
 
@@ -165,11 +165,6 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
     else
     {
 #ifdef PRINTLN_I2C
-
-      if (NumbGenerator == ADDRESS_IMU_MPU6050)
-      {
-        LOG("DISPOSITIVO ENCONTRADO - 0x68 << MPU6050");
-      }
 
       if (NumbGenerator == ADDRESS_BAROMETER_MS5611)
       {
@@ -375,11 +370,11 @@ void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
 {
 }
 
-void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
+void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Data)
 {
   Wire.beginTransmission(Address);
   Wire.write(Register);
-  Wire.write(Value);
+  Wire.write(Data);
   Wire.endTransmission();
 }
 
@@ -393,11 +388,6 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
     Wire.beginTransmission(NumbGenerator);
     if (Wire.endTransmission() == 0)
     {
-      if (NumbGenerator == ADDRESS_IMU_MPU6050)
-      {
-        Serial.println("MPU6050 ENCONTRADO!");
-      }
-
       if (NumbGenerator == ADDRESS_COMPASS_AK8975)
       {
         COMPASS.Type = COMPASS_AK8975;
@@ -477,7 +467,7 @@ void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
 {
 }
 
-void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value)
+void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Data)
 {
 }
 
@@ -488,17 +478,10 @@ void I2CPROTOCOL::All_Initialization(void)
   uint8_t ForceInitialization = 5;
   SCHEDULERTIME.Sleep(200);
   I2C.Initialization();
+  MPU6050AccAndGyroInitialization();
   while (ForceInitialization--)
   {
-    Gyro_Initialization();
-    if (I2CResources.Found.Barometer)
-    {
-      BAROMETER.Initialization();
-    }
-    if (I2CResources.Found.Compass)
-    {
-      COMPASS.Initialization();
-    }
-    Acc_Initialization();
+    BAROMETER.Initialization();
+    COMPASS.Initialization();
   }
 }

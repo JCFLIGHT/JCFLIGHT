@@ -172,78 +172,66 @@ void RCConfigClass::Init(void)
   //THROTTLE
   Throttle.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Throttle.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(THROTTLE_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ALTITUDE-HOLD)
-  Throttle.Set_Reverse(false);
   Throttle.Set_Filter(true);
   Throttle.Set_Fail_Safe(true);
   //YAW
   Yaw.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Yaw.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(YAW_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
-  Yaw.Set_Reverse(false);
   Yaw.Set_Filter(true);
   Yaw.Set_Fail_Safe(false);
   //PITCH
   Pitch.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Pitch.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(PITCH_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
-  Pitch.Set_Reverse(false);
   Pitch.Set_Filter(true);
   Pitch.Set_Fail_Safe(false);
   //ROLL
   Roll.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Roll.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(ROLL_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
-  Roll.Set_Reverse(false);
   Roll.Set_Filter(true);
   Roll.Set_Fail_Safe(false);
   //AUX1
   AuxiliarOne.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarOne.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarOne.Set_Reverse(false);
   AuxiliarOne.Set_Filter(true);
   AuxiliarOne.Set_Fail_Safe(false);
   //AUX2
   AuxiliarTwo.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarTwo.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarTwo.Set_Reverse(false);
   AuxiliarTwo.Set_Filter(true);
   AuxiliarTwo.Set_Fail_Safe(false);
   //AUX3
   AuxiliarThree.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarThree.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarThree.Set_Reverse(false);
   AuxiliarThree.Set_Filter(true);
   AuxiliarThree.Set_Fail_Safe(false);
   //AUX4
   AuxiliarFour.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarFour.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarFour.Set_Reverse(false);
   AuxiliarFour.Set_Filter(true);
   AuxiliarFour.Set_Fail_Safe(false);
   //AUX5
   AuxiliarFive.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarFive.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarFive.Set_Reverse(false);
   AuxiliarFive.Set_Filter(true);
   AuxiliarFive.Set_Fail_Safe(false);
   //AUX6
   AuxiliarSix.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarSix.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarSix.Set_Reverse(false);
   AuxiliarSix.Set_Filter(true);
   AuxiliarSix.Set_Fail_Safe(false);
   //AUX7
   AuxiliarSeven.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarSeven.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarSeven.Set_Reverse(false);
   AuxiliarSeven.Set_Filter(true);
   AuxiliarSeven.Set_Fail_Safe(false);
   //AUX8
   AuxiliarEight.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarEight.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarEight.Set_Reverse(false);
   AuxiliarEight.Set_Filter(true);
   AuxiliarEight.Set_Fail_Safe(false);
   //FAZ AS PRIMEIRAS LEITURAS DOS CANAIS PARA A CALIBRAÇÃO DOS ESC'S
   //CORRE AS FUNÇÕES 100 VEZES PARA OBTER OS VALORES ATUAIS DOS CANAIS DO RADIO
-  for (uint8_t i = 0; i < 100; i++)
+  for (uint8_t IndexCount = 0; IndexCount < 100; IndexCount++)
   {
     DECODE.Update();            //FAZ AS PRIMEIRA LEITURAS
     RCCONFIG.Set_Pulse();       //APLICA OS VALORES LIDOS

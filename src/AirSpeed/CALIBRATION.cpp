@@ -134,7 +134,7 @@ static float Get_Scale_Calibration(float True_AirSpeed, const Vector3x3Float &GP
     return StateEstimate.Z;
 }
 
-void AirSpeedCalibrationClass::Scale_Update(void) //2HZ
+void AirSpeedCalibrationClass::Scale_Update(void)
 {
     static Scheduler_Struct Scale_Scheduler;
 
@@ -166,9 +166,9 @@ void AirSpeedCalibrationClass::Scale_Update(void) //2HZ
     }
 
     //OBTÉM E CONVERTE O NED DADO PELO GPS DE CM/S PARA M/S
-    const Vector3x3Float &GPSVelocity = Vector3x3Float(ConvertCMToMeters(GPSParameters.Navigation.Misc.Velocity.Get[NORTH]),
-                                                       ConvertCMToMeters(GPSParameters.Navigation.Misc.Velocity.Get[EAST]),
-                                                       ConvertCMToMeters(GPSParameters.Navigation.Misc.Velocity.Get[DOWN]));
+    const Vector3x3Float &GPSVelocity = Vector3x3Float(ConvertCMToMeters(GPS_Resources.Navigation.Misc.Velocity.Get[NORTH]),
+                                                       ConvertCMToMeters(GPS_Resources.Navigation.Misc.Velocity.Get[EAST]),
+                                                       ConvertCMToMeters(GPS_Resources.Navigation.Misc.Velocity.Get[DOWN]));
 
     //VELOCIDADE VERDADEIRA DO AR SEM O GANHO DE 'AirSpeed_Factor'
     float True_AirSpeed = sqrtf(AirSpeed.Raw.DifferentialPressure) * Get_EAS2TAS();

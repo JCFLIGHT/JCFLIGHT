@@ -24,7 +24,7 @@
 
 FILE_COMPILE_FOR_SPEED
 
-static const PID_Mixer_Struct Pid_Mixer_Quad_X[] FLASH_MEMORY_ATTRIBUTE = {
+static const PID_Mixer_Struct PID_Mixer_Quad_X[] FLASH_MEMORY_ATTRIBUTE = {
     {+1.0f, -1.0f, -1.0f}, //MOTOR 1
     {+1.0f, +1.0f, +1.0f}, //MOTOR 2
     {-1.0f, -1.0f, +1.0f}, //MOTOR 3
@@ -32,7 +32,7 @@ static const PID_Mixer_Struct Pid_Mixer_Quad_X[] FLASH_MEMORY_ATTRIBUTE = {
     //ROLL   PITCH  YAW
 };
 
-static const PID_Mixer_Struct Pid_Mixer_Hexa_X[] FLASH_MEMORY_ATTRIBUTE = {
+static const PID_Mixer_Struct PID_Mixer_Hexa_X[] FLASH_MEMORY_ATTRIBUTE = {
     {+0.8f, -0.9f, -1.0f}, //MOTOR 1
     {+0.8f, +0.9f, -1.0f}, //MOTOR 2
     {-0.8f, -0.9f, +1.0f}, //MOTOR 3
@@ -42,7 +42,7 @@ static const PID_Mixer_Struct Pid_Mixer_Hexa_X[] FLASH_MEMORY_ATTRIBUTE = {
     //ROLL   PITCH  YAW
 };
 
-static const PID_Mixer_Struct Pid_Mixer_Hexa_I[] FLASH_MEMORY_ATTRIBUTE = {
+static const PID_Mixer_Struct PID_Mixer_Hexa_I[] FLASH_MEMORY_ATTRIBUTE = {
     {+0.9f, -0.8f, -1.0f}, //MOTOR 1
     {+0.9f, +0.8f, +1.0f}, //MOTOR 2
     {-0.9f, -0.8f, -1.0f}, //MOTOR 3
@@ -52,7 +52,7 @@ static const PID_Mixer_Struct Pid_Mixer_Hexa_I[] FLASH_MEMORY_ATTRIBUTE = {
     //ROLL   PITCH  YAW
 };
 
-static const PID_Mixer_Struct Pid_Mixer_ZMR250[] FLASH_MEMORY_ATTRIBUTE = {
+static const PID_Mixer_Struct PID_Mixer_ZMR250[] FLASH_MEMORY_ATTRIBUTE = {
     {+1.0f, -0.772f, -1.0f}, //MOTOR 1
     {+1.0f, +0.772f, +1.0f}, //MOTOR 2
     {-1.0f, -0.772f, +1.0f}, //MOTOR 3
@@ -60,10 +60,10 @@ static const PID_Mixer_Struct Pid_Mixer_ZMR250[] FLASH_MEMORY_ATTRIBUTE = {
     //ROLL   PITCH    YAW
 };
 
-static const PID_Mixer_Struct Pid_Mixer_TBS[] FLASH_MEMORY_ATTRIBUTE = {
-    {+1.0f, -0.647f, -1.0f},   //MOTOR 1
+static const PID_Mixer_Struct PID_Mixer_TBS[] FLASH_MEMORY_ATTRIBUTE = {
+    {+1.0f,   -0.647f, -1.0f}, //MOTOR 1
     {+0.848f, +0.647f, +1.0f}, //MOTOR 2
-    {-1.0f, -0.647f, +1.0f},   //MOTOR 3
+    {-1.0f,   -0.647f, +1.0f}, //MOTOR 3
     {-0.848f, +0.647f, -1.0f}, //MOTOR 4
     //ROLL     PITCH    YAW
 };

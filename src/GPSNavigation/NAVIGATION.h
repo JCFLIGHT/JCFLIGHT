@@ -19,7 +19,7 @@
 #define NAVIGATION_H_
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
-extern GPS_Parameters_Struct GPSParameters;
+extern GPS_Resources_Struct GPS_Resources;
 void LoadGPSParameters(void);
 void GPS_Reset_Navigation(void);
 void GPS_Process_FlightModes(float DeltaTime);

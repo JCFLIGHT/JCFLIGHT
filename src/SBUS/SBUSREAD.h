@@ -18,16 +18,16 @@
 #ifndef SBUSREAD_H_
 #define SBUSREAD_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern uint16_t SBUSReadChannels[12];
+#include "Build/BOARDDEFS.h"
+extern uint16_t SBUSReadChannels[SBUS_MAX_CHANNELS];
 class SBUS
 {
 public:
-  void Update();
+  void Update(void);
   bool FailSafe;
 
 private:
-#define SBUS_TIMEOUT_US 7000
-  bool SerialParse();
+  bool SerialParse(void);
   uint8_t ParserState;
   uint8_t PrevByte = 0x00;
   uint8_t ActualByte;

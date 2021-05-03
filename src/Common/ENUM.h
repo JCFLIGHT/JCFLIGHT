@@ -41,7 +41,7 @@ enum Frames_Type_Enum
     HEXA_I,
     AIR_PLANE,
     FIXED_WING,
-    PLANE_VTAIL,
+    AIR_PLANE_VTAIL,
     ZMR_250,
     TBS
 
@@ -78,10 +78,10 @@ enum FlightModes_Enum
     SECONDARY_ARM_DISARM,
     STABILIZE_MODE,
     HEADING_HOLD_MODE,
+    ALTITUDE_HOLD_MODE,
     RTH_MODE,
 
     //MODOS DE VOOS PARA MULTIROTORES
-    ALTITUDE_HOLD_MODE,
     SIMPLE_MODE,
     POS_HOLD_MODE,
     ATTACK_MODE,
@@ -90,7 +90,6 @@ enum FlightModes_Enum
     WAYPOINT_MODE,
 
     //MODOS DE VOO PARA AEROS
-    AUTO_THROTTLE_MODE,
     MANUAL_MODE,
     CIRCLE_MODE,
     LAUNCH_MODE,
@@ -504,7 +503,8 @@ enum GPS_Velocity_NED_Enum
 {
     NORTH = 0,
     EAST,
-    DOWN
+    DOWN = 2,
+    UP = 2
 };
 
 enum GCS_FlightModes_Enum
@@ -547,4 +547,19 @@ enum GPS_Orientation_Enum
     COORD_LATITUDE = 0,
     COORD_LONGITUDE
 };
+
+enum TECS_PID_Flags_Enum
+{
+    TECS_PID_USE_NONE = 0,
+    TECS_PID_USE_TRACKING_ERROR = 1,
+    TECS_PID_USE_SHRINK_INTEGRATOR = 2
+};
+
+typedef enum
+{
+    MPU6050_NONE = 0,
+    MPU6050_HALF_RESOLUTION = 1,
+    MPU6050_FULL_RESOLUTION = 2
+} MPUDetectionResult_Enum;
+
 #endif

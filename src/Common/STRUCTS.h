@@ -20,7 +20,6 @@
 
 #include "ENUM.h"
 #include "RCDEFINES.h"
-#include "IMU/IMUDEFS.h"
 
 typedef struct
 {
@@ -28,17 +27,23 @@ typedef struct
   {
     int16_t Read[3] = {0, 0, 0};
     int16_t ReadNotFiltered[3] = {0, 0, 0};
+    float ReadFloat[3] = {0.0f, 0.0f, 0.0f};
+
     struct Gravity_Struct
     {
       bool Initialization = false;
+      int16_t OneG = 256;
       float Value = 0;
     } GravityForce;
+
   } Accelerometer;
 
   struct Gyroscope_Struct
   {
+    float Scale = 1.0f;
     int16_t Read[3] = {0, 0, 0};
     int16_t ReadNotFiltered[3] = {0, 0, 0};
+    float ReadFloat[3] = {0.0f, 0.0f, 0.0f};
   } Gyroscope;
 
   struct Compass_Struct
@@ -53,23 +58,25 @@ typedef struct
 typedef struct
 {
   //LPF
-  float AccelerationEarthFrame_LPF[3];
+  float AccelerationEarthFrame_LPF[3] = {0, 0, 0};
 
   //AVERAGE
-  uint8_t AccelerationEarthFrame_Sum_Count[3];
-  float AccelerationEarthFrame_Filtered[3];
-  float AccelerationEarthFrame_Sum[3];
+  uint8_t AccelerationEarthFrame_Sum_Count[3] = {0, 0, 0};
+  float AccelerationEarthFrame_Filtered[3] = {0, 0, 0};
+  float AccelerationEarthFrame_Sum[3] = {0, 0, 0};
 
   struct Math_Struct
   {
-    float Cosine_Roll = 0;
-    float Sine_Roll = 0;
-    float Cosine_Pitch = 0;
-    float Sine_Pitch = 0;
-    float Cosine_Yaw = 0;
-    float Sine_Yaw = 0;
-    float Sine_Pitch_Cosine_Yaw_Fusion = 0;
-    float Sine_Pitch_Sine_Yaw_Fusion = 0;
+    struct Cosine_Struct
+    {
+      float Yaw = 0.0f;
+    } Cosine;
+
+    struct Sine_Struct
+    {
+      float Yaw = 0.0f;
+    } Sine;
+
   } Math;
 
   struct History_Struct
@@ -155,19 +162,76 @@ typedef struct
 {
   struct Accelerometer_Struct
   {
-    int16_t Counter = 0;
-    int16_t PositionCount = 0;
+
+    struct Flags_Struct
+    {
+      bool InCalibration = false;
+      bool CalibratedPosition[6] = {false, false, false, false, false, false};
+    } Flags;
+
+    struct Time_Struct
+    {
+      uint32_t Actual = 0;
+      uint32_t Previous = 0;
+      uint32_t Difference = 0;
+    } Time;
+
+    struct Samples_Struct
+    {
+      int16_t Counter = 0;
+      int32_t Window[6][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+    } Samples;
+
     int16_t OffSet[3] = {0, 0, 0};
-    uint16_t Scale[3] = {0, 0, 0};
-    int32_t Samples[6][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+    int16_t Scale[3] = {0, 0, 0};
+
+    struct Gravity_Struct
+    {
+      struct Flags_Struct
+      {
+        bool Restart = true;
+        bool Calibrated = false;
+      } Flags;
+
+      struct Time_Struct
+      {
+        uint32_t Actual = 0;
+        uint32_t Previous = 0;
+      } Time;
+
+      struct Samples_Struct
+      {
+        int16_t Count = 0;
+        float Sum = 0.0f;
+      } Samples;
+
+    } Gravity;
+
   } Accelerometer;
 
   struct Gyroscope_Struct
   {
-    float Deviation[3] = {0, 0, 0};
-    int16_t Counter = ACC_1G;
-    int16_t PreviousValue[3] = {0, 0, 0};
-    int32_t Sum[3] = {0, 0, 0};
+
+    struct Flags_Struct
+    {
+      bool Calibrated = false;
+      bool Restart = true;
+    } Flags;
+
+    struct Time_Struct
+    {
+      uint32_t Actual = 0;
+      uint32_t Previous = 0;
+    } Time;
+
+    float Deviation[3] = {0.0f, 0.0f, 0.0f};
+
+    struct Samples_Struct
+    {
+      int16_t Count = 0;
+      int32_t Sum[3] = {0, 0, 0};
+    } Samples;
+
   } Gyroscope;
 
   struct Magnetometer_Struct
@@ -286,7 +350,7 @@ typedef struct
 
   } Navigation;
 
-} GPS_Parameters_Struct;
+} GPS_Resources_Struct;
 
 typedef struct
 {
@@ -389,13 +453,6 @@ typedef struct
   float RC = 0.0f;
   float DeltaTime = 0.0f;
 } PT1_Filter_Struct;
-
-typedef struct
-{
-  uint32_t ActualTime = 0;
-  uint32_t PreviousTime = 0;
-  uint32_t TotalTime = 0;
-} MachineInitTime_Struct;
 
 typedef struct
 {
@@ -525,10 +582,10 @@ typedef struct
 
   struct Calced_Struct
   {
-    float Voltage = 0;
-    float Current = 0;
-    float CurrentInMah = 0;
-    float Percentage = 0;
+    float Voltage = 0.0f;
+    float Current = 0.0f;
+    float CurrentInMah = 0.0f;
+    float Percentage = 0.0f;
   } Calced;
 
   struct Exhausted_Struct
@@ -592,16 +649,14 @@ typedef struct
   uint16_t Navigation_Vel;
   uint8_t GPS_WP_Radius;
   uint8_t GPS_RTH_Land;
-#ifndef __AVR_ATmega2560__
   uint8_t GPS_TiltCompensation;
+#ifndef __AVR_ATmega2560__
   uint8_t AirSpeed_Samples;
 #endif
   float AirSpeed_Factor;
-#ifndef __AVR_ATmega2560__
   uint8_t Arm_Time_Safety;
   uint8_t Disarm_Time_Safety;
   uint8_t Compass_Cal_Timer;
-#endif
   uint8_t AutoPilotMode;
 #ifndef __AVR_ATmega2560__
   uint8_t AirSpeedAutoCalScale;
@@ -640,9 +695,9 @@ typedef struct
 
   struct RcRateTarget_Struct
   {
-    int16_t Roll = 0;
-    int16_t Pitch = 0;
-    int16_t Yaw = 0;
+    float Roll = 0.0f;
+    float Pitch = 0.0f;
+    float Yaw = 0.0f;
 
     struct GCS_Struct
     {
@@ -716,6 +771,178 @@ typedef struct
     int32_t IntegratorSum = 0;
   } PID;
 
-} AH_Controller_Struct;
+} AltitudeHold_Controller_Struct;
+
+typedef struct
+{
+  bool Reset = false;
+  float Error = 0.0f;
+  float PreviousMeasurement = 0.0f;
+  float Derivative = 0.0f;
+  float DerivativeCutOff = 0.0f;
+  float ControlTracking = 0.0f;
+  float IntegratorSum = 0.0f;
+  float PreviousIntegrator = 0.0f;
+  float ValueConstrained = 0.0f;
+  int16_t AutoPilotControl[3] = {0, 0, 0};
+  PT1_Filter_Struct Derivative_Smooth;
+} TECS_PID_Float_Struct;
+
+typedef struct
+{
+  float X = 0.0f;
+  float Y = 0.0f;
+  int32_t Altitude = 0;
+  void Clear(void)
+  {
+    X = 0.0f;
+    Y = 0.0f;
+    Altitude = 0;
+  }
+} Frame3D_Struct;
+
+typedef struct
+{
+  Scheduler_Struct Scheduler;
+
+  PT1_Filter_Struct PitchToThrottle_Smooth;
+  PT1_Filter_Struct PositionController_Smooth;
+  PT1_Filter_Struct PitchController_Smooth;
+
+  struct Position_Struct
+  {
+    Frame3D_Struct TargetCruiseOrCircle;
+    Frame3D_Struct Virtual;
+    Frame3D_Struct HomePoint;
+
+    struct AutoPilot_Struct
+    {
+      int16_t RollAngle = 0;
+    } AutoPilot;
+
+    struct Target_Struct
+    {
+      float Distance = 0.0f;
+    } Target;
+
+    struct Error_Struct
+    {
+      float X = 0.0f;
+      float Y = 0.0f;
+    } Error;
+
+    struct Circle_Struct
+    {
+
+      struct Flags_Struct
+      {
+        bool OkToRun = false;
+      } Flags;
+
+      float Angle = 0.0f;
+
+      struct Target_Struct
+      {
+        float X = 0.0f;
+        float Y = 0.0f;
+      } Target;
+
+    } Circle;
+
+    struct Tracking_Struct
+    {
+      float Actual = 0.0f;
+      float Period = 0.0f;
+    } Tracking;
+
+    bool HomePointOnce = false;
+    float PilotManualAddRoll = 0.0f;
+    float VelocityXY = 0.0f;
+    int32_t Altitude = 0;
+  } Position;
+
+  struct Velocity_Struct
+  {
+    float ClimbRate = 0.0f;
+  } Velocity;
+
+  struct Heading_Struct
+  {
+
+    struct Flags_Struct
+    {
+      bool ErrorTrasborded = false;
+      bool ForceTurnDirection = false;
+    } Flags;
+
+    struct AutoPilot_Struct
+    {
+      float Adjust = 0.0f;
+    } AutoPilot;
+
+    float AHRSYawInCentiDegress = 0.0f;
+    float MinToNormalizeTurnDirection = 0.0f;
+    float MaxToRunTurnDirection = 0.0f;
+    int32_t TargetBearing = 0;
+    int32_t Error = 0;
+    int32_t PreviousError = 0;
+  } Heading;
+
+  struct Energies_Struct
+  {
+    struct Specific_Struct
+    {
+      struct Demanded_Struct
+      {
+        float PotentialEnergy = 0.0f;
+        float KineticEnergy = 0.0f;
+        float EnergyBalance = 0.0f;
+      } Demanded;
+
+      struct Estimated_Struct
+      {
+        float PotentialEnergy = 0.0f;
+        float KineticEnergy = 0.0f;
+        float EnergyBalance = 0.0f;
+        float PitchGainBalance = 0.0f;
+        float PitchAngle = 0.0f;
+      } Estimated;
+
+      float Control = 0.0f;
+    } Specific;
+
+  } Energies;
+
+  struct Throttle_Struct
+  {
+    float SpeedBoost = 0.0f;
+    float SpeedAdjustment = 0.0f;
+    int16_t Correction = 0;
+    int16_t Cruise = 0;
+  } Throttle;
+
+  struct Params_Struct
+  {
+    bool CircleDirectionToRight = false;
+    bool UseLandInRTH = false;
+    uint8_t LandMinAltitude = 0;
+    uint8_t FinalLandPitchAngle = 0;
+    uint8_t PitchToThrottleLPFQuality = 0;
+    uint8_t PitchToThrottleDifference = 0;
+    uint8_t PitchToThrottleFactor = 0;
+    uint8_t AutoPilotLPFQuality = 0;
+    float AutoPilotMaxDescentAngle = 0.0f;
+    float AutoPilotMaxClimbAngle = 0.0f;
+    float AutoThrottleGain = 0.0f;
+    float AutoThrottleMinVel = 0.0f;
+    int16_t PilotManualRollSpeed = 0;
+    int16_t PilotManualClimbDescentRate = 0;
+    int16_t MinCruiseThrottle = 0;
+    int16_t MaxCruiseThrottle = 0;
+    int16_t CruiseThrottle = 0;
+    int16_t Circle_Radius = 0;
+  } Params;
+
+} TECS_Resources_Struct;
 
 #endif

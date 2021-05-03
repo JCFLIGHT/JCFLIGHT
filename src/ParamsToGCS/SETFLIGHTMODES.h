@@ -18,5 +18,5 @@
 #ifndef SETFLIGHTMODES_H
 #define SETFLIGHTMODES_H
 #include "Build/LIBDEPENDENCIES.h"
-void SetFlightModeToGCS();
+void SetFlightModeToGCS(void);
 #endif

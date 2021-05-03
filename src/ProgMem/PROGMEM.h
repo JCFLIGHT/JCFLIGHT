@@ -32,9 +32,21 @@
     __Result;                                       \
 }))
 
+#define ProgMemReadWord(Address) (__extension__({                \
+    uint16_t __Address16Bits = (uint16_t)(Address);              \
+    int16_t __Result;                                            \
+    __asm__ __volatile__("lpm %A0, Z+"                           \
+                         "\n\t"                                  \
+                         "lpm %B0, Z"                            \
+                         "\n\t"                                  \
+                         : "=r"(__Result), "=z"(__Address16Bits) \
+                         : "1"(__Address16Bits));                \
+    __Result;                                                    \
+}))
+
 #define ProgMemReadDWord(Address) (__extension__({               \
     uint16_t __Address16Bits = (uint16_t)(Address);              \
-    uint32_t __Result;                                           \
+    int32_t __Result;                                            \
     __asm__ __volatile__("lpm %A0, Z+"                           \
                          "\n\t"                                  \
                          "lpm %B0, Z+"                           \
@@ -42,18 +54,6 @@
                          "lpm %C0,Z+"                            \
                          "\n\t"                                  \
                          "lpm %D0, Z"                            \
-                         "\n\t"                                  \
-                         : "=r"(__Result), "=z"(__Address16Bits) \
-                         : "1"(__Address16Bits));                \
-    __Result;                                                    \
-}))
-
-#define ProgMemReadWord(Address) (__extension__({                \
-    uint16_t __Address16Bits = (uint16_t)(Address);              \
-    uint16_t __Result;                                           \
-    __asm__ __volatile__("lpm %A0, Z+"                           \
-                         "\n\t"                                  \
-                         "lpm %B0, Z"                            \
                          "\n\t"                                  \
                          : "=r"(__Result), "=z"(__Address16Bits) \
                          : "1"(__Address16Bits));                \
@@ -76,17 +76,31 @@
     __Result;                                                    \
 }))
 
+#define ProgMemReadPTR(Address) (void *)(__extension__({         \
+    uint16_t __Address16Bits = (uint16_t)(Address);              \
+    uint16_t __Result;                                           \
+    __asm__ __volatile__("lpm %A0, Z+"                           \
+                         "\n\t"                                  \
+                         "lpm %B0, Z"                            \
+                         "\n\t"                                  \
+                         : "=r"(__Result), "=z"(__Address16Bits) \
+                         : "1"(__Address16Bits));                \
+    __Result;                                                    \
+}))
+
 #elif defined __arm__ || defined ESP32
 
 #define FLASH_MEMORY_ATTRIBUTE
 
 #define ProgMemReadByte(Address) (*(const unsigned char *)(Address))
 
-#define ProgMemReadDWord(Address) ({ typeof(Address) _Address = (Address); *(const unsigned long *)(_Address); })
-
 #define ProgMemReadWord(Address) ({ typeof(Address) _Address = (Address); *(const unsigned short *)(_Address); })
 
+#define ProgMemReadDWord(Address) ({ typeof(Address) _Address = (Address); *(const unsigned long *)(_Address); })
+
 #define ProgMemReadFloat(Address) ({ typeof(Address) _Address = (Address); *(const float *)(_Address); })
+
+#define ProgMemReadPTR(Address) ({ typeof(Address) _Address = (Address); *(void * const *)(_Address); })
 
 #endif
 

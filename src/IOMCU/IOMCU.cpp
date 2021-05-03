@@ -32,7 +32,6 @@
 #include "WayPointNavigation/WAYPOINT.h"
 #include "Buzzer/BUZZER.h"
 #include "GPSNavigation/NAVIGATION.h"
-#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "ParamsToGCS/IMUCALGCS.h"
 #include "AirSpeed/AIRSPEEDBACKEND.h"
 #include "MemoryCheck/FREERAM.h"
@@ -167,7 +166,7 @@ struct _Send_User_Basic_Parameters
     uint8_t SendUART_NUMB_2Type;
     uint8_t SendUartNumb1Type;
     uint8_t SendCompassRotationType;
-    uint8_t SendRTHAltitudeType;
+    uint8_t SendRTHAltitude;
     uint8_t SendAcroType;
     uint8_t SendAltitudeHoldType;
     uint8_t SendPositionHoldType;
@@ -193,7 +192,7 @@ struct _Get_User_Basic_Parameters
     uint8_t GetUART_NUMB_2Type;
     uint8_t GetUartNumb1Type;
     uint8_t GetCompassRotationType;
-    uint8_t GetRTHAltitudeType;
+    uint8_t GetRTHAltitude;
     uint8_t GetAcroType;
     uint8_t GetAltitudeHoldType;
     uint8_t GetPositionHoldType;
@@ -686,7 +685,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         break;
 
     case 3:
-        EEPROM_Function = 1;
+        WayPointResources.Storage.Function = WAYPOINT_STORAGE_RESET;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
@@ -694,7 +693,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         break;
 
     case 4:
-        EEPROM_Function = 2;
+        WayPointResources.Storage.Function = WAYPOINT_STORAGE_SAVE;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
@@ -736,7 +735,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     case 11:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-            StartAccCalibration();
+            ACCCALIBRATION.Start();
         }
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
@@ -898,12 +897,12 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     {
 
     case 3:
-        EEPROM_Function = 1;
+        WayPointResources.Storage.Function = WAYPOINT_STORAGE_RESET;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         break;
 
     case 4:
-        EEPROM_Function = 2;
+        WayPointResources.Storage.Function = WAYPOINT_STORAGE_SAVE;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         break;
 
@@ -975,8 +974,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 22) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(int16_t) * 3)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 22)); //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendFrameType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendReceiverType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendGimbalType, VAR_8BITS);
@@ -985,7 +983,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendUART_NUMB_2Type, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendUartNumb1Type, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendCompassRotationType, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Basic_Parameters.SendRTHAltitudeType, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendRTHAltitude, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAcroType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAltitudeHoldType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendPositionHoldType, VAR_8BITS);
@@ -998,9 +996,6 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAutoLandType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendSafeBtnState, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAirSpeedState, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Basic_Parameters.SendAccRollAdjust, VAR_16BITS);
-        Send_Data_To_GCS(Send_User_Basic_Parameters.SendAccPitchAdjust, VAR_16BITS);
-        Send_Data_To_GCS(Send_User_Basic_Parameters.SendAccYawAdjust, VAR_16BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendPitchLevelTrim, VAR_16BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
@@ -1051,9 +1046,9 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendGPSBank, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralVelZ, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativeVelZ, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Medium_Parameters.SendAltitudeHold, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Medium_Parameters.SendAltitudeHold, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Medium_Parameters.SendAltitudeHold, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalAltitudeHold, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralAltitudeHold, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativeAltitudeHold, VAR_8BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1108,7 +1103,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     case 11:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-            StartAccCalibration();
+            ACCCALIBRATION.Start();
         }
         break;
 
@@ -1276,7 +1271,7 @@ void GCSClass::First_Packet_Request_Parameters()
     }
     else
     {
-        Essential_First_Packet_Parameters.SendAttitudeYaw = WRap_18000(GPSParameters.Navigation.Misc.Get.GroundCourse * 10) / 10;
+        Essential_First_Packet_Parameters.SendAttitudeYaw = WRap_18000(GPS_Resources.Navigation.Misc.Get.GroundCourse * 10) / 10;
     }
     Essential_First_Packet_Parameters.DevicesOnBoard = CHECKSUM.GetDevicesActived();
     Essential_First_Packet_Parameters.SendThrottleValue = Throttle.Output;
@@ -1291,39 +1286,39 @@ void GCSClass::First_Packet_Request_Parameters()
     Essential_First_Packet_Parameters.SendAuxSixValue = AuxiliarSix.Output;
     Essential_First_Packet_Parameters.SendAuxSevenValue = AuxiliarSeven.Output;
     Essential_First_Packet_Parameters.SendAuxEightValue = AuxiliarEight.Output;
-    Essential_First_Packet_Parameters.SendGPSNumberOfSat = GPSParameters.Navigation.Misc.Get.Satellites;
-    Essential_First_Packet_Parameters.SendGPSLatitude = GPSParameters.Navigation.Coordinates.Actual[COORD_LATITUDE];
-    Essential_First_Packet_Parameters.SendGPSLongitude = GPSParameters.Navigation.Coordinates.Actual[COORD_LONGITUDE];
-    Essential_First_Packet_Parameters.SendHomePointLatitude = GPSParameters.Home.Coordinates[COORD_LATITUDE];
-    Essential_First_Packet_Parameters.SendHomePointLongitude = GPSParameters.Home.Coordinates[COORD_LONGITUDE];
+    Essential_First_Packet_Parameters.SendGPSNumberOfSat = GPS_Resources.Navigation.Misc.Get.Satellites;
+    Essential_First_Packet_Parameters.SendGPSLatitude = GPS_Resources.Navigation.Coordinates.Actual[COORD_LATITUDE];
+    Essential_First_Packet_Parameters.SendGPSLongitude = GPS_Resources.Navigation.Coordinates.Actual[COORD_LONGITUDE];
+    Essential_First_Packet_Parameters.SendHomePointLatitude = GPS_Resources.Home.Coordinates[COORD_LATITUDE];
+    Essential_First_Packet_Parameters.SendHomePointLongitude = GPS_Resources.Home.Coordinates[COORD_LONGITUDE];
     if (I2CResources.Found.Barometer)
     {
-        Essential_First_Packet_Parameters.SendBarometerValue = GetAltitudeForGCS();
+        Essential_First_Packet_Parameters.SendBarometerValue = Barometer.Altitude.Actual;
     }
     else
     {
-        Essential_First_Packet_Parameters.SendBarometerValue = ConverMetersToCM(GPSParameters.Navigation.Misc.Get.Altitude - Altitude_For_Plane);
+        Essential_First_Packet_Parameters.SendBarometerValue = 0;
     }
     Essential_First_Packet_Parameters.SendFailSafeState = SystemInFailSafe();
     Essential_First_Packet_Parameters.SendBatteryVoltageValue = BATTERY.Get_Actual_Voltage() * 100;
     Essential_First_Packet_Parameters.SendBatteryPercentageValue = BATTERY.GetPercentage();
     Essential_First_Packet_Parameters.SendArmDisarmState = IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
-    Essential_First_Packet_Parameters.SendHDOPValue = GPSParameters.Navigation.Misc.Get.HDOP;
+    Essential_First_Packet_Parameters.SendHDOPValue = GPS_Resources.Navigation.Misc.Get.HDOP;
     Essential_First_Packet_Parameters.SendCurrentValue = BATTERY.Get_Actual_Current();
     Essential_First_Packet_Parameters.SendWattsValue = BATTERY.GetWatts();
     Essential_First_Packet_Parameters.SendDeclinationValue = (int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100);
     Essential_First_Packet_Parameters.SendActualFlightMode = FlightMode;
     Essential_First_Packet_Parameters.SendFrameType = GetActualPlatformType();
-    Essential_First_Packet_Parameters.SendHomePointState = GPSParameters.Home.Marked;
+    Essential_First_Packet_Parameters.SendHomePointState = GPS_Resources.Home.Marked;
     Essential_First_Packet_Parameters.SendTemperature = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);
-    Essential_First_Packet_Parameters.SendHomePointDistance = GPSParameters.Home.Distance;
+    Essential_First_Packet_Parameters.SendHomePointDistance = GPS_Resources.Home.Distance;
     Essential_First_Packet_Parameters.SendCurrentInMah = BATTERY.Get_Current_In_Mah();
 #ifndef MACHINE_CYCLE
-    Essential_First_Packet_Parameters.SendCourseOverGround = GPSParameters.Navigation.Misc.Get.GroundCourse;
+    Essential_First_Packet_Parameters.SendCourseOverGround = GPS_Resources.Navigation.Misc.Get.GroundCourse;
 #else
     Essential_First_Packet_Parameters.SendCourseOverGround = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
 #endif
-    Essential_First_Packet_Parameters.SendBearing = GPSParameters.Navigation.Bearing.ActualTarget;
+    Essential_First_Packet_Parameters.SendBearing = GPS_Resources.Navigation.Bearing.ActualTarget;
     Essential_First_Packet_Parameters.SendAccGForce = IMU.Accelerometer.GravityForce.Value;
     Essential_First_Packet_Parameters.SendAccImageBitMap = GetImageToGCS();
     Essential_First_Packet_Parameters.SendCompassRoll = IMU.Compass.Read[ROLL];
@@ -1363,7 +1358,7 @@ void GCSClass::Second_Packet_Request_Parameters()
     Essential_Second_Packet_Parameters.SendGyroXFiltered = IMU.Gyroscope.Read[ROLL];
     Essential_Second_Packet_Parameters.SendGyroYFiltered = IMU.Gyroscope.Read[PITCH];
     Essential_Second_Packet_Parameters.SendGyroZFiltered = IMU.Gyroscope.Read[YAW];
-    Essential_Second_Packet_Parameters.SendGPSGroundSpeed = GPSParameters.Navigation.Misc.Get.GroundSpeed;
+    Essential_Second_Packet_Parameters.SendGPSGroundSpeed = GPS_Resources.Navigation.Misc.Get.GroundSpeed;
     Essential_Second_Packet_Parameters.SendI2CError = I2CResources.Error.Count;
     Essential_Second_Packet_Parameters.SendAirSpeedValue = AirSpeed.Raw.IASPressureInCM;
     Essential_Second_Packet_Parameters.SendCPULoad = SystemLoadPercent;
@@ -1437,7 +1432,7 @@ void GCSClass::Save_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, Get_User_Basic_Parameters.GetUART_NUMB_2Type);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, Get_User_Basic_Parameters.GetSPIType);
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, Get_User_Basic_Parameters.GetCompassRotationType);
-    STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, Get_User_Basic_Parameters.GetRTHAltitudeType);
+    STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, Get_User_Basic_Parameters.GetRTHAltitude);
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, Get_User_Basic_Parameters.GetAcroType);
     STORAGEMANAGER.Write_8Bits(ALT_HOLD_ADDR, Get_User_Basic_Parameters.GetAltitudeHoldType);
     STORAGEMANAGER.Write_8Bits(GPS_HOLD_ADDR, Get_User_Basic_Parameters.GetPositionHoldType);
@@ -1565,7 +1560,14 @@ void GCSClass::Default_Basic_Configuration()
     STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 0);
+    if (GetMultirotorEnabled())
+    {
+        STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 10);
+    }
+    else if (GetAirPlaneEnabled())
+    {
+        STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 40);
+    }
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(ATACK_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, 0);
@@ -1663,12 +1665,24 @@ void GCSClass::Default_Medium_Configuration()
         STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
         STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 15);
 
+        //ALTITUDE-HOLD
+        STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 3);
+        STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 5);
+        STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 10);
+
+        //GPS-HOLD
+        STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 100);
+        STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 90);
+
         //ÂNGULOS DE NAVEGAÇÃO
         STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 30);
         STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 30);
         STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 30);
         STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
         STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
+
+        //RTH ALTITUDE
+        STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 10);
     }
     else if (GetAirPlaneEnabled())
     {
@@ -1694,27 +1708,30 @@ void GCSClass::Default_Medium_Configuration()
         STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
         STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 5);
 
+        //ALTITUDE-HOLD
+        STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 40);
+        STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 5);
+        STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 10);
+
+        //AUTO-THROTTLE
+        STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 150);
+        STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 70);
+
         //ÂNGULOS DE NAVEGAÇÃO
         STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 45);
         STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 20);
         STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 25);
-        STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
+        STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 75);
         STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
-    }
 
-    //ALTITUDE-HOLD E AUTO-THROTTLE
-    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 3);
-    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 50);
-    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 20);
+        //RTH ALTITUDE
+        STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 40);
+    }
 
     //VELOCIDADE Z
     STORAGEMANAGER.Write_8Bits(KP_VEL_Z_ADDR, 50);
     STORAGEMANAGER.Write_8Bits(KI_VEL_Z_ADDR, 20);
     STORAGEMANAGER.Write_8Bits(KD_VEL_Z_ADDR, 16);
-
-    //GPS-HOLD
-    STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 100);
-    STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 90);
 
     //HEADING-HOLD
     STORAGEMANAGER.Write_8Bits(KP_HEADING_HOLD_ADDR, 60);
@@ -1742,7 +1759,7 @@ void GCSClass::UpdateParametersToGCS()
     Send_User_Basic_Parameters.SendUART_NUMB_2Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
     Send_User_Basic_Parameters.SendSPIType = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR);
     Send_User_Basic_Parameters.SendCompassRotationType = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
-    Send_User_Basic_Parameters.SendRTHAltitudeType = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
+    Send_User_Basic_Parameters.SendRTHAltitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
     Send_User_Basic_Parameters.SendAcroType = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);
     Send_User_Basic_Parameters.SendAltitudeHoldType = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR);
     Send_User_Basic_Parameters.SendPositionHoldType = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);

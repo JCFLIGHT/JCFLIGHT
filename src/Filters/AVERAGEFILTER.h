@@ -59,7 +59,6 @@ typedef AverageFilter<uint32_t, float, 3> AverageFilterUInt32_Size3;
 typedef AverageFilter<uint32_t, float, 4> AverageFilterUInt32_Size4;
 typedef AverageFilter<uint32_t, float, 5> AverageFilterUInt32_Size5;
 typedef AverageFilter<float, float, 5> AverageFilterFloat_Size5;
-typedef AverageFilter<float, float, 20> AverageFilterFloat_Size20;
 
 template <class T, class U, uint8_t FILTER_SIZE>
 T AverageFilter<T, U, FILTER_SIZE>::Apply(T Sample)
@@ -71,9 +70,9 @@ T AverageFilter<T, U, FILTER_SIZE>::Apply(T Sample)
   {
     Num_Samples = FILTER_SIZE;
   }
-  for (uint8_t i = 0; i < FILTER_SIZE; i++)
+  for (uint8_t IndexCount = 0; IndexCount < FILTER_SIZE; IndexCount++)
   {
-    Result += FilterWithBuffer<T, FILTER_SIZE>::Samples[i];
+    Result += FilterWithBuffer<T, FILTER_SIZE>::Samples[IndexCount];
   }
   return (T)(Result / Num_Samples);
 }

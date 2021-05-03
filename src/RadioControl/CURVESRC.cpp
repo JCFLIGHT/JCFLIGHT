@@ -59,10 +59,10 @@ void CurvesRC_CalculeValue()
   }
 }
 
-int16_t RCControllerToRate(int16_t StickData, uint8_t Rate)
+float RCControllerToRate(int16_t StickData, uint8_t Rate)
 {
   const int16_t MaximumRateDPS = ConvertDegreesToDecidegrees(Rate);
-  return ScaleRange32Bits((int16_t)StickData, -500, 500, -MaximumRateDPS, MaximumRateDPS);
+  return ScaleRangeFloat((int16_t)StickData, -500, 500, -MaximumRateDPS, MaximumRateDPS);
 }
 
 int16_t CalcedAttitudeRC(int16_t Data, int16_t RcExpo)
@@ -77,6 +77,12 @@ float RcControllerToAngle(int16_t RcControllerInput, int16_t MaxInclination)
 {
   RcControllerInput = Constrain_Float(RcControllerInput, -500, 500);
   return ScaleRangeFloat((float)RcControllerInput, -500.0f, 500.0f, (float)-MaxInclination, (float)MaxInclination);
+}
+
+int16_t PIDAngleToRcController(float AngleDeciDegrees, int16_t MaxInclination)
+{
+  AngleDeciDegrees = Constrain_Float(AngleDeciDegrees, (float)-MaxInclination, (float)MaxInclination);
+  return ScaleRangeFloat((float)AngleDeciDegrees, (float)-MaxInclination, (float)MaxInclination, -500.0f, 500.0f);
 }
 
 float RcControllerToAngleWithMinMax(int16_t RcControllerInput, int16_t MinInclination, int16_t MaxInclination)

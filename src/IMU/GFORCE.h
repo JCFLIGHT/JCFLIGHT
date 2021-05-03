@@ -18,5 +18,5 @@
 #ifndef GFORCE_H_
 #define GFORCE_H_
 #include "Build/LIBDEPENDENCIES.h"
-void IMU_GForce_Update();
+void IMU_GForce_Update(void);
 #endif

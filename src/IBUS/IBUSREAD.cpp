@@ -26,13 +26,17 @@ FILE_COMPILE_FOR_SPEED
 
 IBUSClass IBUSRC;
 
+#define IBUS_SERIAL_RX_PACKET_LENGTH 32
+#define IBUS_CHECKSUM_SIZE 2
+#define IBUS_MAX_SLOTS 14
+
 static uint8_t IBUSIndex = 0;
-static uint8_t IBUS_Vector[32];
-uint16_t IBUSReadChannels[12];
+static uint8_t IBUS_Packet[32];
+uint16_t IBUSReadChannels[IBUS_MAX_CHANNELS];
 
 void IBUSClass::Update(void)
 {
-  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != 2)
+  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != IBUS_RECEIVER)
   {
     return;
   }
@@ -52,58 +56,38 @@ void IBUSClass::Update(void)
     }
     if (IBUSIndex < 32)
     {
-      IBUS_Vector[IBUSIndex] = IBUS_SerialRead;
+      IBUS_Packet[IBUSIndex] = IBUS_SerialRead;
     }
     IBUSIndex++;
     if (IBUSIndex == 32)
     {
       IBUSIndex = 0;
       CheckSum = 0xFFFF;
-      CheckSum -= IBUS_Vector[0];
-      CheckSum -= IBUS_Vector[1];
-      CheckSum -= IBUS_Vector[2];
-      CheckSum -= IBUS_Vector[3];
-      CheckSum -= IBUS_Vector[4];
-      CheckSum -= IBUS_Vector[5];
-      CheckSum -= IBUS_Vector[6];
-      CheckSum -= IBUS_Vector[7];
-      CheckSum -= IBUS_Vector[8];
-      CheckSum -= IBUS_Vector[9];
-      CheckSum -= IBUS_Vector[10];
-      CheckSum -= IBUS_Vector[11];
-      CheckSum -= IBUS_Vector[12];
-      CheckSum -= IBUS_Vector[13];
-      CheckSum -= IBUS_Vector[14];
-      CheckSum -= IBUS_Vector[15];
-      CheckSum -= IBUS_Vector[16];
-      CheckSum -= IBUS_Vector[17];
-      CheckSum -= IBUS_Vector[18];
-      CheckSum -= IBUS_Vector[19];
-      CheckSum -= IBUS_Vector[20];
-      CheckSum -= IBUS_Vector[21];
-      CheckSum -= IBUS_Vector[22];
-      CheckSum -= IBUS_Vector[23];
-      CheckSum -= IBUS_Vector[24];
-      CheckSum -= IBUS_Vector[25];
-      CheckSum -= IBUS_Vector[26];
-      CheckSum -= IBUS_Vector[27];
-      CheckSum -= IBUS_Vector[28];
-      CheckSum -= IBUS_Vector[29];
-      ReceiverSum = IBUS_Vector[30] + (IBUS_Vector[31] << 8);
+
+      for (size_t IndexCount = 0; IndexCount < IBUS_SERIAL_RX_PACKET_LENGTH - IBUS_CHECKSUM_SIZE; IndexCount++)
+      {
+        CheckSum -= IBUS_Packet[IndexCount];
+      }
+
+      ReceiverSum = IBUS_Packet[30] + (IBUS_Packet[31] << 8);
+
       if (CheckSum == ReceiverSum)
       {
-        IBUSReadChannels[0] = (IBUS_Vector[3] << 8) + IBUS_Vector[2];
-        IBUSReadChannels[1] = (IBUS_Vector[5] << 8) + IBUS_Vector[4];
-        IBUSReadChannels[2] = (IBUS_Vector[7] << 8) + IBUS_Vector[6];
-        IBUSReadChannels[3] = (IBUS_Vector[9] << 8) + IBUS_Vector[8];
-        IBUSReadChannels[4] = (IBUS_Vector[11] << 8) + IBUS_Vector[10];
-        IBUSReadChannels[5] = (IBUS_Vector[13] << 8) + IBUS_Vector[12];
-        IBUSReadChannels[6] = (IBUS_Vector[15] << 8) + IBUS_Vector[14];
-        IBUSReadChannels[7] = (IBUS_Vector[17] << 8) + IBUS_Vector[16];
-        IBUSReadChannels[8] = (IBUS_Vector[19] << 8) + IBUS_Vector[18];
-        IBUSReadChannels[9] = (IBUS_Vector[21] << 8) + IBUS_Vector[20];
-        IBUSReadChannels[10] = (IBUS_Vector[23] << 8) + IBUS_Vector[22];
-        IBUSReadChannels[11] = (IBUS_Vector[25] << 8) + IBUS_Vector[24];
+        uint8_t IndexCount;
+        uint8_t OffSet;
+
+        for (IndexCount = 0, OffSet = 3; IndexCount < IBUS_MAX_SLOTS; IndexCount++, OffSet += 2)
+        {
+          IBUSReadChannels[IndexCount] = IBUS_Packet[OffSet] + ((IBUS_Packet[OffSet + 1] & 0x0F) << 8);
+        }
+#ifdef USE_IBUS_EXTENDED
+
+        for (IndexCount = IBUS_MAX_SLOTS, OffSet = 3; IndexCount < IBUS_MAX_CHANNELS; IndexCount++, OffSet += 6)
+        {
+          IBUSReadChannels[IndexCount] = ((IBUS_Packet[OffSet] & 0xF0) >> 4) | (IBUS_Packet[OffSet + 2] & 0xF0) | ((IBUS_Packet[OffSet + 4] & 0xF0) << 4);
+        }
+
+#endif
       }
     }
   }

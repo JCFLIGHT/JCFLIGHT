@@ -23,7 +23,8 @@ extern INS_Struct INS;
 class InertialNavigationClass
 {
 public:
-  void Calculate_AccelerationXYZ_To_EarthFrame();
+  void Calculate_AccelerationXYZ_To_EarthFrame(void);
+  bool WaitForSample(void);
   void Calculate_AccelerationXY(float DeltaTime);
   void Calculate_AccelerationZ(float DeltaTime);
 
@@ -31,12 +32,12 @@ private:
   void UpdateAccelerationEarthFrame_Filtered(uint8_t ArrayCount);
   void CorrectXYStateWithGPS(float DeltaTime);
   void EstimationPredictXY(float DeltaTime);
-  void SaveXYPositionToHistory();
-  void ResetXYState();
+  void SaveXYPositionToHistory(void);
+  void ResetXYState(void);
   void CorrectZStateWithBaro(float DeltaTime);
   void EstimationPredictZ(float DeltaTime);
-  void SaveZPositionToHistory();
-  void ResetZState();
+  void SaveZPositionToHistory(void);
+  void ResetZState(void);
 };
 extern InertialNavigationClass INERTIALNAVIGATION;
 #endif

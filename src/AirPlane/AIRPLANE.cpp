@@ -75,7 +75,7 @@ void AirPlaneClass::Update_FixedWing(void)
 
 void AirPlaneClass::Update_AirPlaneVTail(void)
 {
-  if (!GetActualPlatformEnabledUsingName(PLANE_VTAIL))
+  if (!GetActualPlatformEnabledUsingName(AIR_PLANE_VTAIL))
   {
     return;
   }
@@ -90,8 +90,8 @@ void AirPlaneClass::Update_AirPlaneVTail(void)
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    Servo.Signal.UnFiltered[SERVO1] = PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO1];                                   //AILERON  (SERVO 1 DA ASA)
-    Servo.Signal.UnFiltered[SERVO2] = PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO2];                                   //AILERON  (SERVO 2 DA ASA)
+    Servo.Signal.UnFiltered[SERVO1] = PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO1];                                               //AILERON  (SERVO 1 DA ASA)
+    Servo.Signal.UnFiltered[SERVO2] = PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO2];                                               //AILERON  (SERVO 2 DA ASA)
     Servo.Signal.UnFiltered[SERVO3] = (PIDResources.Controller.Output.Calced[ROLL] + PIDResources.Controller.Output.Calced[YAW]) * Servo.Direction.GetAndSet[SERVO3]; //V-TAIL   (CAUDA)
     Servo.Signal.UnFiltered[SERVO4] = (PIDResources.Controller.Output.Calced[ROLL] - PIDResources.Controller.Output.Calced[YAW]) * Servo.Direction.GetAndSet[SERVO4]; //V-TAIL   (CAUDA)
   }

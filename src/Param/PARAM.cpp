@@ -36,6 +36,7 @@ NÃO INDENTE ESSA EXTENSÃO
 #include "Build/BOARDDEFS.h"
 #include "IOMCU/IOMCU.h"
 #include "ATO.h"
+#include "WatchDog/REBOOT.h"
 #include "FastSerial/PRINTF.h"
 #include "FastSerial/FASTSERIAL.h"
 
@@ -64,7 +65,7 @@ const Resources_Of_Param Params_Table[] = {
     {"AutoLaunch_Exit",                    AL_EXIT_ADDR,                         VAR_16BITS,             &JCF_Param.AutoLaunch_Exit,                 0,             30000,           5000},
     {"AutoLaunch_Altitude",                AL_ALTITUDE_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Altitude,             0,             255,             0},
 #endif
-    {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_FLOAT,              &JCF_Param.Batt_Voltage_Factor,             0,             1000,            259.489f},
+    {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_FLOAT,              &JCF_Param.Batt_Voltage_Factor,             0,             1000,            10.1f},
     {"Batt_Amps_Per_Volt",                 BATT_AMPS_VOLT_ADDR,                  VAR_FLOAT,              &JCF_Param.Amps_Per_Volt,                   0,             1000,            62.0f},
 #ifndef __AVR_ATmega2560__   
     {"Batt_Amps_OffSet",                   BATT_AMPS_OFFSET_ADDR,                VAR_FLOAT,              &JCF_Param.Amps_OffSet,                     0,             1000,            0},
@@ -84,11 +85,9 @@ const Resources_Of_Param Params_Table[] = {
     {"AirPlane_Wheels",                    WHEELS_ADDR,                          VAR_8BITS,              &JCF_Param.AirPlane_Wheels,                 0,             1,               0},
 #ifndef __AVR_ATmega2560__
     {"GPS_Baud_Rate",                      GPS_BAUDRATE_ADDR,                    VAR_8BITS,              &JCF_Param.GPS_Baud_Rate,                   0,             4,               4},
-#endif
     {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             400},
     {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             2},
     {"GPS_RTH_Land_Radius",                RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             10},
-#ifndef __AVR_ATmega2560__   
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif
@@ -117,6 +116,16 @@ void ParamClass::Initialization(void)
 #endif
 
   PARAM.Load_Sketch();
+
+#ifdef __AVR_ATmega2560__
+  JCF_Param.Navigation_Vel = 400;
+  JCF_Param.GPS_WP_Radius = 2;
+  JCF_Param.GPS_RTH_Land = 10;
+  JCF_Param.GPS_TiltCompensation = 20;
+  JCF_Param.Arm_Time_Safety = 2;
+  JCF_Param.Disarm_Time_Safety = 2;
+  JCF_Param.Compass_Cal_Timer = 60;
+#endif
 }
 
 void ParamClass::Default_List()
@@ -321,6 +330,7 @@ void ParamClass::Process_Command(char *ParamCommandLine)
   }
   else if (strncasecmp(ParamCommandLine, "reiniciar", 9) == 0)
   {
+    WATCHDOG.Reboot();
   }
   else if (strncasecmp(ParamCommandLine, "sair", 4) == 0)
   {

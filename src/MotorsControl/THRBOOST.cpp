@@ -20,6 +20,7 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Math/MATHSUPPORT.h"
 #include "PID/RCPID.h"
+#include "GPSNavigation/NAVIGATION.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -28,7 +29,7 @@ FILE_COMPILE_FOR_SPEED
 //DEBUG
 //#define PRINTLN_THR_BOOST
 
-int16_t Get_Angle_Boost(int16_t Throttle_Value)
+static int16_t Get_Angle_Boost(int16_t Throttle_Value)
 {
     float AHRS_Angles_Cosine = AHRS.GetCosinePitch() * AHRS.GetCosineRoll();
     AHRS_Angles_Cosine = Constrain_Float(AHRS_Angles_Cosine, 0.5f, 1.0f);
@@ -36,9 +37,9 @@ int16_t Get_Angle_Boost(int16_t Throttle_Value)
     return Constrain_Float((float)(Throttle_Value - AttitudeThrottleMin) * AHRS_Angles_Cosine + AttitudeThrottleMin, AttitudeThrottleMin, MAX_STICKS_PULSE);
 }
 
-void Set_Throttle_Out(int16_t Throttle_Out, bool Apply_Angle_Boost)
+static void Set_Throttle_Out(int16_t Throttle_Out, bool _Apply_Angle_Boost)
 {
-    if (Apply_Angle_Boost)
+    if (_Apply_Angle_Boost)
     {
         RCController[THROTTLE] = Get_Angle_Boost(Throttle_Out);
     }
@@ -48,13 +49,14 @@ void Set_Throttle_Out(int16_t Throttle_Out, bool Apply_Angle_Boost)
     }
 }
 
-void ApplyThrottleBoost()
+void ApplyThrottleBoost(void)
 {
     if (!GetMultirotorEnabled()) //NÃO APLICA EM MODO AERO
     {
         return;
     }
-    Set_Throttle_Out(RCController[THROTTLE], IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE)); //APLIQUE APENAS NO MODO STABILIZE
+    const bool Apply_Angle_Boost = IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) && GPS_Resources.Navigation.AutoPilot.Control.Enabled;
+    Set_Throttle_Out(RCController[THROTTLE], Apply_Angle_Boost);
 #ifdef PRINTLN_THR_BOOST
     PRINTF.SendToConsole(ProgramMemoryString("RCController[THROTTLE]:%d\n"), RCController[THROTTLE]);
 #endif

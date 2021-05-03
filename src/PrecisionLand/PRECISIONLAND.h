@@ -18,7 +18,7 @@
 #ifndef PRECISIONLAND_H_
 #define PRECISIONLAND_H_
 #include "Build/LIBDEPENDENCIES.h"
-void Update_PrecisionLand();
-float GetAccelerationTotal();
-bool GetLandSuccess();
+void Update_PrecisionLand(void);
+float GetAccelerationTotal(void);
+bool GetLandSuccess(void);
 #endif

@@ -21,10 +21,10 @@
 class CheckSumClass
 {
 public:
-    uint16_t GetFailSafeValue;
-    uint8_t GetDevicesActived();
-    void UpdateServosReverse();
-    void UpdateChannelsReverse();
+  uint16_t GetFailSafeValue;
+  uint8_t GetDevicesActived(void);
+  void UpdateServosReverse(void);
+  void UpdateChannelsReverse(void);
 };
 extern CheckSumClass CHECKSUM;
 #endif

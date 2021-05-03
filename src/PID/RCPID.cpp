@@ -32,7 +32,9 @@
 
 FILE_COMPILE_FOR_SPEED
 
-PT1_Filter_Struct FixedWingTPAFilter;
+#ifndef __AVR_ATmega2560__
+PT1_Filter_Struct FixedWingTPA_Smooth;
+#endif
 
 //DEBUG
 //#define PRINTLN_TPA
@@ -111,15 +113,16 @@ void RC_PID_Update()
   //APLICA O BOOST NO THROTTLE PARA O MODO STABILIZE
   ApplyThrottleBoost();
 
+#ifndef __AVR_ATmega2560__
   if (GetAirPlaneEnabled() && (TPA_Parameters.FixedWingTauMS > 0))
   {
     if (!FixedWingTPAFilterInitalized)
     {
-      FixedWingTPAFilter.RC = TPA_Parameters.FixedWingTauMS * 1e-3f;
-      FixedWingTPAFilter.State = AttitudeThrottleMin;
+      FixedWingTPA_Smooth.RC = TPA_Parameters.FixedWingTauMS * 1e-3f;
+      FixedWingTPA_Smooth.State = AttitudeThrottleMin;
       FixedWingTPAFilterInitalized = true;
     }
-    int16_t FilteredThrottle = PT1FilterApply2(&FixedWingTPAFilter, RCController[THROTTLE], SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+    int16_t FilteredThrottle = PT1FilterApply2(&FixedWingTPA_Smooth, RCController[THROTTLE], SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
     if (FilteredThrottle != TPA_Parameters.PreviousThrottle)
     {
       TPA_Parameters.PreviousThrottle = FilteredThrottle;
@@ -127,6 +130,7 @@ void RC_PID_Update()
     }
   }
   else
+#endif
   {
     if (RCController[THROTTLE] != TPA_Parameters.PreviousThrottle)
     {

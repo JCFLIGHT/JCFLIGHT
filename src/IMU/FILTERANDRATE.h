@@ -15,11 +15,40 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MACHINEINIT_H_
-#define MACHINEINIT_H_
+#ifndef FILTERANDRATE_H_
+#define FILTERANDRATE_H_
 #include "Common/STRUCTS.h"
-extern MachineInitTime_Struct MachineInitTime;
-void SetInitialTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer);
-void CalculeTheFinalTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer);
-uint32_t GetTheFinalTimeToInitTheMachine(MachineInitTime_Struct *MachineInitTime_StructPointer);
+
+enum MPU_DLPF_Enum
+{
+    MPU_DLPF_10HZ = 5,
+    MPU_DLPF_20HZ = 4,
+    MPU_DLPF_42HZ = 3,
+    MPU_DLPF_98HZ = 2,
+    MPU_DLPF_188HZ = 1,
+    MPU_DLPF = 1,
+    MPU_DLPF_256HZ = 0
+};
+
+enum MPU_Gyro_LPF_Enum
+{
+    MPU_GYRO_LPF = 0,
+    GYRO_LPF_256HZ = 0,
+    GYRO_LPF_188HZ = 1,
+    GYRO_LPF_98HZ = 2,
+    GYRO_LPF_42HZ = 3,
+    GYRO_LPF_20HZ = 4,
+    GYRO_LPF_10HZ = 5,
+    GYRO_LPF_5HZ = 6,
+    GYRO_LPF_NONE = 7
+};
+
+typedef struct
+{
+    uint8_t GyroLPF;
+    uint16_t GyroRateInHz;
+    uint8_t Gyro_I2C_Register[2];
+} MPUGyroFilterAndRate_Struct;
+
+const MPUGyroFilterAndRate_Struct *IMUChooseGyroConfig(uint8_t DesiredGyroLPF, uint16_t DesiredRateInHz);
 #endif

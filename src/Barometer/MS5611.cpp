@@ -30,7 +30,7 @@ static struct
   uint8_t CountState;
 } StructBarometer;
 
-void MS5611_Initialization()
+void MS5611_Initialization(void)
 {
   I2C.WriteRegister(ADDRESS_BAROMETER_MS5611, 0x1E, 0);
   SCHEDULERTIME.Sleep(100);
@@ -117,7 +117,7 @@ static void CalculatePressure()
   Barometer.Raw.Pressure = (((StructBarometer.UP * Sense) / 2097152) - OffSet) / 32768;
 }
 
-void MS5611_Update()
+void MS5611_Update(void)
 {
   uint8_t Command_UT_UP;
   uint32_t *RawValue_UT_UP;
@@ -125,7 +125,7 @@ void MS5611_Update()
   switch (StructBarometer.CountState)
   {
   case 0:
-    RecalculateBaroTotalPressure();
+    Remove_Barometer_Spikes();
     RawValue_UT_UP = &StructBarometer.UT;
     Command_UT_UP = 0x48;
     break;
@@ -146,3 +146,94 @@ void MS5611_Update()
   UT_UP_Read(RawValue_UT_UP);
   UT_UP_Start(Command_UT_UP);
 }
+
+/*
+
+static uint32_t MS5611_UT;
+static uint32_t MS5611_UP;
+static uint16_t MS5611_ROM[8];
+static uint8_t MS5611_OSR = 0x08;
+
+static uint32_t MS5611_Read_Buffer(void)
+{
+  uint8_t MS5611Buffer[3];
+  I2C.RegisterBuffer(ADDRESS_BAROMETER_MS5611, 0x00, MS5611Buffer, 0x03);
+  return (MS5611Buffer[0] << 16) | (MS5611Buffer[1] << 8) | MS5611Buffer[2];
+}
+
+typedef enum
+{
+  BAROMETER_NEEDS_SAMPLES = 0,
+  BAROMETER_NEEDS_CALCULATION
+} BarometerState_Enum;
+
+static void MS5611Calculate(void)
+{
+  int64_t Temperature;
+  int64_t TemperatureDelta;
+  int64_t DeltaTime = (int64_t)MS5611_UT - ((uint64_t)MS5611_ROM[5] * 256);
+  int64_t OffSet = ((int64_t)MS5611_ROM[2] << 16) + (((int64_t)MS5611_ROM[4] * DeltaTime) >> 7);
+  int64_t Scale = ((int64_t)MS5611_ROM[1] << 15) + (((int64_t)MS5611_ROM[3] * DeltaTime) >> 8);
+  Temperature = 2000 + ((DeltaTime * (int64_t)MS5611_ROM[6]) >> 23);
+
+  if (Temperature < 2000)
+  {
+    TemperatureDelta = Temperature - 2000;
+    TemperatureDelta = 5 * TemperatureDelta * TemperatureDelta;
+    OffSet -= TemperatureDelta >> 1;
+    Scale -= TemperatureDelta >> 2;
+    if (Temperature < -1500)
+    {
+      TemperatureDelta = Temperature + 1500;
+      TemperatureDelta = TemperatureDelta * TemperatureDelta;
+      OffSet -= 7 * TemperatureDelta;
+      Scale -= (11 * TemperatureDelta) >> 1;
+    }
+    Temperature -= ((DeltaTime * DeltaTime) >> 31);
+  }
+
+  Barometer.Raw.Pressure = ((((int64_t)MS5611_UP * Scale) >> 21) - OffSet) >> 15;
+  Barometer.Raw.Temperature = Temperature;
+}
+
+uint32_t BaroUpdate(void)
+{
+  static BarometerState_Enum State = BAROMETER_NEEDS_SAMPLES;
+
+  switch (State)
+  {
+
+  default:
+  case BAROMETER_NEEDS_SAMPLES:
+    MS5611_UT = MS5611_Read_Buffer();
+    I2C.WriteRegister(ADDRESS_BAROMETER_MS5611, 0x40 + 0x00 + MS5611_OSR, 0x01);
+    State = BAROMETER_NEEDS_CALCULATION;
+    return 10000;
+    break;
+
+  case BAROMETER_NEEDS_CALCULATION:
+    MS5611_UP = MS5611_Read_Buffer();
+    I2C.WriteRegister(ADDRESS_BAROMETER_MS5611, 0x40 + 0x10 + MS5611_OSR, 0x01);
+    MS5611Calculate();
+    //Barometer.Raw.Pressure = applyBarometerMedianFilter(Barometer.Raw.Pressure);
+    State = BAROMETER_NEEDS_SAMPLES;
+    return 10000;
+    break;
+  }
+}
+
+void MS5611_Initialization()
+{
+  for (uint8_t IndexCount = 0; IndexCount < 8; IndexCount++)
+  {
+    uint8_t MS5611Buffer[2] = {0, 0};
+    I2C.RegisterBuffer(ADDRESS_BAROMETER_MS5611, 0xA0 + IndexCount * 2, MS5611Buffer, 0x02);
+    MS5611_ROM[IndexCount] = (MS5611Buffer[0] << 8 | MS5611Buffer[1]);
+  }
+}
+
+void MS5611_Update()
+{
+  BaroUpdate();
+}
+*/

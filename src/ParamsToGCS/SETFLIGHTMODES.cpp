@@ -20,14 +20,14 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "Common/ENUM.h"
 
-void SetFlightModeToGCS()
+void SetFlightModeToGCS(void)
 {
-  if ((GPSParameters.Mode.Navigation == DO_LAND_SETTLE) ||
-      (GPSParameters.Mode.Navigation == DO_LAND_DESCENT) ||
-      (GPSParameters.Mode.Navigation == DO_LAND_DETECTED) ||
-      (GPSParameters.Mode.Navigation == DO_LANDED))
+  if ((GPS_Resources.Mode.Navigation == DO_LAND_SETTLE) ||
+      (GPS_Resources.Mode.Navigation == DO_LAND_DESCENT) ||
+      (GPS_Resources.Mode.Navigation == DO_LAND_DETECTED) ||
+      (GPS_Resources.Mode.Navigation == DO_LANDED))
   {
-    if (GPSParameters.Mode.Navigation == DO_LANDED)
+    if (GPS_Resources.Mode.Navigation == DO_LANDED)
     {
       FlightMode = GCS_LANDED_MODE;
     }

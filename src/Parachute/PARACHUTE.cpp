@@ -43,7 +43,7 @@ void ParachuteClass::Auto_Do_Now(bool ActiveParachute)
   PARACHUTE.ParachuteReleased = true;
 }
 
-void ParachuteClass::Manual_Do_Now()
+void ParachuteClass::Manual_Do_Now(void)
 {
   if (!PARACHUTE.ParachuteReleased)
   {
@@ -67,7 +67,7 @@ void ParachuteClass::Manual_Do_Now()
   PARACHUTE.ParachuteReleased = true;
 }
 
-void ParachuteClass::Manual_Detect_Channel()
+void ParachuteClass::Manual_Detect_Channel(void)
 {
   switch (ParachuteDetectTrigger)
   {
@@ -170,7 +170,7 @@ void ParachuteClass::Manual_Detect_Channel()
   }
 }
 
-bool ParachuteClass::GetSafeStateToDisarmMotors()
+bool ParachuteClass::GetSafeStateToDisarmMotors(void)
 {
   if (ParachuteDetectTrigger == 0)
   {
@@ -183,12 +183,12 @@ bool ParachuteClass::GetSafeStateToDisarmMotors()
   return false;
 }
 
-bool ParachuteClass::Released()
+bool ParachuteClass::Released(void)
 {
   return (PARACHUTE.ParachuteReleased && PARACHUTE.ReleasedOverFlowTime());
 }
 
-bool ParachuteClass::ReleasedOverFlowTime()
+bool ParachuteClass::ReleasedOverFlowTime(void)
 {
   if (SCHEDULERTIME.GetMillis() - PARACHUTE.OverFlowTime >= MOTORS_DISARM_TIME)
   {

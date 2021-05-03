@@ -28,13 +28,6 @@
 
 CompassCalClass COMPASSCAL;
 
-#ifdef __AVR_ATmega2560__
-//TEMPO MAXIMO DE CALIBRAÇÃO DO COMPASS
-#define CALIBRATION_COUNT 60 //SEGUNDOS
-#else
-#define CALIBRATION_COUNT JCF_Param.Compass_Cal_Timer
-#endif
-
 void CompassCalClass::ApplyGain()
 {
     //APLICA O GANHO CALCULADO
@@ -63,7 +56,7 @@ void CompassCalClass::RunningCalibration()
     else
     {
         Calibration.Magnetometer.Count++;
-        if (Calibration.Magnetometer.Count < (CALIBRATION_COUNT * 10))
+        if (Calibration.Magnetometer.Count < (JCF_Param.Compass_Cal_Timer * 10))
         {
             RGB.Function(CALL_LED_MAG_CALIBRATION);
             if (Calibration.Magnetometer.Count == 1)

@@ -18,7 +18,8 @@
 #ifndef IBUSREAD_H_
 #define IBUSREAD_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern uint16_t IBUSReadChannels[12];
+#include "Build/BOARDDEFS.h"
+extern uint16_t IBUSReadChannels[IBUS_MAX_CHANNELS];
 class IBUSClass
 {
 public:

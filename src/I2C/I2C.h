@@ -31,7 +31,7 @@ public:
   void Write(uint8_t SendData);
   void Stop(void);
   void SensorsRead(uint8_t Address, uint8_t Register);
-  void WriteRegister(uint8_t Address, uint8_t Register, uint8_t Value);
+  void WriteRegister(uint8_t Address, uint8_t Register, uint8_t Data);
   void RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size);
 
 private:

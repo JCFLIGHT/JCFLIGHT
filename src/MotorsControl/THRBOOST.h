@@ -18,5 +18,5 @@
 #ifndef THRBOOST_H_
 #define THRBOOST_H_
 #include "Build/LIBDEPENDENCIES.h"
-void ApplyThrottleBoost();
+void ApplyThrottleBoost(void);
 #endif

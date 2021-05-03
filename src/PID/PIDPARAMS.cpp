@@ -17,7 +17,6 @@
 
 #include "PIDPARAMS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "IOMCU/IOMCU.h"
 #include "BAR/BAR.h"
 #include "Common/ENUM.h"
 
@@ -86,6 +85,38 @@ void Load_All_PID_Params(void)
     //GET_SET[PID_GPS_POSITION].kI = 90;
     //GET_SET[PID_GPS_POSITION].kD = 0;
 
+    //APENAS TEMPORARIAMENTE
+    uint8_t ActualFrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR);
+    if (ActualFrameType == QUAD_X ||
+        ActualFrameType == HEXA_X ||
+        ActualFrameType == HEXA_I ||
+        ActualFrameType == ZMR_250 ||
+        ActualFrameType == TBS)
+    {
+        //RATE DO PID DA RETENÇÃO DE POSIÇÃO (GPS-HOLD)
+        GET_SET[PID_GPS_POSITION_RATE].kP = 70;
+        GET_SET[PID_GPS_POSITION_RATE].kI = 20;
+        GET_SET[PID_GPS_POSITION_RATE].kD = 20;
+
+        //RATE DE NAVEGAÇÃO (RTH E MISSÃO)
+        GET_SET[PID_GPS_NAVIGATION_RATE].kP = 25;
+        GET_SET[PID_GPS_NAVIGATION_RATE].kI = 33;
+        GET_SET[PID_GPS_NAVIGATION_RATE].kD = 83;
+    }
+    else //AEROS
+    {
+        //RATE DO PID DA RETENÇÃO DE POSIÇÃO (CRUISE OU CIRCULOS)
+        GET_SET[PID_GPS_POSITION_RATE].kP = 75;
+        GET_SET[PID_GPS_POSITION_RATE].kI = 5;
+        GET_SET[PID_GPS_POSITION_RATE].kD = 8;
+
+        //RATE DE NAVEGAÇÃO DO CONTROLE DO LEME
+        GET_SET[PID_GPS_NAVIGATION_RATE].kP = 30;
+        GET_SET[PID_GPS_NAVIGATION_RATE].kI = 2;
+        GET_SET[PID_GPS_NAVIGATION_RATE].kD = 0;
+    }
+
+    /*
     //RATE DO PID DA RETENÇÃO DE POSIÇÃO (GPS-HOLD)
     GET_SET[PID_GPS_POSITION_RATE].kP = 70;
     GET_SET[PID_GPS_POSITION_RATE].kI = 20;
@@ -95,6 +126,7 @@ void Load_All_PID_Params(void)
     GET_SET[PID_GPS_NAVIGATION_RATE].kP = 25;
     GET_SET[PID_GPS_NAVIGATION_RATE].kI = 33;
     GET_SET[PID_GPS_NAVIGATION_RATE].kD = 83;
+*/
 
     //HEADING-HOLD RATE
     //GET_SET[P_YAW_RATE].kP = 60;
@@ -168,29 +200,32 @@ void UpdateValuesOfPID()
                 STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 40);
                 STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, 30);
                 STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 23);
-
-                //FEED-FORWAD OU CONTROLE DERIVATIVO
                 STORAGEMANAGER.Write_8Bits(FF_OR_CD_PITCH_ADDR, 60);
 
                 //ROLL
                 STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 40);
                 STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 30);
                 STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 23);
-
-                //FEED-FORWAD OU CONTROLE DERIVATIVO
                 STORAGEMANAGER.Write_8Bits(FF_OR_CD_ROLL_ADDR, 60);
 
                 //YAW
                 STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 85);
                 STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 45);
                 STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, 0);
-
-                //FEED-FORWAD OU CONTROLE DERIVATIVO
                 STORAGEMANAGER.Write_8Bits(FF_OR_CD_YAW_ADDR, 60);
 
                 //AUTO-NÍVEL
                 STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
                 STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 15);
+
+                //ALTITUDE-HOLD
+                STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 3);
+                STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 5);
+                STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 10);
+
+                //GPS-HOLD
+                STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 100);
+                STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 90);
 
                 //ÂNGULOS DE NAVEGAÇÃO
                 STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 30);
@@ -198,60 +233,60 @@ void UpdateValuesOfPID()
                 STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 30);
                 STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
                 STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
+
+                //RTH ALTITUDE
+                STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 10);
             }
             else if (ActualFrameType == AIR_PLANE ||
                      ActualFrameType == FIXED_WING ||
-                     ActualFrameType == PLANE_VTAIL)
+                     ActualFrameType == AIR_PLANE_VTAIL)
             {
                 //PITCH
                 STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 5);
                 STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, 7);
                 STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 0);
-
-                //FEED-FORWAD OU CONTROLE DERIVATIVO
                 STORAGEMANAGER.Write_8Bits(FF_OR_CD_PITCH_ADDR, 50);
 
                 //ROLL
                 STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 5);
                 STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 7);
                 STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 0);
-
-                //FEED-FORWAD OU CONTROLE DERIVATIVO
                 STORAGEMANAGER.Write_8Bits(FF_OR_CD_ROLL_ADDR, 50);
 
                 //YAW
                 STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 6);
                 STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 10);
                 STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, 0);
-
-                //FEED-FORWAD OU CONTROLE DERIVATIVO
                 STORAGEMANAGER.Write_8Bits(FF_OR_CD_YAW_ADDR, 60);
 
                 //AUTO-NÍVEL
                 STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
                 STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 5);
 
+                //ALTITUDE-HOLD
+                STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 40);
+                STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 5);
+                STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 10);
+
+                //AUTO-THROTTLE
+                STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 150);
+                STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 70);
+
                 //ÂNGULOS DE NAVEGAÇÃO
                 STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 45);
                 STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 20);
                 STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 25);
-                STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
+                STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 75);
                 STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
-            }
 
-            //ALTITUDE-HOLD E AUTO-THROTTLE
-            STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 3);
-            STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 50);
-            STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 20);
+                //RTH ALTITUDE
+                STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 40);
+            }
 
             //VELOCIDADE Z
             STORAGEMANAGER.Write_8Bits(KP_VEL_Z_ADDR, 50);
             STORAGEMANAGER.Write_8Bits(KI_VEL_Z_ADDR, 20);
             STORAGEMANAGER.Write_8Bits(KD_VEL_Z_ADDR, 16);
-
-            //GPS-HOLD
-            STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 100);
-            STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 90);
 
             //HEADING-HOLD
             STORAGEMANAGER.Write_8Bits(KP_HEADING_HOLD_ADDR, 60);

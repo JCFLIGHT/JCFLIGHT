@@ -22,13 +22,15 @@
 class BEEPERCLASS
 {
 public:
-  void Run();
   void Play(Beeper_Mode Mode);
-  void Silence();
+  void Silence(void);
+  bool GetSafeToOthersBeeps(void);
+  void UpdateSafeToOthersBeepsCounter(void);
+  void Run(void);
 
 private:
-  void Update();
-  void ProcessCommand();
+  void Update(void);
+  void ProcessCommand(void);
 };
 extern BEEPERCLASS BEEPER;
 #endif

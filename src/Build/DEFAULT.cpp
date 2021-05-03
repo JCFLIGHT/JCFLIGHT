@@ -76,7 +76,7 @@ void FirmwareOrganizeAllParams(void)
     if (!CheckActualFormatVersion())
     {
         LOG("Restaurando os valores de fabrica dos parametros...");
-        for (uint8_t i = 0; i < 5; i++) //FORÇA UMA REPETIÇÃO DE 5 VEZES
+        for (uint8_t IndexCount = 0; IndexCount < 5; IndexCount++) //FORÇA UMA REPETIÇÃO DE 5 VEZES
         {
             RecallAllParams();
         }

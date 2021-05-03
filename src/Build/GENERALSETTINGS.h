@@ -17,5 +17,5 @@
 
 #ifndef GENERALSETTINGS_H_
 #define GENERALSETTINGS_H_
-void GeneralSettingsInitialization();
+void GeneralSettingsInitialization(void);
 #endif

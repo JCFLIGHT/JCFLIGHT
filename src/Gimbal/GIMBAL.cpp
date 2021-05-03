@@ -21,8 +21,10 @@
 #include "MotorsControl/MOTORS.h"
 #include "Common/RCDEFINES.h"
 #include "Common/ENUM.h"
+#include "Math/MATHSUPPORT.h"
+#include "Param/PARAM.h"
 
-void Gimbal_Controll()
+void Gimbal_Controll(void)
 {
   //CONTROLE DO GIMBAL
   if (GimbalControlAux == NONE)
@@ -61,4 +63,7 @@ void Gimbal_Controll()
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX8);
   }
+#ifndef __AVR_ATmega2560__
+  Constrain_16Bits(MotorControl[GIMBAL], JCF_Param.GimbalMinValue, JCF_Param.GimbalMaxValue);
+#endif
 }

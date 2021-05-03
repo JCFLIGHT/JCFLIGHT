@@ -19,11 +19,8 @@
 #define ACCGYROREAD_H_
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
-#include "IMUDEFS.h"
 extern IMU_Struct IMU;
-void IMU_Filters_Initialization();
-void Acc_Initialization();
-void Gyro_Initialization();
-void Acc_ReadBufferData();
-void Gyro_ReadBufferData();
+void MPU6050AccAndGyroInitialization(void);
+void Acc_ReadBufferData(void);
+void Gyro_ReadBufferData(void);
 #endif

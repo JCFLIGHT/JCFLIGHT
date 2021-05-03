@@ -20,8 +20,6 @@
 #include "Math/MATHSUPPORT.h"
 #include "PerformanceCalibration/PERFORMACC.h"
 
-bool AccCalibratedPosition[6];
-
 int8_t GetAxisInclinedToCalibration(int16_t AccSample[3])
 {
   if ((ABS(AccSample[ROLL]) / 1.5f) > ABS(AccSample[PITCH]) &&
@@ -61,32 +59,32 @@ uint8_t GetImageToGCS(void)
     return 0x3F;
   }
 
-  if (AccCalibratedPosition[0])
+  if (Calibration.Accelerometer.Flags.CalibratedPosition[0])
   {
     FlagCheck |= (1 << ImageBitMap[0]);
   }
 
-  if (AccCalibratedPosition[1])
+  if (Calibration.Accelerometer.Flags.CalibratedPosition[1])
   {
     FlagCheck |= (1 << ImageBitMap[1]);
   }
 
-  if (AccCalibratedPosition[2])
+  if (Calibration.Accelerometer.Flags.CalibratedPosition[2])
   {
     FlagCheck |= (1 << ImageBitMap[2]);
   }
 
-  if (AccCalibratedPosition[3])
+  if (Calibration.Accelerometer.Flags.CalibratedPosition[3])
   {
     FlagCheck |= (1 << ImageBitMap[3]);
   }
 
-  if (AccCalibratedPosition[4])
+  if (Calibration.Accelerometer.Flags.CalibratedPosition[4])
   {
     FlagCheck |= (1 << ImageBitMap[4]);
   }
 
-  if (AccCalibratedPosition[5])
+  if (Calibration.Accelerometer.Flags.CalibratedPosition[5])
   {
     FlagCheck |= (1 << ImageBitMap[5]);
   }

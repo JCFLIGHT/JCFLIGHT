@@ -23,7 +23,7 @@ FILE_COMPILE_FOR_SPEED
 
 BiQuadFilter BIQUADFILTER;
 
-float FilterGetLPF_Quality()
+float FilterGetLPF_Quality(void)
 {
   return 1.0f / Fast_SquareRoot(2.0f);
 }

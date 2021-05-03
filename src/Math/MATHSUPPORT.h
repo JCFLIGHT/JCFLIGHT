@@ -40,6 +40,8 @@
   }))
 #define _ABS_I(x, var) _ABS_II(x, var)
 #define ABS(x) _ABS_I(x, _CHOOSE_VAR(_abs, __COUNTER__))
+#define GRAVITY_MSS 9.80665f  //VALOR DA GRAVIDADE EM M/S^2
+#define GRAVITY_CMSS 980.665f //VALOR DA GRAVIDADE EM CM/S^2
 float Constrain_Float(float ValueInput, float ValueInputMin, float ValueInputMax);
 int8_t Constrain_8Bits(int8_t ValueInput, int8_t ValueInputMin, int8_t ValueInputMax);
 uint8_t Constrain_U8Bits(uint8_t ValueInput, uint8_t ValueInputMin, uint8_t ValueInputMax);
@@ -56,12 +58,14 @@ float ConvertToRadians(float InputValue);
 float ConvertRadiansToDeciDegrees(float Inputvalue);
 float ConvertDeciDegreesToRadians(float Inputvalue);
 float ConvertDeciDegreesToDegrees(float Inputvalue);
+float ConvertCentiDegreesToDeciDegrees(float Inputvalue);
 float ConvertDegreesToDecidegrees(float Inputvalue);
 float ConvertDecidegreesToCentiDegrees(float Inputvalue);
+float ConvertDegreesToCentiDegrees(float Inputvalue);
+float ConvertRadiansToCentiDegrees(float Inputvalue);
 float ConvertCentiDegreesToRadians(float Inputvalue);
 float ConvertCentiDegreesToDegrees(float Inputvalue);
 float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput);
-float ConvertAccelerationToCMSS(float InputAcc);
 float ConvertCMToMeters(int32_t CM_Input);
 int32_t ConverMetersToCM(float Meters_Input);
 float Fast_SquareRoot(float ValueInput);
@@ -74,7 +78,9 @@ float Fast_AtanCosine(float X);
 float Sine_Curve(const float InputValue, const float CurveWidth);
 float Fast_Tangent(float InputValue);
 int32_t WRap_18000(int32_t AngleInput);
+int32_t WRap_36000(int32_t AngleInput);
 float Fast_Pow(float ValueA, float ValueB);
 float Power_Float(float Base, int16_t Exponential);
 float ConvertCentimeterPerSecondsToKmPerHour(float Value);
+float Power3_Float(float InputValue);
 #endif

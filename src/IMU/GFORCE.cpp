@@ -23,18 +23,19 @@
 #include "Build/BOARDDEFS.h"
 #include "IMU/ACCGYROREAD.h"
 #include "FastSerial/PRINTF.h"
+#include "Build/GCC.h"
+
+FILE_COMPILE_FOR_SPEED
 
 PT1_Filter_Struct GravityForce_Smooth;
 
-#define GRAVITY_MSS 9.80665f //M/S^2
-
-void IMU_GForce_Update()
+void IMU_GForce_Update(void)
 {
   IMU.Accelerometer.GravityForce.Value = Fast_SquareRoot(VectorNormSquared(&BodyFrameAcceleration)) / GRAVITY_MSS;
 
   if (IMU.Accelerometer.GravityForce.Initialization)
   {
-    IMU.Accelerometer.GravityForce.Value = PT1FilterApply2(&GravityForce_Smooth, IMU.Accelerometer.GravityForce.Value, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+    IMU.Accelerometer.GravityForce.Value = PT1FilterApply2(&GravityForce_Smooth, IMU.Accelerometer.GravityForce.Value, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
   }
   else
   {

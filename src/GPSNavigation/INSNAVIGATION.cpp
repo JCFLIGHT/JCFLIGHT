@@ -24,33 +24,30 @@
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Param/PARAM.h"
 #include "PID/RCPID.h"
+#include "Scheduler/SCHEDULER.h"
+#include "FrameStatus/FRAMESTATUS.h"
+#include "RadioControl/CURVESRC.h"
 
-#define POS_HOLD_DEADBAND 20
-
-void SetThisPointToPositionHold(void)
+void MultirotorSetThisPointToPositionHold(void)
 {
-    INS.Position.Hold[COORD_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + INS.EarthFrame.Velocity[INS_LATITUDE] * PositionHoldPID.kI;
-    INS.Position.Hold[COORD_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + INS.EarthFrame.Velocity[INS_LONGITUDE] * PositionHoldPID.kI;
+    INS.Position.Hold[INS_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + INS.EarthFrame.Velocity[INS_LATITUDE] * PositionHoldPID.kI;
+    INS.Position.Hold[INS_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + INS.EarthFrame.Velocity[INS_LONGITUDE] * PositionHoldPID.kI;
 }
 
-static void ApplyINSPositionHoldPIDControl(float DeltaTime)
+static void MultirotorApplyINSPositionHoldPIDControl(float DeltaTime)
 {
     static bool NewPointToPositionHold = false;
-
-    //--------PARAMETRO DE CONFIG PARA O USUARIO--------//
-    float MaxManualSpeed = 500; //CM/S
-    //--------------------------------------------------//
 
     if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && (JCF_Param.AutoPilotMode == AUTOPILOT_MODE_CRUISE))
     {
         if (RCController[PITCH] || RCController[ROLL]) //CHECA SE OS STICKS DO RÁDIO FORAM MANIPULADOS
         {
-            const float RadioControllVelocityRoll = RCController[PITCH] * MaxManualSpeed / (float)(500 - POS_HOLD_DEADBAND);
-            const float RadioControllVelocityPitch = RCController[ROLL] * MaxManualSpeed / (float)(500 - POS_HOLD_DEADBAND);
+            const float RadioControllVelocityRoll = RCController[PITCH] * MAX_MANUAL_SPEED / (float)(500 - POS_HOLD_DEADBAND);
+            const float RadioControllVelocityPitch = RCController[ROLL] * MAX_MANUAL_SPEED / (float)(500 - POS_HOLD_DEADBAND);
 
             //ROTACIONA AS VELOCIDADES DO BODY-FRAME PARA EARTH-FRAME
-            const float NEUVelocityRoll = RadioControllVelocityRoll * INS.Math.Cosine_Yaw - RadioControllVelocityPitch * INS.Math.Sine_Yaw;
-            const float NEUVelocityPitch = RadioControllVelocityRoll * INS.Math.Sine_Yaw + RadioControllVelocityPitch * INS.Math.Cosine_Yaw;
+            const float NEUVelocityRoll = RadioControllVelocityRoll * INS.Math.Cosine.Yaw - RadioControllVelocityPitch * INS.Math.Sine.Yaw;
+            const float NEUVelocityPitch = RadioControllVelocityRoll * INS.Math.Sine.Yaw + RadioControllVelocityPitch * INS.Math.Cosine.Yaw;
 
             //CALCULA UMA NOVA POSIÇÃO
             INS.Position.Hold[INS_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + (NEUVelocityRoll * PositionHoldPID.kI);
@@ -62,7 +59,7 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
         {
             if (NewPointToPositionHold)
             {
-                SetThisPointToPositionHold();
+                MultirotorSetThisPointToPositionHold();
                 NewPointToPositionHold = false;
             }
         }
@@ -73,24 +70,54 @@ static void ApplyINSPositionHoldPIDControl(float DeltaTime)
         int32_t PositionError = INS.Position.Hold[IndexCount] - INS.EarthFrame.Position[IndexCount];
         int32_t TargetPositionError = Constrain_32Bits(GPSGetProportional(PositionError, &PositionHoldPID), -1000, 1000);
         int32_t FinalPositionError = Constrain_32Bits(TargetPositionError - INS.EarthFrame.Velocity[IndexCount], -1000, 1000);
-        GPSParameters.Navigation.AutoPilot.INS.Angle[IndexCount] = GPSGetProportional(FinalPositionError, &PositionHoldRatePID) + GPSGetIntegral(FinalPositionError, DeltaTime, &PositionHoldRatePIDArray[IndexCount], &PositionHoldRatePID);
-        GPSParameters.Navigation.AutoPilot.INS.Angle[IndexCount] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[IndexCount] * PositionHoldRatePID.kD), -2000, 2000);
-        GPSParameters.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPSParameters.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MaxValue));
+        GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount] = GPSGetProportional(FinalPositionError, &PositionHoldRatePID) + GPSGetIntegral(FinalPositionError, DeltaTime, &PositionHoldRatePIDArray[IndexCount], &PositionHoldRatePID);
+        GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[IndexCount] * PositionHoldRatePID.kD), -2000, 2000);
+        GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MaxValue));
         NavigationPIDArray[IndexCount].GPSFilter.IntegralSum = PositionHoldRatePIDArray[IndexCount].GPSFilter.IntegralSum;
     }
 }
 
-void ApplyPosHoldPIDControl(float DeltaTime)
+static void MultirotorApplyPosHoldPIDControl(float DeltaTime)
 {
     if (!GetTakeOffInProgress() && !GetGroundDetectedFor100ms())
     {
-        ApplyINSPositionHoldPIDControl(DeltaTime);
+        MultirotorApplyINSPositionHoldPIDControl(DeltaTime);
     }
     else
     {
-        GPSParameters.Navigation.AutoPilot.INS.Angle[COORD_LATITUDE] = 0;
-        GPSParameters.Navigation.AutoPilot.INS.Angle[COORD_LONGITUDE] = 0;
+        GPS_Resources.Navigation.AutoPilot.INS.Angle[COORD_LATITUDE] = 0;
+        GPS_Resources.Navigation.AutoPilot.INS.Angle[COORD_LONGITUDE] = 0;
         GPSResetPID(&PositionHoldRatePIDArray[COORD_LATITUDE]);
         GPSResetPID(&PositionHoldRatePIDArray[COORD_LONGITUDE]);
+    }
+}
+
+void MultirotorUpdateAutoPilotControl(void)
+{
+    if (!GetMultirotorEnabled())
+    {
+        return;
+    }
+
+    bool AltHoldControlApplied = ApplyAltitudeHoldControl();
+    static Scheduler_Struct GPSControlTimer;
+    if (!AltHoldControlApplied && Scheduler(&GPSControlTimer, SCHEDULER_SET_FREQUENCY(50, "Hz")))
+    {
+        if (GPS_Resources.Navigation.AutoPilot.Control.Enabled)
+        {
+            if (Get_Safe_State_To_Apply_Position_Hold())
+            {
+                float DeltaTime = GPSControlTimer.ActualTime * 1e-6f;
+                MultirotorApplyPosHoldPIDControl(DeltaTime);
+            }
+            GPS_Resources.Navigation.AutoPilot.Control.Angle[ROLL] = PIDAngleToRcController(GPS_Resources.Navigation.AutoPilot.INS.Angle[COORD_LONGITUDE] * INS.Math.Cosine.Yaw - GPS_Resources.Navigation.AutoPilot.INS.Angle[COORD_LATITUDE] * INS.Math.Sine.Yaw, ConvertDegreesToDecidegrees(GET_SET[MAX_ROLL_LEVEL].MaxValue));
+            GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = PIDAngleToRcController(GPS_Resources.Navigation.AutoPilot.INS.Angle[COORD_LONGITUDE] * INS.Math.Sine.Yaw + GPS_Resources.Navigation.AutoPilot.INS.Angle[COORD_LATITUDE] * INS.Math.Cosine.Yaw, ConvertDegreesToDecidegrees(GET_SET[MAX_PITCH_LEVEL].MaxValue));
+        }
+        else
+        {
+            GPS_Resources.Navigation.AutoPilot.Control.Angle[ROLL] = 0;
+            GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
+            GPS_Resources.Navigation.AutoPilot.Control.Angle[YAW] = 0;
+        }
     }
 }

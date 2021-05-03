@@ -104,17 +104,32 @@ float ConvertDeciDegreesToRadians(float Inputvalue)
 
 float ConvertDeciDegreesToDegrees(float Inputvalue)
 {
-    return Inputvalue / 10;
+    return Inputvalue / 10.0f;
+}
+
+float ConvertCentiDegreesToDeciDegrees(float Inputvalue)
+{
+    return Inputvalue / 10.0f;
 }
 
 float ConvertDegreesToDecidegrees(float Inputvalue)
 {
-    return Inputvalue * 10;
+    return Inputvalue * 10.0f;
 }
 
 float ConvertDecidegreesToCentiDegrees(float Inputvalue)
 {
-    return Inputvalue * 10;
+    return Inputvalue * 10.0f;
+}
+
+float ConvertDegreesToCentiDegrees(float Inputvalue)
+{
+    return Inputvalue * 100.0f;
+}
+
+float ConvertRadiansToCentiDegrees(float Inputvalue)
+{
+    return ((Inputvalue * 100.0f) * 0.01745329251994329576923690768489f);
 }
 
 float ConvertCentiDegreesToRadians(float Inputvalue)
@@ -132,14 +147,9 @@ float ConvertCoordinateToFloatingPoint(int32_t CoordinateInput)
     return CoordinateInput * 1.0e-7f;
 }
 
-float ConvertAccelerationToCMSS(float InputAcc)
-{
-    return InputAcc * (GRAVITY_CMSS / ACC_1G);
-}
-
 float ConvertCMToMeters(int32_t CM_Input)
 {
-    return CM_Input / 100;
+    return CM_Input / 100.0f;
 }
 
 int32_t ConverMetersToCM(float Meters_Input)
@@ -338,6 +348,19 @@ int32_t WRap_18000(int32_t AngleInput)
     return AngleInput;
 }
 
+int32_t WRap_36000(int32_t AngleInput)
+{
+    if (AngleInput > 36000)
+    {
+        AngleInput -= 36000;
+    }
+    if (AngleInput < 0)
+    {
+        AngleInput += 36000;
+    }
+    return AngleInput;
+}
+
 float Fast_Exponential(float InputValue)
 {
     union
@@ -393,4 +416,9 @@ float Power_Float(float Base, int16_t Exponential) //X^Y
 float ConvertCentimeterPerSecondsToKmPerHour(float Value)
 {
     return Value / 27.778f;
+}
+
+float Power3_Float(float InputValue)
+{
+    return ((InputValue) * (InputValue) * (InputValue));
 }

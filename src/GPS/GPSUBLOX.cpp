@@ -18,7 +18,6 @@
 #include "GPSUBLOX.h"
 #include "FastSerial/FASTSERIAL.h"
 #include "GPSNavigation/NAVIGATION.h"
-#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "ProgMem/PROGMEM.h"
 #include "Common/ENUM.h"
@@ -362,28 +361,28 @@ void UBLOX_GetAllGPSData(void)
   {
 
   case MSG_POSLLH:
-    GPSParameters.Navigation.Coordinates.Actual[COORD_LATITUDE] = Buffer.PositionLLH.Latitude;
-    GPSParameters.Navigation.Coordinates.Actual[COORD_LONGITUDE] = Buffer.PositionLLH.Longitude;
-    GPSParameters.Navigation.Misc.Get.Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
+    GPS_Resources.Navigation.Coordinates.Actual[COORD_LATITUDE] = Buffer.PositionLLH.Latitude;
+    GPS_Resources.Navigation.Coordinates.Actual[COORD_LONGITUDE] = Buffer.PositionLLH.Longitude;
+    GPS_Resources.Navigation.Misc.Get.Altitude = Buffer.PositionLLH.Altitude_MSL / 1000;
     break;
 
   case MSG_STATUS:
-    GPSParameters.Navigation.Misc.Get.Marked3DFix = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
+    GPS_Resources.Navigation.Misc.Get.Marked3DFix = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
     break;
 
   case MSG_SOL:
-    GPSParameters.Navigation.Misc.Get.Marked3DFix = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
-    GPSParameters.Navigation.Misc.Get.Satellites = Buffer.Solution.Satellites;
-    GPSParameters.Navigation.Misc.Get.HDOP = Buffer.Solution.Position_DOP;
+    GPS_Resources.Navigation.Misc.Get.Marked3DFix = (Buffer.Solution.Fix_Status & 1) && (Buffer.Solution.Fix_Type == FIX_3D);
+    GPS_Resources.Navigation.Misc.Get.Satellites = Buffer.Solution.Satellites;
+    GPS_Resources.Navigation.Misc.Get.HDOP = Buffer.Solution.Position_DOP;
     break;
 
   case MSG_VELNED:
-    GPSParameters.Navigation.Misc.Get.GroundSpeed = Buffer.VelocityNED.Speed_2D;
-    GPSParameters.Navigation.Misc.Get.GroundCourse = (uint16_t)(Buffer.VelocityNED.Heading_2D / 10000);
-    GPSParameters.Navigation.Misc.Velocity.Get[NORTH] = Buffer.VelocityNED.North;
-    GPSParameters.Navigation.Misc.Velocity.Get[EAST] = Buffer.VelocityNED.East;
-    GPSParameters.Navigation.Misc.Velocity.Get[DOWN] = Buffer.VelocityNED.Down;
-    GPSParameters.Navigation.Misc.Velocity.NEDStatus = true;
+    GPS_Resources.Navigation.Misc.Get.GroundSpeed = Buffer.VelocityNED.Speed_2D;
+    GPS_Resources.Navigation.Misc.Get.GroundCourse = (uint16_t)(Buffer.VelocityNED.Heading_2D / 10000);
+    GPS_Resources.Navigation.Misc.Velocity.Get[NORTH] = Buffer.VelocityNED.North;
+    GPS_Resources.Navigation.Misc.Velocity.Get[EAST] = Buffer.VelocityNED.East;
+    GPS_Resources.Navigation.Misc.Velocity.Get[DOWN] = Buffer.VelocityNED.Down;
+    GPS_Resources.Navigation.Misc.Velocity.NEDStatus = true;
     break;
   }
 }

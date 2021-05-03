@@ -19,7 +19,6 @@
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "GPSNavigation/INSNAVIGATION.h"
-#include "GPSNavigation/AIRPLANENAVIGATION.h"
 #include "RadioControl/RCSTATES.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "GPS/GPSSTATES.h"
@@ -33,7 +32,7 @@ bool Do_Altitude_Hold = false;
 bool Do_RTH_Or_Land_Call_Alt_Hold = false;
 bool Do_Pos_Hold_Call_Alt_Hold = false;
 
-bool Get_Multirotor_GPS_FlightModes_Once()
+static bool Get_Multirotor_GPS_FlightModes_Once(void)
 {
   static uint8_t Previous_Mode = 0;
   uint8_t Check_Actual_State = ((IS_FLIGHT_MODE_ACTIVE(LAND_MODE) << 2) +
@@ -47,20 +46,7 @@ bool Get_Multirotor_GPS_FlightModes_Once()
   return false;
 }
 
-bool Get_AirPlane_GPS_FlightModes_Once()
-{
-  static uint8_t Previous_Mode = 0;
-  uint8_t Check_Actual_State = ((IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) << 1) +
-                                (IS_FLIGHT_MODE_ACTIVE(RTH_MODE)));
-  if (Previous_Mode != Check_Actual_State)
-  {
-    Previous_Mode = Check_Actual_State;
-    return true;
-  }
-  return false;
-}
-
-void ProcessFlightModesToMultirotor()
+static void ProcessFlightModesToMultirotor(void)
 {
   if (!GetMultirotorEnabled())
   {
@@ -79,14 +65,14 @@ void ProcessFlightModesToMultirotor()
       {
         if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE) && (JCF_Param.AutoPilotMode == AUTOPILOT_MODE_ATTI))
         {
-          ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, SticksInAutoPilotPosition(20));
+          ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, SticksInAutoPilotPosition(POS_HOLD_DEADBAND));
         }
       }
       if (Get_Multirotor_GPS_FlightModes_Once())
       {
         if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
         {
-          GPSParameters.Mode.Navigation = DO_START_RTH;
+          GPS_Resources.Mode.Navigation = DO_START_RTH;
           Do_RTH_Or_Land_Call_Alt_Hold = true;
           Do_Pos_Hold_Call_Alt_Hold = false;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
@@ -94,19 +80,19 @@ void ProcessFlightModesToMultirotor()
         }
         else if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
         {
-          GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
+          GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
           Do_RTH_Or_Land_Call_Alt_Hold = false;
           Do_Pos_Hold_Call_Alt_Hold = true;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
-          SetThisPointToPositionHold();
+          MultirotorSetThisPointToPositionHold();
         }
         else if (IS_FLIGHT_MODE_ACTIVE(LAND_MODE))
         {
-          GPSParameters.Mode.Navigation = DO_LAND_INIT;
+          GPS_Resources.Mode.Navigation = DO_LAND_INIT;
           Do_RTH_Or_Land_Call_Alt_Hold = true;
           Do_Pos_Hold_Call_Alt_Hold = false;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
-          SetThisPointToPositionHold();
+          MultirotorSetThisPointToPositionHold();
         }
         else
         {
@@ -153,66 +139,46 @@ void ProcessFlightModesToMultirotor()
   }
 }
 
-void ProcessFlightModesToAirPlane()
+static void ProcessFlightModesToAirPlane(void)
 {
-  if (!GetAirPlaneEnabled())
+  if (!GetAirPlaneEnabled() || !Get_State_Armed_With_GPS())
   {
     return;
   }
 
-  if (Get_State_Armed_With_GPS())
+  if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
   {
-    if (Get_GPS_Used_To_Navigation() && !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
-    {
-      ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE); //FORÇA O MODO STABILIZE EM MODO NAVEGAÇÃO POR GPS
-    }
-
-    if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
-    {
-      ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(CIRCLE_MODE, SticksInAutoPilotPosition(20));
-    }
-
-    if (Get_AirPlane_GPS_FlightModes_Once())
-    {
-      if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
-      {
-        GPSParameters.Mode.Navigation = DO_RTH_ENROUTE;
-        AltitudeHold_For_Plane = GPSParameters.Navigation.Misc.Get.Altitude;
-        Set_Next_Point_To_Navigation(GPSParameters.Home.Coordinates[COORD_LATITUDE], GPSParameters.Home.Coordinates[COORD_LONGITUDE]);
-        ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
-      }
-      else
-      {
-        if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
-        {
-          GPSParameters.Mode.Navigation = DO_POSITION_HOLD;
-          AltitudeHold_For_Plane = GPSParameters.Navigation.Misc.Get.Altitude;
-          Set_Next_Point_To_Navigation(GPSParameters.Navigation.Coordinates.Actual[COORD_LATITUDE], GPSParameters.Navigation.Coordinates.Actual[COORD_LONGITUDE]);
-          DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
-        }
-        else
-        {
-          DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
-          GPS_Reset_Navigation();
-        }
-      }
-    }
+    GPS_Resources.Mode.Navigation = DO_RTH_ENROUTE; //INDICA PARA O SISTEMA QUE O RTH SERÁ USADO
+    ENABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);           //ATIVA O CONTROLE XY & HEADING
+    ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);         //ATIVA O CONTROLE Z
   }
   else
   {
-    GPSParameters.Mode.Navigation = DO_NONE;
-  }
-
-  if (IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
-  {
-    if (!Do_Altitude_Hold)
+    if (IS_FLIGHT_MODE_ACTIVE(ALTITUDE_HOLD_MODE))
     {
-      Do_Altitude_Hold = true;
+      GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+      ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
+    }
+    else if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
+    {
+      GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+      ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
+    }
+    else if (IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
+    {
+      GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+      ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
+    }
+    else
+    {
+      GPS_Resources.Mode.Navigation = DO_NONE;
+      DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
     }
   }
-  else
+
+  if (Get_GPS_Used_To_Navigation() && !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
   {
-    Do_Altitude_Hold = false;
+    ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE); //FORÇA O MODO DE ESTABILIZAÇÃO EM MODO DE NAVEGAÇÃO POR GPS
   }
 }
 
@@ -223,8 +189,8 @@ void FlightModesUpdate(void)
 
   if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
   {
-    GPSParameters.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw;
+    GPS_Resources.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw;
   }
 
-  GPSParameters.Navigation.AutoPilot.Control.Enabled = Get_GPS_Used_To_Navigation();
+  GPS_Resources.Navigation.AutoPilot.Control.Enabled = Get_GPS_Used_To_Navigation();
 }

@@ -22,31 +22,51 @@
 #include "Math/MATHSUPPORT.h"
 #include "LedRGB/LEDRGB.h"
 #include "PERFORMACC.h"
+#include "Scheduler/SCHEDULERTIME.h"
+#include "FastSerial/PRINTF.h"
+#include "Build/GCC.h"
 
-#define GYRO_MAX_DELTA 32
+FILE_COMPILE_FOR_SPEED
 
-void StartGyroCalibration(void)
+GyroCalClass GYROCALIBRATION;
+
+#define GYRO_MAX_DELTA 32             //DESVIO MAXIMO SUPORTADO NO GYRO PRA COMPLETAR A CALIBRAÇÃO.ISSO SERVE PARA EVITAR COM QUE A CALIBRAÇÃO CONCLUA COM O USUARIO MOVENDO O UAV
+#define CALIBRATING_GYRO_TIME_MS 2000 //TEMPO MAXIMO DE CALIBRAÇÃO DO GYRO EM MS
+
+bool GyroCalClass::GetRunning(void)
 {
-    Calibration.Gyroscope.Counter = ACC_1G;
+    return !Calibration.Gyroscope.Flags.Calibrated;
 }
 
-bool GyroCalibrationRunning(void)
+void GyroCalClass::Update(void)
 {
-    return Calibration.Gyroscope.Counter > 0;
-}
+    if (!BEEPER.GetSafeToOthersBeeps())
+    {
+        return;
+    }
 
-void Gyroscope_Calibration(void)
-{
-    if (GyroCalibrationRunning())
+    if (!Calibration.Gyroscope.Flags.Calibrated)
     {
         static Device_Struct GyroDevice[3];
-
         RGB.Function(CALL_LED_GYRO_CALIBRATION);
 
-        switch (Calibration.Gyroscope.Counter)
+        if (Calibration.Gyroscope.Flags.Restart)
         {
+            Calibration.Gyroscope.Samples.Sum[ROLL] = 0;
+            Calibration.Gyroscope.Samples.Sum[PITCH] = 0;
+            Calibration.Gyroscope.Samples.Sum[YAW] = 0;
+            DeviceClear(&GyroDevice[ROLL]);
+            DeviceClear(&GyroDevice[PITCH]);
+            DeviceClear(&GyroDevice[YAW]);
+            Calibration.Gyroscope.Time.Previous = SCHEDULERTIME.GetMillis();
+            Calibration.Gyroscope.Samples.Count = 0;
+            Calibration.Gyroscope.Flags.Restart = false;
+        }
 
-        case 1:
+        Calibration.Gyroscope.Time.Actual = SCHEDULERTIME.GetMillis() - Calibration.Gyroscope.Time.Previous;
+
+        if (Calibration.Gyroscope.Time.Actual >= CALIBRATING_GYRO_TIME_MS)
+        {
             Calibration.Gyroscope.Deviation[ROLL] = DeviceStandardDeviation(&GyroDevice[ROLL]);
             Calibration.Gyroscope.Deviation[PITCH] = DeviceStandardDeviation(&GyroDevice[PITCH]);
             Calibration.Gyroscope.Deviation[YAW] = DeviceStandardDeviation(&GyroDevice[YAW]);
@@ -55,54 +75,37 @@ void Gyroscope_Calibration(void)
                 (Calibration.Gyroscope.Deviation[PITCH] > GYRO_MAX_DELTA) ||
                 (Calibration.Gyroscope.Deviation[YAW] > GYRO_MAX_DELTA))
             {
-                Calibration.Gyroscope.Counter = ACC_1G + 1; //REINICIA A CALIBRAÇÃO
                 BEEPER.Play(BEEPER_ACTION_FAIL);            //SINALIZA COM O BUZZER QUE HOUVE UM ERRO
+                Calibration.Gyroscope.Flags.Restart = true; //REINICIA A CALIBRAÇÃO DO GYRO
             }
             else
             {
-                Calibration.Gyroscope.Sum[ROLL] /= ACC_1G;
-                Calibration.Gyroscope.Sum[PITCH] /= ACC_1G;
-                Calibration.Gyroscope.Sum[YAW] /= ACC_1G;
+                Calibration.Gyroscope.Samples.Sum[ROLL] = Calibration.Gyroscope.Samples.Sum[ROLL] / Calibration.Gyroscope.Samples.Count;
+                Calibration.Gyroscope.Samples.Sum[PITCH] = Calibration.Gyroscope.Samples.Sum[PITCH] / Calibration.Gyroscope.Samples.Count;
+                Calibration.Gyroscope.Samples.Sum[YAW] = Calibration.Gyroscope.Samples.Sum[YAW] / Calibration.Gyroscope.Samples.Count;
                 BEEPER.Play(BEEPER_CALIBRATION_DONE); //SINALIZA COM O BUZZER QUE TUDO OCORREU BEM
+                LOG_WITH_ARGS("Giroscopio Calib OffSets:Roll = %ld Pitch = %ld Yaw = %d",
+                              Calibration.Gyroscope.Samples.Sum[ROLL],
+                              Calibration.Gyroscope.Samples.Sum[PITCH],
+                              Calibration.Gyroscope.Samples.Sum[YAW]);
+                LINE_SPACE;
+                Calibration.Gyroscope.Flags.Calibrated = true; //CALIBRAÇÃO CONCLUIDA
             }
-            break;
-
-        case ACC_1G:
-            Calibration.Gyroscope.Sum[ROLL] = 0;
-            Calibration.Gyroscope.Sum[PITCH] = 0;
-            Calibration.Gyroscope.Sum[YAW] = 0;
-            DeviceClear(&GyroDevice[ROLL]);
-            DeviceClear(&GyroDevice[PITCH]);
-            DeviceClear(&GyroDevice[YAW]);
-            break;
-
-        default:
-            Calibration.Gyroscope.Sum[ROLL] += IMU.Gyroscope.Read[ROLL];
-            Calibration.Gyroscope.Sum[PITCH] += IMU.Gyroscope.Read[PITCH];
-            Calibration.Gyroscope.Sum[YAW] += IMU.Gyroscope.Read[YAW];
+        }
+        else
+        {
+            Calibration.Gyroscope.Samples.Sum[ROLL] += IMU.Gyroscope.Read[ROLL];
+            Calibration.Gyroscope.Samples.Sum[PITCH] += IMU.Gyroscope.Read[PITCH];
+            Calibration.Gyroscope.Samples.Sum[YAW] += IMU.Gyroscope.Read[YAW];
             DevicePushValues(&GyroDevice[ROLL], IMU.Gyroscope.Read[ROLL]);
             DevicePushValues(&GyroDevice[PITCH], IMU.Gyroscope.Read[PITCH]);
             DevicePushValues(&GyroDevice[YAW], IMU.Gyroscope.Read[YAW]);
-            break;
+            Calibration.Gyroscope.Samples.Count++;
         }
-        Calibration.Gyroscope.Counter--;
     }
-    else
-    {
-        //ROLL
-        IMU.Gyroscope.Read[ROLL] = (IMU.Gyroscope.Read[ROLL] - Calibration.Gyroscope.Sum[ROLL]);
-        IMU.Gyroscope.Read[ROLL] = Constrain_16Bits(IMU.Gyroscope.Read[ROLL], Calibration.Gyroscope.PreviousValue[ROLL] - 800, Calibration.Gyroscope.PreviousValue[ROLL] + 800);
-        Calibration.Gyroscope.PreviousValue[ROLL] = IMU.Gyroscope.Read[ROLL];
-        IMU.Gyroscope.Read[ROLL] = IMU.Gyroscope.Read[ROLL] * GYRO_SCALE;
-        //PITCH
-        IMU.Gyroscope.Read[PITCH] = (IMU.Gyroscope.Read[PITCH] - Calibration.Gyroscope.Sum[PITCH]);
-        IMU.Gyroscope.Read[PITCH] = Constrain_16Bits(IMU.Gyroscope.Read[PITCH], Calibration.Gyroscope.PreviousValue[PITCH] - 800, Calibration.Gyroscope.PreviousValue[PITCH] + 800);
-        Calibration.Gyroscope.PreviousValue[PITCH] = IMU.Gyroscope.Read[PITCH];
-        IMU.Gyroscope.Read[PITCH] = IMU.Gyroscope.Read[PITCH] * GYRO_SCALE;
-        //YAW
-        IMU.Gyroscope.Read[YAW] = (IMU.Gyroscope.Read[YAW] - Calibration.Gyroscope.Sum[YAW]);
-        IMU.Gyroscope.Read[YAW] = Constrain_16Bits(IMU.Gyroscope.Read[YAW], Calibration.Gyroscope.PreviousValue[YAW] - 800, Calibration.Gyroscope.PreviousValue[YAW] + 800);
-        Calibration.Gyroscope.PreviousValue[YAW] = IMU.Gyroscope.Read[YAW];
-        IMU.Gyroscope.Read[YAW] = IMU.Gyroscope.Read[YAW] * GYRO_SCALE;
-    }
+
+    //APLICA A ROTAÇÃO ZERO
+    IMU.Gyroscope.Read[ROLL] = (IMU.Gyroscope.Read[ROLL] - Calibration.Gyroscope.Samples.Sum[ROLL]);
+    IMU.Gyroscope.Read[PITCH] = (IMU.Gyroscope.Read[PITCH] - Calibration.Gyroscope.Samples.Sum[PITCH]);
+    IMU.Gyroscope.Read[YAW] = (IMU.Gyroscope.Read[YAW] - Calibration.Gyroscope.Samples.Sum[YAW]);
 }

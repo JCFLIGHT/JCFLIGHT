@@ -38,7 +38,6 @@ static int32_t XYZ_CompassBias[3] = {0, 0, 0};
 
 void CompassReadClass::Initialization()
 {
-  //SAIA DA FUNÇÃO SE NÃO FOR ENCONTRADO NENHUM COMPASS NO BARRAMENTO I2C
   if (!I2CResources.Found.Compass)
   {
     return;

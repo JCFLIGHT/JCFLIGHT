@@ -27,9 +27,11 @@
 
 BEEPERCLASS BEEPER;
 
-#define BEEPER_COMMAND_STOP 0xFF
+#define BEEPER_COMMAND_STOP 0xFF //INDICA PARA O SISTEMA QUE O BUZZER DEVE PARAR DE TOCAR
+#define TIME_TO_OTHERS_BEEPS 2   //SEGUNDOS
 
 bool BuzzerInit = false;
+uint8_t SafeToOthersBeeps = 0;
 static uint8_t BeeperState = 0;
 static uint16_t BeeperPositionArray = 0;
 static uint32_t BeeperNextNote = 0;
@@ -160,9 +162,9 @@ void BEEPERCLASS::Play(Beeper_Mode Mode)
     return;
   }
   const BeeperEntry_Struct *SelectedSong = NULL;
-  for (uint8_t i = 0; i < BEEPER_TABLE_ENTRY_COUNT; i++)
+  for (uint8_t IndexCount = 0; IndexCount < BEEPER_TABLE_ENTRY_COUNT; IndexCount++)
   {
-    const BeeperEntry_Struct *SelectedSongTable = &BeeperTable[i];
+    const BeeperEntry_Struct *SelectedSongTable = &BeeperTable[IndexCount];
     if (SelectedSongTable->Mode != Mode)
     {
       continue;
@@ -187,7 +189,7 @@ void BEEPERCLASS::Play(Beeper_Mode Mode)
   BeeperNextNote = 0;
 }
 
-void BEEPERCLASS::Silence()
+void BEEPERCLASS::Silence(void)
 {
   BEEP_OFF;
   BeeperState = 0;
@@ -196,7 +198,7 @@ void BEEPERCLASS::Silence()
   BeeperEntry = NULL;
 }
 
-void BEEPERCLASS::Update()
+void BEEPERCLASS::Update(void)
 {
   if (BeeperEntry == NULL)
   {
@@ -225,7 +227,7 @@ void BEEPERCLASS::Update()
   BEEPER.ProcessCommand();
 }
 
-void BEEPERCLASS::ProcessCommand()
+void BEEPERCLASS::ProcessCommand(void)
 {
   if (BeeperEntry->Sequence[BeeperPositionArray] == BEEPER_COMMAND_STOP)
   {
@@ -238,11 +240,25 @@ void BEEPERCLASS::ProcessCommand()
   }
 }
 
-void BEEPERCLASS::Run()
+bool BEEPERCLASS::GetSafeToOthersBeeps(void)
+{
+  return (SafeToOthersBeeps >= (10 * TIME_TO_OTHERS_BEEPS));
+}
+
+void BEEPERCLASS::UpdateSafeToOthersBeepsCounter(void)
+{
+  if (BuzzerInit && SafeToOthersBeeps < (10 * TIME_TO_OTHERS_BEEPS))
+  {
+    SafeToOthersBeeps++;
+  }
+}
+
+void BEEPERCLASS::Run(void)
 {
   if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
       STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_SWITCH)
   {
+    SafeToOthersBeeps = 0xFF;
     BEEPER.Silence();
     return;
   }
@@ -252,14 +268,8 @@ void BEEPERCLASS::Run()
 #if defined ESP32
     AnalogWriteSetSettings(GPIO_NUM_18, 490, 12);
 #endif
-  }
-  if (!BuzzerInit)
-  {
     BEEPER.Play(BEEPER_ALGORITHM_INIT);
-  }
-  BEEPER.Update();
-  if (!BuzzerInit)
-  {
     BuzzerInit = true;
   }
+  BEEPER.Update();
 }

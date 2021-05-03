@@ -41,7 +41,7 @@ void ClassESC::Calibration(void)
   }
   LOG("Etapa de calib dos escs inicializada!");
   ConfigureRegisters(true); //INICIA OS REGISTRADORES DE CONFIGURAÇÃO DOS PINOS PWM
-  while (true)              //FICA TRAVADO AQUI NO WHILE ATÉ QUE A CONTROLADORA SEJA REINICIADA MANUALMENTE
+  while (true)              //FICA TRAVADO AQUI NO WHILE ATÉ QUE O SISTEMA SEJA REINICIADO MANUALMENTE
   {
     BEEPER.Run();                                                                                                //TOCA A MÚSICA DE INICIALIZAÇÃO
     RGB.Function(CALL_LED_CALIBRATION_ESC);                                                                      //RGB EM MODO DE INDICAÇÃO DE CALIBRAÇÃO DOS ESC

@@ -63,10 +63,10 @@ bool ServosMasterClass::LoadBiquadSettings(void)
 #ifndef __AVR_ATmega2560__
   //ATUALIZA A FREQUENCIA DE CORTE DO LPF DOS SERVOS
   Servo.Filter.CutOff = STORAGEMANAGER.Read_16Bits(SERVOS_LPF_ADDR);
-  BIQUADFILTER.Settings(&Smooth_Servo1_Aileron, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
-  BIQUADFILTER.Settings(&Smooth_Servo2_Aileron, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
-  BIQUADFILTER.Settings(&Smooth_Servo_Rudder, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
-  BIQUADFILTER.Settings(&Smooth_Servo_Elevator, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo1_Aileron, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo2_Aileron, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo_Rudder, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
+  BIQUADFILTER.Settings(&Smooth_Servo_Elevator, Servo.Filter.CutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
 #endif
   return true;
 }

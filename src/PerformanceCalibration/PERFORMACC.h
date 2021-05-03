@@ -19,7 +19,12 @@
 #define PERFORMACC_H_
 #include "Common/STRUCTS.h"
 extern Calibration_Struct Calibration;
-void StartAccCalibration(void);
-bool AccCalibrationRunning(void);
-void Accelerometer_Calibration(void);
+class AccCalibClass
+{
+public:
+  void Start(void);
+  bool GetRunning(void);
+  void Update(void);
+};
+extern AccCalibClass ACCCALIBRATION;
 #endif

@@ -34,14 +34,14 @@
 
 #define HEADING_HOLD_LPF_FREQ 2
 
-PT1_Filter_Struct HeadingHoldRateFilter;
+PT1_Filter_Struct HeadingHoldRate_Smooth;
 
 void UpdateStateOfHeadingHold(void)
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    HeadingHoldRateFilter.State = 0.0f;                                    //RESETA O FILTRO
-    GPSParameters.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
+    HeadingHoldRate_Smooth.State = 0.0f;                                    //RESETA O FILTRO
+    GPS_Resources.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
   }
 }
 
@@ -57,7 +57,7 @@ bool GetSafeStateOfHeadingHold()
     return false;
   }
 
-  if (!Get_GPS_Used_To_Navigation()) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO POR GPS ESTIVER ATIVO
+  if (!GPS_Resources.Navigation.AutoPilot.Control.Enabled) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO POR GPS ESTIVER ATIVO
   {
     return false;
   }
@@ -74,7 +74,7 @@ float GetHeadingHoldValue(float DeltaTime)
 {
   float HeadingHoldRate;
 
-  int16_t YawError = Attitude.EulerAngles.Yaw - GPSParameters.Navigation.HeadingHoldTarget; //CALCULA O ERRO / DIFERENÇA
+  int16_t YawError = Attitude.EulerAngles.Yaw - GPS_Resources.Navigation.HeadingHoldTarget; //CALCULA O ERRO / DIFERENÇA
 
   //CALCULA O VALOR RELATIVO DO ERRO/DIFERENÇA E CONVERTE PARA UM VALOR ACEITAVEL POR HEADING
   if (YawError <= -180)
@@ -99,9 +99,9 @@ float GetHeadingHoldValue(float DeltaTime)
 
 //REALIZA FILTRAGEM DO RATE COM O PT1
 #ifndef __AVR_ATmega2560__
-  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, DeltaTime);
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRate_Smooth, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, DeltaTime);
 #else
-  HeadingHoldRate = PT1FilterApply(&HeadingHoldRateFilter, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+  HeadingHoldRate = PT1FilterApply(&HeadingHoldRate_Smooth, HeadingHoldRate, HEADING_HOLD_LPF_FREQ, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
 #endif
 
 #ifdef PRINTLN_HEADING_HOLD

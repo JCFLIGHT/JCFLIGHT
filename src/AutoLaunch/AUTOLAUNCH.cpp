@@ -80,7 +80,7 @@ bool AutoLaunchClass::GetSwingVelocityState(void)
 
 bool AutoLaunchClass::GetForwardState(void)
 {
-  return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPSParameters.Navigation.Misc.Get.GroundSpeed > ConverMetersToCM(LAUNCH_VELOCITY_THRESH));
+  return Get_GPS_Heading_Is_Valid() && (GetRollAccelerationInMSS() > 0) && (GPS_Resources.Navigation.Misc.Get.GroundSpeed > ConverMetersToCM(LAUNCH_VELOCITY_THRESH));
 }
 
 void AutoLaunchClass::AutomaticDetector()

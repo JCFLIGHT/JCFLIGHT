@@ -19,7 +19,7 @@
 #define NAVIGATIONGEO_H_
 #include "inttypes.h"
 #define DISTANCE_BETWEEN_TWO_LONGITUDE_POINTS_AT_EQUATOR 1.113195f //RETIRADO DA ARDUPILOT - VALOR ANTERIOR 1.11318845f
-void GPS_Adjust_Heading();
+void GPS_Adjust_Heading(void);
 void GPS_Calcule_Bearing(int32_t InputLatitude, int32_t InputLongitude, int32_t *Bearing);
 void GPS_Calcule_Distance_In_CM(int32_t InputLatitude, int32_t InputLongitude, int32_t *CalculateDistance);
 void GPS_Calcule_Distance_To_Home(uint32_t *CalculateDistance);

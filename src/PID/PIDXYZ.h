@@ -29,14 +29,14 @@ public:
 
 private:
   float ProportionalTermProcess(uint8_t kP, float RateError);
-  float DerivativeTermProcessRoll(int16_t ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);
-  float DerivativeTermProcessPitch(int16_t ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);
-  float DerivativeTermProcessYaw(int16_t ActualGyro, float PreviousRateGyro, float PreviousRateTarget, float DeltaTime);
+  float DerivativeTermProcessRoll(float ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);
+  float DerivativeTermProcessPitch(float ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);
+  float DerivativeTermProcessYaw(float ActualGyro, float PreviousRateGyro, float PreviousRateTarget, float DeltaTime);
   float ApplyIntegralTermRelaxRoll(float CurrentPIDSetpoint, float IntegralTermErrorRate);
   float ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float IntegralTermErrorRate);
   float ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral);
-  float ApplyDerivativeBoostRoll(int16_t ActualGyro, int16_t PrevGyro, int16_t ActualRateTagert, int16_t PrevRateTagert, float DeltaTime);
-  float ApplyDerivativeBoostPitch(int16_t ActualGyro, int16_t PrevGyro, int16_t ActualRateTagert, int16_t PrevRateTagert, float DeltaTime);
+  float ApplyDerivativeBoostRoll(float ActualGyro, float PrevGyro, float ActualRateTagert, float PrevRateTagert, float DeltaTime);
+  float ApplyDerivativeBoostPitch(float ActualGyro, float PrevGyro, float ActualRateTagert, float PrevRateTagert, float DeltaTime);
   float LevelRoll(float DeltaTime);
   float LevelPitch(float DeltaTime);
   void ApplyMulticopterRateControllerRoll(float DeltaTime);

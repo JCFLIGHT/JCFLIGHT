@@ -15,8 +15,13 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GPSORIENTATION_H_
-#define GPSORIENTATION_H_
-#include "Build/LIBDEPENDENCIES.h"
-void GPS_Orientation_Update();
+#ifndef PERFORMGRAVITY_H_
+#define PERFORMGRAVITY_H_
+#include "Common/STRUCTS.h"
+class GravityClass
+{
+public:
+  void Update(Vector3x3_Struct *VectorPointer);
+};
+extern GravityClass GRAVITYCALIBRATION;
 #endif

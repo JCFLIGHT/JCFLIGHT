@@ -183,7 +183,7 @@ void TaskSystemRun(void)
   }
 }
 
-void SystemLoad()
+void SystemLoad(void)
 {
   if (WaitingTasksSamples > 0)
   {

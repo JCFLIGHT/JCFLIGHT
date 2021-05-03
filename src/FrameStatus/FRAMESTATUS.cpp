@@ -48,7 +48,7 @@ bool GetAirPlaneEnabled(void)
 {
     if (FrameType == AIR_PLANE ||
         FrameType == FIXED_WING ||
-        FrameType == PLANE_VTAIL)
+        FrameType == AIR_PLANE_VTAIL)
     {
         return true;
     }

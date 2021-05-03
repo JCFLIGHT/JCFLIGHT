@@ -27,18 +27,18 @@ static union
   struct
   {
     //CONSTRUIDO A PARTIR DA TABELA 17 DO DATASHEET
-    uint16_t dig_T1;
-    int16_t dig_T2;
-    int16_t dig_T3;
-    uint16_t dig_P1;
-    int16_t dig_P2;
-    int16_t dig_P3;
-    int16_t dig_P4;
-    int16_t dig_P5;
-    int16_t dig_P6;
-    int16_t dig_P7;
-    int16_t dig_P8;
-    int16_t dig_P9;
+    uint16_t Dig_T1;
+    int16_t Dig_T2;
+    int16_t Dig_T3;
+    uint16_t Dig_P1;
+    int16_t Dig_P2;
+    int16_t Dig_P3;
+    int16_t Dig_P4;
+    int16_t Dig_P5;
+    int16_t Dig_P6;
+    int16_t Dig_P7;
+    int16_t Dig_P8;
+    int16_t Dig_P9;
   };
 } BMP280_Calculation;
 
@@ -49,17 +49,17 @@ static void BMP280_Get_Calibration(void)
   I2C.RegisterBuffer(ADDRESS_BAROMETER_BMP280, 0x88, BMP280_Calculation.BMP280_CalculationArray, 0x1A);
 }
 
-void BMP280_Set_Control_Mode(uint8_t OverSamplingSet_Temperature, uint8_t OverSamplingSet_Pressure, uint8_t PowerMode)
+static void BMP280_Set_Control_Mode(uint8_t OverSamplingSet_Temperature, uint8_t OverSamplingSet_Pressure, uint8_t PowerMode)
 {
   I2C.WriteRegister(ADDRESS_BAROMETER_BMP280, 0xF4, ((OverSamplingSet_Temperature & 0x7) << 5) | ((OverSamplingSet_Pressure & 0x7) << 2) | (PowerMode & 0x3));
 }
 
-void BMP280_Set_Operation_Mode(uint8_t StandByTime, uint8_t FilterCoefficient, uint8_t SPIModeEnabled)
+static void BMP280_Set_Operation_Mode(uint8_t StandByTime, uint8_t FilterCoefficient, uint8_t SPIModeEnabled)
 {
   I2C.WriteRegister(ADDRESS_BAROMETER_BMP280, 0xF5, ((StandByTime & 0x7) << 5) | ((FilterCoefficient & 0x7) << 2) | (SPIModeEnabled & 1));
 }
 
-void CalculatePressure(void)
+static void CalculatePressure(void)
 {
   uint8_t BMP280_RawData[6];
   int32_t BMP280_Temperature_Raw, BMP280_Pressure_Raw, BMP280_VariationOne, BMP280_VariationTwo, BMP280_VariationOffSet;
@@ -68,31 +68,29 @@ void CalculatePressure(void)
   BMP280_Temperature_Raw = ((int32_t)(BMP280_RawData[3]) << 16) | ((int32_t)(BMP280_RawData[4]) << 8) | ((int32_t)(BMP280_RawData[5]));
   BMP280_Temperature_Raw >>= 4;
   BMP280_Pressure_Raw >>= 4;
-  BMP280_VariationOne = ((((BMP280_Temperature_Raw >> 3) - ((int32_t)BMP280_Calculation.dig_T1 << 1))) * ((int32_t)BMP280_Calculation.dig_T2)) >> 11;
-  BMP280_VariationTwo = (((((BMP280_Temperature_Raw >> 4) - ((int32_t)BMP280_Calculation.dig_T1)) * ((BMP280_Temperature_Raw >> 4) -
-                                                                                                     ((int32_t)BMP280_Calculation.dig_T1))) >>
-                          12) *
-                         ((int32_t)BMP280_Calculation.dig_T3)) >>
-                        14;
+  BMP280_VariationOne = ((((BMP280_Temperature_Raw >> 3) - ((int32_t)BMP280_Calculation.Dig_T1 << 1))) * ((int32_t)BMP280_Calculation.Dig_T2)) >> 11;
+  BMP280_VariationTwo = (((((BMP280_Temperature_Raw >> 4) - ((int32_t)BMP280_Calculation.Dig_T1)) * ((BMP280_Temperature_Raw >> 4) - ((int32_t)BMP280_Calculation.Dig_T1))) >> 12) * ((int32_t)BMP280_Calculation.Dig_T3)) >> 14;
   BMP280_VariationOffSet = BMP280_VariationOne + BMP280_VariationTwo;
   Barometer.Raw.Temperature = (BMP280_VariationOffSet * 5 + 128) >> 8;
   BMP280_VariationOne = ((int64_t)BMP280_VariationOffSet) - 128000;
-  BMP280_VariationTwo = BMP280_VariationOne * BMP280_VariationOne * (int64_t)BMP280_Calculation.dig_P6;
-  BMP280_VariationTwo = BMP280_VariationTwo + ((BMP280_VariationOne * (int64_t)BMP280_Calculation.dig_P5) << 17);
-  BMP280_VariationTwo = BMP280_VariationTwo + (((int64_t)BMP280_Calculation.dig_P4) << 35);
-  BMP280_VariationOne = ((BMP280_VariationOne * BMP280_VariationOne * (int64_t)BMP280_Calculation.dig_P3) >> 8) + ((BMP280_VariationOne * (int64_t)BMP280_Calculation.dig_P2) << 12);
-  BMP280_VariationOne = (((((int64_t)1) << 47) + BMP280_VariationOne)) * ((int64_t)BMP280_Calculation.dig_P1) >> 33;
+  BMP280_VariationTwo = BMP280_VariationOne * BMP280_VariationOne * (int64_t)BMP280_Calculation.Dig_P6;
+  BMP280_VariationTwo = BMP280_VariationTwo + ((BMP280_VariationOne * (int64_t)BMP280_Calculation.Dig_P5) << 17);
+  BMP280_VariationTwo = BMP280_VariationTwo + (((int64_t)BMP280_Calculation.Dig_P4) << 35);
+  BMP280_VariationOne = ((BMP280_VariationOne * BMP280_VariationOne * (int64_t)BMP280_Calculation.Dig_P3) >> 8) + ((BMP280_VariationOne * (int64_t)BMP280_Calculation.Dig_P2) << 12);
+  BMP280_VariationOne = (((((int64_t)1) << 47) + BMP280_VariationOne)) * ((int64_t)BMP280_Calculation.Dig_P1) >> 33;
   if (BMP280_VariationOne == 0)
+  {
     return;
+  }
   BMP280_Pressure = 1048576 - BMP280_Pressure_Raw;
   BMP280_Pressure = (((BMP280_Pressure << 31) - BMP280_VariationTwo) * 3125) / BMP280_VariationOne;
-  BMP280_VariationOne = (((int64_t)BMP280_Calculation.dig_P9) * (BMP280_Pressure >> 13) * (BMP280_Pressure >> 13)) >> 25;
-  BMP280_VariationTwo = (((int64_t)BMP280_Calculation.dig_P8) * BMP280_Pressure) >> 19;
-  BMP280_Pressure = ((BMP280_Pressure + BMP280_VariationOne + BMP280_VariationTwo) >> 8) + (((int64_t)BMP280_Calculation.dig_P7) << 4);
+  BMP280_VariationOne = (((int64_t)BMP280_Calculation.Dig_P9) * (BMP280_Pressure >> 13) * (BMP280_Pressure >> 13)) >> 25;
+  BMP280_VariationTwo = (((int64_t)BMP280_Calculation.Dig_P8) * BMP280_Pressure) >> 19;
+  BMP280_Pressure = ((BMP280_Pressure + BMP280_VariationOne + BMP280_VariationTwo) >> 8) + (((int64_t)BMP280_Calculation.Dig_P7) << 4);
   Barometer.Raw.Pressure = BMP280_Pressure >> 8;
 }
 
-void BMP280_Initialization()
+void BMP280_Initialization(void)
 {
   BMP280_Get_Calibration();
   //VALORES DEFINIDOS A PARTIR DO DATASHEET
@@ -106,8 +104,8 @@ void BMP280_Initialization()
   BMP280_Set_Control_Mode(2, 5, 3);
 }
 
-void BMP280_Update()
+void BMP280_Update(void)
 {
-  RecalculateBaroTotalPressure();
+  Remove_Barometer_Spikes();
   CalculatePressure();
 }

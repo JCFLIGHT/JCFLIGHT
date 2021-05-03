@@ -26,8 +26,6 @@
 #include "Param/PARAM.h"
 
 #define THIS_LOOP_RATE 50 //STICKS.Update()
-#define ARM_TIME_MAX 2    //SEGUNDOS
-#define DISARM_TIME_MAX 2 //SEGUNDOS
 
 int16_t ArmDelayedCount = 0;
 int16_t DisarmDelayedCount = 0;
@@ -47,11 +45,7 @@ bool CheckInclinationForArm(void)
 
 bool ArmDelayedState(void)
 {
-#ifdef __AVR_ATmega2560__
-    if (ArmDelayedCount >= (THIS_LOOP_RATE * ARM_TIME_MAX))
-#else
     if (ArmDelayedCount >= (THIS_LOOP_RATE * JCF_Param.Arm_Time_Safety))
-#endif
     {
         return true;
     }
@@ -64,11 +58,7 @@ bool ArmDelayedState(void)
 
 bool DisarmDelayedState(void)
 {
-#ifdef __AVR_ATmega2560__
-    if (DisarmDelayedCount >= (THIS_LOOP_RATE * DISARM_TIME_MAX))
-#else
     if (DisarmDelayedCount >= (THIS_LOOP_RATE * JCF_Param.Disarm_Time_Safety))
-#endif
     {
         return true;
     }

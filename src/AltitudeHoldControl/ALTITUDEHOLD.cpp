@@ -26,39 +26,18 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "PID/RCPID.h"
 #include "FlightModes/FLIGHTMODES.h"
-#include "InertialNavigation/INS.h"
 #include "PID/PIDPARAMS.h"
 #include "Barometer/BAROBACKEND.h"
 #include "GPS/GPSSTATES.h"
 
-AH_Controller_Struct AHController;
+AltitudeHold_Controller_Struct AltitudeHoldController;
 
-#define ALT_HOLD_DEADBAND 50         //GANHO PARA EVITAR BAIXO OU ALTO VALOR DE THROTTLE
 #define SAFE_ALTITUDE 5              //ALTITUDE SEGURA PARA O LAND E TAKE-OFF EM METROS
 #define MIN_TARGET_POS_Z 50          //GANHO DE ALTITUDE DURANTE O LAND E ACIMA DA ALTITUDE DADA PELO PARAM "SAFE_ALTITUDE" EM CM DE 30 ~ 100
 #define VALID_ALT_REACHED 50         //RESULTADO DA SUBTRAÇÃO ENTRE A ALTITUDE MARCADA COMO HOLD E A ALTIUDE ATUAL PARA VALIDAR QUE ALTITUDE FOI ALCANÇADA EM CM
 #define MIN_VEL_Z_TO_VALID_GROUND 15 //VELOCIDADE VERTICAL MINIMA PARA INDICAR QUE A VEL Z DO INS ESTÁ EM REPOUSO
 #define LANDED_TIME 4000             //ESTOURO DE TEMPO EM MS PARA INDICAR QUE REALMENTE O SOLO FOI DETECTADO
 #define MAX_ALTITUDE_SUPORTED 150    //ALTITUDE MAXIMA SUPORTADA PELO ALGORITIMO EM METROS,PODE SER INCREMENTADO,MAS É NECESSARIO TESTES DE FUNCIONAMENTO
-
-//-------------------------------------
-//PARAMS DO USUARIO
-uint8_t AH_Percent_Complete_TakeOff = 70;
-int16_t AH_Hover_Throttle = 1500;
-//-------------------------------------
-
-static void ResetIntegralOfVelZError(void)
-{
-  AHController.PID.IntegratorSum = Constrain_32Bits(AHController.PID.IntegratorSum, -8192000, 8192000);
-  AHController.PID.IntegratorError = Constrain_16Bits(AHController.PID.IntegratorError, -125, 125);
-}
-
-static void ResetLandDetector(void)
-{
-  AHController.Time.LandDetectorStart = SCHEDULERTIME.GetMillis();
-  AHController.Time.OnLand = 0;
-  AHController.Flags.GroundAltitudeSet = false;
-}
 
 //#define THR_SMOOTH_TEST
 
@@ -73,38 +52,38 @@ PT1_Filter_Struct Smooth_ThrottleHover;
 
 #endif
 
-static void ApplyAltitudeHoldPIDControl(uint16_t DeltaTime, bool HoveringState)
+//-------------------------------------
+//PARAMS DO USUARIO
+uint8_t AH_Percent_Complete_TakeOff = 70;
+int16_t AH_Hover_Throttle = 1500;
+//-------------------------------------
+
+static void ResetIntegralOfVelZError(void)
 {
-  AHController.Target.Position.Z = Constrain_32Bits(AHController.Target.Position.Z, -350, 350);
-  AHController.Target.Velocity.Z = Constrain_32Bits(AHController.Target.Position.Z - Barometer.INS.Velocity.Vertical, -600, 600);
-  AHController.PID.IntegratorSum += Constrain_32Bits(((AHController.Target.Velocity.Z * GET_SET[PID_VELOCITY_Z].kI * DeltaTime) / 128) / ((HoveringState && ABS(AHController.Target.Position.Z) < 100) ? 2 : 1), -16384000, 16384000);
-  AHController.PID.IntegratorError = Constrain_16Bits((AHController.PID.IntegratorSum / 65536), -250, 250);
-  AHController.PID.Control = ((AHController.Target.Velocity.Z * GET_SET[PID_VELOCITY_Z].kP) / 32) + AHController.PID.IntegratorError - (((int32_t)INS.AccelerationEarthFrame_Filtered[INS_VERTICAL_Z] * GET_SET[PID_VELOCITY_Z].kD) / 64);
+  AltitudeHoldController.PID.IntegratorSum = Constrain_32Bits(AltitudeHoldController.PID.IntegratorSum, -8192000, 8192000);
+  AltitudeHoldController.PID.IntegratorError = Constrain_16Bits(AltitudeHoldController.PID.IntegratorError, -125, 125);
+}
 
-  RCController[THROTTLE] = Constrain_16Bits(AHController.Throttle.Hovering + AHController.PID.Control, AttitudeThrottleMin + ALT_HOLD_DEADBAND, AttitudeThrottleMax - ALT_HOLD_DEADBAND);
-
-#ifdef THR_SMOOTH_TEST
-
-  RCController[THROTTLE] = (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], ALT_HOLD_LPF_CUTOFF, DeltaTime * 1e-6f);
-
-  DEBUG("RCController[THROTTLE]:%d", RCController[THROTTLE]);
-
-#endif
+static void ResetLandDetector(void)
+{
+  AltitudeHoldController.Time.LandDetectorStart = SCHEDULERTIME.GetMillis();
+  AltitudeHoldController.Time.OnLand = 0;
+  AltitudeHoldController.Flags.GroundAltitudeSet = false;
 }
 
 static void RunLandDetector(void)
 {
   if (GetGroundDetected())
   {
-    AHController.Time.OnLand = SCHEDULERTIME.GetMillis() - AHController.Time.LandDetectorStart;
+    AltitudeHoldController.Time.OnLand = SCHEDULERTIME.GetMillis() - AltitudeHoldController.Time.LandDetectorStart;
   }
   else
   {
     ResetLandDetector();
   }
-  if (!AHController.Flags.GroundAltitudeSet && (AHController.Time.OnLand >= 100))
+  if (!AltitudeHoldController.Flags.GroundAltitudeSet && (AltitudeHoldController.Time.OnLand >= 100))
   {
-    AHController.Flags.GroundAltitudeSet = true;
+    AltitudeHoldController.Flags.GroundAltitudeSet = true;
     Barometer.Altitude.GroundOffSet = Barometer.Altitude.Actual;
   }
 }
@@ -120,80 +99,94 @@ bool ApplyAltitudeHoldControl(void)
       if (!BaroModeActivated)
       {
         BaroModeActivated = true;
-        AHController.Flags.Hovering = false;
-        AHController.Flags.TakeOffInProgress = false;
-        if ((AHController.Throttle.Hovering < (MIDDLE_STICKS_PULSE - 250)) ||
-            (AHController.Throttle.Hovering > (MIDDLE_STICKS_PULSE + 250)))
+        AltitudeHoldController.Flags.Hovering = false;
+        AltitudeHoldController.Flags.TakeOffInProgress = false;
+        if ((AltitudeHoldController.Throttle.Hovering < (MIDDLE_STICKS_PULSE - 250)) ||
+            (AltitudeHoldController.Throttle.Hovering > (MIDDLE_STICKS_PULSE + 250)))
         {
-          AHController.Throttle.Hovering = Constrain_16Bits(AH_Hover_Throttle, MIDDLE_STICKS_PULSE - 250, MIDDLE_STICKS_PULSE + 250);
+          AltitudeHoldController.Throttle.Hovering = Constrain_16Bits(AH_Hover_Throttle, MIDDLE_STICKS_PULSE - 250, MIDDLE_STICKS_PULSE + 250);
         }
         ResetLandDetector();
       }
       RunLandDetector();
       if (Do_RTH_Or_Land_Call_Alt_Hold)
       {
-        AHController.Flags.TakeOffInProgress = false;
+        AltitudeHoldController.Flags.TakeOffInProgress = false;
         if (Get_GPS_Used_To_Land())
         {
-          AHController.Flags.Hovering = false;
+          AltitudeHoldController.Flags.Hovering = false;
           SetNewAltitudeToHold(Barometer.INS.Altitude.Estimated);
           if (Barometer.INS.Altitude.Estimated > ConverMetersToCM(SAFE_ALTITUDE))
           {
-            AHController.Target.Position.Z = MIN_TARGET_POS_Z + ((int32_t)(250 - MIN_TARGET_POS_Z) * (Barometer.INS.Altitude.Estimated - ConverMetersToCM(SAFE_ALTITUDE)) / (ConverMetersToCM(GPSParameters.Home.Altitude) - ConverMetersToCM(SAFE_ALTITUDE)));
+            AltitudeHoldController.Target.Position.Z = MIN_TARGET_POS_Z + ((int32_t)(250 - MIN_TARGET_POS_Z) * (Barometer.INS.Altitude.Estimated - ConverMetersToCM(SAFE_ALTITUDE)) / (ConverMetersToCM(GPS_Resources.Home.Altitude) - ConverMetersToCM(SAFE_ALTITUDE)));
           }
-          AHController.Target.Position.Z = -AHController.Target.Position.Z;
+          AltitudeHoldController.Target.Position.Z = -AltitudeHoldController.Target.Position.Z;
         }
         else
         {
-          AHController.Flags.Hovering = true;
-          AHController.Target.Position.Z = ((AHController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
+          AltitudeHoldController.Flags.Hovering = true;
+          AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
           if (Barometer.INS.Altitude.Estimated > ConverMetersToCM(SAFE_ALTITUDE))
           {
-            AHController.Target.Position.Z = Constrain_32Bits(AHController.Target.Position.Z, -250, 250);
+            AltitudeHoldController.Target.Position.Z = Constrain_32Bits(AltitudeHoldController.Target.Position.Z, -250, 250);
           }
           else
           {
-            AHController.Target.Position.Z = Constrain_32Bits(AHController.Target.Position.Z, -83, 83);
+            AltitudeHoldController.Target.Position.Z = Constrain_32Bits(AltitudeHoldController.Target.Position.Z, -83, 83);
           }
         }
       }
       else
       {
-        AHController.Throttle.Difference = DECODE.GetRxChannelOutput(THROTTLE) - MIDDLE_STICKS_PULSE;
-        if (!AHController.Flags.TakeOffInProgress && GetActualThrottleStatus(THROTTLE_LOW) && GetGroundDetectedFor100ms())
+        AltitudeHoldController.Throttle.Difference = DECODE.GetRxChannelOutput(THROTTLE) - MIDDLE_STICKS_PULSE;
+        if (!AltitudeHoldController.Flags.TakeOffInProgress && GetActualThrottleStatus(THROTTLE_LOW) && GetGroundDetectedFor100ms())
         {
-          AHController.Flags.TakeOffInProgress = true;
+          AltitudeHoldController.Flags.TakeOffInProgress = true;
         }
         else
         {
-          if ((AHController.Throttle.Difference > AH_Percent_Complete_TakeOff) && (Barometer.INS.Velocity.Vertical >= MIN_VEL_Z_TO_VALID_GROUND))
+          if ((AltitudeHoldController.Throttle.Difference > AH_Percent_Complete_TakeOff) && (Barometer.INS.Velocity.Vertical >= MIN_VEL_Z_TO_VALID_GROUND))
           {
-            AHController.Flags.TakeOffInProgress = false;
+            AltitudeHoldController.Flags.TakeOffInProgress = false;
           }
         }
-        if (AHController.Flags.TakeOffInProgress || (ABS(AHController.Throttle.Difference) > AH_Percent_Complete_TakeOff))
+        if (AltitudeHoldController.Flags.TakeOffInProgress || (ABS(AltitudeHoldController.Throttle.Difference) > AH_Percent_Complete_TakeOff))
         {
-          AHController.Flags.Hovering = false;
-          if (ABS(AHController.Throttle.Difference) <= AH_Percent_Complete_TakeOff)
+          AltitudeHoldController.Flags.Hovering = false;
+          if (ABS(AltitudeHoldController.Throttle.Difference) <= AH_Percent_Complete_TakeOff)
           {
-            AHController.Target.Position.Z = 0;
+            AltitudeHoldController.Target.Position.Z = 0;
           }
           else
           {
-            AHController.Target.Position.Z = ((AHController.Throttle.Difference - ((AHController.Throttle.Difference > 0) ? AH_Percent_Complete_TakeOff : -AH_Percent_Complete_TakeOff)) * GET_SET[PID_ALTITUDE].kP) / 4;
+            AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Throttle.Difference - ((AltitudeHoldController.Throttle.Difference > 0) ? AH_Percent_Complete_TakeOff : -AH_Percent_Complete_TakeOff)) * GET_SET[PID_ALTITUDE].kP) / 4;
           }
         }
         else
         {
-          if (!AHController.Flags.Hovering)
+          if (!AltitudeHoldController.Flags.Hovering)
           {
-            AHController.Flags.Hovering = true;
-            AHController.Target.Altitude = Barometer.INS.Altitude.Estimated;
+            AltitudeHoldController.Flags.Hovering = true;
+            AltitudeHoldController.Target.Altitude = Barometer.INS.Altitude.Estimated;
           }
-          AHController.Target.Position.Z = ((AHController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
+          AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
         }
       }
-      ApplyAltitudeHoldPIDControl(AltitudeHoldControlTimer.ActualTime, AHController.Flags.Hovering);
+      AltitudeHoldController.Target.Position.Z = Constrain_32Bits(AltitudeHoldController.Target.Position.Z, -350, 350);
+      AltitudeHoldController.Target.Velocity.Z = Constrain_32Bits(AltitudeHoldController.Target.Position.Z - Barometer.INS.Velocity.Vertical, -600, 600);
+      AltitudeHoldController.PID.IntegratorSum += Constrain_32Bits(((AltitudeHoldController.Target.Velocity.Z * GET_SET[PID_VELOCITY_Z].kI * AltitudeHoldControlTimer.ActualTime) / 128) / ((AltitudeHoldController.Flags.Hovering && ABS(AltitudeHoldController.Target.Position.Z) < 100) ? 2 : 1), -16384000, 16384000);
+      AltitudeHoldController.PID.IntegratorError = Constrain_16Bits((AltitudeHoldController.PID.IntegratorSum / 65536), -250, 250);
+      AltitudeHoldController.PID.Control = ((AltitudeHoldController.Target.Velocity.Z * GET_SET[PID_VELOCITY_Z].kP) / 32) + AltitudeHoldController.PID.IntegratorError - (((int32_t)INS.AccelerationEarthFrame_Filtered[INS_VERTICAL_Z] * GET_SET[PID_VELOCITY_Z].kD) / 64);
+
+      RCController[THROTTLE] = Constrain_16Bits(AltitudeHoldController.Throttle.Hovering + AltitudeHoldController.PID.Control, AttitudeThrottleMin + ALT_HOLD_DEADBAND, AttitudeThrottleMax - ALT_HOLD_DEADBAND);
+
+#ifdef THR_SMOOTH_TEST
+
+      RCController[THROTTLE] = (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], ALT_HOLD_LPF_CUTOFF, AltitudeHoldControlTimer.ActualTime * 1e-6f);
+
+      DEBUG("RCController[THROTTLE]:%d", RCController[THROTTLE]);
+
+#endif
       return true;
     }
     else
@@ -201,8 +194,8 @@ bool ApplyAltitudeHoldControl(void)
       if (BaroModeActivated)
       {
         BaroModeActivated = false;
-        AHController.Flags.TakeOffInProgress = false;
-        AHController.Target.Position.Z = 0;
+        AltitudeHoldController.Flags.TakeOffInProgress = false;
+        AltitudeHoldController.Target.Position.Z = 0;
         ResetIntegralOfVelZError();
         ResetLandDetector();
       }
@@ -218,30 +211,33 @@ void SetNewAltitudeToHold(int32_t AltitudeSetPoint)
   {
     AltitudeSetPoint = Max_Altitude_Suported;
   }
-  AHController.Target.Altitude = AltitudeSetPoint;
+  AltitudeHoldController.Target.Altitude = AltitudeSetPoint;
 }
 
 bool GetTakeOffInProgress(void)
 {
-  return AHController.Flags.TakeOffInProgress;
+  return AltitudeHoldController.Flags.TakeOffInProgress;
 }
 
 bool GetAltitudeReached(void)
 {
-  return ABS(AHController.Target.Altitude - Barometer.INS.Altitude.Estimated) < VALID_ALT_REACHED;
+  return ABS(AltitudeHoldController.Target.Altitude - Barometer.INS.Altitude.Estimated) < VALID_ALT_REACHED;
 }
 
 bool GetGroundDetected(void)
 {
-  return (ABS(Barometer.INS.Velocity.Vertical) < MIN_VEL_Z_TO_VALID_GROUND) && (AHController.PID.IntegratorError <= -185) && (Barometer.INS.Altitude.Estimated < ConverMetersToCM(SAFE_ALTITUDE));
+  return (ABS(Barometer.INS.Velocity.Vertical) < MIN_VEL_Z_TO_VALID_GROUND) &&
+         (AltitudeHoldController.PID.IntegratorError <= -185) &&
+         (Barometer.INS.Altitude.Estimated < ConverMetersToCM(SAFE_ALTITUDE));
 }
 
 bool GetGroundDetectedFor100ms(void)
 {
-  return AHController.Flags.GroundAltitudeSet;
+  return AltitudeHoldController.Flags.GroundAltitudeSet;
 }
 
 bool GetLanded(void)
 {
-  return AHController.Flags.GroundAltitudeSet && (AHController.Time.OnLand >= LANDED_TIME);
+  return AltitudeHoldController.Flags.GroundAltitudeSet &&
+         (AltitudeHoldController.Time.OnLand >= LANDED_TIME);
 }

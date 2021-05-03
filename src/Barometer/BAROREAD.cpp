@@ -21,12 +21,13 @@
 #include "BitArray/BITARRAY.h"
 #include "BAROBACKEND.h"
 #include "Math/MATHSUPPORT.h"
+#include "Build/BOARDDEFS.h"
 
 #define BARO_SPIKES_SIZE 0x15
 
 AverageFilterInt32_Size5 Altitude_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A ALTITUDE,TAMANHO = 5 ITERAÇÕES
 
-void RecalculateBaroTotalPressure()
+void Remove_Barometer_Spikes(void)
 {
   static int32_t PressureVector[BARO_SPIKES_SIZE];
   static uint8_t PressureIndex;
@@ -44,7 +45,7 @@ void RecalculateBaroTotalPressure()
 float Get_Altitude_Difference(float Base_Pressure, float Pressure, float BaroTemperature)
 {
   float Result;
-#if __AVR_ATmega2560__
+#if USE_BARO_PRECISE_MATH
   //EM CPU MAIS LENTA USE UM CÁLCULO MENOS EXATO,PORÉM MAIS RÁPIDO
   float Scaling = Base_Pressure / Pressure;
   float CalcedTemperature = BaroTemperature + 273.15f;
@@ -59,7 +60,7 @@ float Get_Altitude_Difference(float Base_Pressure, float Pressure, float BaroTem
   return Result;
 }
 
-void CalculateBarometerAltitude()
+void Calculate_Barometer_Altitude(void)
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
@@ -73,29 +74,4 @@ void CalculateBarometerAltitude()
                                                                                                Barometer.Raw.PressureFiltered * 0.01f,
                                                                                                Barometer.Calibration.GroundTemperature)));
   }
-}
-
-int32_t GetAltitudeForGCS()
-{
-  static uint8_t InitialSamples = 0xC8;
-  static float BarometerTemperatureScaleForGCS;
-  static float BarometerGroundPressure;
-
-  if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
-  {
-    InitialSamples = 0xC8; //RECALIBRA A ALTITUDE DO BARO PARA O MODO DESARMADO
-    return Barometer.Altitude.Actual;
-  }
-
-  if (InitialSamples > 0)
-  {
-    BarometerGroundPressure = Barometer.Raw.PressureFiltered * 0.01f;
-    BarometerTemperatureScaleForGCS = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);
-    InitialSamples--;
-    return 0;
-  }
-
-  return ConverMetersToCM(Get_Altitude_Difference(BarometerGroundPressure,
-                                                  Barometer.Raw.PressureFiltered * 0.01f,
-                                                  BarometerTemperatureScaleForGCS));
 }

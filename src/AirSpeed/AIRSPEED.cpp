@@ -46,7 +46,7 @@ void AirSpeedClass::Initialization(void)
 
   AirSpeed.Healthy = true;
 
-  PT1FilterInit(&Pitot_Smooth, PITOT_LPF_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_FREQUENCY) * 1e-6f);
+  PT1FilterInit(&Pitot_Smooth, PITOT_LPF_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
 
 #ifdef USE_AIRSPEED_AUTO_SCALE_CALIBRATION
   AIRSPEEDCALIBRATION.Initialization();

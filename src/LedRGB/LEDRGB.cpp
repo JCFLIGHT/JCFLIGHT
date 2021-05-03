@@ -52,7 +52,7 @@ void LEDRGB::Initialization()
 
 void LEDRGB::Update()
 {
-  if (!AccCalibrationRunning() && !GyroCalibrationRunning() && !GCS.ConfigFlight && !IMU.Compass.Calibrating && !STICKS.PreArm_Run)
+  if (!ACCCALIBRATION.GetRunning() && !GYROCALIBRATION.GetRunning() && !GCS.ConfigFlight && !IMU.Compass.Calibrating && !STICKS.PreArm_Run)
   {
     RGB.Function(CALL_LED_GPS);
   }
@@ -311,7 +311,7 @@ void LEDRGB::GPS_Led(void)
   //8 SATELITES OU MAIS = 4 PISCADAS
   static uint8_t BlinkCount;
   static uint32_t BlinkTime = SCHEDULERTIME.GetMillis();
-  if (GPSParameters.Mode.Navigation <= DO_POSITION_HOLD)
+  if (GPS_Resources.Mode.Navigation <= DO_POSITION_HOLD)
   {
     if (SCHEDULERTIME.GetMillis() - BlinkTime >= 150)
     {
@@ -326,7 +326,7 @@ void LEDRGB::GPS_Led(void)
         }
         else
         {
-          if (BlinkCount++ > 2 * GPSParameters.Navigation.Misc.Get.Satellites)
+          if (BlinkCount++ > 2 * GPS_Resources.Navigation.Misc.Get.Satellites)
           {
             BlinkCount = 0;
           }

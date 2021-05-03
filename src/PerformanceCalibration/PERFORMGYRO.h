@@ -17,7 +17,11 @@
 
 #ifndef PERFORMGYRO_H_
 #define PERFORMGYRO_H_
-void StartGyroCalibration(void);
-bool GyroCalibrationRunning(void);
-void Gyroscope_Calibration(void);
+class GyroCalClass
+{
+public:
+  bool GetRunning(void);
+  void Update(void);
+};
+extern GyroCalClass GYROCALIBRATION;
 #endif

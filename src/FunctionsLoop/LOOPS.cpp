@@ -22,12 +22,13 @@ void Slow_Loop()
 {
         STICKS.Pre_Arm();
         COMPASS.Constant_Read();
+        BEEPER.UpdateSafeToOthersBeepsCounter();
         UpdateValuesOfPID();
 }
 
 void Medium_Loop()
 {
-        int32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_MEDIUM_LOOP);
+        uint32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_MEDIUM_LOOP);
         const float ThisDeltaTime = (float)ThisTaskTimeUs * 1e-6f;
 
         DECODE.Update();
@@ -81,7 +82,7 @@ void Super_Fast_Loop()
 
 void Integral_Loop()
 {
-        int32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
+        uint32_t ThisTaskTimeUs = GetTaskDeltaTime(TASK_INTEGRAL_LOOP);
         const float ThisDeltaTime = (float)ThisTaskTimeUs * 1e-6f;
 
 #ifdef __AVR_ATmega2560__
@@ -94,10 +95,10 @@ void Integral_Loop()
         Gyro_ReadBufferData();
         AHRS.Update(ThisDeltaTime);
         RC_PID_Update();
-        GPS_Orientation_Update();
         WAYPOINT.Update();
         AUTOLAUNCH.Update();
         TECS.Update(ThisDeltaTime);
+        MultirotorUpdateAutoPilotControl();
         PIDXYZ.Update(ThisDeltaTime);
         SERVOSMASTER.Update();
         ApplyMixingForMotorsAndServos(ThisDeltaTime);

@@ -18,7 +18,6 @@
 #ifndef IMUCALGCS_H_
 #define IMUCALGCS_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern bool AccCalibratedPosition[6];
 int8_t GetAxisInclinedToCalibration(int16_t AccSample[3]);
 uint8_t GetImageToGCS(void);
 #endif

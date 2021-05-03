@@ -18,7 +18,8 @@
 #ifndef WAYPOINT_H_
 #define WAYPOINT_H_
 #include "Build/LIBDEPENDENCIES.h"
-struct _GetWayPointPacketOne
+#include "Common/STRUCTS.h"
+typedef struct
 {
   int32_t LatitudeOne;
   int32_t LongitudeOne;
@@ -73,9 +74,9 @@ struct _GetWayPointPacketOne
     FlightModeFive = 0;
     GPSHoldTimedFive = 0;
   }
-};
+} _GetWayPointPacketOne;
 
-struct _GetWayPointPacketTwo
+typedef struct
 {
   int32_t LatitudeSix;
   int32_t LongitudeSix;
@@ -130,18 +131,24 @@ struct _GetWayPointPacketTwo
     FlightModeTen = 0;
     GPSHoldTimedTen = 0;
   }
-};
+} _GetWayPointPacketTwo;
 
 #define WAYPOINTS_MAXIMUM 10
+#define OTHERS_PARAMS_MAXIMUM 3 //ALTITUDE,TEMPO DO GPS-HOLD E O MODO DE VOO
 #define INITIAL_ADDR_OF_COORDINATES 704
 #define FINAL_ADDR_OF_COORDINATES 780
 #define INITIAL_ADDR_OF_OTHERS_PARAMS 784
 #define FINAL_ADDR_OF_OTHERS_PARAMS 813
+#define COORDINATES_ADDR_TO_COMPARE ((INITIAL_ADDR_OF_COORDINATES + FINAL_ADDR_OF_COORDINATES + 2) / 2)
+#define GPS_HOLD_TIMED_ADDR_TO_COMPARE (INITIAL_ADDR_OF_OTHERS_PARAMS + WAYPOINTS_MAXIMUM - 1)
+#define FLIGHT_MODE_ADDR_TO_COMPARE ((WAYPOINTS_MAXIMUM * (OTHERS_PARAMS_MAXIMUM - 1)) + INITIAL_ADDR_OF_OTHERS_PARAMS)
+#define ALTITUDE_ADDR_TO_COMPARE ((WAYPOINTS_MAXIMUM * OTHERS_PARAMS_MAXIMUM) + INITIAL_ADDR_OF_OTHERS_PARAMS)
 
 enum WayPointOnce_Enum
 {
   WAYPOINT_PREDICT_POS_ALT = 0,
   WAYPOINT_NORMAL_FLIGHT,
+  WAYPOINT_RESET_POS_ALT,
   SIZE_OF_WAYPOINT_ONCE
 };
 
@@ -153,9 +160,72 @@ enum WayPointMisc_Enum
   WAYPOINT_NORMALIZE_RESET
 };
 
-extern struct _GetWayPointPacketOne GetWayPointPacketOne;
-extern struct _GetWayPointPacketTwo GetWayPointPacketTwo;
-extern uint8_t EEPROM_Function;
+enum WayPointStorage_Enum
+{
+  WAYPOINT_STORAGE_NONE = 0,
+  WAYPOINT_STORAGE_RESET,
+  WAYPOINT_STORAGE_SAVE
+};
+
+typedef struct
+{
+
+  struct AutoTakeOff_Struct
+  {
+
+    struct Flags_Struct
+    {
+      bool State = false;
+      bool Normalized = false;
+    } Flags;
+
+    struct Throttle_Struct
+    {
+      uint8_t IncrementCount = 0;
+      int16_t Increment = MIN_STICKS_PULSE;
+    } Throttle;
+
+  } AutoTakeOff;
+
+  struct Mission_Struct
+  {
+
+    struct Flags_Struct
+    {
+      bool Reached = false;
+      bool OnceFlight[SIZE_OF_WAYPOINT_ONCE];
+    } Flags;
+
+    struct Coordinates_Struct
+    {
+      int32_t Latitude[WAYPOINTS_MAXIMUM];
+      int32_t Longitude[WAYPOINTS_MAXIMUM];
+    } Coordinates;
+
+    struct OthersParams_Struct
+    {
+      uint8_t Altitude[WAYPOINTS_MAXIMUM];
+      uint8_t FlightMode[WAYPOINTS_MAXIMUM];
+      uint8_t PositionHoldTime[WAYPOINTS_MAXIMUM];
+      uint8_t Number = 0;
+      uint8_t Mode = WAYPOINT_INIT;
+      uint32_t PositionHoldTimeToCompare = 0;
+    } OthersParams;
+
+  } Mission;
+
+  struct Storage_Struct
+  {
+    uint8_t Function = WAYPOINT_STORAGE_NONE;
+    uint8_t ArrayCount = 0;
+  } Storage;
+
+} WayPoint_Resources_Struct;
+
+extern WayPoint_Resources_Struct WayPointResources;
+extern _GetWayPointPacketOne GetWayPointPacketOne;
+extern _GetWayPointPacketTwo GetWayPointPacketTwo;
+
 class WayPointClass
 {
 public:

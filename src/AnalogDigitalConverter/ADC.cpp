@@ -17,6 +17,7 @@
 
 #include "ADC.h"
 #include "HAL/HALADC.h"
+#include "Build/BOARDDEFS.h"
 
 AnalogReadClass ANALOGSOURCE;
 
@@ -28,8 +29,8 @@ int16_t AnalogReadClass::Read(uint8_t AnalogPin)
 float AnalogReadClass::Read_Voltage_Ratiometric(uint8_t AnalogPin)
 {
 #ifndef __AVR_ATmega2560__
-  return (float)ANALOGSOURCE.Read(AnalogPin) * (3.3f / 4095.0f);
+  return (float)ANALOGSOURCE.Read(AnalogPin) * (ADC_VOLTAGE_OPERATION / ADC_MAX_SAMPLES);
 #else
-  return (float)ANALOGSOURCE.Read(AnalogPin) * (5.0f / 1023.0f);
+  return (float)ANALOGSOURCE.Read(AnalogPin) * (ADC_VOLTAGE_OPERATION / ADC_MAX_SAMPLES);
 #endif
 }

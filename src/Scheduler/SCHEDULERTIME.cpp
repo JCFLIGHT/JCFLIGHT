@@ -28,7 +28,7 @@ volatile uint32_t Timer0_OverFlow = 0;
 volatile uint32_t Timer0_Scheduler_Millis = 0;
 static uint8_t Timer0_Fraction = 0;
 
-void SchedulerTimeClass::Initialization()
+void SchedulerTimeClass::Initialization(void)
 {
   __asm__ __volatile__("sei" ::
                            : "memory");
@@ -58,7 +58,7 @@ void SchedulerTimeClass::Initialization()
   _SFR_BYTE(ADCSRA) |= _BV(ADEN);
 }
 
-uint32_t SchedulerTimeClass::GetMillis()
+uint32_t SchedulerTimeClass::GetMillis(void)
 {
   uint32_t MillisCount;
   uint8_t oldSREG = SREG;
@@ -69,7 +69,7 @@ uint32_t SchedulerTimeClass::GetMillis()
   return MillisCount;
 }
 
-uint32_t SchedulerTimeClass::GetMicros()
+uint32_t SchedulerTimeClass::GetMicros(void)
 {
   uint32_t MillisCount;
   uint8_t oldSREG = SREG, TCNTCount;
@@ -138,16 +138,16 @@ void __vector_23(void)
 
 #elif defined ESP32
 
-void SchedulerTimeClass::Initialization()
+void SchedulerTimeClass::Initialization(void)
 {
 }
 
-uint32_t SchedulerTimeClass::GetMillis()
+uint32_t SchedulerTimeClass::GetMillis(void)
 {
   return millis();
 }
 
-uint32_t SchedulerTimeClass::GetMicros()
+uint32_t SchedulerTimeClass::GetMicros(void)
 {
   return micros();
 }
@@ -164,16 +164,16 @@ void SchedulerTimeClass::MicroSecondsSleep(uint16_t MicroSeconds)
 
 #elif defined __arm__
 
-void SchedulerTimeClass::Initialization()
+void SchedulerTimeClass::Initialization(void)
 {
 }
 
-uint32_t SchedulerTimeClass::GetMillis()
+uint32_t SchedulerTimeClass::GetMillis(void)
 {
   return millis();
 }
 
-uint32_t SchedulerTimeClass::GetMicros()
+uint32_t SchedulerTimeClass::GetMicros(void)
 {
   return micros();
 }

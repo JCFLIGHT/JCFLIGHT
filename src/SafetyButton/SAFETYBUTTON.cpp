@@ -34,7 +34,7 @@ SAFETYBUTTONCLASS SAFETYBUTTON;
 #define MAX_BUTTON_COUNT 255  //ITERAÇÕES
 #define BUTTON_SCHEDULE 33    //33MS - 30HZ
 
-void SAFETYBUTTONCLASS::Initialization()
+void SAFETYBUTTONCLASS::Initialization(void)
 {
     SAFETY_BUTTON_LED_PINOUT;
 #ifdef ESP32
@@ -42,7 +42,7 @@ void SAFETYBUTTONCLASS::Initialization()
 #endif
 }
 
-bool SAFETYBUTTONCLASS::GetButtonInterval()
+bool SAFETYBUTTONCLASS::GetButtonInterval(void)
 {
     if (SCHEDULERTIME.GetMillis() - SAFETYBUTTON.LastDebounceTime < BUTTON_SCHEDULE)
     {
@@ -52,12 +52,12 @@ bool SAFETYBUTTONCLASS::GetButtonInterval()
     return true;
 }
 
-bool SAFETYBUTTONCLASS::GetButtonState()
+bool SAFETYBUTTONCLASS::GetButtonState(void)
 {
     return (ANALOGSOURCE.Read(SAFETY_BUTTON_PIN_READ_STATE) > 0x200 ? false : true);
 }
 
-void SAFETYBUTTONCLASS::FlashButton()
+void SAFETYBUTTONCLASS::FlashButton(void)
 {
     static Led_Pattern_Enum Pattern;
 
@@ -180,7 +180,7 @@ void SAFETYBUTTONCLASS::SetStateToLed(bool State)
     }
 }
 
-bool SAFETYBUTTONCLASS::GetSafeStateToOutput()
+bool SAFETYBUTTONCLASS::GetSafeStateToOutput(void)
 {
     if (!SAFETYBUTTON.SafeButtonEnabled())
     {
@@ -189,7 +189,7 @@ bool SAFETYBUTTONCLASS::GetSafeStateToOutput()
     return SAFETYBUTTON.SafeStateToApplyPulse;
 }
 
-bool SAFETYBUTTONCLASS::SafeButtonEnabled()
+bool SAFETYBUTTONCLASS::SafeButtonEnabled(void)
 {
     if (STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == OFF_ALL_DISP ||
         STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR) == ONLY_BUZZER)

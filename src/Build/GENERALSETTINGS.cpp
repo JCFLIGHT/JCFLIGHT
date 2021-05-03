@@ -33,14 +33,13 @@
 #include "RadioControl/RCCONFIG.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #include "AirSpeed/AIRSPEED.h"
-#include "AHRS/AHRS.h"
 #include "SafetyButton/SAFETYBUTTON.h"
 #include "Param/PARAM.h"
 #include "RadioControl/RCSMOOTH.h"
 #include "ServosMaster/SERVOSMASTER.h"
 #include "BatteryMonitor/BATTERY.h"
 
-void GeneralSettingsInitialization()
+void GeneralSettingsInitialization(void)
 {
   PARAM.Initialization();
   AUXFLIGHT.Initialization();
@@ -54,11 +53,9 @@ void GeneralSettingsInitialization()
   LoadGPSParameters();
   PIDXYZ.Initialization();
   KALMAN.Init();
-  IMU_Filters_Initialization();
   RCCONFIG.Init();
   AIRSPEED.Initialization();
   GCS.UpdateParametersToGCS();
-  AHRS.Initialization();
   SAFETYBUTTON.Initialization();
   RCInterpolationInit();
   SERVOSMASTER.Initialization();

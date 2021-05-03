@@ -20,13 +20,13 @@
 
 static BiquadFilter_Struct Smooth_AnalogRead;
 
-#define THIS_LOOP_FREQUENCY 1000 //FREQUENCIA DO LOOP INFINITO
+#define THIS_LOOP_FREQ 1000 //FREQUENCIA DO LOOP INFINITO
 #define FILTER_CUTOFF_FREQ 20    //20HZ
 
 void setup()
 {
     Serial.begin(115200);
-    BIQUADFILTER.Settings(&Smooth_AnalogRead, FILTER_CUTOFF_FREQ, 0, THIS_LOOP_FREQUENCY, LPF);
+    BIQUADFILTER.Settings(&Smooth_AnalogRead, FILTER_CUTOFF_FREQ, 0, THIS_LOOP_FREQ, LPF);
 }
 
 void loop()

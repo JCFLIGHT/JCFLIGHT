@@ -18,5 +18,5 @@
 #ifndef GIMBAL_H_
 #define GIMBAL_H_
 #include "Build/LIBDEPENDENCIES.h"
-void Gimbal_Controll();
+void Gimbal_Controll(void);
 #endif

@@ -18,6 +18,6 @@
 #ifndef MACHINEMAIN_H_
 #define MACHINEMAIN_H_
 #include "Common/COMMON.h"
-void MachineInit();
-void MachineRun();
+void MachineInit(void);
+void MachineRun(void);
 #endif

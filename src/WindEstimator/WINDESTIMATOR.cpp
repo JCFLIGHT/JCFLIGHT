@@ -39,15 +39,15 @@ void WindEstimatorClass::Update() //50Hz
 
     WindEstimator.Time.Now = SCHEDULERTIME.GetMillis();
 
-    if (!GetAirPlaneEnabled() || !Get_GPS_Heading_Is_Valid() || !GPSParameters.Navigation.Misc.Velocity.NEDStatus)
+    if (!GetAirPlaneEnabled() || !Get_GPS_Heading_Is_Valid() || !GPS_Resources.Navigation.Misc.Velocity.NEDStatus)
     {
         return;
     }
 
     //OBTÉM A VELOCIDADE 3D DO GPS EM CM/S
-    WindEstimator.Ground.Velocity[ROLL] = GPSParameters.Navigation.Misc.Velocity.Get[NORTH];
-    WindEstimator.Ground.Velocity[PITCH] = GPSParameters.Navigation.Misc.Velocity.Get[EAST];
-    WindEstimator.Ground.Velocity[YAW] = GPSParameters.Navigation.Misc.Velocity.Get[DOWN];
+    WindEstimator.Ground.Velocity[ROLL] = GPS_Resources.Navigation.Misc.Velocity.Get[NORTH];
+    WindEstimator.Ground.Velocity[PITCH] = GPS_Resources.Navigation.Misc.Velocity.Get[EAST];
+    WindEstimator.Ground.Velocity[YAW] = GPS_Resources.Navigation.Misc.Velocity.Get[DOWN];
 
     //OBTÉM A DIREÇÃO DA FUSELAGEM NO EARTH-FRAME (SACADO DO AHRS)
     WindEstimator.Fuselage.Direction[ROLL] = Rotation.Matrix3x3[0][0];
@@ -126,6 +126,7 @@ void WindEstimatorClass::Update() //50Hz
         WindEstimator.Time.LastUpdate = WindEstimator.Time.Now;
         WindEstimator.ValidWindEstimated = true;
     }
+    /*
     else if (WindEstimator.Time.Now - WindEstimator.Time.LastUpdate > 2000 &&    //0.5HZ
              Get_AirSpeed_Enabled() && Get_AirSpeed_Type() != VIRTUAL_AIR_SPEED) //TUBO DE PITOT REAL ATIVADO?SIM...
     {
@@ -151,6 +152,7 @@ void WindEstimatorClass::Update() //50Hz
         float AirSpeedY = WindEstimator.Ground.Velocity[PITCH] - WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH];
         float AirSpeedFinal = Fast_SquareRoot(SquareFloat(AirSpeedX) + SquareFloat(AirSpeedY)); //VELOCIDADE TOTAL EM LINHA RETA FUNDINDO O GPS COM O AIR-SPEED
     }
+*/
 #endif
 }
 
@@ -167,7 +169,7 @@ float WindEstimatorClass::GetEstimatedValueHorizontal(uint16_t *Angle)
         {
             EstimatedHorizontalWindAngle += 6.283185482f;
         }
-        *Angle = ConvertRadiansToDeciDegrees(EstimatedHorizontalWindAngle);
+        *Angle = ConvertRadiansToCentiDegrees(EstimatedHorizontalWindAngle);
     }
     return Fast_SquareRoot(SquareFloat(EstimatedRollWindSpeed) + SquareFloat(EstimatedPitchWindSpeed));
 }

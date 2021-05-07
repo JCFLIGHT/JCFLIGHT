@@ -182,7 +182,7 @@ typedef struct
     struct Throttle_Struct
     {
       uint8_t IncrementCount = 0;
-      int16_t Increment = MIN_STICKS_PULSE;
+      int16_t Increment = 1000;
     } Throttle;
 
   } AutoTakeOff;

@@ -26,6 +26,7 @@
 #include "HAL/LEARNINGRECEIVER.h"
 #include "HAL/HALPPM.h"
 #include "ParamsToGCS/CHECKSUM.h"
+#include "BitArray/BITARRAY.h"
 
 DecodeClass DECODE;
 

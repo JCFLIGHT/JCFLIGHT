@@ -21,6 +21,9 @@
 #include "Math/MATHSUPPORT.h"
 #include "PID/RCPID.h"
 #include "GPSNavigation/NAVIGATION.h"
+#include "BitArray/BITARRAY.h"
+#include "RadioControl/DECODE.h"
+#include "Common/RCDEFINES.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -58,6 +61,6 @@ void ApplyThrottleBoost(void)
     const bool Apply_Angle_Boost = IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) && GPS_Resources.Navigation.AutoPilot.Control.Enabled;
     Set_Throttle_Out(RCController[THROTTLE], Apply_Angle_Boost);
 #ifdef PRINTLN_THR_BOOST
-    PRINTF.SendToConsole(ProgramMemoryString("RCController[THROTTLE]:%d\n"), RCController[THROTTLE]);
+    DEBUG("RCController[THROTTLE]:%d", RCController[THROTTLE]);
 #endif
 }

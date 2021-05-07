@@ -31,7 +31,7 @@ uint8_t BaroType = 0; //DETECTA O BARÔMETRO AUTOMATICAMENTE
 
 /*
 //ERA PRA ESSAS FUNÇÕES FUNCIONAREM,MAS ELAS MATAM O CICLO DE MAQUINA DO ATMEGA2560 E GERA UM RESET AUTOMATICO
-static bool MS5611DeviceDetect(void)
+static bool GetMS5611DeviceDetect(void)
 {
     I2C.WriteRegister(ADDRESS_BAROMETER_MS5611, 0x1E, 0x01);
     SCHEDULERTIME.Sleep(5);
@@ -48,7 +48,7 @@ static bool MS5611DeviceDetect(void)
     return false;
 }
 
-static bool BMP280DeviceDetect(void)
+static bool GetBMP280DeviceDetect(void)
 {
     for (uint8_t IndexCount = 0; IndexCount < 5; IndexCount++)
     {
@@ -67,13 +67,13 @@ static bool BMP280DeviceDetect(void)
 void BarometerClass::Initialization(void)
 {
     /*
-    if (MS5611DeviceDetect())
+    if (GetMS5611DeviceDetect())
     {
         LOG("DISPOSITIVO ENCONTRADO - 0x77 << MS5611");
         BAROMETER.SetType(ADDRESS_BAROMETER_MS5611);
         I2CResources.Found.Barometer = true;
     }
-    else if (BMP280DeviceDetect())
+    else if (GetBMP280DeviceDetect())
     {
         LOG("DISPOSITIVO ENCONTRADO - 0x76 << BMP280");
         BAROMETER.SetType(ADDRESS_BAROMETER_BMP280);

@@ -27,39 +27,39 @@
 void Gimbal_Controll(void)
 {
   //CONTROLE DO GIMBAL
-  if (GimbalControlAux == NONE)
+  if (GimbalConfig == NONE)
   {
     MotorControl[GIMBAL] = MIDDLE_STICKS_PULSE;
   }
-  else if (GimbalControlAux == RCAUX1)
+  else if (GimbalConfig == RCAUX1)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX1);
   }
-  else if (GimbalControlAux == RCAUX2)
+  else if (GimbalConfig == RCAUX2)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX2);
   }
-  else if (GimbalControlAux == RCAUX3)
+  else if (GimbalConfig == RCAUX3)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX3);
   }
-  else if (GimbalControlAux == RCAUX4)
+  else if (GimbalConfig == RCAUX4)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX4);
   }
-  else if (GimbalControlAux == RCAUX5)
+  else if (GimbalConfig == RCAUX5)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX5);
   }
-  else if (GimbalControlAux == RCAUX6)
+  else if (GimbalConfig == RCAUX6)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX6);
   }
-  else if (GimbalControlAux == RCAUX7)
+  else if (GimbalConfig == RCAUX7)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX7);
   }
-  else if (GimbalControlAux == RCAUX8)
+  else if (GimbalConfig == RCAUX8)
   {
     MotorControl[GIMBAL] = DECODE.GetRxChannelOutput(AUX8);
   }

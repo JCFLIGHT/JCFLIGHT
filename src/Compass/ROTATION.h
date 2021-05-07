@@ -20,7 +20,7 @@
 class ClassCompassRotation
 {
 public:
-    void Rotate();
+    void Rotate(void);
 };
 extern ClassCompassRotation COMPASSROTATION;
 #endif

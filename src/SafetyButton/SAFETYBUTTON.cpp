@@ -25,6 +25,7 @@
 #include "AnalogDigitalConverter/ADC.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/RCDEFINES.h"
+#include "BitArray/BITARRAY.h"
 
 SAFETYBUTTONCLASS SAFETYBUTTON;
 

@@ -19,14 +19,13 @@
 #define STRUCTS_H_
 
 #include "ENUM.h"
-#include "RCDEFINES.h"
+#include "inttypes.h"
 
 typedef struct
 {
   struct Accelerometer_Struct
   {
     int16_t Read[3] = {0, 0, 0};
-    int16_t ReadNotFiltered[3] = {0, 0, 0};
     float ReadFloat[3] = {0.0f, 0.0f, 0.0f};
 
     struct Gravity_Struct
@@ -42,15 +41,13 @@ typedef struct
   {
     float Scale = 1.0f;
     int16_t Read[3] = {0, 0, 0};
-    int16_t ReadNotFiltered[3] = {0, 0, 0};
     float ReadFloat[3] = {0.0f, 0.0f, 0.0f};
   } Gyroscope;
 
   struct Compass_Struct
   {
-    bool Calibrating = false;
+    uint8_t Type = 0;
     int16_t Read[3] = {0, 0, 0};
-    float ReadSmooth[3] = {0, 0, 0};
   } Compass;
 
 } IMU_Struct;
@@ -236,12 +233,16 @@ typedef struct
 
   struct Magnetometer_Struct
   {
-    float Gain[3] = {1.0f, 1.0f, 1.0f};
+    bool Calibrating = false;
+    float Difference = 0.0f;
+    float Average = 0.0f;
+    float GaussNewtonOffSet[3] = {0.0f, 0.0f, 0.0f};
+    int16_t Previous[3] = {0, 0, 0};
+    int16_t Deviation[3] = {0, 0, 0};
+    int16_t Gain[3] = {1024, 1024, 1024};
     int16_t OffSet[3] = {0, 0, 0};
-    int16_t MinOffSet[3] = {0, 0, 0};
-    int16_t MaxOffSet[3] = {0, 0, 0};
     int16_t Count = 0;
-    int16_t SimpleMode_Initial_Value = 0;
+    int16_t SimpleModeHeading = 0;
   } Magnetometer;
 
 } Calibration_Struct;
@@ -295,6 +296,7 @@ typedef struct
 
   struct Navigation_Struct
   {
+    float HeadingHoldLimit = 0.0f;
     int16_t Speed[2] = {0, 0};
     int16_t RateError[2] = {0, 0};
     int16_t HeadingHoldTarget = 0;

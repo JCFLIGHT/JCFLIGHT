@@ -75,7 +75,7 @@ void DISABLE_THIS_FLIGHT_MODE(uint8_t FlightModeName)
     BitArrayClear(SetFlightMode, FlightModeName);
 }
 
-void ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(uint8_t FlightModeName, bool Dependency)
+void ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(uint8_t FlightModeName, bool Dependency)
 {
     if (Dependency)
     {
@@ -92,17 +92,17 @@ bool IS_STATE_ACTIVE(uint8_t StateName)
     return BitArrayGet(SetFlightMode, StateName);
 }
 
-void ENABLE_STATE(uint8_t StateName)
+void ENABLE_THIS_STATE(uint8_t StateName)
 {
     BitArraySet(SetFlightMode, StateName);
 }
 
-void DISABLE_STATE(uint8_t StateName)
+void DISABLE_THIS_STATE(uint8_t StateName)
 {
     BitArrayClear(SetFlightMode, StateName);
 }
 
-void ENABLE_DISABLE_STATE_WITH_DEPENDENCY(uint8_t StateName, bool Dependency)
+void ENABLE_DISABLE_THIS_STATE_WITH_DEPENDENCY(uint8_t StateName, bool Dependency)
 {
     if (Dependency)
     {

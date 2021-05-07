@@ -29,6 +29,7 @@
 #include "GPS/GPSUBLOX.h"
 #include "IMU/ACCGYROREAD.h"
 #include "GPSNavigation/NAVIGATION.h"
+#include "PID/PIDPARAMS.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -85,6 +86,7 @@ void AHRSClass::Initialization(void)
   CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedValueInRadians);
   CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedValueInRadians);
   CorrectedMagneticFieldNorth.Yaw = 0;
+  GPS_Resources.Navigation.HeadingHoldLimit = Fast_Cosine(ConvertToRadians(GET_SET[MAX_ROLL_LEVEL].MaxValue)) * Fast_Cosine(ConvertToRadians(GET_SET[MAX_PITCH_LEVEL].MaxValue));
   //RESETA O QUATERNION E A MATRIX
   QuaternionInit(&Orientation);
   ComputeRotationMatrix();

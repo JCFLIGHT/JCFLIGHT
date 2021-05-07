@@ -23,162 +23,106 @@
 #include "BAR/BAR.h"
 #include "ROTATION.h"
 #include "ORIENTATION.h"
-#include "COMPASSCAL.h"
-#include "COMPASSLPF.h"
 #include "Common/ENUM.h"
 #include "Common/STRUCTS.h"
 #include "GPS/GPSSTATES.h"
 #include "WHOAMI.h"
 #include "PerformanceCalibration/PERFORMACC.h"
+#include "PerformanceCalibration/PERFORMCOMPASS.h"
 #include "IMU/ACCGYROREAD.h"
+#include "FastSerial/PRINTF.h"
 
 CompassReadClass COMPASS;
 
-static int32_t XYZ_CompassBias[3] = {0, 0, 0};
-
-void CompassReadClass::Initialization()
+void CompassReadClass::Initialization(void)
 {
+  //USA ISSO POR ENQUANTO,POR QUE AS FUNÇÕES COMENTADAS ABAIXO NÃO FUNCIONAM CORRETAMENTE NO ATMEGA2560
   if (!I2CResources.Found.Compass)
   {
     return;
   }
 
-  Check_Whoami();
-
-  if (COMPASS.Type == COMPASS_AK8975)
+  /*
+  if (GetAK8975DeviceDetected())
   {
-    SCHEDULERTIME.Sleep(100);
+    IMU.Compass.Type = COMPASS_AK8975;
+    I2CResources.Found.Compass = true;
+    LOG("DISPOSITIVO ENCONTRADO - 0x0C < AK8975");
+    LINE_SPACE;
+  }
+  else if (GetHMC5883DeviceDetected())
+  {
+    IMU.Compass.Type = COMPASS_HMC5883;
+    I2CResources.Found.Compass = true;
+    LOG("DISPOSITIVO ENCONTRADO - 0x1E << HMC5883");
+    LINE_SPACE;
+  }
+  else if (GetQMC5883DeviceDetected())
+  {
+    IMU.Compass.Type = COMPASS_QMC5883;
+    I2CResources.Found.Compass = true;
+    LOG("DISPOSITIVO ENCONTRADO - 0x0D << QMC5883");
+    LINE_SPACE;
+  }
+  */
+
+  if (IMU.Compass.Type == COMPASS_AK8975)
+  {
     I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
-    SCHEDULERTIME.Sleep(100);
-  }
-
-  if (COMPASS.Type == COMPASS_HMC5843)
-  {
-    SCHEDULERTIME.Sleep(100);
-    I2C.WriteRegister(COMPASS.Address, 0x00, 0x71);
-    SCHEDULERTIME.Sleep(50);
-    I2C.WriteRegister(COMPASS.Address, 0x01, 0x60);
-    I2C.WriteRegister(COMPASS.Address, 0x02, 0x01);
-    SCHEDULERTIME.Sleep(100);
-    COMPASS.InitialReadBufferData();
     SCHEDULERTIME.Sleep(10);
-    Calibration.Magnetometer.Gain[ROLL] = 1000.0 / ABS(IMU.Compass.Read[ROLL]);
-    Calibration.Magnetometer.Gain[PITCH] = 1000.0 / ABS(IMU.Compass.Read[PITCH]);
-    Calibration.Magnetometer.Gain[YAW] = 1000.0 / ABS(IMU.Compass.Read[YAW]);
-    I2C.WriteRegister(COMPASS.Address, 0x00, 0x70);
-    I2C.WriteRegister(COMPASS.Address, 0x01, 0x20);
-    I2C.WriteRegister(COMPASS.Address, 0x02, 0x00);
   }
 
-  if (COMPASS.Type == COMPASS_HMC5883)
+  if (IMU.Compass.Type == COMPASS_HMC5883)
   {
-    bool BiasOk = true;
-    I2C.WriteRegister(COMPASS.Address, 1, 40);
-    I2C.WriteRegister(COMPASS.Address, 2, 1);
-    SCHEDULERTIME.Sleep(100);
-    COMPASS.InitialReadBufferData();
-    if (!COMPASS.PushBias(0x011))
-    {
-      BiasOk = false;
-    }
-    if (!COMPASS.PushBias(0x012))
-    {
-      BiasOk = false;
-    }
-    if (BiasOk)
-    {
-      //CALCULA O GANHO PARA CADA EIXO DO COMPASS
-      Calibration.Magnetometer.Gain[ROLL] = 19024.00 / XYZ_CompassBias[ROLL];
-      Calibration.Magnetometer.Gain[PITCH] = 19024.00 / XYZ_CompassBias[PITCH];
-      Calibration.Magnetometer.Gain[YAW] = 19024.00 / XYZ_CompassBias[YAW];
-    }
-    I2C.WriteRegister(COMPASS.Address, 0, 0x70);
-    I2C.WriteRegister(COMPASS.Address, 1, 0x20);
-    I2C.WriteRegister(COMPASS.Address, 2, 0x00);
+    I2C.WriteRegister(ADDRESS_COMPASS_HMC5883, 0x00, 0x78);
+    SCHEDULERTIME.Sleep(5);
+
+    I2C.WriteRegister(ADDRESS_COMPASS_HMC5883, 0x01, 0x20);
+    SCHEDULERTIME.Sleep(5);
+
+    I2C.WriteRegister(ADDRESS_COMPASS_HMC5883, 0x02, 0x00);
     SCHEDULERTIME.Sleep(100);
   }
 
-  if (COMPASS.Type == COMPASS_QMC5883)
+  if (IMU.Compass.Type == COMPASS_QMC5883)
   {
-    I2C.WriteRegister(COMPASS.Address, 0x0B, 0x01);
-    I2C.WriteRegister(COMPASS.Address, 0x09, 0xC1);
+    I2C.WriteRegister(ADDRESS_COMPASS_QMC5883, 0x0B, 0x01);
+    I2C.WriteRegister(ADDRESS_COMPASS_QMC5883, 0x09, 0x1D);
   }
+
+  if (Get_GPS_Type(GPS_DJI_NAZA))
+  {
+    IMU.Compass.Type = COMPASS_DJI_NAZA;
+    I2CResources.Found.Compass = true;
+  }
+
+  COMPASSCALIBRATION.Initalization();
 }
 
-bool CompassReadClass::PushBias(uint8_t InputBias)
+void CompassReadClass::ReadBufferData(void)
 {
-  int16_t ABS_MagRead;
-  I2C.WriteRegister(COMPASS.Address, 0, InputBias);
-  for (uint8_t GetSamplesOfMag = 0; GetSamplesOfMag < 10; GetSamplesOfMag++) //RECOLHE 10 AMOSTRAS
+  switch (IMU.Compass.Type)
   {
-    I2C.WriteRegister(COMPASS.Address, 2, 1);
-    SCHEDULERTIME.Sleep(100);
-    COMPASS.InitialReadBufferData();
-    //VERIFICA SE NENHUMA LEITURA DO MAG IRÁ EXCEDER O LIMITE DE 2^12
-    //ROLL
-    ABS_MagRead = ABS(IMU.Compass.Read[ROLL]);
-    XYZ_CompassBias[ROLL] += ABS_MagRead;
-    if (ABS_MagRead > 4096)
-    {
-      return false;
-    }
-    //PITCH
-    ABS_MagRead = ABS(IMU.Compass.Read[PITCH]);
-    XYZ_CompassBias[PITCH] += ABS_MagRead;
-    if (ABS_MagRead > 4096)
-    {
-      return false;
-    }
-    //YAW
-    ABS_MagRead = ABS(IMU.Compass.Read[YAW]);
-    XYZ_CompassBias[YAW] += ABS_MagRead;
-    if (ABS_MagRead > 4096)
-    {
-      return false;
-    }
-  }
-  return true; //OK,NENHUMA LEITURA DO MAG EXCEDEU 2^12
-}
 
-void CompassReadClass::InitialReadBufferData()
-{
-  if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
-  {
-    I2C.SensorsRead(COMPASS.Address, 0x03);
-    COMPASSORIENTATION.SetOrientation(COMPASS.Type);
-    COMPASSROTATION.Rotate();
+  case COMPASS_AK8975:
+    I2C.RegisterBuffer(ADDRESS_COMPASS_AK8975, 0x03, I2CResources.Buffer.Data, 0x06);
+    I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
+    break;
+
+  case COMPASS_HMC5883:
+    I2C.RegisterBuffer(ADDRESS_COMPASS_HMC5883, 0x03, I2CResources.Buffer.Data, 0x06);
+    break;
+
+  case COMPASS_QMC5883:
+    I2C.RegisterBuffer(ADDRESS_COMPASS_QMC5883, 0x00, I2CResources.Buffer.Data, 0x06);
+    break;
   }
 }
 
-void CompassReadClass::ReadBufferData()
-{
-  if (Get_GPS_Type(GPS_UBLOX))
-  {
-    if (COMPASS.Type == COMPASS_AK8975)
-    {
-      I2C.SensorsRead(ADDRESS_COMPASS_AK8975, 0x03);
-      I2C.WriteRegister(ADDRESS_COMPASS_AK8975, 0x0A, 0x01);
-    }
-    else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
-    {
-      I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x49);
-    }
-    else if (COMPASS.Type == COMPASS_QMC5883)
-    {
-      I2C.SensorsRead(COMPASS.Address, COMPASS.Register);
-    }
-    COMPASSORIENTATION.SetOrientation(COMPASS.Type);
-  }
-  else if (Get_GPS_Type(GPS_DJI_NAZA))
-  {
-    COMPASSORIENTATION.SetOrientation(COMPASS_DJI_NAZA);
-  }
-}
-
-void CompassReadClass::Constant_Read()
+void CompassReadClass::Constant_Read(void)
 {
   //SAIA DA FUNÇÃO SE NÃO FOR ENCONTRADO NENHUM COMPASS NO BARRAMENTO I2C
-  if (!I2CResources.Found.Compass && Get_GPS_Type(GPS_UBLOX))
+  if (!I2CResources.Found.Compass)
   {
     return;
   }
@@ -186,26 +130,15 @@ void CompassReadClass::Constant_Read()
   //REALIZA A LEITURA I2C DO COMPASS
   COMPASS.ReadBufferData();
 
-  //APLICA OS AJUSTES DE BIAS CALCULADOS
-  if (Get_GPS_Type(GPS_UBLOX))
-  {
-    COMPASSCAL.ApplyGain();
-  }
-
-  //APLICA O LPF PARA REDUZIR SPIKES DURANTE A CALIBRAÇÃO
-  COMPASSLPF.ApplyFilter();
-
-  //APLICA A CALIBRAÇÃO DO COMPASS
-  COMPASSCAL.ApplyCalibration();
+  //ROTACIONA OS EIXOS DO COMPASS DE ACORDO COM A CONFIGURAÇÃO DO GCS
+  COMPASSORIENTATION.SetOrientation(IMU.Compass.Type);
 
   //CORRE A CALIBRAÇÃO DO COMPASS
-  COMPASSCAL.RunningCalibration();
+  COMPASSCALIBRATION.Update();
+
+  //APLICA A CALIBRAÇÃO DO COMPASS
+  COMPASSCALIBRATION.Apply();
 
   //APLICA A ROTAÇÃO DO COMPASS
   COMPASSROTATION.Rotate();
-}
-
-void CompassReadClass::UpdateCompassCalibration()
-{
-  COMPASSCAL.UpdateCompassCalibration();
 }

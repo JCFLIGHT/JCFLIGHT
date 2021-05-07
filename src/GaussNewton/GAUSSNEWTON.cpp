@@ -153,7 +153,19 @@ static void GaussNewton_SolveLGS(float JacobObservationA[4][4], float JacobObser
   GaussNewton_BackwardSubstitution(JacobObservationA, JacobObservationX, JacobObservationY);
 }
 
-void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianPointer, float Result[3])
+static bool GaussNewtonValidateResult(const float Result[3])
+{
+  for (uint8_t IndexCount = 0; IndexCount < 3; IndexCount++)
+  {
+    if (isnan(Result[IndexCount]) && isinf(Result[IndexCount]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianPointer, float Result[3])
 {
   float Beta[4];
 
@@ -163,9 +175,11 @@ void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianPointer, float Result[3]
   {
     Result[IndexCount] = Beta[IndexCount] / 2;
   }
+
+  return GaussNewtonValidateResult(Result);
 }
 
-void GaussNewtonSolveForScale(Jacobian_Struct *JacobianPointer, float Result[3])
+bool GaussNewtonSolveForScale(Jacobian_Struct *JacobianPointer, float Result[3])
 {
   float Beta[4];
 
@@ -175,4 +189,6 @@ void GaussNewtonSolveForScale(Jacobian_Struct *JacobianPointer, float Result[3])
   {
     Result[IndexCount] = Fast_SquareRoot(Beta[IndexCount]);
   }
+
+  return GaussNewtonValidateResult(Result);
 }

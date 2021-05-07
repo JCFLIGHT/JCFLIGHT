@@ -18,5 +18,5 @@
 #ifndef UART2MODE_H_
 #define UART2MODE_H_
 #include "Build/LIBDEPENDENCIES.h"
-void UART2Mode_Initialization();
+void UART2Mode_Initialization(void);
 #endif

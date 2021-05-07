@@ -29,6 +29,8 @@
 #include "PID/PIDPARAMS.h"
 #include "Barometer/BAROBACKEND.h"
 #include "GPS/GPSSTATES.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/RCDEFINES.h"
 
 AltitudeHold_Controller_Struct AltitudeHoldController;
 

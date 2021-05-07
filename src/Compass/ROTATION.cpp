@@ -26,7 +26,7 @@ ClassCompassRotation COMPASSROTATION;
 
 #define HALF_SQRT_2 0.70710678118654757f
 
-void ClassCompassRotation::Rotate()
+void ClassCompassRotation::Rotate(void)
 {
     uint8_t Rotation = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
     int16_t AngleCorretion;

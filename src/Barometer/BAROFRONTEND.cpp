@@ -20,6 +20,7 @@
 #include "BAROREAD.h"
 #include "Math/MATHSUPPORT.h"
 #include "I2C/I2C.h"
+#include "BitArray/BITARRAY.h"
 
 //https://en.wikipedia.org/wiki/Equivalent_airspeed
 

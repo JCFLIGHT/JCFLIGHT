@@ -36,6 +36,7 @@
 #include "NAVIGATIONGEO.h"
 #include "INSNAVIGATION.h"
 #include "FrameStatus/FRAMESTATUS.h"
+#include "BitArray/BITARRAY.h"
 
 GPS_Resources_Struct GPS_Resources;
 
@@ -211,7 +212,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       break;
 
     case DO_LANDED:
-      DISABLE_STATE(PRIMARY_ARM_DISARM);
+      DISABLE_THIS_STATE(PRIMARY_ARM_DISARM);
       Do_RTH_Or_Land_Call_Alt_Hold = false;
       BEEPER.Play(BEEPER_ACTION_SUCCESS);
       GPS_Reset_Navigation();

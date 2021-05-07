@@ -34,8 +34,6 @@ void MachineInit(void)
     ESC.Calibration();
     //CARREGA OS VALORES DE CALIBRAÇÃO DA IMU
     UpdateIMUCalibration();
-    //CARREGA OS VALORES DE CALIBRAÇÃO DO COMPASS
-    COMPASS.UpdateCompassCalibration();
     //INICIALIZA OS DISPOSITIVOS I2C
     I2C.All_Initialization();
     //INICIALIZA AS CONFIGURAÇÕES DOS PINOS IO

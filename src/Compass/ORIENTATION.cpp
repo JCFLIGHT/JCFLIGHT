@@ -38,18 +38,7 @@ void ClassCompassOrientation::SetOrientation(uint8_t _CompassType)
         IMU.Compass.Read[YAW] = (I2CResources.Buffer.Data[5] << 8) | I2CResources.Buffer.Data[4];
         break;
 
-        //POR ENQUANTO A JCFLIGHT IRÁ FUNCIONAR APENAS COM O HMC5883
-        //COMO DIFERENCIAR O HMC5843 DO HMC5883?O ENDERÇO I2C É IGUAL,QUAL OUTRA ALTERNATIVA ALÉM DO ENDEREÇO
-        //I2C EXISTE PARA DIFERENCIA-LOS E APLICAR A ORIENTAÇÃO CORRETA DE CADA UM?
-    case COMPASS_HMC5843:
     case COMPASS_HMC5883:
-        /*
-        //ORIENTAÇÃO PARA O COMPASS HMC5843
-        IMU.Compass.Read[ROLL] = (I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1];
-        IMU.Compass.Read[PITCH] = (I2CResources.Buffer.Data[2] << 8) | I2CResources.Buffer.Data[3];
-        IMU.Compass.Read[YAW] = (I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5];
-*/
-
         //ORIENTAÇÃO PARA O COMPASS HMC5883
         IMU.Compass.Read[ROLL] = (I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1];
         IMU.Compass.Read[PITCH] = (I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5];

@@ -19,9 +19,22 @@
 #define AUXFLIGHT_H_
 #include "Build/LIBDEPENDENCIES.h"
 
+extern bool AltitudeHoldControlAux,
+    GPSHoldControlAux,
+    RTHControlAux,
+    SimpleControlAux,
+    AcroControlAux,
+    AttackControlAux,
+    AutoFlipControlAux,
+    WayPointControlAux,
+    ArmDisarmControlAux,
+    AutoLandControlAux,
+    ParachuteControlAux;
+
 extern uint8_t GPSHoldConfig,
     RTHConfig,
     SimpleConfig,
+    GimbalConfig,
     AltitudeHoldConfig,
     AcroConfig,
     AttackConfig,
@@ -31,18 +44,7 @@ extern uint8_t GPSHoldConfig,
     ReceiverModel,
     ArmDisarmConfig,
     AutoLandConfig,
-    ParachuteDetectTrigger;
-extern int16_t AltitudeHoldControlAux,
-    GPSHoldControlAux,
-    RTHControlAux,
-    SimpleControlAux,
-    GimbalControlAux,
-    AcroControlAux,
-    AttackControlAux,
-    AutoFlipControlAux,
-    WayPointControlAux,
-    ArmDisarmControlAux,
-    AutoLandControlAux;
+    ParachuteConfig;
 
 class AUXFLIGHTCLASS
 {
@@ -51,7 +53,6 @@ public:
   void Update(void);
 
 private:
-  void SelectMode(void);
   void FlightModesAuxSelect(void);
 };
 extern AUXFLIGHTCLASS AUXFLIGHT;

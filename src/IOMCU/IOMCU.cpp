@@ -52,6 +52,8 @@
 #include "PerformanceCalibration/PERFORMACC.h"
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDPARAMS.h"
+#include "BitArray/BITARRAY.h"
+#include "RadioControl/DECODE.h"
 
 GCSClass GCS;
 
@@ -138,18 +140,12 @@ struct _Essential_Second_Packet_Parameters
     int16_t SendAttitudeRollValue;
     uint16_t SendMemoryRamUsed;
     uint8_t SendMemoryRamUsedPercent;
-    int16_t SendAccXNotFiltered;
-    int16_t SendAccYNotFiltered;
-    int16_t SendAccZNotFiltered;
-    int16_t SendAccXFiltered;
-    int16_t SendAccYFiltered;
-    int16_t SendAccZFiltered;
-    int16_t SendGyroXNotFiltered;
-    int16_t SendGyroYNotFiltered;
-    int16_t SendGyroZNotFiltered;
-    int16_t SendGyroXFiltered;
-    int16_t SendGyroYFiltered;
-    int16_t SendGyroZFiltered;
+    int16_t SendAccX;
+    int16_t SendAccY;
+    int16_t SendAccZ;
+    int16_t SendGyroX;
+    int16_t SendGyroY;
+    int16_t SendGyroZ;
     uint16_t SendGPSGroundSpeed;
     int16_t SendI2CError;
     uint16_t SendAirSpeedValue;
@@ -578,7 +574,7 @@ void GCSClass::Send_String_To_GCS(const char *String)
 #endif
 }
 
-void GCSClass::Serial_Parse_Protocol()
+void GCSClass::Serial_Parse_Protocol(void)
 {
     if (GCS.CliMode)
     {
@@ -745,7 +741,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     case 12:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2CResources.Found.Compass)
         {
-            IMU.Compass.Calibrating = true;
+            Calibration.Magnetometer.Calibrating = true;
         }
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
@@ -1060,7 +1056,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 2) +      //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(int16_t) * 32)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 26)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendActualThrottleValue, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendActualYawValue, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendActualPitchValue, VAR_16BITS);
@@ -1079,18 +1075,12 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAttitudeRollValue, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendMemoryRamUsed, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendMemoryRamUsedPercent, VAR_8BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccXNotFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccYNotFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccZNotFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccXFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccYFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccZFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroXNotFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroYNotFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroZNotFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroXFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroYFiltered, VAR_16BITS);
-        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroZFiltered, VAR_16BITS);
+        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccX, VAR_16BITS);
+        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccY, VAR_16BITS);
+        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAccZ, VAR_16BITS);
+        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroX, VAR_16BITS);
+        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroY, VAR_16BITS);
+        Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGyroZ, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendGPSGroundSpeed, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendI2CError, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAirSpeedValue, VAR_16BITS);
@@ -1110,7 +1100,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     case 12:
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) && I2CResources.Found.Compass)
         {
-            IMU.Compass.Calibrating = true;
+            Calibration.Magnetometer.Calibrating = true;
         }
         break;
 
@@ -1260,7 +1250,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
 #endif
 }
 
-void GCSClass::First_Packet_Request_Parameters()
+void GCSClass::First_Packet_Request_Parameters(void)
 {
     //ENVIA OS PARAMETROS FUNDAMENTAIS PARA O GCS
     Essential_First_Packet_Parameters.SendAttitudePitch = Constrain_16Bits(Attitude.Raw[PITCH], -900, 900);
@@ -1326,7 +1316,7 @@ void GCSClass::First_Packet_Request_Parameters()
     Essential_First_Packet_Parameters.SendCompassYaw = IMU.Compass.Read[YAW];
 }
 
-void GCSClass::Second_Packet_Request_Parameters()
+void GCSClass::Second_Packet_Request_Parameters(void)
 {
     Essential_Second_Packet_Parameters.SendActualThrottleValue = DECODE.DirectRadioControllRead[THROTTLE];
     Essential_Second_Packet_Parameters.SendActualYawValue = DECODE.DirectRadioControllRead[YAW];
@@ -1346,25 +1336,19 @@ void GCSClass::Second_Packet_Request_Parameters()
     Essential_Second_Packet_Parameters.SendAttitudeRollValue = PIDResources.RcRateTarget.GCS.Roll;
     Essential_Second_Packet_Parameters.SendMemoryRamUsed = MEMORY.Check();
     Essential_Second_Packet_Parameters.SendMemoryRamUsedPercent = MEMORY.GetPercentageRAMUsed();
-    Essential_Second_Packet_Parameters.SendAccXNotFiltered = IMU.Accelerometer.ReadNotFiltered[ROLL];
-    Essential_Second_Packet_Parameters.SendAccYNotFiltered = IMU.Accelerometer.ReadNotFiltered[PITCH];
-    Essential_Second_Packet_Parameters.SendAccZNotFiltered = IMU.Accelerometer.ReadNotFiltered[YAW];
-    Essential_Second_Packet_Parameters.SendAccXFiltered = IMU.Accelerometer.Read[ROLL];
-    Essential_Second_Packet_Parameters.SendAccYFiltered = IMU.Accelerometer.Read[PITCH];
-    Essential_Second_Packet_Parameters.SendAccZFiltered = IMU.Accelerometer.Read[YAW];
-    Essential_Second_Packet_Parameters.SendGyroXNotFiltered = IMU.Gyroscope.ReadNotFiltered[ROLL];
-    Essential_Second_Packet_Parameters.SendGyroYNotFiltered = IMU.Gyroscope.ReadNotFiltered[PITCH];
-    Essential_Second_Packet_Parameters.SendGyroZNotFiltered = IMU.Gyroscope.ReadNotFiltered[YAW];
-    Essential_Second_Packet_Parameters.SendGyroXFiltered = IMU.Gyroscope.Read[ROLL];
-    Essential_Second_Packet_Parameters.SendGyroYFiltered = IMU.Gyroscope.Read[PITCH];
-    Essential_Second_Packet_Parameters.SendGyroZFiltered = IMU.Gyroscope.Read[YAW];
+    Essential_Second_Packet_Parameters.SendAccX = IMU.Accelerometer.Read[ROLL];
+    Essential_Second_Packet_Parameters.SendAccY = IMU.Accelerometer.Read[PITCH];
+    Essential_Second_Packet_Parameters.SendAccZ = IMU.Accelerometer.Read[YAW];
+    Essential_Second_Packet_Parameters.SendGyroX = IMU.Gyroscope.Read[ROLL];
+    Essential_Second_Packet_Parameters.SendGyroY = IMU.Gyroscope.Read[PITCH];
+    Essential_Second_Packet_Parameters.SendGyroZ = IMU.Gyroscope.Read[YAW];
     Essential_Second_Packet_Parameters.SendGPSGroundSpeed = GPS_Resources.Navigation.Misc.Get.GroundSpeed;
     Essential_Second_Packet_Parameters.SendI2CError = I2CResources.Error.Count;
     Essential_Second_Packet_Parameters.SendAirSpeedValue = AirSpeed.Raw.IASPressureInCM;
     Essential_Second_Packet_Parameters.SendCPULoad = SystemLoadPercent;
 }
 
-void GCSClass::WayPoint_Request_Coordinates_Parameters()
+void GCSClass::WayPoint_Request_Coordinates_Parameters(void)
 {
     Send_WayPoint_Coordinates.SendLatitudeOne = STORAGEMANAGER.Read_32Bits(704);
     Send_WayPoint_Coordinates.SendLatitudeTwo = STORAGEMANAGER.Read_32Bits(708);
@@ -1388,7 +1372,7 @@ void GCSClass::WayPoint_Request_Coordinates_Parameters()
     Send_WayPoint_Coordinates.SendLongitudeTen = STORAGEMANAGER.Read_32Bits(780);
 }
 
-void GCSClass::WayPoint_Request_Misc_Parameters()
+void GCSClass::WayPoint_Request_Misc_Parameters(void)
 {
     Send_WayPoint_Misc_Parameters.SendAltitudeOne = STORAGEMANAGER.Read_8Bits(804);
     Send_WayPoint_Misc_Parameters.SendAltitudeTwo = STORAGEMANAGER.Read_8Bits(805);
@@ -1422,7 +1406,7 @@ void GCSClass::WayPoint_Request_Misc_Parameters()
     Send_WayPoint_Misc_Parameters.SendGPSHoldTimedTen = STORAGEMANAGER.Read_8Bits(793);
 }
 
-void GCSClass::Save_Basic_Configuration()
+void GCSClass::Save_Basic_Configuration(void)
 {
     STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, Get_User_Basic_Parameters.GetFrameType);
     STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, Get_User_Basic_Parameters.GetReceiverType);
@@ -1451,7 +1435,7 @@ void GCSClass::Save_Basic_Configuration()
     GET_SET[PID_UPDATED].State = false;
 }
 
-void GCSClass::Save_Radio_Control_Configuration()
+void GCSClass::Save_Radio_Control_Configuration(void)
 {
     STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, Get_Radio_Control_Parameters.GetThrottleMiddle);
     STORAGEMANAGER.Write_8Bits(THROTTLE_EXPO_ADDR, Get_Radio_Control_Parameters.GetThrottleExpo);
@@ -1495,7 +1479,7 @@ void GCSClass::Save_Radio_Control_Configuration()
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, Get_Radio_Control_Parameters.GetMaxBankRoll);
 }
 
-void GCSClass::Save_Medium_Configuration()
+void GCSClass::Save_Medium_Configuration(void)
 {
     STORAGEMANAGER.Write_8Bits(TPA_PERCENT_ADDR, Get_User_Medium_Parameters.GetTPAInPercent);
     STORAGEMANAGER.Write_16Bits(BREAKPOINT_ADDR, Get_User_Medium_Parameters.GetBreakPointValue);
@@ -1545,7 +1529,7 @@ void GCSClass::Save_Medium_Configuration()
     GET_SET[PID_UPDATED].State = false;
 }
 
-void GCSClass::Default_Basic_Configuration()
+void GCSClass::Default_Basic_Configuration(void)
 {
     //LIMPA TODAS AS CONFIGURAÇÕES SALVAS
     STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, 0);
@@ -1579,7 +1563,7 @@ void GCSClass::Default_Basic_Configuration()
     STORAGEMANAGER.Write_16Bits(PITCH_LEVEL_TRIM_ADDR, 0);
 }
 
-void GCSClass::Default_RadioControl_Configuration()
+void GCSClass::Default_RadioControl_Configuration(void)
 {
     //LIMPA TODAS AS CONFIGURAÇÕES SALVAS DO RÁDIO E DOS SERVOS
     STORAGEMANAGER.Write_8Bits(THROTTLE_MIDDLE_ADDR, 50);
@@ -1623,7 +1607,7 @@ void GCSClass::Default_RadioControl_Configuration()
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, 30);
 }
 
-void GCSClass::Default_Medium_Configuration()
+void GCSClass::Default_Medium_Configuration(void)
 {
     //LIMPA AS CONFIGURAÇÕES SALVAS
     STORAGEMANAGER.Write_16Bits(BREAKPOINT_ADDR, 1500);
@@ -1741,14 +1725,14 @@ void GCSClass::Default_Medium_Configuration()
     GET_SET[PID_UPDATED].State = false;
 }
 
-void GCSClass::Default_All_Configs()
+void GCSClass::Default_All_Configs(void)
 {
     GCS.Default_Basic_Configuration();
     GCS.Default_Medium_Configuration();
     GCS.Default_RadioControl_Configuration();
 }
 
-void GCSClass::UpdateParametersToGCS()
+void GCSClass::UpdateParametersToGCS(void)
 {
     //ATUALIZA OS PARAMETROS BASICOS AJUSTAVEIS PELO USUARIO
     Send_User_Basic_Parameters.SendFrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR);

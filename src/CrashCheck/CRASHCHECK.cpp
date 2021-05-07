@@ -24,6 +24,7 @@
 #include "Common/RCDEFINES.h"
 #include "AHRS/AHRS.h"
 #include "Barometer/BAROBACKEND.h"
+#include "BitArray/BITARRAY.h"
 #include "FastSerial/PRINTF.h"
 
 #ifdef __AVR_ATmega2560__
@@ -113,10 +114,10 @@ void CrashCheck()
     //DESARMA OS MOTORES
     if (PARACHUTE.GetSafeStateToDisarmMotors())
     {
-      DISABLE_STATE(PRIMARY_ARM_DISARM);
+      DISABLE_THIS_STATE(PRIMARY_ARM_DISARM);
     }
 
     //CHAMA O PARACHUTE SE ESTIVER EQUIPADO
-    PARACHUTE.Auto_Do_Now(ParachuteDetectTrigger > 0);
+    PARACHUTE.Auto_Do_Now(ParachuteConfig > 0);
   }
 }

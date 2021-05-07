@@ -21,17 +21,11 @@
 class CompassReadClass
 {
 public:
-  uint8_t Type;
-  uint8_t Address;
-  uint8_t Register;
-  void Initialization();
-  void Constant_Read();
-  void UpdateCompassCalibration();
+  void Initialization(void);
+  void Constant_Read(void);
 
 private:
-  bool PushBias(uint8_t InputBias);
-  void InitialReadBufferData();
-  void ReadBufferData();
+  void ReadBufferData(void);
 };
 extern CompassReadClass COMPASS;
 #endif

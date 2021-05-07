@@ -16,12 +16,12 @@
 */
 
 #include "GPSSTATES.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 #include "GPSNavigation/NAVIGATION.h"
 #include "GPS/GPSUBLOX.h"
 #include "BitArray/BITARRAY.h"
 #include "Common/ENUM.h"
-#include "StorageManager/EEPROMSTORAGE.h"
-#include "BAR/BAR.h"
 #include "GPSNavigation/NAVIGATION.h"
 
 bool Get_State_Armed_With_GPS(void)

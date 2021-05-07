@@ -23,6 +23,7 @@
 #include "Compass/COMPASSREAD.h"
 #include "BitArray/BITARRAY.h"
 #include "IMU/ACCGYROREAD.h"
+#include "PerformanceCalibration/PERFORMACC.h"
 
 //***********************************************************************************************
 //ATIVAÇÃO PARA O CALIBRÇÃO DO MAG,SERVO AUTO-TRIM & TRIMAGEM MANUAL DOS SERVOS VIA CHAVE AUX
@@ -128,7 +129,7 @@ void Switch_Flag(void)
     FlagParameterFunction = 0;
   }
   //FLAG PRINCIPAL IGUAL A 4?CHAVE AUX ATIVADA?CAL DO MAG ACABOU?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
-  if (FlagParameterFunction == 4 && SimpleControlAux && !IMU.Compass.Calibrating)
+  if (FlagParameterFunction == 4 && SimpleControlAux && !Calibration.Magnetometer.Calibrating)
   {
     GuardValue = FlagParameterFunction;
   }
@@ -155,7 +156,7 @@ void Switch_Flag(void)
   {
     if (GuardValue == 8 && CloseReset > 2.0f && CloseReset < 4.0f)
     {
-      IMU.Compass.Calibrating = true; //O VALOR GUARDADO É IGUAL A 8?E A DECREMENTAÇÃO ACABOU?SIM...INICIA A CALIBRAÇÃO DO COMPASS
+      Calibration.Magnetometer.Calibrating = true; //O VALOR GUARDADO É IGUAL A 8?E A DECREMENTAÇÃO ACABOU?SIM...INICIA A CALIBRAÇÃO DO COMPASS
     }
     if (GuardValue == 8 && CloseReset == 2.0f)
     {

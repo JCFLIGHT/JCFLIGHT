@@ -56,7 +56,6 @@ void Fast_Medium_Loop()
         STICKS.Pre_Arm_Leds();
         Gimbal_Controll();
         CrashCheck();
-        PARACHUTE.Manual_Detect_Channel();
         PARACHUTE.Manual_Do_Now();
         IMU_GForce_Update();
         GCS.Serial_Parse_Protocol();

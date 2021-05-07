@@ -27,6 +27,7 @@
 #include "AHRS/AHRS.h"
 #include "Barometer/BAROBACKEND.h"
 #include "Param/PARAM.h"
+#include "Common/RCDEFINES.h"
 
 bool Do_Altitude_Hold = false;
 bool Do_RTH_Or_Land_Call_Alt_Hold = false;
@@ -65,7 +66,7 @@ static void ProcessFlightModesToMultirotor(void)
       {
         if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE) && (JCF_Param.AutoPilotMode == AUTOPILOT_MODE_ATTI))
         {
-          ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, SticksInAutoPilotPosition(POS_HOLD_DEADBAND));
+          ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, GetSticksInAutoPilotPosition(POS_HOLD_DEADBAND));
         }
       }
       if (Get_Multirotor_GPS_FlightModes_Once())

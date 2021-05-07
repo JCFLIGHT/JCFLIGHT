@@ -27,6 +27,7 @@
 #include "Scheduler/SCHEDULER.h"
 #include "Build/BOARDDEFS.h"
 #include "RadioControl/DECODE.h"
+#include "Common/RCDEFINES.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 

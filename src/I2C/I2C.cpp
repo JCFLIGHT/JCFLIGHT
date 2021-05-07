@@ -38,24 +38,6 @@ void I2CPROTOCOL::Initialization(void)
   TWBR = 12;
   TWCR = 4;
   I2C.SearchDevicesInBarrament();
-  //AK8975 ENDEREÇO:0x0C
-  //HMC5843 OU HMC5883 ENDEREÇO:0x1E
-  //QMC5883 ENDEREÇO:0x0D
-  if (COMPASS.Type == COMPASS_AK8975)
-  {
-    COMPASS.Address = ADDRESS_COMPASS_AK8975;
-    COMPASS.Register = 0x03;
-  }
-  else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
-  {
-    COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-    COMPASS.Register = 0x03;
-  }
-  else if (COMPASS.Type == COMPASS_QMC5883)
-  {
-    COMPASS.Address = ADDRESS_COMPASS_QMC5883;
-    COMPASS.Register = 0x00;
-  }
 }
 
 void __attribute__((noinline)) WaitTransmission(uint8_t _TWCR)
@@ -122,11 +104,6 @@ void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buf
   *BufferPointer = _TWDR;
 }
 
-void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
-{
-  I2C.RegisterBuffer(Address, Register, I2CResources.Buffer.Data, 6);
-}
-
 void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Data)
 {
   I2C.Restart(Address << 1);
@@ -181,9 +158,9 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
         LOG("DISPOSITIVO ENCONTRADO - 0x0C < AK8975");
       }
 
-      if (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883)
+      if (NumbGenerator == ADDRESS_COMPASS_HMC5883)
       {
-        LOG("DISPOSITIVO ENCONTRADO - 0x1E << HMC5843 OU HMC5883");
+        LOG("DISPOSITIVO ENCONTRADO - 0x1E << HMC5883");
       }
 
       if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
@@ -194,20 +171,20 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
 
       if (NumbGenerator == ADDRESS_COMPASS_AK8975)
       {
-        COMPASS.Type = COMPASS_AK8975;
+        IMU.Compass.Type = COMPASS_AK8975;
       }
 
-      if (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883)
+      if (NumbGenerator == ADDRESS_COMPASS_HMC5883)
       {
-        COMPASS.Type = COMPASS_HMC5843;
+        IMU.Compass.Type = COMPASS_HMC5883;
       }
 
       if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
       {
-        COMPASS.Type = COMPASS_QMC5883;
+        IMU.Compass.Type = COMPASS_QMC5883;
       }
 
-      if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
+      if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
       {
         I2CResources.Found.Compass = true;
       }
@@ -311,24 +288,6 @@ void I2CPROTOCOL::Initialization(void)
 {
   Wire.begin(21, 22, 400000);
   I2C.SearchDevicesInBarrament();
-  //AK8975 ENDEREÇO:0x0C
-  //HMC5843 OU HMC5883 ENDEREÇO:0x1E
-  //QMC5883 ENDEREÇO:0x0D
-  if (COMPASS.Type == COMPASS_AK8975)
-  {
-    COMPASS.Address = ADDRESS_COMPASS_AK8975;
-    COMPASS.Register = 0x03;
-  }
-  else if ((COMPASS.Type == COMPASS_HMC5843) || (COMPASS.Type == COMPASS_HMC5883))
-  {
-    COMPASS.Address = ADDRESS_COMPASS_HMC5843_OR_HMC5883;
-    COMPASS.Register = 0x03;
-  }
-  else if (COMPASS.Type == COMPASS_QMC5883)
-  {
-    COMPASS.Address = ADDRESS_COMPASS_QMC5883;
-    COMPASS.Register = 0x00;
-  }
 }
 
 void I2CPROTOCOL::Restart(uint8_t Address)
@@ -366,10 +325,6 @@ void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buf
   }
 }
 
-void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
-{
-}
-
 void I2CPROTOCOL::WriteRegister(uint8_t Address, uint8_t Register, uint8_t Data)
 {
   Wire.beginTransmission(Address);
@@ -390,19 +345,19 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
     {
       if (NumbGenerator == ADDRESS_COMPASS_AK8975)
       {
-        COMPASS.Type = COMPASS_AK8975;
+        IMU.Compass.Type = COMPASS_AK8975;
         Serial.println("AK8975 ENCONTRADO!");
       }
 
-      if (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883)
+      if (NumbGenerator == ADDRESS_COMPASS_HMC5883)
       {
-        COMPASS.Type = COMPASS_HMC5843;
-        Serial.println("HMC5843 OU HMC5883 ENCONTRADO!");
+        IMU.Compass.Type = COMPASS_HMC5883;
+        Serial.println("HMC5883 ENCONTRADO!");
       }
 
       if (NumbGenerator == ADDRESS_COMPASS_QMC5883)
       {
-        COMPASS.Type = COMPASS_QMC5883;
+        IMU.Compass.Type = COMPASS_QMC5883;
         Serial.println("QMC5883 ENCONTRADO!");
       }
 
@@ -418,7 +373,7 @@ void I2CPROTOCOL::SearchDevicesInBarrament(void)
         Serial.println("BMP280 ENCONTRADO!");
       }
 
-      if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5843_OR_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
+      if ((NumbGenerator == ADDRESS_COMPASS_AK8975) || (NumbGenerator == ADDRESS_COMPASS_HMC5883) || (NumbGenerator == ADDRESS_COMPASS_QMC5883))
       {
         I2CResources.Found.Compass = true;
       }
@@ -460,10 +415,6 @@ uint8_t I2CPROTOCOL::ReadNAK(void)
 }
 
 void I2CPROTOCOL::RegisterBuffer(uint8_t Address, uint8_t Register, uint8_t *Buffer, uint8_t Size)
-{
-}
-
-void I2CPROTOCOL::SensorsRead(uint8_t Address, uint8_t Register)
 {
 }
 

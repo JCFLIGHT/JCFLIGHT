@@ -27,6 +27,7 @@
 #include "FlightModes/FLIGHTMODES.h"
 #include "PID/PIDPARAMS.h"
 #include "GPS/GPSSTATES.h"
+#include "BitArray/BITARRAY.h"
 #include "FastSerial/PRINTF.h"
 
 //DEBUG
@@ -40,29 +41,29 @@ void UpdateStateOfHeadingHold(void)
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    HeadingHoldRate_Smooth.State = 0.0f;                                    //RESETA O FILTRO
+    HeadingHoldRate_Smooth.State = 0.0f;                                   //RESETA O FILTRO
     GPS_Resources.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
   }
 }
 
-bool GetSafeStateOfHeadingHold()
+bool GetSafeStateOfHeadingHold(void)
 {
-  if (!IS_FLIGHT_MODE_ACTIVE(HEADING_HOLD_MODE)) //NÃO APLICA A CORREÇÃO DO YAW SE O MODO NÃO ESTIVER ATIVO
+  if (!IS_FLIGHT_MODE_ACTIVE(HEADING_HOLD_MODE)) //NÃO APLICA A CORREÇÃO SE O MODO NÃO ESTIVER ATIVO
   {
     return false;
   }
 
-  if (AHRS.CheckAnglesInclination(25)) //NÃO APLICA A CORREÇÃO DO YAW SE OS ANGULOS FOREM MAIOR QUE 25 GRAUS
+  if (AHRS.CosineTiltAngle() < GPS_Resources.Navigation.HeadingHoldLimit) //NÃO APLICA A CORREÇÃO SE O COSSENO DE Z FOR MAIOR QUE 'N' GRAUS
   {
     return false;
   }
 
-  if (!GPS_Resources.Navigation.AutoPilot.Control.Enabled) //NÃO APLICA A CORREÇÃO DO YAW SE NENHUM MODO DE VOO POR GPS ESTIVER ATIVO
+  if (!GPS_Resources.Navigation.AutoPilot.Control.Enabled) //NÃO APLICA A CORREÇÃO SE NENHUM MODO DE VOO POR GPS ESTIVER ATIVO
   {
     return false;
   }
 
-  if (ABS(RCController[YAW]) != 0) //NÃO APLICA A CORREÇÃO DO YAW SE O USUARIO MANIPULAR O STICK YAW DO RADIO
+  if (ABS(RCController[YAW]) != 0) //NÃO APLICA A CORREÇÃO SE O USUARIO MANIPULAR O YAW DO RADIO
   {
     return false;
   }

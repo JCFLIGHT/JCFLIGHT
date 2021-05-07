@@ -53,7 +53,7 @@ void ParachuteClass::Manual_Do_Now(void)
   {
     return;
   }
-  if (!PARACHUTE.ManualDetectTrigger)
+  if (!ParachuteControlAux)
   {
     MotorControl[PARACHUTESERVO] = 400; //0 GRAUS
     PARACHUTE.ParachuteReleased = false;
@@ -67,112 +67,9 @@ void ParachuteClass::Manual_Do_Now(void)
   PARACHUTE.ParachuteReleased = true;
 }
 
-void ParachuteClass::Manual_Detect_Channel(void)
-{
-  switch (ParachuteDetectTrigger)
-  {
-
-  case PARACHUTEAUXONELOW:
-    PARACHUTE.ManualDetectTrigger = AUX1_LOW;
-    break;
-
-  case PARACHUTEAUXONEMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX1_MID;
-    break;
-
-  case PARACHUTEAUXONEHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX1_HIGH;
-    break;
-
-  case PARACHUTEAUXTWOLOW:
-    PARACHUTE.ManualDetectTrigger = AUX2_LOW;
-    break;
-
-  case PARACHUTEAUXTWOMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX2_MID;
-    break;
-
-  case PARACHUTEAUXTWOHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX2_HIGH;
-    break;
-
-  case PARACHUTEAUXTHREELOW:
-    PARACHUTE.ManualDetectTrigger = AUX3_LOW;
-    break;
-
-  case PARACHUTEAUXTHREEMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX3_MID;
-    break;
-
-  case PARACHUTEAUXTHREEHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX3_HIGH;
-    break;
-
-  case PARACHUTEAUXFOURLOW:
-    PARACHUTE.ManualDetectTrigger = AUX4_LOW;
-    break;
-
-  case PARACHUTEAUXFOURMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX4_MID;
-    break;
-
-  case PARACHUTEAUXFOURHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX4_HIGH;
-    break;
-
-  case PARACHUTEAUXFIVELOW:
-    PARACHUTE.ManualDetectTrigger = AUX5_LOW;
-    break;
-
-  case PARACHUTEAUXFIVEMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX5_MID;
-    break;
-
-  case PARACHUTEAUXFIVEHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX5_HIGH;
-    break;
-
-  case PARACHUTEAUXSIXLOW:
-    PARACHUTE.ManualDetectTrigger = AUX6_LOW;
-    break;
-
-  case PARACHUTEAUXSIXMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX6_MID;
-    break;
-
-  case PARACHUTEAUXSIXHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX6_HIGH;
-    break;
-
-  case PARACHUTEAUXSEVENLOW:
-    PARACHUTE.ManualDetectTrigger = AUX7_LOW;
-    break;
-
-  case PARACHUTEAUXSEVENMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX7_MID;
-    break;
-
-  case PARACHUTEAUXSEVENHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX7_HIGH;
-    break;
-
-  case PARACHUTEAUXEIGHTLOW:
-    PARACHUTE.ManualDetectTrigger = AUX8_LOW;
-    break;
-
-  case PARACHUTEAUXEIGHTMIDDLE:
-    PARACHUTE.ManualDetectTrigger = AUX8_MID;
-    break;
-
-  case PARACHUTEAUXEIGHTHIGH:
-    PARACHUTE.ManualDetectTrigger = AUX8_HIGH;
-    break;
-  }
-}
-
 bool ParachuteClass::GetSafeStateToDisarmMotors(void)
 {
-  if (ParachuteDetectTrigger == 0)
+  if (ParachuteConfig == 0)
   {
     return false;
   }

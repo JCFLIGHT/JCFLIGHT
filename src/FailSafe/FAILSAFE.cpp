@@ -43,12 +43,12 @@ int16_t BuzzerFailSafeRunCount = 0;
 
 volatile int16_t Fail_Safe_System_Count;
 
-bool FastSystemFailSafe()
+bool FastSystemFailSafe(void)
 {
   return ImmediatelyFailSafe;
 }
 
-bool SystemInFailSafe()
+bool SystemInFailSafe(void)
 {
   return Fail_Safe_Event;
 }
@@ -58,7 +58,7 @@ bool GetValidFailSafeState(float DelayToDetect)
   return (Fail_Safe_System_Count > (THIS_LOOP_RATE * DelayToDetect));
 }
 
-void NormalizeFundamentalChannels()
+void NormalizeFundamentalChannels(void)
 {
   DECODE.SetRxChannelInput(THROTTLE, MIDDLE_STICKS_PULSE);
   DECODE.SetRxChannelInput(YAW, MIDDLE_STICKS_PULSE);
@@ -66,7 +66,7 @@ void NormalizeFundamentalChannels()
   DECODE.SetRxChannelInput(ROLL, MIDDLE_STICKS_PULSE);
 }
 
-void NormalizeAuxiliariesChnnels()
+void NormalizeAuxiliariesChnnels(void)
 {
   DECODE.SetRxChannelInput(AUX1, MIN_STICKS_PULSE);
   DECODE.SetRxChannelInput(AUX2, MIN_STICKS_PULSE);
@@ -78,7 +78,7 @@ void NormalizeAuxiliariesChnnels()
   DECODE.SetRxChannelInput(AUX8, MIN_STICKS_PULSE);
 }
 
-void NormalizeFlightModesToFailSafe()
+void NormalizeFlightModesToFailSafe(void)
 {
   //ATIVA OS MODOS DE VOO NECESSARIOS PARA O FAIL-SAFE
   //O ALT-HOLD É CHAMADO ATRAVÉS DE OUTRA FLAG
@@ -104,7 +104,7 @@ void NormalizeFlightModesToFailSafe()
   DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
 }
 
-bool FailSafeCheckStickMotion()
+bool FailSafeCheckStickMotion(void)
 {
   uint32_t CalcedRcDelta = 0;
   CalcedRcDelta += ABS(DECODE.GetRxChannelOutput(ROLL) - MIDDLE_STICKS_PULSE);
@@ -123,7 +123,7 @@ bool GetRxConsistence(uint8_t RecoveryTime)
   return false;
 }
 
-void ResetRxConsistence()
+void ResetRxConsistence(void)
 {
   RxConsistenceCount = 0;
   BuzzerFailSafeRunCount = 0;
@@ -131,7 +131,7 @@ void ResetRxConsistence()
   FailSafeDesarmedRecovered = false;
 }
 
-void ResetFailSafe()
+void ResetFailSafe(void)
 {
   ImmediatelyFailSafe = false;
   Fail_Safe_Event = false;
@@ -142,7 +142,7 @@ void ResetFailSafe()
   ResetRxConsistence();
 }
 
-void AbortFailSafe()
+void AbortFailSafe(void)
 {
   //EVITA COM QUE O STICK MOTION RODE COM O FAIL-SAFE DESATIVADO
   if (!Fail_Safe_Event)
@@ -181,12 +181,12 @@ void AbortFailSafe()
   ResetFailSafe();
 }
 
-bool RxConsistenceOK()
+bool RxConsistenceOK(void)
 {
   return RxConsistenceCount == NONE;
 }
 
-void UpdateFailSafeSystem()
+void UpdateFailSafeSystem(void)
 {
   Fail_Safe_System_Count++;
   if (RxConsistenceOK() && !Fail_Safe_Event && FailSafeGoodRunBeep)
@@ -204,7 +204,7 @@ void UpdateFailSafeSystem()
   }
 }
 
-void FailSafeBuzzerNotification()
+void FailSafeBuzzerNotification(void)
 {
   if (!Fail_Safe_Event)
   {
@@ -223,7 +223,7 @@ void FailSafeBuzzerNotification()
   }
 }
 
-void FailSafeCheck()
+void FailSafeCheck(void)
 {
   //FAIL-SAFE IMEDIATO CASO O USUARIO ESTIVER USANDO O ARM-DISARM POR CANAL AUX E O DESARM-LOW-THR
   if (GetValidFailSafeState(IMMEDIATELY_FAILSAFE_DELAY))
@@ -268,5 +268,5 @@ void FailSafe_Do_RTH_With_Low_Batt(bool FailSafeBatt)
   {
     return;
   }
-  //CODIGO AINDA NÃO DESENVOLVIDO POR QUE É NECESSARIO TESTAR O REAL FUNCIONAMENTO
+  //CODIGO AINDA NÃO DESENVOLVIDO
 }

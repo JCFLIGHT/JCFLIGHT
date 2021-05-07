@@ -28,6 +28,7 @@
 #include "FailSafe/FAILSAFE.h"
 #include "AHRS/AHRS.h"
 #include "PerformanceCalibration/PERFORMACC.h"
+#include "BitArray/BITARRAY.h"
 
 SticksClass STICKS;
 
@@ -35,11 +36,11 @@ void SticksClass::Update()
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    if ((ArmDisarmConfig == 0) && (SticksStateToArm()))
+    if ((ArmDisarmConfig == 0) && (GetSticksStateToArm()))
     {
       if (!Battery.Exhausted.LowPercentPreventArm)
       {
-        if (ArmDelayedState())
+        if (GetArmDelayedState())
         {
           STICKS.PreArm_Run = true;
         }
@@ -52,11 +53,11 @@ void SticksClass::Update()
   }
   else
   {
-    if ((ArmDisarmConfig == 0) && (SticksStateToDisarm()))
+    if ((ArmDisarmConfig == 0) && (GetSticksStateToDisarm()))
     {
-      if (DisarmDelayedState())
+      if (GetDisarmDelayedState())
       {
-        DISABLE_STATE(PRIMARY_ARM_DISARM);
+        DISABLE_THIS_STATE(PRIMARY_ARM_DISARM);
         BEEPER.Play(BEEPER_DISARMING);
       }
     }
@@ -71,21 +72,21 @@ void SticksClass::Update()
     {
       if (ArmDisarmConfig > 0)
       {
-        ENABLE_DISABLE_STATE_WITH_DEPENDENCY(SECONDARY_ARM_DISARM, ArmDisarmControlAux);
+        ENABLE_DISABLE_THIS_STATE_WITH_DEPENDENCY(SECONDARY_ARM_DISARM, ArmDisarmControlAux);
         if (IS_STATE_ACTIVE(SECONDARY_ARM_DISARM))
         {
           if (!SystemInFailSafe() && !IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && !IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
           {
             if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
-              ENABLE_STATE(PRIMARY_ARM_DISARM);
-              Calibration.Magnetometer.SimpleMode_Initial_Value = Attitude.EulerAngles.Yaw;
+              ENABLE_THIS_STATE(PRIMARY_ARM_DISARM);
+              Calibration.Magnetometer.SimpleModeHeading = Attitude.EulerAngles.Yaw;
             }
           }
         }
         else
         {
-          DISABLE_STATE(PRIMARY_ARM_DISARM);
+          DISABLE_THIS_STATE(PRIMARY_ARM_DISARM);
         }
       }
     }
@@ -96,7 +97,7 @@ void SticksClass::Pre_Arm(void)
 {
   if (ArmDisarmConfig != 0)
   {
-    return; //FAÇA UMA RAPIDA SAÍDA SE O ARMDISARM ESTIVE CONFIGURADO PELA CHAVE AUX
+    return; //FAÇA UMA RAPIDA SAÍDA SE O ARMDISARM ESTIVER CONFIGURADO PELA CHAVE AUX
   }
   //ROTINA PRE-ARM
   if (STICKS.PreArm_Run)
@@ -106,12 +107,12 @@ void SticksClass::Pre_Arm(void)
     {
       if (!PREARM.CheckSafeState()) //CONDIÇÕES INCORRETAS?SIM...NÃO ARMA OS MOTORES
       {
-        DISABLE_STATE(PRIMARY_ARM_DISARM);
+        DISABLE_THIS_STATE(PRIMARY_ARM_DISARM);
       }
       else //IMU CALIBRADA?SIM...ARMA OS MOTORES
       {
-        ENABLE_STATE(PRIMARY_ARM_DISARM);
-        Calibration.Magnetometer.SimpleMode_Initial_Value = Attitude.EulerAngles.Yaw;
+        ENABLE_THIS_STATE(PRIMARY_ARM_DISARM);
+        Calibration.Magnetometer.SimpleModeHeading = Attitude.EulerAngles.Yaw;
       }
       STICKS.PreArm_Run = false;
       STICKS.PreArm_Run_Count = 0;

@@ -15,16 +15,14 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef COMPASSCAL_H_
-#define COMPASSCAL_H_
-#include "COMPASSREAD.h"
-class CompassCalClass : CompassReadClass
+#ifndef PERFORMCOMPASS_H_
+#define PERFORMCOMPASS_H_
+class PerformCompassClass
 {
 public:
-  void ApplyGain();
-  void ApplyCalibration();
-  void RunningCalibration();
-  void UpdateCompassCalibration();
+  void Initalization(void);
+  void Update(void);
+  void Apply(void);
 };
-extern CompassCalClass COMPASSCAL;
+extern PerformCompassClass COMPASSCALIBRATION;
 #endif

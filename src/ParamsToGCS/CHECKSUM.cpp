@@ -35,7 +35,7 @@ CheckSumClass CHECKSUM;
 uint8_t CheckSumClass::GetDevicesActived(void)
 {
     const bool Compass_Detect = I2CResources.Found.Compass;
-    const bool Parachute_Detect = ParachuteDetectTrigger > 0 ? true : false;
+    const bool Parachute_Detect = ParachuteConfig > 0 ? true : false;
     const bool Matek_Lidar_OptFlowDetect = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR) == 1 ? true : false;
     const bool Pitot_Detect = Get_AirSpeed_Enabled();
     uint8_t CheckDevices = Compass_Detect | Parachute_Detect << 1 | Matek_Lidar_OptFlowDetect << 2 | Pitot_Detect << 3;

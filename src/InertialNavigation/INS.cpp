@@ -25,6 +25,7 @@
 #include "IMU/ACCGYROREAD.h"
 #include "Barometer/BAROBACKEND.h"
 #include "PerformanceCalibration/PERFORMGRAVITY.h"
+#include "BitArray/BITARRAY.h"
 #include "FastSerial/PRINTF.h"
 
 InertialNavigationClass INERTIALNAVIGATION;

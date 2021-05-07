@@ -28,6 +28,8 @@
 #include "EEPROM.h"
 #endif
 
+#define MAX_RETRY_COUNT 5 //FORÇA UMA REPETIÇÃO DE 5 VEZES
+
 uint8_t Actual_Format_Version = 10; //1.0
 
 bool CheckActualFormatVersion(void)
@@ -51,12 +53,16 @@ void ClearSensorsCalibration(void)
     STORAGEMANAGER.Write_16Bits(ACC_ROLL_OFFSET_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(ACC_PITCH_OFFSET_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(ACC_YAW_OFFSET_ADDR, 0);
-    STORAGEMANAGER.Write_16Bits(ACC_ROLL_SCALE_ADDR, 0);
-    STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, 0);
-    STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(MAG_ROLL_OFFSET_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(MAG_PITCH_OFFSET_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(MAG_YAW_OFFSET_ADDR, 0);
+    //COLOCANDO O GANHO DOS SENSORES NO MAXIMO EVITA DE OCORRER DIVISÕES POR ZERO NO CICLO DE MAQUINA
+    STORAGEMANAGER.Write_16Bits(ACC_ROLL_SCALE_ADDR, 4096);
+    STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, 4096);
+    STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, 4096);
+    STORAGEMANAGER.Write_16Bits(MAG_ROLL_GAIN_ADDR, 4096);
+    STORAGEMANAGER.Write_16Bits(MAG_PITCH_GAIN_ADDR, 4096);
+    STORAGEMANAGER.Write_16Bits(MAG_YAW_GAIN_ADDR, 4096);
 }
 
 void RecallAllParams(void)
@@ -76,7 +82,7 @@ void FirmwareOrganizeAllParams(void)
     if (!CheckActualFormatVersion())
     {
         LOG("Restaurando os valores de fabrica dos parametros...");
-        for (uint8_t IndexCount = 0; IndexCount < 5; IndexCount++) //FORÇA UMA REPETIÇÃO DE 5 VEZES
+        for (uint8_t IndexCount = 0; IndexCount < MAX_RETRY_COUNT; IndexCount++)
         {
             RecallAllParams();
         }

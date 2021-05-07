@@ -22,6 +22,7 @@
 #include "PID/TPA.h"
 #include "Common/RCDEFINES.h"
 #include "PID/RCPID.h"
+#include "RadioControl/DECODE.h"
 
 #define THROTTLE_LOOKUP_LENGTH 11
 

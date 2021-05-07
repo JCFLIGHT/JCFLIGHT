@@ -23,6 +23,7 @@
 #include "PID/PIDXYZ.h"
 #include "Common/ENUM.h"
 #include "ServosMaster/SERVOSMASTER.h"
+#include "BitArray/BITARRAY.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

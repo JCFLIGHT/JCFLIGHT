@@ -52,7 +52,7 @@ void LEDRGB::Initialization()
 
 void LEDRGB::Update()
 {
-  if (!ACCCALIBRATION.GetRunning() && !GYROCALIBRATION.GetRunning() && !GCS.ConfigFlight && !IMU.Compass.Calibrating && !STICKS.PreArm_Run)
+  if (!ACCCALIBRATION.GetRunning() && !GYROCALIBRATION.GetRunning() && !GCS.ConfigFlight && !Calibration.Magnetometer.Calibrating && !STICKS.PreArm_Run)
   {
     RGB.Function(CALL_LED_GPS);
   }

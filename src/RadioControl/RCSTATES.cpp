@@ -24,26 +24,29 @@
 #include "RadioControl/DECODE.h"
 #include "PID/RCPID.h"
 #include "Param/PARAM.h"
+#include "GPSNavigation/NAVIGATION.h"
 
-#define THIS_LOOP_RATE 50 //STICKS.Update()
+#define THIS_LOOP_RATE 50
 
 int16_t ArmDelayedCount = 0;
 int16_t DisarmDelayedCount = 0;
 
-bool CheckInclinationForArm(void)
+bool GetCheckInclinationForArm(void)
 {
     if (GetAirPlaneEnabled())
     {
         return false; //PULA A CHECAGEM DE INCLINAÇÃO NO MODO PLANE
     }
-    if (GetMultirotorEnabled() && AHRS.CheckAnglesInclination(25))
+
+    if (GetMultirotorEnabled() && AHRS.CosineTiltAngle() < GPS_Resources.Navigation.HeadingHoldLimit)
     {
         return true; //INVALIDA O ARMAMENTO DO SISTEMA SE HOUVER INCLINAÇÃO NOS EIXOS
     }
+
     return false; //INCLINAÇÃO NÃO DETECTADA
 }
 
-bool ArmDelayedState(void)
+bool GetArmDelayedState(void)
 {
     if (ArmDelayedCount >= (THIS_LOOP_RATE * JCF_Param.Arm_Time_Safety))
     {
@@ -56,7 +59,7 @@ bool ArmDelayedState(void)
     return false;
 }
 
-bool DisarmDelayedState(void)
+bool GetDisarmDelayedState(void)
 {
     if (DisarmDelayedCount >= (THIS_LOOP_RATE * JCF_Param.Disarm_Time_Safety))
     {
@@ -79,22 +82,22 @@ void ResetDisarmDelayed(void)
     DisarmDelayedCount = 0;
 }
 
-bool SticksStateToArm(void)
+bool GetSticksStateToArm(void)
 {
-    return (Throttle.Output < MIN_PULSE) && (Yaw.Output > MAX_PULSE) && (Pitch.Output < MIN_PULSE) && (Roll.Output) < MIN_PULSE;
+    return (Throttle.Output < MIN_PULSE) && (Yaw.Output > MAX_PULSE) && (Pitch.Output < MIN_PULSE) && (Roll.Output < MIN_PULSE);
 }
 
-bool SticksStateToDisarm(void)
+bool GetSticksStateToDisarm(void)
 {
-    return (Throttle.Output) < MIN_PULSE && (Yaw.Output < MIN_PULSE) && (Pitch.Output < MIN_PULSE) && (Roll.Output > MAX_PULSE);
+    return (Throttle.Output < MIN_PULSE) && (Yaw.Output < MIN_PULSE) && (Pitch.Output < MIN_PULSE) && (Roll.Output > MAX_PULSE);
 }
 
-bool SticksInAutoPilotPosition(int16_t AutoPilotValue)
+bool GetSticksInAutoPilotPosition(int16_t AutoPilotValue)
 {
-    return ABS(RCController[ROLL]) < AutoPilotValue && ABS(RCController[PITCH]) < AutoPilotValue;
+    return (ABS(RCController[ROLL]) < AutoPilotValue) && (ABS(RCController[PITCH]) < AutoPilotValue);
 }
 
-bool SticksDeflected(int16_t MinDeflectionValue)
+bool GetSticksDeflected(int16_t MinDeflectionValue)
 {
     return (ABS(RCController[ROLL]) > MinDeflectionValue) || (ABS(RCController[PITCH]) > MinDeflectionValue);
 }
@@ -109,8 +112,8 @@ bool GetActualThrottleStatus(uint8_t ThrottleStatus)
     {
         return true;
     }
-    else if (DECODE.GetRxChannelOutput(THROTTLE) >= (MIDDLE_STICKS_PULSE - 100) &&
-             DECODE.GetRxChannelOutput(THROTTLE) <= (MIDDLE_STICKS_PULSE + 100) &&
+    else if (DECODE.GetRxChannelOutput(THROTTLE) >= (MIDDLE_STICKS_PULSE - MIDDLE_PULSE_OFF_SET) &&
+             DECODE.GetRxChannelOutput(THROTTLE) <= (MIDDLE_STICKS_PULSE + MIDDLE_PULSE_OFF_SET) &&
              ThrottleStatus == THROTTLE_MIDDLE)
     {
         return true;

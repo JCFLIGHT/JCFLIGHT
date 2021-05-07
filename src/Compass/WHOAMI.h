@@ -17,5 +17,7 @@
 
 #ifndef WHOAMI_H_
 #define WHOAMI_H_
-bool Check_Whoami();
+bool GetAK8975DeviceDetected(void);
+bool GetHMC5883DeviceDetected(void);
+bool GetQMC5883DeviceDetected(void);
 #endif

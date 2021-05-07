@@ -45,7 +45,7 @@ void Remove_Barometer_Spikes(void)
 float Get_Altitude_Difference(float Base_Pressure, float Pressure, float BaroTemperature)
 {
   float Result;
-#if USE_BARO_PRECISE_MATH
+#ifdef USE_BARO_PRECISE_MATH
   //EM CPU MAIS LENTA USE UM CÁLCULO MENOS EXATO,PORÉM MAIS RÁPIDO
   float Scaling = Base_Pressure / Pressure;
   float CalcedTemperature = BaroTemperature + 273.15f;

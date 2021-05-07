@@ -18,14 +18,14 @@
 #ifndef RCSTATES_H_
 #define RCSTATES_H_
 #include "Build/LIBDEPENDENCIES.h"
-bool CheckInclinationForArm(void);
-bool ArmDelayedState(void);
-bool DisarmDelayedState(void);
+bool GetCheckInclinationForArm(void);
+bool GetArmDelayedState(void);
+bool GetDisarmDelayedState(void);
 void ResetArmDelayed(void);
 void ResetDisarmDelayed(void);
-bool SticksStateToArm(void);
-bool SticksStateToDisarm(void);
-bool SticksInAutoPilotPosition(int16_t AutoPilotValue);
-bool SticksDeflected(int16_t MinDeflectionValue);
+bool GetSticksStateToArm(void);
+bool GetSticksStateToDisarm(void);
+bool GetSticksInAutoPilotPosition(int16_t AutoPilotValue);
+bool GetSticksDeflected(int16_t MinDeflectionValue);
 bool GetActualThrottleStatus(uint8_t ThrottleStatus);
 #endif

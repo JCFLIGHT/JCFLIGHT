@@ -24,12 +24,10 @@ public:
   bool GetSafeStateToDisarmMotors(void);
   void Auto_Do_Now(bool ActiveParachute);
   void Manual_Do_Now(void);
-  void Manual_Detect_Channel(void);
 
 private:
   bool ParachuteInAuto = false;
   bool ParachuteReleased = false;
-  uint16_t ManualDetectTrigger = 0;
   uint32_t OverFlowTime = 0;
   bool Released(void);
   bool ReleasedOverFlowTime(void);

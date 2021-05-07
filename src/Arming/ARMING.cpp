@@ -134,7 +134,7 @@ uint8_t PreArmClass::Checking(void)
         return FLIGHT_MODES_ERROR;
     }
 
-    if (CheckInclinationForArm()) //INCLINAÇÃO DE 25 GRAUS DETECTADA
+    if (GetCheckInclinationForArm()) //INCLINAÇÃO DE 'N' GRAUS DETECTADA
     {
         return INCLINATION_ERROR;
     }

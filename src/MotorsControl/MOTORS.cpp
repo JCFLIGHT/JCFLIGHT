@@ -39,6 +39,7 @@
 #include "MIXTABLE.h"
 #include "ProgMem/PROGMEM.h"
 #include "Build/BOARDDEFS.h"
+#include "BitArray/BITARRAY.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 

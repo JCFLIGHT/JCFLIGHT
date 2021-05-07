@@ -32,6 +32,8 @@
 #include "GPSNavigation/INSNAVIGATION.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Barometer/BAROBACKEND.h"
+#include "RadioControl/DECODE.h"
+#include "BitArray/BITARRAY.h"
 
 WayPointClass WAYPOINT;
 WayPoint_Resources_Struct WayPointResources;

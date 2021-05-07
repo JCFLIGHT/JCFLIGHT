@@ -45,7 +45,7 @@ static BiquadFilter_Struct BiquadAccNotch[3];
 static BiquadFilter_Struct BiquadGyroNotch[3];
 #endif
 
-bool UseKalmanFilter = false;
+bool KalmanFilterEnabled = false;
 
 #ifdef USE_IMU_BIQUAD_FILTER
 int16_t Biquad_Acc_LPF = 0;
@@ -57,7 +57,7 @@ int16_t Biquad_Gyro_Notch = 0;
 static void IMU_Filters_Initialization(void)
 {
   //ATUALIZA O ESTADO GUARDADO DO ESTADO DO KALMAN
-  UseKalmanFilter = STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == NONE ? false : true;
+  KalmanFilterEnabled = STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == NONE ? false : true;
 
 #ifdef USE_IMU_BIQUAD_FILTER
   //CARREGA OS VALORES GUARDADOS DO LPF
@@ -303,7 +303,7 @@ void IMU_Get_Data()
 void Acc_ReadBufferData(void)
 {
 #ifdef __AVR_ATmega2560__
-  I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x3B);
+  I2C.RegisterBuffer(ADDRESS_IMU_MPU6050, 0x3B, I2CResources.Buffer.Data, 0x06);
   IMU.Accelerometer.Read[ROLL] = -(((I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1]) >> 3);
   IMU.Accelerometer.Read[PITCH] = -(((I2CResources.Buffer.Data[2] << 8) | I2CResources.Buffer.Data[3]) >> 3);
   IMU.Accelerometer.Read[YAW] = ((I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5]) >> 3;
@@ -313,13 +313,8 @@ void Acc_ReadBufferData(void)
 
   ACCCALIBRATION.Update();
 
-  //OBTÉM OS VALORES DO ACELEROMETRO ANTES DOS FILTROS
-  IMU.Accelerometer.ReadNotFiltered[ROLL] = IMU.Accelerometer.Read[ROLL];
-  IMU.Accelerometer.ReadNotFiltered[PITCH] = IMU.Accelerometer.Read[PITCH];
-  IMU.Accelerometer.ReadNotFiltered[YAW] = IMU.Accelerometer.Read[YAW];
-
   //KALMAN
-  if (UseKalmanFilter)
+  if (KalmanFilterEnabled)
   {
     KALMAN.Apply_In_Acc(IMU.Accelerometer.Read);
   }
@@ -354,7 +349,7 @@ void Acc_ReadBufferData(void)
 void Gyro_ReadBufferData(void)
 {
 #ifdef __AVR_ATmega2560__
-  I2C.SensorsRead(ADDRESS_IMU_MPU6050, 0x43);
+  I2C.RegisterBuffer(ADDRESS_IMU_MPU6050, 0x43, I2CResources.Buffer.Data, 0x06);
   IMU.Gyroscope.Read[PITCH] = -(((I2CResources.Buffer.Data[0] << 8) | I2CResources.Buffer.Data[1]) >> 2);
   IMU.Gyroscope.Read[ROLL] = ((I2CResources.Buffer.Data[2] << 8) | I2CResources.Buffer.Data[3]) >> 2;
   IMU.Gyroscope.Read[YAW] = -(((I2CResources.Buffer.Data[4] << 8) | I2CResources.Buffer.Data[5]) >> 2);
@@ -362,13 +357,8 @@ void Gyro_ReadBufferData(void)
 
   GYROCALIBRATION.Update();
 
-  //OBTÉM OS VALORES DO GYROSCOPIO ANTES DOS FILTROS
-  IMU.Gyroscope.ReadNotFiltered[ROLL] = IMU.Gyroscope.Read[ROLL];
-  IMU.Gyroscope.ReadNotFiltered[PITCH] = IMU.Gyroscope.Read[PITCH];
-  IMU.Gyroscope.ReadNotFiltered[YAW] = IMU.Gyroscope.Read[YAW];
-
   //KALMAN
-  if (UseKalmanFilter)
+  if (KalmanFilterEnabled)
   {
     KALMAN.Apply_In_Gyro(IMU.Gyroscope.Read);
   }

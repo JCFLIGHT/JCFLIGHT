@@ -48,7 +48,7 @@ void GravityClass::Update(Vector3x3_Struct *VectorPointer)
         {
             //5% DE DESVIO MAXIMO SUPORTADO NO EIXO Z DO NEU PRA COMPLETAR A CALIBRAÇÃO,CASO CONTRARIO SERÁ REINICIADA.
             //A CALIBRAÇÃO DA GRAVIDADE OCORRE AO MESMO TEMPO QUE A CALIBRAÇÃO DO GYRO,ENTÃO SE A CALIBRAÇÃO DO GYRO FALHAR,
-            //A DA GRAVIDADE TAMBÉM FALHARÁ.A FALHA SÓ OCORRERÁ SE O USUARIO MOVER O UAV,OU IMU COM DEFEITO EM UM RARO CENARIO.
+            //A DA GRAVIDADE TAMBÉM FALHARÁ.A FALHA SÓ OCORRERÁ SE O USUARIO MOVER O UAV,OU PROVAVEL IMU COM DEFEITO.
             if (DeviceStandardDeviation(&GravityDevice) > (GRAVITY_CMSS * 0.005f))
             {
                 Calibration.Accelerometer.Gravity.Flags.Restart = true;

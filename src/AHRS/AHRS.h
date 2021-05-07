@@ -30,6 +30,7 @@ class AHRSClass
 public:
   void Initialization(void);
   void Update(float DeltaTime);
+  float CosineTiltAngle(void);
   bool CheckAnglesInclination(int16_t Angle);
   void TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *VectorPointer);
   void TransformVectorBodyFrameToEarthFrame(Vector3x3_Struct *VectorPointer);
@@ -39,9 +40,6 @@ public:
   float GetCosinePitch(void);
   float GetSineYaw(void);
   float GetCosineYaw(void);
-
-private:
-  float CosineTiltAngle(void);
 };
 extern AHRSClass AHRS;
 #endif

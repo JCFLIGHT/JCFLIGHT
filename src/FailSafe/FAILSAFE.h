@@ -19,8 +19,8 @@
 #define FAILSAFE_H_
 #include "Build/LIBDEPENDENCIES.h"
 extern volatile int16_t Fail_Safe_System_Count;
-bool FastSystemFailSafe();
-bool SystemInFailSafe();
-void FailSafeCheck();
+bool FastSystemFailSafe(void);
+bool SystemInFailSafe(void);
+void FailSafeCheck(void);
 void FailSafe_Do_RTH_With_Low_Batt(bool FailSafeBatt);
 #endif

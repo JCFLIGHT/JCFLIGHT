@@ -17,41 +17,56 @@
 
 #include "WHOAMI.h"
 #include "I2C/I2C.h"
-#include "Compass/COMPASSREAD.h"
-#include "FastSerial/PRINTF.h"
+#include "Scheduler/SCHEDULERTIME.h"
 
-//#define PRINTLN_WHOAMI
-
-//É UMA FUNÇÃO DE RETORNO,SE O HMC5x43 FOR ENCONTRADO,A FUNÇÃO RETORNA TRUE,CASO CONTRARIO RETORNA FALSE.
-//PRA SABER SE REALMENTE ESTÁ FUNCIONANDO,EU PRECISO ARRUMAR UM COMPASS HMC5843
-//E UM HMC5883,AFIM DE VERIFICAR SE ESSA FUNÇÃO REALMENTE FUNCIONA DE FORMA CORRETA,
-//ESSA FUNÇÃO FOI RETIRADA DA ARDUPILOT,PORÉM LÁ O BARRAMENTO UTILIZADO É SPI,E AQUI NA JCFLIGHT É I2C,
-//MAS A LOGICA DE FUNCIONAMENTO É A MESMA PARA AMBAS.
-//SE FUNCIONAR DA MANEIRA CORRETA,ESSA FUNÇÃO SERÁ UTILIZADA PARA SETAR A ORIENTAÇÃO DO HMC5843 EM ORIENTATION.cpp,
-//E TODO ESSE COMENTARIO DEVERÁ SER REMOVIDO DAQUI.
-bool Check_Whoami() //WHO A MI? -> QUEM SOU EU?
+bool GetAK8975DeviceDetected(void)
 {
-    I2C.SensorsRead(COMPASS.Address, 0x0A);
-
-#ifdef PRINTLN_WHOAMI
-
-    //TABELA ASCII:
-    //H = 72 - 0x48
-    //4 = 4 - 0x04
-    //3 = 3 - 0x03
-    DEBUG("BufferData[0]:%d BufferData[1]:%d BufferData[2]:%d",
-          I2CResources.Buffer.Data[0],
-          I2CResources.Buffer.Data[1],
-          I2CResources.Buffer.Data[2]);
-
-#endif
-
-    if (I2CResources.Buffer.Data[0] != 'H' ||
-        I2CResources.Buffer.Data[1] != '4' ||
-        I2CResources.Buffer.Data[2] != '3')
+    for (uint8_t IndexCount = 0; IndexCount < 5; IndexCount++)
     {
-        //NÃO É UM DISPOSITIVO HMC5x43
-        return false;
+        SCHEDULERTIME.Sleep(30);
+        uint8_t CompareByte = 0;
+        I2C.RegisterBuffer(ADDRESS_COMPASS_AK8975, 0x00, &CompareByte, 0x01);
+        if (CompareByte == 0x48)
+        {
+            return true;
+        }
     }
-    return true;
+    return false;
+}
+
+bool GetHMC5883DeviceDetected(void)
+{
+    for (uint8_t IndexCount = 0; IndexCount < 5; IndexCount++)
+    {
+        SCHEDULERTIME.Sleep(30);
+        uint8_t CompareByte = 0;
+        I2C.RegisterBuffer(ADDRESS_COMPASS_HMC5883, 0x0A, &CompareByte, 0x01);
+        if (CompareByte == 0x48)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool GetQMC5883DeviceDetected(void)
+{
+    for (uint8_t IndexCount = 0; IndexCount < 5; IndexCount++)
+    {
+        I2C.WriteRegister(ADDRESS_COMPASS_QMC5883, 0x0A, 0x80);
+        SCHEDULERTIME.Sleep(30);
+
+        uint8_t CompareByte = 0;
+        I2C.RegisterBuffer(ADDRESS_COMPASS_QMC5883, 0x0D, &CompareByte, 0x01);
+
+        if (CompareByte == 0xFF)
+        {
+            I2C.RegisterBuffer(ADDRESS_COMPASS_QMC5883, 0x09, &CompareByte, 0x01);
+            if (CompareByte == 0x00)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }

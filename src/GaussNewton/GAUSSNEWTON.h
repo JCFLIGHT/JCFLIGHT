@@ -21,6 +21,6 @@
 void ClearGaussNewtonMatrices(Jacobian_Struct *JacobianPointer);
 void GaussNewtonPushSampleForOffSetCalculation(Jacobian_Struct *JacobianPointer, int16_t SensorSample[3]);
 void GaussNewtonPushSampleForScaleCalculation(Jacobian_Struct *JacobianPointer, int16_t AxisIndex, int16_t SensorSample[3], int16_t Target);
-void GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianPointer, float Result[3]);
-void GaussNewtonSolveForScale(Jacobian_Struct *JacobianPointer, float Result[3]);
+bool GaussNewtonSolveForOffSet(Jacobian_Struct *JacobianPointer, float Result[3]);
+bool GaussNewtonSolveForScale(Jacobian_Struct *JacobianPointer, float Result[3]);
 #endif

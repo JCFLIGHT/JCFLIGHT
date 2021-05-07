@@ -31,6 +31,8 @@
 #include "Param/PARAM.h"
 #include "I2C/I2C.h"
 #include "GPSNavigation/NAVIGATION.h"
+#include "RadioControl/DECODE.h"
+#include "BitArray/BITARRAY.h"
 
 AutoLaunchClass AUTOLAUNCH;
 
@@ -126,7 +128,7 @@ void AutoLaunchClass::Update(void)
         AutoLaunchState = true;
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-          ENABLE_STATE(PRIMARY_ARM_DISARM);
+          ENABLE_THIS_STATE(PRIMARY_ARM_DISARM);
         }
         AUTOLAUNCH.RCControllerThrottle_Apply_Logic(true); //TRUE PARA PLANES COM TREM DE POUSO
       }
@@ -139,7 +141,7 @@ void AutoLaunchClass::Update(void)
         AUTOLAUNCH.RCControllerYawPitchRoll_Apply_Logic();
         if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
         {
-          ENABLE_STATE(PRIMARY_ARM_DISARM);
+          ENABLE_THIS_STATE(PRIMARY_ARM_DISARM);
         }
         if (AUTOLAUNCH.GetStatusCompleted())
         {
@@ -284,10 +286,10 @@ bool AutoLaunchClass::GetStatusCompleted(void)
   //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
   if (AUTO_LAUCH_EXIT_FUNCTION == NONE)
   {
-    return (SticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
+    return (GetSticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
   }
   //FAÇA A MESMA VERIFICAÇÃO DE CIMA,PORÉM COM O ESTOURO DO TEMPO MAXIMO DE LAUNCH
-  return (AUTOLAUNCH.GetTimerOverFlow()) || (SticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
+  return (AUTOLAUNCH.GetTimerOverFlow()) || (GetSticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
 }
 
 uint8_t AutoLaunchClass::GetPlaneType(void)

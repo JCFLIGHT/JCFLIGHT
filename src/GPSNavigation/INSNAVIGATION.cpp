@@ -27,6 +27,8 @@
 #include "Scheduler/SCHEDULER.h"
 #include "FrameStatus/FRAMESTATUS.h"
 #include "RadioControl/CURVESRC.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/RCDEFINES.h"
 
 void MultirotorSetThisPointToPositionHold(void)
 {

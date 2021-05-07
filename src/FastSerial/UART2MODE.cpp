@@ -21,7 +21,7 @@
 #include "Common/ENUM.h"
 
 #ifdef __AVR_ATmega2560__
-void UART2Mode_Initialization()
+void UART2Mode_Initialization(void)
 {
     DDRA |= (1 << DDD0); //DEFINE A PORTA DIGITAL 22 COMO SAIDA
     if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER)
@@ -35,7 +35,7 @@ void UART2Mode_Initialization()
 }
 
 #elif defined __arm__ || defined ESP32
-void UART2Mode_Initialization()
+void UART2Mode_Initialization(void)
 {
 }
 #endif

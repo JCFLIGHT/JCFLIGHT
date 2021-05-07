@@ -24,6 +24,8 @@
 #include "FrameStatus/FRAMESTATUS.h"
 #include "Common/ENUM.h"
 #include "Common/RCDEFINES.h"
+#include "RadioControl/DECODE.h"
+#include "BitArray/BITARRAY.h"
 
 //***********************************************************
 //CONFIGURAÇÃO DAS CHAVES AUXILIARES PARA OS MODOS DE VOO
@@ -31,10 +33,24 @@
 
 AUXFLIGHTCLASS AUXFLIGHT;
 
+//VARIAVEIS PARA OBTÉR O VALOR EM uS QUE ESTÁ CONFIGURADO OS MODOS
+bool AltitudeHoldControlAux,
+    GPSHoldControlAux,
+    RTHControlAux,
+    SimpleControlAux,
+    AcroControlAux,
+    AttackControlAux,
+    AutoFlipControlAux,
+    WayPointControlAux,
+    ArmDisarmControlAux,
+    AutoLandControlAux,
+    ParachuteControlAux;
+
 //VARIAVEIS DE CARREGAMENTO DA EEPROM
 uint8_t GPSHoldConfig,
     RTHConfig,
     SimpleConfig,
+    GimbalConfig,
     AltitudeHoldConfig,
     AcroConfig,
     AttackConfig,
@@ -44,1050 +60,90 @@ uint8_t GPSHoldConfig,
     ReceiverModel,
     ArmDisarmConfig,
     AutoLandConfig,
-    ParachuteDetectTrigger;
+    ParachuteConfig;
 
-//VARIAVEIS PARA OBTÉR O VALOR EM uS QUE ESTÁ CONFIGURADO OS MODOS
-int16_t AltitudeHoldControlAux,
-    GPSHoldControlAux,
-    RTHControlAux,
-    SimpleControlAux,
-    GimbalControlAux,
-    AcroControlAux,
-    AttackControlAux,
-    AutoFlipControlAux,
-    WayPointControlAux,
-    ArmDisarmControlAux,
-    AutoLandControlAux;
+uint8_t Channel_Low[MAX_AUX_CHANNELS];
+uint8_t Channel_Middle[MAX_AUX_CHANNELS];
+uint8_t Channel_High[MAX_AUX_CHANNELS];
+uint8_t Channel_Levels_Count = 0;
 
 void AUXFLIGHTCLASS::Initialization(void)
 {
-  SimpleConfig = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);              //CHAVE AUX ATRIBUIDA PARA O MODO SIMPLES
-  AltitudeHoldConfig = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR);      //CHAVE AUX ATRIBUIDA PARA O MODO ALT-HOLD
-  GPSHoldConfig = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);           //CHAVE AUX ATRIBUIDA PARA O MODO GPS-HOLD
-  RTHConfig = STORAGEMANAGER.Read_8Bits(RTH_ADDR);                    //CHAVE AUX ATRIBUIDA PARA O MODO RTH
-  AcroConfig = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);              //CHAVE AUX ATRIBUIDA PARA O MODO ACRO
-  AttackConfig = STORAGEMANAGER.Read_8Bits(ATACK_ADDR);               //CHAVE AUX ATRIBUIDA PARA O MODO ATTACK
-  ParachuteDetectTrigger = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR); //CONFIGURAÇÃO DO PARACHUTE
-  AutoFlipConfig = STORAGEMANAGER.Read_8Bits(AUTOFLIP_ADDR);          //CHAVE AUX ATRIBUIDA PARA O MODO AUTO-FLIP
-  GimbalControlAux = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);          //CANAL AUX ATRIBUIDO PARA O CONTROLE DO GIMBAL
-  SetPlatformType(STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR));         //TIPO DE FRAME SELECIONADO
-  ReceiverModel = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);           //MODELO DO RADIO
-  ArmDisarmConfig = STORAGEMANAGER.Read_8Bits(ARMDISARM_ADDR);        //CHAVE ATRIBUIDA AO ARMDISARM VIA CHAVE AUX
-  WayPointConfig = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR);       //CHAVE ATRIBUIDA AO MODO WAYPOINT
-  AutoLandConfig = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);          //CHAVE ATRIBUIDA AO AUTO LAND
+  SimpleConfig = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);         //CHAVE AUX ATRIBUIDA PARA O MODO SIMPLES
+  AltitudeHoldConfig = STORAGEMANAGER.Read_8Bits(ALT_HOLD_ADDR); //CHAVE AUX ATRIBUIDA PARA O MODO ALT-HOLD
+  GPSHoldConfig = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);      //CHAVE AUX ATRIBUIDA PARA O MODO GPS-HOLD
+  RTHConfig = STORAGEMANAGER.Read_8Bits(RTH_ADDR);               //CHAVE AUX ATRIBUIDA PARA O MODO RTH
+  AcroConfig = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);         //CHAVE AUX ATRIBUIDA PARA O MODO ACRO
+  AttackConfig = STORAGEMANAGER.Read_8Bits(ATACK_ADDR);          //CHAVE AUX ATRIBUIDA PARA O MODO ATTACK
+  ParachuteConfig = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR);   //CONFIGURAÇÃO DO PARACHUTE
+  AutoFlipConfig = STORAGEMANAGER.Read_8Bits(AUTOFLIP_ADDR);     //CHAVE AUX ATRIBUIDA PARA O MODO AUTO-FLIP
+  GimbalConfig = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);         //CANAL AUX ATRIBUIDO PARA O CONTROLE DO GIMBAL
+  SetPlatformType(STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR));    //TIPO DE FRAME SELECIONADO
+  ReceiverModel = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);      //MODELO DO RECEPTOR
+  ArmDisarmConfig = STORAGEMANAGER.Read_8Bits(ARMDISARM_ADDR);   //CHAVE ATRIBUIDA AO ARMDISARM VIA CHAVE AUX
+  WayPointConfig = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR);  //CHAVE ATRIBUIDA AO MODO WAYPOINT
+  AutoLandConfig = STORAGEMANAGER.Read_8Bits(AUTOLAND_ADDR);     //CHAVE ATRIBUIDA AO AUTO LAND
 }
 
-void AUXFLIGHTCLASS::SelectMode(void)
+bool GetFlightModeState(uint8_t _Channel)
 {
-  //MODO SIMPLES
-  switch (SimpleConfig)
+
+  if (_Channel == 0) //NO GCS O BOX EM "NENHUM" É IGUAL A ZERO
   {
-
-  case AUXONELOW:
-    SimpleControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    SimpleControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    SimpleControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    SimpleControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    SimpleControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    SimpleControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    SimpleControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    SimpleControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    SimpleControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    SimpleControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    SimpleControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    SimpleControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    SimpleControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    SimpleControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    SimpleControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    SimpleControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    SimpleControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    SimpleControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    SimpleControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    SimpleControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    SimpleControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    SimpleControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    SimpleControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    SimpleControlAux = AUX8_HIGH;
-    break;
+    return false;
   }
 
-  //ALT-HOLD
-  switch (AltitudeHoldConfig)
+  uint8_t ConfiguredChannel = 0;
+
+  for (uint8_t IndexCount = 0; IndexCount < (MAX_AUX_CHANNELS * 3); IndexCount++)
   {
-
-  case AUXONELOW:
-    AltitudeHoldControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    AltitudeHoldControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    AltitudeHoldControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    AltitudeHoldControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    AltitudeHoldControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    AltitudeHoldControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    AltitudeHoldControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    AltitudeHoldControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    AltitudeHoldControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    AltitudeHoldControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    AltitudeHoldControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    AltitudeHoldControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    AltitudeHoldControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    AltitudeHoldControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    AltitudeHoldControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    AltitudeHoldControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    AltitudeHoldControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    AltitudeHoldControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    AltitudeHoldControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    AltitudeHoldControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    AltitudeHoldControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    AltitudeHoldControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    AltitudeHoldControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    AltitudeHoldControlAux = AUX8_HIGH;
-    break;
+    if (IndexCount == _Channel)
+    {
+      ConfiguredChannel = IndexCount / 3;
+      //VERIFICA AS CASAS DECIMAIS
+      if (((float)IndexCount / 3 >= (ConfiguredChannel + .1f)) &&
+          ((float)IndexCount / 3 <= (ConfiguredChannel + .9f)))
+      {
+        ConfiguredChannel += 1;
+      }
+      break;
+    }
   }
 
-  //GPS-HOLD
-  switch (GPSHoldConfig)
+  if (Channel_Levels_Count < MAX_AUX_CHANNELS)
   {
 
-  case AUXONELOW:
-    GPSHoldControlAux = AUX1_LOW;
-    break;
+    if (Channel_Levels_Count == 0)
+    {
+      Channel_Low[Channel_Levels_Count] = 1;
+      Channel_Middle[Channel_Levels_Count] = 2;
+      Channel_High[Channel_Levels_Count] = 3;
+    }
+    else
+    {
+      Channel_Low[Channel_Levels_Count] = Channel_Low[Channel_Levels_Count - 1] + 3;
+      Channel_Middle[Channel_Levels_Count] = Channel_Middle[Channel_Levels_Count - 1] + 3;
+      Channel_High[Channel_Levels_Count] = Channel_High[Channel_Levels_Count - 1] + 3;
+    }
 
-  case AUXONEMIDDLE:
-    GPSHoldControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    GPSHoldControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    GPSHoldControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    GPSHoldControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    GPSHoldControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    GPSHoldControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    GPSHoldControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    GPSHoldControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    GPSHoldControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    GPSHoldControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    GPSHoldControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    GPSHoldControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    GPSHoldControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    GPSHoldControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    GPSHoldControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    GPSHoldControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    GPSHoldControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    GPSHoldControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    GPSHoldControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    GPSHoldControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    GPSHoldControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    GPSHoldControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    GPSHoldControlAux = AUX8_HIGH;
-    break;
+    Channel_Levels_Count++;
+    return false; //NÃO ATUALIZA NENHUM MODO DE VOO QUANDO A SOMA ESTIVER EM PROCESSAMENTO
   }
 
-  //RETURN TO HOME
-  switch (RTHConfig)
+  if (_Channel == Channel_Low[ConfiguredChannel - 1])
   {
-
-  case AUXONELOW:
-    RTHControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    RTHControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    RTHControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    RTHControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    RTHControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    RTHControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    RTHControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    RTHControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    RTHControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    RTHControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    RTHControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    RTHControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    RTHControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    RTHControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    RTHControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    RTHControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    RTHControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    RTHControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    RTHControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    RTHControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    RTHControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    RTHControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    RTHControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    RTHControlAux = AUX8_HIGH;
-    break;
+    return DECODE.GetRxChannelOutput(ConfiguredChannel + 3) < MIN_STICKS_PULSE + FLIGHT_MODE_PULSE_OFF_SET;
   }
-
-  //ACRO
-  switch (AcroConfig)
+  else if (_Channel == Channel_Middle[ConfiguredChannel - 1])
   {
-
-  case AUXONELOW:
-    AcroControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    AcroControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    AcroControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    AcroControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    AcroControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    AcroControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    AcroControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    AcroControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    AcroControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    AcroControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    AcroControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    AcroControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    AcroControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    AcroControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    AcroControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    AcroControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    AcroControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    AcroControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    AcroControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    AcroControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    AcroControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    AcroControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    AcroControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    AcroControlAux = AUX8_HIGH;
-    break;
+    return DECODE.GetRxChannelOutput(ConfiguredChannel + 3) > (MIDDLE_STICKS_PULSE - FLIGHT_MODE_PULSE_OFF_SET) &&
+           DECODE.GetRxChannelOutput(ConfiguredChannel + 3) < (MIDDLE_STICKS_PULSE + FLIGHT_MODE_PULSE_OFF_SET);
   }
-
-  //ATTACK
-  switch (AttackConfig)
+  else if (_Channel == Channel_High[ConfiguredChannel - 1])
   {
-
-  case AUXONELOW:
-    AttackControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    AttackControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    AttackControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    AttackControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    AttackControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    AttackControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    AttackControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    AttackControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    AttackControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    AttackControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    AttackControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    AttackControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    AttackControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    AttackControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    AttackControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    AttackControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    AttackControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    AttackControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    AttackControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    AttackControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    AttackControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    AttackControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    AttackControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    AttackControlAux = AUX8_HIGH;
-    break;
+    return DECODE.GetRxChannelOutput(ConfiguredChannel + 3) > MAX_STICKS_PULSE - FLIGHT_MODE_PULSE_OFF_SET;
   }
-
-  //AUTOFLIP
-  switch (AutoFlipConfig)
-  {
-
-  case AUXONELOW:
-    AutoFlipControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    AutoFlipControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    AutoFlipControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    AutoFlipControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    AutoFlipControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    AutoFlipControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    AutoFlipControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    AutoFlipControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    AutoFlipControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    AutoFlipControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    AutoFlipControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    AutoFlipControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    AutoFlipControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    AutoFlipControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    AutoFlipControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    AutoFlipControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    AutoFlipControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    AutoFlipControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    AutoFlipControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    AutoFlipControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    AutoFlipControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    AutoFlipControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    AutoFlipControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    AutoFlipControlAux = AUX8_HIGH;
-    break;
-  }
-
-  //AUTO
-  switch (WayPointConfig)
-  {
-
-  case AUXONELOW:
-    WayPointControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    WayPointControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    WayPointControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    WayPointControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    WayPointControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    WayPointControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    WayPointControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    WayPointControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    WayPointControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    WayPointControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    WayPointControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    WayPointControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    WayPointControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    WayPointControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    WayPointControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    WayPointControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    WayPointControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    WayPointControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    WayPointControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    WayPointControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    WayPointControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    WayPointControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    WayPointControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    WayPointControlAux = AUX8_HIGH;
-    break;
-  }
-
-  //ARMDISARM
-  switch (ArmDisarmConfig)
-  {
-
-  case AUXONELOW:
-    ArmDisarmControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    ArmDisarmControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    ArmDisarmControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    ArmDisarmControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    ArmDisarmControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    ArmDisarmControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    ArmDisarmControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    ArmDisarmControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    ArmDisarmControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    ArmDisarmControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    ArmDisarmControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    ArmDisarmControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    ArmDisarmControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    ArmDisarmControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    ArmDisarmControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    ArmDisarmControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    ArmDisarmControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    ArmDisarmControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    ArmDisarmControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    ArmDisarmControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    ArmDisarmControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    ArmDisarmControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    ArmDisarmControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    ArmDisarmControlAux = AUX8_HIGH;
-    break;
-  }
-
-  //AUTO LAND
-  switch (AutoLandConfig)
-  {
-
-  case AUXONELOW:
-    AutoLandControlAux = AUX1_LOW;
-    break;
-
-  case AUXONEMIDDLE:
-    AutoLandControlAux = AUX1_MID;
-    break;
-
-  case AUXONEHIGH:
-    AutoLandControlAux = AUX1_HIGH;
-    break;
-
-  case AUXTWOLOW:
-    AutoLandControlAux = AUX2_LOW;
-    break;
-
-  case AUXTWOMIDDLE:
-    AutoLandControlAux = AUX2_MID;
-    break;
-
-  case AUXTWOHIGH:
-    AutoLandControlAux = AUX2_HIGH;
-    break;
-
-  case AUXTHREELOW:
-    AutoLandControlAux = AUX3_LOW;
-    break;
-
-  case AUXTHREEMIDDLE:
-    AutoLandControlAux = AUX3_MID;
-    break;
-
-  case AUXTHREEHIGH:
-    AutoLandControlAux = AUX3_HIGH;
-    break;
-
-  case AUXFOURLOW:
-    AutoLandControlAux = AUX4_LOW;
-    break;
-
-  case AUXFOURMIDDLE:
-    AutoLandControlAux = AUX4_MID;
-    break;
-
-  case AUXFOURHIGH:
-    AutoLandControlAux = AUX4_HIGH;
-    break;
-
-  case AUXFIVELOW:
-    AutoLandControlAux = AUX5_LOW;
-    break;
-
-  case AUXFIVEMIDDLE:
-    AutoLandControlAux = AUX5_MID;
-    break;
-
-  case AUXFIVEHIGH:
-    AutoLandControlAux = AUX5_HIGH;
-    break;
-
-  case AUXSIXLOW:
-    AutoLandControlAux = AUX6_LOW;
-    break;
-
-  case AUXSIXMIDDLE:
-    AutoLandControlAux = AUX6_MID;
-    break;
-
-  case AUXSIXHIGH:
-    AutoLandControlAux = AUX6_HIGH;
-    break;
-
-  case AUXSEVENLOW:
-    AutoLandControlAux = AUX7_LOW;
-    break;
-
-  case AUXSEVENMIDDLE:
-    AutoLandControlAux = AUX7_MID;
-    break;
-
-  case AUXSEVENHIGH:
-    AutoLandControlAux = AUX7_HIGH;
-    break;
-
-  case AUXEIGHTLOW:
-    AutoLandControlAux = AUX8_LOW;
-    break;
-
-  case AUXEIGHTMIDDLE:
-    AutoLandControlAux = AUX8_MID;
-    break;
-
-  case AUXEIGHTHIGH:
-    AutoLandControlAux = AUX8_HIGH;
-    break;
-  }
+  return false;
 }
 
 void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
@@ -1099,31 +155,42 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
     return;
   }
 
-  ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(STABILIZE_MODE, !AcroControlAux);
-  ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(ALTITUDE_HOLD_MODE, AltitudeHoldControlAux); //TROCAR DE AUTO-THR PARA ALT-HOLD NO GCS
-  ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(RTH_MODE, RTHControlAux);
-  ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(WAYPOINT_MODE, WayPointControlAux);
+  ArmDisarmControlAux = GetFlightModeState(ArmDisarmConfig);
+  AcroControlAux = GetFlightModeState(AcroConfig);
+  AltitudeHoldControlAux = GetFlightModeState(AltitudeHoldConfig);
+  RTHControlAux = GetFlightModeState(RTHConfig);
+  WayPointControlAux = GetFlightModeState(WayPointConfig);
+  SimpleControlAux = GetFlightModeState(SimpleConfig);
+  GPSHoldControlAux = GetFlightModeState(GPSHoldConfig);
+  AutoLandControlAux = GetFlightModeState(AutoLandConfig);
+  AttackControlAux = GetFlightModeState(AttackConfig);
+  AutoFlipControlAux = GetFlightModeState(AutoFlipConfig);
+  ParachuteControlAux = GetFlightModeState(ParachuteConfig);
+
+  ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(STABILIZE_MODE, !AcroControlAux);
+  ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(ALTITUDE_HOLD_MODE, AltitudeHoldControlAux); //TROCAR DE AUTO-THR PARA ALT-HOLD NO GCS
+  ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(RTH_MODE, RTHControlAux);
+  ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(WAYPOINT_MODE, WayPointControlAux);
 
   if (GetMultirotorEnabled())
   {
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(SIMPLE_MODE, SimpleControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, GPSHoldControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(LAND_MODE, AutoLandControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(ATTACK_MODE, AttackControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(FLIP_MODE, AutoFlipControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(SIMPLE_MODE, SimpleControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, GPSHoldControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(LAND_MODE, AutoLandControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(ATTACK_MODE, AttackControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(FLIP_MODE, AutoFlipControlAux);
   }
   else if (GetAirPlaneEnabled())
   {
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(MANUAL_MODE, SimpleControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(CIRCLE_MODE, GPSHoldControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(CRUISE_MODE, AutoLandControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(LAUNCH_MODE, AttackControlAux);
-    ENABLE_DISABLE_FLIGHT_MODE_WITH_DEPENDENCY(TURN_MODE, AutoFlipControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(MANUAL_MODE, SimpleControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(CIRCLE_MODE, GPSHoldControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(CRUISE_MODE, AutoLandControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(LAUNCH_MODE, AttackControlAux);
+    ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(TURN_MODE, AutoFlipControlAux);
   }
 }
 
 void AUXFLIGHTCLASS::Update(void)
 {
-  AUXFLIGHT.SelectMode();
   AUXFLIGHT.FlightModesAuxSelect();
 }

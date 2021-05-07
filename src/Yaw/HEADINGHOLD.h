@@ -19,6 +19,6 @@
 #define HEADINGHOLD_H_
 #include "Build/LIBDEPENDENCIES.h"
 void UpdateStateOfHeadingHold(void);
-bool GetSafeStateOfHeadingHold();
+bool GetSafeStateOfHeadingHold(void);
 float GetHeadingHoldValue(float DeltaTime);
 #endif

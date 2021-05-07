@@ -43,6 +43,9 @@
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDPARAMS.h"
 #include "TECS/TECS.h"
+#include "BitArray/BITARRAY.h"
+#include "Common/RCDEFINES.h"
+#include "RadioControl/DECODE.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -66,8 +69,8 @@ PT1_Filter_Struct Angle_Pitch_Smooth;
 PT1_Filter_Struct WindUpRoll_Smooth;
 PT1_Filter_Struct WindUpPitch_Smooth;
 #ifdef USE_DERIVATIVE_BOOST_PID
-PT1_Filter_Struct DerivativeBoost_Smooth;
-PT1_Filter_Struct DerivativeBoost_Smooth;
+PT1_Filter_Struct DerivativeBoost_PT1_Roll_Smooth;
+PT1_Filter_Struct DerivativeBoost_PT1_Pitch_Smooth;
 #endif
 
 //MIGRAR ESSES PARAMETROS PARA A LISTA COMPLETA DE PARAMETROS
@@ -266,7 +269,7 @@ float PIDXYZClass::ApplyDerivativeBoostRoll(float ActualGyro, float PrevGyro, fl
     const float DerivativeBoostRateAcceleration = ABS((ActualRateTagert - PrevRateTagert) / DeltaTime);
     const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
     DerivativeBoost = ScaleRangeFloat(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
-    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Smooth, DerivativeBoost, DERIVATIVE_BOOST_CUTOFF, DeltaTime);
+    DerivativeBoost = PT1FilterApply(&DerivativeBoost_PT1_Roll_Smooth, DerivativeBoost, DERIVATIVE_BOOST_CUTOFF, DeltaTime);
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
 
@@ -288,7 +291,7 @@ float PIDXYZClass::ApplyDerivativeBoostPitch(float ActualGyro, float PrevGyro, f
     const float DerivativeBoostRateAcceleration = ABS((ActualRateTagert - PrevRateTagert) / DeltaTime);
     const float Acceleration = MAX(DerivativeBoostGyroAcceleration, DerivativeBoostRateAcceleration);
     DerivativeBoost = ScaleRangeFloat(Acceleration, 0.0f, DerivativeBoostMaxAceleration, 1.0f, DerivativeBoostFactor);
-    DerivativeBoost = PT1FilterApply(&DerivativeBoost_Smooth, DerivativeBoost, DERIVATIVE_BOOST_CUTOFF, DeltaTime);
+    DerivativeBoost = PT1FilterApply(&DerivativeBoost_PT1_Pitch_Smooth, DerivativeBoost, DERIVATIVE_BOOST_CUTOFF, DeltaTime);
     DerivativeBoost = Constrain_Float(DerivativeBoost, 1.0f, DerivativeBoostFactor);
   }
 

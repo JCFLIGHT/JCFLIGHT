@@ -17,9 +17,6 @@
 
 #include "DJINAZAGPS.h"
 
-#include "math.h"    //fabsf
-#include "Arduino.h" //max,min
-
 typedef struct
 {
   uint8_t res[4]; //0

@@ -18,9 +18,9 @@
 #include "HALPPM.h"
 #include "HALLIBRARY.h"
 
-ClassHALPPM HALPPM;
+ClassHALPPM HAL_PPM;
 
-void ClassHALPPM::Initialization()
+void ClassHALPPM::Initialization(void)
 {
   _PPM_Initialization();
 }

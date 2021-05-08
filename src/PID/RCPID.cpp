@@ -33,6 +33,8 @@
 
 FILE_COMPILE_FOR_SPEED
 
+RC_Resources_Struct RC_Resources;
+
 #ifndef __AVR_ATmega2560__
 PT1_Filter_Struct FixedWingTPA_Smooth;
 #endif
@@ -40,73 +42,39 @@ PT1_Filter_Struct FixedWingTPA_Smooth;
 //DEBUG
 //#define PRINTLN_TPA
 
-bool FixedWingTPAFilterInitalized = false;
+bool FixedWingTPAFilterInitialized = false;
 
-uint8_t RCRate;
-uint8_t RCExpo;
-uint8_t YawRate;
-uint8_t ThrottleMiddle;
-uint8_t ThrottleExpo;
-
-int16_t RCController[4];
-int16_t AttitudeThrottleMin;
-int16_t AttitudeThrottleMax;
-
-void GetRCDataConvertedAndApplyFilter()
+static void GetRCDataConvertedAndApplyFilter(void)
 {
   int32_t CalcedThrottle;
-  CalcedThrottle = Constrain_16Bits(DECODE.GetRxChannelOutput(THROTTLE), AttitudeThrottleMin, MAX_STICKS_PULSE);
-  CalcedThrottle = (uint32_t)(CalcedThrottle - AttitudeThrottleMin) * MIN_STICKS_PULSE / (MAX_STICKS_PULSE - AttitudeThrottleMin);
-  RCController[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
-  RCController[YAW] = -CalcedAttitudeRC(YAW, RCExpo);
-  RCController[PITCH] = CalcedAttitudeRC(PITCH, RCExpo);
-  RCController[ROLL] = CalcedAttitudeRC(ROLL, RCExpo);
+  CalcedThrottle = Constrain_16Bits(DECODE.GetRxChannelOutput(THROTTLE), RC_Resources.Attitude.ThrottleMin, MAX_STICKS_PULSE);
+  CalcedThrottle = (uint32_t)(CalcedThrottle - RC_Resources.Attitude.ThrottleMin) * MIN_STICKS_PULSE / (MAX_STICKS_PULSE - RC_Resources.Attitude.ThrottleMin);
+  RC_Resources.Attitude.Controller[THROTTLE] = CalcedLookupThrottle(CalcedThrottle);
+  RC_Resources.Attitude.Controller[YAW] = -CalcedAttitudeRC(YAW, RC_Resources.Expo.YawPitchRoll);
+  RC_Resources.Attitude.Controller[PITCH] = CalcedAttitudeRC(PITCH, RC_Resources.Expo.YawPitchRoll);
+  RC_Resources.Attitude.Controller[ROLL] = CalcedAttitudeRC(ROLL, RC_Resources.Expo.YawPitchRoll);
 
   //APLICA O FILTRO LPF NO RC DA ATTITUDE
   RCInterpolationApply();
 
   //FAZ UMA PEQUENA ZONA MORTA NOS CANAIS DA ATTITUDE
-  if (ABS(RCController[YAW]) < 5)
+  if (ABS(RC_Resources.Attitude.Controller[YAW]) < 5)
   {
-    RCController[YAW] = 0;
-  }
-  if (ABS(RCController[ROLL]) < 5)
-  {
-    RCController[ROLL] = 0;
-  }
-  if (ABS(RCController[PITCH]) < 5)
-  {
-    RCController[PITCH] = 0;
+    RC_Resources.Attitude.Controller[YAW] = 0;
   }
 
-  //REMOVE OS VALORES MAIORES QUE -500 E 500 CAUSADOS PELO FILTRO
-  if (RCController[YAW] > 500)
+  if (ABS(RC_Resources.Attitude.Controller[ROLL]) < 5)
   {
-    RCController[YAW] = 500;
+    RC_Resources.Attitude.Controller[ROLL] = 0;
   }
-  else if (RCController[YAW] < -500)
+
+  if (ABS(RC_Resources.Attitude.Controller[PITCH]) < 5)
   {
-    RCController[YAW] = -500;
-  }
-  if (RCController[ROLL] > 500)
-  {
-    RCController[ROLL] = 500;
-  }
-  else if (RCController[ROLL] < -500)
-  {
-    RCController[ROLL] = -500;
-  }
-  if (RCController[PITCH] > 500)
-  {
-    RCController[PITCH] = 500;
-  }
-  else if (RCController[PITCH] < -500)
-  {
-    RCController[PITCH] = -500;
+    RC_Resources.Attitude.Controller[PITCH] = 0;
   }
 }
 
-void RC_PID_Update()
+void RC_PID_Update(void)
 {
   //CONVERTE AS DATAS DOS RADIO E APLICA O FILTRO LPF
   GetRCDataConvertedAndApplyFilter();
@@ -117,13 +85,13 @@ void RC_PID_Update()
 #ifndef __AVR_ATmega2560__
   if (GetAirPlaneEnabled() && (TPA_Parameters.FixedWingTauMS > 0))
   {
-    if (!FixedWingTPAFilterInitalized)
+    if (!FixedWingTPAFilterInitialized)
     {
       FixedWingTPA_Smooth.RC = TPA_Parameters.FixedWingTauMS * 1e-3f;
-      FixedWingTPA_Smooth.State = AttitudeThrottleMin;
-      FixedWingTPAFilterInitalized = true;
+      FixedWingTPA_Smooth.State = RC_Resources.Attitude.ThrottleMin;
+      FixedWingTPAFilterInitialized = true;
     }
-    int16_t FilteredThrottle = PT1FilterApply2(&FixedWingTPA_Smooth, RCController[THROTTLE], SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
+    int16_t FilteredThrottle = PT1FilterApply2(&FixedWingTPA_Smooth, RC_Resources.Attitude.Controller[THROTTLE], SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
     if (FilteredThrottle != TPA_Parameters.PreviousThrottle)
     {
       TPA_Parameters.PreviousThrottle = FilteredThrottle;
@@ -133,24 +101,24 @@ void RC_PID_Update()
   else
 #endif
   {
-    if (RCController[THROTTLE] != TPA_Parameters.PreviousThrottle)
+    if (RC_Resources.Attitude.Controller[THROTTLE] != TPA_Parameters.PreviousThrottle)
     {
-      TPA_Parameters.PreviousThrottle = RCController[THROTTLE];
+      TPA_Parameters.PreviousThrottle = RC_Resources.Attitude.Controller[THROTTLE];
       TPA_Parameters.UpdateRequired = true;
     }
   }
 
   //THROTTLE PID ATTENUATION
-  //AJUSTE DINAMICO DE ACORDO COM O VALOR DO THROTTLE
+  //AJUSTE DINAMICO DO PID DE ACORDO COM O VALOR DO THROTTLE
   if (TPA_Parameters.UpdateRequired)
   {
     if (GetMultirotorEnabled()) //CONFIG PARA DRONES
     {
-      TPA_Parameters.CalcedValue = CalculateMultirotorTPAFactor(RCController[THROTTLE]);
+      TPA_Parameters.CalcedValue = CalculateMultirotorTPAFactor(RC_Resources.Attitude.Controller[THROTTLE]);
     }
     else if (GetAirPlaneEnabled()) //CONFIG PARA AEROS E ASA-FIXA
     {
-      TPA_Parameters.CalcedValue = CalculateFixedWingTPAFactor(RCController[THROTTLE]);
+      TPA_Parameters.CalcedValue = CalculateFixedWingTPAFactor(TPA_Parameters.PreviousThrottle);
     }
     TPA_Parameters.UpdateRequired = false;
   }

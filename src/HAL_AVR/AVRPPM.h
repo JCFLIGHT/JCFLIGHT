@@ -19,6 +19,6 @@
 #define AVRPPM_H_
 #ifdef __AVR_ATmega2560__
 #include "Build/LIBDEPENDENCIES.h"
-void _PPM_Initialization();
+void _PPM_Initialization(void);
 #endif
 #endif

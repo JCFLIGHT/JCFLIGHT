@@ -19,7 +19,6 @@
 #define ESP32SERIAL_H_
 #ifdef ESP32
 #include "Build/LIBDEPENDENCIES.h"
-void Serial_Initialization();
 void Serial_Begin(uint8_t SerialPort, uint32_t BaudRate);
 uint8_t Serial_Read(uint8_t SerialPort);
 void Serial_Write(uint8_t SerialPort, uint8_t WriteData);

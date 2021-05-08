@@ -27,104 +27,66 @@
 #include "HAL/HALPPM.h"
 #include "ParamsToGCS/CHECKSUM.h"
 #include "BitArray/BITARRAY.h"
+#include "PID/RCPID.h"
 
 DecodeClass DECODE;
 
-void DecodeClass::Initialization()
+void DecodeClass::Initialization(void)
 {
-  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER) ||
-      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != IBUS_RECEIVER))
+  RC_Resources.ReceiverTypeEnabled = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
+
+  if (RC_Resources.ReceiverTypeEnabled == PPM_RECEIVER)
   {
-    HALPPM.Initialization();
+    HAL_PPM.Initialization();
   }
+
   //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
+  //CANAIS FUNDAMENTAIS
   if (ReceiverModel <= 7)
   {
-    DECODE.RcChannelMap[0] = ROLL;
-    DECODE.RcChannelMap[1] = PITCH;
-    DECODE.RcChannelMap[2] = THROTTLE;
-    DECODE.RcChannelMap[3] = YAW;
+    DECODE.RadioControlChannelsMap[0] = ROLL;
+    DECODE.RadioControlChannelsMap[1] = PITCH;
+    DECODE.RadioControlChannelsMap[2] = THROTTLE;
+    DECODE.RadioControlChannelsMap[3] = YAW;
   }
-  else
-  { //FUTABA OU D4R-II
-    DECODE.RcChannelMap[0] = PITCH;
-    DECODE.RcChannelMap[1] = ROLL;
-    DECODE.RcChannelMap[2] = THROTTLE;
-    DECODE.RcChannelMap[3] = YAW;
+  else //FUTABA OU D4R-II
+  {
+    DECODE.RadioControlChannelsMap[0] = PITCH;
+    DECODE.RadioControlChannelsMap[1] = ROLL;
+    DECODE.RadioControlChannelsMap[2] = THROTTLE;
+    DECODE.RadioControlChannelsMap[3] = YAW;
   }
-  DECODE.RcChannelMap[4] = AUX1;
-  DECODE.RcChannelMap[5] = AUX2;
-  DECODE.RcChannelMap[6] = AUX3;
-  DECODE.RcChannelMap[7] = AUX4;
-  DECODE.RcChannelMap[8] = AUX5;
-  DECODE.RcChannelMap[9] = AUX6;
-  DECODE.RcChannelMap[10] = AUX7;
-  DECODE.RcChannelMap[11] = AUX8;
+
+  //CANAIS AUXILIARES
+  for (uint8_t IndexCount = AUX1; IndexCount < TOTAL_MAX_CHANNELS; IndexCount++)
+  {
+    DECODE.RadioControlChannelsMap[IndexCount] = IndexCount;
+  }
 }
 
-void DecodeClass::Update()
+void DecodeClass::Update(void)
 {
   bool CheckFailSafeState = true;
-  static uint8_t AverageCount = 0;
-  static uint16_t RadioControllOutputTYPR[12][3];
-  uint16_t RadioControllOutputMeasured;
-  uint16_t RadioControllOutputDecoded;
 
-  AverageCount++;
-  if (AverageCount == 3)
+  for (uint8_t IndexCount = 0; IndexCount < TOTAL_MAX_CHANNELS; IndexCount++)
   {
-    AverageCount = 0;
-  }
+    uint16_t RadioControllOutputDecoded = LearningChannelsOfReceiver(IndexCount);
 
-  for (uint8_t Channels = 0; Channels < 12; Channels++)
-  {
-    RadioControllOutputDecoded = LearningChannelsOfReceiver(Channels);
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
+    CheckFailSafeState = RC_Resources.ReceiverTypeEnabled == SBUS_RECEIVER ? SBUSRC.FailSafe : RadioControllOutputDecoded > CHECKSUM.GetFailSafeValue;
+
+    if (CheckFailSafeState || !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
     {
-      CheckFailSafeState = SBUSRC.FailSafe || !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
-    }
-    else
-    {
-      CheckFailSafeState = RadioControllOutputDecoded > CHECKSUM.GetFailSafeValue || !IS_STATE_ACTIVE(PRIMARY_ARM_DISARM);
-    }
-    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
-        (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))
-    {
-      if (CheckFailSafeState)
-      {
-        DECODE.DirectRadioControllRead[Channels] = RadioControllOutputDecoded;
-      }
-    }
-    else
-    {
-      if (CheckFailSafeState)
-      {
-        RadioControllOutputMeasured = RadioControllOutputDecoded;
-        for (uint8_t AverageIndex = 0; AverageIndex < 3; AverageIndex++)
-        {
-          RadioControllOutputMeasured += RadioControllOutputTYPR[Channels][AverageIndex];
-        }
-        RadioControllOutputMeasured = (RadioControllOutputMeasured + 2) / 4;
-        if (RadioControllOutputMeasured < (uint16_t)DECODE.DirectRadioControllRead[Channels] - 3)
-        {
-          DECODE.DirectRadioControllRead[Channels] = RadioControllOutputMeasured + 2;
-        }
-        if (RadioControllOutputMeasured > (uint16_t)DECODE.DirectRadioControllRead[Channels] + 3)
-        {
-          DECODE.DirectRadioControllRead[Channels] = RadioControllOutputMeasured - 2;
-        }
-        RadioControllOutputTYPR[Channels][AverageCount] = RadioControllOutputDecoded;
-      }
+      DECODE.DirectRadioControlRead[IndexCount] = RadioControllOutputDecoded;
     }
   }
 }
 
 int16_t DecodeClass::GetRxChannelOutput(uint8_t Channel)
 {
-  return DECODE.RadioControllOutput[Channel];
+  return DECODE.RadioControlOutput[Channel];
 }
 
 void DecodeClass::SetRxChannelInput(uint8_t Channel, int16_t Value)
 {
-  DECODE.RadioControllOutput[Channel] = Value;
+  DECODE.RadioControlOutput[Channel] = Value;
 }

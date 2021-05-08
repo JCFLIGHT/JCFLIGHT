@@ -18,6 +18,12 @@
 #include "ABG.h"
 #include "Math/MATHSUPPORT.h"
 
+/*
+  AUTOR:QUICK-FLASH - EMUFLIGHT
+  O PDF ESTÁ NA PASTA "DOCS" COM O NOME "ABGFilter.pdf"
+  https://github.com/emuflight/EmuFlight/blob/master/src/main/common/filter.c
+*/
+
 void ABG_Initialization(AlphaBetaGammaFilter_Struct *Filter_Pointer, float Alpha, int16_t BoostGain, int16_t HalfLife, float DeltaTime)
 {
     const float Alpha2 = Alpha * 0.001f;

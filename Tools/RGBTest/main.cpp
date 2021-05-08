@@ -15,7 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "Arduino.h"
+#include "HardwareSerial.h"
+#include "wiring_private.h"
 
 enum RGB_Enum
 {

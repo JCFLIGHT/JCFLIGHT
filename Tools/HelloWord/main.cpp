@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "Arduino.h"
+#include "HardwareSerial.h"
 
 void setup()
 {

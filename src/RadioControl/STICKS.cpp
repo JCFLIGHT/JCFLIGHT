@@ -38,7 +38,7 @@ void SticksClass::Update()
   {
     if ((ArmDisarmConfig == 0) && (GetSticksStateToArm()))
     {
-      if (!Battery.Exhausted.LowPercentPreventArm)
+      if (!BATTERY.GetExhausted())
       {
         if (GetArmDelayedState())
         {
@@ -97,7 +97,7 @@ void SticksClass::Pre_Arm(void)
 {
   if (ArmDisarmConfig != 0)
   {
-    return; //FAÇA UMA RAPIDA SAÍDA SE O ARMDISARM ESTIVER CONFIGURADO PELA CHAVE AUX
+    return; //FAÇA UMA RAPIDA SAÍDA SE O ARM-DISARM ESTIVER CONFIGURADO PELA CHAVE AUX
   }
   //ROTINA PRE-ARM
   if (STICKS.PreArm_Run)

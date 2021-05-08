@@ -20,6 +20,7 @@
 #include "Common/STRUCTS.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "PID/RCPID.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -28,7 +29,6 @@ IBUSClass IBUSRC;
 
 #define IBUS_SERIAL_RX_PACKET_LENGTH 32
 #define IBUS_CHECKSUM_SIZE 2
-#define IBUS_MAX_SLOTS 14
 
 static uint8_t IBUSIndex = 0;
 static uint8_t IBUS_Packet[32];
@@ -36,7 +36,7 @@ uint16_t IBUSReadChannels[IBUS_MAX_CHANNELS];
 
 void IBUSClass::Update(void)
 {
-  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != IBUS_RECEIVER)
+  if (RC_Resources.ReceiverTypeEnabled != IBUS_RECEIVER)
   {
     return;
   }

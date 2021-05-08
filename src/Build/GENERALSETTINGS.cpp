@@ -17,7 +17,6 @@
 
 #include "GENERALSETTINGS.h"
 #include "ParamsToGCS/CHECKSUM.h"
-#include "GPSNavigation/NAVIGATION.h"
 #include "IMU/ACCGYROREAD.h"
 #include "PID/PIDXYZ.h"
 #include "AirPlane/AIRPLANE.h"
@@ -48,12 +47,11 @@ void GeneralSettingsInitialization(void)
   CurvesRC_CalculeValue();
   DECODE.Initialization();
   UART2Mode_Initialization();
+  RCCONFIG.Initialization();
   CHECKSUM.UpdateChannelsReverse();
   Load_All_PID_Params();
-  LoadGPSParameters();
   PIDXYZ.Initialization();
   KALMAN.Init();
-  RCCONFIG.Init();
   AIRSPEED.Initialization();
   GCS.UpdateParametersToGCS();
   SAFETYBUTTON.Initialization();

@@ -51,8 +51,8 @@ void Throttle_Clipping_Update(uint8_t MotorCount, int16_t MixerThrottleCommand)
 
         int16_t MotorControlRange = MotorControlMax - MotorControlMin;
 
-        ThrottleMin = AttitudeThrottleMin;
-        ThrottleMax = AttitudeThrottleMax;
+        ThrottleMin = RC_Resources.Attitude.ThrottleMin;
+        ThrottleMax = RC_Resources.Attitude.ThrottleMax;
 
         ThrottleRange = ThrottleMax - ThrottleMin;
 
@@ -81,7 +81,7 @@ void Throttle_Clipping_Update(uint8_t MotorCount, int16_t MixerThrottleCommand)
     }
     else
     {
-        MotorControl[MOTOR1] = Constrain_16Bits(MixerThrottleCommand, AttitudeThrottleMin, AttitudeThrottleMax);
+        MotorControl[MOTOR1] = Constrain_16Bits(MixerThrottleCommand, RC_Resources.Attitude.ThrottleMin, RC_Resources.Attitude.ThrottleMax);
     }
 }
 

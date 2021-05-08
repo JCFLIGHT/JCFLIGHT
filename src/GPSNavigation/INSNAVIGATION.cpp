@@ -42,10 +42,10 @@ static void MultirotorApplyINSPositionHoldPIDControl(float DeltaTime)
 
     if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && (JCF_Param.AutoPilotMode == AUTOPILOT_MODE_CRUISE))
     {
-        if (RCController[PITCH] || RCController[ROLL]) //CHECA SE OS STICKS DO RÁDIO FORAM MANIPULADOS
+        if (RC_Resources.Attitude.Controller[PITCH] || RC_Resources.Attitude.Controller[ROLL]) //CHECA SE OS STICKS DO RÁDIO FORAM MANIPULADOS
         {
-            const float RadioControllVelocityRoll = RCController[PITCH] * MAX_MANUAL_SPEED / (float)(500 - POS_HOLD_DEADBAND);
-            const float RadioControllVelocityPitch = RCController[ROLL] * MAX_MANUAL_SPEED / (float)(500 - POS_HOLD_DEADBAND);
+            const float RadioControllVelocityRoll = RC_Resources.Attitude.Controller[PITCH] * MAX_MANUAL_SPEED / (float)(500 - POS_HOLD_DEADBAND);
+            const float RadioControllVelocityPitch = RC_Resources.Attitude.Controller[ROLL] * MAX_MANUAL_SPEED / (float)(500 - POS_HOLD_DEADBAND);
 
             //ROTACIONA AS VELOCIDADES DO BODY-FRAME PARA EARTH-FRAME
             const float NEUVelocityRoll = RadioControllVelocityRoll * INS.Math.Cosine.Yaw - RadioControllVelocityPitch * INS.Math.Sine.Yaw;

@@ -48,11 +48,5 @@
 #include <stdio.h>    //size_t
 #include <stdlib.h>   //malloc & free
 #include <string.h>   //strnlen (STRING LENGTH COM DEFINIÇÃO DE TAMANHO)
-/*
-//ERA PRA FUNCIONAR NÉ?!MAS ENFIM...
-static inline size_t strlen_P(const char *pstr) //STRING LENGTH COM PONTEIRO
-{
-  return strlen((const char *)pstr);
-}
-*/
+
 #endif

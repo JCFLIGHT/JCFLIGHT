@@ -20,7 +20,7 @@
 class PerformCompassClass
 {
 public:
-  void Initalization(void);
+  void Initialization(void);
   void Update(void);
   void Apply(void);
 };

@@ -28,12 +28,12 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "Build/BOARDDEFS.h"
 
-//O PDF ESTÁ NA PASTA 'DOCS' COM O NOME 'WindEstimation.pdf'
+//O PDF ESTÁ NA PASTA "DOCS" COM O NOME "WindEstimation.pdf"
 
 WindEstimatorClass WINDESTIMATOR;
 WindEstimator_Struct WindEstimator;
 
-void WindEstimatorClass::Update() //50Hz
+void WindEstimatorClass::Update(void)
 {
 #ifdef USE_WIND_ESTIMATOR
 
@@ -45,9 +45,9 @@ void WindEstimatorClass::Update() //50Hz
     }
 
     //OBTÉM A VELOCIDADE 3D DO GPS EM CM/S
-    WindEstimator.Ground.Velocity[ROLL] = GPS_Resources.Navigation.Misc.Velocity.Get[NORTH];
-    WindEstimator.Ground.Velocity[PITCH] = GPS_Resources.Navigation.Misc.Velocity.Get[EAST];
-    WindEstimator.Ground.Velocity[YAW] = GPS_Resources.Navigation.Misc.Velocity.Get[DOWN];
+    WindEstimator.Ground.Velocity[NORTH] = GPS_Resources.Navigation.Misc.Velocity.Get[NORTH];
+    WindEstimator.Ground.Velocity[EAST] = GPS_Resources.Navigation.Misc.Velocity.Get[EAST];
+    WindEstimator.Ground.Velocity[DOWN] = GPS_Resources.Navigation.Misc.Velocity.Get[DOWN];
 
     //OBTÉM A DIREÇÃO DA FUSELAGEM NO EARTH-FRAME (SACADO DO AHRS)
     WindEstimator.Fuselage.Direction[ROLL] = Rotation.Matrix3x3[0][0];
@@ -73,54 +73,58 @@ void WindEstimatorClass::Update() //50Hz
 
     if (DifferenceLenght > SquareFloat(0.2f)) //A FUSELAGEM ESTÁ VIRANDO?SIM...
     {
-        WindEstimator.Ground.VelocityDifference[ROLL] = WindEstimator.Ground.Velocity[ROLL] - WindEstimator.Ground.LastVelocity[ROLL];
-        WindEstimator.Ground.VelocityDifference[PITCH] = WindEstimator.Ground.Velocity[PITCH] - WindEstimator.Ground.LastVelocity[PITCH];
-        WindEstimator.Ground.VelocityDifference[YAW] = WindEstimator.Ground.Velocity[ROLL] - WindEstimator.Ground.LastVelocity[YAW];
+        WindEstimator.Ground.VelocityDifference[NORTH] = WindEstimator.Ground.Velocity[NORTH] - WindEstimator.Ground.LastVelocity[NORTH];
+        WindEstimator.Ground.VelocityDifference[EAST] = WindEstimator.Ground.Velocity[EAST] - WindEstimator.Ground.LastVelocity[EAST];
+        WindEstimator.Ground.VelocityDifference[DOWN] = WindEstimator.Ground.Velocity[DOWN] - WindEstimator.Ground.LastVelocity[DOWN];
 
         //VELOCIDADE ESTIMADA DO AR
-        float EstimatedAirSpeed = (Fast_SquareRoot(SquareFloat(WindEstimator.Ground.VelocityDifference[ROLL]) +
-                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[PITCH]) +
-                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[YAW]))) /
+        float EstimatedAirSpeed = (Fast_SquareRoot(SquareFloat(WindEstimator.Ground.VelocityDifference[NORTH]) +
+                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[EAST]) +
+                                                   SquareFloat(WindEstimator.Ground.VelocityDifference[DOWN]))) /
                                   Fast_SquareRoot(DifferenceLenght);
 
         WindEstimator.Fuselage.DirectionSum[ROLL] = WindEstimator.Fuselage.Direction[ROLL] + WindEstimator.Fuselage.LastDirection[ROLL];
         WindEstimator.Fuselage.DirectionSum[PITCH] = WindEstimator.Fuselage.Direction[PITCH] + WindEstimator.Fuselage.LastDirection[PITCH];
         WindEstimator.Fuselage.DirectionSum[YAW] = WindEstimator.Fuselage.Direction[YAW] + WindEstimator.Fuselage.LastDirection[YAW];
 
-        WindEstimator.Ground.VelocitySum[ROLL] = WindEstimator.Ground.Velocity[ROLL] + WindEstimator.Ground.LastVelocity[ROLL];
-        WindEstimator.Ground.VelocitySum[PITCH] = WindEstimator.Ground.Velocity[PITCH] + WindEstimator.Ground.LastVelocity[PITCH];
-        WindEstimator.Ground.VelocitySum[YAW] = WindEstimator.Ground.Velocity[YAW] + WindEstimator.Ground.LastVelocity[YAW];
+        WindEstimator.Ground.VelocitySum[NORTH] = WindEstimator.Ground.Velocity[NORTH] + WindEstimator.Ground.LastVelocity[NORTH];
+        WindEstimator.Ground.VelocitySum[EAST] = WindEstimator.Ground.Velocity[EAST] + WindEstimator.Ground.LastVelocity[EAST];
+        WindEstimator.Ground.VelocitySum[DOWN] = WindEstimator.Ground.Velocity[DOWN] + WindEstimator.Ground.LastVelocity[DOWN];
 
         memcpy(WindEstimator.Fuselage.LastDirection, WindEstimator.Fuselage.Direction, sizeof(WindEstimator.Fuselage.LastDirection));
         memcpy(WindEstimator.Ground.LastVelocity, WindEstimator.Ground.Velocity, sizeof(WindEstimator.Ground.LastVelocity));
 
-        float Theta = Fast_Atan2(WindEstimator.Ground.VelocityDifference[PITCH],
-                                 WindEstimator.Ground.VelocityDifference[ROLL]) -
+        //EQUAÇÃO 9
+        float Theta = Fast_Atan2(WindEstimator.Ground.VelocityDifference[EAST],
+                                 WindEstimator.Ground.VelocityDifference[NORTH]) -
                       Fast_Atan2(WindEstimator.Fuselage.DirectionDifference[PITCH],
-                                 WindEstimator.Fuselage.DirectionDifference[ROLL]); //EQUAÇÃO 9
+                                 WindEstimator.Fuselage.DirectionDifference[ROLL]);
 
         float SinTheta = Fast_Sine(Theta);
         float CosTheta = Fast_Cosine(Theta);
 
         float Wind[3];
-        Wind[ROLL] = (WindEstimator.Ground.VelocitySum[ROLL] - EstimatedAirSpeed * (CosTheta * WindEstimator.Fuselage.DirectionSum[ROLL] - SinTheta * WindEstimator.Fuselage.DirectionSum[PITCH])) * 0.5f;   //EQUAÇÃO 10
-        Wind[PITCH] = (WindEstimator.Ground.VelocitySum[PITCH] - EstimatedAirSpeed * (SinTheta * WindEstimator.Fuselage.DirectionSum[ROLL] + CosTheta * WindEstimator.Fuselage.DirectionSum[PITCH])) * 0.5f; //EQUAÇÃO 11
-        Wind[YAW] = (WindEstimator.Ground.VelocitySum[YAW] - EstimatedAirSpeed * WindEstimator.Fuselage.DirectionSum[YAW]) * 0.5f;                                                                           //EQUAÇÃO 12
+        //EQUAÇÃO 10
+        Wind[NORTH] = (WindEstimator.Ground.VelocitySum[NORTH] - EstimatedAirSpeed * (CosTheta * WindEstimator.Fuselage.DirectionSum[ROLL] - SinTheta * WindEstimator.Fuselage.DirectionSum[PITCH])) * 0.5f;
+        //EQUAÇÃO 11
+        Wind[EAST] = (WindEstimator.Ground.VelocitySum[EAST] - EstimatedAirSpeed * (SinTheta * WindEstimator.Fuselage.DirectionSum[ROLL] + CosTheta * WindEstimator.Fuselage.DirectionSum[PITCH])) * 0.5f;
+        //EQUAÇÃO 12
+        Wind[DOWN] = (WindEstimator.Ground.VelocitySum[DOWN] - EstimatedAirSpeed * WindEstimator.Fuselage.DirectionSum[YAW]) * 0.5f;
 
-        float PreviousWindLength = Fast_SquareRoot(SquareFloat(WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL]) +
-                                                   SquareFloat(WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH]) +
-                                                   SquareFloat(WindEstimator.EarthFrame.EstimatedWindVelocity[YAW]));
+        float PreviousWindLength = Fast_SquareRoot(SquareFloat(WindEstimator.EarthFrame.EstimatedWindVelocity[NORTH]) +
+                                                   SquareFloat(WindEstimator.EarthFrame.EstimatedWindVelocity[EAST]) +
+                                                   SquareFloat(WindEstimator.EarthFrame.EstimatedWindVelocity[DOWN]));
 
-        float WindLength = Fast_SquareRoot(SquareFloat(Wind[ROLL]) +
-                                           SquareFloat(Wind[PITCH]) +
-                                           SquareFloat(Wind[YAW]));
+        float WindLength = Fast_SquareRoot(SquareFloat(Wind[NORTH]) +
+                                           SquareFloat(Wind[EAST]) +
+                                           SquareFloat(Wind[DOWN]));
 
         if (WindLength < PreviousWindLength + 2000)
         {
             //FILTRO PARA REDUÇÃO DE NOISE
-            WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL] = WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL] * 0.95f + Wind[ROLL] * 0.05f;
-            WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] = WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] * 0.95f + Wind[PITCH] * 0.05f;
-            WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] = WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] * 0.95f + Wind[YAW] * 0.05f;
+            WindEstimator.EarthFrame.EstimatedWindVelocity[NORTH] = WindEstimator.EarthFrame.EstimatedWindVelocity[NORTH] * 0.95f + Wind[NORTH] * 0.05f;
+            WindEstimator.EarthFrame.EstimatedWindVelocity[EAST] = WindEstimator.EarthFrame.EstimatedWindVelocity[EAST] * 0.95f + Wind[EAST] * 0.05f;
+            WindEstimator.EarthFrame.EstimatedWindVelocity[DOWN] = WindEstimator.EarthFrame.EstimatedWindVelocity[DOWN] * 0.95f + Wind[DOWN] * 0.05f;
         }
 
         WindEstimator.Time.LastUpdate = WindEstimator.Time.Now;
@@ -133,23 +137,23 @@ void WindEstimatorClass::Update() //50Hz
         //AO VOAR DIRETO,USE A VELOCIDADE DO TUDO DE PITOT PARA OBTER A ESTIMATIVA DO VENTO
         float AirSpeedVector[3];
         float TrueAirSpeed = AIRSPEED.Get_True_Value("In Meters");
-        AirSpeedVector[ROLL] = WindEstimator.Fuselage.Direction[ROLL] * TrueAirSpeed;
-        AirSpeedVector[PITCH] = WindEstimator.Fuselage.Direction[PITCH] * TrueAirSpeed;
-        AirSpeedVector[YAW] = WindEstimator.Fuselage.Direction[YAW] * TrueAirSpeed;
+        AirSpeedVector[NORTH] = WindEstimator.Fuselage.Direction[ROLL] * TrueAirSpeed;
+        AirSpeedVector[EAST] = WindEstimator.Fuselage.Direction[PITCH] * TrueAirSpeed;
+        AirSpeedVector[DOWN] = WindEstimator.Fuselage.Direction[YAW] * TrueAirSpeed;
 
         float Wind[3];
-        Wind[ROLL] = WindEstimator.Ground.Velocity[ROLL] - AirSpeedVector[ROLL];
-        Wind[PITCH] = WindEstimator.Ground.Velocity[PITCH] - AirSpeedVector[PITCH];
-        Wind[YAW] = WindEstimator.Ground.Velocity[YAW] - AirSpeedVector[YAW];
+        Wind[NORTH] = WindEstimator.Ground.Velocity[NORTH] - AirSpeedVector[NORTH];
+        Wind[EAST] = WindEstimator.Ground.Velocity[EAST] - AirSpeedVector[EAST];
+        Wind[DOWN] = WindEstimator.Ground.Velocity[DOWN] - AirSpeedVector[DOWN];
 
         //FILTRO PARA REDUÇÃO DE NOISE
-        WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL] = WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL] * 0.92f + Wind[ROLL] * 0.08f;
-        WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] = WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH] * 0.92f + Wind[PITCH] * 0.08f;
-        WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] = WindEstimator.EarthFrame.EstimatedWindVelocity[YAW] * 0.92f + Wind[YAW] * 0.08f;
+        WindEstimator.EarthFrame.EstimatedWindVelocity[NORTH] = WindEstimator.EarthFrame.EstimatedWindVelocity[NORTH] * 0.92f + Wind[NORTH] * 0.08f;
+        WindEstimator.EarthFrame.EstimatedWindVelocity[EAST] = WindEstimator.EarthFrame.EstimatedWindVelocity[EAST] * 0.92f + Wind[EAST] * 0.08f;
+        WindEstimator.EarthFrame.EstimatedWindVelocity[DOWN] = WindEstimator.EarthFrame.EstimatedWindVelocity[DOWN] * 0.92f + Wind[DOWN] * 0.08f;
 
         //NÃO SEI SE O CALCULO ESTÁ CORRETO,É NECESSARIO TESTAR,FOI BASEADO NA ARDUPILOT
-        float AirSpeedX = WindEstimator.Ground.Velocity[ROLL] - WindEstimator.EarthFrame.EstimatedWindVelocity[ROLL];
-        float AirSpeedY = WindEstimator.Ground.Velocity[PITCH] - WindEstimator.EarthFrame.EstimatedWindVelocity[PITCH];
+        float AirSpeedX = WindEstimator.Ground.Velocity[NORTH] - WindEstimator.EarthFrame.EstimatedWindVelocity[NORTH];
+        float AirSpeedY = WindEstimator.Ground.Velocity[EAST] - WindEstimator.EarthFrame.EstimatedWindVelocity[EAST];
         float AirSpeedFinal = Fast_SquareRoot(SquareFloat(AirSpeedX) + SquareFloat(AirSpeedY)); //VELOCIDADE TOTAL EM LINHA RETA FUNDINDO O GPS COM O AIR-SPEED
     }
 */
@@ -160,8 +164,8 @@ float WindEstimatorClass::GetEstimatedValueHorizontal(uint16_t *Angle)
 {
     //O PONTEIRO "Angle" É O ANGULO DO VENTO EM CENTIDEGREES
     //O "return" É A VELOCIDADE TOTAL DO VENTO EM CM/S
-    float EstimatedRollWindSpeed = WINDESTIMATOR.GetEstimatedInAxis(ROLL);
-    float EstimatedPitchWindSpeed = WINDESTIMATOR.GetEstimatedInAxis(PITCH);
+    float EstimatedRollWindSpeed = WINDESTIMATOR.GetEstimatedInAxis(NORTH);
+    float EstimatedPitchWindSpeed = WINDESTIMATOR.GetEstimatedInAxis(EAST);
     if (Angle)
     {
         float EstimatedHorizontalWindAngle = Fast_Atan2(EstimatedPitchWindSpeed, EstimatedRollWindSpeed);

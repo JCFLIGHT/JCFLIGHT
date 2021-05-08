@@ -40,14 +40,14 @@ void Simple_Mode_Update()
     const float HeadingDifference = ConvertToRadians(Attitude.EulerAngles.Yaw - Calibration.Magnetometer.SimpleModeHeading);
     const float CosineDifference = Fast_Cosine(HeadingDifference);
     const float SineDifference = Fast_Sine(HeadingDifference);
-    const int16_t CalcedRCControllerPITCH = RCController[PITCH] * CosineDifference + RCController[ROLL] * SineDifference;
-    RCController[ROLL] = RCController[ROLL] * CosineDifference - RCController[PITCH] * SineDifference;
-    RCController[PITCH] = CalcedRCControllerPITCH;
+    const int16_t CalcedRCControllerPITCH = RC_Resources.Attitude.Controller[PITCH] * CosineDifference + RC_Resources.Attitude.Controller[ROLL] * SineDifference;
+    RC_Resources.Attitude.Controller[ROLL] = RC_Resources.Attitude.Controller[ROLL] * CosineDifference - RC_Resources.Attitude.Controller[PITCH] * SineDifference;
+    RC_Resources.Attitude.Controller[PITCH] = CalcedRCControllerPITCH;
   }
 #ifdef PRINTLN_SIMPLE_MODE
-  PRINTF.SendToConsole(ProgramMemoryString("RCController[ROLL]:%d RCController[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
-                       RCController[ROLL],
-                       RCController[PITCH],
+  PRINTF.SendToConsole(ProgramMemoryString("RC_Resources.Attitude.Controller[ROLL]:%d RC_Resources.Attitude.Controller[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
+                       RC_Resources.Attitude.Controller[ROLL],
+                       RC_Resources.Attitude.Controller[PITCH],
                        CalcedRCControllerPITCH,
                        HeadingDifference,
                        CosineDifference,

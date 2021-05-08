@@ -101,7 +101,7 @@ void AutoDeclinationClass::Set_Initial_Location(int32_t LocationLatitude, int32_
   AUTODECLINATION.ReturnDeclination = AUTODECLINATION.GetDeclinationCalced((float)LocationLatitude / 10000000, (float)LocationLongitude / 10000000);
 }
 
-float AutoDeclinationClass::GetDeclination()
+float AutoDeclinationClass::GetDeclination(void)
 {
   return AUTODECLINATION.ReturnDeclination;
 }

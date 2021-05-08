@@ -77,6 +77,7 @@ static void ProcessFlightModesToMultirotor(void)
           Do_RTH_Or_Land_Call_Alt_Hold = true;
           Do_Pos_Hold_Call_Alt_Hold = false;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+          RESET_THIS_FLIGHT_MODE_ONCE(HEADING_HOLD_MODE);
           Do_Mode_RTH_Now();
         }
         else if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))
@@ -85,6 +86,7 @@ static void ProcessFlightModesToMultirotor(void)
           Do_RTH_Or_Land_Call_Alt_Hold = false;
           Do_Pos_Hold_Call_Alt_Hold = true;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+          RESET_THIS_FLIGHT_MODE_ONCE(HEADING_HOLD_MODE);
           MultirotorSetThisPointToPositionHold();
         }
         else if (IS_FLIGHT_MODE_ACTIVE(LAND_MODE))
@@ -93,6 +95,7 @@ static void ProcessFlightModesToMultirotor(void)
           Do_RTH_Or_Land_Call_Alt_Hold = true;
           Do_Pos_Hold_Call_Alt_Hold = false;
           ENABLE_THIS_FLIGHT_MODE(HEADING_HOLD_MODE);
+          RESET_THIS_FLIGHT_MODE_ONCE(HEADING_HOLD_MODE);
           MultirotorSetThisPointToPositionHold();
         }
         else
@@ -149,9 +152,9 @@ static void ProcessFlightModesToAirPlane(void)
 
   if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
   {
-    GPS_Resources.Mode.Navigation = DO_RTH_ENROUTE; //INDICA PARA O SISTEMA QUE O RTH SERÁ USADO
-    ENABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);           //ATIVA O CONTROLE XY & HEADING
-    ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);         //ATIVA O CONTROLE Z
+    GPS_Resources.Mode.Navigation = DO_RTH_ENROUTE; //INDICA PARA O TECS QUE O RTH SERÁ USADO
+    ENABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);           //ATIVA O CONTROLE HORIZONTAL X,Y & Z
+    ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);         //ATIVA O CONTROLE VERTICAL Z
   }
   else
   {
@@ -187,11 +190,5 @@ void FlightModesUpdate(void)
 {
   ProcessFlightModesToMultirotor();
   ProcessFlightModesToAirPlane();
-
-  if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
-  {
-    GPS_Resources.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw;
-  }
-
   GPS_Resources.Navigation.AutoPilot.Control.Enabled = Get_GPS_Used_To_Navigation();
 }

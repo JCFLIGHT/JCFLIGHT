@@ -15,7 +15,6 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "Arduino.h"
 #include "BIQUADFILTER.h"
 
 static BiquadFilter_Struct Smooth_AnalogRead;

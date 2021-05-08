@@ -82,6 +82,7 @@ static void PerformAccelerationCalibration(void)
         (Calibration.Accelerometer.Flags.CalibratedPosition[GetActualPositionOfAcc] && GetAccAxisCalibrationRunning()))
     {
         Calibration.Accelerometer.Flags.InCalibration = false;
+        Calibration.Accelerometer.Time.Previous = 0;
         BEEPER.Play(BEEPER_ACTION_FAIL);
         return;
     }

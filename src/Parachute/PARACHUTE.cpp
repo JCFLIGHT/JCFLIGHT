@@ -34,12 +34,15 @@ void ParachuteClass::Auto_Do_Now(bool ActiveParachute)
     PARACHUTE.ParachuteReleased = false;
     return;
   }
+
   PARACHUTE.ParachuteInAuto = true;
   MotorControl[PARACHUTESERVO] = 2400; //180 GRAUS
+
   if (!PARACHUTE.ParachuteReleased)
   {
     BEEPER.Play(BEEPER_PARACHUTE);
   }
+
   PARACHUTE.ParachuteReleased = true;
 }
 
@@ -49,21 +52,26 @@ void ParachuteClass::Manual_Do_Now(void)
   {
     PARACHUTE.OverFlowTime += SCHEDULERTIME.GetMillis();
   }
+
   if (PARACHUTE.ParachuteInAuto)
   {
     return;
   }
+
   if (!ParachuteControlAux)
   {
     MotorControl[PARACHUTESERVO] = 400; //0 GRAUS
     PARACHUTE.ParachuteReleased = false;
     return;
   }
+
   MotorControl[PARACHUTESERVO] = 2400; //180 GRAUS
+
   if (!PARACHUTE.ParachuteReleased)
   {
     BEEPER.Play(BEEPER_PARACHUTE);
   }
+
   PARACHUTE.ParachuteReleased = true;
 }
 
@@ -73,10 +81,12 @@ bool ParachuteClass::GetSafeStateToDisarmMotors(void)
   {
     return false;
   }
+
   if (PARACHUTE.Released())
   {
     return true;
   }
+
   return false;
 }
 
@@ -91,5 +101,6 @@ bool ParachuteClass::ReleasedOverFlowTime(void)
   {
     return true;
   }
+
   return false;
 }

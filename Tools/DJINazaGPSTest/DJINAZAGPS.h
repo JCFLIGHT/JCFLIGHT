@@ -18,6 +18,9 @@
 #ifndef DJINAZAGPS_H_
 #define DJINAZAGPS_H_
 #include "inttypes.h"
+#include "math.h"
+#include "HardwareSerial.h"
+#include "wiring_private.h"
 //VARIAVEIS DE SAÍDA
 extern uint8_t DJINaza_Num_Sat;
 extern uint8_t DJINaza_Fix_State;

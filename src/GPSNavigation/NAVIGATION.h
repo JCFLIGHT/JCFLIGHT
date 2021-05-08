@@ -20,7 +20,7 @@
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 extern GPS_Resources_Struct GPS_Resources;
-void LoadGPSParameters(void);
+void Load_GPS_Navigation_Params(void);
 void GPS_Reset_Navigation(void);
 void GPS_Process_FlightModes(float DeltaTime);
 void Do_Mode_RTH_Now(void);

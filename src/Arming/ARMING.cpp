@@ -34,7 +34,7 @@ PreArmClass PREARM;
 #ifdef __AVR_ATmega2560__
 
 const char Message_0[] FLASH_MEMORY_ATTRIBUTE = "Erro:Acelerometro ruim;";
-const char Message_1[] FLASH_MEMORY_ATTRIBUTE = "Erro:Modo de voo ativo;";
+const char Message_1[] FLASH_MEMORY_ATTRIBUTE = "Erro:Piloto Automatico ativo;";
 const char Message_2[] FLASH_MEMORY_ATTRIBUTE = "Erro:GPS Glitch;";
 const char Message_3[] FLASH_MEMORY_ATTRIBUTE = "Erro:Fail-Safe ativo;";
 const char Message_4[] FLASH_MEMORY_ATTRIBUTE = "Erro:Giroscopio ruim;";
@@ -48,7 +48,7 @@ const char Message_10[] FLASH_MEMORY_ATTRIBUTE = "Erro:Barometro ruim;";
 #elif defined __arm__ || defined ESP32
 
 const char *const Message_0 = "Erro:Acelerometro ruim;";
-const char *const Message_1 = "Erro:Modo de voo ativo;";
+const char *const Message_1 = "Erro:Piloto Automatico ativo;";
 const char *const Message_2 = "Erro:GPS Glitch;";
 const char *const Message_3 = "Erro:Fail-Safe ativo;";
 const char *const Message_4 = "Erro:Giroscopio ruim;";
@@ -70,7 +70,7 @@ void PreArmClass::UpdateGCSErrorText(uint8_t GCSErrorType)
         GCS.Send_String_To_GCS(Message_0);
         break;
 
-    case FLIGHT_MODES_ERROR:
+    case AUTO_PILOT_MODE_ERROR:
         GCS.Send_String_To_GCS(Message_1);
         break;
 
@@ -131,7 +131,7 @@ uint8_t PreArmClass::Checking(void)
 
     if (GPS_Resources.Navigation.AutoPilot.Control.Enabled) //MODOS DE VOO POR GPS ATIVO
     {
-        return FLIGHT_MODES_ERROR;
+        return AUTO_PILOT_MODE_ERROR;
     }
 
     if (GetCheckInclinationForArm()) //INCLINAÇÃO DE 'N' GRAUS DETECTADA
@@ -144,7 +144,7 @@ uint8_t PreArmClass::Checking(void)
         return BUTTON_ERROR;
     }
 
-    if (Battery.Exhausted.LowPercentPreventArm) //BATERIA COM BAIXA TENSÃO
+    if (BATTERY.GetExhausted()) //BATERIA COM BAIXA TENSÃO
     {
         return BATTERY_ERROR;
     }
@@ -170,11 +170,13 @@ uint8_t PreArmClass::Checking(void)
 
 bool PreArmClass::CheckSafeState(void)
 {
-    if (PREARM.Checking() == NONE_ERROR ||       //NENHUM DISPOSITVO ESTÁ RUIM
-        PREARM.Checking() == GPS_ERROR ||        //NOTIFIQUE QUE O GPS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
-        PREARM.Checking() == COMPASS_ERROR ||    //NOTIFIQUE QUE O COMPASS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
-        PREARM.Checking() == BAROMETER_ERROR ||  //NOTIFIQUE QUE O BAROMETRO ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
-        PREARM.Checking() == FLIGHT_MODES_ERROR) //NOTIFIQUE QUE O MODO DE VOO POR GPS ESTÁ ATIVO,MAS NÃO IMPEÇA DE ARMAR
+    const uint8_t CheckingResult = PREARM.Checking();
+
+    if (CheckingResult == NONE_ERROR ||          //NENHUM DISPOSITVO ESTÁ RUIM
+        CheckingResult == GPS_ERROR ||           //NOTIFIQUE QUE O GPS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+        CheckingResult == COMPASS_ERROR ||       //NOTIFIQUE QUE O COMPASS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+        CheckingResult == BAROMETER_ERROR ||     //NOTIFIQUE QUE O BAROMETRO ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+        CheckingResult == AUTO_PILOT_MODE_ERROR) //NOTIFIQUE QUE O MODO DE VOO POR GPS ESTÁ ATIVO,MAS NÃO IMPEÇA DE ARMAR
     {
         return true;
     }

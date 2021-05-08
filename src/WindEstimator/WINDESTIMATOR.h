@@ -21,7 +21,7 @@
 class WindEstimatorClass
 {
 public:
-  void Update();
+  void Update(void);
   float GetEstimatedValueHorizontal(uint16_t *Angle);
   bool EstimatedValid(void);
 

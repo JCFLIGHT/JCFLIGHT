@@ -25,6 +25,7 @@
 typedef uint8_t BitArrayElement8Bits;
 
 bool Once_Previous_State[SIZE_OF_FLIGHT_MODES];
+
 uint8_t SetFlightMode[SIZE_OF_FLIGHT_MODES];
 
 bool BitArrayGet(const BitArrayElement8Bits *Array, unsigned Bit)
@@ -49,7 +50,7 @@ bool IS_FLIGHT_MODE_ACTIVE(uint8_t FlightModeName)
 
 bool IS_FLIGHT_MODE_ACTIVE_ONCE(uint8_t FlightModeName)
 {
-    bool Once_Actual_State = IS_FLIGHT_MODE_ACTIVE(FlightModeName);
+    const bool Once_Actual_State = IS_FLIGHT_MODE_ACTIVE(FlightModeName);
 
     if (!Once_Actual_State)
     {
@@ -63,6 +64,11 @@ bool IS_FLIGHT_MODE_ACTIVE_ONCE(uint8_t FlightModeName)
     }
 
     return false;
+}
+
+void RESET_THIS_FLIGHT_MODE_ONCE(uint8_t FlightModeName)
+{
+    Once_Previous_State[FlightModeName] = false;
 }
 
 void ENABLE_THIS_FLIGHT_MODE(uint8_t FlightModeName)

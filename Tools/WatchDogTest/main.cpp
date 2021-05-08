@@ -15,7 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "Arduino.h"
+#include "inttypes.h"
+#include "HardwareSerial.h"
 
 static __inline__ __attribute__((__always_inline__)) void WatchDogReset(const uint8_t ResetDelay)
 {

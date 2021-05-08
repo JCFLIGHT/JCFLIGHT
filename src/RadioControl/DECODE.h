@@ -18,17 +18,20 @@
 #ifndef DECODE_H_
 #define DECODE_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Build/BOARDDEFS.h"
 class DecodeClass
 {
 public:
-  volatile uint16_t PPMReadChannels[12];
-  uint8_t RcChannelMap[12];
-  int16_t DirectRadioControllRead[12];
-  int16_t RadioControllOutput[12];
-  void Initialization();
-  void Update();
+  volatile uint16_t PPMReadChannels[TOTAL_MAX_CHANNELS];
+  uint8_t RadioControlChannelsMap[TOTAL_MAX_CHANNELS];
+  int16_t DirectRadioControlRead[TOTAL_MAX_CHANNELS];
+  void Initialization(void);
+  void Update(void);
   int16_t GetRxChannelOutput(uint8_t Channel);
   void SetRxChannelInput(uint8_t Channel, int16_t Value);
+
+private:
+  int16_t RadioControlOutput[TOTAL_MAX_CHANNELS];
 };
 extern DecodeClass DECODE;
 #endif

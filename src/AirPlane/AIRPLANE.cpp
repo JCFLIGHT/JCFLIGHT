@@ -39,18 +39,18 @@ void AirPlaneClass::Update_Conventional_AirPlane(void)
 
   if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
-    Servo.Signal.UnFiltered[SERVO1] = RCController[ROLL] * Servo.Direction.GetAndSet[SERVO1];  //AILERON  (SERVO 1 DA ASA)
-    Servo.Signal.UnFiltered[SERVO2] = RCController[ROLL] * Servo.Direction.GetAndSet[SERVO2];  //AILERON  (SERVO 2 DA ASA)
-    Servo.Signal.UnFiltered[SERVO3] = RCController[YAW] * Servo.Direction.GetAndSet[SERVO3];   //RUDDER   (LEME)
-    Servo.Signal.UnFiltered[SERVO4] = RCController[PITCH] * Servo.Direction.GetAndSet[SERVO4]; //ELEVATOR (PROFUNDOR)
+    Servo.Signal.UnFiltered[SERVO1] = RC_Resources.Attitude.Controller[ROLL] * Servo.Direction.GetAndSet[SERVO1];  //AILERON  (SERVO 1 DA ASA)
+    Servo.Signal.UnFiltered[SERVO2] = RC_Resources.Attitude.Controller[ROLL] * Servo.Direction.GetAndSet[SERVO2];  //AILERON  (SERVO 2 DA ASA)
+    Servo.Signal.UnFiltered[SERVO3] = RC_Resources.Attitude.Controller[YAW] * Servo.Direction.GetAndSet[SERVO3];   //RUDDER   (LEME)
+    Servo.Signal.UnFiltered[SERVO4] = RC_Resources.Attitude.Controller[PITCH] * Servo.Direction.GetAndSet[SERVO4]; //ELEVATOR (PROFUNDOR)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    Servo.Signal.UnFiltered[SERVO1] = PIDResources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO1];  //AILERON  (SERVO 1 DA ASA)
-    Servo.Signal.UnFiltered[SERVO2] = PIDResources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO2];  //AILERON  (SERVO 2 DA ASA)
-    Servo.Signal.UnFiltered[SERVO3] = PIDResources.Controller.Output.Calced[YAW] * Servo.Direction.GetAndSet[SERVO3];   //RUDDER   (LEME)
-    Servo.Signal.UnFiltered[SERVO4] = PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO4]; //ELEVATOR (PROFUNDOR)
+    Servo.Signal.UnFiltered[SERVO1] = PID_Resources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO1];  //AILERON  (SERVO 1 DA ASA)
+    Servo.Signal.UnFiltered[SERVO2] = PID_Resources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO2];  //AILERON  (SERVO 2 DA ASA)
+    Servo.Signal.UnFiltered[SERVO3] = PID_Resources.Controller.Output.Calced[YAW] * Servo.Direction.GetAndSet[SERVO3];   //RUDDER   (LEME)
+    Servo.Signal.UnFiltered[SERVO4] = PID_Resources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO4]; //ELEVATOR (PROFUNDOR)
   }
 }
 
@@ -63,14 +63,14 @@ void AirPlaneClass::Update_FixedWing(void)
 
   if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
-    Servo.Signal.UnFiltered[SERVO1] = (RCController[ROLL] * Servo.Direction.GetAndSet[SERVO1]) + (RCController[PITCH] * Servo.Direction.GetAndSet[SERVO1]); //AILERON (SERVO 1 DA ASA)
-    Servo.Signal.UnFiltered[SERVO2] = (RCController[ROLL] * Servo.Direction.GetAndSet[SERVO1]) - (RCController[PITCH] * Servo.Direction.GetAndSet[SERVO2]); //AILERON (SERVO 2 DA ASA)
+    Servo.Signal.UnFiltered[SERVO1] = (RC_Resources.Attitude.Controller[ROLL] * Servo.Direction.GetAndSet[SERVO1]) + (RC_Resources.Attitude.Controller[PITCH] * Servo.Direction.GetAndSet[SERVO1]); //AILERON (SERVO 1 DA ASA)
+    Servo.Signal.UnFiltered[SERVO2] = (RC_Resources.Attitude.Controller[ROLL] * Servo.Direction.GetAndSet[SERVO1]) - (RC_Resources.Attitude.Controller[PITCH] * Servo.Direction.GetAndSet[SERVO2]); //AILERON (SERVO 2 DA ASA)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    Servo.Signal.UnFiltered[SERVO1] = (PIDResources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO1]) + (PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO1]); //AILERON (SERVO 1 DA ASA)
-    Servo.Signal.UnFiltered[SERVO2] = (PIDResources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO1]) - (PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO2]); //AILERON (SERVO 2 DA ASA)
+    Servo.Signal.UnFiltered[SERVO1] = (PID_Resources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO1]) + (PID_Resources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO1]); //AILERON (SERVO 1 DA ASA)
+    Servo.Signal.UnFiltered[SERVO2] = (PID_Resources.Controller.Output.Calced[ROLL] * Servo.Direction.GetAndSet[SERVO1]) - (PID_Resources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO2]); //AILERON (SERVO 2 DA ASA)
   }
 }
 
@@ -83,17 +83,17 @@ void AirPlaneClass::Update_AirPlaneVTail(void)
 
   if (IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE)) //MODO MANUAL
   {
-    Servo.Signal.UnFiltered[SERVO1] = RCController[PITCH] * Servo.Direction.GetAndSet[SERVO1];                      //AILERON  (SERVO 1 DA ASA)
-    Servo.Signal.UnFiltered[SERVO2] = RCController[PITCH] * Servo.Direction.GetAndSet[SERVO2];                      //AILERON  (SERVO 2 DA ASA)
-    Servo.Signal.UnFiltered[SERVO3] = (RCController[ROLL] + RCController[YAW]) * Servo.Direction.GetAndSet[SERVO3]; //V-TAIL   (CAUDA)
-    Servo.Signal.UnFiltered[SERVO4] = (RCController[ROLL] - RCController[YAW]) * Servo.Direction.GetAndSet[SERVO4]; //V-TAIL   (CAUDA)
+    Servo.Signal.UnFiltered[SERVO1] = RC_Resources.Attitude.Controller[PITCH] * Servo.Direction.GetAndSet[SERVO1];                                          //AILERON  (SERVO 1 DA ASA)
+    Servo.Signal.UnFiltered[SERVO2] = RC_Resources.Attitude.Controller[PITCH] * Servo.Direction.GetAndSet[SERVO2];                                          //AILERON  (SERVO 2 DA ASA)
+    Servo.Signal.UnFiltered[SERVO3] = (RC_Resources.Attitude.Controller[ROLL] + RC_Resources.Attitude.Controller[YAW]) * Servo.Direction.GetAndSet[SERVO3]; //V-TAIL   (CAUDA)
+    Servo.Signal.UnFiltered[SERVO4] = (RC_Resources.Attitude.Controller[ROLL] - RC_Resources.Attitude.Controller[YAW]) * Servo.Direction.GetAndSet[SERVO4]; //V-TAIL   (CAUDA)
   }
   else //STABILIZE OU ACRO
   {
     //CONTROLE DOS SERVOS DEPENDENTES DO PID E DO RADIO CONTROLE
-    Servo.Signal.UnFiltered[SERVO1] = PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO1];                                               //AILERON  (SERVO 1 DA ASA)
-    Servo.Signal.UnFiltered[SERVO2] = PIDResources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO2];                                               //AILERON  (SERVO 2 DA ASA)
-    Servo.Signal.UnFiltered[SERVO3] = (PIDResources.Controller.Output.Calced[ROLL] + PIDResources.Controller.Output.Calced[YAW]) * Servo.Direction.GetAndSet[SERVO3]; //V-TAIL   (CAUDA)
-    Servo.Signal.UnFiltered[SERVO4] = (PIDResources.Controller.Output.Calced[ROLL] - PIDResources.Controller.Output.Calced[YAW]) * Servo.Direction.GetAndSet[SERVO4]; //V-TAIL   (CAUDA)
+    Servo.Signal.UnFiltered[SERVO1] = PID_Resources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO1];                                                //AILERON  (SERVO 1 DA ASA)
+    Servo.Signal.UnFiltered[SERVO2] = PID_Resources.Controller.Output.Calced[PITCH] * Servo.Direction.GetAndSet[SERVO2];                                                //AILERON  (SERVO 2 DA ASA)
+    Servo.Signal.UnFiltered[SERVO3] = (PID_Resources.Controller.Output.Calced[ROLL] + PID_Resources.Controller.Output.Calced[YAW]) * Servo.Direction.GetAndSet[SERVO3]; //V-TAIL   (CAUDA)
+    Servo.Signal.UnFiltered[SERVO4] = (PID_Resources.Controller.Output.Calced[ROLL] - PID_Resources.Controller.Output.Calced[YAW]) * Servo.Direction.GetAndSet[SERVO4]; //V-TAIL   (CAUDA)
   }
 }

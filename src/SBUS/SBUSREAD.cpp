@@ -22,6 +22,7 @@
 #include "BAR/BAR.h"
 #include "Common/ENUM.h"
 #include "FailSafe/FAILSAFE.h"
+#include "PID/RCPID.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -39,7 +40,7 @@ uint16_t SBUSReadChannels[SBUS_MAX_CHANNELS];
 
 void SBUS::Update(void)
 {
-  if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER)
+  if (RC_Resources.ReceiverTypeEnabled != SBUS_RECEIVER)
   {
     return;
   }

@@ -17,12 +17,39 @@
 
 #include "HALSERIAL.h"
 #include "HALLIBRARY.h"
+#include "Common/ENUM.h"
+#include "PID/RCPID.h"
+#include "GPS/GPSUBLOX.h"
 
 HALSerialClass HAL_SERIAL;
 
 void HALSerialClass::Initialization()
 {
-    Serial_Initialization();
+    //DEBUG E GCS
+    Serial_Begin(UART_NUMB_0, 115200);
+    //GPS
+    Serial_Begin(UART_NUMB_1, 57600);
+    GPS_SerialInit(57600);
+    //IBUS & SBUS
+    if (RC_Resources.ReceiverTypeEnabled == PPM_RECEIVER)
+    {
+        Serial_Begin(UART_NUMB_2, 115200);
+    }
+    if (RC_Resources.ReceiverTypeEnabled == SBUS_RECEIVER)
+    {
+        //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
+        Serial_Begin(UART_NUMB_2, 100000);
+#ifdef __AVR_ATmega2560__
+        (*(volatile uint8_t *)(0xD2)) |= (1 << 5) | (1 << 3);
+#endif
+    }
+    else if (RC_Resources.ReceiverTypeEnabled == IBUS_RECEIVER)
+    {
+        //CONFIGURAÇÃO DA UART_NUMB_2 PARA IBUS
+        Serial_Begin(UART_NUMB_2, 115200);
+    }
+    //MATEK3901L0X,SD LOGGER & OSD
+    Serial_Begin(UART_NUMB_3, 115200);
 }
 
 void HALSerialClass::Begin(uint8_t SerialPort, uint32_t BaudRate)

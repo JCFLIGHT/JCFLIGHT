@@ -22,7 +22,7 @@ class AutoDeclinationClass
 {
 public:
   void Set_Initial_Location(int32_t LocationLatitude, int32_t LocationLongitude);
-  float GetDeclination();
+  float GetDeclination(void);
 
 private:
   float ReturnDeclination;

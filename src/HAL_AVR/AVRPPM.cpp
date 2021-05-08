@@ -23,10 +23,11 @@
 #include "ParamsToGCS/CHECKSUM.h"
 #include "FailSafe/FAILSAFE.h"
 #include "Common/ENUM.h"
+#include "PID/RCPID.h"
 
 #ifdef __AVR_ATmega2560__
 
-void _PPM_Initialization()
+void _PPM_Initialization(void)
 {
     DDRK &= ~(1 << 7);  //DECLARA COMO ENTRADA
     PORTK |= (1 << 7);  //ATIVA O PULL-UP
@@ -79,8 +80,7 @@ void AVRInterruptRoutine(void)
 extern "C" void __vector_11(void) __attribute__((signal, used, externally_visible));
 void __vector_11(void)
 {
-    if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
-        (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))
+    if (RC_Resources.ReceiverTypeEnabled != PPM_RECEIVER)
     {
         return;
     }

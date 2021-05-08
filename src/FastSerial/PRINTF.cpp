@@ -176,10 +176,10 @@ void SerialPrint::ParamsToConsole()
 
 #if defined(PRINTLN_ATTITUDERC)
   PRINTF.SendToConsole(ProgramMemoryString("Thr:%d Yaw:%d Pitch:%d Roll:%d\n"),
-                       RCController[THROTTLE],
-                       RCController[YAW],
-                       RCController[PITCH],
-                       RCController[ROLL]);
+                       RC_Resources.Attitude.Controller[THROTTLE],
+                       RC_Resources.Attitude.Controller[YAW],
+                       RC_Resources.Attitude.Controller[PITCH],
+                       RC_Resources.Attitude.Controller[ROLL]);
 #endif
 }
 

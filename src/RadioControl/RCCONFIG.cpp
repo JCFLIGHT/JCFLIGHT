@@ -25,6 +25,7 @@
 #include "ParamsToGCS/CHECKSUM.h"
 #include "Common/RCDEFINES.h"
 #include "Common/ENUM.h"
+#include "PID/RCPID.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -93,8 +94,7 @@ void RC_Config::Set_Reverse(bool Reverse)
 void RC_Config::Set_Dead_Zone(uint8_t DeadZone)
 {
   //NÃO APLICA A ZONA MORTA NO SBUS E IBUS
-  if ((STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER) ||
-      (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER))
+  if (RC_Resources.ReceiverTypeEnabled != PPM_RECEIVER)
   {
     RC_Config::_DeadZone = 0;
   }
@@ -141,7 +141,7 @@ int16_t RC_Config::Get_Channel_Range(void)
   }
 }
 
-void RCConfigClass::Init(void)
+void RCConfigClass::Initialization(void)
 {
   //PULSO MINIMO E MAXIMO PARA TODOS OS CANAIS RÁDIO
   Throttle.Min_Pulse = STORAGEMANAGER.Read_16Bits(THROTTLE_MIN_ADDR);
@@ -243,18 +243,18 @@ void RCConfigClass::Init(void)
 
 void RCConfigClass::Set_Pulse(void)
 {
-  Throttle.Set_Pulse(DECODE.DirectRadioControllRead[THROTTLE]);
-  Yaw.Set_Pulse(DECODE.DirectRadioControllRead[YAW]);
-  Pitch.Set_Pulse(DECODE.DirectRadioControllRead[PITCH]);
-  Roll.Set_Pulse(DECODE.DirectRadioControllRead[ROLL]);
-  AuxiliarOne.Set_Pulse(DECODE.DirectRadioControllRead[AUX1]);
-  AuxiliarTwo.Set_Pulse(DECODE.DirectRadioControllRead[AUX2]);
-  AuxiliarThree.Set_Pulse(DECODE.DirectRadioControllRead[AUX3]);
-  AuxiliarFour.Set_Pulse(DECODE.DirectRadioControllRead[AUX4]);
-  AuxiliarFive.Set_Pulse(DECODE.DirectRadioControllRead[AUX5]);
-  AuxiliarSix.Set_Pulse(DECODE.DirectRadioControllRead[AUX6]);
-  AuxiliarSeven.Set_Pulse(DECODE.DirectRadioControllRead[AUX7]);
-  AuxiliarEight.Set_Pulse(DECODE.DirectRadioControllRead[AUX8]);
+  Throttle.Set_Pulse(DECODE.DirectRadioControlRead[THROTTLE]);
+  Yaw.Set_Pulse(DECODE.DirectRadioControlRead[YAW]);
+  Pitch.Set_Pulse(DECODE.DirectRadioControlRead[PITCH]);
+  Roll.Set_Pulse(DECODE.DirectRadioControlRead[ROLL]);
+  AuxiliarOne.Set_Pulse(DECODE.DirectRadioControlRead[AUX1]);
+  AuxiliarTwo.Set_Pulse(DECODE.DirectRadioControlRead[AUX2]);
+  AuxiliarThree.Set_Pulse(DECODE.DirectRadioControlRead[AUX3]);
+  AuxiliarFour.Set_Pulse(DECODE.DirectRadioControlRead[AUX4]);
+  AuxiliarFive.Set_Pulse(DECODE.DirectRadioControlRead[AUX5]);
+  AuxiliarSix.Set_Pulse(DECODE.DirectRadioControlRead[AUX6]);
+  AuxiliarSeven.Set_Pulse(DECODE.DirectRadioControlRead[AUX7]);
+  AuxiliarEight.Set_Pulse(DECODE.DirectRadioControlRead[AUX8]);
 }
 
 void RCConfigClass::Update_Channels(void)

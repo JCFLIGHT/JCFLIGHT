@@ -341,6 +341,12 @@ struct _Send_User_Medium_Parameters
     uint8_t SendProportionalAltitudeHold;
     uint8_t SendIntegralAltitudeHold;
     uint8_t SendDerivativeAltitudeHold;
+    uint8_t SendProportionalPositionRate;
+    uint8_t SendIntegralPositionRate;
+    uint8_t SendDerivativePositionRate;
+    uint8_t SendProportionalNavigationRate;
+    uint8_t SendIntegralNavigationRate;
+    uint8_t SendDerivativeNavigationRate;
 } Send_User_Medium_Parameters;
 
 struct _Get_User_Medium_Parameters
@@ -388,6 +394,12 @@ struct _Get_User_Medium_Parameters
     uint8_t GetProportionalAltitudeHold;
     uint8_t GetIntegralAltitudeHold;
     uint8_t GetDerivativeAltitudeHold;
+    uint8_t GetProportionalPositionRate;
+    uint8_t GetIntegralPositionRate;
+    uint8_t GetDerivativePositionRate;
+    uint8_t GetProportionalNavigationRate;
+    uint8_t GetIntegralNavigationRate;
+    uint8_t GetDerivativeNavigationRate;
 } Get_User_Medium_Parameters;
 
 struct _Send_WayPoint_Coordinates
@@ -552,11 +564,12 @@ static void __attribute__((noinline)) Get_Struct_Params_To_GCS(uint8_t *CheckBuf
 
 void GCSClass::Send_String_To_GCS(const char *String)
 {
-#ifdef __AVR_ATmega2560__
-
     Communication_Passed(false, strlen_P(String));
     for (const char *StringCount = String; ProgMemReadByte(StringCount); StringCount++)
     {
+
+#ifdef __AVR_ATmega2560__
+
         Send_Data_To_GCS(ProgMemReadByte(StringCount));
     }
     Send_Data_To_GCS(SerialCheckSum);
@@ -564,9 +577,6 @@ void GCSClass::Send_String_To_GCS(const char *String)
 
 #elif defined ESP32 || defined __arm__
 
-    Communication_Passed(false, strlen_P(String));
-    for (const char *StringCount = String; ProgMemReadByte(StringCount); StringCount++)
-    {
         Send_Data_To_GCS(ProgMemReadByte(StringCount), VAR_8BITS);
     }
     Send_Data_To_GCS(SerialCheckSum, VAR_8BITS);
@@ -1002,7 +1012,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 33) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 39) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 8)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendTPAInPercent, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendBreakPointValue, VAR_16BITS);
@@ -1045,6 +1055,13 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalAltitudeHold, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralAltitudeHold, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativeAltitudeHold, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalPositionRate, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralPositionRate, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativePositionRate, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalNavigationRate, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralNavigationRate, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativeNavigationRate, VAR_8BITS);
+
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1318,22 +1335,22 @@ void GCSClass::First_Packet_Request_Parameters(void)
 
 void GCSClass::Second_Packet_Request_Parameters(void)
 {
-    Essential_Second_Packet_Parameters.SendActualThrottleValue = DECODE.DirectRadioControllRead[THROTTLE];
-    Essential_Second_Packet_Parameters.SendActualYawValue = DECODE.DirectRadioControllRead[YAW];
-    Essential_Second_Packet_Parameters.SendActualPitchValue = DECODE.DirectRadioControllRead[PITCH];
-    Essential_Second_Packet_Parameters.SendActualRollValue = DECODE.DirectRadioControllRead[ROLL];
-    Essential_Second_Packet_Parameters.SendActualAuxOneValue = DECODE.DirectRadioControllRead[AUX1];
-    Essential_Second_Packet_Parameters.SendActualAuxTwoValue = DECODE.DirectRadioControllRead[AUX2];
-    Essential_Second_Packet_Parameters.SendActualAuxThreeValue = DECODE.DirectRadioControllRead[AUX3];
-    Essential_Second_Packet_Parameters.SendActualAuxFourValue = DECODE.DirectRadioControllRead[AUX4];
-    Essential_Second_Packet_Parameters.SendActualAuxFiveValue = DECODE.DirectRadioControllRead[AUX5];
-    Essential_Second_Packet_Parameters.SendActualAuxSixValue = DECODE.DirectRadioControllRead[AUX6];
-    Essential_Second_Packet_Parameters.SendActualAuxSevenValue = DECODE.DirectRadioControllRead[AUX7];
-    Essential_Second_Packet_Parameters.SendActualAuxEightValue = DECODE.DirectRadioControllRead[AUX8];
-    Essential_Second_Packet_Parameters.SendAttitudeThrottleValue = RCController[THROTTLE];
-    Essential_Second_Packet_Parameters.SendAttitudeYawValue = PIDResources.RcRateTarget.GCS.Yaw;
-    Essential_Second_Packet_Parameters.SendAttitudePitchValue = PIDResources.RcRateTarget.GCS.Pitch;
-    Essential_Second_Packet_Parameters.SendAttitudeRollValue = PIDResources.RcRateTarget.GCS.Roll;
+    Essential_Second_Packet_Parameters.SendActualThrottleValue = DECODE.DirectRadioControlRead[THROTTLE];
+    Essential_Second_Packet_Parameters.SendActualYawValue = DECODE.DirectRadioControlRead[YAW];
+    Essential_Second_Packet_Parameters.SendActualPitchValue = DECODE.DirectRadioControlRead[PITCH];
+    Essential_Second_Packet_Parameters.SendActualRollValue = DECODE.DirectRadioControlRead[ROLL];
+    Essential_Second_Packet_Parameters.SendActualAuxOneValue = DECODE.DirectRadioControlRead[AUX1];
+    Essential_Second_Packet_Parameters.SendActualAuxTwoValue = DECODE.DirectRadioControlRead[AUX2];
+    Essential_Second_Packet_Parameters.SendActualAuxThreeValue = DECODE.DirectRadioControlRead[AUX3];
+    Essential_Second_Packet_Parameters.SendActualAuxFourValue = DECODE.DirectRadioControlRead[AUX4];
+    Essential_Second_Packet_Parameters.SendActualAuxFiveValue = DECODE.DirectRadioControlRead[AUX5];
+    Essential_Second_Packet_Parameters.SendActualAuxSixValue = DECODE.DirectRadioControlRead[AUX6];
+    Essential_Second_Packet_Parameters.SendActualAuxSevenValue = DECODE.DirectRadioControlRead[AUX7];
+    Essential_Second_Packet_Parameters.SendActualAuxEightValue = DECODE.DirectRadioControlRead[AUX8];
+    Essential_Second_Packet_Parameters.SendAttitudeThrottleValue = RC_Resources.Attitude.Controller[THROTTLE];
+    Essential_Second_Packet_Parameters.SendAttitudeYawValue = PID_Resources.RcRateTarget.GCS.Yaw;
+    Essential_Second_Packet_Parameters.SendAttitudePitchValue = PID_Resources.RcRateTarget.GCS.Pitch;
+    Essential_Second_Packet_Parameters.SendAttitudeRollValue = PID_Resources.RcRateTarget.GCS.Roll;
     Essential_Second_Packet_Parameters.SendMemoryRamUsed = MEMORY.Check();
     Essential_Second_Packet_Parameters.SendMemoryRamUsedPercent = MEMORY.GetPercentageRAMUsed();
     Essential_Second_Packet_Parameters.SendAccX = IMU.Accelerometer.Read[ROLL];
@@ -1483,7 +1500,7 @@ void GCSClass::Save_Medium_Configuration(void)
 {
     STORAGEMANAGER.Write_8Bits(TPA_PERCENT_ADDR, Get_User_Medium_Parameters.GetTPAInPercent);
     STORAGEMANAGER.Write_16Bits(BREAKPOINT_ADDR, Get_User_Medium_Parameters.GetBreakPointValue);
-    STORAGEMANAGER.Write_8Bits(GYRO_LPF_ADDR, Get_User_Medium_Parameters.GetGyroLPF);
+    STORAGEMANAGER.Write_8Bits(HW_GYRO_LPF_ADDR, Get_User_Medium_Parameters.GetGyroLPF);
     STORAGEMANAGER.Write_16Bits(DERIVATIVE_LPF_ADDR, Get_User_Medium_Parameters.GetDerivativeLPF);
     STORAGEMANAGER.Write_16Bits(RC_LPF_ADDR, Get_User_Medium_Parameters.GetRCLPF);
     STORAGEMANAGER.Write_8Bits(KALMAN_ADDR, Get_User_Medium_Parameters.GetKalmanState);
@@ -1491,7 +1508,7 @@ void GCSClass::Save_Medium_Configuration(void)
     STORAGEMANAGER.Write_16Bits(BI_GYRO_LPF_ADDR, Get_User_Medium_Parameters.GetBiquadGyroLPF);
     STORAGEMANAGER.Write_16Bits(BI_ACC_NOTCH_ADDR, Get_User_Medium_Parameters.GetBiquadAccNotch);
     STORAGEMANAGER.Write_16Bits(BI_GYRO_NOTCH_ADDR, Get_User_Medium_Parameters.GetBiquadGyroNotch);
-    STORAGEMANAGER.Write_8Bits(MOTCOMP_STATE_ADDR, Get_User_Medium_Parameters.GetMotorCompensationState);
+    STORAGEMANAGER.Write_8Bits(MOT_COMP_STATE_ADDR, Get_User_Medium_Parameters.GetMotorCompensationState);
     STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, Get_User_Medium_Parameters.GetProportionalPitch);
     STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, Get_User_Medium_Parameters.GetIntegralPitch);
     STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, Get_User_Medium_Parameters.GetDerivativePitch);
@@ -1521,9 +1538,15 @@ void GCSClass::Save_Medium_Configuration(void)
     STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, Get_User_Medium_Parameters.GetGPSBank);
     STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, Get_User_Medium_Parameters.GetIntegralLPF);
     STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, Get_User_Medium_Parameters.GetkCDLPF);
-    STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, Get_User_Medium_Parameters.GetProportionalAltitudeHold);
-    STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, Get_User_Medium_Parameters.GetIntegralAltitudeHold);
-    STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, Get_User_Medium_Parameters.GetDerivativeAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KP_POS_Z_ADDR, Get_User_Medium_Parameters.GetProportionalAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KI_POS_Z_ADDR, Get_User_Medium_Parameters.GetIntegralAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KD_POS_Z_ADDR, Get_User_Medium_Parameters.GetDerivativeAltitudeHold);
+    STORAGEMANAGER.Write_8Bits(KP_POS_RATE_ADDR, Get_User_Medium_Parameters.GetProportionalPositionRate);
+    STORAGEMANAGER.Write_8Bits(KI_POS_RATE_ADDR, Get_User_Medium_Parameters.GetIntegralPositionRate);
+    STORAGEMANAGER.Write_8Bits(KD_POS_RATE_ADDR, Get_User_Medium_Parameters.GetDerivativePositionRate);
+    STORAGEMANAGER.Write_8Bits(KP_NAV_RATE_ADDR, Get_User_Medium_Parameters.GetProportionalNavigationRate);
+    STORAGEMANAGER.Write_8Bits(KI_NAV_RATE_ADDR, Get_User_Medium_Parameters.GetIntegralNavigationRate);
+    STORAGEMANAGER.Write_8Bits(KD_NAV_RATE_ADDR, Get_User_Medium_Parameters.GetDerivativeNavigationRate);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1612,7 +1635,7 @@ void GCSClass::Default_Medium_Configuration(void)
     //LIMPA AS CONFIGURAÇÕES SALVAS
     STORAGEMANAGER.Write_16Bits(BREAKPOINT_ADDR, 1500);
     STORAGEMANAGER.Write_8Bits(TPA_PERCENT_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(GYRO_LPF_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(HW_GYRO_LPF_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(DERIVATIVE_LPF_ADDR, 40);
     STORAGEMANAGER.Write_16Bits(RC_LPF_ADDR, 50);
     STORAGEMANAGER.Write_8Bits(KALMAN_ADDR, 0);
@@ -1620,106 +1643,21 @@ void GCSClass::Default_Medium_Configuration(void)
     STORAGEMANAGER.Write_16Bits(BI_GYRO_LPF_ADDR, 60);
     STORAGEMANAGER.Write_16Bits(BI_ACC_NOTCH_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(BI_GYRO_NOTCH_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(MOTCOMP_STATE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(MOT_COMP_STATE_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, 50);
     STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, 15);
     STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, 30);
 
     if (GetMultirotorEnabled())
     {
-        //PITCH
-        STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 40);
-        STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, 30);
-        STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 23);
-        STORAGEMANAGER.Write_8Bits(FF_OR_CD_PITCH_ADDR, 60);
-
-        //ROLL
-        STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 40);
-        STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 30);
-        STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 23);
-        STORAGEMANAGER.Write_8Bits(FF_OR_CD_ROLL_ADDR, 60);
-
-        //YAW
-        STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 85);
-        STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 45);
-        STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, 0);
-        STORAGEMANAGER.Write_8Bits(FF_OR_CD_YAW_ADDR, 60);
-
-        //AUTO-NÍVEL
-        STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
-        STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 15);
-
-        //ALTITUDE-HOLD
-        STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 3);
-        STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 5);
-        STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 10);
-
-        //GPS-HOLD
-        STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 100);
-        STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 90);
-
-        //ÂNGULOS DE NAVEGAÇÃO
-        STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 30);
-        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 30);
-        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 30);
-        STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 40);
-        STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
-
-        //RTH ALTITUDE
-        STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 10);
+        DefaultForMultirotorPlatform();
     }
     else if (GetAirPlaneEnabled())
     {
-        //PITCH
-        STORAGEMANAGER.Write_8Bits(KP_PITCH_ADDR, 5);
-        STORAGEMANAGER.Write_8Bits(KI_PITCH_ADDR, 7);
-        STORAGEMANAGER.Write_8Bits(KD_PITCH_ADDR, 0);
-        STORAGEMANAGER.Write_8Bits(FF_OR_CD_PITCH_ADDR, 50);
-
-        //ROLL
-        STORAGEMANAGER.Write_8Bits(KP_ROLL_ADDR, 5);
-        STORAGEMANAGER.Write_8Bits(KI_ROLL_ADDR, 7);
-        STORAGEMANAGER.Write_8Bits(KD_ROLL_ADDR, 0);
-        STORAGEMANAGER.Write_8Bits(FF_OR_CD_ROLL_ADDR, 50);
-
-        //YAW
-        STORAGEMANAGER.Write_8Bits(KP_YAW_ADDR, 6);
-        STORAGEMANAGER.Write_8Bits(KI_YAW_ADDR, 10);
-        STORAGEMANAGER.Write_8Bits(KD_YAW_ADDR, 0);
-        STORAGEMANAGER.Write_8Bits(FF_OR_CD_YAW_ADDR, 60);
-
-        //AUTO-NÍVEL
-        STORAGEMANAGER.Write_8Bits(KP_AUTOLEVEL_ADDR, 20);
-        STORAGEMANAGER.Write_8Bits(KI_AUTOLEVEL_ADDR, 5);
-
-        //ALTITUDE-HOLD
-        STORAGEMANAGER.Write_8Bits(KP_ALTITUDE_ADDR, 40);
-        STORAGEMANAGER.Write_8Bits(KI_ALTITUDE_ADDR, 5);
-        STORAGEMANAGER.Write_8Bits(KD_ALTITUDE_ADDR, 10);
-
-        //AUTO-THROTTLE
-        STORAGEMANAGER.Write_8Bits(KP_GPSPOS_ADDR, 150);
-        STORAGEMANAGER.Write_8Bits(KI_GPSPOS_ADDR, 70);
-
-        //ÂNGULOS DE NAVEGAÇÃO
-        STORAGEMANAGER.Write_8Bits(ROLL_BANK_ADDR, 45);
-        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MIN_ADDR, 20);
-        STORAGEMANAGER.Write_8Bits(PITCH_BANK_MAX_ADDR, 25);
-        STORAGEMANAGER.Write_8Bits(ATTACK_BANK_ADDR, 75);
-        STORAGEMANAGER.Write_8Bits(GPS_BANK_ADDR, 30);
-
-        //RTH ALTITUDE
-        STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 40);
+        DefaultForAirPlanePlatform();
     }
 
-    //VELOCIDADE Z
-    STORAGEMANAGER.Write_8Bits(KP_VEL_Z_ADDR, 50);
-    STORAGEMANAGER.Write_8Bits(KI_VEL_Z_ADDR, 20);
-    STORAGEMANAGER.Write_8Bits(KD_VEL_Z_ADDR, 16);
-
-    //HEADING-HOLD
-    STORAGEMANAGER.Write_8Bits(KP_HEADING_HOLD_ADDR, 60);
-    STORAGEMANAGER.Write_8Bits(HEADING_HOLD_RATE_LIMIT_ADDR, 90);
+    DefaultForAllPlatforms();
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1803,7 +1741,7 @@ void GCSClass::UpdateParametersToGCS(void)
     //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     Send_User_Medium_Parameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
     Send_User_Medium_Parameters.SendBreakPointValue = STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR);
-    Send_User_Medium_Parameters.SendGyroLPF = STORAGEMANAGER.Read_8Bits(GYRO_LPF_ADDR);
+    Send_User_Medium_Parameters.SendGyroLPF = STORAGEMANAGER.Read_8Bits(HW_GYRO_LPF_ADDR);
     Send_User_Medium_Parameters.SendDerivativeLPF = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
     Send_User_Medium_Parameters.SendRCLPF = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
     Send_User_Medium_Parameters.SendKalmanState = STORAGEMANAGER.Read_8Bits(KALMAN_ADDR);
@@ -1811,7 +1749,7 @@ void GCSClass::UpdateParametersToGCS(void)
     Send_User_Medium_Parameters.SendBiQuadGyroLPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
     Send_User_Medium_Parameters.SendBiQuadAccNotch = STORAGEMANAGER.Read_16Bits(BI_ACC_NOTCH_ADDR);
     Send_User_Medium_Parameters.SendBiQuadGyroNotch = STORAGEMANAGER.Read_16Bits(BI_GYRO_NOTCH_ADDR);
-    Send_User_Medium_Parameters.SendMotorCompensationState = STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR);
+    Send_User_Medium_Parameters.SendMotorCompensationState = STORAGEMANAGER.Read_8Bits(MOT_COMP_STATE_ADDR);
     Send_User_Medium_Parameters.SendProportionalPitch = STORAGEMANAGER.Read_8Bits(KP_PITCH_ADDR);
     Send_User_Medium_Parameters.SendIntegralPitch = STORAGEMANAGER.Read_8Bits(KI_PITCH_ADDR);
     Send_User_Medium_Parameters.SendDerivativePitch = STORAGEMANAGER.Read_8Bits(KD_PITCH_ADDR);
@@ -1841,7 +1779,13 @@ void GCSClass::UpdateParametersToGCS(void)
     Send_User_Medium_Parameters.SendGPSBank = STORAGEMANAGER.Read_8Bits(GPS_BANK_ADDR);
     Send_User_Medium_Parameters.SendIntegralLPF = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);
     Send_User_Medium_Parameters.SendkCDLPF = STORAGEMANAGER.Read_16Bits(KCD_OR_FF_LPF_ADDR);
-    Send_User_Medium_Parameters.SendProportionalAltitudeHold = STORAGEMANAGER.Read_8Bits(KP_ALTITUDE_ADDR);
-    Send_User_Medium_Parameters.SendIntegralAltitudeHold = STORAGEMANAGER.Read_8Bits(KI_ALTITUDE_ADDR);
-    Send_User_Medium_Parameters.SendDerivativeAltitudeHold = STORAGEMANAGER.Read_8Bits(KD_ALTITUDE_ADDR);
+    Send_User_Medium_Parameters.SendProportionalAltitudeHold = STORAGEMANAGER.Read_8Bits(KP_POS_Z_ADDR);
+    Send_User_Medium_Parameters.SendIntegralAltitudeHold = STORAGEMANAGER.Read_8Bits(KI_POS_Z_ADDR);
+    Send_User_Medium_Parameters.SendDerivativeAltitudeHold = STORAGEMANAGER.Read_8Bits(KD_POS_Z_ADDR);
+    Send_User_Medium_Parameters.SendProportionalPositionRate = STORAGEMANAGER.Read_8Bits(KP_POS_RATE_ADDR);
+    Send_User_Medium_Parameters.SendIntegralPositionRate = STORAGEMANAGER.Read_8Bits(KI_POS_RATE_ADDR);
+    Send_User_Medium_Parameters.SendDerivativePositionRate = STORAGEMANAGER.Read_8Bits(KD_POS_RATE_ADDR);
+    Send_User_Medium_Parameters.SendProportionalNavigationRate = STORAGEMANAGER.Read_8Bits(KP_NAV_RATE_ADDR);
+    Send_User_Medium_Parameters.SendIntegralNavigationRate = STORAGEMANAGER.Read_8Bits(KI_NAV_RATE_ADDR);
+    Send_User_Medium_Parameters.SendDerivativeNavigationRate = STORAGEMANAGER.Read_8Bits(KD_NAV_RATE_ADDR);
 }

@@ -21,5 +21,8 @@
 #include "Common/STRUCTS.h"
 extern PID_Terms_Struct GET_SET[SIZE_OF_PID_PARAMS];
 void Load_All_PID_Params(void);
-void UpdateValuesOfPID();
+void UpdateValuesOfPID(void);
+void DefaultForMultirotorPlatform(void);
+void DefaultForAirPlanePlatform(void);
+void DefaultForAllPlatforms(void);
 #endif

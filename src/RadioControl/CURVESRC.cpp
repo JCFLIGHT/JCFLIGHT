@@ -26,22 +26,22 @@
 
 #define THROTTLE_LOOKUP_LENGTH 11
 
-uint16_t CalculeLookUpThrottle[11];
+uint16_t CalculeLookUpThrottle[THROTTLE_LOOKUP_LENGTH];
 
 void CurvesRC_SetValues()
 {
-  ThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
-  ThrottleExpo = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
-  RCRate = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
-  RCExpo = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
-  YawRate = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
-  AttitudeThrottleMin = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MIN_ADDR);
-  AttitudeThrottleMax = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MAX_ADDR);
+  RC_Resources.Middle.Throttle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
+  RC_Resources.Expo.Throttle = STORAGEMANAGER.Read_8Bits(THROTTLE_EXPO_ADDR);
+  RC_Resources.Rate.PitchRoll = STORAGEMANAGER.Read_8Bits(RC_RATE_ADDR);
+  RC_Resources.Expo.YawPitchRoll = STORAGEMANAGER.Read_8Bits(RC_EXPO_ADDR);
+  RC_Resources.Rate.Yaw = STORAGEMANAGER.Read_8Bits(YAW_RATE_ADDR);
+  RC_Resources.Attitude.ThrottleMin = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MIN_ADDR);
+  RC_Resources.Attitude.ThrottleMax = STORAGEMANAGER.Read_16Bits(THR_ATTITUDE_MAX_ADDR);
 }
 
 void CurvesRC_CalculeValue()
 {
-  if (ThrottleMiddle == 0)
+  if (RC_Resources.Middle.Throttle == 0) //EVITA DE OCORRER UMA DIVISÃO POR ZERO
   {
     return;
   }
@@ -49,14 +49,14 @@ void CurvesRC_CalculeValue()
   uint8_t ThrottleMiddlePoint;
   for (uint8_t IndexOfLookUpThrottle = 0; IndexOfLookUpThrottle < THROTTLE_LOOKUP_LENGTH; IndexOfLookUpThrottle++)
   {
-    NewValueCalculed = 10 * IndexOfLookUpThrottle - ThrottleMiddle;
-    ThrottleMiddlePoint = ThrottleMiddle;
+    NewValueCalculed = 10 * IndexOfLookUpThrottle - RC_Resources.Middle.Throttle;
+    ThrottleMiddlePoint = RC_Resources.Middle.Throttle;
     if (NewValueCalculed > 0)
     {
       ThrottleMiddlePoint = 100 - ThrottleMiddlePoint;
     }
-    CalculeLookUpThrottle[IndexOfLookUpThrottle] = 100 * ThrottleMiddle + NewValueCalculed * ((int32_t)ThrottleExpo * (NewValueCalculed * NewValueCalculed) / ((uint16_t)ThrottleMiddlePoint * ThrottleMiddlePoint) + 100 - ThrottleExpo);
-    CalculeLookUpThrottle[IndexOfLookUpThrottle] = AttitudeThrottleMin + (uint32_t)((uint16_t)(AttitudeThrottleMax - AttitudeThrottleMin)) * CalculeLookUpThrottle[IndexOfLookUpThrottle] / 10000;
+    CalculeLookUpThrottle[IndexOfLookUpThrottle] = 100 * RC_Resources.Middle.Throttle + NewValueCalculed * ((int32_t)RC_Resources.Expo.Throttle * (NewValueCalculed * NewValueCalculed) / ((uint16_t)ThrottleMiddlePoint * ThrottleMiddlePoint) + 100 - RC_Resources.Expo.Throttle);
+    CalculeLookUpThrottle[IndexOfLookUpThrottle] = RC_Resources.Attitude.ThrottleMin + (uint32_t)((uint16_t)(RC_Resources.Attitude.ThrottleMax - RC_Resources.Attitude.ThrottleMin)) * CalculeLookUpThrottle[IndexOfLookUpThrottle] / 10000;
   }
 }
 
@@ -96,7 +96,7 @@ uint16_t CalcedLookupThrottle(uint16_t CalcedDeflection)
 {
   if (CalcedDeflection > 999)
   {
-    return AttitudeThrottleMax;
+    return RC_Resources.Attitude.ThrottleMax;
   }
 
   const uint8_t CalcedLookUpStep = CalcedDeflection / 100;

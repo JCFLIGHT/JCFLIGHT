@@ -57,10 +57,10 @@ void RCInterpolationApply()
   if (RC_LPF_CutOff > 0)
   {
     //GUARDA OS VALORES ANTERIOR
-    RCControllerUnFiltered[THROTTLE] = RCController[THROTTLE];
-    RCControllerUnFiltered[YAW] = RCController[YAW];
-    RCControllerUnFiltered[PITCH] = RCController[PITCH];
-    RCControllerUnFiltered[ROLL] = RCController[ROLL];
+    RCControllerUnFiltered[THROTTLE] = RC_Resources.Attitude.Controller[THROTTLE];
+    RCControllerUnFiltered[YAW] = RC_Resources.Attitude.Controller[YAW];
+    RCControllerUnFiltered[PITCH] = RC_Resources.Attitude.Controller[PITCH];
+    RCControllerUnFiltered[ROLL] = RC_Resources.Attitude.Controller[ROLL];
 
     //APLICA O FILTRO
     RCAttitudeFiltered[THROTTLE] = BIQUADFILTER.ApplyAndGet(&Smooth_RC_Throttle, RCControllerUnFiltered[THROTTLE]);
@@ -69,15 +69,15 @@ void RCInterpolationApply()
     RCAttitudeFiltered[ROLL] = BIQUADFILTER.ApplyAndGet(&Smooth_RC_Roll, RCControllerUnFiltered[ROLL]);
 
     //OBTÉM O VALOR FILTRADO
-    RCController[THROTTLE] = ((RCAttitudeFiltered[THROTTLE]) >= (AttitudeThrottleMin) ? (RCAttitudeFiltered[THROTTLE]) : (AttitudeThrottleMin));
-    RCController[YAW] = RCAttitudeFiltered[YAW];
-    RCController[PITCH] = RCAttitudeFiltered[PITCH];
-    RCController[ROLL] = RCAttitudeFiltered[ROLL];
+    RC_Resources.Attitude.Controller[THROTTLE] = ((RCAttitudeFiltered[THROTTLE]) >= (RC_Resources.Attitude.ThrottleMin) ? (RCAttitudeFiltered[THROTTLE]) : (RC_Resources.Attitude.ThrottleMin));
+    RC_Resources.Attitude.Controller[YAW] = RCAttitudeFiltered[YAW];
+    RC_Resources.Attitude.Controller[PITCH] = RCAttitudeFiltered[PITCH];
+    RC_Resources.Attitude.Controller[ROLL] = RCAttitudeFiltered[ROLL];
   }
   else
 #endif
   {
-    RCController[THROTTLE] = ((RCController[THROTTLE]) >= (AttitudeThrottleMin) ? (RCController[THROTTLE]) : (AttitudeThrottleMin));
+    RC_Resources.Attitude.Controller[THROTTLE] = ((RC_Resources.Attitude.Controller[THROTTLE]) >= (RC_Resources.Attitude.ThrottleMin) ? (RC_Resources.Attitude.Controller[THROTTLE]) : (RC_Resources.Attitude.ThrottleMin));
   }
 #if defined(PRINTLN_RC_INTERPOLATION)
   static uint32_t Refresh = SCHEDULERTIME.GetMillis();
@@ -85,7 +85,7 @@ void RCInterpolationApply()
   {
     PRINTF.SendToConsole(ProgramMemoryString("NotFiltered:%d Filtered:%d\n"),
                          RCControllerUnFiltered[ROLL],
-                         RCController[ROLL]);
+                         RC_Resources.Attitude.Controller[ROLL]);
     Refresh = SCHEDULERTIME.GetMillis();
   }
 #endif

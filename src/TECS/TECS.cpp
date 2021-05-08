@@ -184,7 +184,7 @@ float TecsClass::AutoPitchDown(int16_t InMinThrottleDownPitchAngle)
 {
     if (!TECS.GetNavigationInAutomaticThrottleMode() && IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
     {
-        return ScaleRange16Bits(MAX(0, TECS_Resources.Params.CruiseThrottle - RCController[THROTTLE]), 0, TECS_Resources.Params.CruiseThrottle - MIN_STICKS_PULSE, 0, InMinThrottleDownPitchAngle);
+        return ScaleRange16Bits(MAX(0, TECS_Resources.Params.CruiseThrottle - RC_Resources.Attitude.Controller[THROTTLE]), 0, TECS_Resources.Params.CruiseThrottle - MIN_STICKS_PULSE, 0, InMinThrottleDownPitchAngle);
     }
     return 0;
 }
@@ -211,10 +211,10 @@ void TecsClass::UpdateEnergyAltitudeController(float DeltaTime)
     TECS_Resources.Energies.Specific.Demanded.KineticEnergy = 0.0f;
     TECS_Resources.Energies.Specific.Estimated.KineticEnergy = 0.0f;
 
-    TECS_Resources.Energies.Specific.Demanded.PotentialEnergy = ConvertCMToMeters(TECS_Resources.Position.TargetCruiseOrCircle.Altitude) * GRAVITY_MSS;
+    TECS_Resources.Energies.Specific.Demanded.PotentialEnergy = ConvertCMToMeters(TECS_Resources.Position.DestinationNEU.Altitude) * GRAVITY_MSS;
     TECS_Resources.Energies.Specific.Estimated.PotentialEnergy = ConvertCMToMeters(TECS_Resources.Position.Altitude) * GRAVITY_MSS;
 
-    //CONTROLE DE BALANÇO PARA AS ENERGIAS
+    //SPE - CONTROLE DE BALANÇO PARA AS ENERGIAS
     TECS_Resources.Energies.Specific.Control = 0.0f;
 
     TECS_Resources.Energies.Specific.Demanded.EnergyBalance = TECS_Resources.Energies.Specific.Demanded.PotentialEnergy * (1.0f - TECS_Resources.Energies.Specific.Control) - TECS_Resources.Energies.Specific.Demanded.KineticEnergy * TECS_Resources.Energies.Specific.Control;
@@ -224,7 +224,7 @@ void TecsClass::UpdateEnergyAltitudeController(float DeltaTime)
     TECS_Resources.Energies.Specific.Estimated.PitchGainBalance = 1.0f;
 
     TECS_Resources.Energies.Specific.Estimated.PitchAngle = TECS.Floating_Point_PID(&TECS_PID_Altitude_Navigation,
-                                                                                    GET_SET[PID_ALTITUDE].kP / 10.0f, GET_SET[PID_ALTITUDE].kI / 10.0f, GET_SET[PID_ALTITUDE].kD / 10.0f,
+                                                                                    GET_SET[PID_POSITION_Z].kP / 10.0f, GET_SET[PID_POSITION_Z].kI / 10.0f, GET_SET[PID_POSITION_Z].kD / 10.0f,
                                                                                     TECS_Resources.Energies.Specific.Demanded.EnergyBalance, TECS_Resources.Energies.Specific.Estimated.EnergyBalance,
                                                                                     TECS_Resources.Energies.Specific.Estimated.PitchGainBalance,
                                                                                     1.0f,
@@ -287,14 +287,14 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
         }
 
         TECS_Resources.Throttle.Cruise = Constrain_16Bits(TECS_Resources.Params.CruiseThrottle + TECS_Resources.Throttle.Correction, TECS_Resources.Params.MinCruiseThrottle, TECS_Resources.Params.MaxCruiseThrottle);
-        RCController[THROTTLE] = Constrain_16Bits(TECS_Resources.Throttle.Cruise, AttitudeThrottleMin, AttitudeThrottleMax);
+        RC_Resources.Attitude.Controller[THROTTLE] = Constrain_16Bits(TECS_Resources.Throttle.Cruise, RC_Resources.Attitude.ThrottleMin, RC_Resources.Attitude.ThrottleMax);
     }
 
     if (TECS_Resources.Params.UseLandInRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
     {
         if (TECS_Resources.Position.Altitude <= ConverMetersToCM(TECS_Resources.Params.LandMinAltitude))
         {
-            RCController[THROTTLE] = AttitudeThrottleMin;
+            RC_Resources.Attitude.Controller[THROTTLE] = RC_Resources.Attitude.ThrottleMin;
             GPS_Resources.Navigation.AutoPilot.Control.Angle[ROLL] = 0;
             GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = PIDAngleToRcController(ConvertDegreesToDecidegrees(TECS_Resources.Params.FinalLandPitchAngle),
                                                                                              ConvertDegreesToDecidegrees(GET_SET[MAX_PITCH_LEVEL].MaxValue));
@@ -304,8 +304,8 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
 
 void TecsClass::UpdateEnergyPositionController(float DeltaTime)
 {
-    TECS_Resources.Position.Error.X = TECS_Resources.Position.TargetCruiseOrCircle.X - INS.EarthFrame.Position[INS_LATITUDE];
-    TECS_Resources.Position.Error.Y = TECS_Resources.Position.TargetCruiseOrCircle.Y - INS.EarthFrame.Position[INS_LONGITUDE];
+    TECS_Resources.Position.Error.X = TECS_Resources.Position.DestinationNEU.X - INS.EarthFrame.Position[INS_LATITUDE];
+    TECS_Resources.Position.Error.Y = TECS_Resources.Position.DestinationNEU.Y - INS.EarthFrame.Position[INS_LONGITUDE];
     TECS_Resources.Position.Target.Distance = sqrtf(SquareFloat(TECS_Resources.Position.Error.X) + SquareFloat(TECS_Resources.Position.Error.Y));
     TECS_Resources.Position.Tracking.Actual = TECS_Resources.Position.Tracking.Period * MAX(TECS_Resources.Position.VelocityXY, 100.0f);
 
@@ -316,8 +316,8 @@ void TecsClass::UpdateEnergyPositionController(float DeltaTime)
     if (TECS_Resources.Position.Circle.Flags.OkToRun)
     {
         TECS_Resources.Position.Circle.Angle = Fast_Atan2(-TECS_Resources.Position.Error.Y, -TECS_Resources.Position.Error.X) + ConvertToRadians(TECS_Resources.Params.CircleDirectionToRight ? 1 : -1 * 45.0f);
-        TECS_Resources.Position.Circle.Target.X = TECS_Resources.Position.TargetCruiseOrCircle.X + TECS_Resources.Params.Circle_Radius * Fast_Cosine(TECS_Resources.Position.Circle.Angle);
-        TECS_Resources.Position.Circle.Target.Y = TECS_Resources.Position.TargetCruiseOrCircle.Y + TECS_Resources.Params.Circle_Radius * Fast_Sine(TECS_Resources.Position.Circle.Angle);
+        TECS_Resources.Position.Circle.Target.X = TECS_Resources.Position.DestinationNEU.X + TECS_Resources.Params.Circle_Radius * Fast_Cosine(TECS_Resources.Position.Circle.Angle);
+        TECS_Resources.Position.Circle.Target.Y = TECS_Resources.Position.DestinationNEU.Y + TECS_Resources.Params.Circle_Radius * Fast_Sine(TECS_Resources.Position.Circle.Angle);
         TECS_Resources.Position.Error.X = TECS_Resources.Position.Circle.Target.X - INS.EarthFrame.Position[INS_LATITUDE];
         TECS_Resources.Position.Error.Y = TECS_Resources.Position.Circle.Target.Y - INS.EarthFrame.Position[INS_LONGITUDE];
         TECS_Resources.Position.Target.Distance = sqrtf(SquareFloat(TECS_Resources.Position.Error.X) + SquareFloat(TECS_Resources.Position.Error.Y));
@@ -326,9 +326,9 @@ void TecsClass::UpdateEnergyPositionController(float DeltaTime)
     TECS_Resources.Position.Virtual.X = INS.EarthFrame.Position[INS_LATITUDE] + TECS_Resources.Position.Error.X * (TECS_Resources.Position.Tracking.Actual / TECS_Resources.Position.Target.Distance);
     TECS_Resources.Position.Virtual.Y = INS.EarthFrame.Position[INS_LONGITUDE] + TECS_Resources.Position.Error.Y * (TECS_Resources.Position.Tracking.Actual / TECS_Resources.Position.Target.Distance);
 
-    if (ABS(RCController[ROLL]) > POS_HOLD_DEADBAND)
+    if (ABS(RC_Resources.Attitude.Controller[ROLL]) > POS_HOLD_DEADBAND)
     {
-        TECS_Resources.Position.PilotManualAddRoll = RCController[ROLL] * TECS_Resources.Params.PilotManualRollSpeed / 500.0f * TECS_Resources.Position.Tracking.Period;
+        TECS_Resources.Position.PilotManualAddRoll = RC_Resources.Attitude.Controller[ROLL] * TECS_Resources.Params.PilotManualRollSpeed / 500.0f * TECS_Resources.Position.Tracking.Period;
         //CONVERTE DE BODY-FRAME PARA EARTH-FRAME
         TECS_Resources.Position.Virtual.X += -TECS_Resources.Position.PilotManualAddRoll * INS.Math.Sine.Yaw;
         TECS_Resources.Position.Virtual.Y += TECS_Resources.Position.PilotManualAddRoll * INS.Math.Cosine.Yaw;
@@ -406,7 +406,7 @@ void TecsClass::Reset_All(void)
     TECS.Reset_PID_Navigation(&TECS_PID_Altitude_Navigation, 10.0f);
     TECS.Reset_PID_Navigation(&TECS_PID_Position_Navigation, 10.0f);
     TECS.Reset_PID_Navigation(&TECS_PID_Heading_Navigation, 2.0f);
-    TECS_Resources.Position.TargetCruiseOrCircle.Clear();
+    TECS_Resources.Position.DestinationNEU.Clear();
     TECS_Resources.Position.Virtual.Clear();
     TECS_Resources.PositionController_Smooth.State = 0.0f;
     TECS_Resources.Throttle.SpeedAdjustment = 0.0f;
@@ -446,9 +446,9 @@ void TecsClass::Update(float DeltaTime)
         return;
     }
 
-    if (ABS(RCController[PITCH]) > ALT_HOLD_DEADBAND)
+    if (ABS(RC_Resources.Attitude.Controller[PITCH]) > ALT_HOLD_DEADBAND)
     {
-        TECS_Resources.Velocity.ClimbRate = -RCController[PITCH] * TECS_Resources.Params.PilotManualClimbDescentRate / (500.0f - ALT_HOLD_DEADBAND);
+        TECS_Resources.Velocity.ClimbRate = -RC_Resources.Attitude.Controller[PITCH] * TECS_Resources.Params.PilotManualClimbDescentRate / (500.0f - ALT_HOLD_DEADBAND);
     }
     else
     {
@@ -479,7 +479,7 @@ void TecsClass::Update(float DeltaTime)
         if (TECS.GetStateToEnableTurnCoordinator())
         {
             //O CONTROLADOR PID VEM DEPOIS DO TECS NO MAIN LOOP,ENTÃO ATIVAR O TURN AQUI FUNCIONA,
-            //O "AUXFLIGHT.cpp" NÃO IRÁ ATRAPALHAR POR QUE ELE ESTÁ EM UM TASK DE 50HZ
+            //O "AUXFLIGHT.cpp" NÃO IRÁ ATRAPALHAR POR QUE ELE ESTÁ EM UMA TASK DE 50HZ
             ENABLE_THIS_FLIGHT_MODE(TURN_MODE);
         }
 
@@ -489,21 +489,21 @@ void TecsClass::Update(float DeltaTime)
             IS_FLIGHT_MODE_ACTIVE_ONCE(RTH_MODE))
         {
             //EM MODO RTH,SE A ALTITUDE DO RTH FOR MENOR DO QUE ALTITUDE ESTIMADA,ESSA VARIAVEL IRÁ GANHAR UM NOVO VALOR NA FUNÇÃO SEGUINTE
-            TECS_Resources.Position.TargetCruiseOrCircle.Altitude = TECS_Resources.Position.Altitude;
+            TECS_Resources.Position.DestinationNEU.Altitude = TECS_Resources.Position.Altitude;
 
             if (GPS_Resources.Mode.Navigation == DO_POSITION_HOLD)
             {
-                TECS_Resources.Position.TargetCruiseOrCircle.X = INS.EarthFrame.Position[INS_LATITUDE];
-                TECS_Resources.Position.TargetCruiseOrCircle.Y = INS.EarthFrame.Position[INS_LONGITUDE];
+                TECS_Resources.Position.DestinationNEU.X = INS.EarthFrame.Position[INS_LATITUDE];
+                TECS_Resources.Position.DestinationNEU.Y = INS.EarthFrame.Position[INS_LONGITUDE];
             }
             else if (GPS_Resources.Mode.Navigation == DO_RTH_ENROUTE)
             {
-                TECS_Resources.Position.TargetCruiseOrCircle.X = TECS_Resources.Position.HomePoint.X;
-                TECS_Resources.Position.TargetCruiseOrCircle.Y = TECS_Resources.Position.HomePoint.Y;
+                TECS_Resources.Position.DestinationNEU.X = TECS_Resources.Position.HomePoint.X;
+                TECS_Resources.Position.DestinationNEU.Y = TECS_Resources.Position.HomePoint.Y;
                 //ADICIONA UM NOVO VALOR DE ALTITUDE
                 if (TECS_Resources.Position.Altitude < ConverMetersToCM(GPS_Resources.Home.Altitude))
                 {
-                    TECS_Resources.Position.TargetCruiseOrCircle.Altitude = ConverMetersToCM(GPS_Resources.Home.Altitude);
+                    TECS_Resources.Position.DestinationNEU.Altitude = ConverMetersToCM(GPS_Resources.Home.Altitude);
                 }
             }
         }
@@ -517,10 +517,10 @@ void TecsClass::Update(float DeltaTime)
                 {
                     if (!GetActualThrottleStatus(THROTTLE_LOW))
                     {
-                        TECS_Resources.Position.TargetCruiseOrCircle.Altitude += TECS_Resources.Velocity.ClimbRate * DeltaTime;
-                        TECS_Resources.Position.TargetCruiseOrCircle.Altitude = Constrain_32Bits(TECS_Resources.Position.TargetCruiseOrCircle.Altitude,
-                                                                                                 TECS_Resources.Position.Altitude - 500,
-                                                                                                 TECS_Resources.Position.Altitude + 500);
+                        TECS_Resources.Position.DestinationNEU.Altitude += TECS_Resources.Velocity.ClimbRate * DeltaTime;
+                        TECS_Resources.Position.DestinationNEU.Altitude = Constrain_32Bits(TECS_Resources.Position.DestinationNEU.Altitude,
+                                                                                           TECS_Resources.Position.Altitude - 500,
+                                                                                           TECS_Resources.Position.Altitude + 500);
                         TECS.UpdateEnergyAltitudeController(DeltaTime);
                     }
                     else
@@ -530,10 +530,10 @@ void TecsClass::Update(float DeltaTime)
                         GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
                         TECS_Resources.Throttle.SpeedAdjustment = 0.0f;
                         //O HOME-POINT COMPARTILHA A MESMA VARIAVEL PARA SETAR UMA NOVA ALTITUDE DE NAVEGAÇÃO,
-                        //ESSE IF SERVE PARA NÃO DEIXAR A ALTITUDE MUDAR EM RTH COM O THROTTLE A NIVEL BAIXO.
+                        //ESSE IF SERVE PARA NÃO DEIXAR A ALTITUDE MUDAR EM RTH COM O THROTTLE A BAIXO NIVEL.
                         if (GPS_Resources.Mode.Navigation == DO_POSITION_HOLD)
                         {
-                            TECS_Resources.Position.TargetCruiseOrCircle.Altitude = TECS_Resources.Position.Altitude;
+                            TECS_Resources.Position.DestinationNEU.Altitude = TECS_Resources.Position.Altitude;
                         }
                     }
                 }
@@ -547,7 +547,7 @@ void TecsClass::Update(float DeltaTime)
             if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE) || IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
             {
                 TECS.UpdateAutoPilotControl(DeltaTime);
-                RCController[YAW] = GPS_Resources.Navigation.AutoPilot.Control.Angle[YAW];
+                RC_Resources.Attitude.Controller[YAW] = GPS_Resources.Navigation.AutoPilot.Control.Angle[YAW];
             }
         }
         else
@@ -559,8 +559,8 @@ void TecsClass::Update(float DeltaTime)
 #ifdef PRINTLN_TECS
     /*
     DEBUG("%.f %.f %.f %.f %.f %.f",
-          TECS_Resources.Position.TargetCruiseOrCircle.X,
-          TECS_Resources.Position.TargetCruiseOrCircle.Y,
+          TECS_Resources.Position.DestinationNEU.X,
+          TECS_Resources.Position.DestinationNEU.Y,
           TECS_Resources.Position.HomePoint.X,
           TECS_Resources.Position.HomePoint.Y,
           INS.EarthFrame.Position[INS_LATITUDE],
@@ -568,7 +568,7 @@ void TecsClass::Update(float DeltaTime)
 */
     /*
     DEBUG("%ld %.2f %.2f ",
-          TECS_Resources.Position.TargetCruiseOrCircle.Altitude,
+          TECS_Resources.Position.DestinationNEU.Altitude,
           TECS_Resources.Position.Virtual.X,
           TECS_Resources.Position.Virtual.Y);
 */

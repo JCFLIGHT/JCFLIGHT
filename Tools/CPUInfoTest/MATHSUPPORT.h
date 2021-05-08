@@ -17,7 +17,10 @@
 
 #ifndef MATHSUPPORT_H_
 #define MATHSUPPORT_H_
-#include "Arduino.h"
+#include "inttypes.h"
+#include "math.h"
+#include "HardwareSerial.h"
+#include "wiring_private.h"
 #define MIN(a, b) \
   __extension__({ __typeof__ (a) _a = (a); \
   __typeof__ (b) _b = (b); \

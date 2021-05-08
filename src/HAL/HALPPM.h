@@ -21,7 +21,7 @@
 class ClassHALPPM
 {
 public:
-  void Initialization();
+  void Initialization(void);
 };
-extern ClassHALPPM HALPPM;
+extern ClassHALPPM HAL_PPM;
 #endif

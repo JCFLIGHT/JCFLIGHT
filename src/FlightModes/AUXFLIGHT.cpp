@@ -95,7 +95,7 @@ bool GetFlightModeState(uint8_t _Channel)
 
   uint8_t ConfiguredChannel = 0;
 
-  for (uint8_t IndexCount = 0; IndexCount < (MAX_AUX_CHANNELS * 3); IndexCount++)
+  for (uint8_t IndexCount = 0; IndexCount <= (MAX_AUX_CHANNELS * 3); IndexCount++)
   {
     if (IndexCount == _Channel)
     {
@@ -143,6 +143,7 @@ bool GetFlightModeState(uint8_t _Channel)
   {
     return DECODE.GetRxChannelOutput(ConfiguredChannel + 3) > MAX_STICKS_PULSE - FLIGHT_MODE_PULSE_OFF_SET;
   }
+
   return false;
 }
 
@@ -168,7 +169,7 @@ void AUXFLIGHTCLASS::FlightModesAuxSelect(void)
   ParachuteControlAux = GetFlightModeState(ParachuteConfig);
 
   ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(STABILIZE_MODE, !AcroControlAux);
-  ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(ALTITUDE_HOLD_MODE, AltitudeHoldControlAux); //TROCAR DE AUTO-THR PARA ALT-HOLD NO GCS
+  ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(ALTITUDE_HOLD_MODE, AltitudeHoldControlAux);
   ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(RTH_MODE, RTHControlAux);
   ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(WAYPOINT_MODE, WayPointControlAux);
 

@@ -20,7 +20,7 @@
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
 extern TPA_Parameters_Struct TPA_Parameters;
-void TPA_Initialization();
+void TPA_Initialization(void);
 float CalculateFixedWingTPAFactor(int16_t Throttle);
 float CalculateMultirotorTPAFactor(int16_t Throttle);
 #endif

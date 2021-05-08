@@ -53,7 +53,7 @@ void BatteryClass::Initialization(void)
 void BatteryClass::Update_Voltage(void)
 {
   Battery.Calced.Voltage = PT1FilterApply3(&BattVoltage_Smooth, (float)(ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_BATTERY_VOLTAGE) * JCF_Param.Batt_Voltage_Factor));
-  BATTERY.Exhausted();
+  BATTERY.Update_Exhausted();
   FailSafe_Do_RTH_With_Low_Batt(Battery.Exhausted.LowPercentPreventArm);
 }
 
@@ -259,7 +259,7 @@ uint32_t BatteryClass::GetWatts(void)
 }
 
 //VALIDA QUE REALMENTE A BATERIA ESTÁ ABAIXO DA CAPACIDADE MINIMA POR 'N' SEGUNDOS
-void BatteryClass::Exhausted(void)
+void BatteryClass::Update_Exhausted(void)
 {
   if (Battery.Calced.Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
   {
@@ -285,4 +285,9 @@ void BatteryClass::Exhausted(void)
   {
     Battery.Exhausted.LowPercentPreventArm = false;
   }
+}
+
+bool BatteryClass::GetExhausted(void)
+{
+  return Battery.Exhausted.LowPercentPreventArm;
 }

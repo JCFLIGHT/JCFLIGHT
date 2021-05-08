@@ -30,7 +30,7 @@
 
 PerformCompassClass COMPASSCALIBRATION;
 
-void PerformCompassClass::Initalization(void)
+void PerformCompassClass::Initialization(void)
 {
     //CARREGA OS OFFSET'S
     Calibration.Magnetometer.OffSet[ROLL] = STORAGEMANAGER.Read_16Bits(MAG_ROLL_OFFSET_ADDR);
@@ -115,7 +115,7 @@ void PerformCompassClass::Update(void)
             STORAGEMANAGER.Write_16Bits(MAG_PITCH_GAIN_ADDR, Calibration.Magnetometer.Gain[PITCH]);
             STORAGEMANAGER.Write_16Bits(MAG_YAW_GAIN_ADDR, Calibration.Magnetometer.Gain[YAW]);
 
-            COMPASSCALIBRATION.Initalization();
+            COMPASSCALIBRATION.Initialization();
 
             Calibration.Magnetometer.Calibrating = false;
             Calibration.Magnetometer.Count = 0;

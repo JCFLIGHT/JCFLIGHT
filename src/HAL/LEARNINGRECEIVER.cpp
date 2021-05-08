@@ -22,17 +22,18 @@
 #include "SBUS/SBUSREAD.h"
 #include "IBUS/IBUSREAD.h"
 #include "Common/ENUM.h"
+#include "PID/RCPID.h"
 
 uint16_t LearningChannelsOfReceiver(uint8_t Channels)
 {
     uint16_t ReceiverData;
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
+    if (RC_Resources.ReceiverTypeEnabled == SBUS_RECEIVER)
     {
-        ReceiverData = SBUSReadChannels[DECODE.RcChannelMap[Channels]];
+        ReceiverData = SBUSReadChannels[DECODE.RadioControlChannelsMap[Channels]];
     }
-    else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER)
+    else if (RC_Resources.ReceiverTypeEnabled == IBUS_RECEIVER)
     {
-        ReceiverData = IBUSReadChannels[DECODE.RcChannelMap[Channels]];
+        ReceiverData = IBUSReadChannels[DECODE.RadioControlChannelsMap[Channels]];
     }
     else
     {
@@ -42,7 +43,7 @@ uint16_t LearningChannelsOfReceiver(uint8_t Channels)
         __asm__ __volatile__("cli" ::
                                  : "memory");
 #endif
-        ReceiverData = DECODE.PPMReadChannels[DECODE.RcChannelMap[Channels]];
+        ReceiverData = DECODE.PPMReadChannels[DECODE.RadioControlChannelsMap[Channels]];
 #ifdef __AVR_ATmega2560__
         SREG = oldSREG;
 #endif

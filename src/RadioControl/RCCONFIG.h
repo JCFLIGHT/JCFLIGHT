@@ -47,7 +47,7 @@ private:
 class RCConfigClass
 {
 public:
-  void Init(void);
+  void Initialization(void);
   void Set_Pulse(void);
   void Update_Channels(void);
 };

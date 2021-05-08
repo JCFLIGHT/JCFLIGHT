@@ -21,7 +21,7 @@
 class DesarmLowThrClass
 {
 public:
-  void Update();
+  void Update(void);
 
 private:
   uint8_t TimerDesarm;

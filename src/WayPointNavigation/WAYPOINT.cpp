@@ -310,9 +310,9 @@ static void WayPointAutoTakeOffUpdate(void)
         WayPointResources.AutoTakeOff.Throttle.Increment = THROTTLE_TAKEOFF_NORMALIZE;
       }
     }
-    WayPointResources.AutoTakeOff.Throttle.Increment = Constrain_16Bits(WayPointResources.AutoTakeOff.Throttle.Increment, AttitudeThrottleMin, AttitudeThrottleMax);
+    WayPointResources.AutoTakeOff.Throttle.Increment = Constrain_16Bits(WayPointResources.AutoTakeOff.Throttle.Increment, RC_Resources.Attitude.ThrottleMin, RC_Resources.Attitude.ThrottleMax);
     DECODE.SetRxChannelInput(THROTTLE, WayPointResources.AutoTakeOff.Throttle.Increment);
-    RCController[THROTTLE] = WayPointResources.AutoTakeOff.Throttle.Increment;
+    RC_Resources.Attitude.Controller[THROTTLE] = WayPointResources.AutoTakeOff.Throttle.Increment;
   }
   else if (GetAirPlaneEnabled())
   {

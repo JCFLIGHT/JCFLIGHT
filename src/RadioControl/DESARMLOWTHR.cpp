@@ -36,7 +36,7 @@
 
 DesarmLowThrClass DESARMLOWTHROTTLE;
 
-bool Check_Throttle()
+static bool Check_Throttle(void)
 {
   if (DECODE.GetRxChannelOutput(THROTTLE) <= THROTTLE_VALUE_MAX)
   {
@@ -45,7 +45,7 @@ bool Check_Throttle()
   return false;
 }
 
-bool Check_Others_Channels()
+static bool Check_Others_Channels(void)
 {
   if ((DECODE.GetRxChannelOutput(YAW) >= YPR_VALUE_MIN && DECODE.GetRxChannelOutput(YAW) <= YPR_VALUE_MAX) &&
       (DECODE.GetRxChannelOutput(PITCH) >= YPR_VALUE_MIN && DECODE.GetRxChannelOutput(PITCH) <= YPR_VALUE_MAX) &&
@@ -70,7 +70,7 @@ void DesarmLowThrClass::Update()
     if (DESARMLOWTHROTTLE.TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
     {
       DISABLE_THIS_STATE(PRIMARY_ARM_DISARM); //DESARMA OS MOTORES
-      BEEPER.Play(BEEPER_DISARMING);     //TOCA A MÚSICA INDICANDO O DESARM
+      BEEPER.Play(BEEPER_DISARMING);          //TOCA A MÚSICA INDICANDO O DESARM
     }
     else if (DESARMLOWTHROTTLE.TimerDesarm > 254)
     {

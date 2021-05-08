@@ -33,6 +33,7 @@ void ClassCompassRotation::Rotate(void)
 
     switch (Rotation)
     {
+
     case ROTATION_NONE:
     case ROTATION_MAX:
         return;

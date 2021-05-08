@@ -43,7 +43,7 @@ GPS_Resources_Struct GPS_Resources;
 #define TIME_TO_INIT_LAND 100 //MS
 #define GPS_PID_NAV_MAX_INTEGRAL 2000.0f
 
-void LoadGPSParameters(void)
+void Load_GPS_Navigation_Params(void)
 {
   GPS_Resources.Home.Altitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
 
@@ -114,7 +114,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       GPS_Resources.Home.Coordinates[COORD_LATITUDE] = GPS_Resources.Navigation.Coordinates.Actual[COORD_LATITUDE];
       GPS_Resources.Home.Coordinates[COORD_LONGITUDE] = GPS_Resources.Navigation.Coordinates.Actual[COORD_LONGITUDE];
       GPS_Calcule_Longitude_Scaling(GPS_Resources.Navigation.Coordinates.Actual[COORD_LATITUDE]);
-      GPS_Resources.Navigation.Bearing.InitalTarget = Attitude.EulerAngles.Yaw;
+      GPS_Resources.Navigation.Bearing.InitialTarget = Attitude.EulerAngles.Yaw;
       GPS_Resources.Home.Marked = true;
     }
   }
@@ -159,7 +159,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       if (GPS_Resources.Home.Distance <= JCF_Param.GPS_RTH_Land)
       {
         GPS_Resources.Mode.Navigation = DO_LAND_INIT;
-        GPS_Resources.Navigation.HeadingHoldTarget = GPS_Resources.Navigation.Bearing.InitalTarget;
+        GPS_Resources.Navigation.HeadingHoldTarget = GPS_Resources.Navigation.Bearing.InitialTarget;
       }
       else if (GetAltitudeReached())
       {
@@ -175,7 +175,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       if ((GPS_Resources.Navigation.Coordinates.Distance <= ConverMetersToCM(JCF_Param.GPS_WP_Radius)) || Point_Reached())
       {
         GPS_Resources.Mode.Navigation = DO_LAND_INIT;
-        GPS_Resources.Navigation.HeadingHoldTarget = GPS_Resources.Navigation.Bearing.InitalTarget;
+        GPS_Resources.Navigation.HeadingHoldTarget = GPS_Resources.Navigation.Bearing.InitialTarget;
       }
       break;
 

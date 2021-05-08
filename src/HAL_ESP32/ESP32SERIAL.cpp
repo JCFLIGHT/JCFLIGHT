@@ -16,38 +16,9 @@
 */
 
 #include "ESP32SERIAL.h"
-#include "StorageManager/EEPROMSTORAGE.h"
-#include "GPS/GPSUBLOX.h"
-#include "BAR/BAR.h"
 #include "Common/ENUM.h"
 
 #if ESP32
-
-void Serial_Initialization()
-{
-    //DEBUG E GCS
-    Serial_Begin(UART_NUMB_0, 115200);
-    //GPS
-    Serial_Begin(UART_NUMB_1, 57600);
-    GPS_SerialInit(57600);
-    //IBUS & SBUS
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == PPM_RECEIVER)
-    {
-        Serial_Begin(UART_NUMB_2, 115200);
-    }
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
-    {
-        //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
-        Serial_Begin(UART_NUMB_2, 100000);
-    }
-    else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER)
-    {
-        //CONFIGURAÇÃO DA UART_NUMB_2 PARA IBUS
-        Serial_Begin(UART_NUMB_2, 115200);
-    }
-    //MATEK3901L0X,SD LOGGER & OSD
-    Serial_Begin(UART_NUMB_3, 115200);
-}
 
 void Serial_UartSendData(uint8_t SerialPort)
 {

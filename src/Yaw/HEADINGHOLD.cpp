@@ -28,6 +28,7 @@
 #include "PID/PIDPARAMS.h"
 #include "GPS/GPSSTATES.h"
 #include "BitArray/BITARRAY.h"
+#include "FrameStatus/FRAMESTATUS.h"
 #include "FastSerial/PRINTF.h"
 
 //DEBUG
@@ -37,12 +38,17 @@
 
 PT1_Filter_Struct HeadingHoldRate_Smooth;
 
-void UpdateStateOfHeadingHold(void)
+void UpdateHeadingHold(void)
 {
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
-    HeadingHoldRate_Smooth.State = 0.0f;                                   //RESETA O FILTRO
-    GPS_Resources.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING HOLD TARGET
+    HeadingHoldRate_Smooth.State = 0.0f;                                   //RESETA O ESTADO DO FILTRO
+    GPS_Resources.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw; //OBTÉM UM NOVO VALOR INICIAL PARA HEADING-HOLD TARGET
+  }
+
+  if (IS_FLIGHT_MODE_ACTIVE_ONCE(HEADING_HOLD_MODE))
+  {
+    GPS_Resources.Navigation.HeadingHoldTarget = Attitude.EulerAngles.Yaw;
   }
 }
 
@@ -53,17 +59,31 @@ bool GetSafeStateOfHeadingHold(void)
     return false;
   }
 
+  //POR ENQUANTO APLICA O HEADING-HOLD APENAS EM MULTIROTORES,POR QUE O PILOTO AUTOMATICO PRECISA DELE,
+  //E TAMBÉM,POR QUE NÃO HÁ MAIS BOX NO GCS PARA O HEADING-HOLD NO MODO AIRPLANE.
+  //POR ENQUANTO EU NÃO VOU ADICIONAR MAIS UM BOX ESPECIALMENTE SÓ PRA ELE.
+  //FUTURAMENTE UM ÚNICO BOX SERÁ ABERTO APENAS PARA O HEADING-HOLD PARA FUNCIONAR COM MULTIROTORES E AIRPLANES.
+  //POR QUE EU NÃO QUERO ADICIONAR POR ENQUANTO UM BOX PARA ESSE MODO NO GCS?POR QUE ESSE É UM MODO DE VOO QUE NENHUM PILOTO USA,
+  //APENAS O PILOTO AUTOMATICO DO SISTEMA QUE O UTILIZA PARA OS MODOS RTH E WAYPOINT PARA FAZER O AJUSTE DO YAW.
+  if (GetAirPlaneEnabled())
+  {
+    return false;
+  }
+
   if (AHRS.CosineTiltAngle() < GPS_Resources.Navigation.HeadingHoldLimit) //NÃO APLICA A CORREÇÃO SE O COSSENO DE Z FOR MAIOR QUE 'N' GRAUS
   {
     return false;
   }
 
-  if (!GPS_Resources.Navigation.AutoPilot.Control.Enabled) //NÃO APLICA A CORREÇÃO SE NENHUM MODO DE VOO POR GPS ESTIVER ATIVO
+  if (GetMultirotorEnabled())
   {
-    return false;
+    if (!GPS_Resources.Navigation.AutoPilot.Control.Enabled) //NÃO APLICA A CORREÇÃO SE NENHUM MODO DE VOO POR GPS ESTIVER ATIVO
+    {
+      return false;
+    }
   }
 
-  if (ABS(RCController[YAW]) != 0) //NÃO APLICA A CORREÇÃO SE O USUARIO MANIPULAR O YAW DO RADIO
+  if (ABS(RC_Resources.Attitude.Controller[YAW]) != 0) //NÃO APLICA A CORREÇÃO SE O USUARIO MANIPULAR O YAW DO RADIO
   {
     return false;
   }

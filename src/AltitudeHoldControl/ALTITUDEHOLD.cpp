@@ -127,7 +127,7 @@ bool ApplyAltitudeHoldControl(void)
         else
         {
           AltitudeHoldController.Flags.Hovering = true;
-          AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
+          AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_POSITION_Z].kP) / 2;
           if (Barometer.INS.Altitude.Estimated > ConverMetersToCM(SAFE_ALTITUDE))
           {
             AltitudeHoldController.Target.Position.Z = Constrain_32Bits(AltitudeHoldController.Target.Position.Z, -250, 250);
@@ -161,7 +161,7 @@ bool ApplyAltitudeHoldControl(void)
           }
           else
           {
-            AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Throttle.Difference - ((AltitudeHoldController.Throttle.Difference > 0) ? AH_Percent_Complete_TakeOff : -AH_Percent_Complete_TakeOff)) * GET_SET[PID_ALTITUDE].kP) / 4;
+            AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Throttle.Difference - ((AltitudeHoldController.Throttle.Difference > 0) ? AH_Percent_Complete_TakeOff : -AH_Percent_Complete_TakeOff)) * GET_SET[PID_POSITION_Z].kP) / 4;
           }
         }
         else
@@ -171,7 +171,7 @@ bool ApplyAltitudeHoldControl(void)
             AltitudeHoldController.Flags.Hovering = true;
             AltitudeHoldController.Target.Altitude = Barometer.INS.Altitude.Estimated;
           }
-          AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_ALTITUDE].kP) / 2;
+          AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Target.Altitude - Barometer.INS.Altitude.Estimated) * GET_SET[PID_POSITION_Z].kP) / 2;
         }
       }
       AltitudeHoldController.Target.Position.Z = Constrain_32Bits(AltitudeHoldController.Target.Position.Z, -350, 350);
@@ -180,13 +180,13 @@ bool ApplyAltitudeHoldControl(void)
       AltitudeHoldController.PID.IntegratorError = Constrain_16Bits((AltitudeHoldController.PID.IntegratorSum / 65536), -250, 250);
       AltitudeHoldController.PID.Control = ((AltitudeHoldController.Target.Velocity.Z * GET_SET[PID_VELOCITY_Z].kP) / 32) + AltitudeHoldController.PID.IntegratorError - (((int32_t)INS.AccelerationEarthFrame_Filtered[INS_VERTICAL_Z] * GET_SET[PID_VELOCITY_Z].kD) / 64);
 
-      RCController[THROTTLE] = Constrain_16Bits(AltitudeHoldController.Throttle.Hovering + AltitudeHoldController.PID.Control, AttitudeThrottleMin + ALT_HOLD_DEADBAND, AttitudeThrottleMax - ALT_HOLD_DEADBAND);
+      RC_Resources.Attitude.Controller[THROTTLE] = Constrain_16Bits(AltitudeHoldController.Throttle.Hovering + AltitudeHoldController.PID.Control, RC_Resources.Attitude.ThrottleMin + ALT_HOLD_DEADBAND, RC_Resources.Attitude.ThrottleMax - ALT_HOLD_DEADBAND);
 
 #ifdef THR_SMOOTH_TEST
 
-      RCController[THROTTLE] = (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RCController[THROTTLE], ALT_HOLD_LPF_CUTOFF, AltitudeHoldControlTimer.ActualTime * 1e-6f);
+      RC_Resources.Attitude.Controller[THROTTLE] = (int16_t)PT1FilterApply(&Smooth_ThrottleHover, RC_Resources.Attitude.Controller[THROTTLE], ALT_HOLD_LPF_CUTOFF, AltitudeHoldControlTimer.ActualTime * 1e-6f);
 
-      DEBUG("RCController[THROTTLE]:%d", RCController[THROTTLE]);
+      DEBUG("RC_Resources.Attitude.Controller[THROTTLE]:%d", RC_Resources.Attitude.Controller[THROTTLE]);
 
 #endif
       return true;

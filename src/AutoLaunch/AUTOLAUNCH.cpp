@@ -170,7 +170,7 @@ void AutoLaunchClass::RCControllerThrottle_Apply_Logic(bool SlowThr)
 {
   if (SlowThr)
   {
-    RCController[THROTTLE] = ThrottleIteration;
+    RC_Resources.Attitude.Controller[THROTTLE] = ThrottleIteration;
     if (SCHEDULERTIME.GetMillis() - ThrottleStart >= MOTOR_SPINUP_TIME)
     {
       if (IgnoreFirstPeak)
@@ -194,7 +194,7 @@ void AutoLaunchClass::RCControllerThrottle_Apply_Logic(bool SlowThr)
     {
       if (IgnoreFirstPeak)
       {
-        RCController[THROTTLE] = AUTO_LAUNCH_THROTTLE_MAX;
+        RC_Resources.Attitude.Controller[THROTTLE] = AUTO_LAUNCH_THROTTLE_MAX;
         BEEPER.Silence();
       }
       else
@@ -205,7 +205,7 @@ void AutoLaunchClass::RCControllerThrottle_Apply_Logic(bool SlowThr)
     }
     else
     {
-      RCController[THROTTLE] = AttitudeThrottleMin; //VAMOS MANTER A VELOCIDADE MINIMA DEFINIDA PELO USUARIO
+      RC_Resources.Attitude.Controller[THROTTLE] = RC_Resources.Attitude.ThrottleMin; //VAMOS MANTER A VELOCIDADE MINIMA DEFINIDA PELO USUARIO
     }
   }
 }
@@ -226,17 +226,17 @@ void AutoLaunchClass::RCControllerYawPitchRoll_Apply_Logic(void)
     if (AUTOLAUNCH.GetStateOfThrottle())
     {
       //PARA PLANES COM RODAS O PITCH INCLINA QUANDO O THROTTLE CHEGAR EM UM DETERMINADO VALOR
-      RCController[ROLL] = 0;
-      RCController[PITCH] = AUTOLAUNCH.CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
-      RCController[YAW] = 0;
+      RC_Resources.Attitude.Controller[ROLL] = 0;
+      RC_Resources.Attitude.Controller[PITCH] = AUTOLAUNCH.CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
+      RC_Resources.Attitude.Controller[YAW] = 0;
     }
   }
   else
   {
     //PARA PLANES SEM RODAS O PITCH FICA SEMPRE INCLINADO
-    RCController[ROLL] = 0;
-    RCController[PITCH] = AUTOLAUNCH.CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
-    RCController[YAW] = 0;
+    RC_Resources.Attitude.Controller[ROLL] = 0;
+    RC_Resources.Attitude.Controller[PITCH] = AUTOLAUNCH.CalculeControllToPitch(-AUTO_LAUNCH_ANGLE, 300);
+    RC_Resources.Attitude.Controller[YAW] = 0;
   }
 }
 

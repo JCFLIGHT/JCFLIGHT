@@ -19,12 +19,14 @@
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
 #include "Common/ENUM.h"
+#include "PID/RCPID.h"
 
 #ifdef __AVR_ATmega2560__
+
 void UART2Mode_Initialization(void)
 {
     DDRA |= (1 << DDD0); //DEFINE A PORTA DIGITAL 22 COMO SAIDA
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) != SBUS_RECEIVER)
+    if (RC_Resources.ReceiverTypeEnabled != SBUS_RECEIVER)
     {
         PORTA |= 1 << 0; //ATIVA OS TRASISTORES DE CORTE E O DE BY-PASS
     }
@@ -35,7 +37,9 @@ void UART2Mode_Initialization(void)
 }
 
 #elif defined __arm__ || defined ESP32
+
 void UART2Mode_Initialization(void)
 {
 }
+
 #endif

@@ -19,7 +19,7 @@
 #define PIDXYZ_H_
 #include "Build/LIBDEPENDENCIES.h"
 #include "Common/STRUCTS.h"
-extern PID_Resources_Struct PIDResources;
+extern PID_Resources_Struct PID_Resources;
 class PIDXYZClass
 {
 public:
@@ -37,6 +37,7 @@ private:
   float ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral);
   float ApplyDerivativeBoostRoll(float ActualGyro, float PrevGyro, float ActualRateTagert, float PrevRateTagert, float DeltaTime);
   float ApplyDerivativeBoostPitch(float ActualGyro, float PrevGyro, float ActualRateTagert, float PrevRateTagert, float DeltaTime);
+  float ApplyDerivativeBoostYaw(float ActualGyro, float PrevGyro, float ActualRateTagert, float PrevRateTagert, float DeltaTime);
   float LevelRoll(float DeltaTime);
   float LevelPitch(float DeltaTime);
   void ApplyMulticopterRateControllerRoll(float DeltaTime);

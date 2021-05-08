@@ -48,11 +48,9 @@ FILE_COMPILE_FOR_SPEED
 //DEBUG
 //#define PRINTLN_MOTORS
 
-float ThrottleScale = 1.0f;
+float ThrottleMixGain = 1.0f;
 
 int16_t MotorControl[8];
-
-int16_t MixerThrottleCommand = 1000;
 
 void ConfigureRegisters(bool Run_Calibrate_ESC)
 {
@@ -186,14 +184,14 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
 
   const uint8_t NumberOfMotors = ProgMemReadByte(&Motors_Count[PlatformTypeEnabled].FrameMotorsCount);
 
-  MixerThrottleCommand = RCController[THROTTLE];
-  MixerThrottleCommand = ((MixerThrottleCommand - AttitudeThrottleMin) * ThrottleScale) + AttitudeThrottleMin;
+  int16_t MixerThrottleController = RC_Resources.Attitude.Controller[THROTTLE];
+  MixerThrottleController = ((MixerThrottleController - RC_Resources.Attitude.ThrottleMin) * ThrottleMixGain) + RC_Resources.Attitude.ThrottleMin;
 
-#ifdef USE_THROTTLE_COMPESATION
+#ifdef USE_THROTTLE_COMPENSATION
 
-  if (STORAGEMANAGER.Read_8Bits(MOTCOMP_STATE_ADDR) > 0)
+  if (STORAGEMANAGER.Read_8Bits(MOT_COMP_STATE_ADDR) > 0)
   {
-    MixerThrottleCommand = MIN(AttitudeThrottleMin + (MixerThrottleCommand - AttitudeThrottleMin) * CalculateThrottleCompensationFactor(DeltaTime), AttitudeThrottleMax);
+    MixerThrottleController = MIN(RC_Resources.Attitude.ThrottleMin + (MixerThrottleController - RC_Resources.Attitude.ThrottleMin) * CalculateThrottleCompensationFactor(DeltaTime), RC_Resources.Attitude.ThrottleMax);
   }
 
 #endif
@@ -202,7 +200,7 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
   Mixing_Update(PlatformTypeEnabled);
 
   //ATUALIZA O THROTTLE CLIPPING
-  Throttle_Clipping_Update(NumberOfMotors, MixerThrottleCommand);
+  Throttle_Clipping_Update(NumberOfMotors, MixerThrottleController);
 
   if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
@@ -210,10 +208,10 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
     {
       for (uint8_t MotorsCount = 0; MotorsCount < NumberOfMotors; MotorsCount++)
       {
-        MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], AttitudeThrottleMin, AttitudeThrottleMax);
+        MotorControl[MotorsCount] = Constrain_16Bits(MotorControl[MotorsCount], RC_Resources.Attitude.ThrottleMin, RC_Resources.Attitude.ThrottleMax);
         if (GetActualThrottleStatus(THROTTLE_LOW))
         {
-          MotorControl[MotorsCount] = AttitudeThrottleMin;
+          MotorControl[MotorsCount] = RC_Resources.Attitude.ThrottleMin;
         }
       }
     }

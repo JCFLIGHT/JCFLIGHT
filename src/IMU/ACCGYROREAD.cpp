@@ -194,31 +194,41 @@ static void AccResolutionDetect(void)
 static uint8_t GetConfiguratedIntenalGyroLPF(void)
 {
   uint8_t RetVal = 0;
-  switch (STORAGEMANAGER.Read_8Bits(GYRO_LPF_ADDR)) //LPF INTERNO DA IMU
+
+  switch (STORAGEMANAGER.Read_8Bits(HW_GYRO_LPF_ADDR)) //LPF INTERNO DA IMU
   {
 
     //"CASE" DE ACORDO COM O COMBOBOX DO GCS
 
   case 0:
-    RetVal = GYRO_LPF_20HZ;
+    RetVal = GYRO_LPF_NONE;
     break;
 
   case 1:
-    RetVal = GYRO_LPF_42HZ;
+    RetVal = GYRO_LPF_10HZ;
     break;
 
   case 2:
-    RetVal = GYRO_LPF_98HZ;
+    RetVal = GYRO_LPF_20HZ;
     break;
 
   case 3:
-    RetVal = GYRO_LPF_188HZ;
+    RetVal = GYRO_LPF_42HZ;
     break;
 
   case 4:
+    RetVal = GYRO_LPF_98HZ;
+    break;
+
+  case 5:
+    RetVal = GYRO_LPF_188HZ;
+    break;
+
+  case 6:
     RetVal = GYRO_LPF_256HZ;
     break;
   }
+
   return RetVal;
 }
 

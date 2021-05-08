@@ -17,7 +17,10 @@
 
 #pragma once
 
-#include "Arduino.h"
+#include "inttypes.h"
+#include "math.h"
+#include "HardwareSerial.h"
+#include "wiring_private.h"
 
 #define SCHEDULER_SET_FREQUENCY(Frequecy, Unidad) (1000000 / (Frequecy))
 #define ACTIVE_THIS_TASK true

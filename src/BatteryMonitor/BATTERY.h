@@ -33,7 +33,8 @@ public:
   float Get_Actual_Current(void);
   void Calculate_Total_Current_In_Mah(void);
   uint32_t GetWatts(void);
-  void Exhausted(void);
+  void Update_Exhausted(void);
+  bool GetExhausted(void);
 
 private:
   uint8_t CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt);

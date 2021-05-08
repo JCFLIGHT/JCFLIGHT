@@ -96,7 +96,7 @@ void CompassReadClass::Initialization(void)
     I2CResources.Found.Compass = true;
   }
 
-  COMPASSCALIBRATION.Initalization();
+  COMPASSCALIBRATION.Initialization();
 }
 
 void CompassReadClass::ReadBufferData(void)

@@ -31,7 +31,13 @@ enum RadioControl_Enum
     AUX5,
     AUX6,
     AUX7,
-    AUX8
+    AUX8,
+    AUX9,
+    AUX10,
+    AUX11,
+    AUX12,
+    AUX13,
+    AUX14
 };
 
 enum Frames_Type_Enum
@@ -52,7 +58,7 @@ enum PID_Params_Enum
     PID_ROLL = 0,
     PID_PITCH,
     PID_YAW,
-    PID_ALTITUDE,
+    PID_POSITION_Z,
     PID_VELOCITY_Z,
     PID_GPS_POSITION,
     PID_GPS_POSITION_RATE,
@@ -67,6 +73,8 @@ enum PID_Params_Enum
     GPS_BANK_MAX,
     MAX_ROLL_LEVEL,
     MAX_PITCH_LEVEL,
+
+    //SEMPRE OS ÚLTIMOS
     PID_UPDATED,
     SIZE_OF_PID_PARAMS
 };
@@ -464,6 +472,7 @@ typedef enum
 #endif
     TASK_INTEGRAL_LOOP,
     TASK_SYSTEM_LOAD,
+
     //TASK COUNT SEMPRE EM ÚLTIMO LUGAR
     TASK_COUNT
 } Tasks_ID_Enum;
@@ -471,7 +480,7 @@ typedef enum
 enum GCS_Message_Type_Enum
 {
     IMU_ERROR = 0,
-    FLIGHT_MODES_ERROR,
+    AUTO_PILOT_MODE_ERROR,
     GPS_ERROR,
     FAIL_SAFE_ERROR,
     GYRO_EEROR,

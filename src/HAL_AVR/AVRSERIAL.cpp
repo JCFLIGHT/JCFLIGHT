@@ -16,9 +16,6 @@
 */
 
 #include "AVRSERIAL.h"
-#include "StorageManager/EEPROMSTORAGE.h"
-#include "GPS/GPSUBLOX.h"
-#include "BAR/BAR.h"
 #include "Common/ENUM.h"
 
 #ifdef __AVR_ATmega2560__
@@ -29,33 +26,6 @@ static volatile uint8_t UARTHeadRX[4];
 static volatile uint8_t UARTHeadTX[4];
 static volatile uint8_t UARTTailRX[4];
 static volatile uint8_t UARTTailTX[4];
-
-void Serial_Initialization()
-{
-    //DEBUG E GCS
-    Serial_Begin(UART_NUMB_0, 115200);
-    //GPS
-    Serial_Begin(UART_NUMB_1, 57600);
-    GPS_SerialInit(57600);
-    //IBUS & SBUS
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == PPM_RECEIVER)
-    {
-        Serial_Begin(UART_NUMB_2, 115200);
-    }
-    if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == SBUS_RECEIVER)
-    {
-        //CONFIGURAÇÃO DA UART_NUMB_2 PARA SBUS
-        Serial_Begin(UART_NUMB_2, 100000);
-        (*(volatile uint8_t *)(0xD2)) |= (1 << 5) | (1 << 3);
-    }
-    else if (STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR) == IBUS_RECEIVER)
-    {
-        //CONFIGURAÇÃO DA UART_NUMB_2 PARA IBUS
-        Serial_Begin(UART_NUMB_2, 115200);
-    }
-    //MATEK3901L0X,SD LOGGER & OSD
-    Serial_Begin(UART_NUMB_3, 115200);
-}
 
 void Serial_Begin(uint8_t SerialPort, uint32_t BaudRate)
 {

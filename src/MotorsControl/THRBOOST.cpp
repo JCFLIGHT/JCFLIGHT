@@ -37,18 +37,18 @@ static int16_t Get_Angle_Boost(int16_t Throttle_Value)
     float AHRS_Angles_Cosine = AHRS.GetCosinePitch() * AHRS.GetCosineRoll();
     AHRS_Angles_Cosine = Constrain_Float(AHRS_Angles_Cosine, 0.5f, 1.0f);
     AHRS_Angles_Cosine = Constrain_Float(9000 - MAX(labs(Attitude.EulerAngles.Roll), labs(Attitude.EulerAngles.Pitch)), 0, 3000) / (3000 * AHRS_Angles_Cosine);
-    return Constrain_Float((float)(Throttle_Value - AttitudeThrottleMin) * AHRS_Angles_Cosine + AttitudeThrottleMin, AttitudeThrottleMin, MAX_STICKS_PULSE);
+    return Constrain_Float((float)(Throttle_Value - RC_Resources.Attitude.ThrottleMin) * AHRS_Angles_Cosine + RC_Resources.Attitude.ThrottleMin, RC_Resources.Attitude.ThrottleMin, MAX_STICKS_PULSE);
 }
 
 static void Set_Throttle_Out(int16_t Throttle_Out, bool _Apply_Angle_Boost)
 {
     if (_Apply_Angle_Boost)
     {
-        RCController[THROTTLE] = Get_Angle_Boost(Throttle_Out);
+        RC_Resources.Attitude.Controller[THROTTLE] = Get_Angle_Boost(Throttle_Out);
     }
     else
     {
-        RCController[THROTTLE] = Throttle_Out;
+        RC_Resources.Attitude.Controller[THROTTLE] = Throttle_Out;
     }
 }
 
@@ -59,8 +59,8 @@ void ApplyThrottleBoost(void)
         return;
     }
     const bool Apply_Angle_Boost = IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE) && GPS_Resources.Navigation.AutoPilot.Control.Enabled;
-    Set_Throttle_Out(RCController[THROTTLE], Apply_Angle_Boost);
+    Set_Throttle_Out(RC_Resources.Attitude.Controller[THROTTLE], Apply_Angle_Boost);
 #ifdef PRINTLN_THR_BOOST
-    DEBUG("RCController[THROTTLE]:%d", RCController[THROTTLE]);
+    DEBUG("RC_Resources.Attitude.Controller[THROTTLE]:%d", RC_Resources.Attitude.Controller[THROTTLE]);
 #endif
 }

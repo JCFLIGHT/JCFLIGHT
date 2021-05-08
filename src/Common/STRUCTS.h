@@ -345,7 +345,7 @@ typedef struct
 
     struct Bearing_Struct
     {
-      int16_t InitalTarget = 0;
+      int16_t InitialTarget = 0;
       int32_t ActualTarget = 0;
       int32_t TargetPrev = 0;
     } Bearing;
@@ -638,7 +638,7 @@ typedef struct
   uint16_t GimbalMaxValue;
   uint8_t Land_Check_Acc;
   uint8_t Land_LPF;
-  float Throttle_Factor;
+  float Throttle_Mix_Gain;
   uint8_t AutoDisarm_Time;
   uint16_t AutoDisarm_Throttle_Min;
   uint16_t AutoDisarm_YPR_Min;
@@ -813,7 +813,7 @@ typedef struct
 
   struct Position_Struct
   {
-    Frame3D_Struct TargetCruiseOrCircle;
+    Frame3D_Struct DestinationNEU;
     Frame3D_Struct Virtual;
     Frame3D_Struct HomePoint;
 
@@ -947,4 +947,33 @@ typedef struct
 
 } TECS_Resources_Struct;
 
+typedef struct
+{
+
+  struct Rate_Struct
+  {
+    uint8_t PitchRoll = 0;
+    uint8_t Yaw = 0;
+  } Rate;
+
+  struct Expo_Struct
+  {
+    uint8_t YawPitchRoll = 0;
+    uint8_t Throttle = 0;
+  } Expo;
+
+  struct Middle_Struct
+  {
+    uint8_t Throttle = 0;
+  } Middle;
+
+  struct Attitude_Struct
+  {
+    int16_t ThrottleMin = 0;
+    int16_t ThrottleMax = 0;
+    int16_t Controller[4] = {0, 0, 0, 0};
+  } Attitude;
+
+  uint8_t ReceiverTypeEnabled = PPM_RECEIVER;
+} RC_Resources_Struct;
 #endif

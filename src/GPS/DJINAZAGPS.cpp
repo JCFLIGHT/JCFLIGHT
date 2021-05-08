@@ -54,12 +54,12 @@ typedef struct
   uint16_t Unused_NDOP;
   uint16_t Unused_EDOP;
   uint8_t Satellites; //48
-  uint8_t Null3;
+  uint8_t Null2;
   uint8_t Fix_Type; //50
-  uint8_t Null4;
+  uint8_t Null3;
   uint8_t Unused_FS; //52
+  uint8_t Null4;
   uint8_t Null5;
-  uint8_t Null6;
   uint8_t Data_Mask; //55
 } Struct_NazaGPS_GPS_Data;
 
@@ -160,7 +160,7 @@ uint16_t HDOPMaxError(uint32_t Value)
   return (Value > 9999) ? 9999 : Value;
 }
 
-static void NazaGPS_Check_Valid_Data()
+static void NazaGPS_Check_Valid_Data(void)
 {
   uint8_t Data_Mask;
   uint8_t Data_Mask_Mag;

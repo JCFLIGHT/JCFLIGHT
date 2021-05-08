@@ -15,7 +15,10 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "Arduino.h"
+#include "inttypes.h"
+#include "math.h"
+#include "HardwareSerial.h"
+#include "wiring_private.h"
 #include "BLACKBOX.h"
 
 /*

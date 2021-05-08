@@ -94,12 +94,12 @@ bool GetSticksStateToDisarm(void)
 
 bool GetSticksInAutoPilotPosition(int16_t AutoPilotValue)
 {
-    return (ABS(RCController[ROLL]) < AutoPilotValue) && (ABS(RCController[PITCH]) < AutoPilotValue);
+    return (ABS(RC_Resources.Attitude.Controller[ROLL]) < AutoPilotValue) && (ABS(RC_Resources.Attitude.Controller[PITCH]) < AutoPilotValue);
 }
 
 bool GetSticksDeflected(int16_t MinDeflectionValue)
 {
-    return (ABS(RCController[ROLL]) > MinDeflectionValue) || (ABS(RCController[PITCH]) > MinDeflectionValue);
+    return (ABS(RC_Resources.Attitude.Controller[ROLL]) > MinDeflectionValue) || (ABS(RC_Resources.Attitude.Controller[PITCH]) > MinDeflectionValue);
 }
 
 bool GetActualThrottleStatus(uint8_t ThrottleStatus)

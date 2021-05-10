@@ -146,9 +146,9 @@ typedef struct
 
 enum WayPointOnce_Enum
 {
-  WAYPOINT_PREDICT_POS_ALT = 0,
-  WAYPOINT_NORMAL_FLIGHT,
-  WAYPOINT_RESET_POS_ALT,
+  WAYPOINT_PREDICT_POS_Z = 0,
+  WAYPOINT_PREDICT_POS_XY,
+  WAYPOINT_RESET_POS_Z,
   SIZE_OF_WAYPOINT_ONCE
 };
 
@@ -222,7 +222,7 @@ typedef struct
 
 } WayPoint_Resources_Struct;
 
-extern WayPoint_Resources_Struct WayPointResources;
+extern WayPoint_Resources_Struct WayPoint_Resources;
 extern _GetWayPointPacketOne GetWayPointPacketOne;
 extern _GetWayPointPacketTwo GetWayPointPacketTwo;
 

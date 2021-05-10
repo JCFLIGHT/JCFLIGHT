@@ -52,22 +52,11 @@ void RC_Config::Set_Range(int16_t Min, int16_t Max)
   RC_Config::_Min_Pulse = Min;
 }
 
-void RC_Config::Set_Filter(bool Filter)
-{
-  RC_Config::_Filter = Filter;
-}
-
 void RC_Config::Set_Pulse(int16_t ChannelInputValue)
 {
-  if (RC_Config::_Filter)
-  {
-    //SMALL FILTERING NOS CANAIS (APENAS UMA MÉDIA ENTRE O VALOR ATUAL E O ANTERIOR)
-    RC_Config::Input = (ChannelInputValue + RC_Config::Input) >> 1;
-  }
-  else //SEM FILTRO
-  {
-    RC_Config::Input = ChannelInputValue;
-  }
+  //SMALL FILTERING NOS CANAIS (APENAS UMA MÉDIA ENTRE O VALOR ATUAL E O ANTERIOR)
+  RC_Config::Input = (ChannelInputValue + RC_Config::Input) >> 1;
+
   if (!RC_Config::_FailSafe)
   {
     RC_Config::_Fail_Safe = false;
@@ -123,7 +112,7 @@ int16_t RC_Config::Get_Channel_Range(void)
   {
     RC_Config::RcConstrain = RC_Config::Max_Pulse - (RC_Config::RcConstrain - RC_Config::Min_Pulse);
   }
-  if ((RC_Config::Input > 1450 + RC_Config::_DeadZone) && (RC_Config::Input < 1550 - RC_Config::_DeadZone) && (RC_Config::_DeadZone > 0))
+  if ((RC_Config::Input >= 1450 + RC_Config::_DeadZone) && (RC_Config::Input <= 1550 - RC_Config::_DeadZone) && (RC_Config::_DeadZone > 0))
   {
     return MIDDLE_STICKS_PULSE;
   }
@@ -172,62 +161,50 @@ void RCConfigClass::Initialization(void)
   //THROTTLE
   Throttle.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Throttle.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(THROTTLE_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ALTITUDE-HOLD)
-  Throttle.Set_Filter(true);
   Throttle.Set_Fail_Safe(true);
   //YAW
   Yaw.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Yaw.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(YAW_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
-  Yaw.Set_Filter(true);
   Yaw.Set_Fail_Safe(false);
   //PITCH
   Pitch.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Pitch.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(PITCH_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
-  Pitch.Set_Filter(true);
   Pitch.Set_Fail_Safe(false);
   //ROLL
   Roll.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   Roll.Set_Dead_Zone(STORAGEMANAGER.Read_8Bits(ROLL_DZ_ADDR)); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (ATTITUDE)
-  Roll.Set_Filter(true);
   Roll.Set_Fail_Safe(false);
   //AUX1
   AuxiliarOne.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarOne.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarOne.Set_Filter(true);
   AuxiliarOne.Set_Fail_Safe(false);
   //AUX2
   AuxiliarTwo.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarTwo.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarTwo.Set_Filter(true);
   AuxiliarTwo.Set_Fail_Safe(false);
   //AUX3
   AuxiliarThree.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarThree.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarThree.Set_Filter(true);
   AuxiliarThree.Set_Fail_Safe(false);
   //AUX4
   AuxiliarFour.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarFour.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarFour.Set_Filter(true);
   AuxiliarFour.Set_Fail_Safe(false);
   //AUX5
   AuxiliarFive.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarFive.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarFive.Set_Filter(true);
   AuxiliarFive.Set_Fail_Safe(false);
   //AUX6
   AuxiliarSix.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarSix.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarSix.Set_Filter(true);
   AuxiliarSix.Set_Fail_Safe(false);
   //AUX7
   AuxiliarSeven.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarSeven.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarSeven.Set_Filter(true);
   AuxiliarSeven.Set_Fail_Safe(false);
   //AUX8
   AuxiliarEight.Set_Range(MIN_STICKS_PULSE, MAX_STICKS_PULSE);
   AuxiliarEight.Set_Dead_Zone(45); //0...50 - ZONA MORTA NO PONTO MEDIO >> 45 = VALORES ENTRE 1495 E 1505 SÃO CONSIDERADOS 1500 (PERFORMANCE)
-  AuxiliarEight.Set_Filter(true);
   AuxiliarEight.Set_Fail_Safe(false);
   //FAZ AS PRIMEIRAS LEITURAS DOS CANAIS PARA A CALIBRAÇÃO DOS ESC'S
   //CORRE AS FUNÇÕES 100 VEZES PARA OBTER OS VALORES ATUAIS DOS CANAIS DO RADIO

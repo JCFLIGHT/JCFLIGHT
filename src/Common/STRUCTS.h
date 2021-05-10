@@ -806,6 +806,7 @@ typedef struct
 typedef struct
 {
   Scheduler_Struct Scheduler;
+  Scheduler_Struct YawScheduler;
 
   PT1_Filter_Struct PitchToThrottle_Smooth;
   PT1_Filter_Struct PositionController_Smooth;
@@ -975,5 +976,6 @@ typedef struct
   } Attitude;
 
   uint8_t ReceiverTypeEnabled = PPM_RECEIVER;
+  uint8_t ReceiverSequency = 0;
 } RC_Resources_Struct;
 #endif

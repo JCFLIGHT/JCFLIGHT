@@ -47,7 +47,6 @@ void Medium_Loop()
         WINDESTIMATOR.Update();
         BATTERY.Update_Voltage();
         BATTERY.Update_Current();
-        PRINTF.ParamsToConsole();
 }
 
 void Fast_Medium_Loop()

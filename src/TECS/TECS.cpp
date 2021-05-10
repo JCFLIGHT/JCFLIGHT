@@ -310,8 +310,7 @@ void TecsClass::UpdateEnergyPositionController(float DeltaTime)
     TECS_Resources.Position.Tracking.Actual = TECS_Resources.Position.Tracking.Period * MAX(TECS_Resources.Position.VelocityXY, 100.0f);
 
     TECS_Resources.Position.Circle.Flags.OkToRun = (TECS_Resources.Position.Target.Distance <= (TECS_Resources.Params.Circle_Radius / 0.26795f)) &&
-                                                   (TECS_Resources.Position.Target.Distance > 50.0f) &&
-                                                   !IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE);
+                                                   (TECS_Resources.Position.Target.Distance > 50.0f) && !IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE);
 
     if (TECS_Resources.Position.Circle.Flags.OkToRun)
     {
@@ -354,8 +353,7 @@ void TecsClass::UpdateEnergyPositionController(float DeltaTime)
         TECS_Resources.Heading.Error = TECS_Resources.Params.CircleDirectionToRight ? 1 : -1 * ABS(TECS_Resources.Heading.Error);
     }
 
-    static Scheduler_Struct HeadingTimer;
-    if (Scheduler(&HeadingTimer, SCHEDULER_SET_FREQUENCY(2, "Hz")))
+    if (Scheduler(&TECS_Resources.YawScheduler, SCHEDULER_SET_FREQUENCY(2, "Hz")))
     {
         TECS_Resources.Heading.Flags.ErrorTrasborded = (ABS(TECS_Resources.Heading.PreviousError) > ABS(TECS_Resources.Heading.Error));
         TECS_Resources.Heading.PreviousError = TECS_Resources.Heading.Error;

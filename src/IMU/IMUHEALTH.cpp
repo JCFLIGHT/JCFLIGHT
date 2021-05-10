@@ -23,9 +23,12 @@
 
 void UpdateIMUCalibration(void)
 {
+  //CARREGA OS OFFSET'S
   Calibration.Accelerometer.OffSet[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_OFFSET_ADDR);
   Calibration.Accelerometer.OffSet[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_OFFSET_ADDR);
   Calibration.Accelerometer.OffSet[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_OFFSET_ADDR);
+
+  //CARREGA AS ESCALAS
   Calibration.Accelerometer.Scale[ROLL] = STORAGEMANAGER.Read_16Bits(ACC_ROLL_SCALE_ADDR);
   Calibration.Accelerometer.Scale[PITCH] = STORAGEMANAGER.Read_16Bits(ACC_PITCH_SCALE_ADDR);
   Calibration.Accelerometer.Scale[YAW] = STORAGEMANAGER.Read_16Bits(ACC_YAW_SCALE_ADDR);
@@ -37,10 +40,12 @@ void SaveIMUCalibration(void)
   STORAGEMANAGER.Write_16Bits(ACC_ROLL_OFFSET_ADDR, Calibration.Accelerometer.OffSet[ROLL]);
   STORAGEMANAGER.Write_16Bits(ACC_PITCH_OFFSET_ADDR, Calibration.Accelerometer.OffSet[PITCH]);
   STORAGEMANAGER.Write_16Bits(ACC_YAW_OFFSET_ADDR, Calibration.Accelerometer.OffSet[YAW]);
+
   //ESCALA
   STORAGEMANAGER.Write_16Bits(ACC_ROLL_SCALE_ADDR, Calibration.Accelerometer.Scale[ROLL]);
   STORAGEMANAGER.Write_16Bits(ACC_PITCH_SCALE_ADDR, Calibration.Accelerometer.Scale[PITCH]);
   STORAGEMANAGER.Write_16Bits(ACC_YAW_SCALE_ADDR, Calibration.Accelerometer.Scale[YAW]);
+
   //ATUALIZA PARA OS NOVOS VALORES
   UpdateIMUCalibration();
 }

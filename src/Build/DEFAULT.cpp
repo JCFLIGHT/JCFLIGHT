@@ -22,7 +22,6 @@
 #include "BOARDDEFS.h"
 #include "Param/PARAM.h"
 #include "FastSerial/PRINTF.h"
-#include "Build/GENERALSETTINGS.h"
 #include "WayPointNavigation/WAYPOINT.h"
 #ifdef ESP32
 #include "EEPROM.h"
@@ -89,5 +88,4 @@ void FirmwareOrganizeAllParams(void)
         LOG("Ok...Parametros reconfigurados!");
         LINE_SPACE;
     }
-    GeneralSettingsInitialization();
 }

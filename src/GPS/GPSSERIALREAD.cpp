@@ -21,7 +21,7 @@
 #include "GPS/GPSUBLOX.h"
 #include "Common/ENUM.h"
 
-void GPS_Serial_Read()
+void GPS_Serial_Read(void)
 {
     uint8_t SerialAvailableGPS;
     uint8_t SerialReadGPS;

@@ -204,7 +204,7 @@ void UpdateValuesOfPID(void)
         return;
     }
 
-    const uint8_t ActualFrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR);
+    const uint8_t ActualFrameType = STORAGEMANAGER.Read_8Bits(FRAME_TYPE_ADDR);
     static uint8_t PreviousFrameType = ActualFrameType;
 
     //RECONFIGURA TODO O PID SE O FRAME SELECIONADO FOR DIFERENTE DO ANTERIOR

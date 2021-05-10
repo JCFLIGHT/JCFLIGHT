@@ -21,7 +21,7 @@
 class Fast_Serial
 {
 public:
-  void Initialization();
+  void Initialization(void);
   void Begin(uint8_t SerialPort, uint32_t BaudRate);
   uint8_t Read(uint8_t SerialPort);
   void Write(uint8_t SerialPort, uint8_t WriteData);

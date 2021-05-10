@@ -24,8 +24,14 @@ void MachineInit(void)
 {
     //CHECA SE É A PRIMEIRA VEZ QUE O FIRMWARE FOI CARREGADO
     FirmwareOrganizeAllParams();
-    //INICIALIZA A SERIAL
+    //INICIALIZA A LISTA DE PARAMETROS
+    PARAM.Initialization();
+    //INICIALIZA TODAS AS SERIAIS
     FASTSERIAL.Initialization();
+    //INICIALIZA AS CONFIGURAÇÕES GERAIS DO RC
+    DECODE.Initialization();
+    //INICIALIZA AS CONFIGURAÇÕES DOS MODOS DE VOO
+    AUXFLIGHT.Initialization();
     //INICIALIZA O LED RGB
     RGB.Initialization();
     //INICIALIZA O AHRS
@@ -38,10 +44,22 @@ void MachineInit(void)
     I2C.All_Initialization();
     //INICIALIZA AS CONFIGURAÇÕES DOS PINOS IO
     ConfigureRegisters(false);
+    //INCIALIZA O PID
+    PIDXYZ.Initialization();
     //INICIALIZA O TECS
     TECS.Initialization();
     //INICIALIZA O WAYPOINT
     WAYPOINT.Initialization();
+    //INICIALIZA O SISTEMA DE MONITORAMENTO DA BATERIA
+    BATTERY.Initialization();
+    //INICIALIZA AS CONFIGURAÇÕES DOS SERVOS
+    SERVOSMASTER.Initialization();
+    //INICIALIZA AS CONFIGURAÇÕES DO TUBO DE PITOT
+    AIRSPEED.Initialization();
+    //INICIALIZA O BOTÃO DE SEGURANÇA
+    SAFETYBUTTON.Initialization();
+    //CARREGA TODAS AS CONFIGURAÇÕES DO SISTEMA PARA ENVIAR PARA O GCS
+    GCS.LoadAllParameters();
     //INICIA O SISTEMA DE TASKS
     TaskSystemInitialization();
 }

@@ -189,6 +189,7 @@ bool ApplyAltitudeHoldControl(void)
       DEBUG("RC_Resources.Attitude.Controller[THROTTLE]:%d", RC_Resources.Attitude.Controller[THROTTLE]);
 
 #endif
+
       return true;
     }
     else

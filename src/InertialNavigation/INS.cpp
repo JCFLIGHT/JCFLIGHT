@@ -119,7 +119,7 @@ void InertialNavigationClass::Calculate_AccelerationXYZ_To_EarthFrame(void)
 
   //INS.EarthFrame.AccelerationNEU[NORTH] -> POSITIVO MOVENDO PARA O NORTE
   //INS.EarthFrame.AccelerationNEU[EAST]  -> POSITIVO MOVENDO PARA O OESTE
-  //INS.EarthFrame.AccelerationNEU[UP]  -> POSITIVO MOVENDO PARA CIMA
+  //INS.EarthFrame.AccelerationNEU[UP]    -> POSITIVO MOVENDO PARA CIMA
 
   DEBUG("NORTH:%.4f EAST:%.4f UP:%.4f",
         INS.EarthFrame.AccelerationNEU[NORTH],

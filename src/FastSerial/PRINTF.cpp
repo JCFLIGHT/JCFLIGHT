@@ -101,17 +101,6 @@ void SerialPrint::SendToConsole(const char *fmt, ...)
   }
 }
 
-//#define PRINTLN_RADIO
-//#define PRINTLN_GPS
-//#define PRINTLN_ATTITUDE
-//#define PRINTLN_BATTERY
-//#define PRINTLN_ALLSENSORS
-//#define PRINTLN_BARO
-//#define PRINTLN_MEMORY
-//#define PRINTLN_IMU
-//#define PRINTLN_COMPASS
-//#define PRINTLN_ATTITUDERC
-
 /*
    COMANDOS PARA TAMANHOS DE VARIAVEIS:
    %0.f >> float (0.000000000000...)
@@ -120,68 +109,6 @@ void SerialPrint::SendToConsole(const char *fmt, ...)
    %d   >> int16_t
    %ld  >> int32_t
 */
-
-void SerialPrint::ParamsToConsole()
-{
-#if defined(PRINTLN_RADIO)
-  PRINTF.SendToConsole(ProgramMemoryString("Throttle:%u Yaw:%u Pitch:%u Roll:%u Aux1:%u Aux2:%u Aux3:%u Aux4:%u Aux5:%u Aux6:%u Aux7:%u Aux8:%u\n"),
-                       Throttle.Output, Yaw.Output, Pitch.Output, Roll.Output,
-                       AuxiliarOne.Output, AuxiliarTwo.Output, AuxiliarThree.Output, AuxiliarFour.Output,
-                       AuxiliarFive.Output, AuxiliarSix.Output, AuxiliarSeven.Output, AuxiliarEight.Output);
-#endif
-
-#if defined(PRINTLN_GPS)
-  PRINTF.SendToConsole(ProgramMemoryString("NúmSat:%u Latitude:%ld Longitude:%ld Declinação:%.2f EEPROM:%.2f HDOP:%.2f\n"),
-                       GPS_Resources.Navigation.Misc.Get.Satellites, GPS_Resources.Navigation.Coordinates.Actual[COORD_LATITUDE], GPS_Resources.Navigation.Coordinates.Actual[COORD_LONGITUDE],
-                       Declination(), STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR),
-                       (float)GPS_Resources.Navigation.Misc.Get.HDOP / 100);
-#endif
-
-#if defined(PRINTLN_ATTITUDE)
-  PRINTF.SendToConsole(ProgramMemoryString("Pitch:%d Roll:%d Yaw:%d\n"),
-                       Attitude.EulerAngles.Pitch, Attitude.EulerAngles.Roll, Attitude.EulerAngles.Yaw);
-#endif
-
-#if defined(PRINTLN_BATTERY)
-  PRINTF.SendToConsole(ProgramMemoryString("Tensão:%.2f Porcentagem:%u Corrente:%.2f TotalCurrentInMah:%.2f Watts:%u\n"),
-                       BATTERY.Get_Actual_Voltage(), BATTERY.GetPercentage(), BATTERY.Get_Actual_Current(), BATTERY.Get_Current_In_Mah(), BATTERY.GetWatts());
-#endif
-
-#if defined(PRINTLN_ALLSENSORS)
-  PRINTF.SendToConsole(ProgramMemoryString("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d Mx:%d My:%d Mz:%d Baro:%ld\n"),
-                       IMU.Accelerometer.Read[ROLL], IMU.Accelerometer.Read[PITCH], IMU.Accelerometer.Read[YAW], IMU.Gyroscope.Read[ROLL], IMU.Gyroscope.Read[PITCH], IMU.Gyroscope.Read[YAW],
-                       IMU.CompassRead[ROLL], IMU.CompassRead[PITCH], IMU.CompassRead[YAW], Barometer.Altitude.Actual);
-#endif
-
-#if defined(PRINTLN_IMU)
-  PRINTF.SendToConsole(ProgramMemoryString("Ax:%d Ay:%d Az:%d Gx:%d Gy:%d Gz:%d\n"),
-                       IMU.Accelerometer.Read[ROLL], IMU.Accelerometer.Read[PITCH], IMU.Accelerometer.Read[YAW],
-                       IMU.Gyroscope.Read[ROLL], IMU.Gyroscope.Read[PITCH], IMU.Gyroscope.Read[YAW]);
-#endif
-
-#if defined(PRINTLN_COMPASS)
-  PRINTF.SendToConsole(ProgramMemoryString("Pitch:%d Roll:%d Yaw:%d Rotation:%d Orientation:%d\n"),
-                       IMU.CompassRead[PITCH], IMU.CompassRead[ROLL], IMU.CompassRead[YAW], STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR), STORAGEMANAGER.Read_8Bits(COMPASS_TYPE_ADDR));
-#endif
-
-#if defined(PRINTLN_BARO)
-  PRINTF.SendToConsole(ProgramMemoryString("BaroFiltered:%ld INSBaro:%ld\n"),
-                       Barometer.Altitude.Actual, Barometer.INS.Altitude.Estimated);
-#endif
-
-#if defined(PRINTLN_MEMORY)
-  PRINTF.SendToConsole(ProgramMemoryString("Memoria RAM Livre:%ld Memoria RAM Usada em Porcentagem:%d\n"),
-                       MEMORY.Check(), MEMORY.GetPercentageRAMUsed());
-#endif
-
-#if defined(PRINTLN_ATTITUDERC)
-  PRINTF.SendToConsole(ProgramMemoryString("Thr:%d Yaw:%d Pitch:%d Roll:%d\n"),
-                       RC_Resources.Attitude.Controller[THROTTLE],
-                       RC_Resources.Attitude.Controller[YAW],
-                       RC_Resources.Attitude.Controller[PITCH],
-                       RC_Resources.Attitude.Controller[ROLL]);
-#endif
-}
 
 void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap)
 {
@@ -673,40 +600,6 @@ void SerialPrint::SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc
 
 #endif
 
-#if defined(__arm__) || defined(ESP32)
-
-void SerialPrint::SendToConsole()
-{
-}
-
-void SerialPrint::SerialPrintF()
-{
-}
-
-void SerialPrint::ParamsToConsole()
-{
-
-  /*
-  Serial.print(IMU.Accelerometer.Read[PITCH]);
-  Serial.print("  ");
-  Serial.print(IMU.Accelerometer.Read[ROLL]);
-  Serial.print("  ");
-  Serial.println(IMU.Accelerometer.Read[YAW]);
-  */
-
-  /*
-  Serial.print(Attitude.EulerAngles.Roll);
-  Serial.print("  ");
-  Serial.print(Attitude.EulerAngles.Pitch);
-  Serial.print("  ");
-  Serial.println(Attitude.EulerAngles.Yaw);
-  */
-
-  //Serial.println(STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR));
-}
-
-#endif
-
 typedef void (*putcf)(void *, char);
 static putcf stdout_putf;
 static void *stdout_putp;
@@ -911,7 +804,7 @@ void init_printf(void *putp, void (*putf)(void *, char))
   stdout_putp = putp;
 }
 
-void SerialPrint::Initialization()
+void SerialPrint::Initialization(void)
 {
 #ifndef __AVR_ATmega2560__
   init_printf(NULL, _putc);

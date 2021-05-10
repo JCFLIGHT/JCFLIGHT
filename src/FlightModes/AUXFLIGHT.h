@@ -41,7 +41,6 @@ extern uint8_t GPSHoldConfig,
     AutoFlipConfig,
     WayPointConfig,
     FlightMode,
-    ReceiverModel,
     ArmDisarmConfig,
     AutoLandConfig,
     ParachuteConfig;

@@ -24,7 +24,7 @@ public:
   bool ConfigFlight = false;
   bool CliMode = false;
   void Serial_Parse_Protocol(void);
-  void UpdateParametersToGCS(void);
+  void LoadAllParameters(void);
   void Send_String_To_GCS(const char *String);
   void Default_All_Configs(void);
 

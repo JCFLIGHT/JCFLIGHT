@@ -45,12 +45,12 @@ void Simple_Mode_Update()
     RC_Resources.Attitude.Controller[PITCH] = CalcedRCControllerPITCH;
   }
 #ifdef PRINTLN_SIMPLE_MODE
-  PRINTF.SendToConsole(ProgramMemoryString("RC_Resources.Attitude.Controller[ROLL]:%d RC_Resources.Attitude.Controller[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f\n"),
-                       RC_Resources.Attitude.Controller[ROLL],
-                       RC_Resources.Attitude.Controller[PITCH],
-                       CalcedRCControllerPITCH,
-                       HeadingDifference,
-                       CosineDifference,
-                       SineDifference);
+  DEBUG("RC_Resources.Attitude.Controller[ROLL]:%d RC_Resources.Attitude.Controller[PITCH]:%d CalcedRCControllerPITCH:%d HeadingDiff:%.3f CosineDiff:%.3f SineDiff:%.3f",
+        RC_Resources.Attitude.Controller[ROLL],
+        RC_Resources.Attitude.Controller[PITCH],
+        CalcedRCControllerPITCH,
+        HeadingDifference,
+        CosineDifference,
+        SineDifference);
 #endif
 }

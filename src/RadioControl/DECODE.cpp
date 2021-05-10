@@ -28,21 +28,26 @@
 #include "ParamsToGCS/CHECKSUM.h"
 #include "BitArray/BITARRAY.h"
 #include "PID/RCPID.h"
+#include "RadioControl/CURVESRC.h"
+#include "PID/TPA.h"
+#include "FastSerial/UART2MODE.h"
+#include "RadioControl/RCCONFIG.h"
+#include "RadioControl/RCSMOOTH.h"
 
 DecodeClass DECODE;
 
 void DecodeClass::Initialization(void)
 {
   RC_Resources.ReceiverTypeEnabled = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
+  RC_Resources.ReceiverSequency = STORAGEMANAGER.Read_8Bits(RC_SEQUENCY_ADDR);
 
   if (RC_Resources.ReceiverTypeEnabled == PPM_RECEIVER)
   {
     HAL_PPM.Initialization();
   }
 
-  //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
   //CANAIS FUNDAMENTAIS
-  if (ReceiverModel <= 7)
+  if (RC_Resources.ReceiverSequency == 0) //FlySky FS-i6, FlySky FS-i6s, FlySky FS-i6x, FlySky FS-iA10B, TGY-I6(OU TGY-I6 OU FS-i6 ATUALIZADO PARA 10 CANAIS)
   {
     DECODE.RadioControlChannelsMap[0] = ROLL;
     DECODE.RadioControlChannelsMap[1] = PITCH;
@@ -62,6 +67,14 @@ void DecodeClass::Initialization(void)
   {
     DECODE.RadioControlChannelsMap[IndexCount] = IndexCount;
   }
+
+  CurvesRC_SetValues();
+  TPA_Initialization();
+  CurvesRC_CalculeValue();
+  UART2Mode_Initialization();
+  RCCONFIG.Initialization();
+  CHECKSUM.UpdateChannelsReverse();
+  RCInterpolationInit();
 }
 
 void DecodeClass::Update(void)

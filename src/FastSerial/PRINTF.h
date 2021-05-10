@@ -28,28 +28,18 @@ extern "C"
 class SerialPrint
 {
 public:
-  void Initialization();
+  void Initialization(void);
   void tfp_printf(char *fmt, ...);
 
-  void ParamsToConsole();
-
-#ifndef __AVR_ATmega2560__
-
-  void SendToConsole();
-
-#else
+#ifdef __AVR_ATmega2560__
 
   void SendToConsole(const char *fmt, ...);
 
 #endif
 
+#ifdef __AVR_ATmega2560__
+
 private:
-#ifndef __AVR_ATmega2560__
-
-  void SerialPrintF();
-
-#else
-
   void SerialPrintF(unsigned char in_progmem, const char *fmt, __gnuc_va_list ap);
 
 #endif

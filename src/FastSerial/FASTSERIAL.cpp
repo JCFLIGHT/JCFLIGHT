@@ -21,7 +21,7 @@
 
 Fast_Serial FASTSERIAL;
 
-void Fast_Serial::Initialization()
+void Fast_Serial::Initialization(void)
 {
   HAL_SERIAL.Initialization();
   PRINTF.Initialization();

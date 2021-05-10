@@ -155,7 +155,7 @@ struct _Essential_Second_Packet_Parameters
 struct _Send_User_Basic_Parameters
 {
     uint8_t SendFrameType;
-    uint8_t SendReceiverType;
+    uint8_t SendRcChSequency;
     uint8_t SendGimbalType;
     uint8_t SendParachuteType;
     uint8_t SendSPIType;
@@ -181,7 +181,7 @@ struct _Send_User_Basic_Parameters
 struct _Get_User_Basic_Parameters
 {
     uint8_t GetFrameType;
-    uint8_t GetReceiverType;
+    uint8_t GetRcChSequency;
     uint8_t GetGimbalType;
     uint8_t GetParachuteType;
     uint8_t GetSPIType;
@@ -691,7 +691,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         break;
 
     case 3:
-        WayPointResources.Storage.Function = WAYPOINT_STORAGE_RESET;
+        WayPoint_Resources.Storage.Function = WAYPOINT_STORAGE_RESET;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
@@ -699,7 +699,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         break;
 
     case 4:
-        WayPointResources.Storage.Function = WAYPOINT_STORAGE_SAVE;
+        WayPoint_Resources.Storage.Function = WAYPOINT_STORAGE_SAVE;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         Communication_Passed(false, 0);
         Send_Data_To_GCS(SerialCheckSum);
@@ -903,12 +903,12 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
     {
 
     case 3:
-        WayPointResources.Storage.Function = WAYPOINT_STORAGE_RESET;
+        WayPoint_Resources.Storage.Function = WAYPOINT_STORAGE_RESET;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         break;
 
     case 4:
-        WayPointResources.Storage.Function = WAYPOINT_STORAGE_SAVE;
+        WayPoint_Resources.Storage.Function = WAYPOINT_STORAGE_SAVE;
         BEEPER.Play(BEEPER_ACTION_SUCCESS);
         break;
 
@@ -982,7 +982,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         OutputVectorCount = 0;
         Communication_Passed(false, (sizeof(uint8_t) * 22)); //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendFrameType, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Basic_Parameters.SendReceiverType, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendRcChSequency, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendGimbalType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendParachuteType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendSPIType, VAR_8BITS);
@@ -1425,8 +1425,8 @@ void GCSClass::WayPoint_Request_Misc_Parameters(void)
 
 void GCSClass::Save_Basic_Configuration(void)
 {
-    STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, Get_User_Basic_Parameters.GetFrameType);
-    STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, Get_User_Basic_Parameters.GetReceiverType);
+    STORAGEMANAGER.Write_8Bits(FRAME_TYPE_ADDR, Get_User_Basic_Parameters.GetFrameType);
+    STORAGEMANAGER.Write_8Bits(RC_SEQUENCY_ADDR, Get_User_Basic_Parameters.GetRcChSequency);
     STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, Get_User_Basic_Parameters.GetGimbalType);
     STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, Get_User_Basic_Parameters.GetParachuteType);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, Get_User_Basic_Parameters.GetUartNumb1Type);
@@ -1561,8 +1561,8 @@ void GCSClass::Default_Basic_Configuration(void)
     STORAGEMANAGER.Write_8Bits(RTH_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(FRAMETYPE_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(RECEIVER_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(FRAME_TYPE_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(RC_SEQUENCY_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, 0);
@@ -1670,11 +1670,11 @@ void GCSClass::Default_All_Configs(void)
     GCS.Default_RadioControl_Configuration();
 }
 
-void GCSClass::UpdateParametersToGCS(void)
+void GCSClass::LoadAllParameters(void)
 {
     //ATUALIZA OS PARAMETROS BASICOS AJUSTAVEIS PELO USUARIO
-    Send_User_Basic_Parameters.SendFrameType = STORAGEMANAGER.Read_8Bits(FRAMETYPE_ADDR);
-    Send_User_Basic_Parameters.SendReceiverType = STORAGEMANAGER.Read_8Bits(RECEIVER_ADDR);
+    Send_User_Basic_Parameters.SendFrameType = STORAGEMANAGER.Read_8Bits(FRAME_TYPE_ADDR);
+    Send_User_Basic_Parameters.SendRcChSequency = STORAGEMANAGER.Read_8Bits(RC_SEQUENCY_ADDR);
     Send_User_Basic_Parameters.SendGimbalType = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);
     Send_User_Basic_Parameters.SendParachuteType = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR);
     Send_User_Basic_Parameters.SendUartNumb1Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);

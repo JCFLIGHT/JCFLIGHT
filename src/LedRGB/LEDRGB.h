@@ -21,8 +21,8 @@
 class LEDRGB
 {
 public:
-  void Initialization();
-  void Update();
+  void Initialization(void);
+  void Update(void);
   void Function(uint8_t Mode);
   void Off_All_Leds(void);
 

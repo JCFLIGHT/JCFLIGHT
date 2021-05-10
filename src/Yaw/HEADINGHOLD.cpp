@@ -83,7 +83,7 @@ bool GetSafeStateOfHeadingHold(void)
     }
   }
 
-  if (ABS(RC_Resources.Attitude.Controller[YAW]) != 0) //NÃO APLICA A CORREÇÃO SE O USUARIO MANIPULAR O YAW DO RADIO
+  if (ABS(RC_Resources.Attitude.Controller[YAW]) != 0) //NÃO APLICA A CORREÇÃO SE O YAW DO RADIO FOR MANIPULADO
   {
     return false;
   }
@@ -126,9 +126,9 @@ float GetHeadingHoldValue(float DeltaTime)
 #endif
 
 #ifdef PRINTLN_HEADING_HOLD
-  PRINTF.SendToConsole(ProgramMemoryString("HHR:%.2f HHRF:%.2f\n"),
-                       HeadingHoldRateNF,
-                       HeadingHoldRate);
+  DEBUG("HHR:%.2f HHRF:%.2f",
+        HeadingHoldRateNF,
+        HeadingHoldRate);
 #endif
 
   //APLICA O CONTROLE DO YAW

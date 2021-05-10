@@ -110,6 +110,7 @@ float ErrorGyroIntegralLimit[3];
 
 void PIDXYZClass::Initialization(void)
 {
+  Load_All_PID_Params();
   PitchLevelTrim = STORAGEMANAGER.Read_16Bits(PITCH_LEVEL_TRIM_ADDR);
   PID_Resources.Filter.DerivativeCutOff = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
   PID_Resources.Filter.IntegralRelaxCutOff = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);

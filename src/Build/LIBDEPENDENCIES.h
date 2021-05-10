@@ -18,10 +18,6 @@
 #ifndef LIBDEPENDENCIES_H_
 #define LIBDEPENDENCIES_H_
 
-#ifndef NULL
-#define NULL 0
-#endif
-
 #ifdef __AVR_ATmega2560__
 
 #include <avr/io.h>       //PARA MANIPULAÇÃO DE REGISTRADORES
@@ -48,5 +44,10 @@
 #include <stdio.h>    //size_t
 #include <stdlib.h>   //malloc & free
 #include <string.h>   //strnlen (STRING LENGTH COM DEFINIÇÃO DE TAMANHO)
+
+#undef NULL
+#ifndef NULL
+#define NULL 0
+#endif
 
 #endif

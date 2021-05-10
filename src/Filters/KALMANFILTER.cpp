@@ -16,36 +16,31 @@
 */
 
 #include "KALMANFILTER.h"
+#include "Common/ENUM.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
 
-//CALCULO DE FILTRAGEM DO KALMAN
-//x_k = Ax_{k-1} + Bu_k + w_k
-//z_k = Hx_k + v_k
+KalmanClass KALMAN;
 
-//CALCULO DE ATUALIZAÇÃO DE TEMPO DO KALMAN
-//x_k = Ax_{k - 1} + Uu_k
-//P_k = AP_{k - 1}A^T + Q
+StructKalmanState Kalman_Acc[3];
+StructKalmanState Kalman_Gyro[3];
 
-//CALCULO DE ATUALIZAÇÃO DE MEDIÇÃO DO KALMAN
-//K_k = P_k H^T(HP_kH^T + R)^T
-//x_k = x_k + K_k(z_k - Hx_k)
-//P_k = (I - K_kH)P_k
+#define ACC_PROCESS_NOISE 0.0625 //RUIDO DO PROCESSO
+#define ACC_MEDICION_NOISE 1.0   //RUIDO DE MEDIÇÃO
+#define ACC_ESTIMATE_ERROR 0.22  //ERRO ESTIMADO
 
-KALMANCLASS KALMAN;
+#define GYRO_PROCESS_NOISE 3.0    //RUIDO DO PROCESSO
+#define GYRO_MEDICION_NOISE 0.125 //RUIDO DE MEDIÇÃO
+#define GYRO_ESTIMATE_ERROR 0.42  //ERRO ESTIMADO
 
-//3 EIXOS ACELEROMETRO
-StructKalmanState Kalman_Acc_X;
-StructKalmanState Kalman_Acc_Y;
-StructKalmanState Kalman_Acc_Z;
+void KalmanClass::Initialization(void)
+{
+  KALMAN.AccelInitialization();
+  KALMAN.GyroInitialization();
+}
 
-//3 EIXOS GYROSCOPIO
-StructKalmanState Kalman_Gyro_X;
-StructKalmanState Kalman_Gyro_Y;
-StructKalmanState Kalman_Gyro_Z;
-
-void KALMANCLASS::State(StructKalmanState *State, float Q, float R, float P, float Initial_Value)
+void KalmanClass::State(StructKalmanState *State, float Q, float R, float P, float Initial_Value)
 {
   State->Q = Q;
   State->R = R;
@@ -53,7 +48,7 @@ void KALMANCLASS::State(StructKalmanState *State, float Q, float R, float P, flo
   State->X = Initial_Value;
 }
 
-void KALMANCLASS::Update(StructKalmanState *State, int16_t *ErrorInput)
+void KalmanClass::Update(StructKalmanState *State, int16_t *ErrorInput)
 {
   float K;
   float Measurement = *ErrorInput;
@@ -66,55 +61,30 @@ void KALMANCLASS::Update(StructKalmanState *State, int16_t *ErrorInput)
   *ErrorInput = (int16_t)Measurement;
 }
 
-void KALMANCLASS::Accel()
+void KalmanClass::AccelInitialization(void)
 {
-#define PROCESSNOISE 0.0625 //RUIDO DO PROCESSO
-#define MEDICIONNOISE 1.0   //RUIDO DE MEDIÇÃO
-#define ESTIMATEERROR 0.22  //ERRO ESTIMADO
-
-  KALMAN.State(&Kalman_Acc_X, PROCESSNOISE, MEDICIONNOISE, ESTIMATEERROR, 0);
-  KALMAN.State(&Kalman_Acc_Y, PROCESSNOISE, MEDICIONNOISE, ESTIMATEERROR, 0);
-  KALMAN.State(&Kalman_Acc_Z, PROCESSNOISE, MEDICIONNOISE, ESTIMATEERROR, 0);
-
-#undef PROCESSNOISE
-#undef MEDICIONNOISE
-#undef ESTIMATEERROR
+  KALMAN.State(&Kalman_Acc[ROLL], ACC_PROCESS_NOISE, ACC_MEDICION_NOISE, ACC_ESTIMATE_ERROR, 0);
+  KALMAN.State(&Kalman_Acc[PITCH], ACC_PROCESS_NOISE, ACC_MEDICION_NOISE, ACC_ESTIMATE_ERROR, 0);
+  KALMAN.State(&Kalman_Acc[YAW], ACC_PROCESS_NOISE, ACC_MEDICION_NOISE, ACC_ESTIMATE_ERROR, 0);
 }
 
-void KALMANCLASS::Gyro()
+void KalmanClass::GyroInitialization(void)
 {
-#define PROCESSNOISE 3.0    //RUIDO DO PROCESSO
-#define MEDICIONNOISE 0.125 //RUIDO DE MEDIÇÃO
-#define ESTIMATEERROR 0.42  //ERRO ESTIMADO
-
-  KALMAN.State(&Kalman_Gyro_X, PROCESSNOISE, MEDICIONNOISE, ESTIMATEERROR, 0);
-  KALMAN.State(&Kalman_Gyro_Y, PROCESSNOISE, MEDICIONNOISE, ESTIMATEERROR, 0);
-  KALMAN.State(&Kalman_Gyro_Z, PROCESSNOISE, MEDICIONNOISE, ESTIMATEERROR, 0);
-
-#undef PROCESSNOISE
-#undef MEDICIONNOISE
-#undef ESTIMATEERROR
+  KALMAN.State(&Kalman_Gyro[ROLL], GYRO_PROCESS_NOISE, GYRO_MEDICION_NOISE, GYRO_ESTIMATE_ERROR, 0);
+  KALMAN.State(&Kalman_Gyro[PITCH], GYRO_PROCESS_NOISE, GYRO_MEDICION_NOISE, GYRO_ESTIMATE_ERROR, 0);
+  KALMAN.State(&Kalman_Gyro[YAW], GYRO_PROCESS_NOISE, GYRO_MEDICION_NOISE, GYRO_ESTIMATE_ERROR, 0);
 }
 
-//APLICA O FILTRO KALMAN NO ACELEROMETRO
-void KALMANCLASS::Apply_In_Acc(int16_t ApplyInAcc[3])
+void KalmanClass::Apply_In_Acc(int16_t AccVectorInput[3])
 {
-  KALMAN.Update(&Kalman_Acc_X, &ApplyInAcc[0]);
-  KALMAN.Update(&Kalman_Acc_Y, &ApplyInAcc[1]);
-  KALMAN.Update(&Kalman_Acc_Z, &ApplyInAcc[2]);
+  KALMAN.Update(&Kalman_Acc[ROLL], &AccVectorInput[ROLL]);
+  KALMAN.Update(&Kalman_Acc[PITCH], &AccVectorInput[PITCH]);
+  KALMAN.Update(&Kalman_Acc[YAW], &AccVectorInput[YAW]);
 }
 
-//APLICA O FILTRO KALMAN NO GYROSCOPIO
-void KALMANCLASS::Apply_In_Gyro(int16_t ApplyInGyro[3])
+void KalmanClass::Apply_In_Gyro(int16_t GyroVectorInput[3])
 {
-  KALMAN.Update(&Kalman_Gyro_X, &ApplyInGyro[0]);
-  KALMAN.Update(&Kalman_Gyro_Y, &ApplyInGyro[1]);
-  KALMAN.Update(&Kalman_Gyro_Z, &ApplyInGyro[2]);
-}
-
-//INICIA O FILTRO RESPECTIVO DE CADA SENSOR
-void KALMANCLASS::Init()
-{
-  KALMAN.Accel();
-  KALMAN.Gyro();
+  KALMAN.Update(&Kalman_Gyro[ROLL], &GyroVectorInput[ROLL]);
+  KALMAN.Update(&Kalman_Gyro[PITCH], &GyroVectorInput[PITCH]);
+  KALMAN.Update(&Kalman_Gyro[YAW], &GyroVectorInput[YAW]);
 }

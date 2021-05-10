@@ -31,11 +31,13 @@ void Remove_Barometer_Spikes(void)
 {
   static int32_t PressureVector[BARO_SPIKES_SIZE];
   static uint8_t PressureIndex;
-  uint8_t PressureIndexCount = (PressureIndex + 1);
+  uint8_t PressureIndexCount = PressureIndex + 1;
+
   if (PressureIndexCount >= BARO_SPIKES_SIZE)
   {
     PressureIndexCount = 0;
   }
+
   PressureVector[PressureIndex] = Barometer.Raw.Pressure;
   Barometer.Raw.PressureFiltered += PressureVector[PressureIndex];
   Barometer.Raw.PressureFiltered -= PressureVector[PressureIndexCount];

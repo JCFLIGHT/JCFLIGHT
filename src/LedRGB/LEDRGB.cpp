@@ -38,7 +38,7 @@ LEDRGB RGB;
 #define MAX_PWM 254
 #endif
 
-void LEDRGB::Initialization()
+void LEDRGB::Initialization(void)
 {
   RED_LED_PINOUT;
   GREEN_LED_PINOUT;
@@ -50,7 +50,7 @@ void LEDRGB::Initialization()
 #endif
 }
 
-void LEDRGB::Update()
+void LEDRGB::Update(void)
 {
   if (!ACCCALIBRATION.GetRunning() && !GYROCALIBRATION.GetRunning() && !GCS.ConfigFlight && !Calibration.Magnetometer.Calibrating && !STICKS.PreArm_Run)
   {

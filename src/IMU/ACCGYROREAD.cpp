@@ -58,6 +58,7 @@ static void IMU_Filters_Initialization(void)
 {
   //ATUALIZA O ESTADO GUARDADO DO ESTADO DO KALMAN
   KalmanFilterEnabled = STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == NONE ? false : true;
+  KALMAN.Initialization();
 
 #ifdef USE_IMU_BIQUAD_FILTER
   //CARREGA OS VALORES GUARDADOS DO LPF

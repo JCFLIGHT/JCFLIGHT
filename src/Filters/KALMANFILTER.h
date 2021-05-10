@@ -18,26 +18,27 @@
 #ifndef KALMANFILTER_H_
 #define KALMANFILTER_H_
 #include "Build/LIBDEPENDENCIES.h"
+
 typedef struct
 {
   float Q; //RUIDO GERADO NO PROCESSO
   float R; //RUIDO DE MEDIÇÃO
-  float X; //VALOR
+  float X; //VALOR INICIAL
   float P; //ERRO ESTIMADO
 } StructKalmanState;
-class KALMANCLASS
+
+class KalmanClass
 {
 public:
-  KALMANCLASS(){};
-  void Init();
-  void Apply_In_Acc(int16_t ApplyInAcc[3]);
-  void Apply_In_Gyro(int16_t ApplyInGyro[3]);
+  void Initialization(void);
+  void Apply_In_Acc(int16_t AccVectorInput[3]);
+  void Apply_In_Gyro(int16_t GyroVectorInput[3]);
 
 private:
-  void Accel();
-  void Gyro();
+  void AccelInitialization(void);
+  void GyroInitialization(void);
   void Update(StructKalmanState *State, int16_t *ErrorInput);
   void State(StructKalmanState *State, float Q, float R, float P, float Initial_Value);
 };
-extern KALMANCLASS KALMAN;
+extern KalmanClass KALMAN;
 #endif

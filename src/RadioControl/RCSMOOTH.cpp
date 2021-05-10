@@ -40,7 +40,7 @@ int16_t RCControllerUnFiltered[4];
 int16_t RCAttitudeFiltered[4];
 #endif
 
-void RCInterpolationInit()
+void RCInterpolationInit(void)
 {
 #ifndef __AVR_ATmega2560__
   RC_LPF_CutOff = STORAGEMANAGER.Read_16Bits(RC_LPF_ADDR);
@@ -51,7 +51,7 @@ void RCInterpolationInit()
 #endif
 }
 
-void RCInterpolationApply()
+void RCInterpolationApply(void)
 {
 #ifndef __AVR_ATmega2560__
   if (RC_LPF_CutOff > 0)
@@ -83,9 +83,9 @@ void RCInterpolationApply()
   static uint32_t Refresh = SCHEDULERTIME.GetMillis();
   if (SCHEDULERTIME.GetMillis() - Refresh >= 20)
   {
-    PRINTF.SendToConsole(ProgramMemoryString("NotFiltered:%d Filtered:%d\n"),
-                         RCControllerUnFiltered[ROLL],
-                         RC_Resources.Attitude.Controller[ROLL]);
+    DEBUG("NotFiltered:%d Filtered:%d",
+          RCControllerUnFiltered[ROLL],
+          RC_Resources.Attitude.Controller[ROLL]);
     Refresh = SCHEDULERTIME.GetMillis();
   }
 #endif

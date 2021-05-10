@@ -123,7 +123,7 @@ void RC_PID_Update(void)
     TPA_Parameters.UpdateRequired = false;
   }
 #if defined(PRINTLN_TPA)
-  PRINTF.SendToConsole(ProgramMemoryString("TPA:%d\n"), TPA_Parameters.CalcedValue);
+  DEBUG("TPA:%d", TPA_Parameters.CalcedValue);
 #endif
   Simple_Mode_Update();
 }

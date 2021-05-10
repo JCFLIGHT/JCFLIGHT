@@ -25,7 +25,7 @@ PID_Terms_Float_Struct NavigationPID;
 PID_Terms_Float_Struct PositionHoldRatePIDArray[2];
 PID_Terms_Float_Struct NavigationPIDArray[2];
 
-#define GPS_DERIVATIVE_CUTOFF 20 //HZ
+#define GPS_DERIVATIVE_CUTOFF 20.0f //HZ
 
 int32_t GPSGetProportional(int32_t Error, PID_Terms_Float_Struct *PID_Param_Pointer)
 {
@@ -41,7 +41,7 @@ int32_t GPSGetIntegral(int32_t Error, float DeltaTime, PID_Terms_Float_Struct *F
 
 float Get_Derivative_LPF_Coefficient(float CutOff)
 {
-    return (1.0f / (6.283185482f * (float)CutOff));
+    return (1.0f / (6.283185482f * CutOff));
 }
 
 int32_t GPSGetDerivative(int32_t Input, float DeltaTime, PID_Terms_Float_Struct *FilterPointer, PID_Terms_Float_Struct *PID_Param_Pointer)

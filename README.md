@@ -10,9 +10,9 @@ JCFLIGHT é um software de piloto automático de código aberto,ele está em des
 
 | Status | Microcontrolador | Nome | Versão | Notas |
 | :----: | :-------: | ---- | :-----: | :---- |
-| :heavy_check_mark:  | ATMEGA2560 | JCFLIGHT-CLASSIC | *0.0.0* | Em construção |
-| :x:  | STM32F407VE | JCFLIGHT-PASCAL | *0.0.0* | Construção não iniciada |
-| :x:  | ESP32 | JCFLIGHT-EXTREME | *0.0.0* | Em construção |
+| :heavy_check_mark:  | ATmega2560 | JCFlight-Classic | *0.0.0* | Em construção |
+| :x:  | Stm32F407ve | JCFlight-Pascal | *0.0.0* | Construção não iniciada |
+| :x:  | Esp32 | JCFlight-Extrene | *0.0.0* | Em construção |
 
 ## Licença
 
@@ -28,11 +28,11 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 
 - [Videos por JCLab](https://www.youtube.com/channel/UC6kk7H1CiaPVv4iKVGS9GsA)
 
-## Contribuidor
+## Mantenedor
 
 [Julio Cesar Matias](https://github.com/JulioCesarMatias)                                                        
-**Veículo**: Multirotores,Aeros e Asa-Fixa.                                                                    
-**Plataformas**: JCFLIGHT-CLASSIC,JCFLIGHT-PASCAL e JCFLIGHT-EXTREME
+**Plataformas**: Multirotores,Aeromodelos e Asa-Fixa.                                                                    
+**Placas**: JCFlight-Classic,JCFlight-Pascal e JCFlight-Extreme
 
 ## Como construir
 

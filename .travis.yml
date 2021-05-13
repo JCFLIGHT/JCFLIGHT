@@ -25,11 +25,10 @@ cache:
     - "~/.platformio"
 
 env:
-  - PLATFORMIO_CI_SRC = src
+  - PLATFORMIO_CI_SRC = src/
 
 install:
-  - pip install -U platformio
-  - pio update
+  - pip install --upgrade platformio
 
 script:
   - platformio run

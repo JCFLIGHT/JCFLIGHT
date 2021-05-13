@@ -16,7 +16,6 @@
 */
 
 #include "MATHSUPPORT.h"
-#include "IMU/ACCGYROREAD.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED
@@ -401,21 +400,6 @@ float Fast_Logarithm(float InputValue)
 float Fast_Pow(float ValueA, float ValueB) //X^Y
 {
     return Fast_Exponential(ValueB * Fast_Logarithm(ValueA));
-}
-
-float Power_Float(float Base, int16_t Exponential) //X^Y
-{
-    float Result = Base;
-    for (int16_t Count = 1; Count < Exponential; Count++)
-    {
-        Result *= Base;
-    }
-    return Result;
-}
-
-float ConvertCentimeterPerSecondsToKmPerHour(float Value)
-{
-    return Value / 27.778f;
 }
 
 float Power3_Float(float InputValue)

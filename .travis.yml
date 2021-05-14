@@ -27,15 +27,16 @@ cache:
 env:
   - PLATFORMIO_CI_SRC = src/
 
-before_install:
-  - source <(curl -SLs https://raw.githubusercontent.com/${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}/install.sh)
-
 install:
     - pip install -U platformio
     - pio update
 
 script:
   - platformio run
-  - build_platform megaatmega2560
-  - build_platform esp32dev
-  - build_platform bluepill_f103c8_128k
+  - cd ./
+  - mkdir dist
+  - find . -name "*.hex"  
+  - ls -l ./.pio/build/
+  - ls -l ./.pio/build/ | grep ^d | tr -s ' ' | cut -d ' ' -f 9 >> filenames.txt;
+  - while read envname; do echo $envname; cp ./.pio/build/$envname/firmware.hex ./dist/$envname.hex; done < filenames.txt;
+  - ls -l dist/

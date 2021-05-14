@@ -1,4 +1,4 @@
-# Do Clone ao Pull-Request
+# Clone & Pull-Request
 
 Documento apenas para desenvolvedores.
 

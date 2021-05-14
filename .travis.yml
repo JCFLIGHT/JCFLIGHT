@@ -33,4 +33,6 @@ install:
 
 script:
   - platformio run
-  - platformio ci --project-conf=/path/to/platformio.ini
+  - build_platform megaatmega2560
+  - build_platform esp32dev
+  - build_platform bluepill_f103c8_128k

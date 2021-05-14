@@ -28,9 +28,10 @@ env:
   - PLATFORMIO_CI_SRC = src/
 
 install:
+    - python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
     - pip install -U platformio
     - pio update
 
 script:
   - platformio run
-  - export PLATFORMIO_BUILD_FLAGS=-D GLOBAL_MACROS_FOR_ALL_TEST_ENV
+  - platformio ci --project-conf=/path/to/platformio.ini

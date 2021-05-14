@@ -33,4 +33,4 @@ install:
 
 script:
   - platformio run
-  - pio ci --board = megaatmega2560 --board = esp32dev --board = bluepill_f103c8_128k --lib="."
+  - pio ci --board=megaatmega2560 --board=esp32dev --board=bluepill_f103c8_128k --lib="."

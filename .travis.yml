@@ -27,6 +27,9 @@ cache:
 env:
   - PLATFORMIO_CI_SRC = src/
 
+before_install:
+  - source <(curl -SLs https://raw.githubusercontent.com/${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}/install.sh)
+
 install:
     - pip install -U platformio
     - pio update

@@ -28,7 +28,6 @@ env:
   - PLATFORMIO_CI_SRC = src/
 
 install:
-    - python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
     - pip install -U platformio
     - pio update
 

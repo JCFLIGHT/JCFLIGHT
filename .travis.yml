@@ -28,7 +28,9 @@ env:
   - PLATFORMIO_CI_SRC = src/
 
 install:
-  - pip install --upgrade platformio
+    - pip install -U platformio
+    - pio update
 
 script:
   - platformio run
+  - pio ci --board = megaatmega2560 --board = esp32dev --board = bluepill_f103c8_128k --lib="."

@@ -43,7 +43,7 @@ Vector3x3Float StateEstimate(0.0f, 0.0f, 0.0f);
 #define FUSELAGE_PITCH_MAX 25        //PITCH MAXIMO EM GRAUS SUPORTADO PARA ENTRAR NA CALIBRAÇÃO EM VOO
 #define KF_PROCESS_NOISE 0.01f       //NOISE GERADO PELO SENSOR AO LONGO DO PROCESSO
 #define KF_MEDICION_NOISE 0.0000005f //ERRO DE MEDIÇÃO AO LONGO DO PROCESSO
-#define KF_NOISE_BASE 1.0f           //ADIÇÃO MANUAL DE ERRO AO KF EM M/S
+#define KF_NOISE_BASE 1.0f           //ADIÇÃO MANUAL DE ERRO AO FILTRO DE KALMAN EM M/S
 
 void AirSpeedCalibrationClass::Initialization(void)
 {
@@ -73,12 +73,14 @@ bool AirSpeedCalibrationClass::Calibrate(void)
         AirSpeed.Calibration.Start_MS = 0;
         return false;
     }
+
     //DESCARTA AS 5 PRIMEIRAS AMOSTRAS
     if (AirSpeed.Calibration.Read_Count > 5)
     {
         AirSpeed.Calibration.Sum += AirSpeed.Raw.Pressure;
         AirSpeed.Calibration.Count++;
     }
+
     AirSpeed.Calibration.Read_Count++;
     return false;
 }
@@ -136,16 +138,16 @@ static float Get_Scale_Calibration(float True_AirSpeed, const Vector3x3Float &GP
 
 void AirSpeedCalibrationClass::Scale_Update(void)
 {
-    static Scheduler_Struct Scale_Scheduler;
+    static Scheduler_Struct AirSpeedScale_Scheduler;
 
-    if (!Scheduler(&Scale_Scheduler, SCHEDULER_SET_FREQUENCY(2, "Hz")))
+    if (!Scheduler(&AirSpeedScale_Scheduler, SCHEDULER_SET_FREQUENCY(2, "Hz")))
     {
         return;
     }
 
 #ifndef __AVR_ATmega2560__
 
-    if (!JCF_Param.AirSpeedAutoCalScale)
+    if (!JCF_Param.AirSpeedAutoCalScale) //UM CANAL AUXILIAR DO RÁDIO DEVE SER ATRIBUIDO TAMBÉM A VERFICAÇÃO,NÃO APENAS O PARAMETRO.
     {
         return;
     }

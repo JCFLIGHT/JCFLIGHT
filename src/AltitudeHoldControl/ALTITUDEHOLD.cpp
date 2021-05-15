@@ -40,10 +40,13 @@ AltitudeHold_Controller_Struct AltitudeHoldController;
 #define MIN_VEL_Z_TO_VALID_GROUND 15 //VELOCIDADE VERTICAL MINIMA PARA INDICAR QUE A VEL Z DO INS ESTÁ EM REPOUSO
 #define LANDED_TIME 4000             //ESTOURO DE TEMPO EM MS PARA INDICAR QUE REALMENTE O SOLO FOI DETECTADO
 #define MAX_ALTITUDE_SUPORTED 150    //ALTITUDE MAXIMA SUPORTADA PELO ALGORITIMO EM METROS,PODE SER INCREMENTADO,MAS É NECESSARIO TESTES DE FUNCIONAMENTO
+#define THR_DIFF_COMPLETE_TAKEOFF 70 //O THROTTLE - 1500 INDICA PARA O CONTRALADOR DO ALT-HOLD QUE O TAKEOFF ESTÁ EM ANDAMENDO OU FOI CONCLUIDO.
 
 //#define THR_SMOOTH_TEST
 
 #ifdef THR_SMOOTH_TEST
+
+//É NECESSARIO TESTES PARA DEFINIR SE SERÁ IMPLEMENTADO OU NÃO
 
 #include "FastSerial/PRINTF.h"
 #include "Filters/PT1.h"
@@ -56,7 +59,6 @@ PT1_Filter_Struct Smooth_ThrottleHover;
 
 //-------------------------------------
 //PARAMS DO USUARIO
-uint8_t AH_Percent_Complete_TakeOff = 70;
 int16_t AH_Hover_Throttle = 1500;
 //-------------------------------------
 
@@ -147,21 +149,23 @@ bool ApplyAltitudeHoldControl(void)
         }
         else
         {
-          if ((AltitudeHoldController.Throttle.Difference > AH_Percent_Complete_TakeOff) && (Barometer.INS.Velocity.Vertical >= MIN_VEL_Z_TO_VALID_GROUND))
+          if ((AltitudeHoldController.Throttle.Difference > THR_DIFF_COMPLETE_TAKEOFF) &&
+              (Barometer.INS.Velocity.Vertical >= MIN_VEL_Z_TO_VALID_GROUND))
           {
             AltitudeHoldController.Flags.TakeOffInProgress = false;
           }
         }
-        if (AltitudeHoldController.Flags.TakeOffInProgress || (ABS(AltitudeHoldController.Throttle.Difference) > AH_Percent_Complete_TakeOff))
+        if (AltitudeHoldController.Flags.TakeOffInProgress ||
+            (ABS(AltitudeHoldController.Throttle.Difference) > THR_DIFF_COMPLETE_TAKEOFF))
         {
           AltitudeHoldController.Flags.Hovering = false;
-          if (ABS(AltitudeHoldController.Throttle.Difference) <= AH_Percent_Complete_TakeOff)
+          if (ABS(AltitudeHoldController.Throttle.Difference) <= THR_DIFF_COMPLETE_TAKEOFF)
           {
             AltitudeHoldController.Target.Position.Z = 0;
           }
           else
           {
-            AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Throttle.Difference - ((AltitudeHoldController.Throttle.Difference > 0) ? AH_Percent_Complete_TakeOff : -AH_Percent_Complete_TakeOff)) * GET_SET[PID_POSITION_Z].kP) / 4;
+            AltitudeHoldController.Target.Position.Z = ((AltitudeHoldController.Throttle.Difference - ((AltitudeHoldController.Throttle.Difference > 0) ? THR_DIFF_COMPLETE_TAKEOFF : -THR_DIFF_COMPLETE_TAKEOFF)) * GET_SET[PID_POSITION_Z].kP) / 4;
           }
         }
         else

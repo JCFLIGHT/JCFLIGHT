@@ -33,10 +33,3 @@ install:
 
 script:
   - platformio run
-  - cd ./
-- mkdir dist
-- find . -name "*.hex"
-- ls -l ./.pio/build/
-- ls -l ./.pio/build/ | grep ^d | tr -s ' ' | cut -d ' ' -f 9 >> filenames.txt;
-- while read envname; do echo $envname; cp ./.pio/build/$envname/firmware.hex ./dist/$envname.hex; done < filenames.txt;
-- ls -l dist/

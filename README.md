@@ -30,7 +30,7 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 
 ## Mantenedor
 
-[Julio Cesar Matias](https://github.com/JulioCesarMatias) - Mantenedor do Firmware e do GCS da JCFLIGHT.                                                      
+[Julio Cesar Matias](https://github.com/JulioCesarMatias) - Mantenedor do Firmware e do [GCS da JCFLIGHT](https://github.com/JCFLIGHT/JCLFIGHTGCS).                                                      
 **Plataformas**: Multirotores,Aeromodelos e Asa-Fixa.                                                                    
 **Placas**: JCFlight-Classic,JCFlight-Pascal e JCFlight-Extreme
 

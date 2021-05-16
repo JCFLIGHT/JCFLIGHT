@@ -91,7 +91,7 @@ PT1_Filter_Struct DerivativeBoost_PT1_Yaw_Smooth;
 #define DERIVATIVE_BOOST_CUTOFF 10 //Hz
 
 uint8_t IntegralTermWindUpPercent = 50;        //AJUSTAVEL PELO USUARIO -> (0 a 90)
-int16_t ReferenceAirSpeed = 1500;              //AJUSTAVEL PELO USUARIO - VALOR DE 36KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
+int16_t ReferenceAirSpeed = 1500;              //AJUSTAVEL PELO USUARIO - VALOR DE 54KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO -> (0 a 500)
 int16_t MinThrottleDownPitchAngle = 0;         //AJUSTAVEL PELO USUARIO -> (0 a 450)
 float CoordinatedPitchGain = 1.0f;             //AJUSTAVEL PELO USUARIO -> (0.0 a 2.0 (float))

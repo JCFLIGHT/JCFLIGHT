@@ -74,7 +74,7 @@ def Generate_Code(Function, Date):
 */\
 \n\n")
 
-    Function.write('#ifndef BAR_H_\n#define BAR_H_\n\n')
+    Function.write('#pragma once\n\n')
 
     Function.write('//BASE ADDRESS REGISTER\n\n')
     Function.write(
@@ -100,8 +100,6 @@ def Generate_Code(Function, Date):
         PrevStorageAddress = NextStorageAddress
 
     print('--------------------------------------------------------------------------------\n')
-
-    Function.write('\n#endif\n')
 
 
 if __name__ == '__main__':

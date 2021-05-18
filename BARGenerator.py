@@ -25,16 +25,16 @@ class StorageSizeOf(enum.Enum):
 
 
 DefsTable = [
-    ['Nome',            'Tamanho'],
-    ['KP_ACC_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['KI_ACC_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['KP_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['KI_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['Nome da Definição', 'OffSet'],
+    ['KP_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_32_BITS.value],
+    ['KI_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_32_BITS.value],
+    ['KP_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
+    ['KI_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
 ]
 
 # MAPEAMENTO DE ARMAZENAMENTO,SE O ENDEREÇO FINAL FOR ULTRAPASSADO,UM ERRO DE COMPILAÇÃO DEVE SER GERADO,ESSA É A IDEIA
 StorageLayout = [
-    ['Nome', 'Endereço Inicial', 'Endereço Final'],
+    ['Grupo', 'Endereço Inicial', 'Endereço Final'],
     ['CLI', StorageSizeOf.CLI_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.CLI_SIZE_FINAL_RESERVED.value],
     ['NORMAL_CONFIG', StorageSizeOf.NORMAL_CONFIG_SIZE_INITIAL_RESERVED.value,
@@ -86,7 +86,7 @@ def Generate_Code(File, Date):
     # PRIMEIRO UPLOAD ADDR
     File.write('//ADDR PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
     File.write('#define FIRMWARE_FIRST_USAGE_ADDR ' + '%d' %
-                   StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value + '\n\n')
+               StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value + '\n\n')
 
     NextStorageAddress = 0
     PrevStorageAddress = 0
@@ -97,9 +97,9 @@ def Generate_Code(File, Date):
         NextStorageAddress = NextStorageAddress + \
             DefsTable[TableSizeCount + 1][1]
         Generate_Defines(
-            File, DefsTable[TableSizeCount + 1][0], PrevStorageAddress)
+            File, DefsTable[TableSizeCount + 1][0], PrevStorageAddress + 1)  # +1 PARA INICIAR A CONTAGEM DO ADDR 1
         print('DEF: %s' % DefsTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
-              PrevStorageAddress + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
+              (PrevStorageAddress + 1) + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
         PrevStorageAddress = NextStorageAddress
 
     print('--------------------------------------------------------------------------------\n')

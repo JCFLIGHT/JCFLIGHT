@@ -4,10 +4,10 @@ import enum
 
 
 class AddrSizeOf(enum.Enum):
-    TYPE_8_BITS = 1
-    TYPE_16_BITS = 2
-    TYPE_32_BITS = 4
-    TYPE_FLOAT = 4
+    TYPE_8_BITS = 0x01
+    TYPE_16_BITS = 0x02
+    TYPE_32_BITS = 0x04
+    TYPE_FLOAT = 0x04
 
 
 class StorageSizeOf(enum.Enum):
@@ -17,9 +17,11 @@ class StorageSizeOf(enum.Enum):
     # 215 BYTES DO ARMAZENAMENTO RESERVADOS PARA AS CONFIGURAÇÕES NORMAIS
     NORMAL_CONFIG_SIZE_INITIAL_RESERVED = 0x1E0
     NORMAL_CONFIG_SIZE_FINAL_RESERVED = 0x2B7
-    # 109 BYTES DO ARMAZENAMENTO RESERVADOS PARA AS CONFIGURAÇÕES NORMAIS
+    # 109 BYTES DO ARMAZENAMENTO RESERVADOS PARA AS CONFIGURAÇÕES DO MODO WAYPOINT
     WAYPOINT_SIZE_INITIAL_RESERVED = 0x2C0
     WAYPOINT_SIZE_FINAL_RESERVED = 0x32D
+    # ENDEREÇO PARA A VERIFICAÇÃO DE UPLOAD DO FIRMWARE
+    FIRMWARE_RESERVED_MAGIC_ADDR = 0x5DC
 
 
 DefsTable = [
@@ -42,20 +44,20 @@ StorageLayout = [
 ]
 
 
-def Format_Entry(x):
-    return '%d' % round(x)
+def Format_Entry(StrIn):
+    return '%d' % round(StrIn)
 
 
-def Generate_Defines(Function, DefineName, StorageAddressOffSet):
+def Generate_Defines(File, DefineName, StorageAddressOffSet):
 
-    Function.write('#define %s ' % DefineName)
-    Function.write(Format_Entry(StorageAddressOffSet))
-    Function.write("\n")
+    File.write('#define %s ' % DefineName)
+    File.write(Format_Entry(StorageAddressOffSet))
+    File.write("\n")
 
 
-def Generate_Code(Function, Date):
+def Generate_Code(File, Date):
     # GERA O TOPO DA EXTENSÃO
-    Function.write("\
+    File.write("\
 /* \n\
    Este arquivo faz parte da JCFLIGHT.\
    \n\
@@ -74,16 +76,17 @@ def Generate_Code(Function, Date):
 */\
 \n\n")
 
-    Function.write('#pragma once\n\n')
+    File.write('#pragma once\n\n')
 
-    Function.write('//BASE ADDRESS REGISTER\n\n')
-    Function.write(
+    File.write('//BASE ADDRESS REGISTER\n\n')
+    File.write(
         '//ESSE ARQUIVO FOI GERADO AUTOMATICAMENTE - POR FAVOR,NUNCA O EDITE MANUALMENTE!\n\n')
-    Function.write('//ATUALIZADO EM %s\n\n' % Date)
+    File.write('//ATUALIZADO EM %s\n\n' % Date)
 
     # PRIMEIRO UPLOAD ADDR
-    Function.write('//ADDR PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
-    Function.write('#define FIRMWARE_FIRST_USAGE_ADDR 1500\n\n')
+    File.write('//ADDR PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
+    File.write('#define FIRMWARE_FIRST_USAGE_ADDR ' + '%d' %
+                   StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value + '\n\n')
 
     NextStorageAddress = 0
     PrevStorageAddress = 0
@@ -94,7 +97,7 @@ def Generate_Code(Function, Date):
         NextStorageAddress = NextStorageAddress + \
             DefsTable[TableSizeCount + 1][1]
         Generate_Defines(
-            Function, DefsTable[TableSizeCount + 1][0], PrevStorageAddress)
+            File, DefsTable[TableSizeCount + 1][0], PrevStorageAddress)
         print('DEF: %s' % DefsTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
               PrevStorageAddress + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
         PrevStorageAddress = NextStorageAddress
@@ -109,5 +112,5 @@ if __name__ == '__main__':
 
     Date = datetime.datetime.now()
 
-    with open(Output, 'w') as Function:
-        Generate_Code(Function, Date)
+    with open(Output, 'w') as File:
+        Generate_Code(File, Date)

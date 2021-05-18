@@ -1,6 +1,5 @@
 import datetime
 import pathlib
-from tabulate import tabulate
 import enum
 
 
@@ -14,8 +13,8 @@ class SizeOf(enum.Enum):
 AddressTable = [
     ['Name',            'Size'],
     ['KP_ACC_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
-    ['KI_ACC_AHRS_ADDR', SizeOf.ADDR_TYPE_32_BITS.value],
-    ['KP_MAG_AHRS_ADDR', SizeOf.ADDR_TYPE_16_BITS.value],
+    ['KI_ACC_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
+    ['KP_MAG_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
     ['KI_MAG_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
 ]
 
@@ -63,14 +62,16 @@ def Generate_Code(Function, Date):
     Function.write('#define FIRMWARE_FIRST_USAGE_ADDR 1500\n\n')
 
     NextADDR = 0
+    PrevADDR = 0
     for TableSizeCount in range(len(AddressTable) - 1):
         NextADDR = NextADDR + AddressTable[TableSizeCount + 1][1]
         Generate_Defines(
-            Function, AddressTable[TableSizeCount + 1][0], NextADDR)
+            Function, AddressTable[TableSizeCount + 1][0], PrevADDR)
+        print('DEF: %s' % AddressTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
+              PrevADDR + '  TAMANHO:%d BYTE(S)' % AddressTable[TableSizeCount + 1][1])
+        PrevADDR = NextADDR
 
-    Function.write('\n\n#endif\n')
-
-    print(tabulate(AddressTable, headers='firstrow', tablefmt='fancy_grid'))
+    Function.write('\n#endif\n')
 
 
 if __name__ == '__main__':

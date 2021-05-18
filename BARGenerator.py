@@ -97,7 +97,7 @@ def Generate_Code(File, Date):
         NextStorageAddress = NextStorageAddress + \
             DefsTable[TableSizeCount + 1][1]
         Generate_Defines(
-            File, DefsTable[TableSizeCount + 1][0], PrevStorageAddress + 1)  # +1 PARA INICIAR A CONTAGEM DO ADDR 1
+            File, DefsTable[TableSizeCount + 1][0], PrevStorageAddress + 1)  # +1 PARA INICIAR A CONTAGEM DO ADDR 1 (UM) AO INVÉS DO 0 (ZERO)
         print('DEF: %s' % DefsTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
               (PrevStorageAddress + 1) + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
         PrevStorageAddress = NextStorageAddress

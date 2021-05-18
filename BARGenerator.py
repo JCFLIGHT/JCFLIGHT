@@ -22,10 +22,10 @@ AddressTable = [
 def format_entry(x): return '%d' % round(x)
 
 
-def Generate_Defines(Function, DefineName, ADDROffSet):
+def Generate_Defines(Function, DefineName, StorageAddressOffSet):
 
     Function.write('#define %s ' % DefineName)
-    Function.write(format_entry(ADDROffSet))
+    Function.write(format_entry(StorageAddressOffSet))
     Function.write("\n")
 
 
@@ -61,15 +61,16 @@ def Generate_Code(Function, Date):
     Function.write('//ADDR PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
     Function.write('#define FIRMWARE_FIRST_USAGE_ADDR 1500\n\n')
 
-    NextADDR = 0
-    PrevADDR = 0
+    NextStorageAddress = 0
+    PrevStorageAddress = 0
     for TableSizeCount in range(len(AddressTable) - 1):
-        NextADDR = NextADDR + AddressTable[TableSizeCount + 1][1]
+        NextStorageAddress = NextStorageAddress + \
+            AddressTable[TableSizeCount + 1][1]
         Generate_Defines(
-            Function, AddressTable[TableSizeCount + 1][0], PrevADDR)
+            Function, AddressTable[TableSizeCount + 1][0], PrevStorageAddress)
         print('DEF: %s' % AddressTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
-              PrevADDR + '  TAMANHO:%d BYTE(S)' % AddressTable[TableSizeCount + 1][1])
-        PrevADDR = NextADDR
+              PrevStorageAddress + '  TAMANHO:%d' % AddressTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
+        PrevStorageAddress = NextStorageAddress
 
     Function.write('\n#endif\n')
 

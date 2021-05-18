@@ -19,7 +19,7 @@
 #include "FlightModes/AUXFLIGHT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "ServosMaster/SERVOAUTOTRIM.h"
+#include "ServosMaster/SERVOSAUTOTRIM.h"
 #include "Compass/COMPASSREAD.h"
 #include "BitArray/BITARRAY.h"
 #include "IMU/ACCGYROREAD.h"

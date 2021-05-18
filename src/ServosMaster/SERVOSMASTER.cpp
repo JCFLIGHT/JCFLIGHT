@@ -28,7 +28,7 @@
 #include "MotorsControl/MOTORS.h"
 #include "Build/BOARDDEFS.h"
 #include "ParamsToGCS/CHECKSUM.h"
-#include "SERVOAUTOTRIM.h"
+#include "SERVOSAUTOTRIM.h"
 #include "Build/GCC.h"
 
 FILE_COMPILE_FOR_SPEED

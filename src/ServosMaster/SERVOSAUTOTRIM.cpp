@@ -15,7 +15,7 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#include "SERVOAUTOTRIM.h"
+#include "SERVOSAUTOTRIM.h"
 #include "AirPlane/AIRPLANE.h"
 #include "PID/PIDXYZ.h"
 #include "SwitchFlag/SWITCHFLAG.h"

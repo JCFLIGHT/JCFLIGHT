@@ -15,8 +15,8 @@
   junto com a JCFLIGHT. Caso contrário, consulte <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SERVOAUTOTRIM_H_
-#define SERVOAUTOTRIM_H_
+#ifndef SERVOSAUTOTRIM_H_
+#define SERVOSAUTOTRIM_H_
 #include "Build/LIBDEPENDENCIES.h"
 extern bool ServoAutoTrimEnabled;
 void ServoAutoTrimRun(void);

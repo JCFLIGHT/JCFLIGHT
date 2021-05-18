@@ -3,29 +3,53 @@ import pathlib
 import enum
 
 
-class SizeOf(enum.Enum):
-    ADDR_TYPE_8_BITS = 1
-    ADDR_TYPE_16_BITS = 2
-    ADDR_TYPE_32_BITS = 4
-    ADDR_TYPE_FLOAT = 4
+class AddrSizeOf(enum.Enum):
+    TYPE_8_BITS = 1
+    TYPE_16_BITS = 2
+    TYPE_32_BITS = 4
+    TYPE_FLOAT = 4
 
 
-AddressTable = [
-    ['Name',            'Size'],
-    ['KP_ACC_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
-    ['KI_ACC_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
-    ['KP_MAG_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
-    ['KI_MAG_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
+class StorageSizeOf(enum.Enum):
+    # 475 BYTES DO ARMAZENAMENTO RESERVADOS PARA O CLI
+    CLI_SIZE_INITIAL_RESERVED = 0x00
+    CLI_SIZE_FINAL_RESERVED = 0x1DB
+    # 215 BYTES DO ARMAZENAMENTO RESERVADOS PARA AS CONFIGURAÇÕES NORMAIS
+    NORMAL_CONFIG_SIZE_INITIAL_RESERVED = 0x1E0
+    NORMAL_CONFIG_SIZE_FINAL_RESERVED = 0x2B7
+    # 109 BYTES DO ARMAZENAMENTO RESERVADOS PARA AS CONFIGURAÇÕES NORMAIS
+    WAYPOINT_SIZE_INITIAL_RESERVED = 0x2C0
+    WAYPOINT_SIZE_FINAL_RESERVED = 0x32D
+
+
+DefsTable = [
+    ['Nome',            'Tamanho'],
+    ['KP_ACC_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_ACC_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+]
+
+# MAPEAMENTO DE ARMAZENAMENTO,SE O ENDEREÇO FINAL FOR ULTRAPASSADO,UM ERRO DE COMPILAÇÃO DEVE SER GERADO,ESSA É A IDEIA
+StorageLayout = [
+    ['Nome', 'Endereço Inicial', 'Endereço Final'],
+    ['CLI', StorageSizeOf.CLI_SIZE_INITIAL_RESERVED.value,
+        StorageSizeOf.CLI_SIZE_FINAL_RESERVED.value],
+    ['NORMAL_CONFIG', StorageSizeOf.NORMAL_CONFIG_SIZE_INITIAL_RESERVED.value,
+        StorageSizeOf.NORMAL_CONFIG_SIZE_FINAL_RESERVED.value],
+    ['WAYPOINT', StorageSizeOf.WAYPOINT_SIZE_INITIAL_RESERVED.value,
+        StorageSizeOf.WAYPOINT_SIZE_FINAL_RESERVED.value],
 ]
 
 
-def format_entry(x): return '%d' % round(x)
+def Format_Entry(x):
+    return '%d' % round(x)
 
 
 def Generate_Defines(Function, DefineName, StorageAddressOffSet):
 
     Function.write('#define %s ' % DefineName)
-    Function.write(format_entry(StorageAddressOffSet))
+    Function.write(Format_Entry(StorageAddressOffSet))
     Function.write("\n")
 
 
@@ -63,14 +87,19 @@ def Generate_Code(Function, Date):
 
     NextStorageAddress = 0
     PrevStorageAddress = 0
-    for TableSizeCount in range(len(AddressTable) - 1):
+
+    print('\n--------------------------------------------------------------------------------')
+
+    for TableSizeCount in range(len(DefsTable) - 1):
         NextStorageAddress = NextStorageAddress + \
-            AddressTable[TableSizeCount + 1][1]
+            DefsTable[TableSizeCount + 1][1]
         Generate_Defines(
-            Function, AddressTable[TableSizeCount + 1][0], PrevStorageAddress)
-        print('DEF: %s' % AddressTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
-              PrevStorageAddress + '  TAMANHO:%d' % AddressTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
+            Function, DefsTable[TableSizeCount + 1][0], PrevStorageAddress)
+        print('DEF: %s' % DefsTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
+              PrevStorageAddress + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
         PrevStorageAddress = NextStorageAddress
+
+    print('--------------------------------------------------------------------------------\n')
 
     Function.write('\n#endif\n')
 

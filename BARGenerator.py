@@ -5,31 +5,25 @@ import enum
 
 
 class SizeOf(enum.Enum):
-    ADDR_8_BITS = 1
-    ADDR_16_BITS = 2
-    ADDR_32_BITS = 4
-    ADDR_FLOAT = 4
+    ADDR_TYPE_8_BITS = 1
+    ADDR_TYPE_16_BITS = 2
+    ADDR_TYPE_32_BITS = 4
+    ADDR_TYPE_FLOAT = 4
 
 
-Table = [['Name', 'Size'],
-         ['KP_ACC_AHRS_ADDR', SizeOf.ADDR_8_BITS.value],
-         ['KI_ACC_AHRS_ADDR', SizeOf.ADDR_8_BITS.value],
-         ['KP_MAG_AHRS_ADDR', SizeOf.ADDR_8_BITS.value],
-         ['KI_MAG_AHRS_ADDR', SizeOf.ADDR_8_BITS.value]]
+AddressTable = [
+    ['Name',            'Size'],
+    ['KP_ACC_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
+    ['KI_ACC_AHRS_ADDR', SizeOf.ADDR_TYPE_32_BITS.value],
+    ['KP_MAG_AHRS_ADDR', SizeOf.ADDR_TYPE_16_BITS.value],
+    ['KI_MAG_AHRS_ADDR', SizeOf.ADDR_TYPE_8_BITS.value],
+]
 
 
 def format_entry(x): return '%d' % round(x)
 
 
-def Generate_Defines(Function, DefineName, ADDROffSet, ADDRMax):
-
-    for ADDRCount in range(ADDRMax):
-        Function.write('#define %s ' % DefineName)
-        Function.write(format_entry(ADDROffSet))
-        Function.write("\n")
-
-
-def Generate_Defines2(Function, DefineName, ADDROffSet):
+def Generate_Defines(Function, DefineName, ADDROffSet):
 
     Function.write('#define %s ' % DefineName)
     Function.write(format_entry(ADDROffSet))
@@ -68,23 +62,21 @@ def Generate_Code(Function, Date):
     Function.write('//ADDR PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
     Function.write('#define FIRMWARE_FIRST_USAGE_ADDR 1500\n\n')
 
-    # APENAS DE TESTE POR ENQUANTO - SERÁ NECESSARIO CRIAR UMA TABELA CONTENDO O NOME DO PARAMETRO E O TAMANHO QUE ELE OCUPA PARA O OFFSET
-    #Generate_Defines(Function, 'KP_ACC_AHRS_ADDR', 1, 1000)
-
-    #Generate_Defines(Function, Table, 1, 1)
-
-    for TableSizeCount in range(len(Table) - 1):
-        Generate_Defines2(Function, Table[TableSizeCount + 1][0], TableSizeCount)
+    NextADDR = 0
+    for TableSizeCount in range(len(AddressTable) - 1):
+        NextADDR = NextADDR + AddressTable[TableSizeCount + 1][1]
+        Generate_Defines(
+            Function, AddressTable[TableSizeCount + 1][0], NextADDR)
 
     Function.write('\n\n#endif\n')
 
-    print(tabulate(Table, headers='firstrow', tablefmt='fancy_grid'))
+    print(tabulate(AddressTable, headers='firstrow', tablefmt='fancy_grid'))
 
 
 if __name__ == '__main__':
 
     Output = pathlib.PurePath(__file__).parent / \
-        'src' / 'BAR' / 'BARGEN.h'
+        'src' / 'BAR' / 'BARGENERATED.h'
 
     Date = datetime.datetime.now()
 

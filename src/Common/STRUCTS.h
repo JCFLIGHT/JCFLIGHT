@@ -718,6 +718,12 @@ typedef struct
       int16_t Calced[3] = {0, 0, 0};
     } Output;
 
+    struct Integral_Struct
+    {
+      float ErrorGyro[3] = {0.0f, 0.0f, 0.0f};
+      float ErrorGyroLimit[3] = {0.0f, 0.0f, 0.0f};
+    } Integral;
+
   } Controller;
 
 } PID_Resources_Struct;

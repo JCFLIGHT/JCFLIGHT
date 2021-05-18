@@ -37,10 +37,18 @@ ServosMasterClass SERVOSMASTER;
 Servo_Struct Servo;
 
 #ifndef __AVR_ATmega2560__
+
+typedef struct ServoSpeedLimit
+{
+  float State;
+} ServoSpeedLimit_Stuct;
+
 static BiquadFilter_Struct Smooth_Servo1_Aileron;
 static BiquadFilter_Struct Smooth_Servo2_Aileron;
 static BiquadFilter_Struct Smooth_Servo_Rudder;
 static BiquadFilter_Struct Smooth_Servo_Elevator;
+
+static ServoSpeedLimit_Stuct ServoSpeedLimit[MAX_SUPPORTED_SERVOS];
 #endif
 
 void ServosMasterClass::Initialization(void)
@@ -80,7 +88,7 @@ void ServosMasterClass::Rate_Update(void)
   Servo.Rate.GetAndSet[SERVO4] = GET_SERVO_RATE(SERVO4_RATE_ADDR);
 }
 
-void ServosMasterClass::UpdateMinAndMax()
+void ServosMasterClass::UpdateMinAndMax(void)
 {
   //OBTÉM O PULSO MINIMO DOS SERVOS
   Servo.Pulse.Min[SERVO1] = GET_SERVO_MIN(SERVO1_MIN_ADDR);
@@ -108,8 +116,55 @@ void ServosMasterClass::UpdateDirection(void)
   CHECKSUM.UpdateServosReverse();
 }
 
-void ServosMasterClass::Rate_Apply()
+#ifndef __AVR_ATmega2560__
+
+float ServoSpeedLimitApply(ServoSpeedLimit_Stuct *ServoLimitPointer, float Input, float RateLimit, float DeltaTime)
 {
+  if (RateLimit > 0)
+  {
+    const float RateLimitPerSample = RateLimit * DeltaTime;
+    ServoLimitPointer->State = Constrain_Float(Input, ServoLimitPointer->State - RateLimitPerSample, ServoLimitPointer->State + RateLimitPerSample);
+  }
+  else
+  {
+    ServoLimitPointer->State = Input;
+  }
+  return ServoLimitPointer->State;
+}
+
+#endif
+
+void ServosMasterClass::Rate_Apply(void)
+{
+#ifndef __AVR_ATmega2560__
+
+/*
+ 0 = NENHUM LIMITE
+ 1 = 10 SEGUNDOS
+ 10 = 10 SEGUNDOS
+ 100 = 1 SEGUNDO
+
+ POR EXEMPLO:
+ EM 100,O SERVO IRÁ LEVAR 1 SEGUNDO PARA IR DE UM PONTO A OUTRO,POR EXEMPLO DE 0° A 180°
+*/
+
+#define DEFAULT_SERVO_SPEED 0
+#define DELTA_TIME_VIRTUAL 1000 * 1e-6f //APENAS PARA TESTE
+
+  int16_t ServoSignalLimited[MAX_SUPPORTED_SERVOS];
+
+  for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
+  {
+    ServoSignalLimited[ServoIndex] = (int16_t)ServoSpeedLimitApply(&ServoSpeedLimit[ServoIndex],
+                                                                   Servo.Signal.UnFiltered[ServoIndex],
+                                                                   DEFAULT_SERVO_SPEED * 10,
+                                                                   DELTA_TIME_VIRTUAL);
+
+    Servo.Signal.UnFiltered[ServoIndex] = ServoSignalLimited[ServoIndex];
+  }
+
+#endif
+
   //CALCULA O RATE PARA OS SERVOS
   Servo.Signal.UnFiltered[SERVO1] = (((int32_t)Servo.Rate.GetAndSet[SERVO1] * Servo.Signal.UnFiltered[SERVO1]) / 100L); //AJUSTA O RATE DO SERVO 1
   Servo.Signal.UnFiltered[SERVO2] = (((int32_t)Servo.Rate.GetAndSet[SERVO2] * Servo.Signal.UnFiltered[SERVO2]) / 100L); //AJUSTA O RATE DO SERVO 2

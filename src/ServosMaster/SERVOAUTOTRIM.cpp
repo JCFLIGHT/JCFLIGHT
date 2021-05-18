@@ -140,3 +140,89 @@ void ServoAutoTrimRun(void)
         ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
     }
 }
+/*
+#include "AHRS/AHRS.h"
+#include "Scheduler/SCHEDULERTIME.h"
+#include "Filters/PT1.h"
+#include "GPS/GPSSTATES.h"
+#include "PID/PIDXYZ.h"
+
+static PT1_Filter_Struct RotationRateFilter;
+static PT1_Filter_Struct TargetRateFilter;
+
+#define SERVO_AUTOTRIM_FILTER_CUTOFF 1
+#define SERVO_AUTOTRIM_UPDATE_SIZE 5
+#define SERVO_AUTOTRIM_CENTER_MIN 1300
+#define SERVO_AUTOTRIM_CENTER_MAX 1700
+
+// @param descrição: Os pontos médios do servo são atualizados quando a rotação total do UAV for menor que esse limite [graus/s].
+// @param min: 1
+// @param max: 60
+float Servo_AutoTrim_Rotation_Limit = 15;
+
+void PIDReduceErrorAccumulators(int8_t Delta, uint8_t Axis)
+{
+    PID_Resources.Controller.Integral.ErrorGyro[Axis] -= Delta;
+    PID_Resources.Controller.Integral.ErrorGyroLimit[Axis] -= Delta;
+}
+
+float GetTotalRateTarget(void)
+{
+    return sqrtf(SquareFloat(PID_Resources.RcRateTarget.Roll) +
+                 SquareFloat(PID_Resources.RcRateTarget.Pitch) +
+                 SquareFloat(PID_Resources.RcRateTarget.Yaw));
+}
+
+float GetNewIntegralTerm(uint8_t Axis)
+{
+    return PID_Resources.Controller.Integral.ErrorGyro[Axis];
+}
+
+void ProcessContinuousServoAutotrim(const float DeltaTime)
+{
+    static ServoAutoTrimState_Enum ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
+    static uint32_t PreviousTime;
+
+    const float RotationRateMagnitude = sqrtf(VectorNormSquared(&BodyFrameRotation));
+    const float RotationRateMagnitudeFiltered = PT1FilterApply(&RotationRateFilter, RotationRateMagnitude, SERVO_AUTOTRIM_FILTER_CUTOFF, DeltaTime);
+    const float TargetRateMagnitude = GetTotalRateTarget();
+    const float TargetRateMagnitudeFiltered = PT1FilterApply(&TargetRateFilter, TargetRateMagnitude, SERVO_AUTOTRIM_FILTER_CUTOFF, DeltaTime);
+
+    if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
+    {
+        ServoAutoTrimState = SERVO_AUTOTRIM_COLLECTING;
+        if ((SCHEDULERTIME.GetMillis() - PreviousTime) > 500)
+        {
+            const bool FuselageIsFlyingStraight = RotationRateMagnitudeFiltered <= ConvertToRadians(Servo_AutoTrim_Rotation_Limit);
+            const bool NoRotationCommanded = TargetRateMagnitudeFiltered <= Servo_AutoTrim_Rotation_Limit;
+            const bool FuselageIsFlyingLevel = AHRS.CosineTiltAngle() >= 0.878153032f;
+
+            if (FuselageIsFlyingStraight && NoRotationCommanded && FuselageIsFlyingLevel && !IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && Get_GPS_Heading_Is_Valid())
+            {
+                for (uint8_t IndexCount = 0; IndexCount < 3; IndexCount++)
+                {
+                    const float NewIntegralTerm = GetNewIntegralTerm(IndexCount);
+                    if (fabsf(NewIntegralTerm) > SERVO_AUTOTRIM_UPDATE_SIZE)
+                    {
+                        const int8_t IntegralTermUpdate = NewIntegralTerm > 0.0f ? SERVO_AUTOTRIM_UPDATE_SIZE : -SERVO_AUTOTRIM_UPDATE_SIZE;
+                        for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
+                        {
+                            const float servoRate = Servo.Rate.GetAndSet[ServoIndex] / 100.0f;
+                            Servo.Pulse.Middle[ServoIndex] += IntegralTermUpdate * servoRate;
+                            Servo.Pulse.Middle[ServoIndex] = Constrain_16Bits(Servo.Pulse.Middle[ServoIndex], SERVO_AUTOTRIM_CENTER_MIN, SERVO_AUTOTRIM_CENTER_MAX);
+                        }
+                        PIDReduceErrorAccumulators(IntegralTermUpdate, IndexCount);
+                    }
+                }
+            }
+            PreviousTime = SCHEDULERTIME.GetMillis();
+        }
+    }
+    else if (ServoAutoTrimState == SERVO_AUTOTRIM_COLLECTING)
+    {
+        ServosSaveAndUpdateMiddlePoint();
+        BEEPER.Play(BEEPER_ACTION_SUCCESS);
+        ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
+    }
+}
+*/

@@ -105,8 +105,6 @@ float PitchLevelTrim = 0;
 float MotorIntegralTermWindUpPoint;
 float AntiWindUpScaler;
 float CoordinatedTurnRateEarthFrame;
-float ErrorGyroIntegral[3];
-float ErrorGyroIntegralLimit[3];
 
 void PIDXYZClass::Initialization(void)
 {
@@ -248,11 +246,11 @@ float PIDXYZClass::ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegr
 {
   if ((MixerIsOutputSaturated() && GetMultirotorEnabled()) || (GetAirPlaneEnabled() && PIDXYZ.FixedWingIntegralTermLimitActive(Axis)))
   {
-    ErrorGyroIntegral = Constrain_Float(ErrorGyroIntegral, -ErrorGyroIntegralLimit[Axis], ErrorGyroIntegralLimit[Axis]);
+    ErrorGyroIntegral = Constrain_Float(ErrorGyroIntegral, -PID_Resources.Controller.Integral.ErrorGyroLimit[Axis], PID_Resources.Controller.Integral.ErrorGyroLimit[Axis]);
   }
   else
   {
-    ErrorGyroIntegralLimit[Axis] = ABS(ErrorGyroIntegral);
+    PID_Resources.Controller.Integral.ErrorGyroLimit[Axis] = ABS(ErrorGyroIntegral);
   }
   return ErrorGyroIntegral;
 }
@@ -426,7 +424,7 @@ void PIDXYZClass::ApplyMulticopterRateControllerRoll(float DeltaTime)
 
   NewDerivativeTerm = PIDXYZ.DerivativeTermProcessRoll(IMU.Gyroscope.ReadFloat[ROLL], PreviousRateGyro, PreviousRateTarget, DeltaTime);
 
-  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[ROLL] + NewControlDerivativeTerm;
+  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + PID_Resources.Controller.Integral.ErrorGyro[ROLL] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 
   float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelaxRoll(PID_Resources.RcRateTarget.Roll, RateError);
@@ -443,9 +441,9 @@ void PIDXYZClass::ApplyMulticopterRateControllerRoll(float DeltaTime)
     NewControlTracking = 0;
   }
 
-  ErrorGyroIntegral[ROLL] += (IntegralTermErrorRate * (GET_SET[PID_ROLL].kI / 4.0f * TPA_Parameters.CalcedValue) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
+  PID_Resources.Controller.Integral.ErrorGyro[ROLL] += (IntegralTermErrorRate * (GET_SET[PID_ROLL].kI / 4.0f * TPA_Parameters.CalcedValue) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
 
-  ErrorGyroIntegral[ROLL] = PIDXYZ.ApplyIntegralTermLimiting(ROLL, ErrorGyroIntegral[ROLL]);
+  PID_Resources.Controller.Integral.ErrorGyro[ROLL] = PIDXYZ.ApplyIntegralTermLimiting(ROLL, PID_Resources.Controller.Integral.ErrorGyro[ROLL]);
 
   PID_Resources.Controller.Output.Calced[ROLL] = NewOutputLimited;
 
@@ -479,7 +477,7 @@ void PIDXYZClass::ApplyMulticopterRateControllerPitch(float DeltaTime)
 
   NewDerivativeTerm = PIDXYZ.DerivativeTermProcessPitch(IMU.Gyroscope.ReadFloat[PITCH], PreviousRateGyro, PreviousRateTarget, DeltaTime);
 
-  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[PITCH] + NewControlDerivativeTerm;
+  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + PID_Resources.Controller.Integral.ErrorGyro[PITCH] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 
   float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelaxPitch(PID_Resources.RcRateTarget.Pitch, RateError);
@@ -496,9 +494,9 @@ void PIDXYZClass::ApplyMulticopterRateControllerPitch(float DeltaTime)
     NewControlTracking = 0;
   }
 
-  ErrorGyroIntegral[PITCH] += (IntegralTermErrorRate * (GET_SET[PID_PITCH].kI / 4.0f * TPA_Parameters.CalcedValue) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
+  PID_Resources.Controller.Integral.ErrorGyro[PITCH] += (IntegralTermErrorRate * (GET_SET[PID_PITCH].kI / 4.0f * TPA_Parameters.CalcedValue) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
 
-  ErrorGyroIntegral[PITCH] = PIDXYZ.ApplyIntegralTermLimiting(PITCH, ErrorGyroIntegral[PITCH]);
+  PID_Resources.Controller.Integral.ErrorGyro[PITCH] = PIDXYZ.ApplyIntegralTermLimiting(PITCH, PID_Resources.Controller.Integral.ErrorGyro[PITCH]);
 
   PID_Resources.Controller.Output.Calced[PITCH] = NewOutputLimited;
 
@@ -539,7 +537,7 @@ void PIDXYZClass::ApplyMulticopterRateControllerYaw(float DeltaTime)
     NewDerivativeTerm = PIDXYZ.DerivativeTermProcessYaw(IMU.Gyroscope.ReadFloat[YAW], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   }
 
-  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + ErrorGyroIntegral[YAW] + NewControlDerivativeTerm;
+  const float NewOutput = NewProportionalTerm + NewDerivativeTerm + PID_Resources.Controller.Integral.ErrorGyro[YAW] + NewControlDerivativeTerm;
   const float NewOutputLimited = Constrain_Float(NewOutput, -MAX_YAW_PID_SUM_LIMIT, +MAX_YAW_PID_SUM_LIMIT);
 
   //float IntegralTermErrorRate = PIDXYZ.ApplyIntegralTermRelaxYaw(PID_Resources.RcRateTarget.Yaw, RateError);
@@ -558,9 +556,9 @@ void PIDXYZClass::ApplyMulticopterRateControllerYaw(float DeltaTime)
     NewControlTracking = 0;
   }
 
-  ErrorGyroIntegral[YAW] += (IntegralTermErrorRate * (GET_SET[PID_YAW].kI / 4.0f * 1.0f) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
+  PID_Resources.Controller.Integral.ErrorGyro[YAW] += (IntegralTermErrorRate * (GET_SET[PID_YAW].kI / 4.0f * 1.0f) * AntiWindUpScaler * DeltaTime) + ((NewOutputLimited - NewOutput) * NewControlTracking * AntiWindUpScaler * DeltaTime);
 
-  ErrorGyroIntegral[YAW] = PIDXYZ.ApplyIntegralTermLimiting(YAW, ErrorGyroIntegral[YAW]);
+  PID_Resources.Controller.Integral.ErrorGyro[YAW] = PIDXYZ.ApplyIntegralTermLimiting(YAW, PID_Resources.Controller.Integral.ErrorGyro[YAW]);
 
   PID_Resources.Controller.Output.Calced[YAW] = NewOutputLimited;
 
@@ -578,16 +576,16 @@ void PIDXYZClass::ApplyFixedWingRateControllerRoll(float DeltaTime)
   const float NewDerivativeTerm = PIDXYZ.DerivativeTermProcessRoll(IMU.Gyroscope.ReadFloat[ROLL], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   const float NewFeedForwardTerm = PID_Resources.RcRateTarget.Roll * (GET_SET[PID_ROLL].kFF / 31.0f * TPA_Parameters.CalcedValue);
 
-  ErrorGyroIntegral[ROLL] += RateError * (GET_SET[PID_ROLL].kI / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
+  PID_Resources.Controller.Integral.ErrorGyro[ROLL] += RateError * (GET_SET[PID_ROLL].kI / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 
-  ErrorGyroIntegral[ROLL] = PIDXYZ.ApplyIntegralTermLimiting(ROLL, ErrorGyroIntegral[ROLL]);
+  PID_Resources.Controller.Integral.ErrorGyro[ROLL] = PIDXYZ.ApplyIntegralTermLimiting(ROLL, PID_Resources.Controller.Integral.ErrorGyro[ROLL]);
 
   if (FixedWingIntegralTermThrowLimit != 0)
   {
-    ErrorGyroIntegral[ROLL] = Constrain_Float(ErrorGyroIntegral[ROLL], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
+    PID_Resources.Controller.Integral.ErrorGyro[ROLL] = Constrain_Float(PID_Resources.Controller.Integral.ErrorGyro[ROLL], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PID_Resources.Controller.Output.Calced[ROLL] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[ROLL] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PID_Resources.Controller.Output.Calced[ROLL] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + PID_Resources.Controller.Integral.ErrorGyro[ROLL] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 
   PreviousRateTarget = PID_Resources.RcRateTarget.Roll;
   PreviousRateGyro = IMU.Gyroscope.ReadFloat[ROLL];
@@ -603,16 +601,16 @@ void PIDXYZClass::ApplyFixedWingRateControllerPitch(float DeltaTime)
   const float NewDerivativeTerm = PIDXYZ.DerivativeTermProcessPitch(IMU.Gyroscope.ReadFloat[PITCH], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   const float NewFeedForwardTerm = PID_Resources.RcRateTarget.Pitch * (GET_SET[PID_PITCH].kFF / 31.0f * TPA_Parameters.CalcedValue);
 
-  ErrorGyroIntegral[PITCH] += RateError * (GET_SET[PID_PITCH].kI / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
+  PID_Resources.Controller.Integral.ErrorGyro[PITCH] += RateError * (GET_SET[PID_PITCH].kI / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 
-  ErrorGyroIntegral[PITCH] = PIDXYZ.ApplyIntegralTermLimiting(PITCH, ErrorGyroIntegral[PITCH]);
+  PID_Resources.Controller.Integral.ErrorGyro[PITCH] = PIDXYZ.ApplyIntegralTermLimiting(PITCH, PID_Resources.Controller.Integral.ErrorGyro[PITCH]);
 
   if (FixedWingIntegralTermThrowLimit != 0)
   {
-    ErrorGyroIntegral[PITCH] = Constrain_Float(ErrorGyroIntegral[PITCH], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
+    PID_Resources.Controller.Integral.ErrorGyro[PITCH] = Constrain_Float(PID_Resources.Controller.Integral.ErrorGyro[PITCH], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PID_Resources.Controller.Output.Calced[PITCH] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[PITCH] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PID_Resources.Controller.Output.Calced[PITCH] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + PID_Resources.Controller.Integral.ErrorGyro[PITCH] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 
   PreviousRateTarget = PID_Resources.RcRateTarget.Pitch;
   PreviousRateGyro = IMU.Gyroscope.ReadFloat[PITCH];
@@ -628,16 +626,16 @@ void PIDXYZClass::ApplyFixedWingRateControllerYaw(float DeltaTime)
   const float NewDerivativeTerm = PIDXYZ.DerivativeTermProcessYaw(IMU.Gyroscope.ReadFloat[YAW], PreviousRateGyro, PreviousRateTarget, DeltaTime);
   const float NewFeedForwardTerm = PID_Resources.RcRateTarget.Yaw * (GET_SET[PID_YAW].kFF / 31.0f * TPA_Parameters.CalcedValue);
 
-  ErrorGyroIntegral[YAW] += RateError * (GET_SET[PID_YAW].kI / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
+  PID_Resources.Controller.Integral.ErrorGyro[YAW] += RateError * (GET_SET[PID_YAW].kI / 4.0f * TPA_Parameters.CalcedValue) * DeltaTime;
 
-  ErrorGyroIntegral[YAW] = PIDXYZ.ApplyIntegralTermLimiting(YAW, ErrorGyroIntegral[YAW]);
+  PID_Resources.Controller.Integral.ErrorGyro[YAW] = PIDXYZ.ApplyIntegralTermLimiting(YAW, PID_Resources.Controller.Integral.ErrorGyro[YAW]);
 
   if (FixedWingIntegralTermThrowLimit != 0)
   {
-    ErrorGyroIntegral[YAW] = Constrain_Float(ErrorGyroIntegral[YAW], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
+    PID_Resources.Controller.Integral.ErrorGyro[YAW] = Constrain_Float(PID_Resources.Controller.Integral.ErrorGyro[YAW], -FixedWingIntegralTermThrowLimit, FixedWingIntegralTermThrowLimit);
   }
 
-  PID_Resources.Controller.Output.Calced[YAW] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + ErrorGyroIntegral[YAW] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
+  PID_Resources.Controller.Output.Calced[YAW] = Constrain_Float(NewProportionalTerm + NewFeedForwardTerm + PID_Resources.Controller.Integral.ErrorGyro[YAW] + NewDerivativeTerm, -MAX_PID_SUM_LIMIT, +MAX_PID_SUM_LIMIT);
 
   PreviousRateTarget = PID_Resources.RcRateTarget.Yaw;
   PreviousRateGyro = IMU.Gyroscope.ReadFloat[YAW];
@@ -695,10 +693,10 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn(void)
 
 void PIDXYZClass::Reset_Integral_Accumulators(void)
 {
-  ErrorGyroIntegral[ROLL] = 0;
-  ErrorGyroIntegral[PITCH] = 0;
-  ErrorGyroIntegral[YAW] = 0;
-  ErrorGyroIntegralLimit[ROLL] = 0;
-  ErrorGyroIntegralLimit[PITCH] = 0;
-  ErrorGyroIntegralLimit[YAW] = 0;
+  PID_Resources.Controller.Integral.ErrorGyro[ROLL] = 0;
+  PID_Resources.Controller.Integral.ErrorGyro[PITCH] = 0;
+  PID_Resources.Controller.Integral.ErrorGyro[YAW] = 0;
+  PID_Resources.Controller.Integral.ErrorGyroLimit[ROLL] = 0;
+  PID_Resources.Controller.Integral.ErrorGyroLimit[PITCH] = 0;
+  PID_Resources.Controller.Integral.ErrorGyroLimit[YAW] = 0;
 }

@@ -158,9 +158,9 @@ struct _Send_User_Basic_Parameters
     uint8_t SendRcChSequency;
     uint8_t SendGimbalType;
     uint8_t SendParachuteType;
-    uint8_t SendSPIType;
-    uint8_t SendUART_NUMB_2Type;
     uint8_t SendUartNumb1Type;
+    uint8_t SendUartNumb2Type;
+    uint8_t SendUartNumb3Type;
     uint8_t SendCompassRotationType;
     uint8_t SendRTHAltitude;
     uint8_t SendAcroType;
@@ -184,9 +184,9 @@ struct _Get_User_Basic_Parameters
     uint8_t GetRcChSequency;
     uint8_t GetGimbalType;
     uint8_t GetParachuteType;
-    uint8_t GetSPIType;
-    uint8_t GetUART_NUMB_2Type;
     uint8_t GetUartNumb1Type;
+    uint8_t GetUartNumb2Type;
+    uint8_t GetUartNumb3Type;
     uint8_t GetCompassRotationType;
     uint8_t GetRTHAltitude;
     uint8_t GetAcroType;
@@ -985,9 +985,9 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendRcChSequency, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendGimbalType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendParachuteType, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Basic_Parameters.SendSPIType, VAR_8BITS);
-        Send_Data_To_GCS(Send_User_Basic_Parameters.SendUART_NUMB_2Type, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendUartNumb1Type, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendUartNumb2Type, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendUartNumb3Type, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendCompassRotationType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendRTHAltitude, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAcroType, VAR_8BITS);
@@ -1430,8 +1430,8 @@ void GCSClass::Save_Basic_Configuration(void)
     STORAGEMANAGER.Write_8Bits(GIMBAL_ADDR, Get_User_Basic_Parameters.GetGimbalType);
     STORAGEMANAGER.Write_8Bits(PARACHUTE_ADDR, Get_User_Basic_Parameters.GetParachuteType);
     STORAGEMANAGER.Write_8Bits(UART_NUMB_1_ADDR, Get_User_Basic_Parameters.GetUartNumb1Type);
-    STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, Get_User_Basic_Parameters.GetUART_NUMB_2Type);
-    STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, Get_User_Basic_Parameters.GetSPIType);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_2_ADDR, Get_User_Basic_Parameters.GetUartNumb2Type);
+    STORAGEMANAGER.Write_8Bits(UART_NUMB_3_ADDR, Get_User_Basic_Parameters.GetUartNumb3Type);
     STORAGEMANAGER.Write_8Bits(COMPASS_ROTATION_ADDR, Get_User_Basic_Parameters.GetCompassRotationType);
     STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, Get_User_Basic_Parameters.GetRTHAltitude);
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, Get_User_Basic_Parameters.GetAcroType);
@@ -1678,8 +1678,8 @@ void GCSClass::LoadAllParameters(void)
     Send_User_Basic_Parameters.SendGimbalType = STORAGEMANAGER.Read_8Bits(GIMBAL_ADDR);
     Send_User_Basic_Parameters.SendParachuteType = STORAGEMANAGER.Read_8Bits(PARACHUTE_ADDR);
     Send_User_Basic_Parameters.SendUartNumb1Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_1_ADDR);
-    Send_User_Basic_Parameters.SendUART_NUMB_2Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
-    Send_User_Basic_Parameters.SendSPIType = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR);
+    Send_User_Basic_Parameters.SendUartNumb2Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_2_ADDR);
+    Send_User_Basic_Parameters.SendUartNumb3Type = STORAGEMANAGER.Read_8Bits(UART_NUMB_3_ADDR);
     Send_User_Basic_Parameters.SendCompassRotationType = STORAGEMANAGER.Read_8Bits(COMPASS_ROTATION_ADDR);
     Send_User_Basic_Parameters.SendRTHAltitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
     Send_User_Basic_Parameters.SendAcroType = STORAGEMANAGER.Read_8Bits(STABLIZE_ADDR);

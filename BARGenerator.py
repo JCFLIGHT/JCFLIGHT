@@ -24,12 +24,19 @@ class StorageSizeOf(enum.Enum):
     FIRMWARE_RESERVED_MAGIC_ADDR = 0x5DC
 
 
-DefsTable = [
+DefsCLITable = [
     ['Nome da Definição', 'OffSet'],
     ['KP_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
     ['KI_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
     ['KP_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
     ['KI_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
+]
+
+DefsNormalConfigTable = [
+    ['Nome da Definição', 'OffSet'],
+    ['ACC_ROLL_OFFSET_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
+    ['ACC_PITCH_OFFSET_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
+    ['ACC_YAW_OFFSET_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
 ]
 
 # MAPEAMENTO DE ARMAZENAMENTO,SE O ENDEREÇO FINAL FOR ULTRAPASSADO,UM ERRO DE COMPILAÇÃO DEVE SER GERADO,ESSA É A IDEIA
@@ -100,21 +107,37 @@ def Generate_Code(File, Date):
     File.write('#define FIRMWARE_FIRST_USAGE_ADDR ' + '%d' %
                StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value + '\n\n')
 
+    print('\n--------------------------------DEFS DO CLI--------------------------------')
+
+    ColumnsCount = (len(DefsCLITable) - 1)
+    CheckSum = 0
     NextStorageAddress = 0
     PrevStorageAddress = 0
+    SendMessageSuccess = False
 
-    print('\n--------------------------------------------------------------------------------')
+    for TableSizeCount in range(ColumnsCount):
+        CheckSum = CheckSum + DefsCLITable[TableSizeCount + 1][1]
 
-    for TableSizeCount in range(len(DefsTable) - 1):
+    for TableSizeCount in range(ColumnsCount):
+        if(CheckSum >= StorageSizeOf.CLI_SIZE_FINAL_RESERVED.value):
+            print(
+                '!!!FALHA!!! OS ADDRs DOS DEFs DO CLI ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS')
+            break
+        SendMessageSuccess = True
         NextStorageAddress = NextStorageAddress + \
-            DefsTable[TableSizeCount + 1][1]
+            DefsCLITable[TableSizeCount + 1][1]
         Generate_Defines(
-            File, DefsTable[TableSizeCount + 1][0], PrevStorageAddress + 1)  # +1 PARA INICIAR A CONTAGEM DO ADDR 1 (UM) AO INVÉS DO 0 (ZERO)
-        print('DEF: %s' % DefsTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
-              (PrevStorageAddress + 1) + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' %s' % CheckAddressTypeToStr(DefsTable[TableSizeCount + 1][1]))
+            File, DefsCLITable[TableSizeCount + 1][0], PrevStorageAddress + 1)  # +1 PARA INICIAR A CONTAGEM DO ADDR 1 (UM) AO INVÉS DO 0 (ZERO)
+        print('DEF: %s' % DefsCLITable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
+              (PrevStorageAddress + 1) + '  TAMANHO:%d' % DefsCLITable[TableSizeCount + 1][1] + ' %s' % CheckAddressTypeToStr(DefsCLITable[TableSizeCount + 1][1]))
         PrevStorageAddress = NextStorageAddress
 
-    print('--------------------------------------------------------------------------------\n')
+    if (SendMessageSuccess):
+        print('OS ADDRs DOS DEFs DO CLI FORAM GERADOS COM SUCESSO!')
+
+    CheckSum = 0  # RESETA A CHECAGEM DE SOMA DE ENDEREÇOS PARA O PROXIMO
+
+    print('\n---------------------------------------------------------------------------')
 
 
 if __name__ == '__main__':

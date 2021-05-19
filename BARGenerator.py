@@ -26,9 +26,9 @@ class StorageSizeOf(enum.Enum):
 
 DefsTable = [
     ['Nome da Definição', 'OffSet'],
-    ['KP_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_32_BITS.value],
-    ['KI_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_32_BITS.value],
-    ['KP_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
+    ['KP_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
     ['KI_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
 ]
 
@@ -53,6 +53,18 @@ def Generate_Defines(File, DefineName, StorageAddressOffSet):
     File.write('#define %s ' % DefineName)
     File.write(Format_Entry(StorageAddressOffSet))
     File.write("\n")
+
+
+def CheckAddressTypeToStr(AddressSizeOf):
+
+    StringRet = 'BYTES'
+
+    if (AddressSizeOf == AddrSizeOf.TYPE_8_BITS.value):
+        StringRet = 'BYTE'
+    else:
+        StringRet = 'BYTES'
+
+    return StringRet
 
 
 def Generate_Code(File, Date):
@@ -99,7 +111,7 @@ def Generate_Code(File, Date):
         Generate_Defines(
             File, DefsTable[TableSizeCount + 1][0], PrevStorageAddress + 1)  # +1 PARA INICIAR A CONTAGEM DO ADDR 1 (UM) AO INVÉS DO 0 (ZERO)
         print('DEF: %s' % DefsTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
-              (PrevStorageAddress + 1) + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' BYTE OU BYTES')
+              (PrevStorageAddress + 1) + '  TAMANHO:%d' % DefsTable[TableSizeCount + 1][1] + ' %s' % CheckAddressTypeToStr(DefsTable[TableSizeCount + 1][1]))
         PrevStorageAddress = NextStorageAddress
 
     print('--------------------------------------------------------------------------------\n')

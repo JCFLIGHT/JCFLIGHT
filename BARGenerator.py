@@ -24,22 +24,6 @@ class StorageSizeOf(enum.Enum):
     FIRMWARE_RESERVED_MAGIC_ADDR = 0x5DC
 
 
-DefsCLITable = [
-    ['Nome da Definição', 'OffSet'],
-    ['KP_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
-    ['KI_ACC_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
-    ['KP_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
-    ['KI_MAG_AHRS_ADDR',  AddrSizeOf.TYPE_8_BITS.value],
-]
-
-DefsNormalConfigTable = [
-    ['Nome da Definição', 'OffSet'],
-    ['ACC_ROLL_OFFSET_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
-    ['ACC_PITCH_OFFSET_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
-    ['ACC_YAW_OFFSET_ADDR',  AddrSizeOf.TYPE_16_BITS.value],
-]
-
-# MAPEAMENTO DE ARMAZENAMENTO,SE O ENDEREÇO FINAL FOR ULTRAPASSADO,UM ERRO DE COMPILAÇÃO DEVE SER GERADO,ESSA É A IDEIA
 StorageLayout = [
     ['Grupo', 'Endereço Inicial', 'Endereço Final'],
     ['CLI', StorageSizeOf.CLI_SIZE_INITIAL_RESERVED.value,
@@ -48,6 +32,21 @@ StorageLayout = [
         StorageSizeOf.NORMAL_CONFIG_SIZE_FINAL_RESERVED.value],
     ['WAYPOINT', StorageSizeOf.WAYPOINT_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.WAYPOINT_SIZE_FINAL_RESERVED.value],
+]
+
+DefsCLITable = [
+    ['Nome da Definição', 'OffSet'],
+    ['KP_ACC_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_ACC_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+]
+
+DefsNormalConfigTable = [
+    ['Nome da Definição', 'OffSet'],
+    ['ACC_ROLL_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['ACC_PITCH_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['ACC_YAW_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
 ]
 
 
@@ -62,7 +61,7 @@ def Generate_Defines(File, DefineName, StorageAddressOffSet):
     File.write("\n")
 
 
-def CheckAddressTypeToStr(AddressSizeOf):
+def Generate_Address_Type_To_Str(AddressSizeOf):
 
     StringRet = 'BYTES'
 
@@ -72,6 +71,36 @@ def CheckAddressTypeToStr(AddressSizeOf):
         StringRet = 'BYTES'
 
     return StringRet
+
+
+def Generate_Info_And_Defines(InputTable, InputStorageLayoutMin, InputStorageLayoutMax, InputErrorMessage, InputSuccessMessage):
+
+    ColumnsCount = (len(InputTable) - 1)
+    CheckSum = 0
+    NextStorageAddress = 0
+    PrevStorageAddress = 0
+    SendMessageSuccess = False
+
+    for TableSizeCount in range(ColumnsCount):
+        CheckSum = CheckSum + InputTable[TableSizeCount + 1][1]
+
+    for TableSizeCount in range(ColumnsCount):
+        if(CheckSum >= InputStorageLayoutMax):
+            print(InputErrorMessage)
+            break
+        SendMessageSuccess = True
+        NextStorageAddress = NextStorageAddress + \
+            InputTable[TableSizeCount + 1][1]
+        Generate_Defines(
+            File, InputTable[TableSizeCount + 1][0], PrevStorageAddress + 1 + InputStorageLayoutMin)
+        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
+              (PrevStorageAddress + 1 + InputStorageLayoutMin) + '  TAMANHO:%d' % InputTable[TableSizeCount + 1][1] + ' %s' % Generate_Address_Type_To_Str(InputTable[TableSizeCount + 1][1]))
+        PrevStorageAddress = NextStorageAddress
+
+    if (SendMessageSuccess):
+        print(InputSuccessMessage)
+
+    print('\n')
 
 
 def Generate_Code(File, Date):
@@ -107,37 +136,19 @@ def Generate_Code(File, Date):
     File.write('#define FIRMWARE_FIRST_USAGE_ADDR ' + '%d' %
                StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value + '\n\n')
 
-    print('\n--------------------------------DEFS DO CLI--------------------------------')
+    print('\n----------------------------------------------------------------DEFS DO CLI----------------------------------------------------------------')
 
-    ColumnsCount = (len(DefsCLITable) - 1)
-    CheckSum = 0
-    NextStorageAddress = 0
-    PrevStorageAddress = 0
-    SendMessageSuccess = False
+    File.write('//ADDRs PARA O CLI\n')
+    Generate_Info_And_Defines(
+        DefsCLITable, StorageLayout[1][1], StorageLayout[1][2], '!!!FALHA!!! OS ADDRs DO CLI ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ADDRs DO CLI FORAM GERADOS COM SUCESSO!')
 
-    for TableSizeCount in range(ColumnsCount):
-        CheckSum = CheckSum + DefsCLITable[TableSizeCount + 1][1]
+    print('----------------------------------------------------------DEFS DAS CONFIG NORMAIS----------------------------------------------------------')
 
-    for TableSizeCount in range(ColumnsCount):
-        if(CheckSum >= StorageSizeOf.CLI_SIZE_FINAL_RESERVED.value):
-            print(
-                '!!!FALHA!!! OS ADDRs DOS DEFs DO CLI ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS')
-            break
-        SendMessageSuccess = True
-        NextStorageAddress = NextStorageAddress + \
-            DefsCLITable[TableSizeCount + 1][1]
-        Generate_Defines(
-            File, DefsCLITable[TableSizeCount + 1][0], PrevStorageAddress + 1)  # +1 PARA INICIAR A CONTAGEM DO ADDR 1 (UM) AO INVÉS DO 0 (ZERO)
-        print('DEF: %s' % DefsCLITable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
-              (PrevStorageAddress + 1) + '  TAMANHO:%d' % DefsCLITable[TableSizeCount + 1][1] + ' %s' % CheckAddressTypeToStr(DefsCLITable[TableSizeCount + 1][1]))
-        PrevStorageAddress = NextStorageAddress
+    File.write('\n//ADDRs PARA AS CONFIGS NORMAIS\n')
+    Generate_Info_And_Defines(
+        DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], '!!!FALHA!!! OS ADDRs DAS CONFIGS NORMAIS ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ADDRs DAS CONFIGS FORAM GERADOS COM SUCESSO!')
 
-    if (SendMessageSuccess):
-        print('OS ADDRs DOS DEFs DO CLI FORAM GERADOS COM SUCESSO!')
-
-    CheckSum = 0  # RESETA A CHECAGEM DE SOMA DE ENDEREÇOS PARA O PROXIMO
-
-    print('\n---------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------------------------------------------------------------')
 
 
 if __name__ == '__main__':

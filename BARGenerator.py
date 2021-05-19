@@ -2,6 +2,9 @@ import datetime
 import pathlib
 import enum
 
+WAYPOINTS_MAXIMUM = 10
+OTHERS_PARAMS_MAXIMUM = 3  # ALTITUDE,TEMPO DO GPS-HOLD E O MODO DE VOO
+
 
 class AddrSizeOf(enum.Enum):
     TYPE_8_BITS = 0x01
@@ -11,15 +14,15 @@ class AddrSizeOf(enum.Enum):
 
 
 class StorageSizeOf(enum.Enum):
-    # 474 BYTES DO ARMAZENAMENTO RESERVADOS PARA O CLI
+    # 474 BYTES RESERVADOS DO ARMAZENAMENTO PARA O CLI
     CLI_SIZE_INITIAL_RESERVED = 0x01
     CLI_SIZE_FINAL_RESERVED = 0x1DB
-    # 215 BYTES DO ARMAZENAMENTO RESERVADOS PARA AS CONFIGURAÇÕES NORMAIS
+    # 515 BYTES RESERVADOS DO ARMAZENAMENTO PARA AS CONFIGURAÇÕES NORMAIS
     NORMAL_CONFIG_SIZE_INITIAL_RESERVED = 0x1E0
-    NORMAL_CONFIG_SIZE_FINAL_RESERVED = 0x2B7
-    # 109 BYTES DO ARMAZENAMENTO RESERVADOS PARA AS CONFIGURAÇÕES DO MODO WAYPOINT
-    WAYPOINT_SIZE_INITIAL_RESERVED = 0x2C0
-    WAYPOINT_SIZE_FINAL_RESERVED = 0x32D
+    NORMAL_CONFIG_SIZE_FINAL_RESERVED = 0x3E3
+    # 495 BYTES RESERVADOS DO ARMAZENAMENTO PARA AS CONFIGURAÇÕES DO MODO WAYPOINT
+    WAYPOINT_SIZE_INITIAL_RESERVED = 0x3E8
+    WAYPOINT_SIZE_FINAL_RESERVED = 0x5D7
     # ENDEREÇO PARA A VERIFICAÇÃO DE UPLOAD DO FIRMWARE
     FIRMWARE_RESERVED_MAGIC_ADDR = 0x5DC
 
@@ -49,11 +52,18 @@ DefsNormalConfigTable = [
     ['ACC_YAW_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
 ]
 
+FinalOfWayPointCoordinates = (
+    StorageLayout[3][1] + (WAYPOINTS_MAXIMUM * (AddrSizeOf.TYPE_32_BITS.value * 2)))
+FinalOfWayPointCoordinatesWithOffSet = (
+    FinalOfWayPointCoordinates + AddrSizeOf.TYPE_32_BITS.value)
+
 DefsWayPointTable = [
     ['Nome da Definição', 'OffSet'],
+    ['WAYPOINTS_MAXIMUM', WAYPOINTS_MAXIMUM],
+    ['OTHERS_PARAMS_MAXIMUM', OTHERS_PARAMS_MAXIMUM],
     ['INITIAL_ADDR_OF_COORDINATES', StorageLayout[3][1]],
-    ['FINAL_ADDR_OF_COORDINATES', 780],
-    ['INITIAL_ADDR_OF_OTHERS_PARAMS', 784],
+    ['FINAL_ADDR_OF_COORDINATES', FinalOfWayPointCoordinates],
+    ['INITIAL_ADDR_OF_OTHERS_PARAMS', FinalOfWayPointCoordinatesWithOffSet],
     ['FINAL_ADDR_OF_OTHERS_PARAMS', StorageLayout[3][2]],
 ]
 
@@ -88,7 +98,8 @@ def Generate_WayPoint_Defs(File, InputTable):
     for TableSizeCount in range(ColumnsCount):
         File.write('#define %s ' % InputTable[TableSizeCount + 1][0])
         File.write(Format_Entry(InputTable[TableSizeCount + 1][1]))
-        print('DEF: %s' % InputTable[TableSizeCount + 1][0])
+        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
+              InputTable[TableSizeCount + 1][1])
         File.write("\n")
 
 

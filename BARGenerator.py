@@ -49,6 +49,14 @@ DefsNormalConfigTable = [
     ['ACC_YAW_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
 ]
 
+DefsWayPointTable = [
+    ['Nome da Definição', 'OffSet'],
+    ['INITIAL_ADDR_OF_COORDINATES', StorageLayout[3][1]],
+    ['FINAL_ADDR_OF_COORDINATES', 780],
+    ['INITIAL_ADDR_OF_OTHERS_PARAMS', 784],
+    ['FINAL_ADDR_OF_OTHERS_PARAMS', StorageLayout[3][2]],
+]
+
 
 def Format_Entry(StrIn):
     return '%d' % round(StrIn)
@@ -71,6 +79,17 @@ def Generate_Address_Type_To_Str(AddressSizeOf):
         StringRet = 'BYTES'
 
     return StringRet
+
+
+def Generate_WayPoint_Defs(File, InputTable):
+
+    ColumnsCount = (len(InputTable) - 1)
+
+    for TableSizeCount in range(ColumnsCount):
+        File.write('#define %s ' % InputTable[TableSizeCount + 1][0])
+        File.write(Format_Entry(InputTable[TableSizeCount + 1][1]))
+        print('DEF: %s' % InputTable[TableSizeCount + 1][0])
+        File.write("\n")
 
 
 def Generate_Info_And_Defines(InputTable, InputStorageLayoutMin, InputStorageLayoutMax, InputErrorMessage, InputSuccessMessage):
@@ -147,6 +166,11 @@ def Generate_Code(File, Date):
     File.write('\n//ADDRs PARA AS CONFIGS NORMAIS\n')
     Generate_Info_And_Defines(
         DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], '!!!FALHA!!! OS ADDRs DAS CONFIGS NORMAIS ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ADDRs DAS CONFIGS FORAM GERADOS COM SUCESSO!')
+
+    print('-----------------------------------------------------------DEFS DO MODO WAYPOINT-----------------------------------------------------------')
+
+    File.write('\n//ADDRs PARA O MODO WAYPOINT\n')
+    Generate_WayPoint_Defs(File, DefsWayPointTable)
 
     print('-------------------------------------------------------------------------------------------------------------------------------------------')
 

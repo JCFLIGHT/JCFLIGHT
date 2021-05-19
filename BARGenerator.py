@@ -94,11 +94,16 @@ def Generate_Address_Type_To_Str(AddressSizeOf):
 def Generate_WayPoint_Defs(File, InputTable):
 
     ColumnsCount = (len(InputTable) - 1)
+    StringPrint = ''
 
     for TableSizeCount in range(ColumnsCount):
         File.write('#define %s ' % InputTable[TableSizeCount + 1][0])
         File.write(Format_Entry(InputTable[TableSizeCount + 1][1]))
-        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
+        if(TableSizeCount > 1):
+            StringPrint = 'ADDR DE ARMAZENAMENTO:'
+        else:
+            StringPrint = 'VALOR:'
+        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  %s' % StringPrint + '%d' %
               InputTable[TableSizeCount + 1][1])
         File.write("\n")
 

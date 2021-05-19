@@ -2,11 +2,14 @@ import datetime
 import pathlib
 import enum
 
+FIRMWARE_STORAGE_REVISION = 10  # 1.0 - INCREMENTE SEMPRE QUE HOUVER UM LANÇAMENTO
+
 WAYPOINTS_MAXIMUM = 10
 OTHERS_PARAMS_MAXIMUM = 3  # ALTITUDE,TEMPO DO GPS-HOLD E O MODO DE VOO
 
 
 class AddrSizeOf(enum.Enum):
+    TYPE_NONE = 0x00
     TYPE_8_BITS = 0x01
     TYPE_16_BITS = 0x02
     TYPE_32_BITS = 0x04
@@ -25,6 +28,8 @@ class StorageSizeOf(enum.Enum):
     WAYPOINT_SIZE_FINAL_RESERVED = 0x5D7
     # ENDEREÇO PARA A VERIFICAÇÃO DE UPLOAD DO FIRMWARE
     FIRMWARE_RESERVED_MAGIC_ADDR = 0x5DC
+    # 2000 BYTES RESERVADOS PARA USO
+    TOTAL_SIZE_OF_STORAGE_RESERVED_TO_USE = 0x7D0
 
 
 StorageLayout = [
@@ -35,6 +40,10 @@ StorageLayout = [
         StorageSizeOf.NORMAL_CONFIG_SIZE_FINAL_RESERVED.value],
     ['WAYPOINT', StorageSizeOf.WAYPOINT_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.WAYPOINT_SIZE_FINAL_RESERVED.value],
+    ['FIRMWARE_MAGIC_ADDRESS', AddrSizeOf.TYPE_NONE.value,
+        StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value],
+    ['TOTAL_SIZE_OF_STORAGE', AddrSizeOf.TYPE_NONE.value,
+        StorageSizeOf.TOTAL_SIZE_OF_STORAGE_RESERVED_TO_USE.value],
 ]
 
 DefsCLITable = [
@@ -52,23 +61,24 @@ DefsNormalConfigTable = [
     ['ACC_YAW_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
 ]
 
-FinalOfWayPointCoordinates = (
+FinalAddrOfWayPointCoordinates = (
     StorageLayout[3][1] + (WAYPOINTS_MAXIMUM * (AddrSizeOf.TYPE_32_BITS.value * 2)))
-FinalOfWayPointCoordinatesWithOffSet = (
-    FinalOfWayPointCoordinates + AddrSizeOf.TYPE_32_BITS.value)
+FinalAddrOfWayPointCoordinatesWithOffSet = (
+    FinalAddrOfWayPointCoordinates + AddrSizeOf.TYPE_32_BITS.value)
 
 DefsWayPointTable = [
     ['Nome da Definição', 'OffSet'],
     ['WAYPOINTS_MAXIMUM', WAYPOINTS_MAXIMUM],
     ['OTHERS_PARAMS_MAXIMUM', OTHERS_PARAMS_MAXIMUM],
     ['INITIAL_ADDR_OF_COORDINATES', StorageLayout[3][1]],
-    ['FINAL_ADDR_OF_COORDINATES', FinalOfWayPointCoordinates],
-    ['INITIAL_ADDR_OF_OTHERS_PARAMS', FinalOfWayPointCoordinatesWithOffSet],
+    ['FINAL_ADDR_OF_COORDINATES', FinalAddrOfWayPointCoordinates],
+    ['INITIAL_ADDR_OF_OTHERS_PARAMS', FinalAddrOfWayPointCoordinatesWithOffSet],
     ['FINAL_ADDR_OF_OTHERS_PARAMS', StorageLayout[3][2]],
 ]
 
 
 def Format_Entry(StrIn):
+
     return '%d' % round(StrIn)
 
 
@@ -99,6 +109,10 @@ def Generate_WayPoint_Defs(File, InputTable):
     for TableSizeCount in range(ColumnsCount):
         File.write('#define %s ' % InputTable[TableSizeCount + 1][0])
         File.write(Format_Entry(InputTable[TableSizeCount + 1][1]))
+        if(TableSizeCount == 0):
+            File.write(' //NUMERO MAXIMO DE WAYPOINTS SUPORTADO')
+        if(TableSizeCount == 1):
+            File.write(' //ALTITUDE,TEMPO DO GPS-HOLD E O MODO DE VOO')
         if(TableSizeCount > 1):
             StringPrint = 'ADDR DE ARMAZENAMENTO:'
         else:
@@ -135,8 +149,6 @@ def Generate_Info_And_Defines(InputTable, InputStorageLayoutMin, InputStorageLay
     if (SendMessageSuccess):
         print(InputSuccessMessage)
 
-    print('\n')
-
 
 def Generate_Code(File, Date):
     # GERA O TOPO DA EXTENSÃO
@@ -160,16 +172,34 @@ def Generate_Code(File, Date):
 \n\n")
 
     File.write('#pragma once\n\n')
-
-    File.write('//BASE ADDRESS REGISTER\n\n')
+    File.write('/*\n\n')
+    File.write('BAR - BASE ADDRESS REGISTER\n\n')
     File.write(
-        '//ESSE ARQUIVO HEADER FOI GERADO AUTOMATICAMENTE - POR FAVOR,NUNCA O EDITE MANUALMENTE!\n\n')
-    File.write('//ATUALIZADO EM %s\n\n' % Date)
+        'ESSE ARQUIVO HEADER FOI GERADO AUTOMATICAMENTE - POR FAVOR,NUNCA O EDITE MANUALMENTE!\n\n')
+    File.write('ATUALIZADO EM %s\n\n' % Date)
+    File.write('*/\n\n')
 
-    # PRIMEIRO UPLOAD ADDR
+    File.write('//INCREMENTE SEMPRE QUE HOUVER UM NOVO RELEASE\n')
+    File.write('#define FIRMWARE_STORAGE_REVISION' + ' %d' %
+               FIRMWARE_STORAGE_REVISION + ' //%.1f' %
+               (FIRMWARE_STORAGE_REVISION / 10) + '\n\n')
+
+    print('\n')
+    print('FIRMWARE_STORAGE_REVISION' + ' %.1f' %
+          (FIRMWARE_STORAGE_REVISION / 10))
+
+    File.write('//NUMERO DE BYTES DO ARMAZENAMENTO RESERVADOS PARA USO\n')
+    File.write('#define ' + '%s' %
+               StorageLayout[5][0] + ' %d' % StorageLayout[5][2] + '\n\n')
+
+    print('%s' % StorageLayout[5][0] + ' %d' % StorageLayout[5][2])
+
+    # ADDR DO PRIMEIRO UPLOAD
     File.write('//ADDR PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
-    File.write('#define FIRMWARE_FIRST_USAGE_ADDR ' + '%d' %
-               StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value + '\n\n')
+    File.write('#define ' + '%s' %
+               StorageLayout[4][0] + ' %d' % StorageLayout[4][2] + '\n\n')
+
+    print('%s' % StorageLayout[4][0] + ' %d' % StorageLayout[4][2])
 
     print('\n----------------------------------------------------------------DEFS DO CLI----------------------------------------------------------------')
 
@@ -177,18 +207,22 @@ def Generate_Code(File, Date):
     Generate_Info_And_Defines(
         DefsCLITable, StorageLayout[1][1], StorageLayout[1][2], '!!!FALHA!!! OS ADDRs DO CLI ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ADDRs DO CLI FORAM GERADOS COM SUCESSO!')
 
-    print('----------------------------------------------------------DEFS DAS CONFIG NORMAIS----------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------------------------------------------------------------\n')
 
-    File.write('\n//ADDRs PARA AS CONFIGS NORMAIS\n')
+    print('--------------------------------------------------------------DEFS DAS CONFIG--------------------------------------------------------------')
+
+    File.write('\n//ADDRs PARA AS CONFIGS\n')
     Generate_Info_And_Defines(
         DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], '!!!FALHA!!! OS ADDRs DAS CONFIGS NORMAIS ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ADDRs DAS CONFIGS FORAM GERADOS COM SUCESSO!')
 
+    print('-------------------------------------------------------------------------------------------------------------------------------------------\n')
+
     print('-----------------------------------------------------------DEFS DO MODO WAYPOINT-----------------------------------------------------------')
 
-    File.write('\n//ADDRs PARA O MODO WAYPOINT\n')
+    File.write('\n//CONFIG E ADDRs PARA O MODO WAYPOINT\n')
     Generate_WayPoint_Defs(File, DefsWayPointTable)
 
-    print('-------------------------------------------------------------------------------------------------------------------------------------------')
+    print('------------------------------------------------------------------------------------------------------------------------------------------\n')
 
 
 if __name__ == '__main__':

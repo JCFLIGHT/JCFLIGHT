@@ -1,7 +1,9 @@
-import datetime
-import pathlib
-import enum
 import codecs
+import enum
+import pathlib
+import datetime
+Import("env")
+
 
 FIRMWARE_STORAGE_REVISION = 10  # 1.0 - INCREMENTE SEMPRE QUE HOUVER UM LANÇAMENTO
 
@@ -196,7 +198,8 @@ def Generate_Code(File, Date):
     print('%s' % StorageLayout[5][0] + ' %d' % StorageLayout[5][2])
 
     # ENDEREÇO DO PRIMEIRO UPLOAD
-    File.write('//ENDEREÇO PARA VERIFICAR SE É O PRIMEIRO UPLOAD DA VERSÃO DO FIRMWARE\n')
+    File.write(
+        '//ENDEREÇO PARA VERIFICAR SE É O PRIMEIRO UPLOAD DA VERSÃO DO FIRMWARE\n')
     File.write('#define ' + '%s' %
                StorageLayout[4][0] + ' %d' % StorageLayout[4][2] + '\n\n')
 
@@ -226,10 +229,8 @@ def Generate_Code(File, Date):
     print('------------------------------------------------------------------------------------------------------------------------------------------\n')
 
 
-if __name__ == '__main__':
-
-    Output = pathlib.PurePath(__file__).parent / \
-        'src' / 'BAR' / 'BARGENERATED.h'
+env.Dump()
+try:
 
     DateAndTime = str(datetime.datetime.now())
     Year = DateAndTime[0:4]
@@ -239,6 +240,9 @@ if __name__ == '__main__':
     Minutes = DateAndTime[14:16]
     Seconds = DateAndTime[17:19]
 
-    with codecs.open(Output, "w", "utf-8-sig") as File:
-        Generate_Code(File, "{}/{}/{} ÁS {}:{}:{}".format(Month,
-                      Day, Year, Hours, Minutes, Seconds))
+except:
+    print('')
+
+with codecs.open(pathlib.PurePath('__main__').parent / 'src' / 'BAR' / 'BARGENERATED.h', "w", "utf-8-sig") as File:
+    Generate_Code(File, "{}/{}/{} ÁS {}:{}:{}".format(Month,
+                  Day, Year, Hours, Minutes, Seconds))

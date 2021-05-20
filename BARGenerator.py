@@ -1,6 +1,7 @@
 import datetime
 import pathlib
 import enum
+import codecs
 
 FIRMWARE_STORAGE_REVISION = 10  # 1.0 - INCREMENTE SEMPRE QUE HOUVER UM LANÇAMENTO
 
@@ -110,11 +111,11 @@ def Generate_WayPoint_Defs(File, InputTable):
         File.write('#define %s ' % InputTable[TableSizeCount + 1][0])
         File.write(Format_Entry(InputTable[TableSizeCount + 1][1]))
         if(TableSizeCount == 0):
-            File.write(' //NUMERO MAXIMO DE WAYPOINTS SUPORTADO')
+            File.write(' //NÚMERO MAXIMO DE WAYPOINTS SUPORTADO')
         if(TableSizeCount == 1):
             File.write(' //ALTITUDE,TEMPO DO GPS-HOLD E O MODO DE VOO')
         if(TableSizeCount > 1):
-            StringPrint = 'ADDR DE ARMAZENAMENTO:'
+            StringPrint = 'ENDEREÇO DE ARMAZENAMENTO:'
         else:
             StringPrint = 'VALOR:'
         print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  %s' % StringPrint + '%d' %
@@ -142,7 +143,7 @@ def Generate_Info_And_Defines(InputTable, InputStorageLayoutMin, InputStorageLay
             InputTable[TableSizeCount + 1][1]
         Generate_Defines(
             File, InputTable[TableSizeCount + 1][0], PrevStorageAddress + 1 + InputStorageLayoutMin)
-        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  ADDR DE ARMAZENAMENTO:%d' %
+        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  ENDEREÇO DE ARMAZENAMENTO:%d' %
               (PrevStorageAddress + 1 + InputStorageLayoutMin) + '  TAMANHO:%d' % InputTable[TableSizeCount + 1][1] + ' %s' % Generate_Address_Type_To_Str(InputTable[TableSizeCount + 1][1]))
         PrevStorageAddress = NextStorageAddress
 
@@ -172,14 +173,14 @@ def Generate_Code(File, Date):
 \n\n")
 
     File.write('#pragma once\n\n')
-    File.write('/*\n\n')
+    File.write('/*\n')
     File.write('BAR - BASE ADDRESS REGISTER\n\n')
     File.write(
-        'ESSE ARQUIVO HEADER FOI GERADO AUTOMATICAMENTE - POR FAVOR,NUNCA O EDITE MANUALMENTE!\n\n')
-    File.write('ATUALIZADO EM %s\n\n' % Date)
+        'ESSE ARQUIVO HEADER FOI GERADO AUTOMATICAMENTE - POR FAVOR,NÃO O EDITE MANUALMENTE!\n\n')
+    File.write('ATUALIZADO EM %s\n' % Date)
     File.write('*/\n\n')
 
-    File.write('//INCREMENTE SEMPRE QUE HOUVER UM NOVO RELEASE\n')
+    File.write('//INCREMENTE SEMPRE QUE HOUVER UM NOVO LANÇAMENTO\n')
     File.write('#define FIRMWARE_STORAGE_REVISION' + ' %d' %
                FIRMWARE_STORAGE_REVISION + ' //%.1f' %
                (FIRMWARE_STORAGE_REVISION / 10) + '\n\n')
@@ -188,38 +189,38 @@ def Generate_Code(File, Date):
     print('FIRMWARE_STORAGE_REVISION' + ' %.1f' %
           (FIRMWARE_STORAGE_REVISION / 10))
 
-    File.write('//NUMERO DE BYTES DO ARMAZENAMENTO RESERVADOS PARA USO\n')
+    File.write('//NÚMERO DE BYTES DO ARMAZENAMENTO RESERVADOS PARA USO\n')
     File.write('#define ' + '%s' %
                StorageLayout[5][0] + ' %d' % StorageLayout[5][2] + '\n\n')
 
     print('%s' % StorageLayout[5][0] + ' %d' % StorageLayout[5][2])
 
-    # ADDR DO PRIMEIRO UPLOAD
-    File.write('//ADDR PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
+    # ENDEREÇO DO PRIMEIRO UPLOAD
+    File.write('//ENDEREÇO PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
     File.write('#define ' + '%s' %
                StorageLayout[4][0] + ' %d' % StorageLayout[4][2] + '\n\n')
 
     print('%s' % StorageLayout[4][0] + ' %d' % StorageLayout[4][2])
 
-    print('\n----------------------------------------------------------------DEFS DO CLI----------------------------------------------------------------')
+    print('\n-----------------------------------------------------------DEFINIÇÕES DO CLI------------------------------------------------------------')
 
-    File.write('//ADDRs PARA O CLI\n')
+    File.write('//ENDEREÇOS PARA O CLI\n')
     Generate_Info_And_Defines(
-        DefsCLITable, StorageLayout[1][1], StorageLayout[1][2], '!!!FALHA!!! OS ADDRs DO CLI ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ADDRs DO CLI FORAM GERADOS COM SUCESSO!')
+        DefsCLITable, StorageLayout[1][1], StorageLayout[1][2], '!!!FALHA!!! OS ENDEREÇOS DO CLI ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ENDEREÇOS DO CLI FORAM GERADOS COM SUCESSO!')
 
     print('-------------------------------------------------------------------------------------------------------------------------------------------\n')
 
-    print('--------------------------------------------------------------DEFS DAS CONFIG--------------------------------------------------------------')
+    print('-------------------------------------------------------DEFINIÇÕES DAS CONFIGURAÇÕES--------------------------------------------------------')
 
-    File.write('\n//ADDRs PARA AS CONFIGS\n')
+    File.write('\n//ENDEREÇOS PARA AS CONFIGS\n')
     Generate_Info_And_Defines(
-        DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], '!!!FALHA!!! OS ADDRs DAS CONFIGS NORMAIS ATINGIRAM O NUMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ADDRs DAS CONFIGS FORAM GERADOS COM SUCESSO!')
+        DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], '!!!FALHA!!! OS ENDEREÇOS DAS CONFIGURAÇÕES NORMAIS ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ENDEREÇOS DAS CONFIGURAÇÕES FORAM GERADOS COM SUCESSO!')
 
     print('-------------------------------------------------------------------------------------------------------------------------------------------\n')
 
-    print('-----------------------------------------------------------DEFS DO MODO WAYPOINT-----------------------------------------------------------')
+    print('--------------------------------------------------------DEFINIÇÕES DO MODO WAYPOINT--------------------------------------------------------')
 
-    File.write('\n//CONFIG E ADDRs PARA O MODO WAYPOINT\n')
+    File.write('\n//CONFIGURAÇÕES E ENDEREÇOS PARA O MODO WAYPOINT\n')
     Generate_WayPoint_Defs(File, DefsWayPointTable)
 
     print('------------------------------------------------------------------------------------------------------------------------------------------\n')
@@ -232,5 +233,5 @@ if __name__ == '__main__':
 
     Date = datetime.datetime.now()
 
-    with open(Output, 'w') as File:
+    with codecs.open(Output, "w", "utf-8-sig") as File:
         Generate_Code(File, Date)

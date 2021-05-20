@@ -196,7 +196,7 @@ def Generate_Code(File, Date):
     print('%s' % StorageLayout[5][0] + ' %d' % StorageLayout[5][2])
 
     # ENDEREÇO DO PRIMEIRO UPLOAD
-    File.write('//ENDEREÇO PARA VERIFICAR O PRIMEIRO UPLOAD DO FIRMWARE\n')
+    File.write('//ENDEREÇO PARA VERIFICAR SE É O PRIMEIRO UPLOAD DA VERSÃO DO FIRMWARE\n')
     File.write('#define ' + '%s' %
                StorageLayout[4][0] + ' %d' % StorageLayout[4][2] + '\n\n')
 

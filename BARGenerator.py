@@ -231,7 +231,14 @@ if __name__ == '__main__':
     Output = pathlib.PurePath(__file__).parent / \
         'src' / 'BAR' / 'BARGENERATED.h'
 
-    Date = datetime.datetime.now()
+    DateAndTime = str(datetime.datetime.now())
+    Year = DateAndTime[0:4]
+    Day = DateAndTime[5:7]
+    Month = DateAndTime[8:10]
+    Hours = DateAndTime[11:13]
+    Minutes = DateAndTime[14:16]
+    Seconds = DateAndTime[17:19]
 
     with codecs.open(Output, "w", "utf-8-sig") as File:
-        Generate_Code(File, Date)
+        Generate_Code(File, "{}/{}/{} ÁS {}:{}:{}".format(Month,
+                      Day, Year, Hours, Minutes, Seconds))

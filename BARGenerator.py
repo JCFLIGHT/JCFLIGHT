@@ -23,8 +23,11 @@ class StorageSizeOf(enum.Enum):
     # 474 BYTES RESERVADOS DO ARMAZENAMENTO PARA O CLI
     CLI_SIZE_INITIAL_RESERVED = 0x01
     CLI_SIZE_FINAL_RESERVED = 0x1DB
-    # 515 BYTES RESERVADOS DO ARMAZENAMENTO PARA AS CONFIGURAÇÕES NORMAIS
-    NORMAL_CONFIG_SIZE_INITIAL_RESERVED = 0x1E0
+    # 60 BYTES RESERVADOS DO ARMAZENAMENTO PARA AS CALIBRAÇÕES DOS SENSORES
+    CALIBRATION_SIZE_INITIAL_RESERVED = 0x1E0
+    CALIBRATION_SIZE_FINAL_RESERVED = 0x218
+    # 455 BYTES RESERVADOS DO ARMAZENAMENTO PARA AS CONFIGURAÇÕES NORMAIS
+    NORMAL_CONFIG_SIZE_INITIAL_RESERVED = 0x21C
     NORMAL_CONFIG_SIZE_FINAL_RESERVED = 0x3E3
     # 495 BYTES RESERVADOS DO ARMAZENAMENTO PARA AS CONFIGURAÇÕES DO MODO WAYPOINT
     WAYPOINT_SIZE_INITIAL_RESERVED = 0x3E8
@@ -49,16 +52,18 @@ class PrintWithColors:
 
 StorageLayout = [
     ['Grupo', 'Endereço Inicial', 'Endereço Final'],
-    ['CLI', StorageSizeOf.CLI_SIZE_INITIAL_RESERVED.value,
+    ['CLI_STORAGE', StorageSizeOf.CLI_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.CLI_SIZE_FINAL_RESERVED.value],
-    ['NORMAL_CONFIG', StorageSizeOf.NORMAL_CONFIG_SIZE_INITIAL_RESERVED.value,
+    ['NORMAL_CONFIG_STORAGE', StorageSizeOf.NORMAL_CONFIG_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.NORMAL_CONFIG_SIZE_FINAL_RESERVED.value],
-    ['WAYPOINT', StorageSizeOf.WAYPOINT_SIZE_INITIAL_RESERVED.value,
+    ['WAYPOINT_STORAGE', StorageSizeOf.WAYPOINT_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.WAYPOINT_SIZE_FINAL_RESERVED.value],
     ['FIRMWARE_MAGIC_ADDRESS', AddrSizeOf.TYPE_NONE.value,
         StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value],
     ['TOTAL_SIZE_OF_STORAGE', AddrSizeOf.TYPE_NONE.value,
         StorageSizeOf.TOTAL_SIZE_OF_STORAGE_RESERVED_TO_USE.value],
+    ['SENSORS_CALIBRATION_STORAGE', StorageSizeOf.CALIBRATION_SIZE_INITIAL_RESERVED.value,
+        StorageSizeOf.CALIBRATION_SIZE_FINAL_RESERVED.value],
 ]
 
 DefsCLITable = [
@@ -105,13 +110,137 @@ DefsCLITable = [
     ['AS_AUTO_CAL_SCALE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
 ]
 
-
-DefsNormalConfigTable = [
+DefsSensorsCalibrationTable = [
     ['Nome da Definição', 'OffSet'],
     ['ACC_ROLL_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['ACC_PITCH_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['ACC_YAW_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['ACC_ROLL_SCALE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['ACC_PITCH_SCALE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['ACC_YAW_SCALE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['MAG_PITCH_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['MAG_ROLL_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['MAG_YAW_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['MAG_ROLL_GAIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['MAG_PITCH_GAIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['MAG_YAW_GAIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
 ]
+
+DefsNormalConfigTable = [
+    ['Nome da Definição', 'OffSet'],
+    ['SIMPLE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['ALT_HOLD_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['GPS_HOLD_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['RTH_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['STABLIZE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['ATTACK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['PARACHUTE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['AUTOFLIP_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['GIMBAL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['FRAME_TYPE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['FF_OR_CD_ROLL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['AUTOMISSION_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+
+    ['AUTOLAND_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['ARMDISARM_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['DISP_PASSIVES_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['MAG_DECLINATION_ADDR', AddrSizeOf.TYPE_FLOAT.value],
+    ['UART_NUMB_1_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['UART_NUMB_2_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['UART_NUMB_3_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['COMPASS_ROTATION_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['RTH_ALTITUDE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['THROTTLE_DZ_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['YAW_DZ_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['PITCH_DZ_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['ROLL_DZ_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_ROLL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_ROLL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KD_ROLL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_PITCH_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_PITCH_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KD_PITCH_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_YAW_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_YAW_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KD_YAW_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_VEL_Z_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_VEL_Z_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KD_VEL_Z_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_GPSPOS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_GPSPOS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_POS_Z_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_POS_Z_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KD_POS_Z_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_POS_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_POS_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KD_POS_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_NAV_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_NAV_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KD_NAV_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['TPA_PERCENT_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['BREAKPOINT_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['HW_GYRO_LPF_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['DERIVATIVE_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['RC_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['KALMAN_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['BI_ACC_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['BI_GYRO_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['BI_ACC_NOTCH_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['BI_GYRO_NOTCH_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['MOT_COMP_STATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['THR_ATTITUDE_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['THR_ATTITUDE_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['THROTTLE_MIDDLE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['THROTTLE_EXPO_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['RC_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['RC_EXPO_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['ROLL_BANK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['PITCH_BANK_MIN_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['YAW_RATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['FF_OR_CD_PITCH_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['FF_OR_CD_YAW_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['SERVO1_RATE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO2_RATE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO3_RATE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO4_RATE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['FAILSAFE_VAL_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['THROTTLE_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['YAW_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['PITCH_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['ROLL_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['THROTTLE_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['YAW_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['PITCH_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['ROLL_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['CH_REVERSE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['SERVO1_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO2_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO3_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO4_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO1_MID_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO2_MID_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO3_MID_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO4_MID_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO1_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO2_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO3_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVO4_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['SERVOS_REVERSE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['SERVOS_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['KP_AUTOLEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KI_AUTOLEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['KP_HEADING_HOLD_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['PITCH_BANK_MAX_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['ATTACK_BANK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['GPS_BANK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['MAX_PITCH_LEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['MAX_ROLL_LEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['AIRSPEED_TYPE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['INTEGRAL_RELAX_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['KCD_OR_FF_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['PITCH_LEVEL_TRIM_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+]
+
 
 FinalAddrOfWayPointCoordinates = (
     StorageLayout[3][1] + (WAYPOINTS_MAXIMUM * (AddrSizeOf.TYPE_32_BITS.value * 2)))
@@ -268,9 +397,19 @@ def Generate_Code(File, Date):
 
     print('\n')
 
+    print(f"{PrintWithColors.HEADER}--------------------------------------------------------DEFINIÇÕES DAS CALIBRAÇÕES---------------------------------------------------------{PrintWithColors.ENDC}")
+
+    File.write('\n//ENDEREÇOS PARA AS CALIBRAÇÕES DOS SENSORES\n')
+    Generate_Info_And_Defines(
+        DefsSensorsCalibrationTable, StorageLayout[6][1], StorageLayout[6][2], f"{PrintWithColors.WARNING}!!!FALHA!!! OS ENDEREÇOS DAS CALIBRAÇÕES ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS{PrintWithColors.ENDC}", f"{PrintWithColors.OKGREEN}OS ENDEREÇOS DAS CALIBRAÇÕES FORAM GERADOS COM SUCESSO!{PrintWithColors.ENDC}")
+
+    print(f"{PrintWithColors.HEADER}-------------------------------------------------------------------------------------------------------------------------------------------{PrintWithColors.ENDC}")
+
+    print('\n')
+
     print(f"{PrintWithColors.HEADER}-------------------------------------------------------DEFINIÇÕES DAS CONFIGURAÇÕES--------------------------------------------------------{PrintWithColors.ENDC}")
 
-    File.write('\n//ENDEREÇOS PARA AS CONFIGS\n')
+    File.write('\n//ENDEREÇOS PARA AS CONFIGURAÇÕES\n')
     Generate_Info_And_Defines(
         DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], f"{PrintWithColors.WARNING}!!!FALHA!!! OS ENDEREÇOS DAS CONFIGURAÇÕES NORMAIS ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS{PrintWithColors.ENDC}", f"{PrintWithColors.OKGREEN}OS ENDEREÇOS DAS CONFIGURAÇÕES FORAM GERADOS COM SUCESSO!{PrintWithColors.ENDC}")
 

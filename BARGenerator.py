@@ -236,14 +236,16 @@ def Generate_Code(File, Date):
                (FIRMWARE_STORAGE_REVISION / 10) + '\n\n')
 
     print('\n')
-    print('FIRMWARE_STORAGE_REVISION' + ' %.1f' %
+
+    print(f"{PrintWithColors.OKBLUE}FIRMWARE_STORAGE_REVISION:{PrintWithColors.ENDC}" + ' %.1f' %
           (FIRMWARE_STORAGE_REVISION / 10))
 
     File.write('//NÚMERO DE BYTES DO ARMAZENAMENTO RESERVADOS PARA USO\n')
     File.write('#define ' + '%s' %
                StorageLayout[5][0] + ' %d' % StorageLayout[5][2] + '\n\n')
 
-    print('%s' % StorageLayout[5][0] + ' %d' % StorageLayout[5][2])
+    print(f"{PrintWithColors.OKBLUE}%s:{PrintWithColors.ENDC}" %
+          StorageLayout[5][0] + ' %d' % StorageLayout[5][2])
 
     # ENDEREÇO DO PRIMEIRO UPLOAD
     File.write(
@@ -251,7 +253,8 @@ def Generate_Code(File, Date):
     File.write('#define ' + '%s' %
                StorageLayout[4][0] + ' %d' % StorageLayout[4][2] + '\n\n')
 
-    print('%s' % StorageLayout[4][0] + ' %d' % StorageLayout[4][2])
+    print(f"{PrintWithColors.OKBLUE}%s:{PrintWithColors.ENDC}" %
+          StorageLayout[4][0] + ' %d' % StorageLayout[4][2])
 
     print('\n')
 

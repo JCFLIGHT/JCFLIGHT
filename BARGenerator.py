@@ -35,6 +35,18 @@ class StorageSizeOf(enum.Enum):
     TOTAL_SIZE_OF_STORAGE_RESERVED_TO_USE = 0x7D0
 
 
+class PrintWithColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 StorageLayout = [
     ['Grupo', 'Endereço Inicial', 'Endereço Final'],
     ['CLI', StorageSizeOf.CLI_SIZE_INITIAL_RESERVED.value,
@@ -144,7 +156,6 @@ def Generate_Address_Type_To_Str(AddressSizeOf):
 def Generate_WayPoint_Defs(File, InputTable):
 
     ColumnsCount = (len(InputTable) - 1)
-    StringPrint = ''
 
     for TableSizeCount in range(ColumnsCount):
         File.write('#define %s ' % InputTable[TableSizeCount + 1][0])
@@ -154,11 +165,11 @@ def Generate_WayPoint_Defs(File, InputTable):
         if(TableSizeCount == 1):
             File.write(' //ALTITUDE,TEMPO DO GPS-HOLD E O MODO DE VOO')
         if(TableSizeCount > 1):
-            StringPrint = 'ENDEREÇO DE ARMAZENAMENTO:'
+            print(f"{PrintWithColors.OKCYAN}DEF:{PrintWithColors.ENDC} %s" % InputTable[TableSizeCount + 1][0] + f"{PrintWithColors.OKCYAN}  ENDEREÇO DE ARMAZENAMENTO:{PrintWithColors.ENDC}" + '%d' %
+                  InputTable[TableSizeCount + 1][1])
         else:
-            StringPrint = 'VALOR:'
-        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  %s' % StringPrint + '%d' %
-              InputTable[TableSizeCount + 1][1])
+            print(f"{PrintWithColors.OKCYAN}DEF:{PrintWithColors.ENDC} %s" % InputTable[TableSizeCount + 1][0] + f"{PrintWithColors.OKCYAN}  VALOR:{PrintWithColors.ENDC}" + '%d' %
+                  InputTable[TableSizeCount + 1][1])
         File.write("\n")
 
 
@@ -182,8 +193,8 @@ def Generate_Info_And_Defines(InputTable, InputStorageLayoutMin, InputStorageLay
             InputTable[TableSizeCount + 1][1]
         Generate_Defines(
             File, InputTable[TableSizeCount + 1][0], PrevStorageAddress + 1 + InputStorageLayoutMin)
-        print('DEF: %s' % InputTable[TableSizeCount + 1][0] + '  ENDEREÇO DE ARMAZENAMENTO:%d' %
-              (PrevStorageAddress + 1 + InputStorageLayoutMin) + '  TAMANHO:%d' % InputTable[TableSizeCount + 1][1] + ' %s' % Generate_Address_Type_To_Str(InputTable[TableSizeCount + 1][1]))
+        print(f"{PrintWithColors.OKCYAN}DEF:{PrintWithColors.ENDC} %s" % InputTable[TableSizeCount + 1][0] + f"{PrintWithColors.OKCYAN}  ENDEREÇO DE ARMAZENAMENTO:{PrintWithColors.ENDC}%d" %
+              (PrevStorageAddress + 1 + InputStorageLayoutMin) + f"{PrintWithColors.OKCYAN}   TAMANHO:{PrintWithColors.ENDC}%d" % InputTable[TableSizeCount + 1][1] + ' %s' % Generate_Address_Type_To_Str(InputTable[TableSizeCount + 1][1]))
         PrevStorageAddress = NextStorageAddress
 
     if (SendMessageSuccess):
@@ -242,28 +253,36 @@ def Generate_Code(File, Date):
 
     print('%s' % StorageLayout[4][0] + ' %d' % StorageLayout[4][2])
 
-    print('\n-----------------------------------------------------------DEFINIÇÕES DO CLI------------------------------------------------------------')
+    print('\n')
+
+    print(f"{PrintWithColors.HEADER}-----------------------------------------------------------DEFINIÇÕES DO CLI------------------------------------------------------------{PrintWithColors.ENDC}")
 
     File.write('//ENDEREÇOS PARA O CLI\n')
     Generate_Info_And_Defines(
-        DefsCLITable, StorageLayout[1][1], StorageLayout[1][2], '!!!FALHA!!! OS ENDEREÇOS DO CLI ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ENDEREÇOS DO CLI FORAM GERADOS COM SUCESSO!')
+        DefsCLITable, StorageLayout[1][1], StorageLayout[1][2], f"{PrintWithColors.WARNING}!!!FALHA!!! OS ENDEREÇOS DO CLI ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS{PrintWithColors.ENDC}", f"{PrintWithColors.OKGREEN}OS ENDEREÇOS DO CLI FORAM GERADOS COM SUCESSO!{PrintWithColors.ENDC}")
 
-    print('-------------------------------------------------------------------------------------------------------------------------------------------\n')
+    print(f"{PrintWithColors.HEADER}-------------------------------------------------------------------------------------------------------------------------------------------{PrintWithColors.ENDC}")
 
-    print('-------------------------------------------------------DEFINIÇÕES DAS CONFIGURAÇÕES--------------------------------------------------------')
+    print('\n')
+
+    print(f"{PrintWithColors.HEADER}-------------------------------------------------------DEFINIÇÕES DAS CONFIGURAÇÕES--------------------------------------------------------{PrintWithColors.ENDC}")
 
     File.write('\n//ENDEREÇOS PARA AS CONFIGS\n')
     Generate_Info_And_Defines(
-        DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], '!!!FALHA!!! OS ENDEREÇOS DAS CONFIGURAÇÕES NORMAIS ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS', 'OS ENDEREÇOS DAS CONFIGURAÇÕES FORAM GERADOS COM SUCESSO!')
+        DefsNormalConfigTable, StorageLayout[2][1], StorageLayout[2][2], f"{PrintWithColors.WARNING}!!!FALHA!!! OS ENDEREÇOS DAS CONFIGURAÇÕES NORMAIS ATINGIRAM O NÚMERO MAXIMO DE ENDEREÇOS DISPONIVEIS{PrintWithColors.ENDC}", f"{PrintWithColors.OKGREEN}OS ENDEREÇOS DAS CONFIGURAÇÕES FORAM GERADOS COM SUCESSO!{PrintWithColors.ENDC}")
 
-    print('-------------------------------------------------------------------------------------------------------------------------------------------\n')
+    print(f"{PrintWithColors.HEADER}-------------------------------------------------------------------------------------------------------------------------------------------{PrintWithColors.ENDC}")
 
-    print('--------------------------------------------------------DEFINIÇÕES DO MODO WAYPOINT--------------------------------------------------------')
+    print('\n')
+
+    print(f"{PrintWithColors.HEADER}--------------------------------------------------------DEFINIÇÕES DO MODO WAYPOINT--------------------------------------------------------{PrintWithColors.ENDC}")
 
     File.write('\n//CONFIGURAÇÕES E ENDEREÇOS PARA O MODO WAYPOINT\n')
     Generate_WayPoint_Defs(File, DefsWayPointTable)
 
-    print('------------------------------------------------------------------------------------------------------------------------------------------\n')
+    print(f"{PrintWithColors.HEADER}------------------------------------------------------------------------------------------------------------------------------------------{PrintWithColors.ENDC}")
+
+    print('\n')
 
 
 env.Dump()

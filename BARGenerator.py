@@ -12,7 +12,6 @@ OTHERS_PARAMS_MAXIMUM = 3  # ALTITUDE,TEMPO DO GPS-HOLD E O MODO DE VOO
 
 
 class AddrSizeOf(enum.Enum):
-    TYPE_NONE = 0x00
     TYPE_8_BITS = 0x01
     TYPE_16_BITS = 0x02
     TYPE_32_BITS = 0x04
@@ -20,6 +19,7 @@ class AddrSizeOf(enum.Enum):
 
 
 class StorageSizeOf(enum.Enum):
+    NONE = 0x00
     # 474 BYTES RESERVADOS DO ARMAZENAMENTO PARA O CLI
     CLI_SIZE_INITIAL_RESERVED = 0x01
     CLI_SIZE_FINAL_RESERVED = 0x1DB
@@ -60,7 +60,7 @@ StorageLayout = [
         StorageSizeOf.WAYPOINT_SIZE_FINAL_RESERVED.value],
     ['FIRMWARE_MAGIC_ADDRESS', AddrSizeOf.TYPE_NONE.value,
         StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value],
-    ['TOTAL_SIZE_OF_STORAGE', AddrSizeOf.TYPE_NONE.value,
+    ['TOTAL_SIZE_OF_STORAGE', StorageSizeOf.NONE.value,
         StorageSizeOf.TOTAL_SIZE_OF_STORAGE_RESERVED_TO_USE.value],
     ['SENSORS_CALIBRATION_STORAGE', StorageSizeOf.CALIBRATION_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.CALIBRATION_SIZE_FINAL_RESERVED.value],
@@ -140,7 +140,6 @@ DefsNormalConfigTable = [
     ['FRAME_TYPE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['FF_OR_CD_ROLL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AUTOMISSION_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-
     ['AUTOLAND_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['ARMDISARM_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['DISP_PASSIVES_ADDR', AddrSizeOf.TYPE_8_BITS.value],

@@ -29,12 +29,10 @@
 
 #define MAX_RETRY_COUNT 5 //FORÇA UMA REPETIÇÃO DE 5 VEZES
 
-uint8_t Actual_Format_Version = 10; //1.0
-
 bool CheckActualFormatVersion(void)
 {
-    static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(FIRMWARE_FIRST_USAGE_ADDR);
-    if (System_Version != Actual_Format_Version)
+    static uint8_t System_Version = STORAGEMANAGER.Read_8Bits(FIRMWARE_MAGIC_ADDRESS);
+    if (System_Version != FIRMWARE_STORAGE_REVISION)
     {
         return false;
     }
@@ -43,7 +41,7 @@ bool CheckActualFormatVersion(void)
 
 void SetNewActualFormatVersion(void)
 {
-    STORAGEMANAGER.Write_8Bits(FIRMWARE_FIRST_USAGE_ADDR, Actual_Format_Version);
+    STORAGEMANAGER.Write_8Bits(FIRMWARE_MAGIC_ADDRESS, FIRMWARE_STORAGE_REVISION);
 }
 
 void ClearSensorsCalibration(void)

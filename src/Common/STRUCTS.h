@@ -634,10 +634,8 @@ typedef struct
   uint8_t CrashCheck_BankAngle;
   uint8_t CrashCheck_Time;
   uint16_t GimbalMinValue;
-  uint16_t GimbalMiddleValue;
   uint16_t GimbalMaxValue;
   uint8_t Land_Check_Acc;
-  uint8_t Land_LPF;
   float Throttle_Mix_Gain;
   uint8_t AutoDisarm_Time;
   uint16_t AutoDisarm_Throttle_Min;

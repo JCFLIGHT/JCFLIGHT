@@ -22,10 +22,8 @@
 | CrashCheck_BankAngle   | 30         | Ângulo da IMU a ser considerado como Crash [Radianos*100] |
 | CrashCheck_Time   | 2         | Estouro de tempo para validar o Crash [Segundos] |
 | GimbalMinValue   | 1000         | Valor minimo do pulso a ser aplicado no Gimbal [uS] |
-| GimbalMiddleValue   | 1500         | Valor médio do pulso a ser aplicado no Gimbal [uS] |
 | GimbalMaxValue   | 2000         | Valor maximo do pulso a ser aplicado no Gimbal [uS] |
 | Land_CheckAcc   | 3         | Valor da aceleração da IMU [Metros/Segundo^2] |
-| Land_LPF   | 1         | Valor da frequêcnia de corte da aceleração da IMU (Recomendo não alterar) [Hz] |
 | ThrottleMixGain   | 1.0         | Valor de ganho do Throttle para o mixer do PID |
 | AutoDisarm_Time   | 5         | Estouro de tempo para desarmar a controladora em nivel baixo de Throttle [Segundos] |
 | AutoDisarm_Throttle_Min   | 1100         | Valor maximo do Throttle tolerado para iniciar a contagem do Auto-Desarmamento [uS] |

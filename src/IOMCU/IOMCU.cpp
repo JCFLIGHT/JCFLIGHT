@@ -1439,7 +1439,7 @@ void GCSClass::Save_Basic_Configuration(void)
     STORAGEMANAGER.Write_8Bits(GPS_HOLD_ADDR, Get_User_Basic_Parameters.GetPositionHoldType);
     STORAGEMANAGER.Write_8Bits(SIMPLE_ADDR, Get_User_Basic_Parameters.GetSimpleControlType);
     STORAGEMANAGER.Write_8Bits(RTH_ADDR, Get_User_Basic_Parameters.GetReturnToHomeType);
-    STORAGEMANAGER.Write_8Bits(ATACK_ADDR, Get_User_Basic_Parameters.GetAtackType);
+    STORAGEMANAGER.Write_8Bits(ATTACK_ADDR, Get_User_Basic_Parameters.GetAtackType);
     STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, Get_User_Basic_Parameters.GetAutomaticFlipType);
     STORAGEMANAGER.Write_8Bits(AUTOMISSION_ADDR, Get_User_Basic_Parameters.GetAutomaticMissonType);
     STORAGEMANAGER.Write_8Bits(ARMDISARM_ADDR, Get_User_Basic_Parameters.GetArmDisarmType);
@@ -1576,7 +1576,7 @@ void GCSClass::Default_Basic_Configuration(void)
         STORAGEMANAGER.Write_8Bits(RTH_ALTITUDE_ADDR, 40);
     }
     STORAGEMANAGER.Write_8Bits(STABLIZE_ADDR, 0);
-    STORAGEMANAGER.Write_8Bits(ATACK_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(ATTACK_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(AUTOFLIP_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(AUTOMISSION_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(ARMDISARM_ADDR, 0);
@@ -1687,7 +1687,7 @@ void GCSClass::LoadAllParameters(void)
     Send_User_Basic_Parameters.SendPositionHoldType = STORAGEMANAGER.Read_8Bits(GPS_HOLD_ADDR);
     Send_User_Basic_Parameters.SendSimpleControlType = STORAGEMANAGER.Read_8Bits(SIMPLE_ADDR);
     Send_User_Basic_Parameters.SendReturnToHomeType = STORAGEMANAGER.Read_8Bits(RTH_ADDR);
-    Send_User_Basic_Parameters.SendAtackType = STORAGEMANAGER.Read_8Bits(ATACK_ADDR);
+    Send_User_Basic_Parameters.SendAtackType = STORAGEMANAGER.Read_8Bits(ATTACK_ADDR);
     Send_User_Basic_Parameters.SendAutomaticFlipType = STORAGEMANAGER.Read_8Bits(AUTOFLIP_ADDR);
     Send_User_Basic_Parameters.SendAutomaticMissonType = STORAGEMANAGER.Read_8Bits(AUTOMISSION_ADDR);
     Send_User_Basic_Parameters.SendArmDisarmType = STORAGEMANAGER.Read_8Bits(ARMDISARM_ADDR);

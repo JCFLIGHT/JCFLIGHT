@@ -139,6 +139,7 @@ DefsNormalConfigTable = [
     ['AUTOFLIP_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['GIMBAL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['FRAME_TYPE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['RC_SEQUENCY_ADDR',AddrSizeOf.TYPE_8_BITS.value],
     ['FF_OR_CD_ROLL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AUTOMISSION_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AUTOLAND_ADDR', AddrSizeOf.TYPE_8_BITS.value],
@@ -230,6 +231,7 @@ DefsNormalConfigTable = [
     ['KP_AUTOLEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['KI_AUTOLEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['KP_HEADING_HOLD_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['HEADING_HOLD_RATE_LIMIT_ADDR',AddrSizeOf.TYPE_8_BITS.value],
     ['PITCH_BANK_MAX_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['ATTACK_BANK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['GPS_BANK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
@@ -441,6 +443,6 @@ try:
 except:
     print('')
 
-with codecs.open(pathlib.PurePath('__main__').parent / 'src' / 'BAR' / 'BARGENERATED.h', "w", "utf-8-sig") as File:
+with codecs.open(pathlib.PurePath('__main__').parent / 'src' / 'BAR' / 'BAR.h', "w", "utf-8-sig") as File:
     Generate_Code(File, "{}/{}/{} ÁS {}:{}:{}".format(Month,
                   Day, Year, Hours, Minutes, Seconds))

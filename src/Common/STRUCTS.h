@@ -470,14 +470,6 @@ typedef struct
 
 typedef struct
 {
-  float a, b, g, e;
-  float aK, vK, xK, jK;
-  float DeltaTime, DeltaTime2, DeltaTime3;
-  float HalfLife, Boost;
-} AlphaBetaGammaFilter_Struct;
-
-typedef struct
-{
   //MATRIX JACOBIANA
   //http://en.wikipedia.org/wiki/Jacobian_matrix
   float Matrix_JtR[4];

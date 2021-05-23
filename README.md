@@ -22,7 +22,7 @@ Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
 
 ## Wiki
 
-- Por Favor leia a [Wiki](https://github.com/JCFLIGHT/JCFLIGHT/wiki) da JCFLIGHT.
+- Se estiver começando agora com a JCFLIGHT,por favor leia a [Wiki](https://github.com/JCFLIGHT/JCFLIGHT/wiki).
 
 ## Aprendizado
 

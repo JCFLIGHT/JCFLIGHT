@@ -10,7 +10,7 @@ em português,em excessão os comentários,a nossa lingua não é bonita para es
 'GetGroundDetected'.
 3. Evite palavras-ruido em nomes de variaveis,pense no que você está nomeando e nomeie bem.
 4. Evite comentários que descrevam o que o código está fazendo,o código deve se descrever.Os comentários são úteis, entretanto,para fins de visão geral e para documentar o conteúdo das variáveis.
-5. Os comentários devem ser sempre escritos em maiusculos,por mais que pareça que você está gritando(Caps Lock),mas é assim que tem que ser.
+5. Os comentários devem ser sempre escritos em maiusculos,por mais que pareça que você está gritando(Caps-Lock),mas é assim que tem que ser.
 6. Se você precisar documentar uma variável,faça na declaração da mesma,não copie o comentário para o uso `extern`,pois isso levará à podridão do comentário.
 7. Procure conselhos de outros desenvolvedores,saiba que você sempre pode aprender mais.
 8. Saiba que sempre há mais de uma maneira de fazer algo e que o código nunca é final,o que importa é fazer funcionar.
@@ -141,7 +141,7 @@ Barometer
 Barometer
 ```
 
-Os nomes dos arquivos devem ser escritos em maiusculos,exemplo:
+Os nomes dos arquivos .cpp e .h devem ser escritos em maiusculos,exemplo:
 
 ```
 BAROMETER.cpp

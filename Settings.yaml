@@ -1,0 +1,55 @@
+Members:
+
+  - Name: kP_Acc_AHRS
+    Description: "Ganho Proporcional para correção da estimativa de Attitude"
+    DefaultValue: 25
+    Min: 0
+    Max: 255
+
+  - Name: kI_Acc_AHRS
+    Description: "Ganho Integral para correção da estimativa de Attitude"
+    DefaultValue: 50
+    Min: 0
+    Max: 255
+
+  - Name: kP_Mag_AHRS
+    Description: "Ganho Proporcional para correção da estimativa de direção do Yaw"
+    DefaultValue: 10
+    Min: 0
+    Max: 255
+
+  - Name: kI_Mag_AHRS
+    Description: "Ganho Integral para correção da estimativa de direção do Yaw"
+    DefaultValue: 0
+    Min: 0
+    Max: 255
+
+  - Name: AutoLaunch_AHRS_BankAngle
+    Description: "Ângulo no AHRS para considerar que o Auto-Launch deve iniciar [Graus]"
+    DefaultValue: 25
+    Min: 0
+    Max: 255
+
+  - Name: AutoLaunch_IMU_BankAngle
+    Description: "Ângulo na IMU para considerar que o Auto-Launch deve iniciar [Graus*10]"
+    DefaultValue: -450
+    Min: -1000
+    Max: 1000
+
+  - Name: AutoLaunch_Velocity_Thresh
+    Description: "Velocidade da IMU ou GPS para validar o Auto-Launch [Metros/Segundo]"
+    DefaultValue: 3
+    Min: 0
+    Max: 20
+
+  - Name: AutoLaunch_Trigger_Motor_Delay
+    Description: "Tempo para iniciar o motor após o status de lançado [MillisSegundos]"
+    DefaultValue: 1500
+    Min: 0
+    Max: 10000
+
+  - Name: AutoLaunch_Elevator
+    Description: "Inclinação no Pitch (Elevator) ao fazer o Auto-Launch [Graus]"
+    DefaultValue: 18
+    Min: 0
+    Max: 100

@@ -640,7 +640,7 @@ typedef struct
 #endif
   uint16_t Navigation_Vel;
   uint8_t GPS_WP_Radius;
-  uint8_t GPS_RTH_Land;
+  uint8_t GPS_RTH_Land_Radius;
   uint8_t GPS_TiltCompensation;
 #ifndef __AVR_ATmega2560__
   uint8_t AirSpeed_Samples;

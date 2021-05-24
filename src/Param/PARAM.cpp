@@ -85,7 +85,7 @@ const Resources_Of_Param Params_Table[] = {
     {"GPS_Baud_Rate",                      GPS_BAUDRATE_ADDR,                    VAR_8BITS,              &JCF_Param.GPS_Baud_Rate,                   0,             4,               4},
     {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             400},
     {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             2},
-    {"GPS_RTH_Land_Radius",                RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land,                    0,             255,             10},
+    {"GPS_RTH_Land_Radius",                RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land_Radius,             0,             255,             10},
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
 #endif
@@ -118,7 +118,7 @@ void ParamClass::Initialization(void)
 #ifdef __AVR_ATmega2560__
   JCF_Param.Navigation_Vel = 400;
   JCF_Param.GPS_WP_Radius = 2;
-  JCF_Param.GPS_RTH_Land = 10;
+  JCF_Param.GPS_RTH_Land_Radius = 10;
   JCF_Param.GPS_TiltCompensation = 20;
   JCF_Param.Arm_Time_Safety = 2;
   JCF_Param.Disarm_Time_Safety = 2;

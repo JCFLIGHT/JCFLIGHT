@@ -157,7 +157,7 @@ Members:
     Max: 1500
 
   - Name: AutoDisarm_YPR_Max
-    Description: " Valor maximo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarmamento [uS]"
+    Description: "Valor maximo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarmamento [uS]"
     DefaultValue: 1550
     Min: 800
     Max: 2200
@@ -179,3 +179,63 @@ Members:
     DefaultValue: 400
     Min: 0
     Max: 400
+
+  - Name: GPS_WP_Radius
+    Description: "Raio do ponto para validar que o mesmo foi alcançado em modo WayPoint e RTH [Metros]"
+    DefaultValue: 2
+    Min: 0
+    Max: 255
+
+  - Name: GPS_RTH_Land_Radius
+    Description: "Em modo RTH,inicia o Land se o UAV estiver dentro do tamanho desse raio definido aqui,caso contrario,o UAV irá subir até a altitude definido em 'RTH Altitude' nas configurações basicas,voltar ao Home-Point,e fazer o Land [Metros]"
+    DefaultValue: 10
+    Min: 0
+    Max: 255
+
+  - Name: GPS_TiltCompensation
+    Description: "Valor para compensar o rate de navegação em modo WayPoint e RTH (Multirotores apenas)"
+    DefaultValue: 20
+    Min: 0
+    Max: 100
+
+  - Name: AirSpeed_Samples
+    Description: "Número de amostras para calibrar o Tubo de Pitot"
+    DefaultValue: 15
+    Min: 0
+    Max: 255
+
+  - Name: AirSpeed_Factor
+    Description: "Escala dinâmica para o Tubo de Pitot"
+    DefaultValue: 1.9936
+    Min: 0
+    Max: 100
+
+  - Name: Arm_Time_Safety
+    Description: "Tempo seguro para armar com os sticks em posição de armamento [Segundos]"
+    DefaultValue: 2
+    Min: 0
+    Max: 255
+
+  - Name: Disarm_Time_Safety
+    Description: "Tempo seguro para desarmar com os sticks em posição de desarmamento [Segundos]"
+    DefaultValue: 2
+    Min: 0
+    Max: 255
+
+  - Name: Compass_Cal_Timer
+    Description: "Tempo maximo de calibração do Compass [Segundos]"
+    DefaultValue: 60
+    Min: 0
+    Max: 120
+
+  - Name: AutoPilotMode
+    Description: " `0 - Piloto automático do tipo Attitude` ~ O usuário irá controlar o ângulo de inclinação do Roll e Pitch.Quando os sticks do Roll e Pitch do rádio são manipulados pelo piloto manual,o sistema de navegação inercial será ignorado,e os comandos irão passar diretamente no modo By-Pass.Assim que os sticks Roll e Pitch do rádio estiverem centralizados (1500uS),o sistema de navegação inercial irá retomar o piloto automático e manter a posição do multirotor. `1 - Piloto automático do tipo Cruise` ~ O sistema de navegação inercial estará sempre ativo e o usuário irá controlar a velocidade de navegação do Roll e Pitch,e o piloto automático irá calcular um novo controle de Attitude,assim mantendo a posição do multirotor constantemente."
+    DefaultValue: 0
+    Min: 0
+    Max: 100
+
+  - Name: AirSpeedAutoCalScale
+    Description: "`0 - Desativado / 1 - Ativado` ~ Calibração automática em voo da escala do Tubo de Pitot.Um novo valor será armazenado no parâmetro ´AirSpeed_Factor´ a cada 2 minutos."
+    DefaultValue: 0
+    Min: 0
+    Max: 1

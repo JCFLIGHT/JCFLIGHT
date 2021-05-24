@@ -34,8 +34,6 @@ void MachineInit(void)
     AUXFLIGHT.Initialization();
     //INICIALIZA O LED RGB
     RGB.Initialization();
-    //INICIALIZA O AHRS
-    AHRS.Initialization();
     //CALIBRAÇÃO DOS ESCS
     ESC.Calibration();
     //CARREGA OS VALORES DE CALIBRAÇÃO DA IMU
@@ -46,6 +44,8 @@ void MachineInit(void)
     ConfigureRegisters(false);
     //INCIALIZA O PID
     PIDXYZ.Initialization();
+    //INICIALIZA O AHRS
+    AHRS.Initialization();
     //INICIALIZA O TECS
     TECS.Initialization();
     //INICIALIZA O WAYPOINT

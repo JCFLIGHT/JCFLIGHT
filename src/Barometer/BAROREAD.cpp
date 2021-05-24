@@ -44,6 +44,92 @@ void Remove_Barometer_Spikes(void)
   PressureIndex = PressureIndexCount;
 }
 
+/*
+#define BARO_SAMPLE_COUNT_MAX 48
+#define PRESSURE_SAMPLES_MEDIAN 3
+
+//FILTRO COM 3 MEDIAS
+int32_t ApplyQuickMedianFilterSuperSoft(int32_t *VectorBuffer)
+{
+  int32_t Points[3];
+
+  for (int32_t IndexCount = 0; IndexCount < 3; IndexCount++)
+  {
+    Points[IndexCount] = VectorBuffer[IndexCount];
+  }
+
+  if (Points[0] > Points[1])
+  {
+    int32_t StoredPoint = Points[0];
+    Points[0] = Points[1];
+    Points[1] = StoredPoint;
+  }
+
+  if (Points[1] > Points[2])
+  {
+    int32_t StoredPoint = Points[1];
+    Points[1] = Points[2];
+    Points[2] = StoredPoint;
+  }
+
+  if (Points[0] > Points[1])
+  {
+    int32_t StoredPoint = Points[0];
+    Points[0] = Points[1];
+    Points[1] = StoredPoint;
+  }
+
+  return Points[1];
+}
+
+static int32_t ApplyBarometerMedianFilter(int32_t newPressureReading)
+{
+  static int32_t BarometerFilterSamples[PRESSURE_SAMPLES_MEDIAN];
+  static int CurrentFilterSampleIndex = 0;
+  static bool MedianFilterReady = false;
+  int NextSampleIndex;
+
+  NextSampleIndex = (CurrentFilterSampleIndex + 1);
+
+  if (NextSampleIndex == PRESSURE_SAMPLES_MEDIAN)
+  {
+    NextSampleIndex = 0;
+    MedianFilterReady = true;
+  }
+
+  BarometerFilterSamples[CurrentFilterSampleIndex] = newPressureReading;
+  CurrentFilterSampleIndex = NextSampleIndex;
+
+  if (MedianFilterReady)
+  {
+    return ApplyQuickMedianFilterSuperSoft(BarometerFilterSamples);
+  }
+  return newPressureReading;
+}
+
+void Remove_Barometer_Spikes(void)
+{
+  static int32_t BarometerSamples[BARO_SAMPLE_COUNT_MAX + 1];
+  static int CurrentSampleIndex = 0;
+  int16_t NextSampleIndex;
+
+  if (CurrentSampleIndex >= BARO_SPIKES_SIZE)
+  {
+    NextSampleIndex = 0;
+  }
+  else
+  {
+    NextSampleIndex = (CurrentSampleIndex + 1);
+  }
+
+  BarometerSamples[CurrentSampleIndex] = ApplyBarometerMedianFilter(Barometer.Raw.Pressure);
+
+  Barometer.Raw.PressureFiltered += BarometerSamples[CurrentSampleIndex];
+  Barometer.Raw.PressureFiltered -= BarometerSamples[NextSampleIndex];
+
+  CurrentSampleIndex = NextSampleIndex;
+}
+*/
 float Get_Altitude_Difference(float Base_Pressure, float Pressure, float BaroTemperature)
 {
   float Result;

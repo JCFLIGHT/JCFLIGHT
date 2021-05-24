@@ -53,3 +53,129 @@ Members:
     DefaultValue: 18
     Min: 0
     Max: 100
+
+  - Name: AutoLaunch_SpinUp
+    Description: "Valor de incrimentação no Throttle para Aeros com rodas [uS]"
+    DefaultValue: 100
+    Min: 0
+    Max: 2000
+
+  - Name: AutoLaunch_SpinUp_Time
+    Description: "Tempo de incrimentação no Throttle para Aeros com rodas [MillisSegundos]"
+    DefaultValue: 300
+    Min: 0
+    Max: 5000
+
+  - Name: AutoLaunch_MaxThrottle
+    Description: "Valor do Throttle aplicado ao motor durante o Auto-Launch [uS]"
+    DefaultValue: 1700
+    Min: 1000
+    Max: 2000
+
+  - Name: AutoLaunch_Exit
+    Description: "Cancela o Auto-Launch após o estouro desse tempo [MillisSegundos]"
+    DefaultValue: 5000
+    Min: 0
+    Max: 30000
+
+  - Name: AutoLaunch_Altitude
+    Description: "Cancela o Auto-Launch após atingir essa altitude (O tempo acima será ignorado) [Metros]"
+    DefaultValue: 0
+    Min: 0
+    Max: 255
+
+  - Name: Batt_Voltage_Factor
+    Description: "Fator de calibração para converter a leitura ADC em Tensão"
+    DefaultValue: 10.1
+    Min: 0
+    Max: 1000
+
+  - Name: Batt_Amps_Per_Volt
+    Description: "Fator de calibração para converter a leitura ADC em Corrente"
+    DefaultValue: 62.0
+    Min: 0
+    Max: 1000
+
+  - Name: Batt_Amps_OffSet
+    Description: "Ajuste fino do valor da Corrente"
+    DefaultValue: 0
+    Min: 0
+    Max: 1000
+
+  - Name: CrashCheck_BankAngle
+    Description: "Ângulo da IMU a ser considerado como Crash [Radianos*100]"
+    DefaultValue: 30
+    Min: 0
+    Max: 255
+
+  - Name: CrashCheck_Timer
+    Description: "Estouro de tempo para validar o Crash [Segundos]"
+    DefaultValue: 2
+    Min: 0
+    Max: 255
+
+  - Name: GimbalMinValue
+    Description: "Valor minimo do pulso a ser aplicado no Gimbal [uS]"
+    DefaultValue: 1000
+    Min: 800
+    Max: 2200
+
+  - Name: GimbalMaxValue
+    Description: "Valor maximo do pulso a ser aplicado no Gimbal [uS]"
+    DefaultValue: 2000
+    Min: 800
+    Max: 2200
+
+  - Name: CrashCheck_BankAngle
+    Description: "Valor da aceleração da IMU [Metros/Segundo^2]"
+    DefaultValue: 3
+    Min: 0
+    Max: 20
+
+  - Name: ThrottleMixGain
+    Description: "Valor de ganho do Throttle para o mixer do PID"
+    DefaultValue: 1.0
+    Min: 0
+    Max: 1
+
+  - Name: AutoDisarm_Time
+    Description: "Estouro de tempo para desarmar a controladora em nivel baixo de Throttle [Segundos]"
+    DefaultValue: 5
+    Min: 0
+    Max: 255
+
+  - Name: AutoDisarm_Throttle_Min
+    Description: "Valor maximo do Throttle tolerado para iniciar a contagem do Auto-Desarmamento [uS]"
+    DefaultValue: 1100
+    Min: 800
+    Max: 1500
+
+  - Name: AutoDisarm_YPR_Min
+    Description: "Valor minimo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarmamento [uS]"
+    DefaultValue: 1450
+    Min: 800
+    Max: 1500
+
+  - Name: AutoDisarm_YPR_Max
+    Description: " Valor maximo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarmamento [uS]"
+    DefaultValue: 1550
+    Min: 800
+    Max: 2200
+
+  - Name: AirPlane_Wheels
+    Description: "0 - Sem trem de pouso / 1 - Com trem de pouso (Apenas para o Auto-Launch)"
+    DefaultValue: 0
+    Min: 0
+    Max: 1
+
+  - Name: GPS_Baud_Rate
+    Description: "0 - 9600KBPS / 1 - 19200KBPS / 2 - 38400KBPS / 3 - 57600KBPS / 4 - 115200KBPS"
+    DefaultValue: 4
+    Min: 0
+    Max: 4
+
+  - Name: Navigation_Vel
+    Description: "Velocidade maxima de navegação em modos de voo que utilizam o GPS [Centimetos/Segundo]"
+    DefaultValue: 400
+    Min: 0
+    Max: 400

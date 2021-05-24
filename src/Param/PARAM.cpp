@@ -61,7 +61,7 @@ const Resources_Of_Param Params_Table[] = {
     {"AutoLaunch_Elevator",                AL_ELEVATOR_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Elevator,             0,             100,             18},
     {"AutoLaunch_SpinUp",                  AL_SPINUP_ADDR,                       VAR_16BITS,             &JCF_Param.AutoLaunch_SpinUp,               0,             2000,            100},
     {"AutoLaunch_SpinUp_Time",             AL_SPINUP_TIME_ADDR,                  VAR_16BITS,             &JCF_Param.AutoLaunch_SpinUp_Time,          0,             5000,            300},
-    {"AutoLaunch_MaxThrottle",             AL_MAX_THROTTLE_ADDR,                 VAR_16BITS,             &JCF_Param.AutoLaunch_MaxThrottle,          1000,          2200,            1700},
+    {"AutoLaunch_MaxThrottle",             AL_MAX_THROTTLE_ADDR,                 VAR_16BITS,             &JCF_Param.AutoLaunch_MaxThrottle,          1000,          2000,            1700},
     {"AutoLaunch_Exit",                    AL_EXIT_ADDR,                         VAR_16BITS,             &JCF_Param.AutoLaunch_Exit,                 0,             30000,           5000},
     {"AutoLaunch_Altitude",                AL_ALTITUDE_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Altitude,             0,             255,             0},
 #endif
@@ -73,7 +73,7 @@ const Resources_Of_Param Params_Table[] = {
     {"CrashCheck_Time",                    CC_TIME_ADDR,                         VAR_8BITS,              &JCF_Param.CrashCheck_Time,                 0,             255,             2},
     {"GimbalMinValue",                     GIMBAL_MIN_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMinValue,                  800,           2200,            1000},
     {"GimbalMaxValue",                     GIMBAL_MAX_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMaxValue,                  800,           2200,            2000},
-    {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             255,             3},
+    {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             20,             3},
     {"ThrottleMixGain",                    THROTTLE_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.Throttle_Mix_Gain,               0,             1,               1.0f},
     {"AutoDisarm_Time",                    AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             5},
     {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            1100},

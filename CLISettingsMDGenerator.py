@@ -1,9 +1,8 @@
-import optparse
 import yaml
 import codecs
+import pathlib
 
 SETTINGS_YAML_PATH = "Settings.yaml"
-SETTINGS_MD_PATH = "Settings.md"
 
 
 def Parse_Settings_YAML():
@@ -36,14 +35,14 @@ def Generate_MD_Doc_From_YAML(Settings_YAML):
     return MD_Table
 
 
-def Write_Settings_MD(Lines):
+try:
+    print('')
 
-    with codecs.open(SETTINGS_MD_PATH, "w", "utf-8-sig") as Settings_md:
-        Settings_md.writelines(Lines)
+except:
+    print('')
 
-
-if __name__ == "__main__":
+with codecs.open(pathlib.PurePath('__main__').parent / "Settings.md", "w", "utf-8-sig") as Settings_md:
     Settings_YAML = Parse_Settings_YAML()
     MD_Table = Generate_MD_Doc_From_YAML(Settings_YAML)
-    Write_Settings_MD(["# Variáveis do CLI\n", "\n"] + MD_Table + ["\n",
-                      "> Esse arquivo é gerado automaticamente,não o edite manualmente!"])
+    Settings_md.writelines(["# Variáveis do CLI\n", "\n"] + MD_Table + ["\n",
+                                                                        "> Esse arquivo é gerado automaticamente,não o edite manualmente!"])

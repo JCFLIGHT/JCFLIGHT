@@ -94,9 +94,9 @@ with codecs.open(pathlib.PurePath('__main__').parent / 'Docs' / 'Settings.md', "
     global Options, Args
     parser = optparse.OptionParser()
     parser.add_option('-q', '--Quiet', action="store_true",
-                      default=False, help="não escreva nada para stdout")
+                      default=False, help="Não escreva nada")
     parser.add_option('-d', '--Defaults', action="store_true",
-                      default=False, help="verifique se há valores padrão incompatíveis")
+                      default=False, help="Verifique se há valores padrões incompatíveis")
     Options, Args = parser.parse_args()
     Settings_YAML = Parse_Settings_YAML()
     if Options.Defaults:

@@ -19,12 +19,12 @@ jobs:
           Este problema foi automaticamente marcado como obsoleto porque
           não teve atividade recente.Ele será fechado se nenhuma outra atividade ocorrer dentro de uma semana.
         close-issue-message: 'Problema fechado automaticamente como inativo.'        
-        exempt-issue-labels: 'BUG,Solicitação de recurso'
+        exempt-issue-labels: 'Bug,Solicitação de recurso'
         stale-issue-label: 'Inativo'
         stale-pr-message: >
           Esta solicitação pull foi marcada automaticamente como obsoleta porque
           não teve atividade recente.Ele será fechado se nenhuma outra atividade ocorrer dentro de uma semana.
         close-pr-message: 'Solicitação pull fechada automaticamente como inativa.'
-        exempt-pr-labels: 'Fixado'
+        exempt-pr-labels: 'Inativo'
         stale-pr-label: 'Inativo'
         exempt-all-milestones: true

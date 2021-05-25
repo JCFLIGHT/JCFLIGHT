@@ -156,7 +156,7 @@ void GPS_Process_FlightModes(float DeltaTime)
       break;
 
     case DO_START_RTH:
-      if (GPS_Resources.Home.Distance <= JCF_Param.GPS_RTH_Land)
+      if (GPS_Resources.Home.Distance <= JCF_Param.GPS_RTH_Land_Radius)
       {
         GPS_Resources.Mode.Navigation = DO_LAND_INIT;
         GPS_Resources.Navigation.HeadingHoldTarget = GPS_Resources.Navigation.Bearing.InitialTarget;

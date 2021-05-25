@@ -10,7 +10,7 @@ on:
       - Docs/Settings.md
 
 jobs:
-  settings_md:
+  Settings_MD:
     runs-on: ubuntu-18.04
 
     steps:

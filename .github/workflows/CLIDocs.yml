@@ -19,7 +19,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get -y install python3-yaml
       - name: Cheque se o Settings.md está atualizado
         run: |
-          cp docs/Settings.md{,.ci}
+          cp Docs/Settings.md{,.ci}
           python3 CLISettingsMDGenerator.py -q
           if ! diff -q Docs/Settings.md{,.ci} >/Dev/null; then
             echo "::error ::\"Docs/Settings.md\" Documento não atualizado, Por Favor compile o arquivo \"CLISettingsMDGenerator.py\""

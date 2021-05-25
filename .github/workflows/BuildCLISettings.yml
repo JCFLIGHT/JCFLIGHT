@@ -1,4 +1,4 @@
-name: Lista do CLI
+name: Verfique se a lista do CLI está atualizada
 on:
   pull_request:
     paths:
@@ -10,7 +10,7 @@ on:
       - Docs/Settings.md
 
 jobs:
-  Settings_MD:
+  CliSettingsCheck:
     runs-on: ubuntu-18.04
 
     steps:
@@ -21,7 +21,7 @@ jobs:
         run: |
           cp Docs/Settings.md{,.ci}
           python3 CLISettingsMDGenerator.py -q
-          if ! diff -q Docs/Settings.md{,.ci} >/Docs/null; then
+          if ! diff -q Docs/Settings.md{,.ci}; then
             echo "::error ::\"Docs/Settings.md\" Documento não atualizado, Por Favor compile o arquivo usando o Python \"CLISettingsMDGenerator.py\""
             exit 1
           fi

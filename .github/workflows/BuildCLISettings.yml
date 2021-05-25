@@ -21,7 +21,7 @@ jobs:
         run: |
           cp Docs/Settings.md{,.ci}
           python3 CLISettingsMDGenerator.py -q
-          if ! diff -q Docs/Settings.md{,.ci} >/Dev/null; then
-            echo "::error ::\"Docs/Settings.md\" Documento não atualizado, Por Favor compile o arquivo \"CLISettingsMDGenerator.py\""
+          if ! diff -q Docs/Settings.md{,.ci} >/.vscode/null; then
+            echo "::error ::\"Docs/Settings.md\" Documento não atualizado, Por Favor compile o arquivo usando o Python \"CLISettingsMDGenerator.py\""
             exit 1
           fi

@@ -1,0 +1,32 @@
+name: 'Fechar problemas obsoletos'
+
+on:
+  schedule:
+  - cron: "30 4 * * *"
+
+jobs:
+  stale:
+    name: 'Verificar e fechar problemas obsoletos'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        operations-per-run: 30
+        days-before-stale: 30
+        days-before-close: 7
+        stale-issue-message: >
+          Este problema foi automaticamente marcado como obsoleto porque
+          não teve atividade recente.Ele será fechado se nenhuma outra atividade ocorrer
+          Dentro de uma semana.
+        close-issue-message: 'Problema fechado automaticamente como inativo.'        
+        exempt-issue-labels: 'BUG,Solicitação de recurso'
+        stale-issue-label: 'Inativo'
+        stale-pr-message: >
+         Esta solicitação pull foi marcada automaticamente como obsoleta porque
+          não teve atividade recente.Ele será fechado se nenhuma outra atividade ocorrer
+          Dentro de uma semana.
+        close-pr-message: 'Solicitação pull fechada automaticamente como inativa.'
+        exempt-pr-labels: 'Fixado'
+        stale-pr-label: 'Inativo'
+        exempt-all-milestones: true

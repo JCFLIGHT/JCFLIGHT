@@ -230,7 +230,7 @@ Members:
 
   - Name: AutoPilotMode
     Description: " `0 - Piloto automático do tipo Attitude` ~ O usuário irá controlar o ângulo de inclinação do Roll e Pitch.Quando os sticks do Roll e Pitch do rádio são manipulados pelo piloto manual,o sistema de navegação inercial será ignorado,e os comandos irão passar diretamente no modo By-Pass.Assim que os sticks Roll e Pitch do rádio estiverem centralizados (1500uS),o sistema de navegação inercial irá retomar o piloto automático e manter a posição do multirotor. `1 - Piloto automático do tipo Cruise` ~ O sistema de navegação inercial estará sempre ativo e o usuário irá controlar a velocidade de navegação do Roll e Pitch,e o piloto automático irá calcular um novo controle de Attitude,assim mantendo a posição do multirotor constantemente."
-    DefaultValue: 0
+    DefaultValue: 1
     Min: 0
     Max: 100
 

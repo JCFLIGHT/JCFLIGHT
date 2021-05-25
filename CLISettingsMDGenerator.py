@@ -40,7 +40,7 @@ def Generate_MD_Doc_From_YAML(Settings_YAML):
     return MD_Table
 
 
-def regex_search(Regex):
+def Regex_Search(Regex):
     with open(1, 'r') as File:
         for _, line in enumerate(File.readlines()):
             Matches = Regex.search(line)
@@ -48,20 +48,20 @@ def regex_search(Regex):
                 yield Matches
 
 
-def find_default(Setting_Name):
+def Find_dDefault(Setting_Name):
     Regex = re.compile(
         rf'^\s*\.{Setting_Name}\s=\s([A-Za-z0-9_\-]+)(?:,)?(?:\s+//.+$)?')
     Defaults = []
-    for Matches in regex_search(Regex):
+    for Matches in Regex_Search(Regex):
         Defaults.append(Matches.group(1))
     return Defaults
 
 
-def check_defaults(settings_yaml):
+def Check_Defaults(settings_yaml):
     retval = True
     for Member in settings_yaml['Members']:
 
-        Default_From_Code = find_default(Member['Name'])
+        Default_From_Code = Find_dDefault(Member['Name'])
         if len(Default_From_Code) == 0:
             continue
         elif len(Default_From_Code) > 1:
@@ -100,7 +100,7 @@ with codecs.open(pathlib.PurePath('__main__').parent / 'Docs' / 'Settings.md', "
     Options, Args = parser.parse_args()
     Settings_YAML = Parse_Settings_YAML()
     if Options.Defaults:
-        Defaults_Match = check_defaults(Settings_YAML)
+        Defaults_Match = Check_Defaults(Settings_YAML)
         quit(0 if Defaults_Match else 1)
     MD_Table = Generate_MD_Doc_From_YAML(Settings_YAML)
     Settings_md.writelines(["# Variáveis do CLI\n", "\n"] + MD_Table + ["\n",

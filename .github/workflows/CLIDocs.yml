@@ -15,9 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Instalar Python
+      - name: Instalar o Python
         run: sudo apt-get update && sudo apt-get -y install python3-yaml
-      - name: Cheque se o Settings.md está atualizado
+      - name: Checar se o Settings.md está atualizado
         run: |
           cp Docs/Settings.md{,.ci}
           python3 CLISettingsMDGenerator.py -q

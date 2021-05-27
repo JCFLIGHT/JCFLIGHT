@@ -11,15 +11,15 @@
 
 ![Versão](https://img.shields.io/badge/version-1.0.0-blue)
 
-[<img src="https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" width="120" height="30">]()
+[<img src="https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white">]()
 
-[<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" width="120" height="30">]()
+[<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white">]()
 
-[<img src="https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white" width="120" height="30">]()
+[<img src="https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white">]()
 
 ## Suporte JCFLIGHT
 Se você gostaria de apoiar o desenvolvimento da JCFLIGHT,sinta-se à vontade para fazer uma doação.Isso nos ajuda a comprar hardware para portabilidade,desenvolvimento e prototipagem.<br/><br/>
-[<img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" width="120" height="30">](https://www.paypal.com/donate?business=SQZHMV2JMJBTA&item_name=Ajude+o+projeto+da+JCFLIGHT+a+se+manter+vivo.&currency_code=BRL)
+[<img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white">](https://www.paypal.com/donate?business=SQZHMV2JMJBTA&item_name=Ajude+o+projeto+da+JCFLIGHT+a+se+manter+vivo.&currency_code=BRL)
 
 Travis-CI Dashboard: [travis-ci.com/JCFLIGHT/JCFLIGHT](https://travis-ci.com/JCFLIGHT/JCFLIGHT)
 

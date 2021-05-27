@@ -1,8 +1,14 @@
 ![JCFLIGHT](Docs/Logo.png)
 
+* [<img src="https://camo.githubusercontent.com/b079fe922f00c4b86f1b724fbc2e8141c468794ce8adbc9b7456e5e1ad09c622/68747470733a2f2f6564656e742e6769746875622e696f2f537570657254696e7949636f6e732f696d616765732f7376672f6769746875622e737667" width="15" height="15"> Wiki](https://github.com/JCFLIGHT/JCFLIGHT/wiki)
+
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ![Travis-CI Build Status](https://travis-ci.com/JCFLIGHT/JCFLIGHT.svg?branch=master)
+
+## Suporte JCFLIGHT
+Se você gostaria de apoiar o desenvolvimento da JCFLIGHT,sinta-se à vontade para fazer uma doação.Isso nos ajuda a comprar hardware para portabilidade,desenvolvimento e prototipagem.
+[![Donate](https://img.shields.io/badge/Donate-PayPal-253B80.svg)](https://www.paypal.com/donate?business=SQZHMV2JMJBTA&item_name=Ajude+o+projeto+da+JCFLIGHT+a+se+manter+vivo.&currency_code=BRL)
 
 Travis-CI Dashboard: [travis-ci.com/JCFLIGHT/JCFLIGHT](https://travis-ci.com/JCFLIGHT/JCFLIGHT)
 
@@ -19,10 +25,6 @@ JCFLIGHT é um software de piloto automático de código aberto,ele está em des
 O projeto JCFLIGHT está licenciado sob a GNU General Public License,versão 3.
 
 Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
-
-## Wiki
-
-- Se estiver começando agora com a JCFLIGHT,por favor leia a [Wiki](https://github.com/JCFLIGHT/JCFLIGHT/wiki).
 
 ## Aprendizado
 

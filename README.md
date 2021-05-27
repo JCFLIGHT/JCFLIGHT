@@ -11,9 +11,15 @@
 
 ![Versão](https://img.shields.io/badge/version-1.0.0-blue)
 
+[<img src="https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" width="100" height="40">]()
+
+[<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" width="100" height="40">]()
+
+[<img src="https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white" width="100" height="40">]()
+
 ## Suporte JCFLIGHT
 Se você gostaria de apoiar o desenvolvimento da JCFLIGHT,sinta-se à vontade para fazer uma doação.Isso nos ajuda a comprar hardware para portabilidade,desenvolvimento e prototipagem.<br/><br/>
-[![Donate](https://img.shields.io/badge/Donate-PayPal-253B80.svg)](https://www.paypal.com/donate?business=SQZHMV2JMJBTA&item_name=Ajude+o+projeto+da+JCFLIGHT+a+se+manter+vivo.&currency_code=BRL)
+[<img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white" width="100" height="40">](https://www.paypal.com/donate?business=SQZHMV2JMJBTA&item_name=Ajude+o+projeto+da+JCFLIGHT+a+se+manter+vivo.&currency_code=BRL)
 
 Travis-CI Dashboard: [travis-ci.com/JCFLIGHT/JCFLIGHT](https://travis-ci.com/JCFLIGHT/JCFLIGHT)
 
@@ -30,10 +36,6 @@ JCFLIGHT é um software de piloto automático de código aberto,ele está em des
 O projeto JCFLIGHT está licenciado sob a GNU General Public License,versão 3.
 
 Repositório Github: https://github.com/JCFLIGHT/JCFLIGHT
-
-## Aprendizado
-
-- [Videos por JCLab](https://www.youtube.com/channel/UC6kk7H1CiaPVv4iKVGS9GsA)
 
 ## Mantenedor
 

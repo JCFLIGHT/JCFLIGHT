@@ -23,7 +23,7 @@
 
 ## Suporte JCFLIGHT
 Se você gostaria de apoiar o desenvolvimento da JCFLIGHT,sinta-se à vontade para fazer uma doação.Isso nos ajuda a comprar hardware para portabilidade,desenvolvimento e prototipagem.<br/><br/>
-[<img src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white">](https://www.paypal.com/donate?business=SQZHMV2JMJBTA&item_name=Ajude+o+projeto+da+JCFLIGHT+a+se+manter+vivo.&currency_code=BRL)
+[<img src="https://img.shields.io/badge/Donate-PayPal-253B80.svg">](https://www.paypal.com/donate?business=SQZHMV2JMJBTA&item_name=Ajude+o+projeto+da+JCFLIGHT+a+se+manter+vivo.&currency_code=BRL)
 
 Travis-CI Dashboard: [travis-ci.com/JCFLIGHT/JCFLIGHT](https://travis-ci.com/JCFLIGHT/JCFLIGHT)
 

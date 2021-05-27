@@ -1,9 +1,9 @@
 ![JCFLIGHT](Docs/Logo.png)
 
 ## Se você for novato com a JCLIFHT,leia a Wiki,ou acesse o YouTube
-[<img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" width="100" height="25"> Wiki](https://github.com/JCFLIGHT/JCFLIGHT/wiki)
+[<img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" width="100" height="45"> Wiki](https://github.com/JCFLIGHT/JCFLIGHT/wiki)
 
-[<img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" width="100" height="25"> YouTube](https://www.youtube.com/channel/UC6kk7H1CiaPVv4iKVGS9GsA)
+[<img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" width="100" height="45"> YouTube](https://www.youtube.com/channel/UC6kk7H1CiaPVv4iKVGS9GsA)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 

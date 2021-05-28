@@ -18,7 +18,6 @@
 #include "SETFLIGHTMODES.h"
 #include "FlightModes/AUXFLIGHT.h"
 #include "GPSNavigation/NAVIGATION.h"
-#include "Common/ENUM.h"
 
 void SetFlightModeToGCS(void)
 {
@@ -29,56 +28,54 @@ void SetFlightModeToGCS(void)
   {
     if (GPS_Resources.Mode.Navigation == DO_LANDED)
     {
-      FlightMode = GCS_LANDED_MODE;
+      AUXFLIGHT.FlightMode = GCS_LANDED_MODE;
     }
     else
     {
-      FlightMode = GCS_LAND_MODE;
+      AUXFLIGHT.FlightMode = GCS_LAND_MODE;
     }
   }
   else
   {
-    if (AcroControlAux)
+    if (AUXFLIGHT.GetModeState[STABILIZE_MODE])
     {
-      FlightMode = GCS_ACRO_MODE;
+      AUXFLIGHT.FlightMode = GCS_ACRO_MODE;
     }
-    if (SimpleControlAux)
+    else if (AUXFLIGHT.GetModeState[SIMPLE_MODE])
     {
-      FlightMode = GCS_SIMPLE_MODE;
+      AUXFLIGHT.FlightMode = GCS_SIMPLE_MODE;
     }
-    if (AltitudeHoldControlAux)
+    else if (AUXFLIGHT.GetModeState[ALTITUDE_HOLD_MODE])
     {
-      FlightMode = GCS_ALTITUDE_HOLD_MODE;
+      AUXFLIGHT.FlightMode = GCS_ALTITUDE_HOLD_MODE;
     }
-    if (GPSHoldControlAux)
+    else if (AUXFLIGHT.GetModeState[POS_HOLD_MODE])
     {
-      FlightMode = GCS_POS_HOLD_MODE;
+      AUXFLIGHT.FlightMode = GCS_POS_HOLD_MODE;
     }
-    if (RTHControlAux)
+    else if (AUXFLIGHT.GetModeState[RTH_MODE])
     {
-      FlightMode = GCS_RTH_MODE;
+      AUXFLIGHT.FlightMode = GCS_RTH_MODE;
     }
-    if (AttackControlAux)
+    else if (AUXFLIGHT.GetModeState[ATTACK_MODE])
     {
-      FlightMode = GCS_ATTACK_MODE;
+      AUXFLIGHT.FlightMode = GCS_ATTACK_MODE;
     }
-    if (AutoFlipControlAux)
+    else if (AUXFLIGHT.GetModeState[FLIP_MODE])
     {
-      FlightMode = GCS_FLIP_MODE;
+      AUXFLIGHT.FlightMode = GCS_FLIP_MODE;
     }
-    if (WayPointControlAux)
+    else if (AUXFLIGHT.GetModeState[WAYPOINT_MODE])
     {
-      FlightMode = GCS_WAYPOINT_MODE;
+      AUXFLIGHT.FlightMode = GCS_WAYPOINT_MODE;
     }
-    if (AutoLandControlAux)
+    else if (AUXFLIGHT.GetModeState[LAND_MODE])
     {
-      FlightMode = GCS_LAND_MODE;
+      AUXFLIGHT.FlightMode = GCS_LAND_MODE;
     }
-    if (!AcroControlAux && !SimpleControlAux && !AltitudeHoldControlAux &&
-        !GPSHoldControlAux && !RTHControlAux && !AttackControlAux &&
-        !AutoFlipControlAux && !WayPointControlAux && !AutoLandControlAux)
+    else
     {
-      FlightMode = GCS_STABILIZE_MODE;
+      AUXFLIGHT.FlightMode = GCS_STABILIZE_MODE;
     }
   }
 }

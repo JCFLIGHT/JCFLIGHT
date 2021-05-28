@@ -95,7 +95,7 @@ void Switch_Flag(void)
 {
   const bool InAirPlaneMode = GetAirPlaneEnabled();
   //INICIA A CONTAGEM DA FLAG PRINCIPAL
-  if (SimpleControlAux)
+  if (AUXFLIGHT.GetModeState[SIMPLE_MODE])
   {
     if ((SCHEDULERTIME.GetMillis() - TimerFunction) > 50) //DEBOUNCE
     {
@@ -119,22 +119,22 @@ void Switch_Flag(void)
     CloseReset = 0; //EVITA GUARDAR VALORES NEGATIVOS CAUSADO PELA DECREMENTAÇÃO DA FUNÇÃO ACIMA
   }
   //RESETA A FLAG SE O VALOR DELA FOR IGUAL A 8,E A CHAVE AUX DO MODO SIMPLES FOR FALSA
-  if (FlagParameterFunction == 8 && !SimpleControlAux)
+  if (FlagParameterFunction == 8 && !AUXFLIGHT.GetModeState[SIMPLE_MODE])
   {
     FlagParameterFunction = 0;
   }
   //ESPERA A DECREMENTAÇÃO DA VARIAVEL ACABAR E RESETA A FLAG PRINCIPAL
-  if (!SimpleControlAux && CloseReset == 0)
+  if (!AUXFLIGHT.GetModeState[SIMPLE_MODE] && CloseReset == 0)
   {
     FlagParameterFunction = 0;
   }
   //FLAG PRINCIPAL IGUAL A 4?CHAVE AUX ATIVADA?CAL DO MAG ACABOU?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
-  if (FlagParameterFunction == 4 && SimpleControlAux && !Calibration.Magnetometer.Calibrating)
+  if (FlagParameterFunction == 4 && AUXFLIGHT.GetModeState[SIMPLE_MODE] && !Calibration.Magnetometer.Calibrating)
   {
     GuardValue = FlagParameterFunction;
   }
   //FLAG PRINCIPAL IGUAL A 8?CHAVE AUX ATIVADA?SIM...GUARDE O VALOR DA FLAG PRINCIPAL NA VARIAVEL "GUARDVALUE"
-  if (FlagParameterFunction == 8 && SimpleControlAux)
+  if (FlagParameterFunction == 8 && AUXFLIGHT.GetModeState[SIMPLE_MODE])
   {
     GuardValue = FlagParameterFunction;
   }

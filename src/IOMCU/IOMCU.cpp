@@ -1314,7 +1314,7 @@ void GCSClass::First_Packet_Request_Parameters(void)
     Essential_First_Packet_Parameters.SendCurrentValue = BATTERY.Get_Actual_Current();
     Essential_First_Packet_Parameters.SendWattsValue = BATTERY.GetWatts();
     Essential_First_Packet_Parameters.SendDeclinationValue = (int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100);
-    Essential_First_Packet_Parameters.SendActualFlightMode = FlightMode;
+    Essential_First_Packet_Parameters.SendActualFlightMode = AUXFLIGHT.FlightMode;
     Essential_First_Packet_Parameters.SendFrameType = GetActualPlatformType();
     Essential_First_Packet_Parameters.SendHomePointState = GPS_Resources.Home.Marked;
     Essential_First_Packet_Parameters.SendTemperature = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);

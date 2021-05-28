@@ -16,7 +16,6 @@
 */
 
 #include "BAROREAD.h"
-#include "Filters/AVERAGEFILTER.h"
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
 #include "BAROBACKEND.h"
@@ -25,7 +24,7 @@
 
 #define BARO_SPIKES_SIZE 0x15
 
-AverageFilterInt32_Size5 Altitude_Filter; //INSTANCIA DO FILTRO AVERAGE PARA A ALTITUDE,TAMANHO = 5 ITERAÇÕES
+#ifndef USE_BARO_PRECISE_MATH
 
 void Remove_Barometer_Spikes(void)
 {
@@ -44,7 +43,8 @@ void Remove_Barometer_Spikes(void)
   PressureIndex = PressureIndexCount;
 }
 
-/*
+#else
+
 #define BARO_SAMPLE_COUNT_MAX 48
 #define PRESSURE_SAMPLES_MEDIAN 3
 
@@ -129,22 +129,30 @@ void Remove_Barometer_Spikes(void)
 
   CurrentSampleIndex = NextSampleIndex;
 }
-*/
+
+#endif
+
 float Get_Altitude_Difference(float Base_Pressure, float Pressure, float BaroTemperature)
 {
   float Result;
-#ifdef USE_BARO_PRECISE_MATH
+
+#ifndef USE_BARO_PRECISE_MATH
+
   //EM CPU MAIS LENTA USE UM CÁLCULO MENOS EXATO,PORÉM MAIS RÁPIDO
   float Scaling = Base_Pressure / Pressure;
   float CalcedTemperature = BaroTemperature + 273.15f;
   Result = logf(Scaling) * CalcedTemperature * 29.271267f;
+
 #else
+
   //EM CPUs MAIS RÁPIDAS USE UM CÁLCULO MAIS EXATO
   float Scaling = Pressure / Base_Pressure;
   float CalcedTemperature = BaroTemperature + 273.15f;
   //ESTE É UM CÁLCULO EXATO QUE ESTÁ DENTRO DE +/- 2.5M DAS TABELAS DE ATMOSFERA PADRÃO NA TROPOSFERA (ATÉ 11.000M AMSL)
   Result = 153.8462f * CalcedTemperature * (1.0f - expf(0.190259f * logf(Scaling)));
+
 #endif
+
   return Result;
 }
 
@@ -154,12 +162,11 @@ void Calculate_Barometer_Altitude(void)
   {
     Barometer.Calibration.GroundPressure = Barometer.Raw.PressureFiltered * 0.01f;
     Barometer.Calibration.GroundTemperature = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);
-    Altitude_Filter.Reset();
   }
   else
   {
-    Barometer.Altitude.Actual = Altitude_Filter.Apply(ConverMetersToCM(Get_Altitude_Difference(Barometer.Calibration.GroundPressure,
-                                                                                               Barometer.Raw.PressureFiltered * 0.01f,
-                                                                                               Barometer.Calibration.GroundTemperature)));
+    Barometer.Altitude.Actual = ConverMetersToCM(Get_Altitude_Difference(Barometer.Calibration.GroundPressure,
+                                                                         Barometer.Raw.PressureFiltered * 0.01f,
+                                                                         Barometer.Calibration.GroundTemperature));
   }
 }

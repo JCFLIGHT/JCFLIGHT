@@ -36,7 +36,7 @@ FILE_COMPILE_FOR_SPEED
 
 IMU_Struct IMU;
 
-#ifdef USE_IMU_BIQUAD_FILTER
+#ifdef USE_IMU_FILTERS
 //INSTANCIAS PARA O LPF
 static BiquadFilter_Struct BiquadAccLPF[3];
 static BiquadFilter_Struct BiquadGyroLPF[3];
@@ -47,7 +47,7 @@ static BiquadFilter_Struct BiquadGyroNotch[3];
 
 bool KalmanFilterEnabled = false;
 
-#ifdef USE_IMU_BIQUAD_FILTER
+#ifdef USE_IMU_FILTERS
 int16_t Biquad_Acc_LPF = 0;
 int16_t Biquad_Gyro_LPF = 0;
 int16_t Biquad_Acc_Notch = 0;
@@ -60,7 +60,7 @@ static void IMU_Filters_Initialization(void)
   KalmanFilterEnabled = STORAGEMANAGER.Read_8Bits(KALMAN_ADDR) == NONE ? false : true;
   KALMAN.Initialization();
 
-#ifdef USE_IMU_BIQUAD_FILTER
+#ifdef USE_IMU_FILTERS
   //CARREGA OS VALORES GUARDADOS DO LPF
   Biquad_Acc_LPF = STORAGEMANAGER.Read_16Bits(BI_ACC_LPF_ADDR);
   Biquad_Gyro_LPF = STORAGEMANAGER.Read_16Bits(BI_GYRO_LPF_ADDR);
@@ -330,7 +330,7 @@ void Acc_ReadBufferData(void)
     KALMAN.Apply_In_Acc(IMU.Accelerometer.Read);
   }
 
-#ifdef USE_IMU_BIQUAD_FILTER
+#ifdef USE_IMU_FILTERS
 
   //LPF
   if (Biquad_Acc_LPF > 0)
@@ -374,7 +374,7 @@ void Gyro_ReadBufferData(void)
     KALMAN.Apply_In_Gyro(IMU.Gyroscope.Read);
   }
 
-#ifdef USE_IMU_BIQUAD_FILTER
+#ifdef USE_IMU_FILTERS
 
   //LPF
   if (Biquad_Gyro_LPF > 0)

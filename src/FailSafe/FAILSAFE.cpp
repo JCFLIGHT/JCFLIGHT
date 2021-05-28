@@ -135,7 +135,7 @@ void ResetFailSafe(void)
 {
   ImmediatelyFailSafe = false;
   Fail_Safe_Event = false;
-  if (!RTHControlAux)
+  if (!AUXFLIGHT.GetModeState[RTH_MODE])
   {
     DISABLE_THIS_FLIGHT_MODE(RTH_MODE);
   }

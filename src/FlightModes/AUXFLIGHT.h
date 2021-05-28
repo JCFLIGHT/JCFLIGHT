@@ -18,36 +18,18 @@
 #ifndef AUXFLIGHT_H_
 #define AUXFLIGHT_H_
 #include "Build/LIBDEPENDENCIES.h"
+#include "Common/ENUM.h"
 
-extern bool AltitudeHoldControlAux,
-    GPSHoldControlAux,
-    RTHControlAux,
-    SimpleControlAux,
-    AcroControlAux,
-    AttackControlAux,
-    AutoFlipControlAux,
-    WayPointControlAux,
-    ArmDisarmControlAux,
-    AutoLandControlAux,
-    ParachuteControlAux;
+extern bool ParachuteControlAux;
 
-extern uint8_t GPSHoldConfig,
-    RTHConfig,
-    SimpleConfig,
-    GimbalConfig,
-    AltitudeHoldConfig,
-    AcroConfig,
-    AttackConfig,
-    AutoFlipConfig,
-    WayPointConfig,
-    FlightMode,
-    ArmDisarmConfig,
-    AutoLandConfig,
-    ParachuteConfig;
+extern uint8_t ArmDisarmConfig, GimbalConfig, ParachuteConfig;
 
 class AUXFLIGHTCLASS
 {
 public:
+  bool GetModeState[SIZE_OF_FLIGHT_MODES];
+  uint8_t GetModeConfiguration[SIZE_OF_FLIGHT_MODES];
+  uint8_t FlightMode = STABILIZE_MODE;
   void Initialization(void);
   void Update(void);
 

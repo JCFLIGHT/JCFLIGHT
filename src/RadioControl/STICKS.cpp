@@ -72,7 +72,6 @@ void SticksClass::Update()
     {
       if (ArmDisarmConfig > 0)
       {
-        ENABLE_DISABLE_THIS_STATE_WITH_DEPENDENCY(SECONDARY_ARM_DISARM, ArmDisarmControlAux);
         if (IS_STATE_ACTIVE(SECONDARY_ARM_DISARM))
         {
           if (!SystemInFailSafe() && !IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && !IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE))

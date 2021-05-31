@@ -3,8 +3,7 @@
 | Nome | Valor Padrão | Min | Max | Descrição |
 | ------------- | ------------- | --- | --- | ----------- |
 | AirPlane_Wheels | 0 | 0 | 1 | 0 - Sem trem de pouso / 1 - Com trem de pouso (Apenas para o Auto-Launch) |
-| AirSpeedAutoCalScale | 0 | 0 | 1 | `0 - Desativado / 1 - Ativado` ~ Calibração automática em voo da escala do Tubo de Pitot.Um novo valor será armazenado no parâmetro ´AirSpeed_Factor´ a cada 2 minutos. |
-| AirSpeed_Factor | 1.9936 | 0 | 100 | Escala dinâmica para o Tubo de Pitot |
+| AirSpeedAutoCalScale | 0 | 0 | 1 | `0 - Desativado / 1 - Ativado` ~ Calibração automática em voo da escala do Tubo de Pitot.Um novo valor será armazenado no parâmetro ´AirSpeed Fator´ a cada 2 minutos. |
 | AirSpeed_Samples | 15 | 0 | 255 | Número de amostras para calibrar o Tubo de Pitot |
 | Arm_Time_Safety | 2 | 0 | 255 | Tempo seguro para armar com os sticks em posição de armamento [Segundos] |
 | AutoDisarm_Throttle_Min | 1100 | 800 | 1500 | Valor maximo do Throttle tolerado para iniciar a contagem do Auto-Desarmamento [uS] |
@@ -21,10 +20,6 @@
 | AutoLaunch_SpinUp_Time | 300 | 0 | 5000 | Tempo de incrimentação no Throttle para Aeros com rodas [MillisSegundos] |
 | AutoLaunch_Trigger_Motor_Delay | 1500 | 0 | 10000 | Tempo para iniciar o motor após o status de lançado [MillisSegundos] |
 | AutoLaunch_Velocity_Thresh | 3 | 0 | 20 | Velocidade da IMU ou GPS para validar o Auto-Launch [Metros/Segundo] |
-| AutoPilotMode | 0 | 0 | 100 |  `0 - Piloto automático do tipo Attitude` ~ O usuário irá controlar o ângulo de inclinação do Roll e Pitch.Quando os sticks do Roll e Pitch do rádio são manipulados pelo piloto manual,o sistema de navegação inercial será ignorado,e os comandos irão passar diretamente no modo By-Pass.Assim que os sticks Roll e Pitch do rádio estiverem centralizados (1500uS),o sistema de navegação inercial irá retomar o piloto automático e manter a posição do multirotor. `1 - Piloto automático do tipo Cruise` ~ O sistema de navegação inercial estará sempre ativo e o usuário irá controlar a velocidade de navegação do Roll e Pitch,e o piloto automático irá calcular um novo controle de Attitude,assim mantendo a posição do multirotor constantemente. |
-| Batt_Amps_OffSet | 0 | 0 | 1000 | Ajuste fino do valor da Corrente |
-| Batt_Amps_Per_Volt | 62.0 | 0 | 1000 | Fator de calibração para converter a leitura ADC em Corrente |
-| Batt_Voltage_Factor | 10.1 | 0 | 1000 | Fator de calibração para converter a leitura ADC em Tensão |
 | Compass_Cal_Timer | 60 | 0 | 120 | Tempo maximo de calibração do Compass [Segundos] |
 | CrashCheck_BankAngle | 3 | 0 | 20 | Valor da aceleração da IMU [Metros/Segundo^2] |
 | CrashCheck_Timer | 2 | 0 | 255 | Estouro de tempo para validar o Crash [Segundos] |

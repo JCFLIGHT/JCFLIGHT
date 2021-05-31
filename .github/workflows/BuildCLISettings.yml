@@ -22,6 +22,6 @@ jobs:
           cp Docs/Settings.md{,.ci}
           python3 CLISettingsMDGenerator.py -q
           if ! diff -q Docs/Settings.md{,.ci}; then
-            echo "::error ::\"Docs/Settings.md\" Documento não atualizado, Por Favor compile o arquivo usando o Python \"CLISettingsMDGenerator.py\""
+            echo "::error ::\"Docs/Settings.md\" Documento não atualizado, Por Favor compile o arquivo \"CLISettingsMDGenerator.py\" usando o Python"
             exit 1
           fi

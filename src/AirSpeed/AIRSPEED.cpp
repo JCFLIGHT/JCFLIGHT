@@ -80,7 +80,7 @@ void AirSpeedClass::Parse_IAS_Pressure(float &Pressure)
 {
   //https://en.wikipedia.org/wiki/Indicated_airspeed
   AirSpeed.Raw.DifferentialPressure = ABS(AirSpeed.Raw.Pressure - AirSpeed.Calibration.OffSet);
-  Pressure = Fast_SquareRoot(AirSpeed.Raw.DifferentialPressure * JCF_Param.AirSpeed_Factor);
+  Pressure = Fast_SquareRoot(AirSpeed.Raw.DifferentialPressure * AirSpeed.Param.Factor);
   Pressure = PT1FilterApply3(&Pitot_Smooth, Pressure);
 }
 

@@ -311,6 +311,7 @@ typedef struct
       struct Control_Struct
       {
         bool Enabled = false;
+        bool Mode = false;
         int16_t Angle[3] = {0, 0, 0};
       } Control;
 
@@ -482,9 +483,9 @@ typedef struct
 
   struct Raw_Stuct
   {
-    float Pressure = 0;
-    float IASPressure = 0;
-    float DifferentialPressure = 0;
+    float Pressure = 0.0f;
+    float IASPressure = 0.0f;
+    float DifferentialPressure = 0.0f;
     uint16_t IASPressureInCM = 0;
   } Raw;
 
@@ -497,6 +498,11 @@ typedef struct
     uint16_t Read_Count = 0;
     uint32_t Start_MS = 0;
   } Calibration;
+
+  struct Param_Stuct
+  {
+    float Factor = 0.0f;
+  } Param;
 
 } AirSpeed_Struct;
 
@@ -588,6 +594,13 @@ typedef struct
     uint8_t LowBatteryCount = 0;
   } Exhausted;
 
+  struct Param_Struct
+  {
+    float Voltage_Factor = 0.0f;
+    float Amps_Per_Volt = 0.0f;
+    float Amps_OffSet = 0.0f;
+  } Param;
+
 } Battery_Struct;
 
 typedef struct
@@ -618,11 +631,6 @@ typedef struct
   uint16_t AutoLaunch_MaxThrottle;
   uint16_t AutoLaunch_Exit;
   uint8_t AutoLaunch_Altitude;
-#endif
-  float Batt_Voltage_Factor;
-  float Amps_Per_Volt;
-#ifndef __AVR_ATmega2560__
-  float Amps_OffSet;
   uint8_t CrashCheck_BankAngle;
   uint8_t CrashCheck_Time;
   uint16_t GimbalMinValue;
@@ -633,9 +641,7 @@ typedef struct
   uint16_t AutoDisarm_Throttle_Min;
   uint16_t AutoDisarm_YPR_Min;
   uint16_t AutoDisarm_YPR_Max;
-#endif
   uint8_t AirPlane_Wheels;
-#ifndef __AVR_ATmega2560__
   uint8_t GPS_Baud_Rate;
 #endif
   uint16_t Navigation_Vel;
@@ -645,11 +651,9 @@ typedef struct
 #ifndef __AVR_ATmega2560__
   uint8_t AirSpeed_Samples;
 #endif
-  float AirSpeed_Factor;
   uint8_t Arm_Time_Safety;
   uint8_t Disarm_Time_Safety;
   uint8_t Compass_Cal_Timer;
-  uint8_t AutoPilotMode;
 #ifndef __AVR_ATmega2560__
   uint8_t AirSpeedAutoCalScale;
 #endif
@@ -715,6 +719,12 @@ typedef struct
     } Integral;
 
   } Controller;
+
+  struct Param_Struct
+  {
+    uint8_t IntegralTermWindUpPercent = 0;
+    float PitchLevelTrim = 0.0f;
+  } Param;
 
 } PID_Resources_Struct;
 

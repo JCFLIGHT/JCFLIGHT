@@ -84,24 +84,6 @@ Members:
     Min: 0
     Max: 255
 
-  - Name: Batt_Voltage_Factor
-    Description: "Fator de calibração para converter a leitura ADC em Tensão"
-    DefaultValue: 10.1
-    Min: 0
-    Max: 1000
-
-  - Name: Batt_Amps_Per_Volt
-    Description: "Fator de calibração para converter a leitura ADC em Corrente"
-    DefaultValue: 62.0
-    Min: 0
-    Max: 1000
-
-  - Name: Batt_Amps_OffSet
-    Description: "Ajuste fino do valor da Corrente"
-    DefaultValue: 0
-    Min: 0
-    Max: 1000
-
   - Name: CrashCheck_BankAngle
     Description: "Ângulo da IMU a ser considerado como Crash [Radianos*100]"
     DefaultValue: 30
@@ -204,12 +186,6 @@ Members:
     Min: 0
     Max: 255
 
-  - Name: AirSpeed_Factor
-    Description: "Escala dinâmica para o Tubo de Pitot"
-    DefaultValue: 1.9936
-    Min: 0
-    Max: 100
-
   - Name: Arm_Time_Safety
     Description: "Tempo seguro para armar com os sticks em posição de armamento [Segundos]"
     DefaultValue: 2
@@ -228,14 +204,8 @@ Members:
     Min: 0
     Max: 120
 
-  - Name: AutoPilotMode
-    Description: " `0 - Piloto automático do tipo Attitude` ~ O usuário irá controlar o ângulo de inclinação do Roll e Pitch.Quando os sticks do Roll e Pitch do rádio são manipulados pelo piloto manual,o sistema de navegação inercial será ignorado,e os comandos irão passar diretamente no modo By-Pass.Assim que os sticks Roll e Pitch do rádio estiverem centralizados (1500uS),o sistema de navegação inercial irá retomar o piloto automático e manter a posição do multirotor. `1 - Piloto automático do tipo Cruise` ~ O sistema de navegação inercial estará sempre ativo e o usuário irá controlar a velocidade de navegação do Roll e Pitch,e o piloto automático irá calcular um novo controle de Attitude,assim mantendo a posição do multirotor constantemente."
-    DefaultValue: 0
-    Min: 0
-    Max: 100
-
   - Name: AirSpeedAutoCalScale
-    Description: "`0 - Desativado / 1 - Ativado` ~ Calibração automática em voo da escala do Tubo de Pitot.Um novo valor será armazenado no parâmetro ´AirSpeed_Factor´ a cada 2 minutos."
+    Description: "`0 - Desativado / 1 - Ativado` ~ Calibração automática em voo da escala do Tubo de Pitot.Um novo valor será armazenado no parâmetro ´AirSpeed Fator´ a cada 2 minutos."
     DefaultValue: 0
     Min: 0
     Max: 1

@@ -47,8 +47,8 @@ Vector3x3Float StateEstimate(0.0f, 0.0f, 0.0f);
 
 void AirSpeedCalibrationClass::Initialization(void)
 {
-    AIRSPEEDCALIBRATION.Previous_Scale = JCF_Param.AirSpeed_Factor;
-    StateEstimate.Z = 1.0f / sqrtf(JCF_Param.AirSpeed_Factor);
+    AIRSPEEDCALIBRATION.Previous_Scale = AirSpeed.Param.Factor;
+    StateEstimate.Z = 1.0f / sqrtf(AirSpeed.Param.Factor);
 }
 
 bool AirSpeedCalibrationClass::Calibrate(void)
@@ -172,10 +172,10 @@ void AirSpeedCalibrationClass::Scale_Update(void)
                                                        ConvertCMToMeters(GPS_Resources.Navigation.Misc.Velocity.Get[EAST]),
                                                        ConvertCMToMeters(GPS_Resources.Navigation.Misc.Velocity.Get[DOWN]));
 
-    //VELOCIDADE VERDADEIRA DO AR SEM O GANHO DE 'AirSpeed_Factor'
+    //VELOCIDADE VERDADEIRA DO AR SEM O GANHO DE 'AirSpeed.Param.Factor'
     float True_AirSpeed = sqrtf(AirSpeed.Raw.DifferentialPressure) * Get_EAS2TAS();
 
-    float CurrentScale = Constrain_Float(JCF_Param.AirSpeed_Factor, 1.0f, 4.0f);
+    float CurrentScale = Constrain_Float(AirSpeed.Param.Factor, 1.0f, 4.0f);
 
     StateEstimate.Z = 1.0f / sqrtf(CurrentScale);
 
@@ -187,15 +187,15 @@ void AirSpeedCalibrationClass::Scale_Update(void)
     }
 
     EstimatedZScale = Constrain_Float(EstimatedZScale, 0.5f, 1.0f);
-    JCF_Param.AirSpeed_Factor = 1.0f / SquareFloat(EstimatedZScale);
+    AirSpeed.Param.Factor = 1.0f / SquareFloat(EstimatedZScale);
     if (AIRSPEEDCALIBRATION.Scale_Counter > 60)
     {
-        if (AIRSPEEDCALIBRATION.Previous_Scale < (0.95f * JCF_Param.AirSpeed_Factor) ||
-            AIRSPEEDCALIBRATION.Previous_Scale > (1.05f * JCF_Param.AirSpeed_Factor))
+        if (AIRSPEEDCALIBRATION.Previous_Scale < (0.95f * AirSpeed.Param.Factor) ||
+            AIRSPEEDCALIBRATION.Previous_Scale > (1.05f * AirSpeed.Param.Factor))
         {
             //GUARDA UM NOVO VALOR DE CALIBRAÇÃO NA EEPROM A CADA 2 MINUTOS
-            STORAGEMANAGER.Write_Float(AIRSPEED_FACTOR_ADDR, JCF_Param.AirSpeed_Factor);
-            AIRSPEEDCALIBRATION.Previous_Scale = JCF_Param.AirSpeed_Factor;
+            STORAGEMANAGER.Write_Float(AIRSPEED_FACTOR_ADDR, AirSpeed.Param.Factor);
+            AIRSPEEDCALIBRATION.Previous_Scale = AirSpeed.Param.Factor;
             AIRSPEEDCALIBRATION.Scale_Counter = 0;
         }
     }

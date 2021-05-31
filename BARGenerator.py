@@ -83,9 +83,6 @@ DefsCLITable = [
     ['AL_MAX_THROTTLE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['AL_EXIT_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['AL_ALTITUDE_ADDR', AddrSizeOf.TYPE_32_BITS.value],
-    ['BATT_VOLTAGE_FACTOR_ADDR', AddrSizeOf.TYPE_FLOAT.value],
-    ['BATT_AMPS_VOLT_ADDR', AddrSizeOf.TYPE_FLOAT.value],
-    ['BATT_AMPS_OFFSET_ADDR', AddrSizeOf.TYPE_FLOAT.value],
     ['CC_BANKANGLE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['CC_TIME_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['GIMBAL_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
@@ -103,11 +100,9 @@ DefsCLITable = [
     ['RTH_LAND_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['GPS_TILT_COMP_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AIRSPEED_SAMPLES_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['AIRSPEED_FACTOR_ADDR', AddrSizeOf.TYPE_FLOAT.value],
     ['ARM_TIME_SAFETY_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['DISARM_TIME_SAFETY_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['COMPASS_CAL_TIME_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['AUTO_PILOT_MODE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AS_AUTO_CAL_SCALE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
 ]
 
@@ -139,7 +134,7 @@ DefsNormalConfigTable = [
     ['AUTOFLIP_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['GIMBAL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['FRAME_TYPE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['RC_SEQUENCY_ADDR',AddrSizeOf.TYPE_8_BITS.value],
+    ['RC_SEQUENCY_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['FF_OR_CD_ROLL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AUTOMISSION_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AUTOLAND_ADDR', AddrSizeOf.TYPE_8_BITS.value],
@@ -231,7 +226,7 @@ DefsNormalConfigTable = [
     ['KP_AUTOLEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['KI_AUTOLEVEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['KP_HEADING_HOLD_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['HEADING_HOLD_RATE_LIMIT_ADDR',AddrSizeOf.TYPE_8_BITS.value],
+    ['HEADING_HOLD_RATE_LIMIT_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['PITCH_BANK_MAX_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['ATTACK_BANK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['GPS_BANK_ADDR', AddrSizeOf.TYPE_8_BITS.value],
@@ -241,6 +236,12 @@ DefsNormalConfigTable = [
     ['INTEGRAL_RELAX_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['KCD_OR_FF_LPF_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['PITCH_LEVEL_TRIM_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['BATT_VOLTAGE_FACTOR_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['BATT_AMPS_VOLT_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['BATT_AMPS_OFFSET_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['AUTO_PILOT_MODE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['AIRSPEED_FACTOR_ADDR', AddrSizeOf.TYPE_32_BITS.value],
+    ['INTEGRAL_WINDUP_ADDR', AddrSizeOf.TYPE_8_BITS.value],
 ]
 
 

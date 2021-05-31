@@ -63,12 +63,7 @@ const Resources_Of_Param Params_Table[] = {
     {"AutoLaunch_SpinUp_Time",             AL_SPINUP_TIME_ADDR,                  VAR_16BITS,             &JCF_Param.AutoLaunch_SpinUp_Time,          0,             5000,            300},
     {"AutoLaunch_MaxThrottle",             AL_MAX_THROTTLE_ADDR,                 VAR_16BITS,             &JCF_Param.AutoLaunch_MaxThrottle,          1000,          2000,            1700},
     {"AutoLaunch_Exit",                    AL_EXIT_ADDR,                         VAR_16BITS,             &JCF_Param.AutoLaunch_Exit,                 0,             30000,           5000},
-    {"AutoLaunch_Altitude",                AL_ALTITUDE_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Altitude,             0,             255,             0},
-#endif
-    {"Batt_Voltage_Factor",                BATT_VOLTAGE_FACTOR_ADDR,             VAR_FLOAT,              &JCF_Param.Batt_Voltage_Factor,             0,             1000,            10.1f},
-    {"Batt_Amps_Per_Volt",                 BATT_AMPS_VOLT_ADDR,                  VAR_FLOAT,              &JCF_Param.Amps_Per_Volt,                   0,             1000,            62.0f},
-#ifndef __AVR_ATmega2560__   
-    {"Batt_Amps_OffSet",                   BATT_AMPS_OFFSET_ADDR,                VAR_FLOAT,              &JCF_Param.Amps_OffSet,                     0,             1000,            0},
+    {"AutoLaunch_Altitude",                AL_ALTITUDE_ADDR,                     VAR_8BITS,              &JCF_Param.AutoLaunch_Altitude,             0,             255,             0}, 
     {"CrashCheck_BankAngle",               CC_BANKANGLE_ADDR,                    VAR_8BITS,              &JCF_Param.CrashCheck_BankAngle,            0,             255,             30},
     {"CrashCheck_Time",                    CC_TIME_ADDR,                         VAR_8BITS,              &JCF_Param.CrashCheck_Time,                 0,             255,             2},
     {"GimbalMinValue",                     GIMBAL_MIN_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMinValue,                  800,           2200,            1000},
@@ -79,24 +74,16 @@ const Resources_Of_Param Params_Table[] = {
     {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            1100},
     {"AutoDisarm_YPR_Min",                 AUTODISARM_YPR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Min,              800,           1500,            1450},
     {"AutoDisarm_YPR_Max",                 AUTODISARM_YPR_MAX_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_YPR_Max,              800,           2200,            1550},
-#endif
     {"AirPlane_Wheels",                    WHEELS_ADDR,                          VAR_8BITS,              &JCF_Param.AirPlane_Wheels,                 0,             1,               0},
-#ifndef __AVR_ATmega2560__
     {"GPS_Baud_Rate",                      GPS_BAUDRATE_ADDR,                    VAR_8BITS,              &JCF_Param.GPS_Baud_Rate,                   0,             4,               4},
     {"Navigation_Vel",                     NAV_VEL_ADDR,                         VAR_16BITS,             &JCF_Param.Navigation_Vel,                  0,             400,             400},
     {"GPS_WP_Radius",                      WP_RADIUS_ADDR,                       VAR_8BITS,              &JCF_Param.GPS_WP_Radius,                   0,             255,             2},
     {"GPS_RTH_Land_Radius",                RTH_LAND_ADDR,                        VAR_8BITS,              &JCF_Param.GPS_RTH_Land_Radius,             0,             255,             10},
     {"GPS_TiltCompensation",               GPS_TILT_COMP_ADDR,                   VAR_8BITS,              &JCF_Param.GPS_TiltCompensation,            0,             100,             20},
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
-#endif
-    {"AirSpeed_Factor",                    AIRSPEED_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.AirSpeed_Factor,                 0,             100,             1.9936f},
-#ifndef __AVR_ATmega2560__  
     {"Arm_Time_Safety",                    ARM_TIME_SAFETY_ADDR,                 VAR_8BITS,              &JCF_Param.Arm_Time_Safety,                 0,             255,             2},
     {"Disarm_Time_Safety",                 DISARM_TIME_SAFETY_ADDR,              VAR_8BITS,              &JCF_Param.Disarm_Time_Safety,              0,             255,             2},
     {"Compass_Cal_Timer",                  COMPASS_CAL_TIME_ADDR,                VAR_8BITS,              &JCF_Param.Compass_Cal_Timer,               0,             120,             60},
-#endif
-    {"AutoPilotControlMode",               AUTO_PILOT_MODE_ADDR,                 VAR_8BITS,              &JCF_Param.AutoPilotMode,                   0,             1,               0},
-#ifndef __AVR_ATmega2560__ 
     {"AirSpeedAutoCalScale",               AS_AUTO_CAL_SCALE_ADDR,               VAR_8BITS,              &JCF_Param.AirSpeedAutoCalScale,            0,             1,               0},
 #endif 
 };
@@ -113,7 +100,9 @@ void ParamClass::Initialization(void)
   STORAGEMANAGER.Erase(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR);
 #endif
 
+#ifndef __AVR_ATmega2560__
   PARAM.Load_Sketch();
+#endif
 
 #ifdef __AVR_ATmega2560__
   JCF_Param.Navigation_Vel = 400;
@@ -126,8 +115,10 @@ void ParamClass::Initialization(void)
 #endif
 }
 
-void ParamClass::Default_List()
+void ParamClass::Default_List(void)
 {
+#ifndef __AVR_ATmega2560__
+
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
 
@@ -155,6 +146,8 @@ void ParamClass::Default_List()
       break;
     }
   }
+
+#endif
 }
 
 void ParamClass::Load_Sketch(void)
@@ -346,6 +339,8 @@ void ParamClass::Process_Command(char *ParamCommandLine)
 
 void ParamClass::Update(void)
 {
+#ifndef __AVR_ATmega2560__
+
   if (!GCS.CliMode)
   {
     return;
@@ -382,4 +377,6 @@ void ParamClass::Update(void)
   {
     PARAM.SerialBuffer[PARAM.SerialBufferIndex--] = 0;
   }
+
+#endif
 }

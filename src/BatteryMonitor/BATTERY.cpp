@@ -25,7 +25,8 @@
 #include "Build/BOARDDEFS.h"
 #include "Math/MATHSUPPORT.h"
 #include "FailSafe/FAILSAFE.h"
-#include "Param/PARAM.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 #include "FastSerial/PRINTF.h"
 
 BatteryClass BATTERY;
@@ -46,13 +47,16 @@ PT1_Filter_Struct BattCurrent_Smooth;
 
 void BatteryClass::Initialization(void)
 {
+  Battery.Param.Voltage_Factor = STORAGEMANAGER.Read_16Bits(BATT_VOLTAGE_FACTOR_ADDR) / 100.0f;
+  Battery.Param.Amps_Per_Volt = STORAGEMANAGER.Read_16Bits(BATT_AMPS_VOLT_ADDR) / 100.0f;
+  Battery.Param.Amps_OffSet = STORAGEMANAGER.Read_16Bits(BATT_AMPS_OFFSET_ADDR) / 100.0f;
   PT1FilterInit(&BattVoltage_Smooth, VOLTAGE_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
   PT1FilterInit(&BattCurrent_Smooth, CURRENT_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
 }
 
 void BatteryClass::Update_Voltage(void)
 {
-  Battery.Calced.Voltage = PT1FilterApply3(&BattVoltage_Smooth, (float)(ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_BATTERY_VOLTAGE) * JCF_Param.Batt_Voltage_Factor));
+  Battery.Calced.Voltage = PT1FilterApply3(&BattVoltage_Smooth, (float)(ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_BATTERY_VOLTAGE) * Battery.Param.Voltage_Factor));
   BATTERY.Update_Exhausted();
   FailSafe_Do_RTH_With_Low_Batt(Battery.Exhausted.LowPercentPreventArm);
 }
@@ -215,11 +219,7 @@ uint8_t BatteryClass::GetPercentage(void)
 void BatteryClass::Update_Current(void)
 {
   //FAZ A LEITURA DO SENSOR DE CORRENTE
-#ifndef __AVR_ATmega2560__
-  Battery.Calced.Current = PT1FilterApply3(&BattCurrent_Smooth, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - JCF_Param.Amps_OffSet) * JCF_Param.Amps_Per_Volt);
-#else
-  Battery.Calced.Current = PT1FilterApply3(&BattCurrent_Smooth, ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_BATTERY_CURRENT) * JCF_Param.Amps_Per_Volt);
-#endif
+  Battery.Calced.Current = PT1FilterApply3(&BattCurrent_Smooth, (ANALOGSOURCE.Read(ADC_BATTERY_CURRENT) - Battery.Param.Amps_OffSet) * Battery.Param.Amps_Per_Volt);
   Battery.Calced.Current = MAX(Battery.Calced.Current, 0);
 }
 

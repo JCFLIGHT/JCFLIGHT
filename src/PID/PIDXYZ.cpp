@@ -90,7 +90,6 @@ PT1_Filter_Struct DerivativeBoost_PT1_Yaw_Smooth;
 //FREQUENCIA DE CORTE DA ACELERAÇÃO CALCULADA PELO DERIVATIVE BOOST
 #define DERIVATIVE_BOOST_CUTOFF 10 //Hz
 
-uint8_t IntegralTermWindUpPercent = 50;        //AJUSTAVEL PELO USUARIO -> (0 a 90)
 int16_t ReferenceAirSpeed = 1500;              //AJUSTAVEL PELO USUARIO - VALOR DE 54KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO -> (0 a 500)
 int16_t MinThrottleDownPitchAngle = 0;         //AJUSTAVEL PELO USUARIO -> (0 a 450)
@@ -101,7 +100,6 @@ float DerivativeBoostMaxAceleration = 7500.0f; //AJUSTAVEL PELO USUARIO -> (1000
 
 ///////////////////////////////////////////////////////////////
 
-float PitchLevelTrim = 0;
 float MotorIntegralTermWindUpPoint;
 float AntiWindUpScaler;
 float CoordinatedTurnRateEarthFrame;
@@ -109,10 +107,11 @@ float CoordinatedTurnRateEarthFrame;
 void PIDXYZClass::Initialization(void)
 {
   Load_All_PID_Params();
-  PitchLevelTrim = STORAGEMANAGER.Read_16Bits(PITCH_LEVEL_TRIM_ADDR);
+  PID_Resources.Param.PitchLevelTrim = STORAGEMANAGER.Read_16Bits(PITCH_LEVEL_TRIM_ADDR);
   PID_Resources.Filter.DerivativeCutOff = STORAGEMANAGER.Read_16Bits(DERIVATIVE_LPF_ADDR);
   PID_Resources.Filter.IntegralRelaxCutOff = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);
   PID_Resources.Filter.ControlDerivativeCutOff = STORAGEMANAGER.Read_16Bits(KCD_OR_FF_LPF_ADDR);
+  PID_Resources.Param.IntegralTermWindUpPercent = STORAGEMANAGER.Read_8Bits(INTEGRAL_WINDUP_ADDR);
   BIQUADFILTER.Settings(&Derivative_Roll_Smooth, PID_Resources.Filter.DerivativeCutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
   BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, PID_Resources.Filter.DerivativeCutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
   BIQUADFILTER.Settings(&Derivative_Yaw_Smooth, PID_Resources.Filter.DerivativeCutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
@@ -125,7 +124,7 @@ void PIDXYZClass::Initialization(void)
 #endif
   PT1FilterInit(&WindUpRoll_Smooth, PID_Resources.Filter.IntegralRelaxCutOff, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
   PT1FilterInit(&WindUpPitch_Smooth, PID_Resources.Filter.IntegralRelaxCutOff, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
-  MotorIntegralTermWindUpPoint = 1.0f - (IntegralTermWindUpPercent / 100.0f);
+  MotorIntegralTermWindUpPoint = 1.0f - (PID_Resources.Param.IntegralTermWindUpPercent / 100.0f);
 }
 
 void PIDXYZClass::Update(float DeltaTime)
@@ -373,7 +372,7 @@ float PIDXYZClass::LevelPitch(float DeltaTime)
 
   if (GetAirPlaneEnabled())
   {
-    RcControllerAngle -= ConvertDegreesToDecidegrees(PitchLevelTrim);
+    RcControllerAngle -= ConvertDegreesToDecidegrees(PID_Resources.Param.PitchLevelTrim);
   }
 
   float AngleErrorInDegrees = ConvertDeciDegreesToDegrees(RcControllerAngle - Attitude.Raw[PITCH]);

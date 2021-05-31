@@ -64,7 +64,7 @@ static void ProcessFlightModesToMultirotor(void)
       }
       else
       {
-        if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE) && (JCF_Param.AutoPilotMode == AUTOPILOT_MODE_ATTI))
+        if (IS_FLIGHT_MODE_ACTIVE(POS_HOLD_MODE) && (GPS_Resources.Navigation.AutoPilot.Control.Mode == AUTOPILOT_MODE_ATTI))
         {
           ENABLE_DISABLE_THIS_FLIGHT_MODE_WITH_DEPENDENCY(POS_HOLD_MODE, GetSticksInAutoPilotPosition(POS_HOLD_DEADBAND));
         }

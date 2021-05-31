@@ -294,11 +294,13 @@ bool AutoLaunchClass::GetStatusCompleted(void)
 
 uint8_t AutoLaunchClass::GetPlaneType(void)
 {
-  if (JCF_Param.AirPlane_Wheels == 0)
+#ifndef __AVR_ATmega2560__
+  if (JCF_Param.AirPlane_Wheels == WITH_WHEELS)
   {
-    return WITHOUT_WHEELS;
+    return WITH_WHEELS;
   }
-  return WITH_WHEELS;
+#endif
+  return WITHOUT_WHEELS;
 }
 
 void AutoLaunchClass::ResetParameters(void)

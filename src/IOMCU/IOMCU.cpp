@@ -176,6 +176,9 @@ struct _Send_User_Basic_Parameters
     uint8_t SendSafeBtnState;
     uint8_t SendAirSpeedState;
     int16_t SendPitchLevelTrim;
+    int16_t SendBatteryVoltageScale;
+    int16_t SendBatteryCurrentScale;
+    int16_t SendBatteryCurrentOffSet;
 } Send_User_Basic_Parameters;
 
 struct _Get_User_Basic_Parameters
@@ -202,6 +205,9 @@ struct _Get_User_Basic_Parameters
     uint8_t GetSafeBtnState;
     uint8_t GetAirSpeedState;
     int16_t GetPitchLevelTrim;
+    int16_t GetBatteryVoltageScale;
+    int16_t GetBatteryCurrentScale;
+    int16_t GetBatteryCurrentOffSet;
 } Get_User_Basic_Parameters;
 
 struct _Send_Radio_Control_Parameters
@@ -246,6 +252,8 @@ struct _Send_Radio_Control_Parameters
     int16_t SendFailSafeValue;
     uint8_t SendMaxBankPitch;
     uint8_t SendMaxBankRoll;
+    uint8_t SendAutoPilotMode;
+    int32_t SendAirSpeedScale;
 } Send_Radio_Control_Parameters;
 
 struct _Get_Radio_Control_Parameters
@@ -273,6 +281,8 @@ struct _Get_Radio_Control_Parameters
     int16_t GetFailSafeValue;
     uint8_t GetMaxBankPitch;
     uint8_t GetMaxBankRoll;
+    uint8_t GetdAutoPilotMode;
+    int32_t GetAirSpeedScale;
 } Get_Radio_Control_Parameters;
 
 struct _Get_Servos_Parameters
@@ -347,6 +357,7 @@ struct _Send_User_Medium_Parameters
     uint8_t SendProportionalNavigationRate;
     uint8_t SendIntegralNavigationRate;
     uint8_t SendDerivativeNavigationRate;
+    uint8_t SendIntegralWindUp;
 } Send_User_Medium_Parameters;
 
 struct _Get_User_Medium_Parameters
@@ -400,6 +411,7 @@ struct _Get_User_Medium_Parameters
     uint8_t GetProportionalNavigationRate;
     uint8_t GetIntegralNavigationRate;
     uint8_t GetDerivativeNavigationRate;
+    uint8_t GetIntegralWindUp;
 } Get_User_Medium_Parameters;
 
 struct _Send_WayPoint_Coordinates
@@ -980,7 +992,8 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 22)); //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint16_t) * 4) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(uint8_t) * 21)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendFrameType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendRcChSequency, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendGimbalType, VAR_8BITS);
@@ -1003,6 +1016,9 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendSafeBtnState, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendAirSpeedState, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendPitchLevelTrim, VAR_16BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendBatteryVoltageScale, VAR_16BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendBatteryCurrentScale, VAR_16BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendBatteryCurrentOffSet, VAR_16BITS);
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1012,7 +1028,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 39) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 40) +    //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 8)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendTPAInPercent, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendBreakPointValue, VAR_16BITS);
@@ -1061,6 +1077,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendProportionalNavigationRate, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralNavigationRate, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Medium_Parameters.SendDerivativeNavigationRate, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Medium_Parameters.SendIntegralWindUp, VAR_8BITS);
 
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
@@ -1203,8 +1220,9 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 13) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(int16_t) * 27)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 14) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 27) + //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+                                        (sizeof(int32_t) * 1));  //NÚMERO TOTAL DE VARIAVEIS DE 32 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleMiddle, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleExpo, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendRCRate, VAR_8BITS);
@@ -1245,6 +1263,9 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendFailSafeValue, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendMaxBankPitch, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendMaxBankRoll, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAutoPilotMode, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAirSpeedScale, VAR_32BITS);
+
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1447,6 +1468,9 @@ void GCSClass::Save_Basic_Configuration(void)
     STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, Get_User_Basic_Parameters.GetSafeBtnState);
     STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, Get_User_Basic_Parameters.GetAirSpeedState);
     STORAGEMANAGER.Write_16Bits(PITCH_LEVEL_TRIM_ADDR, Get_User_Basic_Parameters.GetPitchLevelTrim);
+    STORAGEMANAGER.Write_16Bits(BATT_VOLTAGE_FACTOR_ADDR, Get_User_Basic_Parameters.GetBatteryVoltageScale);
+    STORAGEMANAGER.Write_16Bits(BATT_AMPS_VOLT_ADDR, Get_User_Basic_Parameters.GetBatteryCurrentScale);
+    STORAGEMANAGER.Write_16Bits(BATT_AMPS_OFFSET_ADDR, Get_User_Basic_Parameters.GetBatteryCurrentOffSet);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1494,6 +1518,8 @@ void GCSClass::Save_Radio_Control_Configuration(void)
     STORAGEMANAGER.Write_16Bits(FAILSAFE_VAL_ADDR, Get_Radio_Control_Parameters.GetFailSafeValue);
     STORAGEMANAGER.Write_8Bits(MAX_PITCH_LEVEL_ADDR, Get_Radio_Control_Parameters.GetMaxBankPitch);
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, Get_Radio_Control_Parameters.GetMaxBankRoll);
+    STORAGEMANAGER.Write_8Bits(AUTO_PILOT_MODE_ADDR, Get_Radio_Control_Parameters.GetdAutoPilotMode);
+    STORAGEMANAGER.Write_32Bits(AIRSPEED_FACTOR_ADDR, Get_Radio_Control_Parameters.GetAirSpeedScale);
 }
 
 void GCSClass::Save_Medium_Configuration(void)
@@ -1547,6 +1573,7 @@ void GCSClass::Save_Medium_Configuration(void)
     STORAGEMANAGER.Write_8Bits(KP_NAV_RATE_ADDR, Get_User_Medium_Parameters.GetProportionalNavigationRate);
     STORAGEMANAGER.Write_8Bits(KI_NAV_RATE_ADDR, Get_User_Medium_Parameters.GetIntegralNavigationRate);
     STORAGEMANAGER.Write_8Bits(KD_NAV_RATE_ADDR, Get_User_Medium_Parameters.GetDerivativeNavigationRate);
+    STORAGEMANAGER.Write_8Bits(INTEGRAL_WINDUP_ADDR, Get_User_Medium_Parameters.GetIntegralWindUp);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1584,6 +1611,9 @@ void GCSClass::Default_Basic_Configuration(void)
     STORAGEMANAGER.Write_8Bits(DISP_PASSIVES_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(AIRSPEED_TYPE_ADDR, 0);
     STORAGEMANAGER.Write_16Bits(PITCH_LEVEL_TRIM_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(BATT_VOLTAGE_FACTOR_ADDR, 1010);
+    STORAGEMANAGER.Write_16Bits(BATT_AMPS_VOLT_ADDR, 6200);
+    STORAGEMANAGER.Write_16Bits(BATT_AMPS_OFFSET_ADDR, 0);
 }
 
 void GCSClass::Default_RadioControl_Configuration(void)
@@ -1628,6 +1658,8 @@ void GCSClass::Default_RadioControl_Configuration(void)
     STORAGEMANAGER.Write_16Bits(FAILSAFE_VAL_ADDR, 975);
     STORAGEMANAGER.Write_8Bits(MAX_PITCH_LEVEL_ADDR, 30);
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, 30);
+    STORAGEMANAGER.Write_8Bits(AUTO_PILOT_MODE_ADDR, 0);
+    STORAGEMANAGER.Write_32Bits(AIRSPEED_FACTOR_ADDR, 19936);
 }
 
 void GCSClass::Default_Medium_Configuration(void)
@@ -1647,6 +1679,7 @@ void GCSClass::Default_Medium_Configuration(void)
     STORAGEMANAGER.Write_16Bits(SERVOS_LPF_ADDR, 50);
     STORAGEMANAGER.Write_16Bits(INTEGRAL_RELAX_LPF_ADDR, 15);
     STORAGEMANAGER.Write_16Bits(KCD_OR_FF_LPF_ADDR, 30);
+    STORAGEMANAGER.Write_8Bits(INTEGRAL_WINDUP_ADDR, 50);
 
     if (GetMultirotorEnabled())
     {
@@ -1695,6 +1728,9 @@ void GCSClass::LoadAllParameters(void)
     Send_User_Basic_Parameters.SendSafeBtnState = STORAGEMANAGER.Read_8Bits(DISP_PASSIVES_ADDR);
     Send_User_Basic_Parameters.SendAirSpeedState = STORAGEMANAGER.Read_8Bits(AIRSPEED_TYPE_ADDR);
     Send_User_Basic_Parameters.SendPitchLevelTrim = STORAGEMANAGER.Read_16Bits(PITCH_LEVEL_TRIM_ADDR);
+    Send_User_Basic_Parameters.SendBatteryVoltageScale = STORAGEMANAGER.Read_16Bits(BATT_VOLTAGE_FACTOR_ADDR);
+    Send_User_Basic_Parameters.SendBatteryCurrentScale = STORAGEMANAGER.Read_16Bits(BATT_AMPS_VOLT_ADDR);
+    Send_User_Basic_Parameters.SendBatteryCurrentOffSet = STORAGEMANAGER.Read_16Bits(BATT_AMPS_OFFSET_ADDR);
 
     //ATUALIZA OS PARAMETROS DO RADIO CONTROLE
     Send_Radio_Control_Parameters.SendThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);
@@ -1737,6 +1773,8 @@ void GCSClass::LoadAllParameters(void)
     Send_Radio_Control_Parameters.SendFailSafeValue = STORAGEMANAGER.Read_16Bits(FAILSAFE_VAL_ADDR);
     Send_Radio_Control_Parameters.SendMaxBankPitch = STORAGEMANAGER.Read_8Bits(MAX_PITCH_LEVEL_ADDR);
     Send_Radio_Control_Parameters.SendMaxBankRoll = STORAGEMANAGER.Read_8Bits(MAX_ROLL_LEVEL_ADDR);
+    Send_Radio_Control_Parameters.SendAutoPilotMode = STORAGEMANAGER.Read_8Bits(AUTO_PILOT_MODE_ADDR);
+    Send_Radio_Control_Parameters.SendAirSpeedScale = STORAGEMANAGER.Read_32Bits(AIRSPEED_FACTOR_ADDR);
 
     //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     Send_User_Medium_Parameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
@@ -1788,4 +1826,5 @@ void GCSClass::LoadAllParameters(void)
     Send_User_Medium_Parameters.SendProportionalNavigationRate = STORAGEMANAGER.Read_8Bits(KP_NAV_RATE_ADDR);
     Send_User_Medium_Parameters.SendIntegralNavigationRate = STORAGEMANAGER.Read_8Bits(KI_NAV_RATE_ADDR);
     Send_User_Medium_Parameters.SendDerivativeNavigationRate = STORAGEMANAGER.Read_8Bits(KD_NAV_RATE_ADDR);
+    Send_User_Medium_Parameters.SendIntegralWindUp = STORAGEMANAGER.Read_8Bits(INTEGRAL_WINDUP_ADDR);
 }

@@ -40,7 +40,7 @@ static void MultirotorApplyINSPositionHoldPIDControl(float DeltaTime)
 {
     static bool NewPointToPositionHold = false;
 
-    if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && (JCF_Param.AutoPilotMode == AUTOPILOT_MODE_CRUISE))
+    if (!IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && (GPS_Resources.Navigation.AutoPilot.Control.Mode == AUTOPILOT_MODE_CRUISE))
     {
         if (RC_Resources.Attitude.Controller[PITCH] || RC_Resources.Attitude.Controller[ROLL]) //CHECA SE OS STICKS DO RÁDIO FORAM MANIPULADOS
         {

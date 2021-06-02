@@ -40,7 +40,7 @@ AltitudeHold_Controller_Struct AltitudeHoldController;
 #define MIN_VEL_Z_TO_VALID_GROUND 15 //VELOCIDADE VERTICAL MINIMA PARA INDICAR QUE A VEL Z DO INS ESTÁ EM REPOUSO
 #define LANDED_TIME 4000             //ESTOURO DE TEMPO EM MS PARA INDICAR QUE REALMENTE O SOLO FOI DETECTADO
 #define MAX_ALTITUDE_SUPORTED 150    //ALTITUDE MAXIMA SUPORTADA PELO ALGORITIMO EM METROS,PODE SER INCREMENTADO,MAS É NECESSARIO TESTES DE FUNCIONAMENTO
-#define THR_DIFF_COMPLETE_TAKEOFF 70 //O THROTTLE - 1500 INDICA PARA O CONTRALADOR DO ALT-HOLD QUE O TAKEOFF ESTÁ EM ANDAMENDO OU FOI CONCLUIDO.
+#define THR_DIFF_COMPLETE_TAKEOFF 70 //1500 INDICA PARA O CONTROLADOR DO ALT-HOLD QUE O TAKEOFF ESTÁ EM ANDAMENDO OU FOI CONCLUIDO.
 
 //#define THR_SMOOTH_TEST
 
@@ -56,11 +56,6 @@ PT1_Filter_Struct Smooth_ThrottleHover;
 #define ALT_HOLD_LPF_CUTOFF 4 //HZ
 
 #endif
-
-//-------------------------------------
-//PARAMS DO USUARIO
-int16_t AH_Hover_Throttle = 1500;
-//-------------------------------------
 
 static void ResetIntegralOfVelZError(void)
 {
@@ -108,7 +103,7 @@ bool ApplyAltitudeHoldControl(void)
         if ((AltitudeHoldController.Throttle.Hovering < (MIDDLE_STICKS_PULSE - 250)) ||
             (AltitudeHoldController.Throttle.Hovering > (MIDDLE_STICKS_PULSE + 250)))
         {
-          AltitudeHoldController.Throttle.Hovering = Constrain_16Bits(AH_Hover_Throttle, MIDDLE_STICKS_PULSE - 250, MIDDLE_STICKS_PULSE + 250);
+          AltitudeHoldController.Throttle.Hovering = Constrain_16Bits(AltitudeHoldController.Throttle.Hover, MIDDLE_STICKS_PULSE - 250, MIDDLE_STICKS_PULSE + 250);
         }
         ResetLandDetector();
       }
@@ -203,6 +198,7 @@ bool ApplyAltitudeHoldControl(void)
         BaroModeActivated = false;
         AltitudeHoldController.Flags.TakeOffInProgress = false;
         AltitudeHoldController.Target.Position.Z = 0;
+        AltitudeHoldController.Throttle.Hover = STORAGEMANAGER.Read_16Bits(HOVER_THROTTLE_ADDR);
         ResetIntegralOfVelZError();
         ResetLandDetector();
       }

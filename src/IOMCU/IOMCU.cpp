@@ -254,6 +254,10 @@ struct _Send_Radio_Control_Parameters
     uint8_t SendMaxBankRoll;
     uint8_t SendAutoPilotMode;
     int32_t SendAirSpeedScale;
+    uint8_t SendCH6Tunning;
+    uint8_t SendLandAfterRTH;
+    int16_t SendHoverThrottle;
+    int16_t SendAirSpeedReference;
 } Send_Radio_Control_Parameters;
 
 struct _Get_Radio_Control_Parameters
@@ -283,6 +287,10 @@ struct _Get_Radio_Control_Parameters
     uint8_t GetMaxBankRoll;
     uint8_t GetdAutoPilotMode;
     int32_t GetAirSpeedScale;
+    uint8_t GetCH6Tunning;
+    uint8_t GetLandAfterRTH;
+    int16_t GetHoverThrottle;
+    int16_t GetAirSpeedReference;
 } Get_Radio_Control_Parameters;
 
 struct _Get_Servos_Parameters
@@ -1220,8 +1228,8 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 14) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(int16_t) * 27) + //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(int16_t) * 29) + //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
                                         (sizeof(int32_t) * 1));  //NÚMERO TOTAL DE VARIAVEIS DE 32 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleMiddle, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleExpo, VAR_8BITS);
@@ -1265,6 +1273,10 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendMaxBankRoll, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAutoPilotMode, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAirSpeedScale, VAR_32BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendCH6Tunning, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendLandAfterRTH, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendHoverThrottle, VAR_16BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAirSpeedReference, VAR_16BITS);
 
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
@@ -1520,6 +1532,10 @@ void GCSClass::Save_Radio_Control_Configuration(void)
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, Get_Radio_Control_Parameters.GetMaxBankRoll);
     STORAGEMANAGER.Write_8Bits(AUTO_PILOT_MODE_ADDR, Get_Radio_Control_Parameters.GetdAutoPilotMode);
     STORAGEMANAGER.Write_32Bits(AIRSPEED_FACTOR_ADDR, Get_Radio_Control_Parameters.GetAirSpeedScale);
+    STORAGEMANAGER.Write_8Bits(CH6_TUNNING_ADDR, Get_Radio_Control_Parameters.GetCH6Tunning);
+    STORAGEMANAGER.Write_8Bits(LAND_AFTER_RTH_ADDR, Get_Radio_Control_Parameters.GetLandAfterRTH);
+    STORAGEMANAGER.Write_16Bits(HOVER_THROTTLE_ADDR, Get_Radio_Control_Parameters.GetHoverThrottle);
+    STORAGEMANAGER.Write_16Bits(AIR_SPEED_REFERENCE_ADDR, Get_Radio_Control_Parameters.GetAirSpeedReference);
 }
 
 void GCSClass::Save_Medium_Configuration(void)
@@ -1660,6 +1676,10 @@ void GCSClass::Default_RadioControl_Configuration(void)
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, 30);
     STORAGEMANAGER.Write_8Bits(AUTO_PILOT_MODE_ADDR, 0);
     STORAGEMANAGER.Write_32Bits(AIRSPEED_FACTOR_ADDR, 19936);
+    STORAGEMANAGER.Write_8Bits(CH6_TUNNING_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(LAND_AFTER_RTH_ADDR, 1);
+    STORAGEMANAGER.Write_16Bits(HOVER_THROTTLE_ADDR, 1500);
+    STORAGEMANAGER.Write_16Bits(AIR_SPEED_REFERENCE_ADDR, 1500);
 }
 
 void GCSClass::Default_Medium_Configuration(void)
@@ -1775,6 +1795,10 @@ void GCSClass::LoadAllParameters(void)
     Send_Radio_Control_Parameters.SendMaxBankRoll = STORAGEMANAGER.Read_8Bits(MAX_ROLL_LEVEL_ADDR);
     Send_Radio_Control_Parameters.SendAutoPilotMode = STORAGEMANAGER.Read_8Bits(AUTO_PILOT_MODE_ADDR);
     Send_Radio_Control_Parameters.SendAirSpeedScale = STORAGEMANAGER.Read_32Bits(AIRSPEED_FACTOR_ADDR);
+    Send_Radio_Control_Parameters.SendCH6Tunning = STORAGEMANAGER.Read_8Bits(CH6_TUNNING_ADDR);
+    Send_Radio_Control_Parameters.SendLandAfterRTH = STORAGEMANAGER.Read_8Bits(LAND_AFTER_RTH_ADDR);
+    Send_Radio_Control_Parameters.SendHoverThrottle = STORAGEMANAGER.Read_16Bits(HOVER_THROTTLE_ADDR);
+    Send_Radio_Control_Parameters.SendAirSpeedReference = STORAGEMANAGER.Read_16Bits(AIR_SPEED_REFERENCE_ADDR);
 
     //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     Send_User_Medium_Parameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);

@@ -242,6 +242,10 @@ DefsNormalConfigTable = [
     ['AUTO_PILOT_MODE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AIRSPEED_FACTOR_ADDR', AddrSizeOf.TYPE_32_BITS.value],
     ['INTEGRAL_WINDUP_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['CH6_TUNNING_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['LAND_AFTER_RTH_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['HOVER_THROTTLE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
+    ['AIR_SPEED_REFERENCE_ADDR', AddrSizeOf.TYPE_16_BITS.value],
 ]
 
 

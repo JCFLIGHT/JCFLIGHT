@@ -90,7 +90,6 @@ PT1_Filter_Struct DerivativeBoost_PT1_Yaw_Smooth;
 //FREQUENCIA DE CORTE DA ACELERAÇÃO CALCULADA PELO DERIVATIVE BOOST
 #define DERIVATIVE_BOOST_CUTOFF 10 //Hz
 
-int16_t ReferenceAirSpeed = 1500;              //AJUSTAVEL PELO USUARIO - VALOR DE 54KM/H CASO NÃO TENHA UM TUBO DE PITOT INSTALADO
 int16_t FixedWingIntegralTermThrowLimit = 165; //AJUSTAVEL PELO USUARIO -> (0 a 500)
 int16_t MinThrottleDownPitchAngle = 0;         //AJUSTAVEL PELO USUARIO -> (0 a 450)
 float CoordinatedPitchGain = 1.0f;             //AJUSTAVEL PELO USUARIO -> (0.0 a 2.0 (float))
@@ -112,6 +111,7 @@ void PIDXYZClass::Initialization(void)
   PID_Resources.Filter.IntegralRelaxCutOff = STORAGEMANAGER.Read_16Bits(INTEGRAL_RELAX_LPF_ADDR);
   PID_Resources.Filter.ControlDerivativeCutOff = STORAGEMANAGER.Read_16Bits(KCD_OR_FF_LPF_ADDR);
   PID_Resources.Param.IntegralTermWindUpPercent = STORAGEMANAGER.Read_8Bits(INTEGRAL_WINDUP_ADDR);
+  PID_Resources.Param.ReferenceAirSpeed = STORAGEMANAGER.Read_16Bits(AIR_SPEED_REFERENCE_ADDR);
   BIQUADFILTER.Settings(&Derivative_Roll_Smooth, PID_Resources.Filter.DerivativeCutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
   BIQUADFILTER.Settings(&Derivative_Pitch_Smooth, PID_Resources.Filter.DerivativeCutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
   BIQUADFILTER.Settings(&Derivative_Yaw_Smooth, PID_Resources.Filter.DerivativeCutOff, 0, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US), LPF);
@@ -665,7 +665,7 @@ void PIDXYZClass::GetNewControllerForPlaneWithTurn(void)
     if (AHRS.CheckAnglesInclination(10)) //10 GRAUS DE INCLINAÇÃO
     {
       //SE O PITOT NÃO ESTIVER A BORDO,UTILIZE O VALOR PADRÃO DE 1500CM/S = 54KM/H
-      float AirSpeedForCoordinatedTurn = Get_AirSpeed_Enabled() ? AIRSPEED.Get_True_Value("In Centimeters") : ReferenceAirSpeed;
+      float AirSpeedForCoordinatedTurn = Get_AirSpeed_Enabled() ? AIRSPEED.Get_True_Value("In Centimeters") : PID_Resources.Param.ReferenceAirSpeed;
       //LIMITE DE 10KM/H - 216KM/H
       AirSpeedForCoordinatedTurn = Constrain_Float(AirSpeedForCoordinatedTurn, 300, 6000);
       float BankAngleTarget = ConvertDeciDegreesToRadians(RcControllerToAngle(RC_Resources.Attitude.Controller[ROLL], ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue)));

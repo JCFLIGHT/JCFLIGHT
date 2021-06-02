@@ -20,10 +20,10 @@
 #include "AltitudeHoldControl/ALTITUDEHOLD.h"
 #include "Declination/AUTODECLINATION.h"
 #include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Math/MATHSUPPORT.h"
 #include "PID/GPSPID.h"
-#include "BAR/BAR.h"
 #include "Buzzer/BUZZER.h"
 #include "GPS/GPSSTATES.h"
 #include "Yaw/HEADINGHOLD.h"
@@ -46,6 +46,7 @@ GPS_Resources_Struct GPS_Resources;
 void Load_GPS_Navigation_Params(void)
 {
   GPS_Resources.Home.Altitude = STORAGEMANAGER.Read_8Bits(RTH_ALTITUDE_ADDR);
+  GPS_Resources.Navigation.LandAfterRTH = STORAGEMANAGER.Read_8Bits(LAND_AFTER_RTH_ADDR) > 0 ? true : false;
 
   PositionHoldPID.kP = (float)GET_SET[PID_GPS_POSITION].kP / 100.0f;
   PositionHoldPID.kI = (float)GET_SET[PID_GPS_POSITION].kI / 100.0f;
@@ -158,7 +159,15 @@ void GPS_Process_FlightModes(float DeltaTime)
     case DO_START_RTH:
       if (GPS_Resources.Home.Distance <= JCF_Param.GPS_RTH_Land_Radius)
       {
-        GPS_Resources.Mode.Navigation = DO_LAND_INIT;
+        if (GPS_Resources.Navigation.LandAfterRTH)
+        {
+          GPS_Resources.Mode.Navigation = DO_LAND_INIT;
+        }
+        else
+        {
+          SetNewAltitudeToHold(Barometer.INS.Altitude.Estimated);
+          GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+        }
         GPS_Resources.Navigation.HeadingHoldTarget = GPS_Resources.Navigation.Bearing.InitialTarget;
       }
       else if (GetAltitudeReached())
@@ -174,7 +183,14 @@ void GPS_Process_FlightModes(float DeltaTime)
       GPS_Adjust_Heading();
       if ((GPS_Resources.Navigation.Coordinates.Distance <= ConverMetersToCM(JCF_Param.GPS_WP_Radius)) || Point_Reached())
       {
-        GPS_Resources.Mode.Navigation = DO_LAND_INIT;
+        if (GPS_Resources.Navigation.LandAfterRTH)
+        {
+          GPS_Resources.Mode.Navigation = DO_LAND_INIT;
+        }
+        else
+        {
+          GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+        }
         GPS_Resources.Navigation.HeadingHoldTarget = GPS_Resources.Navigation.Bearing.InitialTarget;
       }
       break;

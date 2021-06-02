@@ -296,6 +296,7 @@ typedef struct
 
   struct Navigation_Struct
   {
+    bool LandAfterRTH = true;
     float HeadingHoldLimit = 0.0f;
     int16_t Speed[2] = {0, 0};
     int16_t RateError[2] = {0, 0};
@@ -311,7 +312,7 @@ typedef struct
       struct Control_Struct
       {
         bool Enabled = false;
-        bool Mode = false;
+        uint8_t Mode = AUTOPILOT_MODE_ATTI;
         int16_t Angle[3] = {0, 0, 0};
       } Control;
 
@@ -419,7 +420,7 @@ typedef struct
 
 typedef struct
 {
-  bool State;
+  bool State = false;
   uint8_t kP = 0;
   uint8_t kI = 0;
   uint8_t kD = 0;
@@ -724,6 +725,7 @@ typedef struct
   {
     uint8_t IntegralTermWindUpPercent = 0;
     float PitchLevelTrim = 0.0f;
+    int16_t ReferenceAirSpeed = 1500;
   } Param;
 
 } PID_Resources_Struct;
@@ -768,6 +770,7 @@ typedef struct
 
   struct Throttle_Struct
   {
+    int16_t Hover = 1500;
     int16_t Hovering = 0;
     int16_t Difference = 0;
   } Throttle;

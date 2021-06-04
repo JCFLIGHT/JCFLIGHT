@@ -35,8 +35,10 @@
 #include "Common/RCDEFINES.h"
 #include "FastSerial/PRINTF.h"
 
-//TOTAL ENERGY CONSERVATION SYSTEM - SISTEMA DE CONSERVAÇÃO TOTAL DE ENERGIA
-//APENAS PARA AIRPLANES E FIXED-WING
+/*
+    TOTAL ENERGY CONSERVATION SYSTEM - SISTEMA DE CONSERVAÇÃO TOTAL DE ENERGIA
+    APENAS PARA AIRPLANES E FIXED-WING
+*/
 
 TecsClass TECS;
 
@@ -59,7 +61,7 @@ void TecsClass::Initialization(void)
 {
     //RECURSOS DESTINADOS PARA O USUARIO
     TECS_Resources.Params.CircleDirectionToRight = true;
-    TECS_Resources.Params.UseLandInRTH = false;
+    TECS_Resources.Params.DoLandAfterRTH = GPS_Resources.Navigation.LandAfterRTH;
     TECS_Resources.Params.LandMinAltitude = 5;                           //METROS
     TECS_Resources.Params.FinalLandPitchAngle = 2;                       //GRAUS
     TECS_Resources.Params.PitchToThrottleLPFQuality = 6;                 //0 A 9 ~ AJUSTE DO FILTRO LPF DA CORREÇÃO DO PITCH FEITO PELO PILOTO AUTOMATICO
@@ -78,7 +80,7 @@ void TecsClass::Initialization(void)
     TECS_Resources.Params.CruiseThrottle = 1400;
 
     //RECURSOS NÃO DESTINADOS PARA O USUARIO - APENAS DEV'S
-    TECS_Resources.Position.Tracking.Period = TECS_TIMER_US * 1e-6f * 2;
+    TECS_Resources.Position.Tracking.Period = (TECS_TIMER_US * 1e-6f) * 2;
     TECS_Resources.Heading.MinToNormalizeTurnDirection = ConvertDegreesToCentiDegrees(MIN_DEGREES_DEACTIVE_TURN);
     TECS_Resources.Heading.MaxToRunTurnDirection = ConvertDegreesToCentiDegrees(MAX_DEGREES_ACTIVE_TURN);
 }
@@ -271,7 +273,7 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
         GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = -PIDAngleToRcController(TECS_PID_Altitude_Navigation.AutoPilotControl[PITCH], ConvertDegreesToDecidegrees(GET_SET[MAX_PITCH_LEVEL].MaxValue));
         TECS_Resources.Throttle.Correction = TECS.UpdatePitchToThrottle(TECS_PID_Altitude_Navigation.AutoPilotControl[PITCH], DeltaTime);
 
-        if (TECS_Resources.Params.UseLandInRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
+        if (TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
         {
             TECS_Resources.Throttle.Correction = Constrain_16Bits(TECS_Resources.Throttle.Correction, TECS_Resources.Params.MinCruiseThrottle - TECS_Resources.Params.CruiseThrottle, 0);
         }
@@ -280,7 +282,7 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
             TECS_Resources.Throttle.Correction = Constrain_16Bits(TECS_Resources.Throttle.Correction, TECS_Resources.Params.MinCruiseThrottle - TECS_Resources.Params.CruiseThrottle, TECS_Resources.Params.MaxCruiseThrottle - TECS_Resources.Params.CruiseThrottle);
         }
 
-        if ((IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE)) && !TECS_Resources.Params.UseLandInRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
+        if ((IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE)) && !TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
         {
             TECS_Resources.Throttle.Correction += TECS.GetEnergySpeedController(DeltaTime);
             TECS_Resources.Throttle.Correction = Constrain_16Bits(TECS_Resources.Throttle.Correction, TECS_Resources.Params.MinCruiseThrottle - TECS_Resources.Params.CruiseThrottle, TECS_Resources.Params.MaxCruiseThrottle - TECS_Resources.Params.CruiseThrottle);
@@ -290,7 +292,7 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
         RC_Resources.Attitude.Controller[THROTTLE] = Constrain_16Bits(TECS_Resources.Throttle.Cruise, RC_Resources.Attitude.ThrottleMin, RC_Resources.Attitude.ThrottleMax);
     }
 
-    if (TECS_Resources.Params.UseLandInRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
+    if (TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
     {
         if (TECS_Resources.Position.Altitude <= ConverMetersToCM(TECS_Resources.Params.LandMinAltitude))
         {

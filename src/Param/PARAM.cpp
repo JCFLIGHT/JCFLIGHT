@@ -49,7 +49,7 @@ JCF_Param_Adjustable_Struct JCF_Param;
 
 const Resources_Of_Param Params_Table[] = {
     //NOME                                 ENDEREÇO NA EEPROM                    TIPO                    VARIAVEL                                    MIN            MAX              VALOR PADRÃO
-#ifndef __AVR_ATmega2560__
+#ifdef USE_CLI
     {"kP_Acc_AHRS",                        KP_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Acc_AHRS,                     0,             255,             25},
     {"kI_Acc_AHRS",                        KI_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Acc_AHRS,                     0,             255,             50},
     {"kP_Mag_AHRS",                        KP_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Mag_AHRS,                     0,             255,             10},
@@ -100,11 +100,11 @@ void ParamClass::Initialization(void)
   STORAGEMANAGER.Erase(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR);
 #endif
 
-#ifndef __AVR_ATmega2560__
+#ifdef USE_CLI
   PARAM.Load_Sketch();
 #endif
 
-#ifdef __AVR_ATmega2560__
+#ifndef USE_CLI
   JCF_Param.Navigation_Vel = 400;
   JCF_Param.GPS_WP_Radius = 2;
   JCF_Param.GPS_RTH_Land_Radius = 10;
@@ -117,7 +117,7 @@ void ParamClass::Initialization(void)
 
 void ParamClass::Default_List(void)
 {
-#ifndef __AVR_ATmega2560__
+#ifdef USE_CLI
 
   for (uint32_t Table_Counter = 0; Table_Counter < TABLE_COUNT; Table_Counter++)
   {
@@ -339,7 +339,7 @@ void ParamClass::Process_Command(char *ParamCommandLine)
 
 void ParamClass::Update(void)
 {
-#ifndef __AVR_ATmega2560__
+#ifdef USE_CLI
 
   if (!GCS.CliMode)
   {

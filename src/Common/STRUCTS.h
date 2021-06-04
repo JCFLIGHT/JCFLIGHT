@@ -936,7 +936,7 @@ typedef struct
   struct Params_Struct
   {
     bool CircleDirectionToRight = false;
-    bool UseLandInRTH = false;
+    bool DoLandAfterRTH = false;
     uint8_t LandMinAltitude = 0;
     uint8_t FinalLandPitchAngle = 0;
     uint8_t PitchToThrottleLPFQuality = 0;

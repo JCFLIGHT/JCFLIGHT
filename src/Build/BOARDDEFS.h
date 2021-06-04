@@ -49,6 +49,7 @@
 #undef USE_BARO_PRECISE_MATH
 #undef USE_SBUS_EXTENDED
 #undef USE_IBUS_EXTENDED
+#undef USE_CLI
 
 #else //STM32
 
@@ -71,5 +72,6 @@
 #define USE_BARO_PRECISE_MATH
 #define USE_SBUS_EXTENDED
 #define USE_IBUS_EXTENDED
+#define USE_CLI
 
 #endif

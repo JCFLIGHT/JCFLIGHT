@@ -19,7 +19,7 @@
 #include "FlightModes/AUXFLIGHT.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "FrameStatus/FRAMESTATUS.h"
-#include "ServosMaster/SERVOSAUTOTRIM.h"
+#include "ServosMaster/SERVOSMASTER.h"
 #include "Compass/COMPASSREAD.h"
 #include "BitArray/BITARRAY.h"
 #include "IMU/ACCGYROREAD.h"
@@ -143,12 +143,12 @@ void Switch_Flag(void)
     //O VALOR GUARDADO É IGUAL A 4?E A DECREMENTAÇÃO ACABOU?SIM...INICIA O SERVO AUTO-TRIM
     if (GuardValue == 4 && CloseReset < 2.51f && InAirPlaneMode)
     {
-      ServoAutoTrimEnabled = true;
+      Servo.AutoTrim.Enabled = true;
     }
     //O VALOR GUARDADO É IGUAL A 6?E A DECREMENTAÇÃO ACABOU?SIM...DESATIVA O SERVO AUTO-TRIM
     if (GuardValue == 6 && CloseReset < 2.51f && InAirPlaneMode)
     {
-      ServoAutoTrimEnabled = false;
+      Servo.AutoTrim.Enabled = false;
       GuardValue = 0;
     }
   }
@@ -163,7 +163,7 @@ void Switch_Flag(void)
       GuardValue = 0;
     }
     //LIMPA A FLAG SE O USUARIO REJEITAR OS VALORES DO SERVO AUTO-TRIM
-    if (GuardValue == 4 && CloseReset < 2.51f && InAirPlaneMode && ServoAutoTrimEnabled)
+    if (GuardValue == 4 && CloseReset < 2.51f && InAirPlaneMode && Servo.AutoTrim.Enabled)
     {
       GuardValue = 0;
     }
@@ -182,7 +182,7 @@ void Switch_Flag(void)
   //O VALOR GUARDADO É IGUAL A 12?E A DECREMENTAÇÃO ACABOU?SIM...SE O SERVO AUTO-TRIM ESTIVER ATIVADO NÃO LIMPA A FLAG,CASO CONTRARIO LIMPA
   if (GuardValue == 12 && CloseReset == 0)
   {
-    if (ServoAutoTrimEnabled || ServoManualTrimEnabled)
+    if (Servo.AutoTrim.Enabled || ServoManualTrimEnabled)
     {
       GuardValue = 4;
     }

@@ -98,7 +98,7 @@ void Integral_Loop()
         TECS.Update(ThisDeltaTime);
         MultirotorUpdateAutoPilotControl();
         PIDXYZ.Update(ThisDeltaTime);
-        SERVOSMASTER.Update();
+        SERVOSMASTER.Update(ThisDeltaTime);
         ApplyMixingForMotorsAndServos(ThisDeltaTime);
         ApplyPWMControlForMotorsAndServos();
 }

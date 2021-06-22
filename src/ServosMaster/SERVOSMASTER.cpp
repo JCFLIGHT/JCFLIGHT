@@ -59,6 +59,7 @@ void ServosMasterClass::Initialization(void)
     SERVOSMASTER.UpdateMiddlePoint();
     SERVOSMASTER.UpdateDirection();
     SERVOSMASTER.Rate_Update();
+    Servo.ContinousTrim.Enabled = false;
   }
 }
 
@@ -138,7 +139,7 @@ void ServosMasterClass::Rate_Apply(void)
 {
 #ifndef __AVR_ATmega2560__
 
-/*
+  /*
  0 = NENHUM LIMITE
  1 = 10 SEGUNDOS
  10 = 10 SEGUNDOS
@@ -178,7 +179,7 @@ void ServosMasterClass::Rate_Apply(void)
   Servo.Signal.UnFiltered[SERVO4] += Servo.Pulse.Middle[SERVO4];
 }
 
-void ServosMasterClass::Update(void)
+void ServosMasterClass::Update(const float DeltaTime)
 {
   if (GetMultirotorEnabled() || !SAFETYBUTTON.GetSafeStateToOutput())
   {
@@ -217,5 +218,5 @@ void ServosMasterClass::Update(void)
     MotorControl[MOTOR5] = Constrain_16Bits(Servo.Signal.Filtered[SERVO4], Servo.Pulse.Min[SERVO4], Servo.Pulse.Max[SERVO4]); //SERVO 4
   }
 #endif
-  ServoAutoTrimRun();
+  ServoAutoTrimRun(DeltaTime);
 }

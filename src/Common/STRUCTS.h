@@ -569,6 +569,30 @@ typedef struct
     int16_t Filtered[4] = {0, 0, 0, 0};
   } Signal;
 
+  struct AutoTrim_Struct
+  {
+    bool Enabled = false;
+
+    int16_t ActualPulse[4] = {0, 0, 0, 0};
+    int16_t MiddleBackup[4] = {0, 0, 0, 0};
+
+    int32_t MiddleAccum[4] = {0, 0, 0, 0};
+    int32_t MiddleAccumCount = 0;
+
+    uint32_t PreviousTime = 0;
+    uint32_t SavePreviousTime = 0;
+
+  } AutoTrim;
+
+  struct ContinousTrim_Struct
+  {
+    bool Enabled = false;
+    // @param descrição: Os pontos médios do servo são atualizados quando a rotação total do UAV for menor que esse limite [graus/s].
+    // @param min: 1
+    // @param max: 60
+    float Rotation_Limit = 15;
+  } ContinousTrim;
+
 } Servo_Struct;
 
 typedef struct

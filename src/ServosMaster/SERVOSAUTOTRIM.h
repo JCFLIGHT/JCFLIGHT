@@ -18,6 +18,6 @@
 #ifndef SERVOSAUTOTRIM_H_
 #define SERVOSAUTOTRIM_H_
 #include "Build/LIBDEPENDENCIES.h"
-extern bool ServoAutoTrimEnabled;
-void ServoAutoTrimRun(void);
+void ServoAutoTrimRun(const float DeltaTime);
+void ProcessContinuousServoAutoTrim(float DeltaTime);
 #endif

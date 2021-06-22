@@ -24,7 +24,7 @@ class ServosMasterClass
 {
 public:
   void Initialization(void);
-  void Update(void);
+  void Update(const float DeltaTime);
   void UpdateMiddlePoint(void);
 
 private:

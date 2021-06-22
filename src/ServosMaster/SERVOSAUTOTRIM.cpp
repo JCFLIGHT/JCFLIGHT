@@ -27,20 +27,23 @@
 #include "BitArray/BITARRAY.h"
 #include "SERVOSMASTER.h"
 #include "ServosMaster/SERVOSMASTER.h"
+#include "AHRS/AHRS.h"
+#include "Scheduler/SCHEDULERTIME.h"
+#include "Filters/PT1.h"
+#include "GPS/GPSSTATES.h"
+#include "PID/PIDXYZ.h"
+#include "Build/BOARDDEFS.h"
+
+static PT1_Filter_Struct RotationRateFilter;
+static PT1_Filter_Struct TargetRateFilter;
+
+#define SERVO_AUTOTRIM_FILTER_CUTOFF 1
+#define SERVO_AUTOTRIM_UPDATE_SIZE 5
+#define SERVO_AUTOTRIM_CENTER_MIN 1300
+#define SERVO_AUTOTRIM_CENTER_MAX 1700
 
 #define SERVO_AUTOTRIM_OVERFLOW 2000
 #define SAVE_OVERFLOW 2500
-
-bool ServoAutoTrimEnabled; //O ESTADO É MANIPULADO LÁ EM SWITCHFLAG.cpp
-
-int16_t ServoActualPulse[MAX_SUPPORTED_SERVOS];
-int16_t ServoMiddleBackup[MAX_SUPPORTED_SERVOS];
-
-int32_t ServoMiddleAccum[MAX_SUPPORTED_SERVOS];
-int32_t ServoMiddleAccumCount;
-
-uint32_t AutoTrimPreviousTime;
-uint32_t SavePreviuosTime;
 
 void ServosSaveAndUpdateMiddlePoint(void)
 {
@@ -51,16 +54,23 @@ void ServosSaveAndUpdateMiddlePoint(void)
     SERVOSMASTER.UpdateMiddlePoint();
 }
 
-void ServoAutoTrimRun(void)
+void ServoAutoTrimRun(const float DeltaTime)
 {
+
+    if (Servo.ContinousTrim.Enabled)
+    {
+        ProcessContinuousServoAutoTrim(DeltaTime);
+        return;
+    }
+
     static ServoAutoTrimState_Enum ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
 
-    ServoActualPulse[SERVO1] = MotorControl[MOTOR2];
-    ServoActualPulse[SERVO2] = MotorControl[MOTOR3];
-    ServoActualPulse[SERVO3] = MotorControl[MOTOR4];
-    ServoActualPulse[SERVO4] = MotorControl[MOTOR5];
+    Servo.AutoTrim.ActualPulse[SERVO1] = MotorControl[MOTOR2];
+    Servo.AutoTrim.ActualPulse[SERVO2] = MotorControl[MOTOR3];
+    Servo.AutoTrim.ActualPulse[SERVO3] = MotorControl[MOTOR4];
+    Servo.AutoTrim.ActualPulse[SERVO4] = MotorControl[MOTOR5];
 
-    if (ServoAutoTrimEnabled)
+    if (Servo.AutoTrim.Enabled)
     {
         switch (ServoAutoTrimState)
         {
@@ -69,12 +79,12 @@ void ServoAutoTrimRun(void)
             {
                 for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
                 {
-                    ServoMiddleBackup[ServoIndex] = Servo.Pulse.Middle[ServoIndex];
-                    ServoMiddleAccum[ServoIndex] = 0;
+                    Servo.AutoTrim.MiddleBackup[ServoIndex] = Servo.Pulse.Middle[ServoIndex];
+                    Servo.AutoTrim.MiddleAccum[ServoIndex] = 0;
                 }
 
-                AutoTrimPreviousTime = SCHEDULERTIME.GetMillis();
-                ServoMiddleAccumCount = 0;
+                Servo.AutoTrim.PreviousTime = SCHEDULERTIME.GetMillis();
+                Servo.AutoTrim.MiddleAccumCount = 0;
                 ServoAutoTrimState = SERVO_AUTOTRIM_COLLECTING;
             }
             else
@@ -85,18 +95,18 @@ void ServoAutoTrimRun(void)
         case SERVO_AUTOTRIM_COLLECTING:
             if (IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
-                ServoMiddleAccumCount++;
+                Servo.AutoTrim.MiddleAccumCount++;
 
                 for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
                 {
-                    ServoMiddleAccum[ServoIndex] += ServoActualPulse[ServoIndex];
+                    Servo.AutoTrim.MiddleAccum[ServoIndex] += Servo.AutoTrim.ActualPulse[ServoIndex];
                 }
 
-                if ((SCHEDULERTIME.GetMillis() - AutoTrimPreviousTime) > SERVO_AUTOTRIM_OVERFLOW)
+                if ((SCHEDULERTIME.GetMillis() - Servo.AutoTrim.PreviousTime) > SERVO_AUTOTRIM_OVERFLOW)
                 {
                     for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
                     {
-                        Servo.Pulse.Middle[ServoIndex] = ServoMiddleAccum[ServoIndex] / ServoMiddleAccumCount;
+                        Servo.Pulse.Middle[ServoIndex] = Servo.AutoTrim.MiddleAccum[ServoIndex] / Servo.AutoTrim.MiddleAccumCount;
                     }
                     ServoAutoTrimState = SERVO_AUTOTRIM_SAVE_PENDING;
                     PIDXYZ.Reset_Integral_Accumulators();
@@ -111,7 +121,7 @@ void ServoAutoTrimRun(void)
         case SERVO_AUTOTRIM_SAVE_PENDING:
             if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
             {
-                if ((SCHEDULERTIME.GetMillis() - SavePreviuosTime) > SAVE_OVERFLOW)
+                if ((SCHEDULERTIME.GetMillis() - Servo.AutoTrim.SavePreviousTime) > SAVE_OVERFLOW)
                 {
                     ServosSaveAndUpdateMiddlePoint();
                     BEEPER.Play(BEEPER_ACTION_SUCCESS);
@@ -120,7 +130,7 @@ void ServoAutoTrimRun(void)
             }
             else
             {
-                SavePreviuosTime = SCHEDULERTIME.GetMillis();
+                Servo.AutoTrim.SavePreviousTime = SCHEDULERTIME.GetMillis();
             }
             break;
 
@@ -134,31 +144,12 @@ void ServoAutoTrimRun(void)
         {
             for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
             {
-                Servo.Pulse.Middle[ServoIndex] = ServoMiddleBackup[ServoIndex];
+                Servo.Pulse.Middle[ServoIndex] = Servo.AutoTrim.MiddleBackup[ServoIndex];
             }
         }
         ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
     }
 }
-/*
-#include "AHRS/AHRS.h"
-#include "Scheduler/SCHEDULERTIME.h"
-#include "Filters/PT1.h"
-#include "GPS/GPSSTATES.h"
-#include "PID/PIDXYZ.h"
-
-static PT1_Filter_Struct RotationRateFilter;
-static PT1_Filter_Struct TargetRateFilter;
-
-#define SERVO_AUTOTRIM_FILTER_CUTOFF 1
-#define SERVO_AUTOTRIM_UPDATE_SIZE 5
-#define SERVO_AUTOTRIM_CENTER_MIN 1300
-#define SERVO_AUTOTRIM_CENTER_MAX 1700
-
-// @param descrição: Os pontos médios do servo são atualizados quando a rotação total do UAV for menor que esse limite [graus/s].
-// @param min: 1
-// @param max: 60
-float Servo_AutoTrim_Rotation_Limit = 15;
 
 void PIDReduceErrorAccumulators(int8_t Delta, uint8_t Axis)
 {
@@ -178,8 +169,15 @@ float GetNewIntegralTerm(uint8_t Axis)
     return PID_Resources.Controller.Integral.ErrorGyro[Axis];
 }
 
-void ProcessContinuousServoAutotrim(const float DeltaTime)
+/*
+    ESSA FUNÇÃO IRÁ FICAR RODANDO CONSTANTEMENTE,AINDA É NECESSARIO COLOCAR UM BOTÃO NO GCS PARA QUE O USUARIO A ATIVE OU NÃO.
+ */
+void ProcessContinuousServoAutoTrim(float DeltaTime)
 {
+#ifdef __AVR_ATmega2560__
+    DeltaTime = THIS_LOOP_RATE_IN_US * 1e-6f;
+#endif
+
     static ServoAutoTrimState_Enum ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
     static uint32_t PreviousTime;
 
@@ -193,8 +191,8 @@ void ProcessContinuousServoAutotrim(const float DeltaTime)
         ServoAutoTrimState = SERVO_AUTOTRIM_COLLECTING;
         if ((SCHEDULERTIME.GetMillis() - PreviousTime) > 500)
         {
-            const bool FuselageIsFlyingStraight = RotationRateMagnitudeFiltered <= ConvertToRadians(Servo_AutoTrim_Rotation_Limit);
-            const bool NoRotationCommanded = TargetRateMagnitudeFiltered <= Servo_AutoTrim_Rotation_Limit;
+            const bool FuselageIsFlyingStraight = RotationRateMagnitudeFiltered <= ConvertToRadians(Servo.ContinousTrim.Rotation_Limit);
+            const bool NoRotationCommanded = TargetRateMagnitudeFiltered <= Servo.ContinousTrim.Rotation_Limit;
             const bool FuselageIsFlyingLevel = AHRS.CosineTiltAngle() >= 0.878153032f;
 
             if (FuselageIsFlyingStraight && NoRotationCommanded && FuselageIsFlyingLevel && !IS_FLIGHT_MODE_ACTIVE(MANUAL_MODE) && Get_GPS_Heading_Is_Valid())
@@ -207,8 +205,8 @@ void ProcessContinuousServoAutotrim(const float DeltaTime)
                         const int8_t IntegralTermUpdate = NewIntegralTerm > 0.0f ? SERVO_AUTOTRIM_UPDATE_SIZE : -SERVO_AUTOTRIM_UPDATE_SIZE;
                         for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
                         {
-                            const float servoRate = Servo.Rate.GetAndSet[ServoIndex] / 100.0f;
-                            Servo.Pulse.Middle[ServoIndex] += IntegralTermUpdate * servoRate;
+                            const float ServoRate = Servo.Rate.GetAndSet[ServoIndex] / 100.0f;
+                            Servo.Pulse.Middle[ServoIndex] += IntegralTermUpdate * ServoRate;
                             Servo.Pulse.Middle[ServoIndex] = Constrain_16Bits(Servo.Pulse.Middle[ServoIndex], SERVO_AUTOTRIM_CENTER_MIN, SERVO_AUTOTRIM_CENTER_MAX);
                         }
                         PIDReduceErrorAccumulators(IntegralTermUpdate, IndexCount);
@@ -225,4 +223,3 @@ void ProcessContinuousServoAutotrim(const float DeltaTime)
         ServoAutoTrimState = SERVO_AUTOTRIM_IDLE;
     }
 }
-*/

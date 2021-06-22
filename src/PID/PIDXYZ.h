@@ -28,10 +28,10 @@ public:
   void Reset_Integral_Accumulators(void);
 
 private:
-  float ProportionalTermProcess(uint8_t kP, float RateError);
+  float ProportionalTermProcess(uint8_t kP, float RateError, float TPA_Value);
   float DerivativeTermProcessRoll(float ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);
   float DerivativeTermProcessPitch(float ActualGyro, float PrevGyro, float PrevRateTarget, float DeltaTime);
-  float DerivativeTermProcessYaw(float ActualGyro, float PreviousRateGyro, float PreviousRateTarget, float DeltaTime);
+  float DerivativeTermProcessYaw(float ActualGyro, float PreviousRateGyro, float PreviousRateTarget, float TPA_Value, float DeltaTime);
   float ApplyIntegralTermRelaxRoll(float CurrentPIDSetpoint, float IntegralTermErrorRate);
   float ApplyIntegralTermRelaxPitch(float CurrentPIDSetpoint, float IntegralTermErrorRate);
   float ApplyIntegralTermLimiting(uint8_t Axis, float ErrorGyroIntegral);

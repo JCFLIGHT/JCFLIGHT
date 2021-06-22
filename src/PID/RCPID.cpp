@@ -112,11 +112,11 @@ void RC_PID_Update(void)
   //AJUSTE DINAMICO DO PID DE ACORDO COM O VALOR DO THROTTLE
   if (TPA_Parameters.UpdateRequired)
   {
-    if (GetMultirotorEnabled()) //CONFIG PARA DRONES
+    if (GetMultirotorEnabled())
     {
       TPA_Parameters.CalcedValue = CalculateMultirotorTPAFactor(RC_Resources.Attitude.Controller[THROTTLE]);
     }
-    else if (GetAirPlaneEnabled()) //CONFIG PARA AEROS E ASA-FIXA
+    else if (GetAirPlaneEnabled())
     {
       TPA_Parameters.CalcedValue = CalculateFixedWingTPAFactor(TPA_Parameters.PreviousThrottle);
     }

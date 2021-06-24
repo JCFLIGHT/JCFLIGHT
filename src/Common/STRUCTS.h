@@ -621,9 +621,14 @@ typedef struct
 
   struct Param_Struct
   {
+    bool Do_RTH = false;
+    uint8_t NumberOfCells = 0;
+    uint8_t CriticPercent = 0;
     float Voltage_Factor = 0.0f;
     float Amps_Per_Volt = 0.0f;
     float Amps_OffSet = 0.0f;
+    float Min_Cell_Volt = 0.0f;
+    float Max_Cell_Volt = 0.0f;
   } Param;
 
 } Battery_Struct;

@@ -21,7 +21,6 @@
 #include "Scheduler/SCHEDULER.h"
 #include "Scheduler/SCHEDULERTIME.h"
 #include "Buzzer/BUZZER.h"
-#include "BATTLEVELS.h"
 #include "Build/BOARDDEFS.h"
 #include "Math/MATHSUPPORT.h"
 #include "FailSafe/FAILSAFE.h"
@@ -41,15 +40,41 @@ PT1_Filter_Struct BattCurrent_Smooth;
 #define THIS_LOOP_RATE 50            //HZ
 #define TIMER_TO_AUTO_DETECT_BATT 15 //TEMPO EM SEGUNDOS PARA AUTO DETECTAR O NÚMERO DE CELULAS DA BATERIA
 #define LOW_BATT_DETECT_EXHAUSTED 10 //VALIDA QUE REALMENTE A BATERIA ESTÁ ABAIXO DA CAPACIDADE MINIMA POR 'N' SEGUNDOS
-#define LOW_BATT_CRITIC_PERCENT 20   //PREVINE O SISTEMA DE ARMAR SE A BATERIA ESTIVER ABAIXO DE 'N%' DA CAPACIDADE
 #define VOLTAGE_CUTOFF 1             //FREQUENCIA DE CORTE DO FILTRO LPF DA LEITURA DA TENSÃO EM HZ
 #define CURRENT_CUTOFF 1             //FREQUENCIA DE CORTE DO FILTRO LPF DA LEITURA DA CORRENTE EM HZ
+
+//PARAMETROS PARA AS CELULAS DA BATERIA
+#define BATT_LOW_CELLS Battery.Param.Min_Cell_Volt
+#define BATT_HIGH_CELLS Battery.Param.Max_Cell_Volt
+
+//PARAMETROS DE TENSÃO PARA BATERIA DE 3 CELULAS
+#define BATT_3S_LOW_VOLTAGE 3 * BATT_LOW_CELLS
+#define BATT_3S_HIGH_VOLTAGE 3 * BATT_HIGH_CELLS
+#define BATT_3S_SAFE_LOW_VOLTAGE 10.0f
+#define BATT_3S_SAFE_HIGH_VOLTAGE 13.0f
+
+//PARAMETROS DE TENSÃO PARA BATERIA DE 4 CELULAS
+#define BATT_4S_LOW_VOLTAGE 4 * BATT_LOW_CELLS
+#define BATT_4S_HIGH_VOLTAGE 4 * BATT_HIGH_CELLS
+#define BATT_4S_SAFE_LOW_VOLTAGE 14.0f
+#define BATT_4S_SAFE_HIGH_VOLTAGE 17.5f
+
+//PARAMETROS DE TENSÃO PARA BATERIA DE 6 CELULAS
+#define BATT_6S_LOW_VOLTAGE 6 * BATT_LOW_CELLS
+#define BATT_6S_HIGH_VOLTAGE 6 * BATT_HIGH_CELLS
+#define BATT_6S_SAFE_LOW_VOLTAGE 20.0f
+#define BATT_6S_SAFE_HIGH_VOLTAGE 26.0f
 
 void BatteryClass::Initialization(void)
 {
   Battery.Param.Voltage_Factor = STORAGEMANAGER.Read_16Bits(BATT_VOLTAGE_FACTOR_ADDR) / 100.0f;
   Battery.Param.Amps_Per_Volt = STORAGEMANAGER.Read_16Bits(BATT_AMPS_VOLT_ADDR) / 100.0f;
   Battery.Param.Amps_OffSet = STORAGEMANAGER.Read_16Bits(BATT_AMPS_OFFSET_ADDR) / 100.0f;
+  Battery.Param.Min_Cell_Volt = STORAGEMANAGER.Read_16Bits(BATT_MIN_VOLTAGE_ADDR) / 100.0f;
+  Battery.Param.Max_Cell_Volt = STORAGEMANAGER.Read_16Bits(BATT_MAX_VOLTAGE_ADDR) / 100.0f;
+  Battery.Param.NumberOfCells = STORAGEMANAGER.Read_8Bits(BATT_NUMBER_OF_CELLS_ADDR);
+  Battery.Param.CriticPercent = STORAGEMANAGER.Read_8Bits(BATT_CRIT_PERCENT_ADDR);
+  Battery.Param.Do_RTH = STORAGEMANAGER.Read_8Bits(BATT_RTH_LOW_BATT_ADDR);
   PT1FilterInit(&BattVoltage_Smooth, VOLTAGE_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
   PT1FilterInit(&BattCurrent_Smooth, CURRENT_CUTOFF, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
 }
@@ -58,7 +83,10 @@ void BatteryClass::Update_Voltage(void)
 {
   Battery.Calced.Voltage = PT1FilterApply3(&BattVoltage_Smooth, (float)(ANALOGSOURCE.Read_Voltage_Ratiometric(ADC_BATTERY_VOLTAGE) * Battery.Param.Voltage_Factor));
   BATTERY.Update_Exhausted();
-  FailSafe_Do_RTH_With_Low_Batt(Battery.Exhausted.LowPercentPreventArm);
+  if (Battery.Param.Do_RTH)
+  {
+    FailSafe_Do_RTH_With_Low_Batt(Battery.Exhausted.LowPercentPreventArm);
+  }
 }
 
 uint8_t BatteryClass::CalculatePercentage(float BattVoltage, float BattMinVolt, float BattMaxVolt)
@@ -90,7 +118,7 @@ uint8_t BatteryClass::CalculatePercentage(float BattVoltage, float BattMinVolt, 
 
 float BatteryClass::AutoBatteryMin(float BattVoltage)
 {
-  if (BattVoltage > 6.0f)
+  if (BattVoltage > 6.0f && Battery.Param.NumberOfCells == AUTO_BATTERY)
   {
     if (Battery.Auto.MinVoltageType == BATTERY_3S)
     {
@@ -141,6 +169,21 @@ float BatteryClass::AutoBatteryMin(float BattVoltage)
       return BATT_6S_LOW_VOLTAGE;
     }
   }
+  else
+  {
+    if (Battery.Param.NumberOfCells == BATTERY_3S)
+    {
+      return BATT_3S_LOW_VOLTAGE;
+    }
+    else if (Battery.Param.NumberOfCells == BATTERY_4S)
+    {
+      return BATT_4S_LOW_VOLTAGE;
+    }
+    else if (Battery.Param.NumberOfCells == BATTERY_6S)
+    {
+      return BATT_6S_LOW_VOLTAGE;
+    }
+  }
   Battery.Auto.MinCount = 0;
   Battery.Auto.MinVoltageType = 0;
   return NONE_BATTERY;
@@ -148,7 +191,7 @@ float BatteryClass::AutoBatteryMin(float BattVoltage)
 
 float BatteryClass::AutoBatteryMax(float BattVoltage)
 {
-  if (BattVoltage > 6.0f)
+  if (BattVoltage > 6.0f && Battery.Param.NumberOfCells == AUTO_BATTERY)
   {
     if (Battery.Auto.MaxVoltageType == BATTERY_3S)
     {
@@ -196,6 +239,21 @@ float BatteryClass::AutoBatteryMax(float BattVoltage)
       {
         Battery.Auto.MaxCount++;
       }
+      return BATT_6S_HIGH_VOLTAGE;
+    }
+  }
+  else
+  {
+    if (Battery.Param.NumberOfCells == BATTERY_3S)
+    {
+      return BATT_3S_HIGH_VOLTAGE;
+    }
+    else if (Battery.Param.NumberOfCells == BATTERY_4S)
+    {
+      return BATT_4S_HIGH_VOLTAGE;
+    }
+    else if (Battery.Param.NumberOfCells == BATTERY_6S)
+    {
       return BATT_6S_HIGH_VOLTAGE;
     }
   }
@@ -261,9 +319,9 @@ uint32_t BatteryClass::GetWatts(void)
 //VALIDA QUE REALMENTE A BATERIA ESTÁ ABAIXO DA CAPACIDADE MINIMA POR 'N' SEGUNDOS
 void BatteryClass::Update_Exhausted(void)
 {
-  if (Battery.Calced.Voltage > 6.0f) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
+  if (Battery.Calced.Voltage > 6.0f && Battery.Param.CriticPercent != 0) //TENSÃO DA BATERIA ACIMA DE 6V?SIM...
   {
-    if (BATTERY.GetPercentage() <= LOW_BATT_CRITIC_PERCENT) //MENOR OU IGUAL QUE 'N%' DA CAPACIDADE TOTAL DA BATERIA?SIM...
+    if (BATTERY.GetPercentage() <= Battery.Param.CriticPercent) //MENOR OU IGUAL QUE 'N%' DA CAPACIDADE TOTAL DA BATERIA?SIM...
     {
       if (Battery.Exhausted.LowBatteryCount >= (THIS_LOOP_RATE * LOW_BATT_DETECT_EXHAUSTED)) //CHECA SE NÃO É APENAS UM PICO POR 'N' SEGUNDOS
       {

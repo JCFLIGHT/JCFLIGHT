@@ -299,6 +299,7 @@ enum Barometer_Type_Enum
 enum Battery_Type_Enum
 {
     NONE_BATTERY = 0,
+    AUTO_BATTERY = 0,
     BATTERY_3S,
     BATTERY_4S,
     BATTERY_6S

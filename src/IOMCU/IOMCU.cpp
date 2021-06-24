@@ -179,6 +179,11 @@ struct _Send_User_Basic_Parameters
     int16_t SendBatteryVoltageScale;
     int16_t SendBatteryCurrentScale;
     int16_t SendBatteryCurrentOffSet;
+    int16_t SendBattMinVoltage;
+    int16_t SendBattMaxVoltage;
+    uint8_t SendNumberOfCells;
+    uint8_t SendCriticBattPercent;
+    uint8_t SendRTHLowBatt;
 } Send_User_Basic_Parameters;
 
 struct _Get_User_Basic_Parameters
@@ -208,6 +213,11 @@ struct _Get_User_Basic_Parameters
     int16_t GetBatteryVoltageScale;
     int16_t GetBatteryCurrentScale;
     int16_t GetBatteryCurrentOffSet;
+    int16_t GetBattMinVoltage;
+    int16_t GetBattMaxVoltage;
+    uint8_t GetNumberOfCells;
+    uint8_t GetCriticBattPercent;
+    uint8_t GetRTHLowBatt;
 } Get_User_Basic_Parameters;
 
 struct _Send_Radio_Control_Parameters
@@ -991,6 +1001,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Essential_First_Packet_Parameters.SendCompassRoll, VAR_16BITS);
         Send_Data_To_GCS(Essential_First_Packet_Parameters.SendCompassPitch, VAR_16BITS);
         Send_Data_To_GCS(Essential_First_Packet_Parameters.SendCompassYaw, VAR_16BITS);
+
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1000,8 +1011,8 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint16_t) * 4) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
-                                        (sizeof(uint8_t) * 21)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint16_t) * 6) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+                                        (sizeof(uint8_t) * 24)); //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendFrameType, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendRcChSequency, VAR_8BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendGimbalType, VAR_8BITS);
@@ -1027,6 +1038,12 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendBatteryVoltageScale, VAR_16BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendBatteryCurrentScale, VAR_16BITS);
         Send_Data_To_GCS(Send_User_Basic_Parameters.SendBatteryCurrentOffSet, VAR_16BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendBattMinVoltage, VAR_16BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendBattMaxVoltage, VAR_16BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendNumberOfCells, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendCriticBattPercent, VAR_8BITS);
+        Send_Data_To_GCS(Send_User_Basic_Parameters.SendRTHLowBatt, VAR_8BITS);
+
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1127,6 +1144,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendI2CError, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendAirSpeedValue, VAR_16BITS);
         Send_Data_To_GCS(Essential_Second_Packet_Parameters.SendCPULoad, VAR_8BITS);
+
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
         SerialCheckSum ^= SerialCheckSum;
@@ -1483,6 +1501,11 @@ void GCSClass::Save_Basic_Configuration(void)
     STORAGEMANAGER.Write_16Bits(BATT_VOLTAGE_FACTOR_ADDR, Get_User_Basic_Parameters.GetBatteryVoltageScale);
     STORAGEMANAGER.Write_16Bits(BATT_AMPS_VOLT_ADDR, Get_User_Basic_Parameters.GetBatteryCurrentScale);
     STORAGEMANAGER.Write_16Bits(BATT_AMPS_OFFSET_ADDR, Get_User_Basic_Parameters.GetBatteryCurrentOffSet);
+    STORAGEMANAGER.Write_16Bits(BATT_MIN_VOLTAGE_ADDR, Get_User_Basic_Parameters.GetBattMinVoltage);
+    STORAGEMANAGER.Write_16Bits(BATT_MAX_VOLTAGE_ADDR, Get_User_Basic_Parameters.GetBattMaxVoltage);
+    STORAGEMANAGER.Write_8Bits(BATT_NUMBER_OF_CELLS_ADDR, Get_User_Basic_Parameters.GetNumberOfCells);
+    STORAGEMANAGER.Write_8Bits(BATT_CRIT_PERCENT_ADDR, Get_User_Basic_Parameters.GetCriticBattPercent);
+    STORAGEMANAGER.Write_8Bits(BATT_RTH_LOW_BATT_ADDR, Get_User_Basic_Parameters.GetRTHLowBatt);
 
     //ATUALIZA OS PARAMETROS DO PID
     GET_SET[PID_UPDATED].State = false;
@@ -1630,6 +1653,11 @@ void GCSClass::Default_Basic_Configuration(void)
     STORAGEMANAGER.Write_16Bits(BATT_VOLTAGE_FACTOR_ADDR, 1010);
     STORAGEMANAGER.Write_16Bits(BATT_AMPS_VOLT_ADDR, 6200);
     STORAGEMANAGER.Write_16Bits(BATT_AMPS_OFFSET_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(BATT_MIN_VOLTAGE_ADDR, 360);
+    STORAGEMANAGER.Write_16Bits(BATT_MAX_VOLTAGE_ADDR, 420);
+    STORAGEMANAGER.Write_8Bits(BATT_NUMBER_OF_CELLS_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(BATT_CRIT_PERCENT_ADDR, 20);
+    STORAGEMANAGER.Write_8Bits(BATT_RTH_LOW_BATT_ADDR, 0);
 }
 
 void GCSClass::Default_RadioControl_Configuration(void)
@@ -1751,6 +1779,11 @@ void GCSClass::LoadAllParameters(void)
     Send_User_Basic_Parameters.SendBatteryVoltageScale = STORAGEMANAGER.Read_16Bits(BATT_VOLTAGE_FACTOR_ADDR);
     Send_User_Basic_Parameters.SendBatteryCurrentScale = STORAGEMANAGER.Read_16Bits(BATT_AMPS_VOLT_ADDR);
     Send_User_Basic_Parameters.SendBatteryCurrentOffSet = STORAGEMANAGER.Read_16Bits(BATT_AMPS_OFFSET_ADDR);
+    Send_User_Basic_Parameters.SendBattMinVoltage = STORAGEMANAGER.Read_16Bits(BATT_MIN_VOLTAGE_ADDR);
+    Send_User_Basic_Parameters.SendBattMaxVoltage = STORAGEMANAGER.Read_16Bits(BATT_MAX_VOLTAGE_ADDR);
+    Send_User_Basic_Parameters.SendNumberOfCells = STORAGEMANAGER.Read_8Bits(BATT_NUMBER_OF_CELLS_ADDR);
+    Send_User_Basic_Parameters.SendCriticBattPercent = STORAGEMANAGER.Read_8Bits(BATT_CRIT_PERCENT_ADDR);
+    Send_User_Basic_Parameters.SendRTHLowBatt = STORAGEMANAGER.Read_8Bits(BATT_RTH_LOW_BATT_ADDR);
 
     //ATUALIZA OS PARAMETROS DO RADIO CONTROLE
     Send_Radio_Control_Parameters.SendThrottleMiddle = STORAGEMANAGER.Read_8Bits(THROTTLE_MIDDLE_ADDR);

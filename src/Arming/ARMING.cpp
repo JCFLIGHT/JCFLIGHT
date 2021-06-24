@@ -149,6 +149,11 @@ uint8_t PreArmClass::Checking(void)
         return BATTERY_ERROR;
     }
 
+    if (!GLITCH.CheckGPS()) //CHECA O GPS
+    {
+        return GPS_ERROR;
+    }
+
     if (!GLITCH.CheckCompass()) //CHECA O COMPASS
     {
         return COMPASS_ERROR;
@@ -159,11 +164,6 @@ uint8_t PreArmClass::Checking(void)
         return BAROMETER_ERROR;
     }
 
-    if (!GLITCH.CheckGPS()) //CHECA O GPS
-    {
-        return GPS_ERROR;
-    }
-
     //TUDO ESTÁ OK,O SISTEMA ESTÁ PRONTO PARA ARMAR
     return NONE_ERROR;
 }
@@ -172,11 +172,10 @@ bool PreArmClass::CheckSafeState(void)
 {
     const uint8_t CheckingResult = PREARM.Checking();
 
-    if (CheckingResult == NONE_ERROR ||          //NENHUM DISPOSITVO ESTÁ RUIM
-        CheckingResult == GPS_ERROR ||           //NOTIFIQUE QUE O GPS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
-        CheckingResult == COMPASS_ERROR ||       //NOTIFIQUE QUE O COMPASS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
-        CheckingResult == BAROMETER_ERROR ||     //NOTIFIQUE QUE O BAROMETRO ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
-        CheckingResult == AUTO_PILOT_MODE_ERROR) //NOTIFIQUE QUE O MODO DE VOO POR GPS ESTÁ ATIVO,MAS NÃO IMPEÇA DE ARMAR
+    if (CheckingResult == NONE_ERROR ||    //NENHUM DISPOSITVO ESTÁ RUIM
+        CheckingResult == GPS_ERROR ||     //NOTIFIQUE QUE O GPS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+        CheckingResult == COMPASS_ERROR || //NOTIFIQUE QUE O COMPASS ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
+        CheckingResult == BAROMETER_ERROR) //NOTIFIQUE QUE O BAROMETRO ESTÁ RUIM,MAS NÃO IMPEÇA DE ARMAR
     {
         return true;
     }

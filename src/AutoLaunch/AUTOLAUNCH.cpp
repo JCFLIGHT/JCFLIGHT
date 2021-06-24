@@ -308,8 +308,3 @@ void AutoLaunchClass::ResetParameters(void)
   ThrottleStart = 0;
   AbortAutoLaunch = 0;
 }
-
-bool AutoLaunchClass::Finished(void)
-{
-  return !AutoLaunchState;
-}

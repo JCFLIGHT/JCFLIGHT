@@ -22,7 +22,6 @@ class AutoLaunchClass
 {
 public:
   void Update(void);
-  bool Finished(void);
 
 private:
   bool GetSwingVelocityState(void);

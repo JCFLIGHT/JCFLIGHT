@@ -151,42 +151,39 @@ static void ProcessFlightModesToAirPlane(void)
     return;
   }
 
-  if (AUTOLAUNCH.Finished()) //ESPERE O LANÇAMENTO TERMINAR PARA ATIVAR OS MODOS DE VOO ABAIXO
+  if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
   {
-    if (IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
+    GPS_Resources.Mode.Navigation = DO_RTH_ENROUTE; //INDICA PARA O TECS QUE O RTH SERÁ USADO
+    ENABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);           //ATIVA O CONTROLE HORIZONTAL X,Y & HEADING
+    ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);         //ATIVA O CONTROLE VERTICAL Z
+  }
+  else
+  {
+    if (IS_FLIGHT_MODE_ACTIVE(ALTITUDE_HOLD_MODE))
     {
-      GPS_Resources.Mode.Navigation = DO_RTH_ENROUTE; //INDICA PARA O TECS QUE O RTH SERÁ USADO
-      ENABLE_THIS_FLIGHT_MODE(CIRCLE_MODE);           //ATIVA O CONTROLE HORIZONTAL X,Y & Z
-      ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);         //ATIVA O CONTROLE VERTICAL Z
+      GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+      ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
+    }
+    else if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
+    {
+      GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+      ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
+    }
+    else if (IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
+    {
+      GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
+      ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
     }
     else
     {
-      if (IS_FLIGHT_MODE_ACTIVE(ALTITUDE_HOLD_MODE))
-      {
-        GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
-        ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
-      }
-      else if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE))
-      {
-        GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
-        ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
-      }
-      else if (IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
-      {
-        GPS_Resources.Mode.Navigation = DO_POSITION_HOLD;
-        ENABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
-      }
-      else
-      {
-        GPS_Resources.Mode.Navigation = DO_NONE;
-        DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
-      }
+      GPS_Resources.Mode.Navigation = DO_NONE;
+      DISABLE_THIS_FLIGHT_MODE(CLIMBOUT_MODE);
     }
+  }
 
-    if (Get_GPS_Used_To_Navigation() && !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
-    {
-      ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE); //FORÇA O MODO DE ESTABILIZAÇÃO EM MODO DE NAVEGAÇÃO POR GPS
-    }
+  if (Get_GPS_Used_To_Navigation() && !IS_FLIGHT_MODE_ACTIVE(STABILIZE_MODE))
+  {
+    ENABLE_THIS_FLIGHT_MODE(STABILIZE_MODE); //FORÇA O MODO DE ESTABILIZAÇÃO EM MODO DE NAVEGAÇÃO POR GPS
   }
 }
 

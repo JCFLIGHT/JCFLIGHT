@@ -283,13 +283,7 @@ bool AutoLaunchClass::GetMaxAltitudeReached(void)
 
 bool AutoLaunchClass::GetStatusCompleted(void)
 {
-  //VERIFIQUE APENAS SE OS STICK'S FORAM MANIPULADOS OU SE A ALTITUDE DEFINIDA FOI ATINGIDA
-  if (AUTO_LAUCH_EXIT_FUNCTION == NONE)
-  {
-    return (GetSticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
-  }
-  //FAÇA A MESMA VERIFICAÇÃO DE CIMA,PORÉM COM O ESTOURO DO TEMPO MAXIMO DE LAUNCH
-  return (AUTOLAUNCH.GetTimerOverFlow()) || (GetSticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
+  return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0 ? false : AUTOLAUNCH.GetTimerOverFlow()) || (GetSticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
 }
 
 uint8_t AutoLaunchClass::GetPlaneType(void)
@@ -313,4 +307,9 @@ void AutoLaunchClass::ResetParameters(void)
   ThrottleIteration = 1000;
   ThrottleStart = 0;
   AbortAutoLaunch = 0;
+}
+
+bool AutoLaunchClass::Finished(void)
+{
+  return !AutoLaunchState;
 }

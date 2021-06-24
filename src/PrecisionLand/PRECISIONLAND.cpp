@@ -23,12 +23,18 @@
 #include "FastSerial/PRINTF.h"
 
 #ifndef __AVR_ATmega2560__
-#define LOOP_RATE_IN_HZ 400 //HZ
+
+#define LOOP_RATE_IN_HZ 400                              //HZ
+#define LAND_CHECK_ACCEL_MOVING JCF_Param.Land_Check_Acc //M/S^2
+
 #else
-#define LOOP_RATE_IN_HZ 1000 //HZ - O FILTRO SÓ FUNCIONA CORRETAMENTE COM ESSE VALOR EM 1KHZ NA VERSÃO CLASSIC
-#endif
+
+#define LOOP_RATE_IN_HZ 1000         //HZ - O FILTRO SÓ FUNCIONA CORRETAMENTE COM ESSE VALOR EM 1KHZ NA VERSÃO CLASSIC
 #define LAND_CHECK_ACCEL_MOVING 3.0f //M/S^2
-#define LPF_CUTOFF_IN_HZ 1.0f        //HZ
+
+#endif
+
+#define LPF_CUTOFF_IN_HZ 1.0f //HZ
 
 //DEBUG
 //#define PRINTLN_PRECISION_LAND

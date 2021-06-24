@@ -23,16 +23,29 @@
 #include "FailSafe/FAILSAFE.h"
 #include "Common/ENUM.h"
 #include "BitArray/BITARRAY.h"
+#include "Param/PARAM.h"
 
 //**************************************************************************
 //TIMER DE DESLIGAMENTO AUTOMATICO DOS MOTORES POR INATIVADADE DO THROTTLE
 //**************************************************************************
 
-#define THIS_LOOP_RATE 50  //HZ
+#define THIS_LOOP_RATE 50 //HZ
+
+#ifdef __AVR_ATmega2560__
+
 #define AUTO_DISARM_TIME 5 //SEGUNDOS
 #define THROTTLE_VALUE_MAX 1100
 #define YPR_VALUE_MIN 1450
 #define YPR_VALUE_MAX 1550
+
+#else
+
+#define AUTO_DISARM_TIME JCF_Param.AutoDisarm_Time //SEGUNDOS
+#define THROTTLE_VALUE_MAX JCF_Param.AutoDisarm_Throttle_Min
+#define YPR_VALUE_MIN JCF_Param.AutoDisarm_YPR_Min
+#define YPR_VALUE_MAX JCF_Param.AutoDisarm_YPR_Max
+
+#endif
 
 DesarmLowThrClass DESARMLOWTHROTTLE;
 
@@ -65,7 +78,7 @@ void DesarmLowThrClass::Update()
   }
   //THROTTLE NO MINIMO,DRONE ARMADO,FAIL-SAFE DESATIVADO?SIM...
   if (Check_Throttle() && Check_Others_Channels() && IS_STATE_ACTIVE(PRIMARY_ARM_DISARM) &&
-      !FastSystemFailSafe() && !IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && ArmDisarmConfig == 0)
+      !FastSystemFailSafe() && !IS_FLIGHT_MODE_ACTIVE(WAYPOINT_MODE) && ArmDisarmConfig == NONE)
   {
     if (DESARMLOWTHROTTLE.TimerDesarm == (THIS_LOOP_RATE * AUTO_DISARM_TIME))
     {

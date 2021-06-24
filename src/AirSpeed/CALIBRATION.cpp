@@ -45,6 +45,15 @@ Vector3x3Float StateEstimate(0.0f, 0.0f, 0.0f);
 #define KF_MEDICION_NOISE 0.0000005f //ERRO DE MEDIÇÃO AO LONGO DO PROCESSO
 #define KF_NOISE_BASE 1.0f           //ADIÇÃO MANUAL DE ERRO AO FILTRO DE KALMAN EM M/S
 
+#ifdef __AVR_ATmega2560__
+
+#define CALIBRATION_SAMPLES 15
+
+#else
+
+#define CALIBRATION_SAMPLES JCF_Param.AirSpeed_Samples
+
+#endif
 void AirSpeedCalibrationClass::Initialization(void)
 {
     AIRSPEEDCALIBRATION.Previous_Scale = AirSpeed.Param.Factor;
@@ -64,7 +73,7 @@ bool AirSpeedCalibrationClass::Calibrate(void)
         return true;
     }
 
-    if (SCHEDULERTIME.GetMillis() - AirSpeed.Calibration.Start_MS >= 1000 && AirSpeed.Calibration.Read_Count > 15)
+    if (SCHEDULERTIME.GetMillis() - AirSpeed.Calibration.Start_MS >= 1000 && AirSpeed.Calibration.Read_Count > CALIBRATION_SAMPLES)
     {
         if (AirSpeed.Calibration.Count > 0)
         {
@@ -145,14 +154,10 @@ void AirSpeedCalibrationClass::Scale_Update(void)
         return;
     }
 
-#ifndef __AVR_ATmega2560__
-
-    if (!JCF_Param.AirSpeedAutoCalScale) //UM CANAL AUXILIAR DO RÁDIO DEVE SER ATRIBUIDO TAMBÉM A VERFICAÇÃO,NÃO APENAS O PARAMETRO.
+    //if () //TUNNING
     {
         return;
     }
-
-#endif
 
     if (!AirSpeed.Healthy || (AirSpeed.Raw.IASPressureInCM < ConverMetersToCM(AIR_SPEED_MIN)) || !Get_GPS_Heading_Is_Valid())
     {

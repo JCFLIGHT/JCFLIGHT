@@ -48,8 +48,9 @@ ParamClass PARAM;
 JCF_Param_Adjustable_Struct JCF_Param;
 
 const Resources_Of_Param Params_Table[] = {
-    //NOME                                 ENDEREÇO NA EEPROM                    TIPO                    VARIAVEL                                    MIN            MAX              VALOR PADRÃO
 #ifdef USE_CLI
+
+    //NOME                                 ENDEREÇO NA EEPROM                    TIPO                    VARIAVEL                                    MIN            MAX              VALOR PADRÃO
     {"kP_Acc_AHRS",                        KP_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Acc_AHRS,                     0,             255,             25},
     {"kI_Acc_AHRS",                        KI_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Acc_AHRS,                     0,             255,             50},
     {"kP_Mag_AHRS",                        KP_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Mag_AHRS,                     0,             255,             10},
@@ -68,7 +69,7 @@ const Resources_Of_Param Params_Table[] = {
     {"CrashCheck_Time",                    CC_TIME_ADDR,                         VAR_8BITS,              &JCF_Param.CrashCheck_Time,                 0,             255,             2},
     {"GimbalMinValue",                     GIMBAL_MIN_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMinValue,                  800,           2200,            1000},
     {"GimbalMaxValue",                     GIMBAL_MAX_ADDR,                      VAR_16BITS,             &JCF_Param.GimbalMaxValue,                  800,           2200,            2000},
-    {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             20,             3},
+    {"Land_CheckAcc",                      LAND_CHECKACC_ADDR,                   VAR_8BITS,              &JCF_Param.Land_Check_Acc,                  0,             20,              3},
     {"ThrottleMixGain",                    THROTTLE_FACTOR_ADDR,                 VAR_FLOAT,              &JCF_Param.Throttle_Mix_Gain,               0,             1,               1.0f},
     {"AutoDisarm_Time",                    AUTODISARM_ADDR,                      VAR_8BITS,              &JCF_Param.AutoDisarm_Time,                 0,             255,             5},
     {"AutoDisarm_Throttle_Min",            AUTODISARM_THR_MIN_ADDR,              VAR_16BITS,             &JCF_Param.AutoDisarm_Throttle_Min,         800,           1500,            1100},
@@ -83,8 +84,8 @@ const Resources_Of_Param Params_Table[] = {
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
     {"Arm_Time_Safety",                    ARM_TIME_SAFETY_ADDR,                 VAR_8BITS,              &JCF_Param.Arm_Time_Safety,                 0,             255,             2},
     {"Disarm_Time_Safety",                 DISARM_TIME_SAFETY_ADDR,              VAR_8BITS,              &JCF_Param.Disarm_Time_Safety,              0,             255,             2},
-    {"Compass_Cal_Timer",                  COMPASS_CAL_TIME_ADDR,                VAR_8BITS,              &JCF_Param.Compass_Cal_Timer,               0,             120,             60},
-    {"AirSpeedAutoCalScale",               AS_AUTO_CAL_SCALE_ADDR,               VAR_8BITS,              &JCF_Param.AirSpeedAutoCalScale,            0,             1,               0},
+    {"Compass_Cal_Timer",                  COMPASS_CAL_TIME_ADDR,                VAR_8BITS,              &JCF_Param.Compass_Cal_Timer,               0,             120,             60}
+
 #endif 
 };
 
@@ -93,18 +94,23 @@ const Resources_Of_Param Params_Table[] = {
 void ParamClass::Initialization(void)
 {
 #ifdef OPERATOR_CHECK_EEPROM
+
   Operator_Check_Values_In_Address(SIZE_OF_EEPROM);
+
 #endif
 
 #ifdef ERASE_ALL_EEPROM
+
   STORAGEMANAGER.Erase(INITIAL_ADDRESS_EEPROM_TO_CLEAR, FINAL_ADDRESS_EEPROM_TO_CLEAR);
+
 #endif
 
 #ifdef USE_CLI
-  PARAM.Load_Sketch();
-#endif
 
-#ifndef USE_CLI
+  PARAM.Load_Sketch();
+
+#else
+
   JCF_Param.Navigation_Vel = 400;
   JCF_Param.GPS_WP_Radius = 2;
   JCF_Param.GPS_RTH_Land_Radius = 10;
@@ -112,7 +118,9 @@ void ParamClass::Initialization(void)
   JCF_Param.Arm_Time_Safety = 2;
   JCF_Param.Disarm_Time_Safety = 2;
   JCF_Param.Compass_Cal_Timer = 60;
+
 #endif
+
 }
 
 void ParamClass::Default_List(void)

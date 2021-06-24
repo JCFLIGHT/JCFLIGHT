@@ -684,9 +684,6 @@ typedef struct
   uint8_t Arm_Time_Safety;
   uint8_t Disarm_Time_Safety;
   uint8_t Compass_Cal_Timer;
-#ifndef __AVR_ATmega2560__
-  uint8_t AirSpeedAutoCalScale;
-#endif
 } JCF_Param_Adjustable_Struct;
 
 typedef struct

@@ -36,6 +36,8 @@
 
 AutoLaunchClass AUTOLAUNCH;
 
+#ifdef __AVR_ATmega2560__
+
 #define AHRS_BANKED_ANGLE 25                                 //25 GRAUS MAXIMO DE BANK ANGLE (CONSIDERANDO EM RADIANOS = 436)
 #define IMU_BANKED_ANGLE -450.0f                             //-45 GRAUS DE INCLINAÇÃO NA IMU
 #define LAUNCH_MOTOR_IDLE_SPINUP_TIME 1500                   //ARMA O MOTOR DEPOIS DE 1.5 SEGUNDO APÓS DETECTAR O AUTO-LAUNCH
@@ -47,6 +49,22 @@ AutoLaunchClass AUTOLAUNCH;
 #define AUTO_LAUCH_EXIT_FUNCTION 5000                        //TEMPO DE PARA SAIR DO MODO AUTO-LAUCH APÓS A DETECÇÃO (TEMPO EM MS)
 #define AUTO_LAUNCH_THROTTLE_MAX 1700                        //VALOR MAXIMO DE ACELERAÇÃO
 #define AUTO_LAUCH_MAX_ALTITUDE 0                            //ALTITUDE MAXIMA PARA VALIDAR O AUTO-LAUNCH (VALOR EM METROS)
+
+#else
+
+#define AHRS_BANKED_ANGLE JCF_Param.AutoLaunch_AHRS_BankAngle                  //'N' GRAUS MAXIMO DE BANK ANGLE
+#define IMU_BANKED_ANGLE JCF_Param.AutoLaunch_IMU_BankAngle                    //'N'' GRAUS DE INCLINAÇÃO NA IMU
+#define LAUNCH_MOTOR_IDLE_SPINUP_TIME JCF_Param.AutoLaunch_Trigger_Motor_Delay //ARMA O MOTOR DEPOIS DE 'N' SEGUNDO APÓS DETECTAR O AUTO-LAUNCH (TEMPO EM MS)
+#define AUTO_LAUNCH_ANGLE JCF_Param.AutoLaunch_Elevator                        //VALOR DO PITCH (ELEVATOR) AO FAZER O AUTO-LAUNCH (VALOR EM GRAUS)
+#define SWING_LAUNCH_MIN_ROTATION_RATE ConvertToRadians(100)                   //NO MINIMO UM RATE DE 100DPS NO GYRO
+#define LAUNCH_VELOCITY_THRESH JCF_Param.AutoLaunch_Velocity_Thresh            //METROS/S
+#define MOTOR_SPINUP_VALUE JCF_Param.AutoLaunch_SpinUp                         //VALOR DA INCREMENTAÇÃO DO THROTTLE PARA PLANES COM RODAS
+#define MOTOR_SPINUP_TIME JCF_Param.AutoLaunch_SpinUp_Time                     //VAI SUBINDO O THROTTLE AOS POUCOS,BOM PARA AERO COM RODAS (TEMPO EM MS)
+#define AUTO_LAUCH_EXIT_FUNCTION JCF_Param.AutoLaunch_Exit                     //TEMPO DE PARA SAIR DO MODO AUTO-LAUCH APÓS A DETECÇÃO (TEMPO EM MS)
+#define AUTO_LAUNCH_THROTTLE_MAX JCF_Param.AutoLaunch_MaxThrottle              //VALOR MAXIMO DE ACELERAÇÃO
+#define AUTO_LAUCH_MAX_ALTITUDE JCF_Param.AutoLaunch_Altitude                  //ALTITUDE MAXIMA PARA VALIDAR O AUTO-LAUNCH (VALOR EM METROS)
+
+#endif
 
 bool AutoLaunchState = false;
 bool StateLaunched = false;
@@ -289,11 +307,11 @@ bool AutoLaunchClass::GetStatusCompleted(void)
 uint8_t AutoLaunchClass::GetPlaneType(void)
 {
 #ifndef __AVR_ATmega2560__
-  if (JCF_Param.AirPlane_Wheels == WITH_WHEELS)
-  {
-    return WITH_WHEELS;
-  }
+
+  return JCF_Param.AirPlane_Wheels;
+
 #endif
+
   return WITHOUT_WHEELS;
 }
 

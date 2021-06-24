@@ -203,9 +203,3 @@ Members:
     DefaultValue: 60
     Min: 0
     Max: 120
-
-  - Name: AirSpeedAutoCalScale
-    Description: "`0 - Desativado / 1 - Ativado` ~ Calibração automática em voo da escala do Tubo de Pitot.Um novo valor será armazenado no parâmetro ´AirSpeed Fator´ a cada 2 minutos."
-    DefaultValue: 0
-    Min: 0
-    Max: 1

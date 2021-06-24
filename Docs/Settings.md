@@ -3,7 +3,6 @@
 | Nome | Valor Padrão | Min | Max | Descrição |
 | ------------- | ------------- | --- | --- | ----------- |
 | AirPlane_Wheels | 0 | 0 | 1 | 0 - Sem trem de pouso / 1 - Com trem de pouso (Apenas para o Auto-Launch) |
-| AirSpeedAutoCalScale | 0 | 0 | 1 | `0 - Desativado / 1 - Ativado` ~ Calibração automática em voo da escala do Tubo de Pitot.Um novo valor será armazenado no parâmetro ´AirSpeed Fator´ a cada 2 minutos. |
 | AirSpeed_Samples | 15 | 0 | 255 | Número de amostras para calibrar o Tubo de Pitot |
 | Arm_Time_Safety | 2 | 0 | 255 | Tempo seguro para armar com os sticks em posição de armamento [Segundos] |
 | AutoDisarm_Throttle_Min | 1100 | 800 | 1500 | Valor maximo do Throttle tolerado para iniciar a contagem do Auto-Desarmamento [uS] |

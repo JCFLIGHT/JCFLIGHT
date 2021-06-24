@@ -25,15 +25,22 @@
 #include "AHRS/AHRS.h"
 #include "Barometer/BAROBACKEND.h"
 #include "BitArray/BITARRAY.h"
+#include "Param/PARAM.h"
 #include "FastSerial/PRINTF.h"
 
 #ifdef __AVR_ATmega2560__
-#define THIS_LOOP_RATE 60 //HZ
-#else
-#define THIS_LOOP_RATE 100 //HZ
-#endif
+
+#define THIS_LOOP_RATE 60                   //HZ
 #define CRASH_CHECK_TIMER 2                 //TEMPO MAXIMO DE CRASH EM SEGUNDOS
 #define ATTITUDE_CHECK_THRESH_ROLL_PITCH 30 //VALOR CONVERTIDO PARA RADIANOS E FATORADO POR 1000
+
+#else
+
+#define THIS_LOOP_RATE 100                                              //HZ
+#define CRASH_CHECK_TIMER JCF_Param.CrashCheck_Time                     //TEMPO MAXIMO DE CRASH EM SEGUNDOS
+#define ATTITUDE_CHECK_THRESH_ROLL_PITCH JCF_Param.CrashCheck_BankAngle //VALOR CONVERTIDO PARA RADIANOS E FATORADO POR 1000
+
+#endif
 
 //DEBUG
 //#define PRINTLN_CRASHCHECK

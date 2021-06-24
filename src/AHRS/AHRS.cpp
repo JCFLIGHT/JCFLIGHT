@@ -51,7 +51,7 @@ Quaternion_Struct Orientation;
 Matrix3x3_Struct Rotation;
 
 static Vector3x3_Struct CorrectedMagneticFieldNorth;
-static AHRS_Configuration_Struct IMURuntimeConfiguration;
+static AHRS_Configuration_Struct AHRSConfiguration;
 
 static bool GPSHeadingInitialized = false;
 
@@ -79,6 +79,15 @@ static void ComputeRotationMatrix(void)
 
 void AHRSClass::Initialization(void)
 {
+#ifndef __AVR_ATmega2560__
+
+  AHRSConfiguration.kP_Accelerometer = JCF_Param.kP_Acc_AHRS / 10000.0f;
+  AHRSConfiguration.kI_Accelerometer = JCF_Param.kI_Acc_AHRS / 10000.0f;
+  AHRSConfiguration.kP_Magnetometer = JCF_Param.kP_Mag_AHRS / 10000.0f;
+  AHRSConfiguration.kI_Magnetometer = JCF_Param.kI_Mag_AHRS > 0 ? JCF_Param.kI_Mag_AHRS / 10000.0f : 0.0f;
+
+#endif
+
   //CALCULA A DECLINAÇÃO MAGNETICA
   const int16_t Degrees = ((int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100)) / 100;
   const int16_t Remainder = ((int16_t)(STORAGEMANAGER.Read_Float(MAG_DECLINATION_ADDR) * 100)) % 100;
@@ -173,20 +182,20 @@ static void MahonyAHRSUpdate(float DeltaTime,
     VectorCrossProduct(&VectorError, &AccelerationVector, &EstimatedGravity);
 
     //CALCULA E APLICA O FEEDBACK INTEGRAL
-    if (IMURuntimeConfiguration.kI_Accelerometer > 0.0f)
+    if (AHRSConfiguration.kI_Accelerometer > 0.0f)
     {
       //DESATIVA A INTEGRAÇÃO SE O SPIN RATE ULTRAPASSAR UM CERTO VALOR
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Vector3x3_Struct OldVector;
         //CALCULA O ERRO ESCALADO POR kI
-        VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.kI_Accelerometer * DeltaTime);
+        VectorScale(&OldVector, &VectorError, AHRSConfiguration.kI_Accelerometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
       }
     }
 
     //CALCULA O GANHO DE kP E APLICA O FEEDBACK PROPORCIONAL
-    VectorScale(&VectorError, &VectorError, IMURuntimeConfiguration.kP_Accelerometer * AccelerometerWeightScaler);
+    VectorScale(&VectorError, &VectorError, AHRSConfiguration.kP_Accelerometer * AccelerometerWeightScaler);
     VectorAdd(&RotationRate, &RotationRate, &VectorError);
   }
 
@@ -257,20 +266,20 @@ static void MahonyAHRSUpdate(float DeltaTime,
     }
 
     //CALCULA E APLICA O FEEDBACK INTEGRAL
-    if (IMURuntimeConfiguration.kI_Magnetometer > 0.0f)
+    if (AHRSConfiguration.kI_Magnetometer > 0.0f)
     {
       //PARE A INTEGRAÇÃO SE O SPIN RATE FOR MAIOR QUE O LIMITE
       if (Spin_Rate_Square < SquareFloat(ConvertToRadians(SPIN_RATE_LIMIT)))
       {
         Vector3x3_Struct OldVector;
         //CALCULA O ERRO INTEGRAL ESCALADO POR kI
-        VectorScale(&OldVector, &VectorError, IMURuntimeConfiguration.kI_Magnetometer * DeltaTime);
+        VectorScale(&OldVector, &VectorError, AHRSConfiguration.kI_Magnetometer * DeltaTime);
         VectorAdd(&GyroDriftEstimate, &GyroDriftEstimate, &OldVector);
       }
     }
 
     //CALCULA O GANHO DE kP E APLICA O FEEDBACK DO PROPORCIONAL
-    VectorScale(&VectorError, &VectorError, IMURuntimeConfiguration.kP_Magnetometer * MagnetometerWeightScaler);
+    VectorScale(&VectorError, &VectorError, AHRSConfiguration.kP_Magnetometer * MagnetometerWeightScaler);
     VectorAdd(&RotationRate, &RotationRate, &VectorError);
   }
 

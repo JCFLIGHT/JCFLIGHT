@@ -40,6 +40,7 @@
 #include "ProgMem/PROGMEM.h"
 #include "Build/BOARDDEFS.h"
 #include "BitArray/BITARRAY.h"
+#include "Param/PARAM.h"
 #include "FastSerial/PRINTF.h"
 #include "Build/GCC.h"
 
@@ -47,8 +48,6 @@ FILE_COMPILE_FOR_SPEED
 
 //DEBUG
 //#define PRINTLN_MOTORS
-
-float ThrottleMixGain = 1.0f;
 
 int16_t MotorControl[8];
 
@@ -185,7 +184,16 @@ void ApplyMixingForMotorsAndServos(float DeltaTime)
   const uint8_t NumberOfMotors = ProgMemReadByte(&Motors_Count[PlatformTypeEnabled].FrameMotorsCount);
 
   int16_t MixerThrottleController = RC_Resources.Attitude.Controller[THROTTLE];
-  MixerThrottleController = ((MixerThrottleController - RC_Resources.Attitude.ThrottleMin) * ThrottleMixGain) + RC_Resources.Attitude.ThrottleMin;
+
+#ifdef __AVR_ATmega2560__
+
+  MixerThrottleController = (MixerThrottleController - RC_Resources.Attitude.ThrottleMin) + RC_Resources.Attitude.ThrottleMin;
+
+#else
+
+  MixerThrottleController = ((MixerThrottleController - RC_Resources.Attitude.ThrottleMin) * JCF_Param.Throttle_Mix_Gain) + RC_Resources.Attitude.ThrottleMin;
+
+#endif
 
 #ifdef USE_THROTTLE_COMPENSATION
 

@@ -22,29 +22,7 @@
 #include "Math/MATHSUPPORT.h"
 #include "Build/BOARDDEFS.h"
 
-#define BARO_SPIKES_SIZE 0x15
-
-#ifndef USE_BARO_PRECISE_MATH
-
-void Remove_Barometer_Spikes(void)
-{
-  static int32_t PressureVector[BARO_SPIKES_SIZE];
-  static uint8_t PressureIndex;
-  uint8_t PressureIndexCount = PressureIndex + 1;
-
-  if (PressureIndexCount >= BARO_SPIKES_SIZE)
-  {
-    PressureIndexCount = 0;
-  }
-
-  PressureVector[PressureIndex] = Barometer.Raw.Pressure;
-  Barometer.Raw.PressureFiltered += PressureVector[PressureIndex];
-  Barometer.Raw.PressureFiltered -= PressureVector[PressureIndexCount];
-  PressureIndex = PressureIndexCount;
-}
-
-#else
-
+#define BARO_SPIKES_SIZE 21
 #define BARO_SAMPLE_COUNT_MAX 48
 #define PRESSURE_SAMPLES_MEDIAN 3
 
@@ -104,6 +82,7 @@ static int32_t ApplyBarometerMedianFilter(int32_t newPressureReading)
   {
     return ApplyQuickMedianFilterSuperSoft(BarometerFilterSamples);
   }
+
   return newPressureReading;
 }
 
@@ -129,8 +108,6 @@ void Remove_Barometer_Spikes(void)
 
   CurrentSampleIndex = NextSampleIndex;
 }
-
-#endif
 
 float Get_Altitude_Difference(float Base_Pressure, float Pressure, float BaroTemperature)
 {

@@ -18,27 +18,10 @@
 #include "TUNNING.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "RadioControl/DECODE.h"
 
 TunningClass TUNNING;
-
-enum Tunning_Enum
-{
-  NONE_TUNNING_MODE = 0,
-  TUNNING_NONE_CHANNEL = 0,
-  TUNNING_KP_ROLL,
-  TUNNING_KI_ROLL,
-  TUNNING_KD_ROLL,
-  TUNNING_KCD_OR_KFF_ROLL,
-  TUNNING_KP_PITCH,
-  TUNNING_KI_PITCH,
-  TUNNING_KD_PITCH,
-  TUNNING_KCD_OR_KFF_PITCH,
-  TUNNING_KP_YAW,
-  TUNNING_KI_YAW,
-  TUNNING_KD_YAW,
-  TUNNING_KCD_OR_KFF_YAW,
-  TUNNING_PITOT_FACTOR,
-};
+Tunning_Enum_Typedef Tunning_Status;
 
 void TunningClass::Initialization(void)
 {
@@ -46,9 +29,19 @@ void TunningClass::Initialization(void)
   TUNNING.Mode = STORAGEMANAGER.Read_8Bits(TUNNING_ADDR);
 }
 
+int16_t TunningClass::GetConfiguredChannelValue(Tunning_Enum_Typedef OnOffMode)
+{
+  if (OnOffMode == TUNNING_TYPE_STATE)
+  {
+    return (DECODE.GetRxChannelOutput(TUNNING.ChannelControll + 3) > 1400) ? TUNNING_STATE_ENABLED : TUNNING_STATE_DISABLED;
+  }
+
+  return DECODE.GetRxChannelOutput(TUNNING.ChannelControll + 3);
+}
+
 void TunningClass::Update(void)
 {
-  if (TUNNING.Mode == NONE_TUNNING_MODE || TUNNING.ChannelControll == TUNNING_NONE_CHANNEL)
+  if (TUNNING.Mode == NONE_TUNNING_MODE || TUNNING.ChannelControll == NONE_TUNNING_CHANNEL)
   {
     return;
   }
@@ -93,6 +86,19 @@ void TunningClass::Update(void)
     break;
 
   case TUNNING_PITOT_FACTOR:
+    Tunning_Status = TUNNING_PITOT_FACTOR;
     break;
   }
+}
+
+bool TunningClass::GetActivated(Tunning_Enum_Typedef TunningParam)
+{
+  if (Tunning_Status == TunningParam)
+  {
+    if (TUNNING.GetConfiguredChannelValue(TUNNING_TYPE_STATE) == TUNNING_STATE_ENABLED)
+    {
+      return true;
+    }
+  }
+  return false;
 }

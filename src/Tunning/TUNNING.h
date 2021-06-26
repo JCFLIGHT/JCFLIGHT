@@ -18,15 +18,41 @@
 #ifndef TUNNING_H_
 #define TUNNING_H_
 #include "inttypes.h"
+
+typedef enum Tunning_Enum
+{
+    NONE_TUNNING_MODE = 0,
+    NONE_TUNNING_CHANNEL = 0,
+    TUNNING_TYPE_ADJUSTABLE = 0,
+    TUNNING_STATE_DISABLED = 0,
+    TUNNING_STATE_ENABLED = 1,
+    TUNNING_TYPE_STATE = 1,
+    TUNNING_KP_ROLL = 1,
+    TUNNING_KI_ROLL,
+    TUNNING_KD_ROLL,
+    TUNNING_KCD_OR_KFF_ROLL,
+    TUNNING_KP_PITCH,
+    TUNNING_KI_PITCH,
+    TUNNING_KD_PITCH,
+    TUNNING_KCD_OR_KFF_PITCH,
+    TUNNING_KP_YAW,
+    TUNNING_KI_YAW,
+    TUNNING_KD_YAW,
+    TUNNING_KCD_OR_KFF_YAW,
+    TUNNING_PITOT_FACTOR,
+} Tunning_Enum_Typedef;
+
 class TunningClass
 {
 public:
     void Initialization(void);
     void Update(void);
+    bool GetActivated(Tunning_Enum_Typedef TunningParam);
 
 private:
     uint8_t ChannelControll;
     uint8_t Mode;
+    int16_t GetConfiguredChannelValue(Tunning_Enum_Typedef StateMode);
 };
 extern TunningClass TUNNING;
 #endif

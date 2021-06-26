@@ -264,10 +264,18 @@ struct _Send_Radio_Control_Parameters
     uint8_t SendMaxBankRoll;
     uint8_t SendAutoPilotMode;
     int32_t SendAirSpeedScale;
-    uint8_t SendCH6Tunning;
+    uint8_t SendTunningChannel;
+    uint8_t SendTunning;
     uint8_t SendLandAfterRTH;
     int16_t SendHoverThrottle;
     int16_t SendAirSpeedReference;
+    uint8_t SendTECSPitch2ThrFactor;
+    uint8_t SendTECSPitch2ThrLPF;
+    uint8_t SendTECSAutoPilotLPF;
+    int16_t SendTECSCruiseMinThrottle;
+    int16_t SendTECSCruiseMaxThrottle;
+    int16_t SendTECSCruiseThrottle;
+    uint8_t SendTECSCircleDirection;
 } Send_Radio_Control_Parameters;
 
 struct _Get_Radio_Control_Parameters
@@ -297,7 +305,8 @@ struct _Get_Radio_Control_Parameters
     uint8_t GetMaxBankRoll;
     uint8_t GetdAutoPilotMode;
     int32_t GetAirSpeedScale;
-    uint8_t GetCH6Tunning;
+    uint8_t GetTunningChannel;
+    uint8_t GetTunning;
     uint8_t GetLandAfterRTH;
     int16_t GetHoverThrottle;
     int16_t GetAirSpeedReference;
@@ -322,6 +331,13 @@ struct _Get_Servos_Parameters
     int16_t GetServo2Max;
     int16_t GetServo3Max;
     int16_t GetServo4Max;
+    uint8_t GetTECSPitch2ThrFactor;
+    uint8_t GetTECSPitch2ThrLPF;
+    uint8_t GetTECSAutoPilotLPF;
+    int16_t GetTECSCruiseMinThrottle;
+    int16_t GetTECSCruiseMaxThrottle;
+    int16_t GetTECSCruiseThrottle;
+    uint8_t GetTECSCircleDirection;
 } Get_Servos_Parameters;
 
 struct _Send_User_Medium_Parameters
@@ -1291,10 +1307,18 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendMaxBankRoll, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAutoPilotMode, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAirSpeedScale, VAR_32BITS);
-        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendCH6Tunning, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTunningChannel, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTunning, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendLandAfterRTH, VAR_8BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendHoverThrottle, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendAirSpeedReference, VAR_16BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSPitch2ThrFactor, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSPitch2ThrLPF, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSAutoPilotLPF, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSCruiseMinThrottle, VAR_16BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSCruiseMaxThrottle, VAR_16BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSCruiseThrottle, VAR_16BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSCircleDirection, VAR_8BITS);
 
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
@@ -1555,10 +1579,18 @@ void GCSClass::Save_Radio_Control_Configuration(void)
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, Get_Radio_Control_Parameters.GetMaxBankRoll);
     STORAGEMANAGER.Write_8Bits(AUTO_PILOT_MODE_ADDR, Get_Radio_Control_Parameters.GetdAutoPilotMode);
     STORAGEMANAGER.Write_32Bits(AIRSPEED_FACTOR_ADDR, Get_Radio_Control_Parameters.GetAirSpeedScale);
-    STORAGEMANAGER.Write_8Bits(CH6_TUNNING_ADDR, Get_Radio_Control_Parameters.GetCH6Tunning);
+    STORAGEMANAGER.Write_8Bits(CH_TUNNING_ADDR, Get_Radio_Control_Parameters.GetTunningChannel);
+    STORAGEMANAGER.Write_8Bits(TUNNING_ADDR, Get_Radio_Control_Parameters.GetTunning);
     STORAGEMANAGER.Write_8Bits(LAND_AFTER_RTH_ADDR, Get_Radio_Control_Parameters.GetLandAfterRTH);
     STORAGEMANAGER.Write_16Bits(HOVER_THROTTLE_ADDR, Get_Radio_Control_Parameters.GetHoverThrottle);
     STORAGEMANAGER.Write_16Bits(AIR_SPEED_REFERENCE_ADDR, Get_Radio_Control_Parameters.GetAirSpeedReference);
+    STORAGEMANAGER.Write_8Bits(TECS_PITCH2THR_FACTOR_ADDR, Get_Servos_Parameters.GetTECSPitch2ThrFactor);
+    STORAGEMANAGER.Write_8Bits(TECS_PITCH2THR_LPF_ADDR, Get_Servos_Parameters.GetTECSPitch2ThrLPF);
+    STORAGEMANAGER.Write_8Bits(TECS_AP_LPF_ADDR, Get_Servos_Parameters.GetTECSAutoPilotLPF);
+    STORAGEMANAGER.Write_16Bits(TECS_CRUISE_MIN_THR_ADDR, Get_Servos_Parameters.GetTECSCruiseMinThrottle);
+    STORAGEMANAGER.Write_16Bits(TECS_CRUISE_MAX_THR_ADDR, Get_Servos_Parameters.GetTECSCruiseMaxThrottle);
+    STORAGEMANAGER.Write_16Bits(TECS_CRUISE_THR_ADDR, Get_Servos_Parameters.GetTECSCruiseThrottle);
+    STORAGEMANAGER.Write_8Bits(TECS_CIRCLE_DIR_ADDR, Get_Servos_Parameters.GetTECSCircleDirection);
 }
 
 void GCSClass::Save_Medium_Configuration(void)
@@ -1704,10 +1736,18 @@ void GCSClass::Default_RadioControl_Configuration(void)
     STORAGEMANAGER.Write_8Bits(MAX_ROLL_LEVEL_ADDR, 30);
     STORAGEMANAGER.Write_8Bits(AUTO_PILOT_MODE_ADDR, 0);
     STORAGEMANAGER.Write_32Bits(AIRSPEED_FACTOR_ADDR, 19936);
-    STORAGEMANAGER.Write_8Bits(CH6_TUNNING_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(CH_TUNNING_ADDR, 0);
+    STORAGEMANAGER.Write_8Bits(TUNNING_ADDR, 0);
     STORAGEMANAGER.Write_8Bits(LAND_AFTER_RTH_ADDR, 1);
     STORAGEMANAGER.Write_16Bits(HOVER_THROTTLE_ADDR, 1500);
     STORAGEMANAGER.Write_16Bits(AIR_SPEED_REFERENCE_ADDR, 1500);
+    STORAGEMANAGER.Write_8Bits(TECS_PITCH2THR_FACTOR_ADDR, 10);
+    STORAGEMANAGER.Write_8Bits(TECS_PITCH2THR_LPF_ADDR, 6);
+    STORAGEMANAGER.Write_8Bits(TECS_AP_LPF_ADDR, 0);
+    STORAGEMANAGER.Write_16Bits(TECS_CRUISE_MIN_THR_ADDR, 1200);
+    STORAGEMANAGER.Write_16Bits(TECS_CRUISE_MAX_THR_ADDR, 1700);
+    STORAGEMANAGER.Write_16Bits(TECS_CRUISE_THR_ADDR, 1400);
+    STORAGEMANAGER.Write_8Bits(TECS_CIRCLE_DIR_ADDR, 1);
 }
 
 void GCSClass::Default_Medium_Configuration(void)
@@ -1828,12 +1868,20 @@ void GCSClass::LoadAllParameters(void)
     Send_Radio_Control_Parameters.SendMaxBankRoll = STORAGEMANAGER.Read_8Bits(MAX_ROLL_LEVEL_ADDR);
     Send_Radio_Control_Parameters.SendAutoPilotMode = STORAGEMANAGER.Read_8Bits(AUTO_PILOT_MODE_ADDR);
     Send_Radio_Control_Parameters.SendAirSpeedScale = STORAGEMANAGER.Read_32Bits(AIRSPEED_FACTOR_ADDR);
-    Send_Radio_Control_Parameters.SendCH6Tunning = STORAGEMANAGER.Read_8Bits(CH6_TUNNING_ADDR);
+    Send_Radio_Control_Parameters.SendTunningChannel = STORAGEMANAGER.Read_8Bits(CH_TUNNING_ADDR);
+    Send_Radio_Control_Parameters.SendTunning = STORAGEMANAGER.Read_8Bits(TUNNING_ADDR);
     Send_Radio_Control_Parameters.SendLandAfterRTH = STORAGEMANAGER.Read_8Bits(LAND_AFTER_RTH_ADDR);
     Send_Radio_Control_Parameters.SendHoverThrottle = STORAGEMANAGER.Read_16Bits(HOVER_THROTTLE_ADDR);
     Send_Radio_Control_Parameters.SendAirSpeedReference = STORAGEMANAGER.Read_16Bits(AIR_SPEED_REFERENCE_ADDR);
+    Send_Radio_Control_Parameters.SendTECSPitch2ThrFactor = STORAGEMANAGER.Read_8Bits(TECS_PITCH2THR_FACTOR_ADDR);
+    Send_Radio_Control_Parameters.SendTECSPitch2ThrLPF = STORAGEMANAGER.Read_8Bits(TECS_PITCH2THR_LPF_ADDR);
+    Send_Radio_Control_Parameters.SendTECSAutoPilotLPF = STORAGEMANAGER.Read_8Bits(TECS_AP_LPF_ADDR);
+    Send_Radio_Control_Parameters.SendTECSCruiseMinThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_MIN_THR_ADDR);
+    Send_Radio_Control_Parameters.SendTECSCruiseMaxThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_MAX_THR_ADDR);
+    Send_Radio_Control_Parameters.SendTECSCruiseThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_THR_ADDR);
+    Send_Radio_Control_Parameters.SendTECSCircleDirection = STORAGEMANAGER.Read_8Bits(TECS_CIRCLE_DIR_ADDR);
 
-    //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
+     //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     Send_User_Medium_Parameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
     Send_User_Medium_Parameters.SendBreakPointValue = STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR);
     Send_User_Medium_Parameters.SendGyroLPF = STORAGEMANAGER.Read_8Bits(HW_GYRO_LPF_ADDR);

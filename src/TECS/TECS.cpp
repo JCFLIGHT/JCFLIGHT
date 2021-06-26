@@ -33,6 +33,8 @@
 #include "GPSNavigation/NAVIGATION.h"
 #include "InertialNavigation/INS.h"
 #include "Common/RCDEFINES.h"
+#include "StorageManager/EEPROMSTORAGE.h"
+#include "BAR/BAR.h"
 #include "FastSerial/PRINTF.h"
 
 /*
@@ -60,14 +62,14 @@ TECS_Resources_Struct TECS_Resources;
 void TecsClass::Initialization(void)
 {
     //RECURSOS DESTINADOS PARA O USUARIO
-    TECS_Resources.Params.CircleDirectionToRight = true;
+    TECS_Resources.Params.CircleDirectionToRight = STORAGEMANAGER.Read_8Bits(TECS_CIRCLE_DIR_ADDR) == 0 ? false : true;
     TECS_Resources.Params.DoLandAfterRTH = GPS_Resources.Navigation.LandAfterRTH;
-    TECS_Resources.Params.LandMinAltitude = 5;                           //METROS
-    TECS_Resources.Params.FinalLandPitchAngle = 2;                       //GRAUS
-    TECS_Resources.Params.PitchToThrottleLPFQuality = 6;                 //0 A 9 ~ AJUSTE DO FILTRO LPF DA CORREÇÃO DO PITCH FEITO PELO PILOTO AUTOMATICO
-    TECS_Resources.Params.PitchToThrottleDifference = ALT_HOLD_DEADBAND; //DIFERENÇA ENTRE O PITCH FILTRADO E O PITCH NÃO FILTRADO,SE O VALOR FOR MAIOR QUE ESSE PARAMETRO,O PITCH NÃO FILTRADO É PASSADO DIRETO
-    TECS_Resources.Params.PitchToThrottleFactor = 10;                    //GANHO DE PITCH PARA SER APLICADO AO CONTROLE DO THROTTLE
-    TECS_Resources.Params.AutoPilotLPFQuality = 0;                       //0 A 9 ~ AJUSTE DO FILTRO LPF DOS CONTROLES ROLL,PITCH E YAW FEITO PELO PILOTO AUMATICO
+    TECS_Resources.Params.LandMinAltitude = 5;                                                            //METROS
+    TECS_Resources.Params.FinalLandPitchAngle = 2;                                                        //GRAUS
+    TECS_Resources.Params.PitchToThrottleLPFQuality = STORAGEMANAGER.Read_8Bits(TECS_PITCH2THR_LPF_ADDR); //0 A 9 ~ AJUSTE DO FILTRO LPF DA CORREÇÃO DO PITCH FEITO PELO PILOTO AUTOMATICO
+    TECS_Resources.Params.PitchToThrottleDifference = ALT_HOLD_DEADBAND;                                  //DIFERENÇA ENTRE O PITCH FILTRADO E O PITCH NÃO FILTRADO,SE O VALOR FOR MAIOR QUE ESSE PARAMETRO,O PITCH NÃO FILTRADO É PASSADO DIRETO
+    TECS_Resources.Params.PitchToThrottleFactor = STORAGEMANAGER.Read_8Bits(TECS_PITCH2THR_FACTOR_ADDR);  //GANHO DE PITCH PARA SER APLICADO AO CONTROLE DO THROTTLE
+    TECS_Resources.Params.AutoPilotLPFQuality = STORAGEMANAGER.Read_8Bits(TECS_AP_LPF_ADDR);              //0 A 9 ~ AJUSTE DO FILTRO LPF DOS CONTROLES ROLL,PITCH E YAW FEITO PELO PILOTO AUMATICO
     TECS_Resources.Params.Circle_Radius = (int16_t)ConverMetersToCM(Constrain_U8Bits(GET_SET[ATTACK_BANK_MAX].MaxValue, 30, 75));
     TECS_Resources.Params.AutoPilotMaxDescentAngle = ConvertDegreesToDecidegrees(MAX_AUTOPILOT_DESCENT_ANGLE);
     TECS_Resources.Params.AutoPilotMaxClimbAngle = ConvertDegreesToDecidegrees(MAX_AUTOPILOT_CLIMB_ANGLE);
@@ -75,9 +77,9 @@ void TecsClass::Initialization(void)
     TECS_Resources.Params.AutoThrottleMinVel = ConvertDegreesToDecidegrees(GET_SET[PID_GPS_POSITION].kI);
     TECS_Resources.Params.PilotManualRollSpeed = MAX_MANUAL_SPEED; //CM/S
     TECS_Resources.Params.PilotManualClimbDescentRate = 200;       //CM/S
-    TECS_Resources.Params.MinCruiseThrottle = 1200;
-    TECS_Resources.Params.MaxCruiseThrottle = 1700;
-    TECS_Resources.Params.CruiseThrottle = 1400;
+    TECS_Resources.Params.MinCruiseThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_MIN_THR_ADDR);
+    TECS_Resources.Params.MaxCruiseThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_MAX_THR_ADDR);
+    TECS_Resources.Params.CruiseThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_THR_ADDR);
 
     //RECURSOS NÃO DESTINADOS PARA O USUARIO - APENAS DEV'S
     TECS_Resources.Position.Tracking.Period = (TECS_TIMER_US * 1e-6f) * 2;

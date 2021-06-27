@@ -558,6 +558,11 @@ typedef struct
     int8_t GetAndSet[4] = {0, 0, 0, 0};
   } Rate;
 
+  struct Weight_Struct
+  {
+    int8_t GetAndSet[4] = {0, 0, 0, 0};
+  } Weight;
+
   struct Filter_Struct
   {
     int16_t CutOff = 0;
@@ -572,25 +577,17 @@ typedef struct
   struct AutoTrim_Struct
   {
     bool Enabled = false;
-
     int16_t ActualPulse[4] = {0, 0, 0, 0};
     int16_t MiddleBackup[4] = {0, 0, 0, 0};
-
     int32_t MiddleAccum[4] = {0, 0, 0, 0};
     int32_t MiddleAccumCount = 0;
-
     uint32_t PreviousTime = 0;
     uint32_t SavePreviousTime = 0;
-
   } AutoTrim;
 
   struct ContinousTrim_Struct
   {
     bool Enabled = false;
-    // @param descrição: Os pontos médios do servo são atualizados quando a rotação total do UAV for menor que esse limite [graus/s].
-    // @param min: 1
-    // @param max: 60
-    float Rotation_Limit = 15;
   } ContinousTrim;
 
 } Servo_Struct;
@@ -684,6 +681,7 @@ typedef struct
   uint8_t Arm_Time_Safety;
   uint8_t Disarm_Time_Safety;
   uint8_t Compass_Cal_Timer;
+  uint8_t Continuous_Servo_Trim_Rot_Limit;
 } JCF_Param_Adjustable_Struct;
 
 typedef struct

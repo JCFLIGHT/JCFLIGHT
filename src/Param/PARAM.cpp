@@ -84,8 +84,8 @@ const Resources_Of_Param Params_Table[] = {
     {"AirSpeed_Samples",                   AIRSPEED_SAMPLES_ADDR,                VAR_8BITS,              &JCF_Param.AirSpeed_Samples,                0,             255,             15},
     {"Arm_Time_Safety",                    ARM_TIME_SAFETY_ADDR,                 VAR_8BITS,              &JCF_Param.Arm_Time_Safety,                 0,             255,             2},
     {"Disarm_Time_Safety",                 DISARM_TIME_SAFETY_ADDR,              VAR_8BITS,              &JCF_Param.Disarm_Time_Safety,              0,             255,             2},
-    {"Compass_Cal_Timer",                  COMPASS_CAL_TIME_ADDR,                VAR_8BITS,              &JCF_Param.Compass_Cal_Timer,               0,             120,             60}
-
+    {"Compass_Cal_Timer",                  COMPASS_CAL_TIME_ADDR,                VAR_8BITS,              &JCF_Param.Compass_Cal_Timer,               0,             120,             60},
+    {"Cont_Servo_Trim_Rot_Limit",          CONT_SERVO_TRIM_ROTATION_LIMIT_ADDR,  VAR_8BITS,              &JCF_Param.Continuous_Servo_Trim_Rot_Limit, 1,             60,              15},
 #endif 
 };
 
@@ -118,6 +118,7 @@ void ParamClass::Initialization(void)
   JCF_Param.Arm_Time_Safety = 2;
   JCF_Param.Disarm_Time_Safety = 2;
   JCF_Param.Compass_Cal_Timer = 60;
+  JCF_Param.Continuous_Servo_Trim_Rot_Limit = 15;
 
 #endif
 

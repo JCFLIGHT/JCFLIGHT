@@ -5,7 +5,7 @@
 
 [<img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white">](https://www.youtube.com/channel/UC6kk7H1CiaPVv4iKVGS9GsA)
 
-Baixe o manual da JCFLIGHT clicando [aqui](https://github.com/JCFLIGHT/JCLFIGHTGCS/blob/master/ManualJCFLIGHT.rtf?raw=true).
+Baixe o manual da JCFLIGHT clicando [aqui](https://github.com/JCFLIGHT/JCLFIGHTGCS/blob/master/ManualJCFLIGHT.rtf).
 
 ## Requesitos para Desenvolver e Compilar
 [<img src="https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white">](https://visualstudio.microsoft.com/pt-br/downloads/)

@@ -276,6 +276,7 @@ struct _Send_Radio_Control_Parameters
     int16_t SendTECSCruiseMaxThrottle;
     int16_t SendTECSCruiseThrottle;
     uint8_t SendTECSCircleDirection;
+    uint8_t SendContServosTrimState;
 } Send_Radio_Control_Parameters;
 
 struct _Get_Radio_Control_Parameters
@@ -310,6 +311,7 @@ struct _Get_Radio_Control_Parameters
     uint8_t GetLandAfterRTH;
     int16_t GetHoverThrottle;
     int16_t GetAirSpeedReference;
+    uint8_t GetContServosTrimState;
 } Get_Radio_Control_Parameters;
 
 struct _Get_Servos_Parameters
@@ -1262,7 +1264,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         //RESETA E CALCULA O TAMANHO DO NOVO BUFFER
         SerialOutputBufferSizeCount = 0;
         OutputVectorCount = 0;
-        Communication_Passed(false, (sizeof(uint8_t) * 16) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
+        Communication_Passed(false, (sizeof(uint8_t) * 17) +     //NÚMERO TOTAL DE VARIAVEIS DE 8 BITS CONTIDO AQUI
                                         (sizeof(int16_t) * 29) + //NÚMERO TOTAL DE VARIAVEIS DE 16 BITS CONTIDO AQUI
                                         (sizeof(int32_t) * 1));  //NÚMERO TOTAL DE VARIAVEIS DE 32 BITS CONTIDO AQUI
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendThrottleMiddle, VAR_8BITS);
@@ -1319,6 +1321,7 @@ void GCSClass::Update_BiDirect_Protocol(uint8_t TaskOrderGCS)
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSCruiseMaxThrottle, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSCruiseThrottle, VAR_16BITS);
         Send_Data_To_GCS(Send_Radio_Control_Parameters.SendTECSCircleDirection, VAR_8BITS);
+        Send_Data_To_GCS(Send_Radio_Control_Parameters.SendContServosTrimState, VAR_8BITS);
 
         //SOMA DO BUFFER
         SerialOutputBuffer[SerialOutputBufferSizeCount++] = SerialCheckSum;
@@ -1591,6 +1594,7 @@ void GCSClass::Save_Radio_Control_Configuration(void)
     STORAGEMANAGER.Write_16Bits(TECS_CRUISE_MAX_THR_ADDR, Get_Servos_Parameters.GetTECSCruiseMaxThrottle);
     STORAGEMANAGER.Write_16Bits(TECS_CRUISE_THR_ADDR, Get_Servos_Parameters.GetTECSCruiseThrottle);
     STORAGEMANAGER.Write_8Bits(TECS_CIRCLE_DIR_ADDR, Get_Servos_Parameters.GetTECSCircleDirection);
+    STORAGEMANAGER.Write_8Bits(CONT_SERVO_TRIM_STATE_ADDR, Get_Radio_Control_Parameters.GetContServosTrimState);
 }
 
 void GCSClass::Save_Medium_Configuration(void)
@@ -1748,6 +1752,7 @@ void GCSClass::Default_RadioControl_Configuration(void)
     STORAGEMANAGER.Write_16Bits(TECS_CRUISE_MAX_THR_ADDR, 1700);
     STORAGEMANAGER.Write_16Bits(TECS_CRUISE_THR_ADDR, 1400);
     STORAGEMANAGER.Write_8Bits(TECS_CIRCLE_DIR_ADDR, 1);
+    STORAGEMANAGER.Write_8Bits(CONT_SERVO_TRIM_STATE_ADDR, 0);
 }
 
 void GCSClass::Default_Medium_Configuration(void)
@@ -1880,8 +1885,9 @@ void GCSClass::LoadAllParameters(void)
     Send_Radio_Control_Parameters.SendTECSCruiseMaxThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_MAX_THR_ADDR);
     Send_Radio_Control_Parameters.SendTECSCruiseThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_THR_ADDR);
     Send_Radio_Control_Parameters.SendTECSCircleDirection = STORAGEMANAGER.Read_8Bits(TECS_CIRCLE_DIR_ADDR);
+    Send_Radio_Control_Parameters.SendContServosTrimState = STORAGEMANAGER.Read_8Bits(CONT_SERVO_TRIM_STATE_ADDR);
 
-     //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
+    //ATUALIZA OS PARAMETROS MEDIOS AJUSTAVEIS PELO USUARIO
     Send_User_Medium_Parameters.SendTPAInPercent = STORAGEMANAGER.Read_8Bits(TPA_PERCENT_ADDR);
     Send_User_Medium_Parameters.SendBreakPointValue = STORAGEMANAGER.Read_16Bits(BREAKPOINT_ADDR);
     Send_User_Medium_Parameters.SendGyroLPF = STORAGEMANAGER.Read_8Bits(HW_GYRO_LPF_ADDR);

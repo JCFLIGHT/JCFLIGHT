@@ -260,6 +260,7 @@ DefsNormalConfigTable = [
     ['TECS_CRUISE_MAX_THR_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['TECS_CRUISE_THR_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['TECS_CIRCLE_DIR_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['CONT_SERVO_TRIM_STATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
 ]
 
 FinalAddrOfWayPointCoordinates = (

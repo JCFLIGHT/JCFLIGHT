@@ -18,8 +18,8 @@
 #include "SERVOSMASTER.h"
 #include "AirPlane/AIRPLANE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "FrameStatus/FRAMESTATUS.h"
 #include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
 #include "Math/MATHSUPPORT.h"
 #include "Common/ENUM.h"
 #include "SafetyButton/SAFETYBUTTON.h"
@@ -59,7 +59,7 @@ void ServosMasterClass::Initialization(void)
     SERVOSMASTER.UpdateMiddlePoint();
     SERVOSMASTER.UpdateDirection();
     SERVOSMASTER.Rate_Update();
-    Servo.ContinousTrim.Enabled = false;
+    Servo.ContinousTrim.Enabled = STORAGEMANAGER.Read_8Bits(CONT_SERVO_TRIM_STATE_ADDR) > 0 ? true : false;
   }
 }
 
@@ -162,7 +162,7 @@ void ServosMasterClass::Rate_Apply(void)
 
 #endif
 
-/*
+  /*
   //CALCULA O PESO PARA OS SERVOS
   Servo.Signal.UnFiltered[SERVO1] += ((int32_t)Servo.Signal.UnFiltered[SERVO1] * Servo.Weight.GetAndSet[SERVO1]) / 100;
   Servo.Signal.UnFiltered[SERVO2] += ((int32_t)Servo.Signal.UnFiltered[SERVO2] * Servo.Weight.GetAndSet[SERVO1]) / 100;

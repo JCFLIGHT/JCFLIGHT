@@ -402,12 +402,6 @@ enum WayPoint_FlightModes_Enum
     WAYPOINT_TAKEOFF
 };
 
-enum AirPlane_Wheels_Enum
-{
-    WITHOUT_WHEELS = 0,
-    WITH_WHEELS
-};
-
 enum AirSpeed_Type_Enum
 {
     AIR_SPEED_DISABLED = 0,

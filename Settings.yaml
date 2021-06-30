@@ -26,15 +26,9 @@ Members:
 
   - Name: AutoLaunch_AHRS_BankAngle
     Description: "Ângulo no AHRS para considerar que o Auto-Launch deve iniciar [Graus]"
-    DefaultValue: 25
-    Min: 0
-    Max: 255
-
-  - Name: AutoLaunch_IMU_BankAngle
-    Description: "Ângulo na IMU para considerar que o Auto-Launch deve iniciar [Graus*10]"
-    DefaultValue: -450
-    Min: -1000
-    Max: 1000
+    DefaultValue: 45
+    Min: 5
+    Max: 180
 
   - Name: AutoLaunch_Velocity_Thresh
     Description: "Velocidade da IMU ou GPS para validar o Auto-Launch [Metros/Segundo]"
@@ -143,12 +137,6 @@ Members:
     DefaultValue: 1550
     Min: 800
     Max: 2200
-
-  - Name: AirPlane_Wheels
-    Description: "0 - Sem trem de pouso / 1 - Com trem de pouso (Apenas para o Auto-Launch)"
-    DefaultValue: 0
-    Min: 0
-    Max: 1
 
   - Name: GPS_Baud_Rate
     Description: "0 - 9600KBPS / 1 - 19200KBPS / 2 - 38400KBPS / 3 - 57600KBPS / 4 - 115200KBPS"

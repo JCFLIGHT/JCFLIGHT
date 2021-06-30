@@ -104,6 +104,7 @@ DefsCLITable = [
     ['DISARM_TIME_SAFETY_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['COMPASS_CAL_TIME_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AS_AUTO_CAL_SCALE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['CONT_SERVO_TRIM_ROTATION_LIMIT_ADDR', AddrSizeOf.TYPE_8_BITS.value],
 ]
 
 DefsSensorsCalibrationTable = [
@@ -259,6 +260,7 @@ DefsNormalConfigTable = [
     ['TECS_CRUISE_MAX_THR_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['TECS_CRUISE_THR_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['TECS_CIRCLE_DIR_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['CONT_SERVO_TRIM_STATE_ADDR', AddrSizeOf.TYPE_8_BITS.value],
 ]
 
 FinalAddrOfWayPointCoordinates = (

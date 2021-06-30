@@ -203,3 +203,9 @@ Members:
     DefaultValue: 60
     Min: 0
     Max: 120
+
+  - Name: Cont_Servo_Trim_Rot_Limit
+    Description: "Os pontos médios dos servos serão atualizados sempre que a rotação total do UAV for menor que esse limite [Graus/s]"
+    DefaultValue: 15
+    Min: 1
+    Max: 60

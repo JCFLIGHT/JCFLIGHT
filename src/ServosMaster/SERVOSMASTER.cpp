@@ -18,8 +18,8 @@
 #include "SERVOSMASTER.h"
 #include "AirPlane/AIRPLANE.h"
 #include "StorageManager/EEPROMSTORAGE.h"
-#include "FrameStatus/FRAMESTATUS.h"
 #include "BAR/BAR.h"
+#include "FrameStatus/FRAMESTATUS.h"
 #include "Math/MATHSUPPORT.h"
 #include "Common/ENUM.h"
 #include "SafetyButton/SAFETYBUTTON.h"
@@ -59,7 +59,7 @@ void ServosMasterClass::Initialization(void)
     SERVOSMASTER.UpdateMiddlePoint();
     SERVOSMASTER.UpdateDirection();
     SERVOSMASTER.Rate_Update();
-    Servo.ContinousTrim.Enabled = false;
+    Servo.ContinousTrim.Enabled = STORAGEMANAGER.Read_8Bits(CONT_SERVO_TRIM_STATE_ADDR) > 0 ? true : false;
   }
 }
 
@@ -152,19 +152,23 @@ void ServosMasterClass::Rate_Apply(void)
 #define DEFAULT_SERVO_SPEED 0
 #define DELTA_TIME_VIRTUAL 1000 * 1e-6f //APENAS PARA TESTE
 
-  int16_t ServoSignalLimited[MAX_SUPPORTED_SERVOS];
-
   for (uint8_t ServoIndex = SERVO1; ServoIndex < MAX_SUPPORTED_SERVOS; ServoIndex++)
   {
-    ServoSignalLimited[ServoIndex] = (int16_t)ServoSpeedLimitApply(&ServoSpeedLimit[ServoIndex],
-                                                                   Servo.Signal.UnFiltered[ServoIndex],
-                                                                   DEFAULT_SERVO_SPEED * 10,
-                                                                   DELTA_TIME_VIRTUAL);
-
-    Servo.Signal.UnFiltered[ServoIndex] = ServoSignalLimited[ServoIndex];
+    Servo.Signal.UnFiltered[ServoIndex] = (int16_t)ServoSpeedLimitApply(&ServoSpeedLimit[ServoIndex],
+                                                                        Servo.Signal.UnFiltered[ServoIndex],
+                                                                        DEFAULT_SERVO_SPEED * 10,
+                                                                        DELTA_TIME_VIRTUAL);
   }
 
 #endif
+
+  /*
+  //CALCULA O PESO PARA OS SERVOS
+  Servo.Signal.UnFiltered[SERVO1] += ((int32_t)Servo.Signal.UnFiltered[SERVO1] * Servo.Weight.GetAndSet[SERVO1]) / 100;
+  Servo.Signal.UnFiltered[SERVO2] += ((int32_t)Servo.Signal.UnFiltered[SERVO2] * Servo.Weight.GetAndSet[SERVO1]) / 100;
+  Servo.Signal.UnFiltered[SERVO3] += ((int32_t)Servo.Signal.UnFiltered[SERVO3] * Servo.Weight.GetAndSet[SERVO1]) / 100;
+  Servo.Signal.UnFiltered[SERVO4] += ((int32_t)Servo.Signal.UnFiltered[SERVO4] * Servo.Weight.GetAndSet[SERVO1]) / 100;
+*/
 
   //CALCULA O RATE PARA OS SERVOS
   Servo.Signal.UnFiltered[SERVO1] = (((int32_t)Servo.Rate.GetAndSet[SERVO1] * Servo.Signal.UnFiltered[SERVO1]) / 100L); //AJUSTA O RATE DO SERVO 1

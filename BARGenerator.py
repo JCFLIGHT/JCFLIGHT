@@ -61,7 +61,7 @@ StorageLayout = [
         StorageSizeOf.WAYPOINT_SIZE_FINAL_RESERVED.value],
     ['FIRMWARE_MAGIC_ADDRESS', StorageSizeOf.NONE.value,
         StorageSizeOf.FIRMWARE_RESERVED_MAGIC_ADDR.value],
-    ['TOTAL_SIZE_OF_STORAGE', StorageSizeOf.NONE.value,
+    ['TOTAL_SIZE_OF_STORAGE_RESERVED', StorageSizeOf.NONE.value,
         StorageSizeOf.TOTAL_SIZE_OF_STORAGE_RESERVED_TO_USE.value],
     ['SENSORS_CALIBRATION_STORAGE', StorageSizeOf.CALIBRATION_SIZE_INITIAL_RESERVED.value,
         StorageSizeOf.CALIBRATION_SIZE_FINAL_RESERVED.value],

@@ -35,6 +35,7 @@
 #include "Common/RCDEFINES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "AutoLaunch/AUTOLAUNCH.h"
 #include "FastSerial/PRINTF.h"
 
 /*
@@ -443,7 +444,7 @@ bool TecsClass::GetStateToEnableTurnCoordinator(void)
 
 void TecsClass::Update(float DeltaTime)
 {
-    if (!GetAirPlaneEnabled() || IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE))
+    if (!GetAirPlaneEnabled() || AUTOLAUNCH.GetStatusCompleted())
     {
         return;
     }

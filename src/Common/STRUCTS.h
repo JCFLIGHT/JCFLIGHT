@@ -390,6 +390,7 @@ typedef struct
   float kI_Accelerometer = 0.0050f;
   float kP_Magnetometer = 1.0f;
   float kI_Magnetometer = 0.0f;
+  float Cosine_Z = 25.0f;
 } AHRS_Configuration_Struct;
 
 typedef struct

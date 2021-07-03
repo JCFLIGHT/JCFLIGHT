@@ -73,6 +73,7 @@ DefsCLITable = [
     ['KI_ACC_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['KP_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['KI_MAG_AHRS_ADDR', AddrSizeOf.TYPE_8_BITS.value],
+    ['ANGLE_BLOCK_ARM_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AL_AHRS_BA_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['AL_IMU_GPS_VEL_ADDR', AddrSizeOf.TYPE_8_BITS.value],
     ['AL_TRIGGER_MOTOR_DELAY_ADDR', AddrSizeOf.TYPE_16_BITS.value],

@@ -55,6 +55,7 @@ const Resources_Of_Param Params_Table[] = {
     {"kI_Acc_AHRS",                        KI_ACC_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Acc_AHRS,                     0,             255,             50},
     {"kP_Mag_AHRS",                        KP_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kP_Mag_AHRS,                     0,             255,             10},
     {"kI_Mag_AHRS",                        KI_MAG_AHRS_ADDR,                     VAR_8BITS,              &JCF_Param.kI_Mag_AHRS,                     0,             255,             0},
+    {"Angle_Block_Arm",                    ANGLE_BLOCK_ARM_ADDR,                 VAR_8BITS,              &JCF_Param.AngleLevelBlockArm,              0,             180,             25},
     {"AutoLaunch_AHRS_BankAngle",          AL_AHRS_BA_ADDR,                      VAR_8BITS,              &JCF_Param.AutoLaunch_AHRS_BankAngle,       0,             255,             25},
     {"AutoLaunch_Velocity_Thresh",         AL_IMU_GPS_VEL_ADDR,                  VAR_8BITS,              &JCF_Param.AutoLaunch_Velocity_Thresh,      0,             20,              3},
     {"AutoLaunch_Trigger_Motor_Delay",     AL_TRIGGER_MOTOR_DELAY_ADDR,          VAR_16BITS,             &JCF_Param.AutoLaunch_Trigger_Motor_Delay,  0,             10000,           1500},

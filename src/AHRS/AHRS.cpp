@@ -43,7 +43,6 @@ AHRSClass AHRS;
 #endif
 #define SPIN_RATE_LIMIT 20     //VALOR DE GYRO^2 PARA CORTAR A CORREÇÃO DO INTEGRAL NO AHRS
 #define MAX_ACC_NEARNESS 0.33f //33% (0.67G - 1.33G)
-#define LEVEL_BLOCK_ARM 25     //GRAUS
 
 Attitude_Struct Attitude;
 Vector3x3_Struct BodyFrameAcceleration;
@@ -86,6 +85,7 @@ void AHRSClass::Initialization(void)
   AHRSConfiguration.kI_Accelerometer = JCF_Param.kI_Acc_AHRS / 10000.0f;
   AHRSConfiguration.kP_Magnetometer = JCF_Param.kP_Mag_AHRS / 10000.0f;
   AHRSConfiguration.kI_Magnetometer = JCF_Param.kI_Mag_AHRS > 0 ? JCF_Param.kI_Mag_AHRS / 10000.0f : 0.0f;
+  AHRSConfiguration.Cosine_Z = JCF_Param.AngleLevelBlockArm;
 
 #endif
 
@@ -95,8 +95,8 @@ void AHRSClass::Initialization(void)
   const float CalcedValueInRadians = -ConvertToRadians(Degrees + Remainder / 60.0f);
   CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedValueInRadians);
   CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedValueInRadians);
-
   CorrectedMagneticFieldNorth.Yaw = 0;
+
   //RESETA O QUATERNION E A MATRIX
   QuaternionInit(&Orientation);
   ComputeRotationMatrix();

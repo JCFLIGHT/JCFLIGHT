@@ -24,6 +24,12 @@ Members:
     Min: 0
     Max: 255
 
+  - Name: Angle_Block_Arm
+    Description: "Se o Coseno de Z for maior que o valor definido aqui,o sistema não irá armar [Graus]"
+    DefaultValue: 25
+    Min: 0
+    Max: 180
+
   - Name: AutoLaunch_AHRS_BankAngle
     Description: "Ângulo no AHRS para considerar que o Auto-Launch deve iniciar [Graus]"
     DefaultValue: 45

@@ -10,6 +10,16 @@ Número de amostras para calibrar o Tubo de Pitot
 
 ---
 
+### Angle_Block_Arm
+
+Se o Coseno de Z for maior que o valor definido aqui,o sistema não irá armar [Graus]
+
+| Valor Padrão | Min | Max |
+| --- | --- | --- |
+| 25 | 0 | 180 |
+
+---
+
 ### Arm_Time_Safety
 
 Tempo seguro para armar com os sticks em posição de armamento [Segundos]

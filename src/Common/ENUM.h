@@ -384,24 +384,6 @@ enum Led_Pattern_Enum
     FMU_SAFE_TO_ARM = 0xFFFF,
 };
 
-enum WayPoint_States_Enum
-{
-    WAYPOINT_INIT = 0,
-    WAYPOINT_RUN_TAKEOFF,
-    WAYPOINT_SET_ALTITUDE,
-    WAYPOINT_START_MISSION,
-    WAYPOINT_MISSION_ENROUTE
-};
-
-enum WayPoint_FlightModes_Enum
-{
-    WAYPOINT_ADVANCE = 1,
-    WAYPOINT_TIMED,
-    WAYPOINT_LAND,
-    WAYPOINT_RTH,
-    WAYPOINT_TAKEOFF
-};
-
 enum AirSpeed_Type_Enum
 {
     AIR_SPEED_DISABLED = 0,

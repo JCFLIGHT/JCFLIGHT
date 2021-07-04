@@ -22,7 +22,7 @@ class AutoLaunchClass
 {
 public:
   void Update(void);
-  bool GetStatusCompleted(void);
+  bool GetLaunchFinalized(void);
 
 private:
   bool GetSwingVelocityState(void);
@@ -33,6 +33,7 @@ private:
   bool GetValidStateToRunLaunch(void);
   bool GetTimerOverFlow(void);
   bool GetMaxAltitudeReached(void);
+  bool GetStatusCompleted(void);
   void ResetParameters(void);
 };
 extern AutoLaunchClass AUTOLAUNCH;

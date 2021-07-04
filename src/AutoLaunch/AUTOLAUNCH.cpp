@@ -227,12 +227,18 @@ bool AutoLaunchClass::GetMaxAltitudeReached(void)
   {
     return false;
   }
+
   return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0) && (Barometer.INS.Altitude.Estimated >= (AUTO_LAUCH_MAX_ALTITUDE * 100));
 }
 
 bool AutoLaunchClass::GetStatusCompleted(void)
 {
   return ((AUTO_LAUCH_MAX_ALTITUDE * 100) > 0 ? false : AUTOLAUNCH.GetTimerOverFlow()) || (GetSticksDeflected(15)) || (AUTOLAUNCH.GetMaxAltitudeReached());
+}
+
+bool AutoLaunchClass::GetLaunchFinalized(void)
+{
+  return !LaunchEnabled;
 }
 
 void AutoLaunchClass::ResetParameters(void)

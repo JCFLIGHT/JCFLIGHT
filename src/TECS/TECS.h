@@ -34,7 +34,7 @@ private:
   bool GetNavigationInAutomaticThrottleMode(void);
   int16_t UpdatePitchToThrottle(int16_t PitchInput, float DeltaTime);
   void UpdateEnergyAltitudeController(float DeltaTime);
-  int16_t GetEnergySpeedController(float DeltaTime);
+  int16_t GetEnergyMotorSpeedController(float DeltaTime);
   void UpdateAutoPilotControl(float DeltaTime);
   void UpdateEnergyPositionController(float DeltaTime);
   void Reset_All(void);

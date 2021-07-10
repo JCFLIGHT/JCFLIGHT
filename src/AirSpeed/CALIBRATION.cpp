@@ -28,6 +28,7 @@
 #include "Scheduler/SCHEDULER.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "Tunning/TUNNING.h"
 
 AirSpeedCalibrationClass AIRSPEEDCALIBRATION;
 
@@ -154,7 +155,7 @@ void AirSpeedCalibrationClass::Scale_Update(void)
         return;
     }
 
-    //if () //TUNNING
+    if (TUNNING.GetActivated(TUNNING_PITOT_FACTOR))
     {
         return;
     }

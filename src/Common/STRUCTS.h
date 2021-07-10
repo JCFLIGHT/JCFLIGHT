@@ -390,6 +390,7 @@ typedef struct
   float kI_Accelerometer = 0.0050f;
   float kP_Magnetometer = 1.0f;
   float kI_Magnetometer = 0.0f;
+  float Cosine_Z = 25.0f;
 } AHRS_Configuration_Struct;
 
 typedef struct
@@ -648,8 +649,8 @@ typedef struct
   uint8_t kI_Acc_AHRS;
   uint8_t kP_Mag_AHRS;
   uint8_t kI_Mag_AHRS;
+  uint8_t AngleLevelBlockArm;
   uint8_t AutoLaunch_AHRS_BankAngle;
-  int16_t AutoLaunch_IMU_BankAngle;
   uint8_t AutoLaunch_Velocity_Thresh;
   uint16_t AutoLaunch_Trigger_Motor_Delay;
   uint8_t AutoLaunch_Elevator;
@@ -668,7 +669,6 @@ typedef struct
   uint16_t AutoDisarm_Throttle_Min;
   uint16_t AutoDisarm_YPR_Min;
   uint16_t AutoDisarm_YPR_Max;
-  uint8_t AirPlane_Wheels;
   uint8_t GPS_Baud_Rate;
 #endif
   uint16_t Navigation_Vel;

@@ -102,12 +102,12 @@ void GPS_Calcule_Velocity(void)
     Last_CoordinatesOfGPS[COORD_LONGITUDE] = GPS_Resources.Navigation.Coordinates.Actual[COORD_LONGITUDE];
 }
 
-bool Point_Reached(void)
+bool GetWaypointMissed(void)
 {
     int32_t TargetCalculed;
     TargetCalculed = GPS_Resources.Navigation.Bearing.ActualTarget - GPS_Resources.Navigation.Bearing.TargetPrev;
     TargetCalculed = WRap_18000(TargetCalculed);
-    return (ABS(TargetCalculed) > 10000);
+    return (ABS(TargetCalculed) > 10000); //BEARING PASSOU DE 100°
 }
 
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput)

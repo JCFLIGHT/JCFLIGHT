@@ -25,7 +25,7 @@ void GPS_Calcule_Distance_In_CM(int32_t InputLatitude, int32_t InputLongitude, i
 void GPS_Calcule_Distance_To_Home(uint32_t *CalculateDistance);
 int16_t Calculate_Navigation_Speed(int16_t Maximum_Velocity);
 void GPS_Calcule_Velocity(void);
-bool Point_Reached(void);
+bool GetWaypointMissed(void);
 void GPS_Calcule_Longitude_Scaling(int32_t LatitudeVectorInput);
 void GPSCalculateNavigationRate(uint16_t Maximum_Velocity);
 #endif

@@ -125,6 +125,7 @@ void PIDXYZClass::Initialization(void)
   PT1FilterInit(&WindUpRoll_Smooth, PID_Resources.Filter.IntegralRelaxCutOff, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
   PT1FilterInit(&WindUpPitch_Smooth, PID_Resources.Filter.IntegralRelaxCutOff, SCHEDULER_SET_PERIOD_US(THIS_LOOP_RATE_IN_US) * 1e-6f);
   MotorIntegralTermWindUpPoint = 1.0f - (PID_Resources.Param.IntegralTermWindUpPercent / 100.0f);
+  GPS_Resources.Navigation.HeadingHoldLimit = Fast_Cosine(ConvertToRadians(GET_SET[MAX_ROLL_LEVEL].MaxValue)) * Fast_Cosine(ConvertToRadians(GET_SET[MAX_PITCH_LEVEL].MaxValue));
 }
 
 void PIDXYZClass::Update(float DeltaTime)

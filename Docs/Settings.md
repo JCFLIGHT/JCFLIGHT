@@ -1,15 +1,5 @@
 ﻿# Variáveis do CLI
 
-### AirPlane_Wheels
-
-0 - Sem trem de pouso / 1 - Com trem de pouso (Apenas para o Auto-Launch)
-
-| Valor Padrão | Min | Max |
-| --- | --- | --- |
-| 0 | 0 | 1 |
-
----
-
 ### AirSpeed_Samples
 
 Número de amostras para calibrar o Tubo de Pitot
@@ -17,6 +7,16 @@ Número de amostras para calibrar o Tubo de Pitot
 | Valor Padrão | Min | Max |
 | --- | --- | --- |
 | 15 | 0 | 255 |
+
+---
+
+### Angle_Block_Arm
+
+Se o Coseno de Z for maior que o valor definido aqui,o sistema não irá armar [Graus]
+
+| Valor Padrão | Min | Max |
+| --- | --- | --- |
+| 25 | 0 | 180 |
 
 ---
 
@@ -76,7 +76,7 @@ Valor minimo tolerado nos canais Yaw,Pitch e Roll para validar o Auto-Desarmamen
 
 | Valor Padrão | Min | Max |
 | --- | --- | --- |
-| 25 | 0 | 255 |
+| 45 | 5 | 180 |
 
 ---
 
@@ -107,16 +107,6 @@ Cancela o Auto-Launch após o estouro desse tempo [MillisSegundos]
 | Valor Padrão | Min | Max |
 | --- | --- | --- |
 | 5000 | 0 | 30000 |
-
----
-
-### AutoLaunch_IMU_BankAngle
-
-Ângulo na IMU para considerar que o Auto-Launch deve iniciar [Graus*10]
-
-| Valor Padrão | Min | Max |
-| --- | --- | --- |
-| -450 | -1000 | 1000 |
 
 ---
 

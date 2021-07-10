@@ -85,6 +85,7 @@ void AHRSClass::Initialization(void)
   AHRSConfiguration.kI_Accelerometer = JCF_Param.kI_Acc_AHRS / 10000.0f;
   AHRSConfiguration.kP_Magnetometer = JCF_Param.kP_Mag_AHRS / 10000.0f;
   AHRSConfiguration.kI_Magnetometer = JCF_Param.kI_Mag_AHRS > 0 ? JCF_Param.kI_Mag_AHRS / 10000.0f : 0.0f;
+  AHRSConfiguration.Cosine_Z = JCF_Param.AngleLevelBlockArm;
 
 #endif
 
@@ -95,7 +96,7 @@ void AHRSClass::Initialization(void)
   CorrectedMagneticFieldNorth.Roll = Fast_Cosine(CalcedValueInRadians);
   CorrectedMagneticFieldNorth.Pitch = Fast_Sine(CalcedValueInRadians);
   CorrectedMagneticFieldNorth.Yaw = 0;
-  GPS_Resources.Navigation.HeadingHoldLimit = Fast_Cosine(ConvertToRadians(GET_SET[MAX_ROLL_LEVEL].MaxValue)) * Fast_Cosine(ConvertToRadians(GET_SET[MAX_PITCH_LEVEL].MaxValue));
+
   //RESETA O QUATERNION E A MATRIX
   QuaternionInit(&Orientation);
   ComputeRotationMatrix();
@@ -107,15 +108,19 @@ static bool ValidateQuaternion(const Quaternion_Struct *Quaternion)
                                    ABS(Quaternion->q1) +
                                    ABS(Quaternion->q2) +
                                    ABS(Quaternion->q3);
+
   if (!isnan(CheckAbsoluteValue) && !isinf(CheckAbsoluteValue))
   {
     return true;
   }
+
   const float QuatSquared = QuaternionNormalizedSquared(&Orientation);
+
   if (QuatSquared > (1.0f - 1e-6f) && QuatSquared < (1.0f + 1e-6f))
   {
     return true;
   }
+
   return false;
 }
 
@@ -136,6 +141,7 @@ static void CheckAndResetOrientationQuaternion(const Quaternion_Struct *Quaterni
   {
     return;
   }
+
   //ORIENTAÇÃO INVALIDA,É NECESSARIO RESETAR O QUATERNION
   if (ValidateQuaternion(Quaternion))
   {
@@ -471,6 +477,11 @@ bool AHRSClass::CheckAnglesInclination(int16_t Angle)
     return true;
   }
   return false;
+}
+
+bool AHRSClass::Get_Cosine_Z_Overflowed(void)
+{
+  return AHRS.CheckAnglesInclination(AHRSConfiguration.Cosine_Z);
 }
 
 void AHRSClass::TransformVectorEarthFrameToBodyFrame(Vector3x3_Struct *VectorPointer)

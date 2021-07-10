@@ -139,11 +139,14 @@ void InertialNavigationClass::UpdateAccelerationEarthFrame_Filtered(uint8_t Arra
 bool InertialNavigationClass::WaitForSample(void)
 {
 #define SAMPLE_DELAY 2.0f //SEGUNDOS
+
   static uint16_t SampleCount = 0;
+
   if (!IS_STATE_ACTIVE(PRIMARY_ARM_DISARM))
   {
     SampleCount = 0;
   }
+
   if (SampleCount >= (50 * SAMPLE_DELAY))
   {
     return true;
@@ -152,6 +155,7 @@ bool InertialNavigationClass::WaitForSample(void)
   {
     SampleCount++;
   }
+
   return false;
 }
 

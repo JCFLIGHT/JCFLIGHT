@@ -35,7 +35,9 @@
 #include "Common/RCDEFINES.h"
 #include "StorageManager/EEPROMSTORAGE.h"
 #include "BAR/BAR.h"
+#include "AutoLaunch/AUTOLAUNCH.h"
 #include "FastSerial/PRINTF.h"
+#include "Param/PARAM.h"
 
 /*
     TOTAL ENERGY CONSERVATION SYSTEM - SISTEMA DE CONSERVAÇÃO TOTAL DE ENERGIA
@@ -52,7 +54,9 @@ TecsClass TECS;
 #define MAX_DEGREES_ACTIVE_TURN 170                    //GRAUS MAXIMO PARA FORÇAR A CURVA CONSTANTE NO MODO CIRCULO EM GRAUS
 #define MAX_AUTOPILOT_DESCENT_ANGLE 15                 //ANGULO MAXIMO DE SUBIDA DISPONIVEL PARA O PILOTO AUTOMATICO EM GRAUS
 #define MAX_AUTOPILOT_CLIMB_ANGLE 20                   //ANGULO MAXIMO DE DESCIDA DISPONIVEL PARA O PILOTO AUTOMATICO EM GRAUS
-#define MIN_FUSELAGE_VELOCITY_TO_RUN 3                 //VELOCIDADE MINIMA PARA QUE O TECS SEJÁ APLICADO EM M/S
+#define ALTITUDE_DERIVATIVE_CUTOFF 10                  //HZ
+#define POSITION_DERIVATIVE_CUTOFF 10                  //HZ
+#define HEADING_DERIVATIVE_CUTOFF 2                    //HZ
 
 TECS_PID_Float_Struct TECS_PID_Altitude_Navigation;
 TECS_PID_Float_Struct TECS_PID_Position_Navigation;
@@ -82,7 +86,7 @@ void TecsClass::Initialization(void)
     TECS_Resources.Params.CruiseThrottle = STORAGEMANAGER.Read_16Bits(TECS_CRUISE_THR_ADDR);
 
     //RECURSOS NÃO DESTINADOS PARA O USUARIO - APENAS DEV'S
-    TECS_Resources.Position.Tracking.Period = (TECS_TIMER_US * 1e-6f) * 2;
+    TECS_Resources.Position.Tracking.Period = (TECS_TIMER_US * 1e-6f) * 2.0f;
     TECS_Resources.Heading.MinToNormalizeTurnDirection = ConvertDegreesToCentiDegrees(MIN_DEGREES_DEACTIVE_TURN);
     TECS_Resources.Heading.MaxToRunTurnDirection = ConvertDegreesToCentiDegrees(MAX_DEGREES_ACTIVE_TURN);
 }
@@ -90,12 +94,10 @@ void TecsClass::Initialization(void)
 float TecsClass::Floating_Point_PID(TECS_PID_Float_Struct *TECS_PID_Pointer, const float SetProportional, const float SetIntegrator, const float SetDerivative, const float PIDSetPoint,
                                     const float RawMeasurement, const float PIDScaler, const float DerivativeScaler, const float OutputMin, const float OutputMax, const uint8_t Flags, const float DeltaTime)
 {
-
     TECS_PID_Pointer->Error = PIDSetPoint - RawMeasurement;
 
     if (TECS_PID_Pointer->Reset)
     {
-        TECS_PID_Pointer->PreviousMeasurement = RawMeasurement;
         if (Flags == TECS_PID_USE_TRACKING_ERROR)
         {
             TECS_PID_Pointer->PreviousMeasurement = TECS_PID_Pointer->Error;
@@ -124,7 +126,7 @@ float TecsClass::Floating_Point_PID(TECS_PID_Float_Struct *TECS_PID_Pointer, con
     }
     else
     {
-        TECS_PID_Pointer->Derivative *= SetDerivative;
+        TECS_PID_Pointer->Derivative = TECS_PID_Pointer->Derivative * SetDerivative;
     }
 
     TECS_PID_Pointer->Derivative = TECS_PID_Pointer->Derivative * PIDScaler * DerivativeScaler;
@@ -190,7 +192,7 @@ float TecsClass::AutoPitchDown(int16_t InMinThrottleDownPitchAngle)
     {
         return ScaleRange16Bits(MAX(0, TECS_Resources.Params.CruiseThrottle - RC_Resources.Attitude.Controller[THROTTLE]), 0, TECS_Resources.Params.CruiseThrottle - MIN_STICKS_PULSE, 0, InMinThrottleDownPitchAngle);
     }
-    return 0;
+    return 0.0f;
 }
 
 int16_t TecsClass::UpdatePitchToThrottle(int16_t PitchInput, float DeltaTime)
@@ -246,7 +248,7 @@ void TecsClass::UpdateEnergyAltitudeController(float DeltaTime)
                                                                            TECS_Resources.Params.AutoPilotMaxClimbAngle);
 }
 
-int16_t TecsClass::GetEnergySpeedController(float DeltaTime)
+int16_t TecsClass::GetEnergyMotorSpeedController(float DeltaTime)
 {
     TECS_Resources.Throttle.SpeedBoost = (TECS_Resources.Params.AutoThrottleMinVel - TECS_Resources.Position.VelocityXY) * TECS_Resources.Params.AutoThrottleGain * DeltaTime;
     if (ABS(TECS_Resources.Position.VelocityXY - TECS_Resources.Params.AutoThrottleMinVel) > 50)
@@ -270,12 +272,14 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
         GPS_Resources.Navigation.AutoPilot.Control.Angle[YAW] = TECS_PID_Heading_Navigation.AutoPilotControl[YAW];
     }
 
+    const bool Fixed_Wing_HomePointReached = GPS_Resources.Home.Distance <= ConverMetersToCM(JCF_Param.GPS_WP_Radius);
+
     if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
     {
         GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = -PIDAngleToRcController(TECS_PID_Altitude_Navigation.AutoPilotControl[PITCH], ConvertDegreesToDecidegrees(GET_SET[MAX_PITCH_LEVEL].MaxValue));
         TECS_Resources.Throttle.Correction = TECS.UpdatePitchToThrottle(TECS_PID_Altitude_Navigation.AutoPilotControl[PITCH], DeltaTime);
 
-        if (TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
+        if (TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && Fixed_Wing_HomePointReached)
         {
             TECS_Resources.Throttle.Correction = Constrain_16Bits(TECS_Resources.Throttle.Correction, TECS_Resources.Params.MinCruiseThrottle - TECS_Resources.Params.CruiseThrottle, 0);
         }
@@ -284,9 +288,9 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
             TECS_Resources.Throttle.Correction = Constrain_16Bits(TECS_Resources.Throttle.Correction, TECS_Resources.Params.MinCruiseThrottle - TECS_Resources.Params.CruiseThrottle, TECS_Resources.Params.MaxCruiseThrottle - TECS_Resources.Params.CruiseThrottle);
         }
 
-        if ((IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE)) && !TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
+        if ((IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE)) && (!IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && !Fixed_Wing_HomePointReached))
         {
-            TECS_Resources.Throttle.Correction += TECS.GetEnergySpeedController(DeltaTime);
+            TECS_Resources.Throttle.Correction += TECS.GetEnergyMotorSpeedController(DeltaTime);
             TECS_Resources.Throttle.Correction = Constrain_16Bits(TECS_Resources.Throttle.Correction, TECS_Resources.Params.MinCruiseThrottle - TECS_Resources.Params.CruiseThrottle, TECS_Resources.Params.MaxCruiseThrottle - TECS_Resources.Params.CruiseThrottle);
         }
 
@@ -294,7 +298,7 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
         RC_Resources.Attitude.Controller[THROTTLE] = Constrain_16Bits(TECS_Resources.Throttle.Cruise, RC_Resources.Attitude.ThrottleMin, RC_Resources.Attitude.ThrottleMax);
     }
 
-    if (TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE))
+    if (TECS_Resources.Params.DoLandAfterRTH && IS_FLIGHT_MODE_ACTIVE(RTH_MODE) && Fixed_Wing_HomePointReached)
     {
         if (TECS_Resources.Position.Altitude <= ConverMetersToCM(TECS_Resources.Params.LandMinAltitude))
         {
@@ -405,9 +409,9 @@ float TecsClass::GetFuselageVelocity(void)
 
 void TecsClass::Reset_All(void)
 {
-    TECS.Reset_PID_Navigation(&TECS_PID_Altitude_Navigation, 10.0f);
-    TECS.Reset_PID_Navigation(&TECS_PID_Position_Navigation, 10.0f);
-    TECS.Reset_PID_Navigation(&TECS_PID_Heading_Navigation, 2.0f);
+    TECS.Reset_PID_Navigation(&TECS_PID_Altitude_Navigation, ALTITUDE_DERIVATIVE_CUTOFF);
+    TECS.Reset_PID_Navigation(&TECS_PID_Position_Navigation, POSITION_DERIVATIVE_CUTOFF);
+    TECS.Reset_PID_Navigation(&TECS_PID_Heading_Navigation, HEADING_DERIVATIVE_CUTOFF);
     TECS_Resources.Position.DestinationNEU.Clear();
     TECS_Resources.Position.Virtual.Clear();
     TECS_Resources.PositionController_Smooth.State = 0.0f;
@@ -443,7 +447,7 @@ bool TecsClass::GetStateToEnableTurnCoordinator(void)
 
 void TecsClass::Update(float DeltaTime)
 {
-    if (!GetAirPlaneEnabled() || IS_FLIGHT_MODE_ACTIVE(LAUNCH_MODE))
+    if (!GetAirPlaneEnabled() || !AUTOLAUNCH.GetLaunchFinalized())
     {
         return;
     }
@@ -513,37 +517,34 @@ void TecsClass::Update(float DeltaTime)
         //ESPERA O PROXIMO CICLO DE MAQUINA COM AS VERIFICAÇÕES DO AUXFLIGHT.cpp E FLIGHTMODES.cpp
         if (GPS_Resources.Navigation.AutoPilot.Control.Enabled)
         {
-            if (TECS_Resources.Position.VelocityXY > ConverMetersToCM(MIN_FUSELAGE_VELOCITY_TO_RUN))
+            if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
             {
-                if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE))
+                if (!GetActualThrottleStatus(THROTTLE_LOW))
                 {
-                    if (!GetActualThrottleStatus(THROTTLE_LOW))
+                    TECS_Resources.Position.DestinationNEU.Altitude += TECS_Resources.Velocity.ClimbRate * DeltaTime;
+                    TECS_Resources.Position.DestinationNEU.Altitude = Constrain_32Bits(TECS_Resources.Position.DestinationNEU.Altitude,
+                                                                                       TECS_Resources.Position.Altitude - 500,
+                                                                                       TECS_Resources.Position.Altitude + 500);
+                    TECS.UpdateEnergyAltitudeController(DeltaTime);
+                }
+                else
+                {
+                    TECS.Reset_PID_Navigation(&TECS_PID_Altitude_Navigation, ALTITUDE_DERIVATIVE_CUTOFF);
+                    TECS_PID_Altitude_Navigation.AutoPilotControl[PITCH] = 0;
+                    GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
+                    TECS_Resources.Throttle.SpeedAdjustment = 0.0f;
+                    //O HOME-POINT COMPARTILHA A MESMA VARIAVEL PARA SETAR UMA NOVA ALTITUDE DE NAVEGAÇÃO,
+                    //ESSE IF SERVE PARA NÃO DEIXAR A ALTITUDE MUDAR EM RTH COM O THROTTLE A BAIXO NIVEL.
+                    if (GPS_Resources.Mode.Navigation == DO_POSITION_HOLD)
                     {
-                        TECS_Resources.Position.DestinationNEU.Altitude += TECS_Resources.Velocity.ClimbRate * DeltaTime;
-                        TECS_Resources.Position.DestinationNEU.Altitude = Constrain_32Bits(TECS_Resources.Position.DestinationNEU.Altitude,
-                                                                                           TECS_Resources.Position.Altitude - 500,
-                                                                                           TECS_Resources.Position.Altitude + 500);
-                        TECS.UpdateEnergyAltitudeController(DeltaTime);
-                    }
-                    else
-                    {
-                        TECS.Reset_PID_Navigation(&TECS_PID_Altitude_Navigation, 10.0f);
-                        TECS_PID_Altitude_Navigation.AutoPilotControl[PITCH] = 0;
-                        GPS_Resources.Navigation.AutoPilot.Control.Angle[PITCH] = 0;
-                        TECS_Resources.Throttle.SpeedAdjustment = 0.0f;
-                        //O HOME-POINT COMPARTILHA A MESMA VARIAVEL PARA SETAR UMA NOVA ALTITUDE DE NAVEGAÇÃO,
-                        //ESSE IF SERVE PARA NÃO DEIXAR A ALTITUDE MUDAR EM RTH COM O THROTTLE A BAIXO NIVEL.
-                        if (GPS_Resources.Mode.Navigation == DO_POSITION_HOLD)
-                        {
-                            TECS_Resources.Position.DestinationNEU.Altitude = TECS_Resources.Position.Altitude;
-                        }
+                        TECS_Resources.Position.DestinationNEU.Altitude = TECS_Resources.Position.Altitude;
                     }
                 }
+            }
 
-                if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
-                {
-                    TECS.UpdateEnergyPositionController(DeltaTime);
-                }
+            if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
+            {
+                TECS.UpdateEnergyPositionController(DeltaTime);
             }
 
             if (IS_FLIGHT_MODE_ACTIVE(CLIMBOUT_MODE) || IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))

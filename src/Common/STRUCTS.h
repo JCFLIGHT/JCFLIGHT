@@ -19,12 +19,13 @@
 #define STRUCTS_H_
 
 #include "ENUM.h"
-#include "inttypes.h"
+#include <inttypes.h>
 
 typedef struct
 {
   struct Accelerometer_Struct
   {
+    uint8_t Temperature = 0;
     int16_t Read[3] = {0, 0, 0};
     float ReadFloat[3] = {0.0f, 0.0f, 0.0f};
 
@@ -336,11 +337,14 @@ typedef struct
       struct Get_Struct
       {
         bool Marked3DFix = false;
+        bool HeadingInitialized = false;
         uint8_t Satellites = 0;
         uint16_t GroundCourse = 0;
         uint16_t Altitude = 0;
         uint16_t GroundSpeed = 0;
         uint16_t HDOP = 0;
+        uint32_t EstimatedPositionHorizontal;
+        uint32_t EstimatedPositionVertical;
       } Get;
 
     } Misc;
@@ -753,12 +757,6 @@ typedef struct
   } Param;
 
 } PID_Resources_Struct;
-
-typedef union
-{
-  float Type_Float;
-  int32_t Type_Int32;
-} Variable_Union;
 
 typedef struct
 {

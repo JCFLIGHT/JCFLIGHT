@@ -30,7 +30,7 @@
 #include "BitArray/BITARRAY.h"
 #include "Common/RCDEFINES.h"
 
-void MultirotorSetThisPointToPositionHold(void)
+void SetThisPointToPositionHold(void)
 {
     INS.Position.Hold[INS_LATITUDE] = INS.EarthFrame.Position[INS_LATITUDE] + INS.EarthFrame.Velocity[INS_LATITUDE] * PositionHoldPID.kI;
     INS.Position.Hold[INS_LONGITUDE] = INS.EarthFrame.Position[INS_LONGITUDE] + INS.EarthFrame.Velocity[INS_LONGITUDE] * PositionHoldPID.kI;
@@ -61,7 +61,7 @@ static void MultirotorApplyINSPositionHoldPIDControl(float DeltaTime)
         {
             if (NewPointToPositionHold)
             {
-                MultirotorSetThisPointToPositionHold();
+                SetThisPointToPositionHold();
                 NewPointToPositionHold = false;
             }
         }

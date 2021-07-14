@@ -1395,7 +1395,7 @@ void GCSClass::First_Packet_Request_Parameters(void)
     Essential_First_Packet_Parameters.SendActualFlightMode = AUXFLIGHT.FlightMode;
     Essential_First_Packet_Parameters.SendFrameType = GetActualPlatformType();
     Essential_First_Packet_Parameters.SendHomePointState = GPS_Resources.Home.Marked;
-    Essential_First_Packet_Parameters.SendTemperature = ConvertCentiDegreesToDegrees(Barometer.Raw.Temperature);
+    Essential_First_Packet_Parameters.SendTemperature = IMU.Accelerometer.Temperature;
     Essential_First_Packet_Parameters.SendHomePointDistance = GPS_Resources.Home.Distance;
     Essential_First_Packet_Parameters.SendCurrentInMah = BATTERY.Get_Current_In_Mah();
 #ifndef MACHINE_CYCLE
@@ -1431,12 +1431,12 @@ void GCSClass::Second_Packet_Request_Parameters(void)
     Essential_Second_Packet_Parameters.SendAttitudeRollValue = PID_Resources.RcRateTarget.GCS.Roll;
     Essential_Second_Packet_Parameters.SendMemoryRamUsed = MEMORY.Check();
     Essential_Second_Packet_Parameters.SendMemoryRamUsedPercent = MEMORY.GetPercentageRAMUsed();
-    Essential_Second_Packet_Parameters.SendAccX = IMU.Accelerometer.Read[ROLL];
-    Essential_Second_Packet_Parameters.SendAccY = IMU.Accelerometer.Read[PITCH];
-    Essential_Second_Packet_Parameters.SendAccZ = IMU.Accelerometer.Read[YAW];
-    Essential_Second_Packet_Parameters.SendGyroX = IMU.Gyroscope.Read[ROLL];
-    Essential_Second_Packet_Parameters.SendGyroY = IMU.Gyroscope.Read[PITCH];
-    Essential_Second_Packet_Parameters.SendGyroZ = IMU.Gyroscope.Read[YAW];
+    Essential_Second_Packet_Parameters.SendAccX = IMU.Accelerometer.ReadFloat[ROLL] * 100;
+    Essential_Second_Packet_Parameters.SendAccY = IMU.Accelerometer.ReadFloat[PITCH] * 100;
+    Essential_Second_Packet_Parameters.SendAccZ = IMU.Accelerometer.ReadFloat[YAW] * 100;
+    Essential_Second_Packet_Parameters.SendGyroX = IMU.Gyroscope.ReadFloat[ROLL] * 100;
+    Essential_Second_Packet_Parameters.SendGyroY = IMU.Gyroscope.ReadFloat[PITCH] * 100;
+    Essential_Second_Packet_Parameters.SendGyroZ = IMU.Gyroscope.ReadFloat[YAW] * 100;
     Essential_Second_Packet_Parameters.SendGPSGroundSpeed = GPS_Resources.Navigation.Misc.Get.GroundSpeed;
     Essential_Second_Packet_Parameters.SendI2CError = I2CResources.Error.Count;
     Essential_Second_Packet_Parameters.SendAirSpeedValue = AirSpeed.Raw.IASPressureInCM;

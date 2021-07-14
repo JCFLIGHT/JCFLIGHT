@@ -85,8 +85,7 @@ void PerformCompassClass::Update(void)
             }
         }
 
-        if ((Calibration.Magnetometer.Average > 0.01f) &&
-            ((Calibration.Magnetometer.Difference / Calibration.Magnetometer.Average) > (0.01960000023f)))
+        if ((Calibration.Magnetometer.Average > 0.01f) && ((Calibration.Magnetometer.Difference / Calibration.Magnetometer.Average) > (0.01960000023f)))
         {
             GaussNewtonPushSampleForOffSetCalculation(&Jacobian_Matrices_To_Compass, IMU.Compass.Read);
             Calibration.Magnetometer.Previous[ROLL] = IMU.Compass.Read[ROLL];

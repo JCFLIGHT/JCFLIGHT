@@ -373,8 +373,7 @@ enum VarType_Enum
 {
     VAR_8BITS,
     VAR_16BITS,
-    VAR_32BITS,
-    VAR_FLOAT
+    VAR_32BITS
 };
 
 enum Led_Pattern_Enum

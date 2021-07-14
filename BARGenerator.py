@@ -88,7 +88,6 @@ DefsCLITable = [
     ['GIMBAL_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['GIMBAL_MAX_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['LAND_CHECKACC_ADDR', AddrSizeOf.TYPE_8_BITS.value],
-    ['THROTTLE_FACTOR_ADDR', AddrSizeOf.TYPE_FLOAT.value],
     ['AUTODISARM_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['AUTODISARM_THR_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],
     ['AUTODISARM_YPR_MIN_ADDR', AddrSizeOf.TYPE_16_BITS.value],

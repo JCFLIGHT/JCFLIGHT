@@ -53,8 +53,6 @@ Matrix3x3_Struct Rotation;
 static Vector3x3_Struct CorrectedMagneticFieldNorth;
 static AHRS_Configuration_Struct AHRSConfiguration;
 
-static bool GPSHeadingInitialized = false;
-
 static void ComputeRotationMatrix(void)
 {
   float q1q1 = Orientation.q1 * Orientation.q1;
@@ -410,11 +408,11 @@ void AHRSClass::Update(float DeltaTime)
     if (I2CResources.Found.Compass)
     {
       SafeToUseCompass = true;
-      GPSHeadingInitialized = true;
+      GPS_Resources.Navigation.Misc.Get.HeadingInitialized = true;
     }
     else if (SafeToUseCOG)
     {
-      if (GPSHeadingInitialized)
+      if (GPS_Resources.Navigation.Misc.Get.HeadingInitialized)
       {
         CourseOverGround = ConvertDeciDegreesToRadians(GPS_Resources.Navigation.Misc.Get.GroundCourse);
         SafeToUseGPSHeading = true;
@@ -422,7 +420,7 @@ void AHRSClass::Update(float DeltaTime)
       else
       {
         ComputeQuaternionFromRPY(Attitude.EulerAngles.Roll, Attitude.EulerAngles.Pitch, GPS_Resources.Navigation.Misc.Get.GroundCourse);
-        GPSHeadingInitialized = true;
+        GPS_Resources.Navigation.Misc.Get.HeadingInitialized = true;
       }
     }
   }

@@ -263,7 +263,7 @@ void TecsClass::UpdateAutoPilotControl(float DeltaTime)
 {
     if (IS_FLIGHT_MODE_ACTIVE(CIRCLE_MODE) || IS_FLIGHT_MODE_ACTIVE(CRUISE_MODE))
     {
-        TECS_Resources.Position.AutoPilot.RollAngle = Constrain_16Bits(TECS_PID_Position_Navigation.AutoPilotControl[ROLL], -ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[ROLL_BANK_MAX].MaxValue));
+        TECS_Resources.Position.AutoPilot.RollAngle = Constrain_16Bits(TECS_PID_Position_Navigation.AutoPilotControl[ROLL], -ConvertDegreesToDecidegrees(GET_SET[NAV_ROLL_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[NAV_ROLL_BANK_MAX].MaxValue));
         GPS_Resources.Navigation.AutoPilot.Control.Angle[ROLL] = PIDAngleToRcController(TECS_Resources.Position.AutoPilot.RollAngle, ConvertDegreesToDecidegrees(GET_SET[MAX_ROLL_LEVEL].MaxValue));
     }
 
@@ -372,8 +372,8 @@ void TecsClass::UpdateEnergyPositionController(float DeltaTime)
                                                                       TECS_Resources.Heading.AHRSYawInCentiDegress + TECS_Resources.Heading.Error,
                                                                       TECS_Resources.Heading.AHRSYawInCentiDegress,
                                                                       1.0f, 1.0f,
-                                                                      -ConvertDegreesToCentiDegrees(GET_SET[ROLL_BANK_MAX].MaxValue),
-                                                                      ConvertDegreesToCentiDegrees(GET_SET[ROLL_BANK_MAX].MaxValue),
+                                                                      -ConvertDegreesToCentiDegrees(GET_SET[NAV_ROLL_BANK_MAX].MaxValue),
+                                                                      ConvertDegreesToCentiDegrees(GET_SET[NAV_ROLL_BANK_MAX].MaxValue),
                                                                       TECS_PID_USE_TRACKING_ERROR | (TECS_Resources.Heading.Flags.ErrorTrasborded ? TECS_PID_USE_SHRINK_INTEGRATOR : TECS_PID_USE_NONE),
                                                                       DeltaTime);
 

@@ -990,8 +990,9 @@ typedef struct
 
   struct Expo_Struct
   {
-    uint8_t YawPitchRoll = 0;
     uint8_t Throttle = 0;
+    uint8_t Yaw = 0;
+    uint8_t PitchRoll = 0;
   } Expo;
 
   struct Middle_Struct

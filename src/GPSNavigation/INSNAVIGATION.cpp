@@ -74,7 +74,7 @@ static void MultirotorApplyINSPositionHoldPIDControl(float DeltaTime)
         int32_t FinalPositionError = Constrain_32Bits(TargetPositionError - INS.EarthFrame.Velocity[IndexCount], -1000, 1000);
         GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount] = GPSGetProportional(FinalPositionError, &PositionHoldRatePID) + GPSGetIntegral(FinalPositionError, DeltaTime, &PositionHoldRatePIDArray[IndexCount], &PositionHoldRatePID);
         GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount] -= Constrain_16Bits((INS.AccelerationEarthFrame_Filtered[IndexCount] * PositionHoldRatePID.kD), -2000, 2000);
-        GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[GPS_BANK_MAX].MaxValue));
+        GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount] = Constrain_16Bits(GPS_Resources.Navigation.AutoPilot.INS.Angle[IndexCount], -ConvertDegreesToDecidegrees(GET_SET[NAV_GPS_BANK_MAX].MaxValue), ConvertDegreesToDecidegrees(GET_SET[NAV_GPS_BANK_MAX].MaxValue));
         NavigationPIDArray[IndexCount].GPSFilter.IntegralSum = PositionHoldRatePIDArray[IndexCount].GPSFilter.IntegralSum;
     }
 }

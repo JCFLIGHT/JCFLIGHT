@@ -60,13 +60,6 @@ static bool GetFinalAccelerationCalibrationCycle(void)
     return (Calibration.Accelerometer.Time.Difference < (CALIBRATING_ACC_TIME_MS * 0.05f)); //5% DO TEMPO
 }
 
-static bool GetCheckOnlyLevelCalibration(void)
-{
-    return Calibration.Accelerometer.Flags.CalibratedPosition[0] && !Calibration.Accelerometer.Flags.CalibratedPosition[1] &&
-           !Calibration.Accelerometer.Flags.CalibratedPosition[2] && !Calibration.Accelerometer.Flags.CalibratedPosition[3] &&
-           !Calibration.Accelerometer.Flags.CalibratedPosition[4] && !Calibration.Accelerometer.Flags.CalibratedPosition[5];
-}
-
 static bool GetAllOrientationsHaveCalibrationDataCollected(void)
 {
     return Calibration.Accelerometer.Flags.CalibratedPosition[0] && Calibration.Accelerometer.Flags.CalibratedPosition[1] &&
@@ -143,9 +136,9 @@ static void PerformAccelerationCalibration(void)
 
         for (uint8_t AxisIndex = 0; AxisIndex < 6; AxisIndex++)
         {
-            AccSampleToScale[ROLL] = Calibration.Accelerometer.Samples.Window[AxisIndex][ROLL] / Calibration.Accelerometer.Samples.Counter - Calibration.Accelerometer.OffSet[ROLL];
-            AccSampleToScale[PITCH] = Calibration.Accelerometer.Samples.Window[AxisIndex][PITCH] / Calibration.Accelerometer.Samples.Counter - Calibration.Accelerometer.OffSet[PITCH];
-            AccSampleToScale[YAW] = Calibration.Accelerometer.Samples.Window[AxisIndex][YAW] / Calibration.Accelerometer.Samples.Counter - Calibration.Accelerometer.OffSet[YAW];
+            AccSampleToScale[ROLL] = Calibration.Accelerometer.Samples.Window[AxisIndex][ROLL] - Calibration.Accelerometer.OffSet[ROLL];
+            AccSampleToScale[PITCH] = Calibration.Accelerometer.Samples.Window[AxisIndex][PITCH] - Calibration.Accelerometer.OffSet[PITCH];
+            AccSampleToScale[YAW] = Calibration.Accelerometer.Samples.Window[AxisIndex][YAW] - Calibration.Accelerometer.OffSet[YAW];
 
             GaussNewtonPushSampleForScaleCalculation(&Jacobian_Matrices_To_Acc, AxisIndex / 2, AccSampleToScale, IMU.Accelerometer.GravityForce.OneG);
         }
@@ -175,13 +168,7 @@ static void PerformAccelerationCalibration(void)
             }
         }
 
-        Calibration.Accelerometer.Samples.Counter = 0;
         Calibration.Accelerometer.Time.Previous = 0;
-    }
-
-    if (GetCheckOnlyLevelCalibration())
-    {
-        Calibration.Accelerometer.Samples.Counter++;
     }
 }
 

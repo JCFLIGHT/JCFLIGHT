@@ -176,8 +176,7 @@ typedef struct
 
     struct Samples_Struct
     {
-      int16_t Counter = 0;
-      int32_t Window[6][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+      int16_t Window[6][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
     } Samples;
 
     int16_t OffSet[3] = {0, 0, 0};
